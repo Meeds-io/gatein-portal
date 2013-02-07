@@ -222,7 +222,15 @@
         <fileset file="${maven.project.basedir}/src/main/patches/JBPAPP-10497/module-apache-cxf-main.xml" />
       </copy>
 
-      <!-- Move to new location -->
+     <!-- CVE-2012-3546 -->
+     <copy tofile="${jbossas.target.dir}/modules/org/jboss/as/web/main/module.xml" preservelastmodified="true" overwrite="true" filtering="false">
+       <fileset file="${maven.project.basedir}/src/main/patches/CVE-2012-3546/module.xml" />
+     </copy>
+     <copy tofile="${jbossas.target.dir}/modules/org/jboss/as/web/main/jbossweb-7.0.17.Final-redhat-1-JBPAPP6-1709.jar" preservelastmodified="true" overwrite="true" filtering="false">
+       <fileset file="${maven.project.basedir}/src/main/patches/CVE-2012-3546/jbossweb-7.0.17.Final-redhat-1-JBPAPP6-1709.jar" />
+     </copy>
+
+     <!-- Move to new location -->
       <move file="${jbossas.target.dir}" tofile="${jbossas.target.dir}/jboss-jpp-6.0"/>
 
       <!-- Package SSO -->
