@@ -229,7 +229,12 @@
       <unzip src="${org.gatein.sso:sso-packaging:zip}" dest="${jbossas.target.dir}"/>
       <move file="${jbossas.target.dir}/gatein-sso-${org.gatein.sso.version}" tofile="${jbossas.target.dir}/gatein-sso"/>
 
-      <!-- Package management -->
+      <!-- Patch CVE-2012-5784 -->
+      <copy tofile="${jbossas.target.dir}/gatein-sso/josso/gatein-josso-181/modules/org/gatein/sso/main/axis-1.4.jar" preservelastmodified="true" overwrite="true" filtering="false">
+        <fileset file="${maven.project.basedir}/src/main/patches/CVE-2012-5784/axis-1.4-redhat-1.jar" />
+      </copy>
+
+    <!-- Package management -->
       <copy tofile="${jbossas.target.dir}/gatein-management/gatein-management-cli.war">
           <fileset file="${org.gatein.management:gatein-management-cli:war}" />
       </copy>
