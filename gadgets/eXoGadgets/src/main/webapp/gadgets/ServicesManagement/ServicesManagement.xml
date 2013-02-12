@@ -39,6 +39,13 @@
     <Locale lang="en" messages="locale/en_ALL.xml"/>
     <Locale lang="fr" messages="locale/fr_ALL.xml"/>
     <Locale lang="vi" messages="locale/vi_ALL.xml"/>
+    <Locale lang="es" messages="locale/es_ES_ALL.xml"/>
+    <Locale lang="sv" messages="locale/sv_SE_ALL.xml"/>
+    <Locale lang="ja" messages="locale/ja_ALL.xml"/>
+    <Locale lang="ar" messages="locale/ar_ALL.xml"/>
+   <Locale lang="de" messages="locale/de_ALL.xml"/>
+   <Locale lang="pt" messages="locale/pt_BR_ALL.xml"/>
+   <Locale lang="it" messages="locale/it_ALL.xml"/>
     <Require feature="dynamic-height"/>
     <Require feature="minimessage"/>
     <Require feature="views"/>
