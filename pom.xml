@@ -37,10 +37,10 @@
   <name>GateIn - Portal</name>
 
   <properties>
-    <org.exoplatform.kernel.version>2.4.1-GA</org.exoplatform.kernel.version>
-    <org.exoplatform.core.version>2.5.1-CP01</org.exoplatform.core.version>
-    <org.exoplatform.ws.version>2.3.1-GA</org.exoplatform.ws.version>
-    <org.exoplatform.jcr.version>1.15.1-CP01</org.exoplatform.jcr.version>
+    <org.exoplatform.kernel.version>2.4.5-GA</org.exoplatform.kernel.version>
+    <org.exoplatform.core.version>2.5.5-GA</org.exoplatform.core.version>
+    <org.exoplatform.ws.version>2.3.5-GA</org.exoplatform.ws.version>
+    <org.exoplatform.jcr.version>1.15.5-GA</org.exoplatform.jcr.version>
     <org.shindig.version>2.0.2.Final-gatein-4</org.shindig.version>
     <nl.captcha.simplecaptcha.version>1.1.1.Final-gatein-3</nl.captcha.simplecaptcha.version>
     <org.gatein.common.version>2.1.0.Final</org.gatein.common.version>
@@ -84,6 +84,12 @@
     <log4j.debug>false</log4j.debug>
     <log4j.level>info</log4j.level>
 
+    <!-- ***************** -->
+    <!-- Repository Deployment URLs for eXo -->
+    <!-- ***************** -->
+    <jboss.releases.repo.url>http://repository.exoplatform.org/service/local/staging/deploy/maven2/</jboss.releases.repo.url>
+    <jboss.snapshots.repo.url>http://repository.exoplatform.org/content/repositories/exo-private-snapshots/</jboss.snapshots.repo.url>
+
     <!-- ************** -->
     <!-- Build settings -->
     <!-- ************** -->
@@ -95,10 +101,6 @@
     <useReleaseProfile>false</useReleaseProfile>
     <version.release.plugin>2.2.1</version.release.plugin>
     <pushChanges>false</pushChanges>
-
-    <!-- checkstyle -->
-    <version.checkstyle.plugin>2.9.1</version.checkstyle.plugin>
-    <linkXRef>false</linkXRef>
 
     <!-- buildnumber-maven-plugin : needs 1.0 for git -->
     <version.buildnumber.plugin>1.0</version.buildnumber.plugin>
@@ -115,9 +117,9 @@
   </properties>
 
   <scm>
-    <connection>scm:git:git://github.com/gatein/gatein-portal.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/gatein/gatein-portal.git</developerConnection>
-    <url>https://github.com/gatein/gatein-portal</url>
+    <connection>scm:git:git://github.com/exoplatform/gatein-portal.git</connection>
+    <developerConnection>scm:git:git@github.com:exoplatform/gatein-portal.git</developerConnection>
+    <url>https://github.com/exoplatform/gatein-portal</url>
   </scm>
 
   <modules>
@@ -1195,23 +1197,6 @@ memory option properties. This should be removed when we can just set the compil
                 </pluginExecution>
                 <pluginExecution>
                   <pluginExecutionFilter>
-                    <groupId>
-                      org.apache.maven.plugins
-                    </groupId>
-                    <artifactId>
-                      maven-checkstyle-plugin
-                    </artifactId>
-                    <versionRange>[2.5,)</versionRange>
-                    <goals>
-                      <goal>checkstyle</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>xml-maven-plugin</artifactId>
                     <versionRange>[1.0,)</versionRange>
@@ -1274,35 +1259,6 @@ memory option properties. This should be removed when we can just set the compil
           <version>${version.plugin.gwt}</version>
         </plugin>
 
-        <!-- Checkstyle -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>${version.checkstyle.plugin}</version>
-          <configuration>
-            <configLocation>gatein-portal-checkstyle/checkstyle.xml</configLocation>
-            <consoleOutput>true</consoleOutput>
-            <failsOnError>true</failsOnError>
-            <useFile />
-          </configuration>
-          <dependencies>
-            <dependency>
-              <groupId>org.gatein.portal</groupId>
-              <artifactId>gatein-portal-build-config</artifactId>
-              <version>${project.version}</version>
-            </dependency>
-          </dependencies>
-          <executions>
-            <execution>
-              <id>check-style</id>
-              <phase>compile</phase>
-              <goals>
-                <goal>checkstyle</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-
       </plugins>
     </pluginManagement>
 
@@ -1310,10 +1266,6 @@ memory option properties. This should be removed when we can just set the compil
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <version>${version.plugin.clean}</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
