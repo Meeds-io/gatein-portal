@@ -76,6 +76,12 @@
     <log4j.debug>false</log4j.debug>
     <log4j.level>info</log4j.level>
 
+    <!-- ***************** -->
+    <!-- Repository Deployment URLs for eXo -->
+    <!-- ***************** -->
+    <jboss.releases.repo.url>http://repository.exoplatform.org/service/local/staging/deploy/maven2/</jboss.releases.repo.url>
+    <jboss.snapshots.repo.url>http://repository.exoplatform.org/content/repositories/exo-private-snapshots/</jboss.snapshots.repo.url>
+
     <!-- ************** -->
     <!-- Build settings -->
     <!-- ************** -->
