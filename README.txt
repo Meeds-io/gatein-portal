@@ -24,6 +24,7 @@ When the gatein.dev property is set it will build and package one or several ser
 
 The various values for gatein.dev are:
 
+- jbosseap6  : JBoss EAP 6
 - tomcat7    : Tomcat 7
 - jbossas711 : JBoss AS 7.1.1.Final
 - jbossas713 : JBoss AS 7.1.3.Final
@@ -73,6 +74,28 @@ For each server packaging there is a default server version that will be used.
 You can override the name of the directory that contains your server (under $SERVERS_DIR) by using -Dserver.name=$NAME parameter.
 
 There are server specific equivalents that have to be used when packaging several servers in one build run. Those are described later.
+
+
+  Packaging with JBoss EAP 6
+  -----------------------------------
+
+
+Unpack JBoss EAP 6 in $SERVERS_DIR directory so that you get $SERVERS_DIR/jboss-eap-6.0 directory.
+
+Then
+
+mvn install -Dgatein.dev=jbosseap6 -DskipTests -Dserver.name=jboss-eap-6.0 -Dservers.dir=$SERVERS_DIR
+
+For more finegrained control you can specify the directory under $SERVERS_DIR that contains the jboss-as-7.x.x that you wish to use for packaging.
+You do that by using either -Dserver.name=$NAME.
+
+The packaged server is available in packaging/jboss-as7/pkg/target/jboss
+
+To start it, go to jboss directory, and run 'bin/standalone.sh' ('bin\standalone.bat' on Windows).
+
+Access the portal at: http://localhost:8080/portal
+
+For more info about JBoss AS7 support see packaging/jboss-as7/README.txt
 
 
 

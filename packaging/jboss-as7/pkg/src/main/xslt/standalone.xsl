@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-   xmlns:xalan="http://xml.apache.org/xalan" 
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+   xmlns:xalan="http://xml.apache.org/xalan"
    xmlns:j="urn:jboss:domain:1.3"
    version="2.0"
    exclude-result-prefixes="xalan j">
 
    <xsl:param name="config"/>
-   
+
    <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" xalan:indent-amount="4" standalone="no"/>
    <xsl:strip-space elements="*"/>
 
@@ -15,7 +15,7 @@
    <xsl:template name="extensions">
         <extension module="org.gatein"/>
    </xsl:template>
-   
+
    <xsl:template name="system-properties">
       <xsl:if test="$config='default'">
          <system-properties>
@@ -30,15 +30,15 @@
             <property name="gatein.jcr.index.changefilterclass" value="org.exoplatform.services.jcr.impl.core.query.jbosscache.LocalIndexChangesFilter"/>
             <property name="gatein.jcr.storage.enabled" value="false"/>
          </system-properties>
-      </xsl:if>     
-   </xsl:template> 
+      </xsl:if>
+   </xsl:template>
 
    <xsl:template name="loggers">
       <logger category="com.google.javascript.jscomp">
          <level name="WARN"/>
       </logger>
    </xsl:template>
-   
+
    <xsl:template name="datasources">
       <xsl:variable name='connection-url-idm'>
          <xsl:choose>
@@ -52,7 +52,7 @@
             <xsl:otherwise>jdbc:h2:file:${jboss.server.data.dir}/gatein/portal/jdbcjcr_portal;DB_CLOSE_DELAY=-1</xsl:otherwise>
          </xsl:choose>
       </xsl:variable>
-              
+
       <datasource jndi-name="java:/jdbcidm_portal" pool-name="IDMPortalDS" enabled="true" use-java-context="true">
          <connection-url><xsl:value-of select="$connection-url-idm"/></connection-url>
          <driver>h2</driver>
@@ -70,9 +70,9 @@
          </security>
       </datasource>
    </xsl:template>
-   
+
    <xsl:template name="datasources-samples">
-      <xsl:if test="$config='default'">   
+      <xsl:if test="$config='default'">
          <xsl:comment> Uncommented this when deploying gatein-sample-portal </xsl:comment>
          <xsl:comment>
                 <![CDATA[<datasource jndi-name="java:/jdbcidm_sample-portal" pool-name="IDMSamplePortalDS" enabled="true" use-java-context="true">
@@ -95,8 +95,8 @@
                     </security>
                 </datasource>]]>
                 </xsl:comment>
-      </xsl:if> 
-      <xsl:if test="$config='clustering'">   
+      </xsl:if>
+      <xsl:if test="$config='clustering'">
          <xsl:comment> Uncommented this when deploying gatein-sample-portal </xsl:comment>
          <xsl:comment>
                 <![CDATA[<datasource jndi-name="java:/jdbcidm_sample-portal" pool-name="IDMSamplePortalDS" enabled="true" use-java-context="true">
@@ -121,11 +121,11 @@
                 </xsl:comment>
       </xsl:if>
    </xsl:template>
-   
+
    <xsl:template name="deployment-scanner">
       <xsl:attribute name="deployment-timeout">300</xsl:attribute>
    </xsl:template>
-   
+
    <xsl:template name="subsystem">
       <subsystem xmlns="urn:jboss:domain:gatein:1.0">
          <portlet-war-dependencies>
@@ -133,9 +133,11 @@
             <dependency name="org.gatein.pc"/>
             <dependency name="javax.portlet.api"/>
          </portlet-war-dependencies>
-      </subsystem>   
+      </subsystem>
    </xsl:template>
-   
+
+   <xsl:template name="wsdl-host">jbossws.undefined.host</xsl:template>
+
    <xsl:template name="security-domains">
       <security-domain name="gatein-domain" cache-type="default">
          <authentication>
@@ -155,9 +157,9 @@
                <module-option name="realmName" value="gatein-domain"/>
             </login-module>
          </authentication>
-      </security-domain>   
+      </security-domain>
    </xsl:template>
-   
+
    <xsl:template name="security-domains-samples">
       <xsl:comment> Uncommented this when deploying gatein-sample-portal </xsl:comment>
       <xsl:comment>
@@ -176,16 +178,16 @@
                         </login-module>
                     </authentication>
                 </security-domain>]]>
-                </xsl:comment>   
+                </xsl:comment>
    </xsl:template>
-   
+
    <xsl:template name="virtual-server-clustering">
-      <xsl:if test="$config='clustering'">   
+      <xsl:if test="$config='clustering'">
          <sso cache-container="web" cache-name="sso" reauthenticate="false"/>
       </xsl:if>
    </xsl:template>
-   
-   <!-- matching rules -->   
+
+   <!-- matching rules -->
 
    <xsl:template match="node()[name(.)='extensions']">
       <xsl:copy>
@@ -238,10 +240,16 @@
          <xsl:call-template name="virtual-server-clustering"/>
       </xsl:copy>
    </xsl:template>
-   
+
    <xsl:template match="@*|node()">
       <xsl:copy>
          <xsl:apply-templates select="@*|node()" />
+      </xsl:copy>
+   </xsl:template>
+
+   <xsl:template match="node()[name(.)='wsdl-host']">
+      <xsl:copy>
+         <xsl:call-template name="wsdl-host" />
       </xsl:copy>
    </xsl:template>
 
