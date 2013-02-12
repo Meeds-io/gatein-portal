@@ -86,5 +86,20 @@
         <module>extension-ear</module>
       </modules>
     </profile>
+    <profile>
+      <id>pkg-jbosseap6</id>
+      <activation>
+        <property>
+          <name>gatein.dev</name>
+          <value>jbosseap6</value>
+        </property>
+         </activation>
+         <modules>
+            <module>extension-config</module>
+            <module>extension-component</module>
+            <module>extension-war</module>
+            <module>extension-ear</module>
+         </modules>
+      </profile>
   </profiles>
 </project>

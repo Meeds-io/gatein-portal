@@ -107,11 +107,6 @@
 
   <route path="/">
 
-    <!-- The portal redirect handler -->
-    <route-param qname="gtn:handler">
-      <value>siteRedirect</value>
-    </route-param>
-
     <!-- The portal access -->
     <route path="/{gtn:lang}/{gtn:sitename}/{gtn:path}">
       <route-param qname="gtn:sitetype">

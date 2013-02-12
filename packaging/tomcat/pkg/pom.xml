@@ -510,12 +510,6 @@
     </dependency>
     -->
 
-    <!-- Device Detection and Redirection-->
-    <dependency>
-      <groupId>org.gatein.web</groupId>
-      <artifactId>redirect</artifactId>
-    </dependency>
-
     <!-- Provided -->
     <dependency>
       <groupId>javax.inject</groupId>
@@ -871,13 +865,6 @@
       <?rename dashboard.war?>
       <groupId>org.gatein.portal</groupId>
       <artifactId>exo.portal.portlet.dashboard</artifactId>
-      <type>war</type>
-    </dependency>
-
-    <dependency>
-      <?rename redirect-portlet.war?>
-      <groupId>org.gatein.portal.portlet</groupId>
-      <artifactId>redirect</artifactId>
       <type>war</type>
     </dependency>
 
