@@ -145,9 +145,6 @@
     <copy tofile="${jbossas.target.dir}/gatein/gatein.ear/web.war">
       <fileset refid="org.gatein.portal:exo.portal.portlet.web:war"/>
     </copy>
-    <copy tofile="${jbossas.target.dir}/gatein/gatein.ear/redirect-portlet.war">
-      <fileset refid="org.gatein.portal.portlet:redirect:war"/>
-    </copy>
 
 
     <!-- WSRP integration -->
