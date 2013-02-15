@@ -124,5 +124,18 @@
         <module>jboss-as7</module>
       </modules>
     </profile>
+    <profile>
+      <id>pkg-jbosseap6</id>
+      <activation>
+        <property>
+          <name>gatein.dev</name>
+          <value>jbosseap6</value>
+        </property>
+      </activation>
+      <modules>
+        <module>common</module>
+        <module>jboss-as7</module>
+      </modules>
+    </profile>
   </profiles>
 </project>
