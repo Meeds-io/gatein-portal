@@ -42,6 +42,7 @@
     <Locale lang="es-ES" messages="locale/es_ES_ALL.xml"/>
     <Locale lang="sv-SE" messages="locale/sv_SE_ALL.xml"/>
     <Locale lang="ja" messages="locale/ja_ALL.xml"/>
+    <Locale lang="ar" messages="locale/ar_ALL.xml"/>
     <Require feature="dynamic-height"/>
     <Require feature="minimessage"/>
     <Require feature="views"/>
