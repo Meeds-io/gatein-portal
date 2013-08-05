@@ -46,6 +46,10 @@
    <Locale lang="de" messages="locale/de_ALL.xml"/>
    <Locale lang="pt" messages="locale/pt_BR_ALL.xml"/>
    <Locale lang="it" messages="locale/it_ALL.xml"/>
+   <Locale lang="ru" messages="locale/ru_ALL.xml"/>
+    <Locale lang="tr" messages="locale/tr_ALL.xml"/>
+    <Locale lang="zh" messages="locale/zh_CN_ALL.xml"/>
+    <Locale lang="fi" messages="locale/fi_ALL.xml"/>
     <Require feature="dynamic-height"/>
     <Require feature="minimessage"/>
     <Require feature="views"/>
