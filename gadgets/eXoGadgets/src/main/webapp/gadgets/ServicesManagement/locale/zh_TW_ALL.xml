@@ -19,22 +19,20 @@
     02110-1301 USA, or see the FSF site: http://www.fsf.org.
 
 -->
-
-<bundle>
-  <UIGadgetEditMode>
-    <title>가젯 URL 지정</title>
-    <label>
-      <gadgetUrl>Url:</gadgetUrl>
-      <typeSelector>유형:</typeSelector>
-      <gadgetSelector>가젯:</gadgetSelector>
-      <option>
-        <remote>원격 가젯</remote>
-        <local>로컬 가젯</local>
-      </option>
-    </label>
-    <action>
-      <Save>저장</Save>
-    </action>
-  </UIGadgetEditMode>
-</bundle>
-
+<messagebundle>
+  <msg name="title">Services Management</msg>
+  <msg name="services">Services</msg>
+  <msg name="name">Name</msg>
+  <msg name="description">Description</msg>
+  <msg name="noDescription">No description</msg>
+  <msg name="method">Method</msg>
+  <msg name="parameters">Parameters</msg>
+  <msg name="action">動作</msg>
+  <msg name="value">Value</msg>
+  <msg name="services_url">Services URL</msg>
+  <msg name="failManage">Temporary can't manage services from other host until we support OAuth</msg>
+  <msg name="noServices">No service's available or you don't have enough permission</msg>
+  <msg name="noMethod">No method</msg>
+  <msg name="noProperty">No property</msg>
+  <msg name="badURL">Error while retrieving data, please check your URL preference</msg>
+</messagebundle>
