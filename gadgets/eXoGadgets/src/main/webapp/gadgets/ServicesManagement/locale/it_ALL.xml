@@ -22,7 +22,7 @@
 <messagebundle>
   <msg name="title">Gestione Servizi</msg>
   <msg name="services">Servizi</msg>
-  <msg name="name">Name</msg>
+  <msg name="name">nome</msg>
   <msg name="description">Descrizione</msg>
   <msg name="noDescription">Nessuna descrizione</msg>
   <msg name="method">Metodo</msg>
