@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Copyright (C) 2009 eXo Platform SAS.
@@ -18,36 +19,21 @@
     02110-1301 USA, or see the FSF site: http://www.fsf.org.
 
 -->
-
 <messagebundle>
-  <msg name="title">
-    Quản lý dịch vụ
-  </msg>
-  <msg name="services">
-    Dịch vụ
-  </msg>
-  <msg name="name">
-    Tên
-  </msg>
-  <msg name="description">
-    Mô tả
-  </msg>
-  <msg name="method">
-    Phương thức
-  </msg>
-  <msg name="property">
-    Thuộc tính
-  </msg>
-  <msg name="parameters">
-    Tham số
-  </msg>
-  <msg name="action">
-    Thực thi
-  </msg>
-  <msg name="value">
-    Giá trị
-  </msg>
-  <msg name="services_url">
-    Địa chỉ dịch vụ
-  </msg>
+  <msg name="title">Quản lý Dịch vụ</msg>
+  <msg name="services">Dịch vụ</msg>
+  <msg name="name">Tên</msg>
+  <msg name="description">Mô tả</msg>
+  <msg name="noDescription">Không có mô tả</msg>
+  <msg name="method">Phương thức</msg>
+  <msg name="property">Thuộc tính</msg>
+  <msg name="parameters">Tham số</msg>
+  <msg name="action">Thực thi</msg>
+  <msg name="value">Giá trị</msg>
+  <msg name="services_url">Địa chỉ Dịch vụ</msg>
+  <msg name="failManage">Tạm thời không thể quản lý dịch vụ từ một máy chủ khác cho đến khi chúng tôi hỗ trợ OAuth</msg>
+  <msg name="noServices">Không tồn tại dịch vụ hoặc bạn không đủ quyền hạn để truy cập</msg>
+  <msg name="noMethod">Không tồn tại phương thức</msg>
+  <msg name="noProperty">Không có thuộc tính</msg>
+  <msg name="badURL">Lỗi trong quá trình lấy dữ liệu, hãy kiểm tra lại đường dẫn tham chiếu của bạn</msg>
 </messagebundle>
