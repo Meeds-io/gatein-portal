@@ -208,6 +208,20 @@
   </target>
 
   <target name="post-package">
+      <!-- Patch JBAPP-104987 -->
+      <copy tofile="${jbossas.target.dir}/modules/org/jboss/ws/cxf/jbossws-cxf-server/main/jbossws-cxf-server-4.0.6.GA-redhat-2-JBPAPP-10497.jar" preservelastmodified="true" overwrite="true" filtering="false">
+        <fileset file="${maven.project.basedir}/src/main/patches/JBPAPP-10497/jbossws-cxf-server-4.0.6.GA-redhat-2-JBPAPP-10497.jar" />
+      </copy>
+      <copy tofile="${jbossas.target.dir}/modules/org/apache/cxf/impl/main/cxf-rt-frontend-simple-2.4.9-redhat-2-JBPAPP-10497.jar" preservelastmodified="true" overwrite="true" filtering="false">
+        <fileset file="${maven.project.basedir}/src/main/patches/JBPAPP-10497/cxf-rt-frontend-simple-2.4.9-redhat-2-JBPAPP-10497.jar" />
+      </copy>
+      <copy tofile="${jbossas.target.dir}/modules/org/jboss/ws/cxf/jbossws-cxf-server/main/module.xml" preservelastmodified="true" overwrite="true" filtering="false">
+        <fileset file="${maven.project.basedir}/src/main/patches/JBPAPP-10497/module-jbossws-cxf-server.xml" />
+      </copy>
+      <copy tofile="${jbossas.target.dir}/modules/org/apache/cxf/impl/main/module.xml" preservelastmodified="true" overwrite="true" filtering="false">
+        <fileset file="${maven.project.basedir}/src/main/patches/JBPAPP-10497/module-apache-cxf-main.xml" />
+      </copy>
+
       <!-- Move to new location -->
       <move file="${jbossas.target.dir}" tofile="${jbossas.target.dir}/jboss-jpp-6.0"/>
 
