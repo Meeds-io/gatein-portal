@@ -173,11 +173,13 @@
        <!--</dependency>-->
 
       <!-- Sample Skin -->
+      <!--
       <dependency>
          <groupId>org.gatein.portal.examples.skins</groupId>
          <artifactId>gatein-sample-skin</artifactId>
          <type>war</type>
       </dependency>
+      -->
 
       <!-- SSO -->
       <dependency>
@@ -187,7 +189,6 @@
          <type>zip</type>
       </dependency>
 
-    <!-- Sample Skin -->
     <dependency>
          <groupId>org.gatein.management</groupId>
          <artifactId>gatein-management-cli</artifactId>
@@ -196,11 +197,11 @@
     </dependency>
 
       <!-- Site Redirection Portlet -->
-      <!--<dependency>-->
-         <!--<groupId>org.gatein.portal.portlet</groupId>-->
-         <!--<artifactId>redirect</artifactId>-->
-         <!--<type>war</type>-->
-      <!--</dependency>-->
+      <dependency>
+         <groupId>org.gatein.portal.portlet</groupId>
+         <artifactId>redirect</artifactId>
+         <type>war</type>
+      </dependency>
 
     <!-- Site Redirection Admin Portlet -->
     <dependency>
