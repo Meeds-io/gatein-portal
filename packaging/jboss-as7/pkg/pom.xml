@@ -173,18 +173,10 @@
        <!--</dependency>-->
 
       <!-- Sample Skin -->
-      <!--<dependency>-->
-         <!--<groupId>org.gatein.portal.examples.skins</groupId>-->
-         <!--<artifactId>gatein-sample-skin</artifactId>-->
-         <!--<type>war</type>-->
-      <!--</dependency>-->
-
-      <!-- Branding -->
       <dependency>
-         <groupId>org.gatein.portal</groupId>
-         <artifactId>org.gatein.portal.jpp.branding.ear</artifactId>
-         <type>ear</type>
-         <version>${project.version}</version>
+         <groupId>org.gatein.portal.examples.skins</groupId>
+         <artifactId>gatein-sample-skin</artifactId>
+         <type>war</type>
       </dependency>
 
       <!-- SSO -->
@@ -197,10 +189,10 @@
 
     <!-- Sample Skin -->
     <dependency>
-      <groupId>org.gatein.portal.examples.skins</groupId>
-      <artifactId>gatein-sample-skin</artifactId>
+         <groupId>org.gatein.management</groupId>
+         <artifactId>gatein-management-cli</artifactId>
          <version>${org.gatein.mgmt.version}</version>
-      <type>war</type>
+         <type>war</type>
     </dependency>
 
       <!-- Site Redirection Portlet -->

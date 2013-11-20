@@ -206,4 +206,7 @@
     <chmod perm="0755" type="file" dir="${jbossas.target.dir}" includes="**/*.sh"/>
 
   </target>
+
+  <target name="post-package">
+  </target>
 </project>
