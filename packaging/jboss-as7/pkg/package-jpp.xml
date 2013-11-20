@@ -2,8 +2,8 @@
 
 <project name="package" xmlns:mvn="http://maven.apache.org/POM/4.0.0">
 
-   <property name="samples.dir" value="${maven.project.basedir}/src/main/resources/${version.jboss.as}/samples" />
-   <property name="cluster.dir" value="${maven.project.basedir}/src/main/resources/${version.jboss.as}/cluster" />
+   <property name="samples.dir" value="${maven.project.basedir}/src/main/resources/jpp/samples" />
+   <property name="cluster.dir" value="${maven.project.basedir}/src/main/resources/jpp/cluster" />
 
    <target name="prepare" depends="prepare-server-dir,package">
    </target>
@@ -112,13 +112,13 @@
 
    <target name="package-version-checkdir">
       <condition property="pkg.version.hasdir">
-          <available file="${maven.project.basedir}/src/main/resources/${version.jboss.as}/main" type="dir"/>
+          <available file="${maven.project.basedir}/src/main/resources/jpp/main" type="dir"/>
       </condition>
    </target>
 
     <target name="package-version-copy" depends="package-version-checkdir" if="pkg.version.hasdir">
         <copy todir="${jbossas.target.dir}" preservelastmodified="true" overwrite="true">
-            <fileset dir="${maven.project.basedir}/src/main/resources/${version.jboss.as}/main"/>
+            <fileset dir="${maven.project.basedir}/src/main/resources/jpp/main"/>
         </copy>
     </target>
 
@@ -185,7 +185,7 @@
 
       <!-- Copy version specific bin, modules, configuration files -->
       <copy todir="${jbossas.target.dir}" preservelastmodified="true" overwrite="true">
-         <fileset dir="${maven.project.basedir}/src/main/resources/${version.jboss.as}/main" />
+         <fileset dir="${maven.project.basedir}/src/main/resources/jpp/main" />
       </copy>
 
       <!-- Copy modules -->

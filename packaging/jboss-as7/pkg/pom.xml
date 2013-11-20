@@ -24,27 +24,6 @@
   <dependencies>
     <dependency>
       <groupId>org.gatein.portal</groupId>
-      <artifactId>exo.portal.packaging.jboss7</artifactId>
-      <version>3.5.0.Final-prod-3</version>
-   </parent>
-
-   <artifactId>exo.portal.packaging.jboss7.pkg</artifactId>
-   <packaging>pom</packaging>
-
-   <name>GateIn for JBoss AS 7.x.x packaging</name>
-
-   <properties>
-      <jbossas.dist.version>${version.jboss.as}</jbossas.dist.version>
-
-      <!--servers.dir>${project.basedir}/../../servers</servers.dir-->
-      <jbossas.dir>${servers.dir}/${server.name}</jbossas.dir>
-      <gatein.working.dir>${project.build.directory}/jboss</gatein.working.dir>
-      <jbossas.target.dir>${gatein.working.dir}</jbossas.target.dir>
-   </properties>
-
-   <dependencies>
-      <dependency>
-         <groupId>org.gatein.portal</groupId>
       <artifactId>jboss-as7-integration-extension</artifactId>
     </dependency>
     <dependency>
