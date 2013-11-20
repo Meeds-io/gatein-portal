@@ -473,19 +473,23 @@
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
+            <artifactId>maven-assembly-plugin</artifactId>
             <executions>
               <execution>
-                <id>package</id>
+                <id>assemble</id>
                 <phase>package</phase>
                 <goals>
-                  <goal>run</goal>
+                  <goal>single</goal>
                 </goals>
                 <configuration>
-                  <target>
-                    <zip destfile="${project.build.directory}/jboss-jpp-${release.version}.zip" basedir="${jbossas.target.dir}" />
-                    <attachartifact file="${project.build.directory}/jboss-jpp-${release.version}.zip" classifier="bundle" type="zip" />
-                  </target>
+                  <descriptors>
+                    <descriptor>assembly.xml</descriptor>
+                  </descriptors>
+                  <finalName>jboss-jpp-${release.version}</finalName>
+                  <appendAssemblyId>false</appendAssemblyId>
+                  <outputDirectory>target/</outputDirectory>
+                  <workDirectory>target/assembly/work</workDirectory>
+                  <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
               </execution>
             </executions>
