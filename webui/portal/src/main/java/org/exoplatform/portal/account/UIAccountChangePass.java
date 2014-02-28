@@ -42,7 +42,7 @@ import org.exoplatform.webui.event.EventListener;
 import org.exoplatform.webui.form.UIForm;
 import org.exoplatform.webui.form.UIFormStringInput;
 import org.exoplatform.webui.form.validator.MandatoryValidator;
-import org.exoplatform.webui.form.validator.PasswordStringLengthValidator;
+import org.exoplatform.webui.form.validator.PasswordPolicyValidator;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -66,9 +66,9 @@ public class UIAccountChangePass extends UIForm {
         addUIFormInput(new UIFormStringInput("currentpass", "password", null).setType(UIFormStringInput.PASSWORD_TYPE)
                 .addValidator(MandatoryValidator.class));
         addUIFormInput(new UIFormStringInput("newpass", "password", null).setType(UIFormStringInput.PASSWORD_TYPE)
-                .addValidator(PasswordStringLengthValidator.class, 6, 30).addValidator(MandatoryValidator.class));
+                .addValidator(PasswordPolicyValidator.class).addValidator(MandatoryValidator.class));
         addUIFormInput(new UIFormStringInput("confirmnewpass", "password", null).setType(UIFormStringInput.PASSWORD_TYPE)
-                .addValidator(PasswordStringLengthValidator.class, 6, 30).addValidator(MandatoryValidator.class));
+                .addValidator(PasswordPolicyValidator.class).addValidator(MandatoryValidator.class));
         setActions(new String[] {"Save", "Reset", "ResetPass"});
     }
 
