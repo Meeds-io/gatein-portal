@@ -43,16 +43,18 @@
     <Locale lang="sv_SE" messages="locale/sv_SE_ALL.xml"/>
     <Locale lang="ja" messages="locale/ja_ALL.xml"/>
     <Locale lang="ar" messages="locale/ar_ALL.xml"/>
-   <Locale lang="de" messages="locale/de_ALL.xml"/>
-   <Locale lang="pt_BR" messages="locale/pt_BR_ALL.xml"/>
-   <Locale lang="it" messages="locale/it_ALL.xml"/>
-   <Locale lang="ru" messages="locale/ru_ALL.xml"/>
+    <Locale lang="de" messages="locale/de_ALL.xml"/>
+    <Locale lang="pt_BR" messages="locale/pt_BR_ALL.xml"/>
+    <Locale lang="it" messages="locale/it_ALL.xml"/>
+    <Locale lang="ru" messages="locale/ru_ALL.xml"/>
     <Locale lang="tr" messages="locale/tr_ALL.xml"/>
     <Locale lang="zh_CN" messages="locale/zh_CN_ALL.xml"/>
     <Locale lang="fi" messages="locale/fi_ALL.xml"/>
     <Locale lang="lt" messages="locale/lt_ALL.xml"/>
     <Locale lang="no" messages="locale/no_ALL.xml"/>
     <Locale lang="zh_TW" messages="locale/zh_TW_ALL.xml"/>
+    <Locale lang="cs" messages="locale/cs_ALL.xml"/>
+    <Locale lang="uk" messages="locale/uk_ALL.xml"/>
     <Require feature="dynamic-height"/>
     <Require feature="minimessage"/>
     <Require feature="views"/>

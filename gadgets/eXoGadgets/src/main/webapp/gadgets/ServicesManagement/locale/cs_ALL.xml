@@ -20,19 +20,19 @@
 
 -->
 <messagebundle>
-  <msg name="title">Paslaugų valdymas</msg>
-  <msg name="services">Paslaugos</msg>
-  <msg name="name">Pavadinimas</msg>
-  <msg name="description">Aprašymas</msg>
-  <msg name="noDescription">Nėra aprašymo</msg>
-  <msg name="method">Metodas</msg>
-  <msg name="parameters">Parametrai</msg>
-  <msg name="action">Veiksmas</msg>
-  <msg name="value">Reikšmė</msg>
-  <msg name="services_url">Paslaugų URL</msg>
-  <msg name="failManage">Laikinai negalima valdyti paslaugų iš kito kompiuterio kol nebus palaikomas OAuth</msg>
-  <msg name="noServices">Paslauga yra neprieinama arba jūs neturite pakankamai teisių</msg>
-  <msg name="noMethod">Nėra metodo</msg>
-  <msg name="noProperty">Nėra savybės</msg>
-  <msg name="badURL">Įvyko klaida nuskaitant duomenis. Prašome patikrinti savo URL nuostatas</msg>
+  <msg name="title">Správa služeb</msg>
+  <msg name="services">Služby</msg>
+  <msg name="name">Jméno</msg>
+  <msg name="description">Popis</msg>
+  <msg name="noDescription">Žádný popis</msg>
+  <msg name="method">Metoda</msg>
+  <msg name="parameters">Parametry</msg>
+  <msg name="action">Akce</msg>
+  <msg name="value">Hodnota</msg>
+  <msg name="services_url">URL služby</msg>
+  <msg name="failManage">Dočasně nelze spravovat služby od jiných hostitelů, dokud budeme podporovat OAuth</msg>
+  <msg name="noServices">Žádná služba není k dispozici nebo nemáte dostatečná oprávnění</msg>
+  <msg name="noMethod">Žádná metoda</msg>
+  <msg name="noProperty">Žádná vlastnost</msg>
+  <msg name="badURL">Při načítání dat došlo k chybě. Zkontrolujte prosím předvolby URL</msg>
 </messagebundle>
