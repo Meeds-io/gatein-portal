@@ -1360,6 +1360,47 @@ memory option properties. This should be removed when we can just set the compil
 
   <profiles>
     <profile>
+      <id>jboss-release</id>
+      <build>
+        <plugins>
+          <!-- Create a source-release artifact that contains the fully buildable
+               project directory source structure. This is the artifact which is
+               the official subject of any release vote. -->
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>source-release-assembly</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
+                  <descriptorRefs>
+                    <descriptorRef>source-release</descriptorRef>
+                  </descriptorRefs>
+                  <tarLongFileMode>gnu</tarLongFileMode>
+                  <appendAssemblyId>true</appendAssemblyId>
+                </configuration>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.apache.apache.resources</groupId>
+                <artifactId>apache-source-release-assembly-descriptor</artifactId>
+                <version>${version.apache-source-release-assembly-descriptor}</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <!-- Produce project sources package distribution -->
+        <version.apache-source-release-assembly-descriptor>1.0.4</version.apache-source-release-assembly-descriptor>
+      </properties>
+    </profile>
+    <profile>
       <id>mysql5</id>
       <dependencies>
         <dependency>
