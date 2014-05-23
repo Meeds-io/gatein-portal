@@ -1360,7 +1360,7 @@ memory option properties. This should be removed when we can just set the compil
 
   <profiles>
     <profile>
-      <id>jboss-release</id>
+      <id>release</id>
       <build>
         <plugins>
           <!-- Create a source-release artifact that contains the fully buildable
