@@ -26,6 +26,7 @@
   <msg name="description">Descripción</msg>
   <msg name="noDescription">Sin descripción</msg>
   <msg name="method">Método</msg>
+  <msg name="property">Propiedad</msg>
   <msg name="parameters">Parámetros</msg>
   <msg name="action">Acción</msg>
   <msg name="value">Valor</msg>

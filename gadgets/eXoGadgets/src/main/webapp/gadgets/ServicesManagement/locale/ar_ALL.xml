@@ -26,6 +26,7 @@
   <msg name="description">الوصف</msg>
   <msg name="noDescription">لا يوجد وصف</msg>
   <msg name="method">الأسلوب</msg>
+  <msg name="property">خاصيّة</msg>
   <msg name="parameters">المعايير</msg>
   <msg name="action">اجراء</msg>
   <msg name="value">القيمة</msg>

@@ -26,6 +26,7 @@
   <msg name="description">Açıklama</msg>
   <msg name="noDescription">Açıklama Yok</msg>
   <msg name="method">Yöntem</msg>
+  <msg name="property">Özelliği</msg>
   <msg name="parameters">Parametreler</msg>
   <msg name="action">Eylem</msg>
   <msg name="value">Değer</msg>

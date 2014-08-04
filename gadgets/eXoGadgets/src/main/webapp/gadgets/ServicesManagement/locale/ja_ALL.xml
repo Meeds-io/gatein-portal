@@ -26,6 +26,7 @@
   <msg name="description">説明</msg>
   <msg name="noDescription">説明なし</msg>
   <msg name="method">メソッド</msg>
+  <msg name="property">プロパティ</msg>
   <msg name="parameters">パラメータ</msg>
   <msg name="action">アクション</msg>
   <msg name="value">値</msg>
