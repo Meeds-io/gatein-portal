@@ -67,51 +67,7 @@
     <!-- Change this to INFO or WARN to reduce ant build logging -->
     <ant.logging.level>DEBUG</ant.logging.level>
   </properties>
-
-
-  <repositories>
-    <!--<repository>
-       <id>repository.jboss.org</id>
-       <url>http://repository.jboss.org/maven2</url>
-       <releases>
-          <enabled>true</enabled>
-       </releases>
-       <snapshots>
-          <enabled>false</enabled>
-       </snapshots>
-    </repository>
-    <repository>
-       <id>snapshots.jboss.org</id>
-       <url>http://snapshots.jboss.org/maven2</url>
-       <releases>
-          <enabled>false</enabled>
-       </releases>
-       <snapshots>
-          <enabled>true</enabled>
-       </snapshots>
-    </repository>-->
-    <repository>
-      <id>jboss-releases</id>
-      <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>jboss-public</id>
-      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
+  
   <!-- no tests by default -->
   <build>
     <plugins>
@@ -429,6 +385,56 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>project-repositories</id>
+      <activation>
+        <property>
+          <name>!skip-project-repositories</name>
+        </property>
+      </activation>
+      <repositories>
+        <!--<repository>
+           <id>repository.jboss.org</id>
+           <url>http://repository.jboss.org/maven2</url>
+           <releases>
+              <enabled>true</enabled>
+           </releases>
+           <snapshots>
+              <enabled>false</enabled>
+           </snapshots>
+        </repository>
+        <repository>
+           <id>snapshots.jboss.org</id>
+           <url>http://snapshots.jboss.org/maven2</url>
+           <releases>
+              <enabled>false</enabled>
+           </releases>
+           <snapshots>
+              <enabled>true</enabled>
+           </snapshots>
+        </repository>-->
+        <repository>
+          <id>jboss-releases</id>
+          <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>jboss-public</id>
+          <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
     </profile>
   </profiles>
   <dependencies>
