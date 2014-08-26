@@ -37,9 +37,11 @@ import org.exoplatform.web.controller.router.Router;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -55,6 +57,8 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
     protected SkinService skinService;
 
     protected ControllerContext controllerCtx;
+
+    protected List<SkinKey> skinsToDelete = new ArrayList<SkinKey>();
 
     private static ServletContext mockServletContext;
 
@@ -99,6 +103,11 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
 
     protected void tearDown() throws Exception {
         resResolver.reset();
+        for(SkinKey key : skinsToDelete) {
+            skinService.removeSupportedSkin(key.getName());
+            skinService.removeSkin(key);
+        }
+        skinsToDelete.clear();
         skinService.reloadSkins();
     }
 
@@ -283,6 +292,7 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
 
     public void testCustomSkinKey() {
         skinService.addSkin("jcr/foo", "bar", "/path/to/customkey.css", -1, false);
+        skinsToDelete.add(new SkinKey("jcr/foo", "bar"));
         SkinConfig skin = skinService.getSkin("foo", "bar");
         assertNull(skin);
         skin = skinService.getSkin("jcr/foo", "bar");
