@@ -22,4 +22,9 @@
 
 <jboss-web>
   <security-domain>java:/jaas/gatein-domain</security-domain>
+  <session-config>
+   <cookie-config>
+       <path>/</path>
+   </cookie-config>
+  </session-config>
 </jboss-web>

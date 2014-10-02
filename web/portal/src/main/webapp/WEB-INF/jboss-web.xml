@@ -44,4 +44,9 @@
       <param-value>#{gatein.sso.saml.config.file}</param-value>
     </param>
   </valve>
+  <session-config>
+   <cookie-config>
+       <path>/</path>
+   </cookie-config>
+  </session-config>
 </jboss-web>
