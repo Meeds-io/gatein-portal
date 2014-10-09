@@ -164,6 +164,12 @@
 	border: 1px solid #b8babf;
 	font-size: 11px; 
 	width: 165px;
+	 vertical-align: middle;
+}
+
+a.AddNewNodeIcon {
+	display: inline-block;
+    vertical-align: middle;
 }
 
 .UIDashboardSelectContainer .DashboardItemContainer .GadgetItemsContainer {
