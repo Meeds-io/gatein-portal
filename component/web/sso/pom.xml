@@ -22,24 +22,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.gatein.portal</groupId>
-    <artifactId>exo.portal.component</artifactId>
+    <artifactId>exo.portal.component.web</artifactId>
     <version>4.x-upgrade-gatein-3.7.x-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>exo.portal.component.web</artifactId>
+  <artifactId>exo.portal.component.web.sso</artifactId>
   <packaging>pom</packaging>
-  <name>GateIn Portal Component Web</name>
+  <name>GateIn Portal SSO configuration</name>
 
   <modules>
-    <module>controller</module>
-    <module>security</module>
-    <module>server</module>
-    <module>resources</module>
-    <module>api</module>
-    <module>security-jboss</module>
-    <module>oauth-common</module>
-    <module>oauth-web</module>
-    <module>sso</module>
+    <module>sso-integration-configs</module>
+    <module>sso-agent-configs</module>
+    <module>sso-saml</module>
   </modules>
 </project>

@@ -28,22 +28,7 @@
     xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-    <key>org.exoplatform.web.security.sso.SSOHelper</key>
-    <type>org.exoplatform.web.security.sso.SSOHelper</type>
-    <init-params>
-      <value-param>
-        <name>isSSOEnabled</name>
-        <value>${gatein.sso.enabled:false}</value>
-      </value-param>
-      <value-param>
-        <name>skipJSPRedirection</name>
-        <value>${gatein.sso.skip.jsp.redirection}</value>
-      </value-param>
-      <value-param>
-        <name>SSORedirectURLSuffix</name>
-        <value>/sso</value>
-      </value-param>
-    </init-params>
+    <key>org.gatein.sso.integration.SSOFilterIntegrator</key>
+    <type>org.gatein.sso.integration.SSOFilterIntegratorImpl</type>
   </component>
-
 </configuration>

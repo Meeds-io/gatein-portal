@@ -236,9 +236,6 @@
   <listener>
     <listener-class>org.exoplatform.web.security.AuthenticationRegistryListener</listener-class>
   </listener>
-  <listener>
-    <listener-class>org.gatein.sso.saml.plugin.listener.IDPHttpSessionListener</listener-class>
-  </listener>
 
   <!-- ================================================================== -->
   <!--           SERVLET                                                  -->
