@@ -47,6 +47,8 @@ import org.exoplatform.webui.core.lifecycle.Lifecycle;
 import org.exoplatform.webui.core.lifecycle.WebuiBindingContext;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.exception.MessageException;
+
+import org.gatein.pc.api.NoSuchPortletException;
 import org.gatein.pc.api.invocation.RenderInvocation;
 import org.gatein.pc.api.invocation.response.PortletInvocationResponse;
 
@@ -210,6 +212,8 @@ public class UIPortletLifecycle<S, C extends Serializable, I> extends Lifecycle<
                 UIPortalApplication uiApp = Util.getUIPortalApplication();
                 uiApp.refreshCachedUI();
                 markup = Text.create(context.getApplicationResourceBundle().getString("UIPortlet.message.staleData"));
+            } else if (e instanceof NoSuchPortletException) {
+                markup = Text.create(context.getApplicationResourceBundle().getString("UIPortlet.message.unavailable"));
             } else {
                 // Log the error
                 log.error("Portlet render threw an exception", pcException);
