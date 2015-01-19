@@ -23,94 +23,6 @@
                   xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_3 http://www.gatein.org/xml/ns/gatein_resources_1_3"
                   xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_3">
 
-  <portal-skin>
-    <skin-name>Default</skin-name>
-    <css-path>/skin/Stylesheet.css</css-path>
-    <css-priority>0</css-priority>
-  </portal-skin>
-
-  <!-- Simple window style -->
-  <window-style>
-    <style-name>Simple</style-name>
-    <style-theme>
-      <theme-name>SimpleBlue</theme-name>
-    </style-theme>
-    <style-theme>
-      <theme-name>SimpleViolet</theme-name>
-    </style-theme>
-    <style-theme>
-      <theme-name>SimpleOrange</theme-name>
-    </style-theme>
-    <style-theme>
-      <theme-name>SimplePink</theme-name>
-    </style-theme>
-    <style-theme>
-      <theme-name>SimpleGreen</theme-name>
-    </style-theme>
-  </window-style>
-
-  <!-- RoundConer window style -->
-  <window-style>
-    <style-name>RoundConer</style-name>
-    <style-theme>
-      <theme-name>RoundConerBlue</theme-name>
-    </style-theme>
-    <style-theme>
-      <theme-name>RoundConerViolet</theme-name>
-    </style-theme>
-    <style-theme>
-      <theme-name>RoundConerOrange</theme-name>
-    </style-theme>
-    <style-theme>
-      <theme-name>RoundConerPink</theme-name>
-    </style-theme>
-    <style-theme>
-      <theme-name>RoundConerGreen</theme-name>
-    </style-theme>
-  </window-style>
-
-  <!-- Shadow window style -->
-  <window-style>
-    <style-name>Shadow</style-name>
-    <style-theme>
-      <theme-name>ShadowBlue</theme-name>
-    </style-theme>
-    <style-theme>
-      <theme-name>ShadowViolet</theme-name>
-    </style-theme>
-    <style-theme>
-      <theme-name>ShadowOrange</theme-name>
-    </style-theme>
-    <style-theme>
-      <theme-name>ShadowPink</theme-name>
-    </style-theme>
-    <style-theme>
-      <theme-name>ShadowGreen</theme-name>
-    </style-theme>
-  </window-style>
-
-  <!-- MacStyle window style -->
-  <window-style>
-    <style-name>MacStyle</style-name>
-    <style-theme>
-      <theme-name>MacTheme</theme-name>
-    </style-theme>
-    <style-theme>
-      <theme-name>MacGray</theme-name>
-    </style-theme>
-    <style-theme>
-      <theme-name>MacGreenSteel</theme-name>
-    </style-theme>
-  </window-style>
-
-  <!-- VistaStyle window style -->
-  <window-style>
-    <style-name>VistaStyle</style-name>
-    <style-theme>
-      <theme-name>VistaTheme</theme-name>
-    </style-theme>
-  </window-style>
-
   <!-- Bootstrap Javascripts -->
   <scripts>
     <name>bootstrap</name>
@@ -176,6 +88,25 @@
     <supported-locale>fr</supported-locale>
     <supported-locale>ru</supported-locale>
     <supported-locale>vi</supported-locale>
+    <supported-locale>es-ES</supported-locale>
+    <supported-locale>sv-SE</supported-locale>
+    <supported-locale>ja</supported-locale>
+    <supported-locale>ar</supported-locale>
+    <supported-locale>pt-BR</supported-locale>
+    <supported-locale>it</supported-locale>
+    <supported-locale>tr</supported-locale>
+    <supported-locale>zh-CN</supported-locale>
+    <supported-locale>fi</supported-locale>
+    <supported-locale>lt</supported-locale>
+    <supported-locale>no</supported-locale>
+    <supported-locale>zh-TW</supported-locale>
+    <supported-locale>cs</supported-locale>
+    <supported-locale>uk</supported-locale>
+    <supported-locale>fa</supported-locale>
+    <supported-locale>el</supported-locale>
+    <supported-locale>ro</supported-locale>
+    <supported-locale>pl</supported-locale>
+    <supported-locale>ca</supported-locale>
     <script>
       <path>/javascript/eXo/i18n/I18NMessage.js</path>
       <resource-bundle>eXo.portal</resource-bundle>
@@ -268,6 +199,25 @@
     <supported-locale>fr</supported-locale>
     <supported-locale>ru</supported-locale>
     <supported-locale>vi</supported-locale>
+    <supported-locale>es-ES</supported-locale>
+    <supported-locale>sv-SE</supported-locale>
+    <supported-locale>ja</supported-locale>
+    <supported-locale>ar</supported-locale>
+    <supported-locale>pt-BR</supported-locale>
+    <supported-locale>it</supported-locale>
+    <supported-locale>tr</supported-locale>
+    <supported-locale>zh-CN</supported-locale>
+    <supported-locale>fi</supported-locale>
+    <supported-locale>lt</supported-locale>
+    <supported-locale>no</supported-locale>
+    <supported-locale>zh-TW</supported-locale>
+    <supported-locale>cs</supported-locale>
+    <supported-locale>uk</supported-locale>
+    <supported-locale>fa</supported-locale>
+    <supported-locale>el</supported-locale>
+    <supported-locale>ro</supported-locale>
+    <supported-locale>pl</supported-locale>
+    <supported-locale>ca</supported-locale>
     <script>
       <path>/javascript/eXo/gadget/UIGadget.js</path>
       <resource-bundle>eXo.portal</resource-bundle>
@@ -278,6 +228,9 @@
     <depends>
       <module>base</module>
     </depends>
+    <depends>
+      <module>bts_tooltip</module>
+    </depends>    
     <depends>
       <module>jquery</module>
     </depends>
@@ -299,6 +252,9 @@
     <depends>
       <module>I18NMessage</module>
     </depends>
+    <depends>
+      <module>bts_tooltip</module>
+    </depends>
   </module>
 
   <module>
@@ -318,6 +274,9 @@
     </depends>
     <depends>
       <module>portalRequest</module>
+    </depends>
+    <depends>
+      <module>bts_tooltip</module>
     </depends>
   </module>
 
@@ -400,6 +359,149 @@
       <module>jquery</module>
     </depends>
   </module>
+  
+  <module>
+    <name>uiPopupMessages</name>
+    <load-group>webuiGRP</load-group>
+    <script>
+      <path>/javascript/eXo/webui/UIPopupMessages.js</path>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+    <depends>
+      <module>uiPopupWindow</module>
+    </depends>
+    <depends>
+      <module>bts_collapse</module>
+    </depends>
+  </module>
+
+  <!-- Twitter Bootstrap bootstrap-affix plugin -->
+  <module>
+    <name>bts_affix</name>
+    <load-group>bts</load-group>
+    <script>
+      <adapter>
+        (function($) {
+          var _$ = window.jQuery; window.jQuery = $;
+          <include>/javascript/bootstrap/js/bootstrap-affix.js</include>
+          window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
+  <!-- Twitter Bootstrap bootstrap-alert plugin -->
+  <module>
+    <name>bts_alert</name>
+    <load-group>bts</load-group>
+    <script>
+      <adapter>
+        (function($) {
+          var _$ = window.jQuery; window.jQuery = $;
+          <include>/javascript/bootstrap/js/bootstrap-alert.js</include>
+          window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
+  <!-- Twitter Boostrap bootstrap-button plugin -->
+  <module>
+    <name>bts_button</name>
+    <load-group>bts</load-group>
+    <script>
+      <adapter>
+        (function($) {
+          var _$ = window.jQuery; window.jQuery = $;
+          <include>/javascript/bootstrap/js/bootstrap-button.js</include>
+          window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
+  <!-- Twitter Bootstrap bootstrap-carousel plugin -->
+  <module>
+    <name>bts_carousel</name>
+    <load-group>bts</load-group>
+    <script>
+      <adapter>
+        (function($) {
+          var _$ = window.jQuery; window.jQuery = $;
+          <include>/javascript/bootstrap/js/bootstrap-carousel.js</include>
+          window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
+  <!-- Twitter Bootstrap bootstrap-collapse plugin -->
+  <module>
+    <name>bts_collapse</name>
+    <load-group>bts</load-group>
+    <script>
+      <adapter>
+        (function($) {
+          var _$ = window.jQuery; window.jQuery = $;
+          <include>/javascript/bootstrap/js/bootstrap-collapse.js</include>
+          window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
+  <!-- Twitter Bootstrap bootstrap-dropdown plugin -->
+  <module>
+    <name>bts_dropdown</name>
+    <load-group>bts</load-group>
+    <script>
+      <adapter>
+        (function($) {
+          var _$ = window.jQuery; window.jQuery = $;
+          <include>/javascript/bootstrap/js/bootstrap-dropdown.js</include>
+          window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
+  <!-- Twitter Bootstrap bootstrap-modal plugin -->
+  <module>
+    <name>bts_modal</name>
+    <load-group>bts</load-group>
+    <script>
+      <adapter>
+        (function($) {
+          var _$ = window.jQuery; window.jQuery = $;
+          <include>/javascript/bootstrap/js/bootstrap-modal.js</include>
+          window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
 
   <module>
     <name>uiSocialLoginButtons</name>
@@ -413,7 +515,120 @@
   </module>
 
   <!-- WebUI-EXT Javascripts -->
+  <!-- Twitter Bootstrap bootstrap-popover plugin -->
+  <module>
+    <name>bts_popover</name>
+    <load-group>bts</load-group>
+    <script>
+      <adapter>
+        (function($) {
+          var _$ = window.jQuery; window.jQuery = $;
+          <include>/javascript/bootstrap/js/bootstrap-popover.js</include>
+          window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>bts_tooltip</module>
+    </depends>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
 
+  <!-- Twitter Bootstrap bootstrap-scrollspy plugin -->
+  <module>
+    <name>bts_scrollspy</name>
+    <load-group>bts</load-group>
+    <script>
+      <adapter>
+        (function($) {
+          var _$ = window.jQuery; window.jQuery = $;
+          <include>/javascript/bootstrap/js/bootstrap-scrollspy.js</include>
+          window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
+  <!-- Twitter Bootstrap bootstrap-tab plugin -->
+  <module>
+    <name>bts_tab</name>
+    <load-group>bts</load-group>
+    <script>
+      <adapter>
+        (function($) {
+          var _$ = window.jQuery; window.jQuery = $;
+          <include>/javascript/bootstrap/js/bootstrap-tab.js</include>
+          window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
+  <!-- Twitter Bootstrap bootstrap-tooltip plugin -->
+  <module>
+    <name>bts_tooltip</name>
+    <load-group>bts</load-group>
+    <script>
+      <adapter>
+        (function($) {
+          var _$ = window.jQuery; window.jQuery = $;
+          <include>/javascript/bootstrap/js/bootstrap-tooltip.js</include>
+          window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
+  <!--
+  Twitter Bootstrap bootstrap-transition plugin
+  firefox 18 and chrome 23 transitionend event is not dispatched correctly
+  -->
+  <module>
+    <name>bts_transition</name>
+    <script>
+      <adapter>
+        (function($) {
+          var _$ = window.jQuery; window.jQuery = $;
+          <include>/javascript/bootstrap/js/bootstrap-transition.js</include>
+          window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
+  <!-- Twitter Bootstrap bootstrap-typeahead plugin -->
+  <module>
+    <name>bts_typeahead</name>
+    <load-group>bts</load-group>
+    <script>
+      <adapter>
+        (function($) {
+          var _$ = window.jQuery; window.jQuery = $;
+          <include>/javascript/bootstrap/js/bootstrap-typeahead.js</include>
+          window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
+  <!-- WebUI-EXT Javascripts -->  
   <module>
     <name>webui-ext</name>
     <as>webuiExt</as>
@@ -449,6 +664,9 @@
     </depends>
     <depends>
       <module>portalRequest</module>
+    </depends>
+    <depends>
+      <module>bts_tooltip</module>
     </depends>
   </module>
 
@@ -504,6 +722,12 @@
     <depends>
       <module>portalRequest</module>
     </depends>
+    <depends>
+      <module>portalRequest</module>
+    </depends>
+    <depends>
+      <module>bts_tooltip</module>
+    </depends>
   </module>
 
   <module>
@@ -549,6 +773,16 @@
       <module>portalDragDrop</module>
     </depends>
   </module>
+  
+  <scripts>
+    <name>tabbedDashboard</name>
+    <script>
+      <path>/javascript/eXo/webui/UITabbedDashboard.js</path>
+    </script>
+    <depends>
+      <scripts>bootstrap</scripts>
+    </depends>
+  </scripts>
 
   <!-- Container Javascript -->
   <module>

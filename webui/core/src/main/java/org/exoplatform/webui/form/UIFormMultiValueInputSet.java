@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import org.exoplatform.web.application.JavascriptManager;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
@@ -36,11 +37,11 @@ import org.exoplatform.webui.form.validator.Validator;
 
 /**
  * Author : Nhu Dinh Thuan nhudinhthuan@exoplatform.com Sep 14, 2006
- *
+ * <p/>
  * Represents a multi value selector
  */
-@ComponentConfig(events = { @EventConfig(listeners = UIFormMultiValueInputSet.AddActionListener.class, phase = Phase.DECODE),
-        @EventConfig(listeners = UIFormMultiValueInputSet.RemoveActionListener.class, phase = Phase.DECODE) })
+@ComponentConfig(events = {@EventConfig(listeners = UIFormMultiValueInputSet.AddActionListener.class, phase = Phase.DECODE),
+        @EventConfig(listeners = UIFormMultiValueInputSet.RemoveActionListener.class, phase = Phase.DECODE)})
 public class UIFormMultiValueInputSet extends UIFormInputContainer<List> {
     /**
      * A list of validators
@@ -80,7 +81,6 @@ public class UIFormMultiValueInputSet extends UIFormInputContainer<List> {
     }
 
     /**
-     *
      * @param clazz
      */
     public void setType(Class<? extends UIFormInputBase> clazz) {
@@ -183,6 +183,10 @@ public class UIFormMultiValueInputSet extends UIFormInputContainer<List> {
     }
 
     public void processRender(WebuiRequestContext context) throws Exception {
+        JavascriptManager jsMan = context.getJavascriptManager();
+        jsMan.require("SHARED/jquery", "$").require("SHARED/bts_tooltip")
+                .addScripts("$('.multiValueContainer *[rel=\"tooltip\"]').tooltip();");
+
         if (getChildren() == null || getChildren().size() < 1)
             createUIFormInput(0);
 
@@ -195,9 +199,10 @@ public class UIFormMultiValueInputSet extends UIFormInputContainer<List> {
         String addItem = res.getString("UIFormMultiValueInputSet.label.add");
         String removeItem = res.getString("UIFormMultiValueInputSet.label.remove");
 
+        writer.append("<ul class=\"multiValueContainer\">");
         for (int i = 0; i < size; i++) {
             UIFormInputBase uiInput = getChild(i);
-            writer.append("<div class=\"MultiValueContainer\">");
+            writer.append("<li>");
 
             uiInput.setReadOnly(readonly_);
             uiInput.setDisabled(!enable_);
@@ -205,18 +210,19 @@ public class UIFormMultiValueInputSet extends UIFormInputContainer<List> {
             uiInput.processRender(context);
 
             if ((size >= 2) || ((size == 1) && (uiInput.getValue() != null))) {
-                writer.append("<img onclick=\"");
-                writer.append(uiForm.event("Remove", uiInput.getId())).append("\" title=\"" + removeItem + "\" alt=\"\"");
-                writer.append(" class=\"MultiFieldAction Remove16x16Icon\" src=\"/eXoResources/skin/sharedImages/Blank.gif\" />");
+                writer.append("<a class=\"actionIcon\" onclick=\"");
+                writer.append(uiForm.event("Remove", uiInput.getId())).append("\" data-placement=\"bottom\" rel=\"tooltip\" title=\"" + removeItem + "\">");
+                writer.append("<i class=\"uiIconTrash uiIconLightGray\"></i></a>");
             }
             if (i == size - 1) {
 
-                writer.append("<img onclick=\"");
-                writer.append(uiForm.event("Add", getId())).append("\" title=\"" + addItem + "\" alt=\"\"");
-                writer.append(" class=\"MultiFieldAction AddNewNodeIcon\" src=\"/eXoResources/skin/sharedImages/Blank.gif\" />");
+                writer.append("<a class=\"actionIcon\" onclick=\"");
+                writer.append(uiForm.event("Add", getId())).append("\" data-placement=\"bottom\" rel=\"tooltip\" title=\"" + addItem + "\">");
+                writer.append("<i class=\"uiIconPlus uiIconLightGray\"></i></a>");
             }
-            writer.append("</div>");
+            writer.append("</li>");
         }
+        writer.append("</ul>");
     }
 
     public UIFormInputBase createUIFormInput(int idx) throws Exception {

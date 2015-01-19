@@ -531,6 +531,20 @@
 		    height += elemt.offsetHeight;
 		    elemt.style.height = height + "px";
 		  }
+		  
+		  var jDoc = $(document), jElm = $(elemt);
+		  var docH = jDoc.height();
+		  while(jDoc.height() == docH) {
+		  	jElm.height(jElm.height() + 1);		  	
+		  }
+		  height = jElm.height() - 1;
+		  //if the vertical scrollbar appears, it'll reduce the page's width 
+		  //a html item may be pushed to the next line if there is not enoungh space
+		  while (jDoc.height() > docH) {
+			  jElm.height(jElm.height() - 1);
+		  }
+		  //need to wait for sometime until browser hide the scrollbar 
+		  window.setTimeout(function() {jElm.height(height)}, 100);
 		}		
 	};
 	

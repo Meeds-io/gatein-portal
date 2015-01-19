@@ -28,6 +28,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.exoplatform.commons.serialization.api.annotations.Serialized;
+import org.exoplatform.web.application.JavascriptManager;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.core.UIComponent;
 import org.gatein.common.logging.Logger;
@@ -60,10 +61,15 @@ public class UIFormInputWithActions extends UIFormInputSet {
             super.processRender(context);
             return;
         }
+
+        JavascriptManager jsMan = context.getJavascriptManager();
+        jsMan.require("SHARED/jquery", "$").require("SHARED/bts_tooltip")
+              .addScripts("$('." + getId() + " *[rel=\"tooltip\"]').tooltip();");
+
         UIForm uiForm = getAncestorOfType(UIForm.class);
         Writer w = context.getWriter();
         w.write("<div id=\"" + getId() + "\" class=\"UIFormInputSet " + getId() + "\">");
-        w.write("<table class=\"UIFormGrid\" summary=\"" + getId() + "\">");
+        w.write("<div class=\"form-horizontal\">");
         ResourceBundle res = context.getApplicationResourceBundle();
 
         boolean required = false;
@@ -87,11 +93,11 @@ public class UIFormInputWithActions extends UIFormInputSet {
                     label = inputEntry.getId();
                     log.error("\n " + uiForm.getId() + ".label." + inputEntry.getId() + " not found value");
                 }
-                w.write("<tr>");
-                w.write("<td class=\"FieldLabel\" scope=\"row\">");
-                w.write("<label for=\"" + inputEntry.getId() + "\">" + label + "</label>");
-                w.write("</td>");
-                w.write("<td class=\"FieldComponent\">");
+                w.write("<div class=\"control-group\">");
+                w.write("<label class=\"control-label\" for=\"" + inputEntry.getId() + "\">");
+                w.write(label);
+                w.write("</label>");
+                w.write("<div class=\"controls\">");
                 renderUIComponent(inputEntry);
                 List<ActionData> actions = actionField.get(inputEntry.getName());
                 if (actions != null) {
@@ -111,9 +117,10 @@ public class UIFormInputWithActions extends UIFormInputSet {
                         }
 
                         if (action.getActionType() == ActionData.TYPE_ICON) {
-                            w.write("<img title=\"" + actionLabel + "\" onclick=\"" + actionLink + "\" "
-                                    + "src=\"/eXoResources/skin/DefaultSkin/background/Blank.gif\" class=\""
-                                    + action.getCssIconClass() + "\" alt=\"" + actionLabel + "\"/>");
+                          w.write("<a rel=\"tooltip\" class=\"actionIcon\" data-placement=\"bottom\" title=\"" + actionLabel
+                              + "\" href=\"" + actionLink + "\"><i class=\"" + action.getCssIconClass()
+                              + "\"></i></a>");
+
                             if (action.isShowLabel)
                                 w.write(actionLabel);
                         } else if (action.getActionType() == ActionData.TYPE_LINK) {
@@ -124,11 +131,11 @@ public class UIFormInputWithActions extends UIFormInputSet {
                             w.write("<br/>");
                     }
                 }
-                w.write("</td>");
-                w.write("</tr>");
+                w.write("</div>");
+                w.write("</div>");
             }
         }
-        w.write("</table>");
+        w.write("</div>");
         w.write("</div>");
     }
 

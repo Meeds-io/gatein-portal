@@ -26,7 +26,6 @@ import org.exoplatform.webui.event.EventListener;
 
 /**
  * Represents a tabbed pane
- *
  */
 public abstract class UIFormTabPane extends UIForm {
     /**
@@ -69,9 +68,8 @@ public abstract class UIFormTabPane extends UIForm {
 
     public void processDecode(WebuiRequestContext context) throws Exception {
         String renderTab = context.getRequestParameter(RENDER_TAB);
-        if (renderTab != null && this.getChildById(renderTab) != null) {
-            setSelectedTab(renderTab);
-        }
+        if (renderTab != null && this.getChildById(renderTab) != null)
+            selectedTabId = renderTab;
         super.processDecode(context);
     }
 
@@ -102,6 +100,12 @@ public abstract class UIFormTabPane extends UIForm {
             if (renderTab == null)
                 return;
             event.getSource().setSelectedTab(renderTab);
+            WebuiRequestContext parentContext = (WebuiRequestContext) context.getParentAppRequestContext();
+            if (parentContext != null) {
+                parentContext.setResponseComplete(true);
+            } else {
+                context.setResponseComplete(true);
+            }
         }
     }
 

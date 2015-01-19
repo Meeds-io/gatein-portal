@@ -35,11 +35,12 @@ import org.gatein.common.logging.LoggerFactory;
 
 /**
  * Represents a select element
- *
  */
 public class UIFormSelectBoxWithGroups extends UIFormStringInput {
 
-    /** . */
+    /**
+     * .
+     */
     private static final Logger log = LoggerFactory.getLogger(UIFormSelectBoxWithGroups.class);
 
     /**
@@ -107,7 +108,7 @@ public class UIFormSelectBoxWithGroups extends UIFormStringInput {
             }
             return selectedValues.toArray(new String[0]);
         }
-        return new String[] { value_ };
+        return new String[]{value_};
     }
 
     public UIFormSelectBoxWithGroups setSelectedValues(String[] values) {
@@ -243,11 +244,16 @@ public class UIFormSelectBoxWithGroups extends UIFormStringInput {
         UIForm uiForm = getAncestorOfType(UIForm.class);
         String formId = null;
         if (uiForm.getId().equals("UISearchForm"))
-            formId = uiForm.<UIComponent> getParent().getId();
+            formId = uiForm.<UIComponent>getParent().getId();
         else
             formId = uiForm.getId();
 
+        isMultiple_ = isMultiple_ || Boolean.parseBoolean(getHTMLAttribute("multiple"));
+
         Writer w = context.getWriter();
+        if (!isMultiple_) {
+            w.write("<span class=\"uiSelectbox\">");
+        }
         w.write("<select class=\"selectbox\" name=\"");
         w.write(name);
         w.write("\"");
@@ -303,6 +309,9 @@ public class UIFormSelectBoxWithGroups extends UIFormStringInput {
             }
         }
         w.write("</select>\n");
+        if (!isMultiple_) {
+            w.write("</span>\n");
+        }
         if (this.isMandatory())
             w.write(" *");
     }

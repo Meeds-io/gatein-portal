@@ -19,21 +19,20 @@
 
 package org.exoplatform.webui.form;
 
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-
 import org.exoplatform.commons.serialization.api.annotations.Serialized;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.core.model.SelectItemOption;
 
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+
 /**
  * Represents a select element
- *
  */
 @Serialized
 public class UIFormSelectBox extends UIFormStringInput {
@@ -102,7 +101,7 @@ public class UIFormSelectBox extends UIFormStringInput {
             }
             return selectedValues.toArray(new String[0]);
         }
-        return new String[] { value_ };
+        return new String[]{value_};
     }
 
     public UIFormSelectBox setSelectedValues(String[] values) {
@@ -191,11 +190,16 @@ public class UIFormSelectBox extends UIFormStringInput {
         UIForm uiForm = getAncestorOfType(UIForm.class);
         String formId = null;
         if (uiForm.getId().equals("UISearchForm"))
-            formId = uiForm.<UIComponent> getParent().getId();
+            formId = uiForm.<UIComponent>getParent().getId();
         else
             formId = uiForm.getId();
 
+        isMultiple_ = isMultiple_ || Boolean.parseBoolean(getHTMLAttribute("multiple"));
+
         Writer w = context.getWriter();
+        if (!isMultiple_) {
+            w.write("<span class=\"uiSelectbox\">");
+        }
         w.write("<select class=\"selectbox\" name=\"");
         w.write(name);
         w.write("\"");
@@ -241,6 +245,9 @@ public class UIFormSelectBox extends UIFormStringInput {
         }
 
         w.write("</select>\n");
+        if (!isMultiple_) {
+            w.write("</span>\n");
+        }
         if (this.isMandatory())
             w.write(" *");
     }

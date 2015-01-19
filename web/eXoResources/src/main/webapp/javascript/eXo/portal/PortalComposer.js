@@ -17,55 +17,64 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-(function($, portalControl, portalDragDrop) {	
+(function($, portalControl, portalDragDrop) {
 	var portalComposer = {
-	
+
 	  init : function(id, width, height, isEditted, portalMode)
 	  {
 		eXo.portal.portalMode = portalMode;
 		eXo.portal.hasEditted = isEditted;
-			
-	    $("div#" + id).attr("exo:minWidth", width).attr("exo:minHeight", height).find("div.OverflowContainer > span").eq(0).on("click", function()
+    $("div#" + id).attr("exo:minWidth", width).attr("exo:minHeight", height).find(".uiIconArrowRightMini, .uiIconArrowDownMini").on("click", function()
 	    {
 	      portalComposer.toggle($(this));
 	    });
+    	$("div#" + id).find('[rel="tooltip"]').tooltip();
 	  },
-	  
-	  initComposerContent : function(id, selTabId) 
+
+	  initComposerContent : function(id, selTabId)
 	  {
 		  portalComposer.showTab(selTabId);
-		  
-		  var tabs = $("#" + id + " .MiddleTab");
-		  tabs.each(function(index) {
+
+			var tabs = $("#" + id).find(".MiddleTab, .nav-tabs a");
+			tabs.each(function(index) {
 			  $(this).on("click", function() {
-				  portalControl.UIHorizontalTabs.changeTabForUITabPane(this);
-				  var hiddenInput = $(this).children("input");		  
+                  			  var jTab = $(this), hiddenInput;
+                  			  if (jTab.closest(".nav-tabs").length) {
+                  				  jTab.tab('show');
+                  				  hiddenInput = $(this).next("input");
+                  			  } else {
+                  				  hiddenInput = $(this).children("input");
+                  			  }
 				  portalComposer.showTab(hiddenInput.attr("name"));
 				  $.globalEval(hiddenInput.attr("value"));
-				  
-				  if(eXo.portal.portalMode) eXo.portal.portalMode += (index==0 ? -1 : 1)*2;  		  
+
+				  if(eXo.portal.portalMode) eXo.portal.portalMode += (index==0 ? -1 : 1)*2;
 			  });
 		  });
 	  },
-	
+
 	  toggle : function(icon)
 	  {
-	    var compWindow = icon.parent().closest(".UIPortalComposer");
-	    var contWindow = compWindow.children("div.UIWindowContent").eq(0);
+	    var compWindow = icon.closest(".uiPortalComposer");
+	    var contWindow = compWindow.children(".popupContent").eq(0);
 	    if(contWindow.css("display") == "block")
 	    {
-	      contWindow.css("display", "none");
-	      icon.attr("class", "CollapseIcon");
+          contWindow.hide();
+          contWindow.next(".uiAction").hide();
+          compWindow.children("span:first").removeClass('uiIconResize');
+          icon.attr("class", "uiIconArrowRightMini pull-left");
 	    }
 	    else
 	    {
-	      contWindow.css("display", "block");
-	      icon.attr("class", "ExpandIcon");
+          contWindow.show();
+          contWindow.next(".uiAction").show();
+          compWindow.children("span:first").addClass('uiIconResize');
+          icon.attr("class", "uiIconArrowDownMini pull-left");
 	    }
-	
+
 	    ajaxAsyncGetRequest(eXo.env.server.createPortalURL(compWindow.attr("id"), "Toggle", true));
 	  },
-	
+
 	  showTab : function(id)
 	  {
 	    var toolPanel = $("#UIPortalToolPanel");
@@ -77,10 +86,10 @@
 	    else if(id == "UIContainerList")
 	    {
 	      toolPanel.attr("class", "ContainerMode");
-	      $("#UIPageBody .DragControlArea").off("mousedown");
-	    }    
+	      $("#UIPageBody").find(".DragControlArea, .uiIconDragDrop").off("mousedown");
+	    }
 	  },
-	
+
 	  /**
 	   * Invoked when content is modified (comparing to persisted one)
 	   *
@@ -92,13 +101,13 @@
 	    if(!eXo.portal.hasEditted)
 	    {
 	      eXo.portal.hasEditted = true;
-	      var compWindow = $("#UIWorkingWorkspace").find("div.UIPortalComposer").eq(0);
-	      compWindow.find("a.SaveButton").attr("class", "EdittedSaveButton");
-	
+	      var compWindow = $("#UIWorkingWorkspace").find(".uiPortalComposer").eq(0);
+	      compWindow.find(".uiIconSave.uiIconLightGray").removeClass("uiIconLightGray").addClass("uiIconDarkGray");
+
 	      ajaxAsyncGetRequest(eXo.env.server.createPortalURL(compWindow.attr("id"), "ChangeEdittedState", true));
 	    }
 	  }
 	};
-	
+
 	return portalComposer;
 })($, portalControl, portalDragDrop);

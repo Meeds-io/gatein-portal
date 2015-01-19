@@ -46,17 +46,17 @@ public class UITree extends UIComponent {
     /**
      * The css class name to show the expand icon
      */
-    private String expandIcon = "ExpandIcon";
+    private String expandIcon = "expandIcon";
 
     /**
      * The css class name to show the collapse icon
      */
-    private String colapseIcon = "CollapseIcon";
+    private String colapseIcon = "collapseIcon";
 
     /**
      * The css class name to show the null icon (item has no child)
      */
-    private String nullItemIcon = "NullItemIcon";
+    private String nullItemIcon = "uiIconEmpty";
 
     /**
      * The css class name to show the selected icon
@@ -252,14 +252,14 @@ public class UITree extends UIComponent {
     }
 
     public String renderNode(Object obj) throws Exception {
-        String nodeIcon = expandIcon;
+        String nodeIcon =colapseIcon;
         String iconGroup = icon;
 
         String note = "";
         if (isSelected(obj)) {
-            nodeIcon = colapseIcon;
+            nodeIcon = expandIcon;
             iconGroup = selectedIcon;
-            note = " NodeSelected";
+            note = " nodeSelected";
         }
 
         if (getBeanChildCountField() != null) {
@@ -267,6 +267,13 @@ public class UITree extends UIComponent {
             if (childCount != null && childCount.getClass().isAssignableFrom(Integer.class) && (Integer) childCount == 0) {
                 nodeIcon = nullItemIcon;
             }
+        }
+
+        //hard code this one because we can't change code on exoadmin webapp
+        if ("DefaultPageIcon".equals(iconGroup)) {
+            iconGroup = "uiIconFileMini uiIconLightGray";
+        } else if ("GroupAdminIcon".equals(iconGroup) || "PortalIcon".equals(iconGroup)) {
+            iconGroup = "uiIconGroup uiIconLightGray";
         }
 
         if (beanIconField_ != null && beanIconField_.length() > 0) {
@@ -286,24 +293,19 @@ public class UITree extends UIComponent {
         if (escapeHTML_) {
             fieldValue = fieldValue != null ? HTMLEntityEncoder.getInstance().encode(fieldValue) : fieldValue;
         }
-
+        CharSequence rightClick = "";
+        if (uiPopupMenu_ != null) {
+            rightClick = uiPopupMenu_.getJSOnclickShowPopup(objId, null);
+        }
         if (nodeIcon.equals(expandIcon)) {
-            builder.append(" <div class=\"").append(nodeIcon).append("\" onclick=\"").append(actionLink).append("\">");
-        } else if (nodeIcon.equals(colapseIcon)) {
-            builder.append(" <div class=\"").append(nodeIcon).append("\">");
-        } else {// Null item
-            builder.append(" <div class=\"").append(nodeIcon).append("\" onclick=\"").append(actionLink).append("\">");
-        }
-        if (uiPopupMenu_ == null) {
-            builder.append(" <a href=\"javascript:void(0);\" class=\"NodeIcon ").append(iconGroup).append(note).append("\"")
-                    .append(" title=\"").append(fieldValue).append("\"").append(">")
-                    .append(fieldValue).append("</a>");
+            builder.append(" <a href=\"javascript:void(0);\" class=\"uiIconNode ").append(nodeIcon).append(note).append("\" ").append(rightClick)
+            .append(" title=\"").append(getFieldValue(obj, beanLabelField_)).append("\"").append(">");
         } else {
-            builder.append("<a href=\"javascript:void(0);\" class=\"NodeIcon ").append(iconGroup).append(note).append("\" ")
-                    .append(uiPopupMenu_.getJSOnclickShowPopup(objId, null)).append(" title=\"")
-                    .append(fieldValue).append("\"").append(">").append(fieldValue).append("</a>");
+            builder.append(" <a href=\"javascript:void(0);\" class=\"uiIconNode ").append(nodeIcon).append(note).append("\" ").append(rightClick)
+            .append(" title=\"").append(getFieldValue(obj, beanLabelField_)).append("\" onclick=\"").append(actionLink).append("\">");
         }
-        builder.append(" </div>");
+        builder.append("<i class=\"" + iconGroup + "\"></i>").append(fieldValue);
+        builder.append(" </a>");
         return builder.toString();
     }
 

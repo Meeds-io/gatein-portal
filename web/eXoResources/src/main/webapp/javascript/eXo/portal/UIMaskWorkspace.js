@@ -22,60 +22,62 @@
  */
 
 (function(base, uiMaskLayer, $) {
-	
-	eXo.portal.UIMaskWorkspace = {
-	
-	  show : function(maskId, width, height) {
-	    this.maskWorkpace = document.getElementById(maskId);
-	    if (this.maskWorkpace) {
-	      if (width > -1) {
-	        this.maskWorkpace.style.width = width + "px";
-	      }
-	
-	      if (eXo.portal.UIMaskWorkspace.maskLayer == null) {
-	        var maskLayer = uiMaskLayer.createMask("UIPortalApplication",
-	            this.maskWorkpace, 30);
-	        eXo.portal.UIMaskWorkspace.maskLayer = maskLayer;
-	      }
-	      this.maskWorkpace.style.margin = "auto";
-	      this.maskWorkpace.style.display = "block";
-          $("#UIWorkingWorkspace").addClass("background");
-	
-	      var browser = base.Browser; 
-	      browser.addOnResizeCallback('mid_maskWorkspace',
-	          eXo.portal.UIMaskWorkspace.resetPositionEvt);
-	      browser.addOnScrollCallback("setPosition_maskWorkspace", eXo.portal.UIMaskWorkspace.resetPositionEvt);
-	    }
-	  },
-	
-	  hide : function(maskId) {
-	    this.maskWorkpace = document.getElementById(maskId);
-	    if (eXo.portal.UIMaskWorkspace.maskLayer == undefined || !this.maskWorkpace) {
-	      return;
-	    }
-	    uiMaskLayer.removeMask(eXo.portal.UIMaskWorkspace.maskLayer);
-	    eXo.portal.UIMaskWorkspace.maskLayer = null;
-	    this.maskWorkpace.style.display = "none";
-        $("#UIWorkingWorkspace").removeClass("background");
-	  },
-	
-	  /**
-	   * Resets the position of the mask calls eXo.core.uiMaskLayer.setPosition to
-	   * perform this operation
-	   */
-	  resetPositionEvt : function() {
-	    var maskWorkpace = eXo.portal.UIMaskWorkspace.maskWorkpace;
-	    if (maskWorkpace && (maskWorkpace.style.display == "block")) {
-	      try {
-	        uiMaskLayer.blockContainer = document
-	            .getElementById("UIPortalApplication");
-	        uiMaskLayer.object = maskWorkpace;
-	        uiMaskLayer.scrollCallback();
-	      } catch (e) {
-	      }
-	    }
-	  }
-	};
-	
-	return eXo.portal.UIMaskWorkspace;
+
+  eXo.portal.UIMaskWorkspace = {
+
+    show : function(maskId, width, height) {
+      this.maskWorkpace = document.getElementById(maskId);
+      if (this.maskWorkpace) {
+        if (width > -1) {
+          this.maskWorkpace.style.width = width + "px";
+        }
+
+        if (eXo.portal.UIMaskWorkspace.maskLayer == null) {
+          var maskLayer = uiMaskLayer.createMask("UIPortalApplication",
+              this.maskWorkpace, 30);
+          eXo.portal.UIMaskWorkspace.maskLayer = maskLayer;
+        }
+        this.maskWorkpace.style.margin = "auto";
+        this.maskWorkpace.style.display = "block";
+        $("#UIWorkingWorkspace").addClass("background");
+
+        var browser = base.Browser;
+        browser.addOnResizeCallback('mid_maskWorkspace',
+            eXo.portal.UIMaskWorkspace.resetPositionEvt);
+        browser.addOnScrollCallback("setPosition_maskWorkspace",
+            eXo.portal.UIMaskWorkspace.resetPositionEvt);
+      }
+    },
+
+    hide : function(maskId) {
+      this.maskWorkpace = document.getElementById(maskId);
+      if (eXo.portal.UIMaskWorkspace.maskLayer == undefined
+          || !this.maskWorkpace) {
+        return;
+      }
+      uiMaskLayer.removeMask(eXo.portal.UIMaskWorkspace.maskLayer);
+      eXo.portal.UIMaskWorkspace.maskLayer = null;
+      this.maskWorkpace.style.display = "none";
+      $("#UIWorkingWorkspace").removeClass("background");
+    },
+
+    /**
+     * Resets the position of the mask calls eXo.core.uiMaskLayer.setPosition to
+     * perform this operation
+     */
+    resetPositionEvt : function() {
+      var maskWorkpace = eXo.portal.UIMaskWorkspace.maskWorkpace;
+      if (maskWorkpace && (maskWorkpace.style.display == "block")) {
+        try {
+          uiMaskLayer.blockContainer = document
+              .getElementById("UIPortalApplication");
+          uiMaskLayer.object = maskWorkpace;
+          uiMaskLayer.scrollCallback();
+        } catch (e) {
+        }
+      }
+    }
+  };
+
+  return eXo.portal.UIMaskWorkspace;
 })(base, uiMaskLayer, $);

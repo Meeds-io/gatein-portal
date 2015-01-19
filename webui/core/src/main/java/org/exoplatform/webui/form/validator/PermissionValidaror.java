@@ -20,14 +20,14 @@
 package org.exoplatform.webui.form.validator;
 
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.exception.MessageException;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
 
 /**
  * Created by The eXo Platform SARL Author : Nhu Dinh Thuan nhudinhthuan@exoplatform.com Apr 12, 2007
@@ -36,8 +36,8 @@ import org.gatein.common.logging.LoggerFactory;
  */
 public class PermissionValidaror {
 
-    private final Logger log = LoggerFactory.getLogger(PermissionValidaror.class);
-
+    private static Log log = ExoLogger.getLogger(PermissionValidaror.class);
+    
     public void validate(UIComponent uicomponent, String permission) throws Exception {
         OrganizationService service = (OrganizationService) ExoContainerContext.getCurrentContainer()
                 .getComponentInstanceOfType(OrganizationService.class);
