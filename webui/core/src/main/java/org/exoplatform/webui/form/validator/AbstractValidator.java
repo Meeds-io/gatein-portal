@@ -42,6 +42,9 @@ public abstract class AbstractValidator implements Validator, Serializable {
         String label = uiInput.getName();
         if (uiForm != null) {
             label = uiForm.getLabel(label);
+            if (label.equals(uiInput.getName()) && uiInput.getLabel() != null) {
+                label = uiForm.getLabel(uiInput.getLabel());
+            }
         }
 
         label = label.trim();
