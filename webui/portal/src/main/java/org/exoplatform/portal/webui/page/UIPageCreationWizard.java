@@ -163,9 +163,23 @@ public class UIPageCreationWizard extends UIPageWizard {
         UIWizardPageSetInfo uiPageSetInfo = getChild(UIWizardPageSetInfo.class);
         String pageName = uiPageSetInfo.getUIStringInput(UIWizardPageSetInfo.PAGE_NAME).getValue();
         UserNode selectedPageNode = uiPageSetInfo.getSelectedPageNode();
-        if (selectedPageNode.getChild(pageName) != null) {
+
+        PortalRequestContext prc = Util.getPortalRequestContext();
+        UserPortal userPortal = prc.getUserPortalConfig().getUserPortal();
+
+        String selectedPageNodeURI = selectedPageNode.getURI();
+        final String newPageURI;
+        if(selectedPageNodeURI.isEmpty()) {
+            newPageURI = pageName;
+        } else {
+            newPageURI = selectedPageNodeURI + "/" + pageName;
+        }
+
+        UserNode existingNode = userPortal.resolvePath(selectedPageNode.getNavigation(), null, newPageURI);
+        if(existingNode != null && existingNode.getURI().equals(newPageURI)) {
             return true;
         }
+
         return false;
     }
 
