@@ -6,17 +6,23 @@
 	 * Aug 11, 2006
 	 * version: $Id$
 	 */
-
+%>
+<%
 	boolean showCloseButton =	uicomponent.isShowCloseButton();
 	String popupId = uicomponent.getId();
-	String rsId = org.exoplatform.webui.application.WebuiRequestContext.stripUUIDSuffix(popupId);
+	String rsId = popupId;
+	if(popupId.indexOf('-')>0){
+		rsId = popupId.substring(0,popupId.lastIndexOf('-'));
+	} 	
 
-	String title = "";
+	String title = rsId;
 	def component = uicomponent.getUIComponent();
-	if (component != null) title = _ctx.appRes(rsId + ".title." + component.getId());
+	if (component != null) {
+		title = _ctx.appRes(rsId + ".title."+ org.exoplatform.webui.application.WebuiRequestContext.stripUUIDSuffix(component.getId()));
+	}
 	
-	int width = uicomponent.getWindowWidth();
-	int height = uicomponent.getWindowHeight() - 40;
+	def width = uicomponent.getWindowWidth();
+	def height = uicomponent.getWindowHeight() - 40;
 	def String widthStyle = "";
 	def String heightStyle = "";
 	if(width > 0) widthStyle = "width:" + width + "px;";
@@ -36,7 +42,7 @@
 		<%if (showCloseButton) {%>
 			<a class="uiIconClose pull-right" title="<%=_ctx.appRes("UIPopupWindow.Close")%>" onclick="<%=uicomponent.event(uicomponent.getCloseEvent())%>"></a>
 		<% } %>
-		<span class="PopupTitle popupTitle"><%=title%></span>
+		<span class="PopupTitle popupTitle"><%=_ctx.appRes(rsId + ".title."+ title)%></span>
 	</div>
 	<div class="PopupContent popupContent"><% uicomponent.renderChildren(); %></div>
 	

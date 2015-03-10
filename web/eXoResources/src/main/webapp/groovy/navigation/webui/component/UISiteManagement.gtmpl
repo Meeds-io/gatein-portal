@@ -17,13 +17,27 @@
   String editNavigationLabel = _ctx.appRes("UISiteManagement.label.editNav");
   String editPortalPropLabel = _ctx.appRes("UISiteManagement.label.editPortalProp");
   String deletePortalLabel = _ctx.appRes("UISiteManagement.label.deletePortal");
+  String noSitesLabel = _ctx.appRes("UISiteManagement.label.noSitesAvailable");
   String manageSitesTitle = _ctx.appRes("UISiteManagement.title");
 %>
 <div class="uiManagementSite">
 	<div class="uiBox">
 		<h5 class="title">$manageSitesTitle</h5>
 		<div class=" uiContentBox" id="<%=uicomponent.getId();%>">
-		 <table class="managementBlock" >
+		<%
+            if (uicomponent.getPortalConfigs() == null || uicomponent.getPortalConfigs().size() == 0)
+            { %>
+                <div class="nothingEditable center">$noSitesLabel</div>  
+      <%    } else {           
+      %>
+		 <table class="managementBlock" summary="Sites edit">
+		   		<tr style="display: none;">
+                 <th scope="col">Site</th>
+                 <th scope="col">Layout</th>
+                 <th scope="col">Navigation</th>
+                 <th scope="col">Properties</th>
+                 <th scope="col">Delete</th>                      
+               </tr>
 			
 			  <%
 					for (portalConfig in uicomponent.getPortalConfigs())  {           
@@ -54,7 +68,7 @@
 											<i class="uiIconNavigation uiIconLightGray"></i>$editNavigationLabel</a>
 								 </td>
 								  <td width="180">
-										<a href="javascript:void(0);" onclick="ajaxGet(eXo.env.server.createPortalURL('UIPortal', 'EditPortalProperties', true, [{name:'portalName',value:'<%=portalConfig.getName()%>'}]))" class="actionIcon">
+										<a href="javascript:void(0);" onclick="javascript:ajaxGet(eXo.env.server.createPortalURL('UIPortal', 'EditPortalProperties', true, [{name:'portalName',value:'<%=portalConfig.getName()%>'}]))" class="actionIcon">
 											<i class="uiIconEditPortalConfig uiIconLightGray"></i>$editPortalPropLabel</a>
 								 </td>  
 								<td width="80">	
@@ -68,10 +82,11 @@
 							  </tr>
 						   
 				<%          
-				  }
+				  }            
 				%> 
 				  </table>   
 			<%
+           }
 				if(uicomponent.getPortalConfigs() != null && uicomponent.getPortalConfigs().size() > 0){
 			%>
 			<div class="uiAction uiActionBorder"> 

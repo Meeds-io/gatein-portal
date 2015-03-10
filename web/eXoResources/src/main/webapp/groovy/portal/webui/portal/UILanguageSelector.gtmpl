@@ -51,7 +51,7 @@
                 %>
                   <tr class="$itemSelected">
                     <td><div class="uiIconTick uiIconBlue"><span></span></div></td>
-                    <td><a class="nodeLabel"><%=opt.getLabel()%></a></td>
+                    <td><a href="javascript:;" class="nodeLabel" tabindex="1"><%=opt.getLabel()%></a></td>
                     <td class="percentLabel"><%=opt.getDescription()%></td>
                   </tr>
                 <%}%> 
@@ -69,7 +69,7 @@
       %>
    	</div>
    	<div class="uiAction uiActionBorder"> 
-      <a href="<%=uicomponent.url("Save");%>" class="btn"><%=_ctx.appRes("UIChangeLanguage.action.save");%></a>
-      <a href="javascript:void(0);" onclick="<%=uicomponent.event("Close");%>" class="btn"><%=_ctx.appRes("UIChangeLanguage.action.close");%></a>
+      <a href="<%=uicomponent.url("Save");%>" class="btn" tabindex="1"><%=_ctx.appRes("UIChangeLanguage.action.save");%></a>
+      <a href="javascript:void(0);" onclick="<%=uicomponent.event("Close");%>" class="btn" tabindex="1"><%=_ctx.appRes("UIChangeLanguage.action.close");%></a>
     </div>    
 </div>

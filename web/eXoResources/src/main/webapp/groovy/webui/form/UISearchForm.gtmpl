@@ -13,7 +13,7 @@
 	<div class="uiSearchFor  form-search">
 		<%uiform.begin()%>
 		  <div class="quickSet ">
-			<span class="searchTitle"><%=_ctx.appRes("UISearch.label.Search")%>:</span >
+			<span class="searchTitle"><label for="searchTerm,searchOption"><%=_ctx.appRes("UISearch.label.Search")%>:</label></span >
 			<% 
 				QuickSearchInputSet = uiform.getQuickSearchInputSet();
 				for(field in QuickSearchInputSet.getChildren()) {

@@ -43,7 +43,7 @@
 										if(children.get(i).isRendered()) {								 
 								%>
 											<div class="control-group">
-												<label class="control-label"><%=uicomponent.getLabel(children.get(i).getName())+": " %></label>
+												<label class="control-label" for="<%=children.get(i).getName()%>"><%=uicomponent.getLabel(children.get(i).getName())+": " %></label>
 												<div class="controls"> <% uiform.renderField(children.get(i)) %></div>
 											</div>
 								<%

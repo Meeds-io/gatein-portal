@@ -3,9 +3,8 @@
 	<div class="uiBox">
 		<%/*WizardStepTitle*/%>	
 
-		<h5 class="wizardStepTitleBar title">
-			
-			<i class="uiIconAddPage uiIconLightGray"></i>
+		<h5 class="wizardStepTitleBar title">			
+			<i class="uiIconAddPage uiIconLightGray"><span class="skipHidden">New Page Wizard Icon</span></i>			
 			<span class="wizardTitle">
 				<%=_ctx.appRes(uicomponent.getId() + ".label.pageCreateWizard")%>:
 			</span>

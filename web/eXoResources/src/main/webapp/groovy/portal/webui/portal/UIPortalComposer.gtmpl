@@ -2,7 +2,10 @@
 	String popupId = uicomponent.getId(); 
 	def rcontext = _ctx.getRequestContext(); 
 	
-	boolean isEditted = uicomponent.isEditted; 
+	boolean isEditted = uicomponent.isEditted;
+	String titleKey = rcontext.getUIApplication().getEditLevel() == org.exoplatform.portal.webui.workspace.UIPortalApplication.EditLevel.EDIT_PAGE ?
+			"UIPageEditor.title.UIPageEditor" :
+			popupId + ".title."+ popupId;
 	def portalMode = uicomponent.getPortalMode();
 	rcontext.getJavascriptManager()
 	 .require("SHARED/uiPopupWindow", "uiPopupWindow").addScripts("uiPopupWindow.show('$popupId', null, null, 390);")
@@ -11,17 +14,17 @@
 %>
 <div class="UIPopupWindow uiPopup UIDragObject uiPortalComposer" id="$uicomponent.id" style="width: 330px; display: block;">
 	<div class="popupHeader clearfix">
-		<i class="<%=uicomponent.isCollapsed ? "uiIconArrowRightMini" : "uiIconArrowDownMini"%> uiIconLightGray pull-left"></i>
+		<i class="<%=uicomponent.isCollapsed ? "uiIconArrowRightMini" : "uiIconArrowDownMini"%> pull-left"></i>
 			<% if(uicomponent.isShowControl) { %>
 			<a class="uiIconClose pull-right" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("word.abort")%>" href="javascript:void(0);" onclick="<%=uicomponent.event("CloseComposer")%>"></a>
 				<% if (uicomponent.isUsedInWizard()) { %>
-					<a class="<%= isEditted ? "uiIconSave uiIconDarkGray" : "uiIconSave uiIconLightGray" %> pull-right" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("word.finish")%>" href="<%=uicomponent.url("Finish")%>"></a>
+					<a class="<%= isEditted ? "uiIconSave uiIconDarkGray" : "uiIconSave uiIconLightGray" %> pull-right" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("word.finish")%>" href="javascript:void(0);" onclick="<%=uicomponent.url("Finish")%>"></a>
 					<a class="uiIconBack uiIconLightGray pull-right" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("word.back")%>" href="javascript:void(0);" onclick="<%=uicomponent.event("Back")%>"></a>
 				<% } else {%>
 					<a class="<%= isEditted ? "uiIconSave uiIconDarkGray" : "uiIconSave uiIconLightGray" %> pull-right" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("word.finish")%>" href="javascript:void(0);" onclick="<%=uicomponent.event("Finish")%>"></a>
 			<%	 }
 				 } %>
-		<span class="PopupTitle popupTitle"><%=_ctx.appRes(popupId + ".title."+ popupId)%></span>
+		<span class="PopupTitle popupTitle"><%=_ctx.appRes(titleKey)%></span>
 	</div>
 	
 	<div class="popupContent" style="display: <%=uicomponent.isCollapsed ? "none": "block"%>" >

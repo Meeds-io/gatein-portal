@@ -4,6 +4,7 @@
   import org.exoplatform.webui.form.UIForm;
   import java.text.DateFormat;
   import java.text.SimpleDateFormat;
+  import org.exoplatform.commons.utils.HTMLEntityEncoder;
 
   String[] beanFields =  uicomponent.getBeanFields() ;  
   String[] beanActions =  uicomponent.getBeanActions() ;  
@@ -15,23 +16,23 @@
   DateFormat dateFormat = null;
 %>
 <div id="$uicomponent.id">
-    <table class="uiGrid table table-hover table-striped" cellspacing="0">
+    <table class="uiGrid table table-hover table-striped" cellspacing="0" summary="Page list">
         <thead>
             <tr>
                 <%if(name != null) {%>
                     <%for(field in beanFields) { %>
-                            <th><%=_ctx.appRes(name+".header."+field)%></th>
+                            <th id="<%=field%>" scope="col"><%=_ctx.appRes(name+".header."+field)%></th>
                     <%}%>
                     <%if(beanActions != null) { %>
-                            <th><%=_ctx.appRes(name+".header.action")%></th>
+                            <th id="actions" scope="col"><%=_ctx.appRes(name+".header.action")%></th>
                     <%}%>
                 <%}%>
                 <%if(name == null) {%>
                     <%for(field in beanFields) { %>
-                            <th><%=_ctx.appRes(uiParent.getName()+".header."+field)%></th>
+                            <th id="<%=field%>" scope="col"><%=_ctx.appRes(uiParent.getName()+".header."+field)%></th>
                     <%}%>
                     <%if(beanActions != null && beanActions.length > 0) { %>
-                            <th class="center"><%=_ctx.appRes(uiParent.getName()+".header.action")%></th>
+                            <th class="center" id="actions" scope="col"><%=_ctx.appRes(uiParent.getName()+".header.action")%></th>
                     <%}%>
                 <%}%>
             </tr>
@@ -53,16 +54,19 @@
 		              cssClass = "dateTime" ;
 		              fieldValue = dateFormat.format(fieldValue);
 		            } 
-		            else cssClass = "text" ;
+		            else {
+		                cssClass = "text" ;
+		                fieldValue = HTMLEntityEncoder.getInstance().encode(fieldValue.toString());
+		            }
 		          } else {
 		            fieldValue = "";
 		          }
 		          String value = fieldValue.toString();
-		          println "<td><span class=\""+cssClass+"\" title='$fieldValue'>"+fieldValue+"</span></td>";
+		          println "<td headers=\"$field\"><span class=\""+cssClass+"\" title='$fieldValue'>"+fieldValue+"</span></td>";
 		        }  
 			      if(beanActions != null && beanActions.length > 0) { 
 			      %>
-	           <td  class="center actionContainer"> 
+	           <td class="center actionContainer" headers="actions"> 
 	                  <%
 	                    def beanIdField = uicomponent.getBeanIdField() ;           
 	                    for(action in beanActions) { 
@@ -72,7 +76,7 @@
 	                      String actionLink = uiParent.event(action, beanId);
 	                    %>             
 
-	                        <a onclick="$actionLink" data-toggle="tooltip" rel="tooltip" data-placement="bottom"  data-original-title="$title" class="actionIcon" ><i class="uiIcon${action} uiIconLightGray"></i></a>
+	                        <a href="javascript:void(0);" onclick="$actionLink" data-toggle="tooltip" data-placement="bottom"  data-original-title="$title" class="actionIcon" ><i class="uiIcon${action} uiIconLightGray"></i></a>
 	                  <%}%>          
 	            </td>
 	      <%

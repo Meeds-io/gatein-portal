@@ -628,7 +628,24 @@
     </depends>
   </module>
 
-  <!-- WebUI-EXT Javascripts -->  
+  <!-- IphoneStyle plugin -->
+  <module>
+    <name>iphoneStyleCheckbox</name>
+    <script>
+      <adapter>
+        (function($) {
+        var _$ = window.jQuery; window.jQuery = $;
+        <include>/skin/jquery-plugins/iphone-style-checkboxes.js</include>
+        window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
+  <!-- WebUI-EXT Javascripts -->
   <module>
     <name>webui-ext</name>
     <as>webuiExt</as>

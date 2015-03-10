@@ -223,6 +223,10 @@ public class UserConfigurableValidator extends MultipleConditionsValidator {
                 minLength = minProperty != null ? Integer.valueOf(minProperty) : ConfigurableIdentifierValidator.DEFAULT_MIN_LENGTH;
                 maxLength = maxProperty != null ? Integer.valueOf(maxProperty) : ConfigurableIdentifierValidator.DEFAULT_MAX_LENGTH;
                 pattern = properties.getProperty(prefixedKey + ".regexp", ConfigurableIdentifierValidator.IDENTIFER_VALIDATOR_REGEX);
+            } else if (EMAIL.equals(propertyKey)) {
+                minLength = minProperty != null ? Integer.valueOf(minProperty) : ConfigurableIdentifierValidator.DEFAULT_MIN_LENGTH;
+                maxLength = maxProperty != null ? Integer.valueOf(maxProperty) : ConfigurableIdentifierValidator.DEFAULT_MAX_LENGTH;
+                pattern = properties.getProperty(prefixedKey + ".regexp", EMAIL_VALIDATION_REGEX);
             } else {
                 minLength = minProperty != null ? Integer.valueOf(minProperty) : 0;
                 maxLength = maxProperty != null ? Integer.valueOf(maxProperty) : Integer.MAX_VALUE;

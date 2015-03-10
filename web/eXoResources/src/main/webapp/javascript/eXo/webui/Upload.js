@@ -281,14 +281,11 @@
 			  return;
 		  var temp = file.value;
 
-		  var fileName = "";
 		  if (file.files && file.files.length) {
-			  fileName =  file.files[0].name;
+			  jCont.data("fileName", file.files[0].name);
 		  } else {
-			  fileName = temp.split(/(\\|\/)/g).pop();
+			  jCont.data("fileName", temp.split(/(\\|\/)/g).pop());
 		  }
-		  fileName = $("<span></span>").text(fileName).html();		  
-		  jCont.data("fileName", encodeURIComponent(fileName));
 
 		  var progressBarFrame = jCont.find(".progressBarFrame").first();
 		  progressBarFrame.show();
@@ -570,15 +567,12 @@
 		  if (file.value == null || file.value == '')
 			  return;
 		  var temp = file.value;
-		  
-		  var fileName = "";
+
 		  if (file.files && file.files.length) {
-			  fileName =  file.files[0].name;
+			  jCont.data("fileName", file.files[0].name);
 		  } else {
-			  fileName = temp.split(/(\\|\/)/g).pop();
+			  jCont.data("fileName", temp.split(/(\\|\/)/g).pop());
 		  }
-		  fileName = $("<span></span>").text(fileName).html();
-		  jCont.data("fileName", encodeURIComponent(fileName));
 
 		  var progressBarFrame = jCont.find(".progressBarFrame").first();
 		  progressBarFrame.show();

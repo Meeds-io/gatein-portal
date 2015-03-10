@@ -10,8 +10,8 @@
 <div class="uiGadgetManagement" id="$uicomponent.id">
   
 	<div class="uiGrayLightBox clearfix">
-	  <a class="actionIcon" onclick="<%= uicomponent.event("AddRemoteGadget") %>"><i class="uiIconAddRemoteGadget uiIconLightGray"></i><%=_ctx.appRes("UIGadgetManagement.label.addRemote")%></a>
-	  <a class="actionIcon" onclick="<%= uicomponent.event("AddLocalGadget") %>"><i class="uiIconCreateNewGadget uiIconLightGray"></i><%=_ctx.appRes("UIGadgetManagement.label.createNew")%></a>
+	  <a class="actionIcon" href="javascript:void(0);" onclick="<%= uicomponent.event("AddRemoteGadget") %>"><i class="uiIconAddRemoteGadget uiIconLightGray"></i><%=_ctx.appRes("UIGadgetManagement.label.addRemote")%></a>
+	  <a class="actionIcon" href="javascript:void(0);" onclick="<%= uicomponent.event("AddLocalGadget") %>"><i class="uiIconCreateNewGadget uiIconLightGray"></i><%=_ctx.appRes("UIGadgetManagement.label.createNew")%></a>
 	</div>
  
   <div class="uiGadgetList row">
@@ -33,13 +33,13 @@
                     <% if(isSelected) { %>
                       <strong><%= (gadgetLabel.length() <= 31) ? gadgetLabel : gadgetLabel.substring(0, 28)+"..." %></strong>
                     <% } else { %>
-                      <a onclick="<%= uicomponent.event("SelectGadget", gadget.getName()) %>" class="$gadgetType" title="<%= gadget.getTitle() %>"><%= (gadgetLabel.length() <= 31) ? gadgetLabel : gadgetLabel.substring(0, 28)+"..." %></a>
+                      <a href="javascript:void(0);" onclick="<%= uicomponent.event("SelectGadget", gadget.getName()) %>" class="$gadgetType" title="<%= gadget.getTitle() %>"><%= (gadgetLabel.length() <= 31) ? gadgetLabel : gadgetLabel.substring(0, 28)+"..." %></a>
                     <% } %>
                   </li>
                 </ul>
               </div>
               <div class="span2">
-                <a class="actionIcon" title="<%=_ctx.appRes("UIGadgetManagement.title.deleteGadget")%>" rel="tooltip" data-placement="bottom" onclick="<%= uicomponent.event("RemoveGadget", gadget.getName()) %>"><i class="uiIconDelete uiIconLightGray"></i></a>
+                <a class="actionIcon" title="<%=_ctx.appRes("UIGadgetManagement.title.deleteGadget")%>" rel="tooltip" data-placement="bottom" href="javascript:void(0);" onclick="<%= uicomponent.event("RemoveGadget", gadget.getName()) %>"><i class="uiIconDelete uiIconLightGray"></i></a>
               </div>
             </div>
           </div>

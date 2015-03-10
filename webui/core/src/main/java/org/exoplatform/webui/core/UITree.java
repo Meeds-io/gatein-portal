@@ -299,10 +299,10 @@ public class UITree extends UIComponent {
         }
         if (nodeIcon.equals(expandIcon)) {
             builder.append(" <a href=\"javascript:void(0);\" class=\"uiIconNode ").append(nodeIcon).append(note).append("\" ").append(rightClick)
-            .append(" title=\"").append(getFieldValue(obj, beanLabelField_)).append("\"").append(">");
+            .append(" title=\"").append(fieldValue).append("\"").append(">");
         } else {
             builder.append(" <a href=\"javascript:void(0);\" class=\"uiIconNode ").append(nodeIcon).append(note).append("\" ").append(rightClick)
-            .append(" title=\"").append(getFieldValue(obj, beanLabelField_)).append("\" onclick=\"").append(actionLink).append("\">");
+            .append(" title=\"").append(fieldValue).append("\" onclick=\"").append(actionLink).append("\">");
         }
         builder.append("<i class=\"" + iconGroup + "\"></i>").append(fieldValue);
         builder.append(" </a>");

@@ -5,11 +5,13 @@
 	UIFormPageIterator uiIterator = uicomponent.getUIFormPageIterator();	
 %>
 <div class="uiFormTableIterator" id="UIFormTableIterator">
-	<table class="uiGrid table table-hover table-striped" cellspacing="0" borderspacing="0">
+   <%
+		String name = uicomponent.getName();
+	%>
+	<table class="uiGrid table table-hover table-striped" cellspacing="0" borderspacing="0" summary="Component of <%= name %>">
 		<thead>
 			<tr>
 				<%
-					String name = uicomponent.getName();
 					String [] columns = uicomponent.getColumns();
 					for(col in columns){
 				%>

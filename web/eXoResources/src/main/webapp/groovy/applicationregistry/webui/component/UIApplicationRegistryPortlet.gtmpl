@@ -1,4 +1,4 @@
-<%	
+<%
 	import org.exoplatform.applicationregistry.webui.component.UIApplicationRegistryEditMode;
 	import javax.portlet.PortletMode ;
 	
@@ -18,15 +18,15 @@
 	<%if( _ctx.getRequestContext().getApplicationMode() == PortletMode.VIEW) {%>
   
 	  <div class="uiGrayLightBox clearfix">
-	    <a onclick="<%=uicomponent.event("ViewChild", "UIApplicationOrganizer")%>" class="actionIcon $categories pull-left">
+	    <a href="javascript:void(0);" onclick="<%=uicomponent.event("ViewChild", "UIApplicationOrganizer")%>" class="actionIcon $categories pull-left">
 	      <i class="uiIconManageApplication uiIconLightGray"></i>
 	      <%=_ctx.appRes("UIToolbar.label.manageApp")%>
 			</a>
-      <a onclick="<%=uicomponent.event("ViewChild", "UIGadgetManagement")%>" class="actionIcon $gadget pull-right">
+      <a href="javascript:void(0);" onclick="<%=uicomponent.event("ViewChild", "UIGadgetManagement")%>" class="actionIcon $gadget pull-right">
         <i class="uiIconGadgets uiIconLightGray"></i>
         <%=_ctx.appRes("UIToolbar.label.gadget")%>
       </a>
-      <a onclick="<%=uicomponent.event("ViewChild", "UIPortletManagement")%>" class="actionIcon $portlet pull-right">
+      <a href="javascript:void(0);" onclick="<%=uicomponent.event("ViewChild", "UIPortletManagement")%>" class="actionIcon $portlet pull-right">
         <i class="uiIconPortlet uiIconLightGray"></i>
         <%=_ctx.appRes("UIToolbar.label.portlet")%>
       </a>
