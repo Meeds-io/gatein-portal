@@ -217,4 +217,6 @@
     <url-pattern>/gadgets/metadata</url-pattern>
   </servlet-mapping>
 
+  <absolute-ordering/>
+
 </web-app>

@@ -328,4 +328,7 @@
     <description>a simple user role</description>
     <role-name>users</role-name>
   </security-role>
+
+  <absolute-ordering/>
+
 </web-app>
