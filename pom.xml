@@ -91,7 +91,7 @@
 
     <!-- maven-release-plugin -->
     <useReleaseProfile>false</useReleaseProfile>
-    <version.release.plugin>2.2.1</version.release.plugin>
+    <version.release.plugin>2.5.1</version.release.plugin>
     <pushChanges>false</pushChanges>
 
     <!-- buildnumber-maven-plugin : needs 1.0 for git -->
