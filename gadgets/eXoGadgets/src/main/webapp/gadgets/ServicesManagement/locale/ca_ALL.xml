@@ -20,20 +20,20 @@
 
 -->
 <messagebundle>
-  <msg name="title">Management servicii</msg>
-  <msg name="services">Servicii</msg>
-  <msg name="name">Nume</msg>
-  <msg name="description">Descriere</msg>
-  <msg name="noDescription">Nici o descriere</msg>
-  <msg name="method">Metoda</msg>
-  <msg name="property">Proprietate</msg>
-  <msg name="parameters">Parametrii</msg>
-  <msg name="action">Acțiune</msg>
-  <msg name="value">Valoare</msg>
-  <msg name="services_url">URL servicii</msg>
-  <msg name="failManage">Temporar nu pot gestiona serviciile de pe alta platformă,   vom introduce OAuth</msg>
-  <msg name="noServices">Nici un serviciu disponibil sau nu aveţi permisiuni suficiente</msg>
-  <msg name="noMethod">Nici o metodă</msg>
-  <msg name="noProperty">Nici o proprietate</msg>
-  <msg name="badURL">Eroare în timpul aducerii datelor, vă rugăm să verificaţi adresa URL</msg>
+  <msg name="title">Gestió de serveis</msg>
+  <msg name="services">Serveis</msg>
+  <msg name="name">Nom</msg>
+  <msg name="description">Descripció</msg>
+  <msg name="noDescription">Sense descripció</msg>
+  <msg name="method">Mètode</msg>
+  <msg name="property">Propietat</msg>
+  <msg name="parameters">Paràmetres</msg>
+  <msg name="action">Acció</msg>
+  <msg name="value">Valor</msg>
+  <msg name="services_url">URL de Serveis</msg>
+  <msg name="failManage">Temporalment no es poden gestionar serveis d'un altre host mentres no donem suport OAuth</msg>
+  <msg name="noServices">Cap servei disponible o no té prou permisos</msg>
+  <msg name="noMethod">Cap mètode</msg>
+  <msg name="noProperty">Cap propietat</msg>
+  <msg name="badURL">Error recuperant dades, si us plau comprovi la seva URL a les preferències</msg>
 </messagebundle>
