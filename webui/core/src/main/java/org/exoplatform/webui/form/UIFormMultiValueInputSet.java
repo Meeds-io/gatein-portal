@@ -254,6 +254,7 @@ public class UIFormMultiValueInputSet extends UIFormInputContainer<List> {
 
         inputBase.setName(compName);
         inputBase.setId(compName);
+        inputBase.setLabel(getLabel());
         List<Validator> validators = this.getValidators();
         if (validators != null) {
             for (Validator validator : validators) {

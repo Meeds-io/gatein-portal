@@ -277,18 +277,18 @@ public class UIForm extends UIContainer {
         return b.toString();
     }
 
-    public String getLabel(String id) throws Exception {
+    public String getLabel(String label) throws Exception {
         WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
         ResourceBundle res = context.getApplicationResourceBundle();
-        return getLabel(res, id);
+        return getLabel(res, label);
     }
 
-    public String getLabel(ResourceBundle res, String id) {
-        String label = getId() + ".label." + id;
+    public String getLabel(ResourceBundle res, String label) {
+        String resKey = getId() + ".label." + label;
         try {
-            return res.getString(label);
+            return res.getString(resKey);
         } catch (MissingResourceException e) {
-            return id;
+            return label;
         }
     }
 
