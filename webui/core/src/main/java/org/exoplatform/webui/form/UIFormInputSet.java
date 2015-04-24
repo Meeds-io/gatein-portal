@@ -150,7 +150,7 @@ public class UIFormInputSet extends UIContainer {
           }
         }
         if (required)
-          w.write("<tr><td colspan=\"2\" class=\"require\">" + res.getString("legend.required_field") + " (*)</td></tr>");
+          w.write("<div class=\"require\">" + res.getString("legend.required_field") + " (*)</div>");
         for (UIComponent inputEntry : getChildren()) {
             if (inputEntry.isRendered()) {
                 String label = "";
