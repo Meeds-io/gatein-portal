@@ -42,7 +42,12 @@
    jsManager.require("SHARED/jquery", "jq")
         .require("SHARED/iphoneStyleCheckbox", "iphoneStyle")
         .require("SHARED/bts_tooltip", "tooltip")
-        .addScripts("jq('input.yesno').each(function(){jq(this).iphoneStyle({checkedLabel:'$yesLabel',uncheckedLabel:'$noLabel', onChange: function(el, val){jq(el).trigger('click');}}); var checked = jq(this).is(':checked'); jq(this).closest('.iPhoneCheckContainer').attr('title', checked ? '$disableTooltip' : '$enableTooltip').tooltip({}); jq(this).change(function(){jq(this).trigger('click');});});");
+        .addScripts("jq('input.yesno').each(function(){jq(this).iphoneStyle(" +
+        "{disabledClass: 'switchBtnDisabled', containerClass: 'uiSwitchBtn', labelOnClass: 'switchBtnLabelOn', labelOffClass: 'switchBtnLabelOff', handleClass: 'switchBtnHandle', checkedLabel:'$yesLabel',uncheckedLabel:'$noLabel', onChange: function(el, val){jq(el).trigger('click');}});" +
+        "var checked = jq(this).is(':checked'); " +
+        "jq(this).closest('.iPhoneCheckContainer').attr('title', checked ? '$disableTooltip' : '$enableTooltip');" +        
+        "jq(this).change(function(){jq(this).trigger('click');});});" + 
+        "jq(document).find('*[rel=\"tooltip\"]').tooltip();");
 %>
 <div id="$uicomponent.id">
    <table class="uiGrid table table-hover table-striped" cellspacing="0" summary="Component $uicomponent.id">
@@ -164,7 +169,7 @@
                                     }
                                 }
                             }%>
-                            <a class="actionIcon" href="javascript:;" onclick="$actionLink">
+                            <a class="actionIcon" title="$title" rel="tooltip" href="javascript:;" onclick="$actionLink">
 								<i class="${classIcon} uiIconLightGray"> </i>
                             </a>
                        <%} %>

@@ -635,7 +635,7 @@
       <adapter>
         (function($) {
         var _$ = window.jQuery; window.jQuery = $;
-        <include>/skin/jquery-plugins/iphone-style-checkboxes.js</include>
+        <include>/javascript/iphone-style-checkboxes.js</include>
         window.jQuery = _$;
         })($);
       </adapter>
