@@ -182,17 +182,18 @@
       var clndr = document.getElementById(this.calendarId);
       clndr.firstChild.lastChild.innerHTML = this.renderCalendar();
       // var x = 0 ;
+      $(clndr).css('top', $(this.dateField).position().top);
       var y = this.dateField.offsetHeight;
       var beforeShow = $(window).height();
-      with (clndr.firstChild.style) {
-        display = 'block';
-        // left = x + "px" ;
-        top = y + "px";
-        if (eXo.core.I18n.isLT())
-          left = "0px";
-        else
-          right = "0px";
-      }
+      if (eXo.core.I18n.isLT())
+    	$(clndr.firstChild).css('left', 0);
+      else
+    	$(clndr.firstChild).css('right', 0);
+      $(clndr.firstChild).css( {
+    	'display' : 'block',
+    	//left = x + "px" ;
+    	'top' : y + "px"
+      });
       var posCal = $(this.dateField).offset().top - y;
       var heightCal = document.getElementById('BlockCalendar');
       var afterShow = posCal + heightCal.offsetHeight;
