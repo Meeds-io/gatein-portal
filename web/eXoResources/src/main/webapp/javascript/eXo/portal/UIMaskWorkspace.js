@@ -28,10 +28,12 @@
     show : function(maskId, width, height) {
       this.maskWorkpace = document.getElementById(maskId);
       if (this.maskWorkpace) {
+    	var content = $(this.maskWorkpace).find('.UIMaskWorkspace');
         if (width > -1) {
-          this.maskWorkpace.style.width = width + "px";
+        	content.width(width);
         }
 
+        document.body.style.overflow = 'hidden';
         if (eXo.portal.UIMaskWorkspace.maskLayer == null) {
           var maskLayer = uiMaskLayer.createMask("UIPortalApplication",
               this.maskWorkpace, 30);
@@ -42,10 +44,11 @@
         $("#UIWorkingWorkspace").addClass("background");
 
         var browser = base.Browser;
+        eXo.portal.UIMaskWorkspace.resetPositionEvt();
         browser.addOnResizeCallback('mid_maskWorkspace',
             eXo.portal.UIMaskWorkspace.resetPositionEvt);
-        browser.addOnScrollCallback("setPosition_maskWorkspace",
-            eXo.portal.UIMaskWorkspace.resetPositionEvt);
+//        browser.addOnScrollCallback("setPosition_maskWorkspace",
+//            eXo.portal.UIMaskWorkspace.resetPositionEvt);
       }
     },
 
@@ -58,6 +61,7 @@
       uiMaskLayer.removeMask(eXo.portal.UIMaskWorkspace.maskLayer);
       eXo.portal.UIMaskWorkspace.maskLayer = null;
       this.maskWorkpace.style.display = "none";
+      document.body.style.overflow = 'auto';
       $("#UIWorkingWorkspace").removeClass("background");
     },
 
@@ -68,6 +72,13 @@
     resetPositionEvt : function() {
       var maskWorkpace = eXo.portal.UIMaskWorkspace.maskWorkpace;
       if (maskWorkpace && (maskWorkpace.style.display == "block")) {
+	    var maskHeight = $(maskWorkpace).height();
+        var content = $(maskWorkpace).find('.UIMaskWorkspace');
+        if (content.height() < maskHeight) {
+          content.css('margin-top', (maskHeight - content.height()) / 2);
+        } else {
+          content.css('margin-top', 0);
+        }
         try {
           uiMaskLayer.blockContainer = document
               .getElementById("UIPortalApplication");
@@ -75,6 +86,8 @@
           uiMaskLayer.scrollCallback();
         } catch (e) {
         }
+        maskWorkpace.style.position = 'fixed';
+        maskWorkpace.style.top = 0;
       }
     }
   };
