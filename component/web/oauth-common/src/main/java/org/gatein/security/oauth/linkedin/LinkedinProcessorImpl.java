@@ -29,6 +29,7 @@ import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.exception.OAuthException;
+import org.gatein.security.oauth.exception.OAuthExceptionCode;
 import org.gatein.security.oauth.spi.InteractionState;
 import org.gatein.security.oauth.spi.OAuthCodec;
 import org.gatein.security.oauth.utils.OAuthPersistenceUtils;
@@ -106,11 +107,18 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
             session.removeAttribute(OAuthConstants.ATTRIBUTE_LINKEDIN_REQUEST_TOKEN);
 
             String verifierCode = httpRequest.getParameter("oauth_verifier");
-            Verifier verifier = new Verifier(verifierCode);
-            Token accessToken = oAuthService.getAccessToken(requestToken, verifier);
-            LinkedinAccessTokenContext accessTokenContext = new LinkedinAccessTokenContext(accessToken, this.oAuthService);
-
-            return new InteractionState<LinkedinAccessTokenContext>(InteractionState.State.FINISH, accessTokenContext);
+            if(verifierCode != null) {
+                Verifier verifier = new Verifier(verifierCode);
+                Token accessToken = oAuthService.getAccessToken(requestToken, verifier);
+                LinkedinAccessTokenContext accessTokenContext = new LinkedinAccessTokenContext(accessToken, this.oAuthService);
+                return new InteractionState<LinkedinAccessTokenContext>(InteractionState.State.FINISH, accessTokenContext);
+            } else {
+                String oauthProblem = httpRequest.getParameter("oauth_problem");
+                if("user_refused".equals(oauthProblem)) {
+                    throw new OAuthException(OAuthExceptionCode.USER_DENIED_SCOPE, "User denied scope on LinkedIn authorization page");
+                }
+                throw new OAuthException(OAuthExceptionCode.LINKEDIN_ERROR, "Can not get oauth verifier code from LinkedIn");
+            }
         }
     }
 
