@@ -26,7 +26,7 @@
   <parent>
     <artifactId>gatein-wsrp-integration-parent</artifactId>
     <groupId>org.gatein.integration</groupId>
-    <version>4.x-upgrade-gatein-3.7.x-SNAPSHOT</version>
+    <version>4.3.x-PLF-SNAPSHOT</version>
   </parent>
 
   <artifactId>extension-config</artifactId>
