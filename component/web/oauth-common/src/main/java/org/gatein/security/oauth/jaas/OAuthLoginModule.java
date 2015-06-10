@@ -25,6 +25,8 @@ package org.gatein.security.oauth.jaas;
 
 import java.lang.reflect.Method;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -97,13 +99,24 @@ public class OAuthLoginModule extends AbstractLoginModule {
                 return false;
             }
 
-            String username = portalUser.getUserName();
-            establishSecurityContext(container, username);
+            // We we do not need this attribute any more
+            // If user want, he must re-authenticate via oauth
+            authRegistry.removeAttributeOfClient(servletRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER_FOR_JAAS);
 
-            if (log.isTraceEnabled()) {
-                log.trace("Successfully established security context for user " + username);
+            Callback[] callbacks = new Callback[] { new NameCallback("Username") };
+            callbackHandler.handle(callbacks);
+            String username = ((NameCallback) callbacks[0]).getName();
+
+            if (username.equals(portalUser.getUserName())) {
+                establishSecurityContext(container, username);
+
+                if (log.isTraceEnabled()) {
+                    log.trace("Successfully established security context for user " + username);
+                }
+                return true;
             }
-            return true;
+
+            return false;
         } catch (Exception e) {
             if (log.isTraceEnabled()) {
                 log.trace("Exception in login module", e);
