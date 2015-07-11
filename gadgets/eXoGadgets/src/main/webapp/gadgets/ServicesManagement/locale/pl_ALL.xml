@@ -20,20 +20,20 @@
 
 -->
 <messagebundle>
-  <msg name="title">Services Management</msg>
-  <msg name="services">Services</msg>
-  <msg name="name">Name</msg>
-  <msg name="description">Description</msg>
-  <msg name="noDescription">No description</msg>
-  <msg name="method">Method</msg>
-  <msg name="property">Property</msg>
-  <msg name="parameters">Parameters</msg>
-  <msg name="action">Action</msg>
-  <msg name="value">Value</msg>
-  <msg name="services_url">Services URL</msg>
-  <msg name="failManage">Temporary can't manage services from other host until we support OAuth</msg>
-  <msg name="noServices">No service's available or you don't have enough permission</msg>
-  <msg name="noMethod">No method</msg>
-  <msg name="noProperty">No property</msg>
-  <msg name="badURL">Error while retrieving data, please check your URL preference</msg>
+  <msg name="title">Zarządzanie usługami</msg>
+  <msg name="services">Usługi</msg>
+  <msg name="name">Nazwa</msg>
+  <msg name="description">Opis</msg>
+  <msg name="noDescription">Brak opisu</msg>
+  <msg name="method">Metoda</msg>
+  <msg name="property">Właściwość</msg>
+  <msg name="parameters">Parametry</msg>
+  <msg name="action">Akcja</msg>
+  <msg name="value">Wartość</msg>
+  <msg name="services_url">Usługi URL</msg>
+  <msg name="failManage">Tymczasowo nie możesz zarządzać usługami z innego hosta do czasu wspierania go przez OAuth</msg>
+  <msg name="noServices">To nie ta na usługa lub nie masz wystarczająco dużo uprawnień</msg>
+  <msg name="noMethod">Brak metody</msg>
+  <msg name="noProperty">Brak właściwości</msg>
+  <msg name="badURL">Wystąpił błąd podczas pobierania danych, sprawdź swoje preferencje URL</msg>
 </messagebundle>
