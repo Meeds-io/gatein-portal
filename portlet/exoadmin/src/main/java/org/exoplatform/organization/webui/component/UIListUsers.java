@@ -105,6 +105,7 @@ public class UIListUsers extends UISearch {
         if(showDisableUserFilterCheckbox) {
             UIFormSelectBox selectBox = new UIFormSelectBox("UIListUsers-" + USER_STATUS_FILTER, null, USER_STATUS_OPTIONS);
             selectBox.setValue(UserStatus.ENABLED.name());
+            selectBox.setLabel("status");
             selectBox.setId("UIListUsers-" + USER_STATUS_FILTER);
             inputSet.addChild(selectBox);
         }

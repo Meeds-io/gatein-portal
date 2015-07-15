@@ -70,6 +70,19 @@ public class UISearchForm extends UIForm {
         uiSelect.setOptions(options);
     }
 
+    public String getLabel(UIFormInput input) {
+        String label = input.getLabel();
+        if(label == null) {
+            return null;
+        } else {
+            try {
+                return getLabel(label);
+            } catch (Exception ex) {
+                return label;
+            }
+        }
+    }
+
     public UIFormInputSet getQuickSearchInputSet() {
         return (UIFormInputSet) getChild(0);
     }
