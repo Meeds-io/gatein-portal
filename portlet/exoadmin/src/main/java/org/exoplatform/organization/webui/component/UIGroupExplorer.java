@@ -148,6 +148,14 @@ public class UIGroupExplorer extends UIContainer {
     }
 
     public Group getCurrentGroup() {
+        if (selectedGroup_ != null) {
+            OrganizationService service = getApplicationComponent(OrganizationService.class);
+            try {
+                selectedGroup_ = service.getGroupHandler().findGroupById(selectedGroup_.getId());
+            } catch (Exception e) {
+                selectedGroup_ = null;
+            }
+        }
         return selectedGroup_;
     }
 
@@ -172,6 +180,9 @@ public class UIGroupExplorer extends UIContainer {
 
     @SuppressWarnings("unused")
     public void processRender(WebuiRequestContext context) throws Exception {
+        if (selectedGroup_ != null) {
+            changeGroup(selectedGroup_.getId());            
+        }
         renderChildren();
     }
 
