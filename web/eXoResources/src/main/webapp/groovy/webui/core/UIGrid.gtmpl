@@ -9,7 +9,7 @@
 
    def rcontext = _ctx.getRequestContext();
    rcontext.getJavascriptManager().require("SHARED/bts_tooltip").require("SHARED/jquery", "\$")
-   				 .addScripts("\$('#${uicomponent.id}').find('*[rel=\"tooltip\"]').tooltip();");
+   				 .addScripts("\$('[rel=\"tooltip\"]').tooltip();");
    
    String[] beanFields = uicomponent.getBeanFields();
    String[] beanActions = uicomponent.getBeanActions();
