@@ -32,17 +32,17 @@
 									    <td class="FieldComponent portlet-input-field" colspan="2"><% uiform.renderField(field) %>
 								<%  } %>
 
-								    <td class="FieldComponent UIAction portlet-input-field">
+								    <td class="FieldComponent UIAction portlet-input-field valign-top">
 								<%
 								      if (field.getValue() == null || field.getValue().length() == 0) {
 								          uicomponent.saveURLAfterLinkSocialAccount();
 								          String linkSocialAccountURL = uicomponent.getLinkSocialAccountURL(oauthPrType);
 								%>
-							              <a href="$linkSocialAccountURL" class="ActionButton LightBlueStyle"><%=_ctx.appRes("UIAccountSocial.action.link")%></a>
+							              <a href="$linkSocialAccountURL" class="ActionButton btn btn-block LightBlueStyle"><%=_ctx.appRes("UIAccountSocial.action.link")%></a>
 								<%    } else {
 								          String link = uicomponent.getUnlinkSocialAccountURL(oauthPrType);
 								%>
-								          <a href="javascript:void(0);" onclick="$link" class="ActionButton LightBlueStyle"><%=_ctx.appRes("UIAccountSocial.action.unlink")%></a>
+								          <a href="javascript:void(0);" onclick="$link" class="ActionButton btn btn-block LightBlueStyle"><%=_ctx.appRes("UIAccountSocial.action.unlink")%></a>
 								<%    } %>
 								    </td>
 							</tr>
