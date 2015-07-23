@@ -69,18 +69,4 @@
 
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>JBoss repository</id>
-      <url>http://repository.jboss.com/maven2</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-
-  </repositories>
-
 </project>
