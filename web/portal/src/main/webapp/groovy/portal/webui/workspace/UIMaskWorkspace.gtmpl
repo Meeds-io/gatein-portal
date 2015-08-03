@@ -9,9 +9,10 @@
 
 	String maskId = uicomponent.getId() ;
   boolean isShow = uicomponent.isShow();
+    String classes = uicomponent.getCssClasses();
 %>	
 <div id="$maskId" style="display: none;">
-<div class="UIMaskWorkspace">
+<div class="UIMaskWorkspace $classes">
 <%
   if (isShow)
   {
