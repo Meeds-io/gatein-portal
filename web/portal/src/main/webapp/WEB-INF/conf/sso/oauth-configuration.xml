@@ -343,6 +343,10 @@
           <value>org.gatein.security.oauth.facebook.GateInFacebookProcessor</value>
         </value-param>
         <value-param>
+          <name>principalProcessorClass</name>
+          <value>org.gatein.security.oauth.facebook.FacebookPrincipalProcessor</value>
+        </value-param>
+        <value-param>
           <name>initOAuthURL</name>
           <value>/facebookAuth</value>
         </value-param>
