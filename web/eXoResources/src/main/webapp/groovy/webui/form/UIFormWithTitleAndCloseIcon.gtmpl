@@ -4,13 +4,15 @@
     def rcontext = _ctx.getRequestContext();
     rcontext.getJavascriptManager().require("SHARED/uiForm");
     String fieldName; %>
-<div class="uiFormWithTitle uiBox uiGroupForm" onkeypress="javascript:SubmitAction.call(this, event);">
-    <h5 class="title"><%=_ctx.appRes(uicomponent.getName() + ".title")%></h5>
+<div class="uiFormWithTitle uiBox uiRegisterOauthForm" onkeypress="javascript:SubmitAction.call(this, event);">
     <%
         String cancelAction = "Cancel";
         String cancelLink = uicomponent.event(cancelAction);
     %>
-    <button type="button" onclick="$cancelLink; window.scroll(0,0);" class="btn">Cancel</button>
+    <h5 class="title clearfix">
+        <a href="#" onclick="$cancelLink; window.scroll(0,0);" class="pull-right"><i class="uiIconClose"></i></a>
+        <%=_ctx.appRes(uicomponent.getName() + ".title")%>
+    </h5>
     <% uiform.begin() %>
     <div class="uiContentBox">
         <div class="form-horizontal">
