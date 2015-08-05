@@ -68,7 +68,7 @@ import org.gatein.common.logging.LoggerFactory;
         @EventConfig(listeners = UIRegisterForm.CancelActionListener.class, phase = Phase.DECODE),
         @EventConfig(name = UIRegisterForm.CheckUsernameAvailability.LISTENER_NAME, listeners = UIRegisterForm.CheckUsernameAvailability.class, phase = Phase.DECODE) },
         initParams = { @ParamConfig(name=UIRegisterForm.SKIP_CAPTCHA_PARAM_NAME, value="false") }),
-    @ComponentConfig(id = UIRegisterOAuth.REGISTER_FORM_CONFIG_ID, lifecycle = UIFormLifecycle.class, template = "system:/groovy/webui/form/UIFormWithTitle.gtmpl", events = {
+    @ComponentConfig(id = UIRegisterOAuth.REGISTER_FORM_CONFIG_ID, lifecycle = UIFormLifecycle.class, template = "system:/groovy/webui/form/UIFormWithTitleAndCloseIcon.gtmpl", events = {
         @EventConfig(listeners = UIRegisterOAuth.SubscribeOAuthActionListener.class),
         @EventConfig(listeners = UIRegisterOAuth.ResetActionListener.class, phase = Phase.DECODE),
         @EventConfig(listeners = UIRegisterOAuth.CancelActionListener.class, phase = Phase.DECODE),
