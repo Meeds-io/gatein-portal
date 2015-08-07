@@ -23,6 +23,7 @@ import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.UserImpl;
 import org.gatein.security.oauth.spi.OAuthPrincipal;
 import org.gatein.security.oauth.spi.OAuthPrincipalProcessor;
+import org.gatein.security.oauth.utils.OAuthUtils;
 
 /**
  * @author <a href="mailto:tuyennt@exoplatform.com">Tuyen Nguyen The</a>.
@@ -39,7 +40,7 @@ public class FacebookPrincipalProcessor implements OAuthPrincipalProcessor {
       }
     }
 
-    User gateinUser = new UserImpl(username);
+    User gateinUser = new UserImpl(OAuthUtils.refineUserName(username));
     gateinUser.setFirstName(principal.getFirstName());
     gateinUser.setLastName(principal.getLastName());
     gateinUser.setEmail(email);
