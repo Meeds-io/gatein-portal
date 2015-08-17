@@ -157,9 +157,7 @@ public class LoginServlet extends AbstractHttpServlet {
 
                 // This will login or send an AuthenticationException
                 try {
-                    if (!password.trim().isEmpty()) {
-                        container.login(req, resp, credentials);
-                    }
+                    container.login(req, resp, credentials);
                 } catch (AuthenticationException e) {
                     log.debug("User authentication failed");
                     if (log.isTraceEnabled()) {

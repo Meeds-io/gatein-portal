@@ -20,8 +20,6 @@
 package org.exoplatform.portal.account;
 
 import org.exoplatform.portal.webui.util.Util;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.security.Authenticator;
@@ -51,49 +49,15 @@ import org.exoplatform.webui.form.validator.PasswordStringLengthValidator;
         @EventConfig(listeners = UIAccountChangePass.ResetActionListener.class, phase = Phase.DECODE) })
 public class UIAccountChangePass extends UIForm {
 
-    private static final Log log = ExoLogger.getLogger(UIAccountChangePass.class);
-
-    private final UIFormStringInput currentPassword;
-
     // constructor
     public UIAccountChangePass() throws Exception {
         super();
-
-        String currentUser = Util.getPortalRequestContext().getRemoteUser();
-        Authenticator authenticator = getApplicationComponent(Authenticator.class);
-        Credential[] credentials = new Credential[] {new UsernameCredential(currentUser), new PasswordCredential("")};
-        boolean isRequireCurrentPassword;
-        try {
-            authenticator.validateUser(credentials);
-            isRequireCurrentPassword = false;
-        } catch (Exception ex) {
-            log.debug(ex);
-            isRequireCurrentPassword = true;
-        }
-
-        currentPassword = new UIFormStringInput("currentpass", "password", "").setType(UIFormStringInput.PASSWORD_TYPE);
-        currentPassword.setDefaultValue("");
-        setRequireCurrentPassword(isRequireCurrentPassword);
-
-        addUIFormInput(currentPassword);
+        addUIFormInput(new UIFormStringInput("currentpass", "password", null).setType(UIFormStringInput.PASSWORD_TYPE)
+                .addValidator(MandatoryValidator.class));
         addUIFormInput(new UIFormStringInput("newpass", "password", null).setType(UIFormStringInput.PASSWORD_TYPE)
                 .addValidator(PasswordStringLengthValidator.class, 6, 30).addValidator(MandatoryValidator.class));
         addUIFormInput(new UIFormStringInput("confirmnewpass", "password", null).setType(UIFormStringInput.PASSWORD_TYPE)
                 .addValidator(PasswordStringLengthValidator.class, 6, 30).addValidator(MandatoryValidator.class));
-    }
-
-    private void setRequireCurrentPassword(boolean isRequireCurrentPass) throws Exception {
-        if (isRequireCurrentPass) {
-            currentPassword.setRendered(true);
-            if (currentPassword.getValidators() == null || currentPassword.getValidators().isEmpty()) {
-                currentPassword.addValidator(MandatoryValidator.class);
-            }
-        } else {
-            currentPassword.setRendered(false);
-            if (currentPassword.getValidators() != null) {
-                currentPassword.getValidators().clear();
-            }
-        }
     }
 
     public static class ResetActionListener extends EventListener<UIAccountChangePass> {
@@ -130,9 +94,6 @@ public class UIAccountChangePass extends UIForm {
             if (!authenticated) {
                 uiApp.addMessage(new ApplicationMessage("UIAccountChangePass.msg.currentpassword-is-not-match", null, 1));
                 uiForm.reset();
-                if (currentPass.isEmpty()) {
-                    uiForm.setRequireCurrentPassword(true);
-                }
                 event.getRequestContext().addUIComponentToUpdateByAjax(uiForm);
                 return;
             }
@@ -150,9 +111,6 @@ public class UIAccountChangePass extends UIForm {
                 UIAccountSetting ui = uiForm.getParent();
                 ui.getChild(UIAccountProfiles.class).setRendered(true);
                 ui.getChild(UIAccountChangePass.class).setRendered(false);
-                if (currentPass.isEmpty()) {
-                    uiForm.setRequireCurrentPassword(true);
-                }
                 event.getRequestContext().addUIComponentToUpdateByAjax(ui);
             } catch (Exception e) {
                 uiApp.addMessage(new ApplicationMessage("UIAccountChangePass.msg.change.pass.fail", null, ApplicationMessage.ERROR));
