@@ -803,6 +803,9 @@ public class SkinService extends AbstractResourceService implements Startable {
                         strReplace.append(matcher.group(3));
                     }
                     String str = strReplace.toString().replaceAll("\\$", "\\\\\\$");
+                    // Add one more "\" before ISO-in-CSS-content character: for example: "\00a0" -> "\\00a0"
+                    // because method Matcher#appendReplacement() will ignore one
+                    str = str.replaceAll("(\\\\[0-9a-fA-F]{4})", "\\\\$1");
                     matcher.appendReplacement((StringBuffer) appendable, str);
                 }
                 matcher.appendTail((StringBuffer) appendable);

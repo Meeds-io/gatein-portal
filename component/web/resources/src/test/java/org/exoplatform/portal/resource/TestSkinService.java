@@ -141,6 +141,20 @@ public class TestSkinService extends AbstractSkinServiceTest {
                 skinService.getCSS(newControllerContext(getRouter(), url), true));
     }
 
+    public void testProcessImportWithUnicodeCssChar() throws Exception {
+        String childResource = "/process/import/childCSS/child.css";
+        resResolver.addResource(childResource, "#test:after {content: \"\\00a0 \\003e \\00a0\";}");
+
+        String resource = "/process/import/css.css";
+        String url = newSimpleSkin(resource).createURL(controllerCtx).toString();
+
+        resResolver.addResource(resource, "@import url(childCSS/child.css); aaa;");
+        String css = skinService.getCSS(newControllerContext(getRouter(), url), true);
+        assertEquals("#test:after {content: \"\\00a0 \\003e \\00a0\";} aaa;", css);
+
+        skinService.invalidateCachedSkin(resource);
+    }
+
     public void testLastModifiedSince() throws Exception {
         String resource = "/last/modify/since.css";
         SkinURL skinURL = newSimpleSkin(resource).createURL(controllerCtx);
