@@ -25,6 +25,8 @@ package org.gatein.security.oauth.data;
 
 import java.lang.reflect.Method;
 
+import org.exoplatform.container.component.ComponentRequestLifecycle;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
@@ -63,25 +65,33 @@ public class SocialNetworkServiceImpl implements SocialNetworkService, OAuthCode
 
     @Override
     public User findUserByOAuthProviderUsername(OAuthProviderType oauthProviderType, String oauthProviderUsername) {
-        UserHandler userHandler = orgService.getUserHandler();
-
-        // TODO: Ugly, but it's used due to OrganizationService API limitations because it doesn't allow to find user by unique userProfile attribute
         try {
-            Method m = userHandler.getClass().getDeclaredMethod("findUserByUniqueAttribute", String.class, String.class, UserStatus.class);
-            return (User)m.invoke(userHandler, oauthProviderType.getUserNameAttrName(), oauthProviderUsername, UserStatus.ANY);
-        } catch (NoSuchMethodException e) {
-            String error = "Method findUserByUniqueAttribute(String, String, boolean) is not available on userHandler object " + userHandler +
-                    "of class " + userHandler.getClass();
-            log.error(error);
-            throw new OAuthException(OAuthExceptionCode.PERSISTENCE_ERROR, error, e);
-        } catch (Exception e) {
-            throw new OAuthException(OAuthExceptionCode.PERSISTENCE_ERROR, e);
+            begin();
+
+            UserHandler userHandler = orgService.getUserHandler();
+            try {
+                // TODO: Ugly, but it's used due to OrganizationService API limitations because it doesn't allow to find user by unique userProfile attribute
+                Method m = userHandler.getClass().getDeclaredMethod("findUserByUniqueAttribute", String.class, String.class, UserStatus.class);
+                return (User)m.invoke(userHandler, oauthProviderType.getUserNameAttrName(), oauthProviderUsername, UserStatus.ANY);
+            } catch (NoSuchMethodException e) {
+                String error = "Method findUserByUniqueAttribute(String, String, boolean) is not available on userHandler object " + userHandler +
+                        "of class " + userHandler.getClass();
+                log.error(error);
+                throw new OAuthException(OAuthExceptionCode.PERSISTENCE_ERROR, error, e);
+            } catch (Exception e) {
+                throw new OAuthException(OAuthExceptionCode.PERSISTENCE_ERROR, e);
+            }
+
+        } finally {
+            end();
         }
     }
 
     @Override
     public <T extends AccessTokenContext> void updateOAuthAccessToken(OAuthProviderType<T> oauthProviderType, String username, T accessToken) {
         try {
+            begin();
+
             UserProfileHandler userProfileHandler = orgService.getUserProfileHandler();
             UserProfile userProfile = userProfileHandler.findUserProfileByName(username);
             if(userProfile == null) {
@@ -96,12 +106,15 @@ public class SocialNetworkServiceImpl implements SocialNetworkService, OAuthCode
             throw oauthEx;
         } catch (Exception e) {
             throw new OAuthException(OAuthExceptionCode.PERSISTENCE_ERROR, e);
+        } finally {
+            end();
         }
     }
 
     @Override
     public <T extends AccessTokenContext> T getOAuthAccessToken(OAuthProviderType<T> oauthProviderType, String username) {
         try {
+            begin();
             UserProfileHandler userProfileHandler = orgService.getUserProfileHandler();
             UserProfile userProfile = userProfileHandler.findUserProfileByName(username);
             if(userProfile == null) {
@@ -113,12 +126,15 @@ public class SocialNetworkServiceImpl implements SocialNetworkService, OAuthCode
             return oauthProviderProcessor.getAccessTokenFromUserProfile(userProfile, this);
         } catch (Exception e) {
             throw new OAuthException(OAuthExceptionCode.PERSISTENCE_ERROR, e);
+        } finally {
+            end();
         }
     }
 
     @Override
     public <T extends AccessTokenContext> void removeOAuthAccessToken(OAuthProviderType<T> oauthProviderType, String username) {
         try {
+            begin();
             UserProfileHandler userProfileHandler = orgService.getUserProfileHandler();
             UserProfile userProfile = userProfileHandler.findUserProfileByName(username);
             if(userProfile == null) {
@@ -132,12 +148,15 @@ public class SocialNetworkServiceImpl implements SocialNetworkService, OAuthCode
             userProfileHandler.saveUserProfile(userProfile, true);
         } catch (Exception e) {
             throw new OAuthException(OAuthExceptionCode.PERSISTENCE_ERROR, e);
+        } finally {
+            end();
         }
     }
 
     @Override
     public <T extends AccessTokenContext> void updateOAuthInfo(OAuthProviderType<T> oauthProviderType, String username, String oauthUsername, T accessToken) {
         try {
+            begin();
             UserProfileHandler userProfileHandler = orgService.getUserProfileHandler();
             UserProfile userProfile = userProfileHandler.findUserProfileByName(username);
             if(userProfile == null) {
@@ -153,6 +172,8 @@ public class SocialNetworkServiceImpl implements SocialNetworkService, OAuthCode
             throw oauthEx;
         } catch (Exception e) {
             throw new OAuthException(OAuthExceptionCode.PERSISTENCE_ERROR, e);
+        } finally {
+            end();
         }
     }
 
@@ -171,6 +192,18 @@ public class SocialNetworkServiceImpl implements SocialNetworkService, OAuthCode
             return null;
         } else {
             return codec.decode(input);
+        }
+    }
+
+    void begin() {
+        if (orgService instanceof ComponentRequestLifecycle) {
+            RequestLifeCycle.begin((ComponentRequestLifecycle) orgService);
+        }
+    }
+    
+    void end() {
+        if (orgService instanceof ComponentRequestLifecycle) {
+            RequestLifeCycle.end();
         }
     }
 
