@@ -90,7 +90,7 @@
          for (bean in uicomponent.getBeans()) {
             def beanIdField = uicomponent.getBeanIdField();
             def beanId = uicomponent.getBeanIdFor(bean);
-            if (bean instanceof org.exoplatform.services.organization.impl.UserImpl) {
+            if (bean instanceof org.exoplatform.services.organization.User) {
                 if(!uicomponent.getFieldValue(bean, "enabled")) {
                     rowStyle = "disabled";
                 } else {
@@ -101,7 +101,7 @@
             <%
                EntityEncoder encoder = HTMLEntityEncoder.getInstance();
                for (field in beanFields) {
-			      def fieldValue = uicomponent.getFieldValue(bean, field);
+            def fieldValue = uicomponent.getFieldValue(bean, field);
                   def cssClass = "";
                   if(fieldValue != null) {
                      def fieldClass = fieldValue.getClass();
@@ -122,7 +122,7 @@
                }%>
 
                <!-- EnableDisableUser action -->
-               <% if (bean instanceof org.exoplatform.services.organization.impl.UserImpl) {%>
+               <% if (bean instanceof org.exoplatform.services.organization.User) {%>
                    <td headers="DisableEnableUser">
                     <div class="center">
                         <%
@@ -161,7 +161,7 @@
                             }
                             classIcon = "uiIcon" + action;
                             if (action == "DisableEnableUser") {
-                                if (bean instanceof org.exoplatform.services.organization.impl.UserImpl) {
+                                if (bean instanceof org.exoplatform.services.organization.User) {
                                     if (uicomponent.getFieldValue(bean, "enabled")) {
                                         classIcon = "uiIconSelectPage uiIconLightGray";
                                     } else {
@@ -170,7 +170,7 @@
                                 }
                             }%>
                             <a class="actionIcon" title="$title" rel="tooltip" href="javascript:;" onclick="$actionLink">
-								<i class="${classIcon} uiIconLightGray"> </i>
+                <i class="${classIcon} uiIconLightGray"> </i>
                             </a>
                        <%} %>
                     </div>

@@ -33,7 +33,6 @@ import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.UserStatus;
-import org.exoplatform.services.organization.impl.UserImpl;
 import org.exoplatform.services.security.jaas.AbstractLoginModule;
 
 public class FilterDisabledLoginModule extends AbstractLoginModule {
@@ -77,7 +76,7 @@ public class FilterDisabledLoginModule extends AbstractLoginModule {
 
                     if (user == null) {
                         log.debug("user {0} doesn't exists. FilterDisabledLoginModule will be ignored.", username);
-                    } else if (user instanceof UserImpl && !((UserImpl) user).isEnabled()) {
+                    } else if (!user.isEnabled()) {
                         HttpServletRequest request = getCurrentHttpServletRequest();
                         if (request != null) {
                             request.setAttribute(DISABLED_USER_NAME, username);
