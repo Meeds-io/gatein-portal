@@ -702,6 +702,13 @@
       } catch (error) {
         alert(error.message);
       }
+      
+      //Remove modal-open class that was added by UIPopupWindow.js
+      //This is a workaround for responsive feature branch
+      //When a popup window is opened, it add modal-open class to html body
+      if (!$('.uiPopupWrapper').length) {
+        $('body').removeClass('modal-open');
+      }
     };
 
     /*

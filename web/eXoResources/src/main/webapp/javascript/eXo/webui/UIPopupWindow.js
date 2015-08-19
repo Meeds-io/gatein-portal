@@ -34,30 +34,31 @@
 	   */
 	  show : function(popupId, isShowMask, middleBrowser, height) {
 	    var popup = document.getElementById(popupId);
-	    if (popup == null) return;        
-	
-	    // TODO Lambkin: this statement create a bug in select box component in
-	    // Firefox
-	    // this.superClass.init(popup) ;    
-	    var popupBar = $(popup).find("span.PopupTitle")[0];
-	    this.initDND(popupBar, popup);
-	    
-	    var resizeBtn = $(popup).find(".ResizeButton, .uiIconResize").last();
-	    if (resizeBtn.length) {
-	    	resizeBtn.show()
-	    	resizeBtn.off().on("mousedown touchstart", this.startResizeEvt);
-	    }    	
-	
-	    if (isShowMask)
-	    	popupWindow.showMask(popup, true);
-	    popup.style.visibility = "hidden";
-	    this.superClass.show(popup);
-	    
-	    if ($(popup).find("iframe").length > 0) {
-	    	setTimeout(function() {popupWindow.setupWindow(popup, middleBrowser, height);}, 500);
-	    } else {
-	    	this.setupWindow(popup, middleBrowser, height);
-	    }
+      if (popup == null) return;        
+  
+      // TODO Lambkin: this statement create a bug in select box component in
+      // Firefox
+      // this.superClass.init(popup) ;    
+      var popupBar = $(popup).find("span.PopupTitle")[0];      
+  
+      if (isShowMask)
+        popupWindow.showMask(popup, true);
+      popup.style.visibility = "hidden";
+      this.superClass.show(popup);
+      
+      popupWindow.addToWrapper(popup);
+      
+      var resizeBtn = $(popup).find(".ResizeButton, .uiIconResize").last();
+      if (resizeBtn.length) {
+        resizeBtn.show();
+        resizeBtn.off().on("mousedown touchstart", this.startResizeEvt);
+      }
+      this.initDND(popupBar, popup);
+      if ($(popup).find("iframe").length > 0) {
+        setTimeout(function() {popupWindow.setupWindow(popup, middleBrowser, height);}, 500);
+      } else {
+        this.setupWindow(popup, middleBrowser, height);
+      }
 	  },
 	  
 	  setupWindow : function(popup, middleBrowser, height) {	    	
@@ -111,6 +112,7 @@
 	  hide : function(popupId, isShowMask) {
 		var popup = document.getElementById(popupId);
 		if (popup == null) return;     
+		  popupWindow.removeFromWrapper(popup);
 	    this.superClass.hide(popup);
 	    if (isShowMask) popupWindow.showMask(popup, false);
 	  },
@@ -136,6 +138,41 @@
 	        uiMaskLayer.removeMask(mask);
 	    }
 	  },  
+	  
+    addToWrapper : function(popup) {
+      var $popup = $(popup);
+      if ($popup.parent().hasClass('uiPopupWrapper')) return;
+      
+      var $wrapper = $('<div class="uiPopupWrapper"></div>');
+      $wrapper.css({
+        'zIndex' : ++eXo.webui.UIPopup.zIndex
+      });
+      $popup.replaceWith($wrapper);
+      $wrapper.append($popup);
+      
+      $wrapper.on('click', function(e) {
+        var $target = $(e.target);
+        if (!$target.hasClass('uiPopup') && !$target.closest('.uiPopup').length) {
+          $wrapper.find('.uiIconClose').first().click();          
+          return false;
+        }
+      });
+      
+      $('body').addClass('modal-open');
+    },
+
+    removeFromWrapper : function(popup) {
+      var $popup = $(popup);
+      if ($popup.css('display') == 'none' || !$popup.parent().hasClass('uiPopupWrapper'))
+        return;
+
+      var $wrapper = $popup.parent();
+      $wrapper.html('');
+      $wrapper.replaceWith($popup);
+      if (!$('.uiPopupWrapper').length) {
+        $('body').removeClass('modal-open');        
+      }      
+    },
 	  
 	  /**
 	   * Called when the window starts being resized sets the onmousemove and
