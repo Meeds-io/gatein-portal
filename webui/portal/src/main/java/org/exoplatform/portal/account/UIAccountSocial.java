@@ -92,6 +92,13 @@ public class UIAccountSocial extends UIForm {
         super.processRender(context);
     }
 
+    void requestActive() {
+        UIAccountSetting uiAccountSetting = this.getAncestorOfType(UIAccountSetting.class);
+        if (uiAccountSetting != null) {
+            uiAccountSetting.setActiveChildId(this.getId());
+        }
+    }
+
     private void updateUIFields() {
         UserProfile userProfile = (UserProfile)Util.getPortalRequestContext().getAttribute(UserProfileLifecycle.USER_PROFILE_ATTRIBUTE_NAME);
 
@@ -114,7 +121,11 @@ public class UIAccountSocial extends UIForm {
 
     public String getLinkSocialAccountURL(OAuthProviderType oauthPrType) {
         PortalRequestContext prc = Util.getPortalRequestContext();
-        return oauthPrType.getInitOAuthURL(prc.getRequestContextPath(), prc.getRequestURI());
+        String requestURI = new StringBuilder(prc.getRequestURI())
+                                .append("?").append(UIAccountSetting.PARAM_ACTIVE_CHILD_ID)
+                                .append("=").append(this.getId())
+                                .toString();
+        return oauthPrType.getInitOAuthURL(prc.getRequestContextPath(), requestURI);
     }
 
     public String getUnlinkSocialAccountURL(OAuthProviderType oauthPrType) throws Exception {
@@ -131,6 +142,8 @@ public class UIAccountSocial extends UIForm {
             WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
             PortalRequestContext prContext = Util.getPortalRequestContext();
             UIApplication uiApp = context.getUIApplication();
+
+            uiForm.requestActive();
 
             ConversationState state = ConversationState.getCurrent();
             String userName = ((User) state.getAttribute(CacheUserProfileFilter.USER_PROFILE)).getUserName();

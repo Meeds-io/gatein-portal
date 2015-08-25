@@ -98,7 +98,7 @@ public class OAuthUtils {
     }
 
     public static User convertOAuthPrincipalToGateInUser(OAuthPrincipal principal) {
-        User gateinUser = new UserImpl(principal.getUserName());
+        User gateinUser = new UserImpl(OAuthUtils.refineUserName(principal.getUserName()));
         gateinUser.setFirstName(principal.getFirstName());
         gateinUser.setLastName(principal.getLastName());
         gateinUser.setEmail(principal.getEmail());
@@ -219,5 +219,22 @@ public class OAuthUtils {
             }
         }
         return params;
+    }
+
+    public static String refineUserName(String username) {
+        final String ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012456789._";
+        final char replaced = '_';
+
+        if (username == null || username.isEmpty()) {
+            return "";
+        }
+
+        final char[] chars = username.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            if (ALLOWED_CHARACTERS.indexOf(chars[i]) == -1) {
+                chars[i] = replaced;
+            }
+        }
+        return new String(chars);
     }
 }

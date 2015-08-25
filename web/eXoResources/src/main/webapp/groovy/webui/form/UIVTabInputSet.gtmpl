@@ -1,8 +1,8 @@
 <%		
 	def rcontext = _ctx.getRequestContext(); 
 	rcontext.getJavascriptManager().require("SHARED/selectors", "selectors").require("SHARED/jquery", "\$")
-			  .addScripts("selectors.UIItemSelector.init('.uiPersonalInfo .itemList .actionIcon', null, true);")
-	      .addScripts("var actions = \$('.uiPersonalInfo .itemList .actionIcon'); actions.on('click', function() { actions.removeClass('active'); \$(this).addClass('active'); });");
+			  .addScripts("selectors.UIItemSelector.init('.uiPersonalInfo .itemList .itemTab', null, true);")
+	      .addScripts("var actions = \$('.uiPersonalInfo .itemList .itemTab'); actions.on('click', function() { actions.removeClass('active'); \$(this).addClass('active'); });");
 %>
 <div class="uiPersonalInfo uiVTabInputSet">
 			<div class="row uiItemSelector">
@@ -27,7 +27,7 @@
 									if(child.isRendered()) type = "active item";
 								%>
 								<li>
-									<a class="actionIcon $type" href="#" ><i class="uiIcon${child.id} uiIconLightGray"></i><%= _ctx.appRes(uicomponent.getId() + ".label." + child.id)%></a>
+									<a class="btn itemTab $type" href="#" ><i class="uiIcon${child.id} uiIconLightGray"></i><%= _ctx.appRes(uicomponent.getId() + ".label." + child.id)%></a>
 								</li>
 								<%}%>
 						</ul>

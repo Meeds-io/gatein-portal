@@ -82,7 +82,8 @@ public class UIPortalComponentActionListener {
             UIMaskWorkspace uiMaskWS = uiApp.getChildById(UIPortalApplication.UI_MASK_WS_ID);
             UILogin uiLogin = uiMaskWS.createUIComponent(UILogin.class, null, null);
             uiMaskWS.setUIComponent(uiLogin);
-            uiMaskWS.setWindowSize(630, -1);
+            uiMaskWS.setCssClasses("TransparentMask");
+            uiMaskWS.setWindowSize(-1, -1);
             event.getRequestContext().addUIComponentToUpdateByAjax(uiMaskWS);
         }
     }

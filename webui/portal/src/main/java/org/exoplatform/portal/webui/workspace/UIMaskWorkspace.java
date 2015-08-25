@@ -38,6 +38,8 @@ public class UIMaskWorkspace extends UIComponentDecorator {
 
     private boolean isShow = false;
 
+    private String cssClasses = "";
+
     // TODO: Seems the isUpdated is never true
     private boolean isUpdated = false;
 
@@ -73,7 +75,20 @@ public class UIMaskWorkspace extends UIComponentDecorator {
         // this.isUpdated = bln;
     }
 
-    public <T extends UIComponent> T createUIComponent(Class<T> clazz, String configId, String id) throws Exception {
+    public String getCssClasses() {
+        return cssClasses;
+    }
+
+    public void setCssClasses(String cssClasses) {
+        this.cssClasses = cssClasses;
+    }
+
+    public void reset() {
+        cssClasses = "";
+        setWindowSize(-1, -1);
+    }
+
+  public <T extends UIComponent> T createUIComponent(Class<T> clazz, String configId, String id) throws Exception {
         T uicomponent = super.createUIComponent(clazz, configId, id);
         setUIComponent(uicomponent);
         return uicomponent;
@@ -102,7 +117,7 @@ public class UIMaskWorkspace extends UIComponentDecorator {
                 return;
             }
             uiMaskWorkspace.setUIComponent(null);
-            uiMaskWorkspace.setWindowSize(-1, -1);
+            uiMaskWorkspace.reset();
             WebuiRequestContext rContext = event.getRequestContext();
             rContext.getJavascriptManager().require("SHARED/uiMaskWorkspace", "maskWS")
                     .addScripts("maskWS.hide('" + uiMaskWorkspace.getId() + "');");

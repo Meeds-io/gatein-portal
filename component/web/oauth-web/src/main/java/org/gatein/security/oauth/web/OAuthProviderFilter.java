@@ -91,6 +91,8 @@ public abstract class OAuthProviderFilter<T extends AccessTokenContext> extends 
             initInteraction(httpRequest, httpResponse);
             saveRememberMe(httpRequest);
             saveInitialURI(httpRequest);
+
+            authenticationRegistry.removeAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER);
         }
 
         // Possibility to init interaction with custom scope. It's needed when custom portlets want bigger scope then the one available in configuration
