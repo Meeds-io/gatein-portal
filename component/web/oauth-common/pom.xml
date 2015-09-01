@@ -53,6 +53,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.picketlink.idm</groupId>
+      <artifactId>picketlink-idm-api</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.gatein.portal</groupId>
       <artifactId>exo.portal.component.web.security</artifactId>
     </dependency>

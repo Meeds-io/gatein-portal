@@ -100,6 +100,9 @@ public class TestI18N extends TestCase {
      * "TH").toString() return "ja_JP_JP_#u-ca-japanese" and "th_TH_TH_#u-nu-thai" respectively in Java 7; see <a
      * href="http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html">Java 7 Locale, Compatibility Section</a>.
      *
+     * In Java 8, There is empty Locale object (with language="", country="",...) returned by {@link Locale#getAvailableLocales()}.
+     * In this case, method {@link Locale#toString()} return empty String, so we can not use parser for this.
+     *
      * The result is computed through comparing the expected Java 6 locale ID (e.g. "en_GB") with the result of
      * {@link Locale#toString()}. If the output of of {@link Locale#toString()} matches the expected ID (i.e. something of the
      * form {language}[_[{country}][_{variant}]]) or if {@link Locale#toString()} equals one of "ja_JP_JP_#u-ca-japanese" or
@@ -109,6 +112,11 @@ public class TestI18N extends TestCase {
      * @return {@code true} or {@code false}
      */
     private static boolean isJava6Compatible(Locale locale) {
+        String foundLocaleId = locale.toString();
+        if (foundLocaleId.isEmpty()) {
+            return false;
+        }
+
         StringBuilder localeIdBuilder = new StringBuilder(16);
         localeIdBuilder.append(locale.getLanguage());
 
@@ -126,7 +134,6 @@ public class TestI18N extends TestCase {
             }
         }
         String expectedJava6LocaleId = localeIdBuilder.toString();
-        String foundLocaleId = locale.toString();
         if ("ja_JP_JP".equals(expectedJava6LocaleId) && "ja_JP_JP_#u-ca-japanese".equals(foundLocaleId)) {
             return true;
         } else if ("th_TH_TH".equals(expectedJava6LocaleId) && "th_TH_TH_#u-nu-thai".equals(foundLocaleId)) {
