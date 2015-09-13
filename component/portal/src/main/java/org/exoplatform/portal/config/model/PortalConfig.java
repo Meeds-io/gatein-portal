@@ -205,6 +205,15 @@ public class PortalConfig extends ModelObject {
     }
 
     public String getProperty(String name, String defaultValue) {
+      //We disable cache-control, viewport, and shared-layout control feature for PLF 4.3.x
+      //We may enable it later after make it work properly on PLF
+      if (PortalProperties.CACHE_CONTROL.equals(name)) {
+        return "no-cache";
+      } else if (PortalProperties.SHARED_LAYOUT.equals(name)) {
+        return PortalProperties.SHARED_LAYOUT_ALL;
+      } else if (PortalProperties.VIEWPORT.equals(name)) {
+        return null;
+      }
         String value = getProperty(name);
         if (value != null)
             return value;

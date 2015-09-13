@@ -96,11 +96,13 @@ public class UIPortalForm extends UIFormTabPane {
 
     private static final String FIELD_SHOW_INFOBAR = "showInfobar";
 
-    private static final String FIELD_VIEWPORT = "viewport";
-
-    private static final String FIELD_CACHE_CONTROL = "cacheControl";
-
-    private static final String FIELD_SHARED_LAYOUT = "sharedLayout";
+    //We disable cache-control, viewport, and shared-layout control feature for PLF 4.3.x
+    //We may enable it later after make it work properly on PLF
+//    private static final String FIELD_VIEWPORT = "viewport";
+//
+//    private static final String FIELD_CACHE_CONTROL = "cacheControl";
+//
+//    private static final String FIELD_SHARED_LAYOUT = "sharedLayout";
 
     private static final String FIELD_LABEL = "label";
 
@@ -253,9 +255,11 @@ public class UIPortalForm extends UIFormTabPane {
         uiSessionAliveBox.setValue(PortalProperties.SESSION_ON_DEMAND);
         uiPropertiesSet.addUIFormInput(uiSessionAliveBox);
 
-        UIFormStringInput uiCacheControlinput = new UIFormStringInput(FIELD_CACHE_CONTROL, FIELD_CACHE_CONTROL, null);
-        uiCacheControlinput.setReadOnly(false);
-        uiPropertiesSet.addChild(uiCacheControlinput);
+        //We disable cache-control, viewport, and shared-layout control feature for PLF 4.3.x
+        //We may enable it later after make it work properly on PLF
+//        UIFormStringInput uiCacheControlinput = new UIFormStringInput(FIELD_CACHE_CONTROL, FIELD_CACHE_CONTROL, null);
+//        uiCacheControlinput.setReadOnly(false);
+//        uiPropertiesSet.addChild(uiCacheControlinput);
 
         // TODO add more box for showPortletMode and showWindowState if needed
         UIFormCheckBoxInput<Boolean> uiShowInfobarBox = new UIFormCheckBoxInput<Boolean>(FIELD_SHOW_INFOBAR,
@@ -263,18 +267,18 @@ public class UIPortalForm extends UIFormTabPane {
         uiShowInfobarBox.setOnChange("CheckShowInfobar");
         uiPropertiesSet.addChild(uiShowInfobarBox);
 
-        UIFormStringInput uiViewportInput = new UIFormStringInput(FIELD_VIEWPORT, FIELD_VIEWPORT, null);
-        uiViewportInput.setReadOnly(false);
-        uiPropertiesSet.addChild(uiViewportInput);
+//        UIFormStringInput uiViewportInput = new UIFormStringInput(FIELD_VIEWPORT, FIELD_VIEWPORT, null);
+//        uiViewportInput.setReadOnly(false);
+//        uiPropertiesSet.addChild(uiViewportInput);
 
         addUIFormInput(uiPropertiesSet);
 
-        List<SelectItemOption<String>> listSharedLayout = new ArrayList<SelectItemOption<String>>();
-        listSharedLayout.add(new SelectItemOption<String>(PortalProperties.SHARED_LAYOUT_ALL, PortalProperties.SHARED_LAYOUT_ALL));
-        listSharedLayout.add(new SelectItemOption<String>(PortalProperties.SHARED_LAYOUT_ADMINS, PortalProperties.SHARED_LAYOUT_ADMINS));
-        UIFormSelectBox sharedLayoutSelectBox = new UIFormSelectBox(FIELD_SHARED_LAYOUT, FIELD_SHARED_LAYOUT, listSharedLayout);
-        sharedLayoutSelectBox.setValue(PortalProperties.SHARED_LAYOUT_ALL);
-        uiPropertiesSet.addUIFormInput(sharedLayoutSelectBox);
+//        List<SelectItemOption<String>> listSharedLayout = new ArrayList<SelectItemOption<String>>();
+//        listSharedLayout.add(new SelectItemOption<String>(PortalProperties.SHARED_LAYOUT_ALL, PortalProperties.SHARED_LAYOUT_ALL));
+//        listSharedLayout.add(new SelectItemOption<String>(PortalProperties.SHARED_LAYOUT_ADMINS, PortalProperties.SHARED_LAYOUT_ADMINS));
+//        UIFormSelectBox sharedLayoutSelectBox = new UIFormSelectBox(FIELD_SHARED_LAYOUT, FIELD_SHARED_LAYOUT, listSharedLayout);
+//        sharedLayoutSelectBox.setValue(PortalProperties.SHARED_LAYOUT_ALL);
+//        uiPropertiesSet.addUIFormInput(sharedLayoutSelectBox);
 
         UIFormInputSet uiPermissionSetting = createUIComponent(UIFormInputSet.class, "PermissionSetting", null);
         addUIComponentInput(uiPermissionSetting);
