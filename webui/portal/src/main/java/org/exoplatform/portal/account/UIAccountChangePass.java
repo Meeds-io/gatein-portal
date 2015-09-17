@@ -19,14 +19,18 @@
 
 package org.exoplatform.portal.account;
 
+import org.exoplatform.portal.application.PortalRequestContext;
+import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.UserStatus;
 import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.Credential;
 import org.exoplatform.services.security.PasswordCredential;
 import org.exoplatform.services.security.UsernameCredential;
 import org.exoplatform.web.application.ApplicationMessage;
+import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
@@ -40,14 +44,21 @@ import org.exoplatform.webui.form.UIFormStringInput;
 import org.exoplatform.webui.form.validator.MandatoryValidator;
 import org.exoplatform.webui.form.validator.PasswordStringLengthValidator;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * Created by The eXo Platform SARL Author : tung.dang tungcnw@gmail.com
  */
 
-@ComponentConfig(lifecycle = UIFormLifecycle.class, template = "system:/groovy/webui/form/UIForm.gtmpl", events = {
+@ComponentConfig(lifecycle = UIFormLifecycle.class, template = "system:/groovy/portal/webui/portal/UIAccountChangePass.gtmpl", events = {
         @EventConfig(listeners = UIAccountChangePass.SaveActionListener.class),
-        @EventConfig(listeners = UIAccountChangePass.ResetActionListener.class, phase = Phase.DECODE) })
+        @EventConfig(listeners = UIAccountChangePass.ResetActionListener.class, phase = Phase.DECODE),
+        @EventConfig(listeners = UIAccountChangePass.ResetPassActionListener.class, phase = Phase.DECODE)})
 public class UIAccountChangePass extends UIForm {
+
+    private String messageType = "info";
+    private String messageKey = "UIAccountChangePass.msg.reset-password";
 
     // constructor
     public UIAccountChangePass() throws Exception {
@@ -58,6 +69,30 @@ public class UIAccountChangePass extends UIForm {
                 .addValidator(PasswordStringLengthValidator.class, 6, 30).addValidator(MandatoryValidator.class));
         addUIFormInput(new UIFormStringInput("confirmnewpass", "password", null).setType(UIFormStringInput.PASSWORD_TYPE)
                 .addValidator(PasswordStringLengthValidator.class, 6, 30).addValidator(MandatoryValidator.class));
+        setActions(new String[] {"Save", "Reset", "ResetPass"});
+    }
+
+    public String upperFirstChar(String s) {
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+    public String getMessage() {
+        WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
+        ResourceBundle res = context.getApplicationResourceBundle();
+        try {
+            String message = res.getString(messageKey);
+            if (message.indexOf("<a href=\"#RESETPASSWORD\">") != -1) {
+                String replace = "<a href=\"javascript:void(0);\" onclick=\"" + this.event("ResetPass") + "\">";
+                message = message.replace("<a href=\"#RESETPASSWORD\">", replace);
+            }
+
+            return message;
+        } catch (Exception ex) {
+            return messageKey;
+        }
     }
 
     public static class ResetActionListener extends EventListener<UIAccountChangePass> {
@@ -118,6 +153,47 @@ public class UIAccountChangePass extends UIForm {
             uiForm.reset();
             event.getRequestContext().addUIComponentToUpdateByAjax(uiForm);
             return;
+        }
+    }
+
+    public static class ResetPassActionListener extends EventListener<UIAccountChangePass> {
+        @Override
+        public void execute(Event<UIAccountChangePass> event) throws Exception {
+            WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
+            PortalRequestContext pContext = PortalRequestContext.getCurrentInstance();
+            UIApplication uiApp = context.getUIApplication();
+            UIAccountChangePass form = event.getSource();
+
+            OrganizationService orgService = form.getApplicationComponent(OrganizationService.class);
+            PasswordRecoveryService service = form.getApplicationComponent(PasswordRecoveryService.class);
+
+            String username = event.getRequestContext().getRemoteUser();
+            User u = null;
+            try {
+                u = orgService.getUserHandler().findUserByName(username, UserStatus.ANY);
+            } catch (Exception ex) {
+                u = null;
+            }
+
+            UserPortal portal = pContext.getUserPortal();
+            Locale locale = portal != null ? portal.getLocale() : null;
+            if (locale == null) {
+                locale = Locale.ENGLISH;
+            }
+
+            if (u == null || !u.isEnabled()) {
+                form.messageKey = "UIAccountChangePass.msg.account-not-exist";
+                form.messageType = "error";
+
+            } else if (service.sendRecoverPasswordEmail(u, locale, pContext.getRequest())) {
+                form.messageKey = "UIAccountChangePass.msg.email-reset-password-sent";
+                form.messageType = "success";
+
+            } else {
+                form.messageKey = "UIAccountChangePass.msg.email-reset-password-not-sent";
+                form.messageType = "error";
+            }
+            context.addUIComponentToUpdateByAjax(form);
         }
     }
 }

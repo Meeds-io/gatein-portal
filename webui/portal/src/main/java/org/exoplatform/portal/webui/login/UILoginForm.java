@@ -19,7 +19,13 @@
 
 package org.exoplatform.portal.webui.login;
 
+import org.exoplatform.portal.application.PortalRequestContext;
+import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.portal.webui.workspace.UIMaskWorkspace;
+import org.exoplatform.web.WebAppController;
+import org.exoplatform.web.controller.QualifiedName;
+import org.exoplatform.web.controller.router.Router;
+import org.exoplatform.web.login.recovery.PasswordRecoveryHandler;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
@@ -29,6 +35,12 @@ import org.exoplatform.webui.core.lifecycle.Lifecycle;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.Event.Phase;
 import org.exoplatform.webui.event.EventListener;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by The eXo Platform SARL Author : Nhu Dinh Thuan nhudinhthuan@exoplatform.com Jul 11, 2006
@@ -59,6 +71,19 @@ public class UILoginForm extends UIContainer {
         if (event != null) {
             event.broadcast();
         }
+    }
+
+    public String getForgetPasswordURL() {
+        PortalRequestContext pContext = Util.getPortalRequestContext();
+        String contextPath = pContext.getRequestContextPath();
+        String initURL = pContext.getInitialURI();
+
+        Router router = this.getApplicationComponent(WebAppController.class).getRouter();
+        Map<QualifiedName, String> params = new HashMap<QualifiedName, String>();
+        params.put(WebAppController.HANDLER_PARAM, PasswordRecoveryHandler.NAME);
+        params.put(PasswordRecoveryHandler.INIT_URL, initURL);
+
+        return contextPath + router.render(params);
     }
 
 }

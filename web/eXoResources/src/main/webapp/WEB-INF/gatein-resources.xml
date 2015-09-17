@@ -336,6 +336,17 @@
       <module>portalRequest</module>
     </depends>
   </module>
+  
+  <module>
+    <name>formValidation</name>
+    <load-group>webuiGRP</load-group>
+    <script>
+      <path>/javascript/eXo/webui/FormValidation.js</path>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
 
   <module>
     <name>uiPopupWindow</name>

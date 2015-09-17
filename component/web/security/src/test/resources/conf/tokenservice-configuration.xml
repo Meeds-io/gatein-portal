@@ -124,6 +124,20 @@
     </init-params>
   </component>
 
+  <component>
+    <key>org.exoplatform.web.security.security.RemindPasswordTokenService</key>
+    <type>org.exoplatform.web.security.security.RemindPasswordTokenService</type>
+    <init-params>
+      <values-param>
+        <name>service.configuration</name>
+        <value>jcr-token</value>
+        <value>2</value>
+        <value>SECOND</value>
+        <value>remindpwd</value>
+      </values-param>
+    </init-params>
+  </component>
+
   <external-component-plugins>
     <target-component>org.exoplatform.commons.chromattic.ChromatticManager</target-component>
     <component-plugin>
