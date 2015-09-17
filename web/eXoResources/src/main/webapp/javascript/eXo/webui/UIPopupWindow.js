@@ -152,7 +152,7 @@
       
       $wrapper.on('click', function(e) {
         var $target = $(e.target);
-        if (!$target.hasClass('uiPopup') && !$target.closest('.uiPopup').length) {
+        if ($target.hasClass('.uiPopupWrapper')) {
           $wrapper.find('.uiIconClose').first().click();          
           return false;
         }
