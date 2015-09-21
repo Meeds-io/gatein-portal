@@ -68,10 +68,10 @@ public class DownloadHandler extends WebRequestHandler {
         if (dresource.getDownloadName() != null) {
             if (userAgent != null && userAgent.contains("Firefox")) {
                 res.setHeader("Content-Disposition",
-                        "attachment; filename*=utf-8''" + URLEncoder.encode(dresource.getDownloadName(), "UTF-8") + "");
+                        "attachment; filename*=utf-8''" + URLEncoder.encode(dresource.getDownloadName(), "UTF-8").replace("+", "%20") + "");
             } else {
                 res.setHeader("Content-Disposition",
-                        "attachment;filename=\"" + URLEncoder.encode(dresource.getDownloadName(), "UTF-8") + "\"");
+                        "attachment;filename=\"" + URLEncoder.encode(dresource.getDownloadName(), "UTF-8").replace("+", "%20") + "\"");
             }
         }
         res.setContentType(dresource.getResourceMimeType());
