@@ -217,4 +217,18 @@ public class ChromatticIntegrationTestCase extends AbstractKernelTest {
         assertSame(session1, session2);
         chromatticManager.endRequest(false);
     }
+
+    public void testGlobalSessionClose() {
+        chromatticManager.beginRequest();
+        try {
+            test1LF.openContext();
+            // do something
+            test1LF.closeContext(true);
+
+            assertNull(test1LF.getContext(true));
+        }
+        finally {
+            chromatticManager.endRequest(true);
+        }
+    }
 }

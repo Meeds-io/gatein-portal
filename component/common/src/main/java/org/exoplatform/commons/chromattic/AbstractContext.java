@@ -94,43 +94,37 @@ abstract class AbstractContext implements SessionContext {
     }
 
     public void close(boolean save) {
-        try {
-            if (listeners != null) {
-                for (SynchronizationListener listener : listeners) {
-                    try {
-                        listener.beforeSynchronization();
-                    } catch (Exception e) {
-                        // to log
-                    }
+        if (listeners != null) {
+            for (SynchronizationListener listener : listeners) {
+                try {
+                    listener.beforeSynchronization();
+                } catch (Exception e) {
+                    // to log
                 }
             }
-
-            //
-            if (session != null) {
-                if (save) {
-                    session.save();
-                }
-
-                //
-                session.close();
-            }
-
-            //
-            if (listeners != null) {
-                SynchronizationStatus status = save ? SynchronizationStatus.SAVED : SynchronizationStatus.DISCARDED;
-                for (SynchronizationListener listener : listeners) {
-                    try {
-                        listener.afterSynchronization(status);
-                    } catch (Exception e) {
-                        // to log
-                    }
-                }
-            }
-        } finally {
-            lifeCycle.currentContext.set(null);
         }
+
         //
-        lifeCycle.onCloseSession(this);
+        if (session != null) {
+            if (save) {
+                session.save();
+            }
+
+            //
+            session.close();
+        }
+
+        //
+        if (listeners != null) {
+            SynchronizationStatus status = save ? SynchronizationStatus.SAVED : SynchronizationStatus.DISCARDED;
+            for (SynchronizationListener listener : listeners) {
+                try {
+                    listener.afterSynchronization(status);
+                } catch (Exception e) {
+                    // to log
+                }
+            }
+        }
     }
 
     public final void addSynchronizationListener(SynchronizationListener listener) {

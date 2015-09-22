@@ -93,10 +93,17 @@ public class Synchronization {
         return session;
     }
 
+    public void close(ChromatticLifeCycle lifecycle, boolean save) {
+        SynchronizedContext context = contexts.remove(lifecycle.getDomainName());
+        context.close(save);
+        lifecycle.onCloseSession(context);
+    }
+
     public void close(boolean save) {
         // First save all global contexts (sessions)
-        for (SynchronizedContext context : contexts.values()) {
-            context.close(save);
+        SynchronizedContext[] array = new SynchronizedContext[contexts.size()];
+        for (SynchronizedContext context : contexts.values().toArray(array)) {
+            close(context.lifeCycle, save);
         }
 
         // Now close all JCR sessions

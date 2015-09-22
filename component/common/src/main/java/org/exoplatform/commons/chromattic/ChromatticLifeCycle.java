@@ -280,7 +280,18 @@ public class ChromatticLifeCycle extends BaseComponentPlugin {
         }
 
         //
-        context.close(save);
+        Synchronization sync = manager.getSynchronization();
+
+        if (sync != null) {
+            sync.close(this, save);
+        } else {
+            try {
+                context.close(save);
+            } finally {
+                currentContext.set(null);
+            }
+            onCloseSession(context);
+        }
     }
 
     protected void onOpenSession(SessionContext context) {
