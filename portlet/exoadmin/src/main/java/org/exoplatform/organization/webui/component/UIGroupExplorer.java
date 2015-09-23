@@ -67,7 +67,8 @@ public class UIGroupExplorer extends UIContainer {
         tree.setSelectedIcon("PortalIcon");
         tree.setBeanIdField("id");
         // tree.setBeanLabelField("groupName");
-        tree.setBeanLabelField("encodedLabel");
+        tree.setBeanLabelField("label");
+        tree.setEscapeHTML(true);
         tree.setMaxTitleCharacter(25);
     }
 
