@@ -60,6 +60,7 @@
     <Locale lang="pl" messages="locale/pl_ALL.xml"/>
     <Locale lang="ro" messages="locale/ro_ALL.xml"/>
     <Locale lang="ca" messages="locale/ca_ALL.xml"/>
+    <Locale lang="nl" messages="locale/nl_ALL.xml"/>
     <Require feature="dynamic-height"/>
     <Require feature="minimessage"/>
     <Require feature="views"/>
