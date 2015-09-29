@@ -65,7 +65,7 @@
 							<%=uiform.getLabel('email')%>
 						</th>
 						<% if(!isMulti) { %>
-						<th class="center" width="100px">Action</th>
+						<th class="center" width="100px"><%=uiform.getLabel('action')%></th>
 						<% } %>
 					</tr>
 				</thead>
