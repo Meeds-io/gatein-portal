@@ -147,7 +147,7 @@
       $wrapper.css({
         'zIndex' : ++eXo.webui.UIPopup.zIndex
       });
-      $popup.replaceWith($wrapper);
+      $wrapper.insertAfter($popup);
       $wrapper.append($popup);
       
       $wrapper.on('click', function(e) {
@@ -167,7 +167,7 @@
         return;
 
       var $wrapper = $popup.parent();
-      $wrapper.html('');
+
       $wrapper.replaceWith($popup);
       if (!$('.uiPopupWrapper').length) {
         $('body').removeClass('modal-open');        
