@@ -21,10 +21,10 @@ package org.exoplatform.web.login.recovery;
 
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.container.PortalContainer;
-
 import org.exoplatform.portal.Constants;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.resources.LocaleContextInfo;
+
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 
@@ -232,5 +232,19 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
 
     protected String getSenderEmail() {
         return System.getProperty("gatein.email.smtp.from", "noreply@gatein.org");
+    }
+
+    @Override
+    public String getPasswordRecoverURL(String tokenId, String lang) {
+        Router router = webController.getRouter();
+        Map<QualifiedName, String> params = new HashMap<QualifiedName, String>();
+        params.put(WebAppController.HANDLER_PARAM, PasswordRecoveryHandler.NAME);
+        if (tokenId != null) {
+          params.put(PasswordRecoveryHandler.TOKEN, tokenId);
+        }
+        if (lang != null) {
+          params.put(PasswordRecoveryHandler.LANG, lang);
+        }
+        return router.render(params);
     }
 }

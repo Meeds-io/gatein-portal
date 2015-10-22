@@ -20,9 +20,11 @@
 package org.exoplatform.web.login.recovery;
 
 import org.exoplatform.services.organization.User;
+
 import org.gatein.wci.security.Credentials;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.Locale;
 
 /**
@@ -32,4 +34,7 @@ public interface PasswordRecoveryService {
     Credentials verifyToken(String tokenId);
     boolean changePass(final String tokenId, final String username, final String password);
     public boolean sendRecoverPasswordEmail(User user, Locale defaultLocale, HttpServletRequest req);
+
+    // EXOGTN-2114 Workaround for Java 8 Backward compatibility.
+    String getPasswordRecoverURL(String tokenId, String lang);
 }

@@ -22,19 +22,13 @@
 <%@ page import="org.exoplatform.container.PortalContainer"%>
 <%@ page import="org.exoplatform.services.resources.ResourceBundleService"%>
 <%@ page import="org.exoplatform.portal.resource.SkinService"%>
-<%@ page import="org.exoplatform.web.WebAppController" %>
-<%@ page import="org.exoplatform.web.controller.router.Router" %>
 <%@ page import="java.util.ResourceBundle"%>
 <%@ page import="org.exoplatform.services.organization.User"%>
 <%@ page import="org.exoplatform.services.organization.impl.UserImpl" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.Set" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.HashSet" %>
-<%@ page import="java.util.Map" %>
 <%@ page import="org.exoplatform.web.controller.QualifiedName" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="org.exoplatform.web.login.recovery.PasswordRecoveryHandler" %>
+<%@ page import="org.exoplatform.web.login.recovery.PasswordRecoveryService" %>
 <%@ page import="org.exoplatform.portal.resource.SkinConfig" %>
 <%@ page import="java.util.Collection" %>
 <%@ page import="java.util.Locale" %>
@@ -42,7 +36,6 @@
 <%@ page language="java" %>
 <%
     PortalContainer portalContainer = PortalContainer.getCurrentInstance(session.getServletContext());
-    WebAppController webAppController = (WebAppController)portalContainer.getComponentInstanceOfType(WebAppController.class);
     ResourceBundleService service = portalContainer.getComponentInstanceOfType(ResourceBundleService.class);
     Locale locale = (Locale)request.getAttribute("request_locale");
     if (locale == null) {
@@ -63,12 +56,8 @@
     String password = (String)request.getAttribute("password");
     String password2 = (String)request.getAttribute("password2");
 
-    Router router = webAppController.getRouter();
-    Map<QualifiedName, String> params = new HashMap<QualifiedName, String>();
-    params.put(WebAppController.HANDLER_PARAM, PasswordRecoveryHandler.NAME);
-    params.put(PasswordRecoveryHandler.TOKEN, tokenId);
-    params.put(PasswordRecoveryHandler.LANG, I18N.toTagIdentifier(locale));
-    String forgotPasswordPath = router.render(params);
+    PasswordRecoveryService passRecoveryServ = portalContainer.getComponentInstanceOfType(PasswordRecoveryService.class);
+    String forgotPasswordPath = passRecoveryServ.getPasswordRecoverURL(tokenId, I18N.toTagIdentifier(locale));
 
 
     List<String> errors = (List<String>)request.getAttribute("errors");

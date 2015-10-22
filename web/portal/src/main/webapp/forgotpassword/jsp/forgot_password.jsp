@@ -22,15 +22,9 @@
 <%@ page import="org.exoplatform.container.PortalContainer"%>
 <%@ page import="org.exoplatform.services.resources.ResourceBundleService"%>
 <%@ page import="org.exoplatform.portal.resource.SkinService"%>
-<%@ page import="org.exoplatform.web.WebAppController" %>
-<%@ page import="org.exoplatform.web.controller.router.Router" %>
 <%@ page import="java.util.ResourceBundle"%>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Map" %>
 <%@ page import="org.exoplatform.web.controller.QualifiedName" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="org.exoplatform.web.login.recovery.PasswordRecoveryHandler" %>
+<%@ page import="org.exoplatform.web.login.recovery.PasswordRecoveryService" %>
 <%@ page import="org.exoplatform.portal.resource.SkinConfig" %>
 <%@ page import="java.util.Collection" %>
 <%@ page import="java.util.Locale" %>
@@ -39,7 +33,6 @@
 <%
     PortalContainer portalContainer = PortalContainer.getCurrentInstance(session.getServletContext());
     ResourceBundleService service = portalContainer.getComponentInstanceOfType(ResourceBundleService.class);
-    WebAppController webAppController = (WebAppController)portalContainer.getComponentInstanceOfType(WebAppController.class);
     Locale locale = (Locale)request.getAttribute("request_locale");
     if (locale == null) {
         locale = request.getLocale();
@@ -57,11 +50,9 @@
     String error = (String)request.getAttribute("error");
     String success = (String)request.getAttribute("success");
 
-    Router router = webAppController.getRouter();
-    Map<QualifiedName, String> params = new HashMap<QualifiedName, String>();
-    params.put(WebAppController.HANDLER_PARAM, PasswordRecoveryHandler.NAME);
-    params.put(PasswordRecoveryHandler.LANG, I18N.toTagIdentifier(locale));
-    String forgotPasswordPath = router.render(params);
+    PasswordRecoveryService passRecoveryServ = portalContainer.getComponentInstanceOfType(PasswordRecoveryService.class);
+    String forgotPasswordPath = passRecoveryServ.getPasswordRecoverURL(null, I18N.toTagIdentifier(locale));
+
 
     String initURL = (String)request.getAttribute("initURL");
     if (initURL == null) {
