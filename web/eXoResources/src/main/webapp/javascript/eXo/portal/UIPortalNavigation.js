@@ -977,8 +977,7 @@
             + "href='"
             + actionLink
             + "'>"
-            + (node.label.length > 40 ? node.label.substring(0, 37) + "..."
-                : node.label) + "</a>");
+            + (node.label) + "</a>");
         if (node.childs.length) {
           htmlFrags += portalNavigation.generateContainer(node.childs);
         }
