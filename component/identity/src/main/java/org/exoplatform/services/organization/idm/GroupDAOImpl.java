@@ -119,6 +119,10 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         if (parentGroup != null) {
             ((ExtGroup) child).setParentId(parent.getId());
         }
+        Group g = findGroupById(child.getId());
+        if(g != null) {
+             throw new Exception("Group " + child.getGroupName() + " is already exist");
+        }
         org.picketlink.idm.api.Group childGroup = persistGroup(child);
 
         try {
