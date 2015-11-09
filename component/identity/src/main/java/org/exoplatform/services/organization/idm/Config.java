@@ -63,6 +63,8 @@ public class Config {
     private boolean countPaginatedUsers = true;
 
     private boolean filterDisabledUsersInQueries = true;
+    
+    private boolean disableUserActived = true;
 
     private boolean skipPaginationInMembershipQuery = false;
 
@@ -319,6 +321,14 @@ public class Config {
 
     public void setFilterDisabledUsersInQueries(boolean filterDisabledUsersInQueries) {
         this.filterDisabledUsersInQueries = filterDisabledUsersInQueries;
+    }
+
+    public boolean isDisableUserActived() {
+        return disableUserActived;
+    }
+
+    public void setDisableUserActived(boolean disableUserActived) {
+        this.disableUserActived = disableUserActived;
     }
 
     public boolean isSkipPaginationInMembershipQuery() {

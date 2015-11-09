@@ -305,6 +305,16 @@
           <field name="filterDisabledUsersInQueries">
             <boolean>true</boolean>
           </field>
+          
+          <!-- 
+            This option is used to toogle disable-user feature
+            By default, this option is set to TRUE
+            When this option is set to FALSE,
+              the disable-user feature is deactivated, and 'filterDisabledUsersInQueries' option is ignored
+           -->
+          <field name="disableUserActived">
+            <boolean>${exo.disable.user.activated:true}</boolean>
+          </field>
 
           <!-- For DB+LDAP it is not possible to efficiently perform paginated membership query. Only way is to download
                all memberships from LDAP server and all memberships from DB and merge them together.

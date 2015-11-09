@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.exoplatform.commons.serialization.api.annotations.Serialized;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.services.organization.OrganizationService;
@@ -89,15 +90,23 @@ public class UIListUsers extends UISearch {
     private String userSelected_;
 
     private UIGridUsers grid_;
+    
+    boolean disableUserActived = true;
 
     public UIListUsers() throws Exception {
         super(OPTIONS_);
 
         UIFormInputSet inputSet = getUISearchForm().getQuickSearchInputSet();
 
-        boolean showDisableUserFilterCheckbox = true;
+        //TODO: we may put this property key to PropertyManager as constant
+        String actived = PropertyManager.getProperty("exo.disable.user.activated");
+        if (actived != null) {
+          disableUserActived = Boolean.parseBoolean(actived);
+        }
+        boolean showDisableUserFilterCheckbox = disableUserActived;
+        
         OrganizationService orgService = this.getApplicationComponent(OrganizationService.class);
-        if(orgService instanceof PicketLinkIDMOrganizationServiceImpl
+        if(disableUserActived && orgService instanceof PicketLinkIDMOrganizationServiceImpl
                 && !((PicketLinkIDMOrganizationServiceImpl) orgService).getConfiguration().isFilterDisabledUsersInQueries()) {
             showDisableUserFilterCheckbox = false;
         }
