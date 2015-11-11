@@ -56,7 +56,7 @@ import org.exoplatform.webui.form.UIFormStringInput;
         @EventConfig(listeners = UIListUsers.DisableEnableUserActionListener.class),
         @EventConfig(listeners = UIListUsers.ViewUserInfoActionListener.class),
         @EventConfig(listeners = UIListUsers.SelectUserActionListener.class),
-        @EventConfig(listeners = UIListUsers.DeleteUserActionListener.class, confirm = "UIListUsers.deleteUser") })
+        @EventConfig(listeners = UIListUsers.DeleteUserActionListener.class, confirm = "UIListUsers.deleteUser", csrfCheck = true) })
 @Serialized
 public class UIListUsers extends UISearch {
 
