@@ -32,7 +32,7 @@ public abstract class AbstractSiteDataImportTest extends AbstractDataImportTest 
     }
 
     @Override
-    protected final void afterOneBootWithExtention(PortalContainer container) throws Exception {
+    protected void afterOneBootWithExtention(PortalContainer container) throws Exception {
         RequestLifeCycle.begin(container);
 
         POMSessionManager mgr = (POMSessionManager) container.getComponentInstanceOfType(POMSessionManager.class);

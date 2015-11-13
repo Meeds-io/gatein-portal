@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -46,6 +47,7 @@ import org.exoplatform.portal.config.model.PageNavigation;
 import org.exoplatform.portal.config.model.PageNode;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.UnmarshalledObject;
+import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.portal.mop.importer.ImportMode;
 import org.exoplatform.portal.mop.importer.Imported;
@@ -54,7 +56,9 @@ import org.exoplatform.portal.mop.importer.NavigationImporter;
 import org.exoplatform.portal.mop.importer.PageImporter;
 import org.exoplatform.portal.mop.importer.PortalConfigImporter;
 import org.exoplatform.portal.mop.navigation.NavigationService;
+import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.portal.mop.page.PageServiceWrapper;
 import org.exoplatform.portal.pom.config.POMSession;
 import org.exoplatform.portal.pom.config.POMSessionManager;
 import org.gatein.common.logging.Logger;
@@ -485,17 +489,14 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         if (pageSet == null) {
             return;
         }
-        ArrayList<Page> list = pageSet.getObject().getPages();
-        for (Page page : list) {
-            RequestLifeCycle.begin(PortalContainer.getInstance());
-            try { //
-                ImportMode importMode = getRightMode(config.getImportMode());
-
-                PageImporter importer = new PageImporter(importMode, page, dataStorage_, pageService_);
-                importer.perform();
-            } finally {
-                RequestLifeCycle.end();
-            }
+        RequestLifeCycle.begin(PortalContainer.getInstance());
+        try{
+            ImportMode importMode = getRightMode(config.getImportMode());
+            ArrayList<Page> list = pageSet.getObject().getPages();            
+            PageImporter importer = new PageImporter(importMode, new SiteKey(config.getOwnerType(), owner), list, dataStorage_, pageService_);
+            importer.perform();
+        } finally {
+            RequestLifeCycle.end();
         }
     }
 
