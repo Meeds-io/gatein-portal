@@ -20,6 +20,7 @@
 package org.exoplatform.services.organization.idm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import org.exoplatform.services.organization.MembershipTypeHandler;
 import org.gatein.common.logging.LogLevel;
 import org.picketlink.idm.api.Attribute;
 import org.picketlink.idm.api.Role;
+import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.SimpleAttribute;
 
 /*
@@ -100,7 +102,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                         orgService.getConfiguration().getGroupType(parent.getParentId()));
             } catch (Exception e) {
                 handleException("Cannot obtain group: " + parentPLGroupName, e);
-
+                throw e;
             }
             if(parentGroup == null) {
                 throw new Exception("Parent group is not exist");
@@ -133,7 +135,23 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                 getIdentitySession().getRelationshipManager().associateGroups(getRootGroup(), childGroup);
             }
         } catch (Exception e) {
-            handleException("Cannot associate groups: ", e);
+        	try {
+        	    // Workaround due to issues in Picketlink if it has not support transaction for LDAP yet
+                if (parentGroup != null) {
+                    if (getIdentitySession().getRelationshipManager().isAssociatedByKeys(parentGroup.getKey(),childGroup.getKey())) {
+                        getIdentitySession().getRelationshipManager().disassociateGroups(parentGroup, new ArrayList<org.picketlink.idm.api.Group> (Arrays.asList(childGroup)));    
+                    }
+                } else {
+                    org.picketlink.idm.api.Group rootGroup = getRootGroup();
+                    if (getIdentitySession().getRelationshipManager().isAssociatedByKeys(rootGroup.getKey(),childGroup.getKey())) {
+                        getIdentitySession().getRelationshipManager().disassociateGroups(rootGroup, new ArrayList<org.picketlink.idm.api.Group> (Arrays.asList(childGroup)));
+                    }
+                }
+        	} catch (IdentityException e1) {
+                handleException("Cannot deassociate groups: ", e1);
+                throw e1;
+        	}
+            throw e;
         }
 
         if (broadcast) {
@@ -173,6 +191,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                     orgService.getConfiguration().getGroupType(group.getParentId()));
         } catch (Exception e) {
             handleException("Cannot obtain group: " + plGroupName + "; ", e);
+            throw e;
         }
 
         if (jbidGroup == null) {
@@ -233,6 +252,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
         } catch (Exception e) {
             handleException("Cannot clear group relationships: " + plGroupName + "; ", e);
+            throw e;
         }
 
         try {
@@ -240,6 +260,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
         } catch (Exception e) {
             handleException("Cannot remove group: " + plGroupName + "; ", e);
+            throw e;
         }
 
         if (broadcast) {
@@ -402,7 +423,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
             } catch (Exception e) {
                 // TODO:
                 handleException("Identity operation error: ", e);
-
             }
         }
 
@@ -419,7 +439,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         } catch (Exception e) {
             // TODO:
             handleException("Identity operation error: ", e);
-
         }
 
         // Get members of all types mapped below the parent group id path.
@@ -509,7 +528,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         } catch (Exception e) {
             // TODO:
             handleException("Identity operation error: ", e);
-
         }
 
         List<Group> exoGroups = new LinkedList<Group>();
@@ -542,7 +560,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         } catch (Exception e) {
             // TODO:
             handleException("Identity operation error: ", e);
-
         }
 
         // Check for all type groups mapped as part of the group tree but not connected with the root group by association
@@ -791,7 +808,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         // throw new IllegalStateException("Group present that is not connected to the root: " + jbidGroup.getName());
     }
 
-    private org.picketlink.idm.api.Group persistGroup(Group exoGroup) {
+    private org.picketlink.idm.api.Group persistGroup(Group exoGroup) throws Exception{
 
         org.picketlink.idm.api.Group jbidGroup = null;
 
@@ -803,6 +820,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         } catch (Exception e) {
             // TODO:
             handleException("Identity operation error: ", e);
+            throw e;
         }
 
         if (jbidGroup == null) {
@@ -810,8 +828,15 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                 jbidGroup = getIdentitySession().getPersistenceManager().createGroup(plGroupName,
                         orgService.getConfiguration().getGroupType(exoGroup.getParentId()));
             } catch (Exception e) {
-                // TODO:
-                handleException("Identity operation error: ", e);
+                //Workaround due to issues in Picketlink
+                //1. it has not support transaction for LDAP yet
+                //2. it use internal cache (infinispan) but this cache is not clear when there is exception occurred
+                try {
+                    getIdentitySession().getPersistenceManager().removeGroup(plGroupName, true);
+                } catch (IdentityException e1) {
+                    handleException("Cannot remove group", e1);
+                }
+                throw e;
             }
         }
 
@@ -837,6 +862,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
             } catch (Exception e) {
                 // TODO:
                 handleException("Identity operation error: ", e);
+                throw e;
             }
 
         }
@@ -892,7 +918,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
      * @return
      * @throws Exception
      */
-    protected org.picketlink.idm.api.Group obtainRootGroup() {
+    protected org.picketlink.idm.api.Group obtainRootGroup() throws Exception{
         org.picketlink.idm.api.Group rootGroup = null;
         try {
             rootGroup = getIdentitySession().getPersistenceManager().findGroup(
@@ -900,6 +926,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         } catch (Exception e) {
             // TODO:
             handleException("Identity operation error: ", e);
+            throw e;
         }
 
         if (rootGroup == null) {
@@ -907,8 +934,15 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                 rootGroup = getIdentitySession().getPersistenceManager().createGroup(
                         orgService.getConfiguration().getRootGroupName(), orgService.getConfiguration().getGroupType("/"));
             } catch (Exception e) {
-                // TODO:
-                handleException("Identity operation error: ", e);
+                //Workaround due to issues in Picketlink
+                //1. it has not support transaction for LDAP yet
+                //2. it use internal cache (infinispan) but this cache is not clear when there is exception occurred
+                try {
+                    getIdentitySession().getPersistenceManager().removeGroup(orgService.getConfiguration().getRootGroupName(), true);
+                } catch (IdentityException e1) {
+                    handleException("Cannot remove group", e1);
+                }
+                throw e;
             }
         }
 

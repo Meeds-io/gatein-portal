@@ -133,7 +133,7 @@ public class UserProfileDAOImpl extends AbstractDAOImpl implements UserProfileHa
                 return profile;
             } catch (Exception exp) {
                 handleException("Exception occured when removing user profile", exp);
-                return null;
+                throw exp;
             }
         }
         return null;
@@ -278,7 +278,7 @@ public class UserProfileDAOImpl extends AbstractDAOImpl implements UserProfileHa
 
     }
 
-    public void setProfile(String userName, UserProfile profile) {
+    public void setProfile(String userName, UserProfile profile) throws Exception{
 
         Map<String, String> profileAttrs = profile.getUserInfoMap();
 
@@ -301,11 +301,12 @@ public class UserProfileDAOImpl extends AbstractDAOImpl implements UserProfileHa
         } catch (Exception e) {
             // TODO:
             handleException("Identity operation error: ", e);
+            throw e;
         }
 
     }
 
-    public void removeProfile(String userName, UserProfile profile) {
+    public void removeProfile(String userName, UserProfile profile) throws Exception{
         Map<String, String> profileAttrs = profile.getUserInfoMap();
 
         String[] attrKeys = new String[profileAttrs.keySet().size()];
@@ -317,6 +318,7 @@ public class UserProfileDAOImpl extends AbstractDAOImpl implements UserProfileHa
         } catch (Exception e) {
             // TODO:
             handleException("Identity operation error: ", e);
+            throw e;
         }
     }
 }

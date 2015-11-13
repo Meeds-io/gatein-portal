@@ -37,6 +37,7 @@ import org.exoplatform.services.organization.MembershipTypeHandler;
 import org.exoplatform.services.organization.impl.MembershipTypeImpl;
 import org.gatein.common.logging.LogLevel;
 import org.picketlink.idm.api.RoleType;
+import org.picketlink.idm.common.exception.IdentityException;
 
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
@@ -93,10 +94,21 @@ public class MembershipTypeDAOImpl extends AbstractDAOImpl implements Membership
             preSave(mt, true);
         }
 
+        if (getIdentitySession().getRoleManager().getRoleType(mt.getName()) != null) {
+            throw new Exception("Membership type '" + mt.getName() + "' is already exists.");
+        }
+
         try {
             getIdentitySession().getRoleManager().createRoleType(mt.getName());
         } catch (Exception e) {
-            handleException("Error when creating Membership", e);
+            try {
+                if (getIdentitySession().getRoleManager().getRoleType(mt.getName()) != null) {
+                    getIdentitySession().getRoleManager().removeRoleType(mt.getName());    
+                }
+            } catch (IdentityException e1) {
+                handleException("Cannot remove roleType", e1);
+            }
+            throw e;
         }
 
         if (broadcast) {
@@ -176,6 +188,7 @@ public class MembershipTypeDAOImpl extends AbstractDAOImpl implements Membership
                 getIdentitySession().getRoleManager().removeRoleType(mt.getName());
             } catch (Exception e) {
                 handleException("Error occured when removing membership type", e);
+                throw e;
             }
 
             if (broadcast) {
@@ -226,7 +239,7 @@ public class MembershipTypeDAOImpl extends AbstractDAOImpl implements Membership
             rt = getIdentitySession().getRoleManager().getRoleType(mt.getName());
         } catch (Exception e) {
             handleException("Exception occured when finding role type", e);
-            return;
+            throw e;
         }
 
         Map<String, String> props = new HashMap<String, String>();
@@ -240,6 +253,7 @@ public class MembershipTypeDAOImpl extends AbstractDAOImpl implements Membership
             getIdentitySession().getRoleManager().setProperties(rt, props);
         } catch (Exception e) {
             handleException("Exception when updating membership type", e);
+            throw e;
         }
 
         return;
@@ -253,7 +267,7 @@ public class MembershipTypeDAOImpl extends AbstractDAOImpl implements Membership
             props = getIdentitySession().getRoleManager().getProperties(rt);
         } catch (Exception e) {
             handleException("Identity error occured when populating membership type", e);
-            return;
+            throw e;
         }
 
         mt.setDescription(props.get(MEMBERSHIP_DESCRIPTION));

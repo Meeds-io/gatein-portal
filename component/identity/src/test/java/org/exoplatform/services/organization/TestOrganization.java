@@ -33,6 +33,8 @@ import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.component.ComponentRequestLifecycle;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl;
 
 /**
@@ -213,6 +215,32 @@ public class TestOrganization extends AbstractKernelTest {
         // uHandler.saveUser(demo, false);
         // demo = uHandler.findUserByName("demo");
         // Assert.assertEquals("Demo Demo", demo.getDisplayName());
+    }
+
+    public void testCreateDuplicateMembershipType() throws Exception {
+        /* Create a membershipType */
+        String testType = "testCreateDuplicateMembershipType";
+        MembershipType mt = mtHandler_.createMembershipTypeInstance();
+        mt.setName(testType);
+        mt.setDescription("This is a test");
+        mt.setOwner("exo");
+
+        MembershipType mt1 = mtHandler_.createMembershipTypeInstance();
+        mt1.setName(testType);
+        mt1.setDescription("a duplicate");
+        mt1.setOwner("exo1");
+
+        try {
+            mtHandler_.createMembershipType(mt, true);
+            assertEquals("Expect mebershiptype is:", testType, mtHandler_.findMembershipType(testType).getName());
+            mtHandler_.createMembershipType(mt1, true);
+            fail("Exception should be thrown");
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        MembershipType membershipType = mtHandler_.findMembershipType(mt.getName());
+        assertNotNull("Membership type " + testType + " must be exist", membershipType);
+        assertEquals("Expect mebershiptype is:", testType, mtHandler_.findMembershipType(testType).getName());
     }
 
     protected void createGroup(String parent, String name) {
