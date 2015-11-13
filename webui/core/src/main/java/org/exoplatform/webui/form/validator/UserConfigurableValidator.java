@@ -215,7 +215,7 @@ public class UserConfigurableValidator extends MultipleConditionsValidator {
      * @return a set containing all known configuration key names.
      */
     public static final Set<String> getConfigurationNames() {
-        return Collections.unmodifiableSet(configurations.keySet());
+        return Collections.unmodifiableSet(getConfigurations().keySet());
     }
 
     private static class ValidatorConfiguration {
