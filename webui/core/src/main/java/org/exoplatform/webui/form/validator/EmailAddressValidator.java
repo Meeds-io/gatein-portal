@@ -56,7 +56,7 @@ public class EmailAddressValidator extends MultipleConditionsValidator {
     }
 
     private static boolean validateLocalPart(char[] localPart) {
-        if (localPart.length == 0 || !Character.isLetter(localPart[0])
+        if (localPart.length == 0 || !Character.isLetterOrDigit(localPart[0])
                 || !Character.isLetterOrDigit(localPart[localPart.length - 1])) {
             return false;
         }
@@ -102,7 +102,7 @@ public class EmailAddressValidator extends MultipleConditionsValidator {
     }
 
     private static boolean isLocalPartSymbol(char c) {
-        return c == '-' || c == '_' || c == '.';
+        return c == '-' || c == '_' || c == '.' || c == '+';
     }
 
     private static boolean isDomainNameSymbol(char c) {
