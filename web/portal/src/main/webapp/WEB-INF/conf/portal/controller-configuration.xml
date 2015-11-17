@@ -121,14 +121,12 @@
       <name>UploadHandler</name>
       <set-method>register</set-method>
       <type>org.exoplatform.web.handler.UploadHandler</type>
-      <!-- Uncomment this block to enable the restriction public upload 
       <init-params>
         <value-param>
           <name>public-access-restriction</name>
-          <value>true</value>
+          <value>${exo.portal.uploadhandler.public-restriction:true}</value>
         </value-param>
       </init-params>
-       -->
     </component-plugin>
     <component-plugin>
       <name>DownloadHandler</name>
