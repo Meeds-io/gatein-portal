@@ -183,6 +183,8 @@ public class UIGroupExplorer extends UIContainer {
     public void processRender(WebuiRequestContext context) throws Exception {
         if (selectedGroup_ != null) {
             changeGroup(selectedGroup_.getId());            
+        } else {
+            changeGroup(null);
         }
         renderChildren();
     }
