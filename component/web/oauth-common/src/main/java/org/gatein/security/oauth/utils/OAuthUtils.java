@@ -62,10 +62,10 @@ public class OAuthUtils {
 
     // Converting objects
 
-    public static OAuthPrincipal<FacebookAccessTokenContext> convertFacebookPrincipalToOAuthPrincipal(FacebookPrincipal facebookPrincipal,
+    public static OAuthPrincipal<FacebookAccessTokenContext> convertFacebookPrincipalToOAuthPrincipal(FacebookPrincipal facebookPrincipal, String avatar,
                                             OAuthProviderType<FacebookAccessTokenContext> facebookProviderType, FacebookAccessTokenContext fbAccessTokenContext) {
         return new OAuthPrincipal<FacebookAccessTokenContext>(facebookPrincipal.getUsername(), facebookPrincipal.getFirstName(), facebookPrincipal.getLastName(),
-                facebookPrincipal.getAttribute("name"), facebookPrincipal.getEmail(), fbAccessTokenContext, facebookProviderType);
+                facebookPrincipal.getAttribute("name"), facebookPrincipal.getEmail(), avatar, fbAccessTokenContext, facebookProviderType);
     }
 
     public static OAuthPrincipal<TwitterAccessTokenContext> convertTwitterUserToOAuthPrincipal(twitter4j.User twitterUser, TwitterAccessTokenContext accessToken,
@@ -73,6 +73,7 @@ public class OAuthUtils {
         String fullName = twitterUser.getName();
         String firstName;
         String lastName;
+        String avatar = twitterUser.getBiggerProfileImageURL();
 
         int spaceIndex = fullName.lastIndexOf(' ');
 
@@ -84,7 +85,7 @@ public class OAuthUtils {
             lastName = null;
         }
 
-        return new OAuthPrincipal<TwitterAccessTokenContext>(twitterUser.getScreenName(), firstName, lastName, fullName, null, accessToken,
+        return new OAuthPrincipal<TwitterAccessTokenContext>(twitterUser.getScreenName(), firstName, lastName, fullName, null, avatar, accessToken,
                 twitterProviderType);
     }
 
@@ -94,7 +95,7 @@ public class OAuthUtils {
         String email = userInfo.getEmail();
         String username = email != null ? email.substring(0, email.indexOf('@')) : userInfo.getGivenName();
         return new OAuthPrincipal<GoogleAccessTokenContext>(username, userInfo.getGivenName(), userInfo.getFamilyName(), userInfo.getName(), userInfo.getEmail(),
-                accessToken, googleProviderType);
+                userInfo.getPicture(), accessToken, googleProviderType);
     }
 
     public static User convertOAuthPrincipalToGateInUser(OAuthPrincipal principal) {

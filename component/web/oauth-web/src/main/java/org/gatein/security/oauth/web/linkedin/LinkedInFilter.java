@@ -30,6 +30,7 @@ import org.gatein.security.oauth.spi.InteractionState;
 import org.gatein.security.oauth.spi.OAuthPrincipal;
 import org.gatein.security.oauth.spi.OAuthProviderType;
 import org.gatein.security.oauth.web.OAuthProviderFilter;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scribe.builder.ServiceBuilder;
@@ -39,7 +40,7 @@ import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
 public class LinkedInFilter extends OAuthProviderFilter<LinkedinAccessTokenContext> {
-    private static String URL_CURRENT_PROFILE_USER = "https://api.linkedin.com/v1/people/~:(id,first-name,last-name,email-address,public-profile-url,picture-url)?format=json";
+    private static String URL_CURRENT_PROFILE_USER = "https://api.linkedin.com/v1/people/~:(id,first-name,last-name,email-address,public-profile-url,picture-url,picture-urls::(original))?format=json";
 
     @Override
     protected OAuthProviderType<LinkedinAccessTokenContext> getOAuthProvider() {
@@ -68,9 +69,17 @@ public class LinkedInFilter extends OAuthProviderFilter<LinkedinAccessTokenConte
             String displayName = firstName + " " + lastName;
             String email = json.getString("emailAddress");
 
+            String avatar = json.optString("pictureUrl");
+            JSONObject profilePictures = json.optJSONObject("pictureUrls");
+            if (profilePictures != null) {
+                JSONArray arr = profilePictures.optJSONArray("values");
+                if (arr != null && arr.length() > 0) {
+                    avatar = arr.getString(0);
+                }
+            }
 
             OAuthPrincipal<LinkedinAccessTokenContext> principal =
-                    new OAuthPrincipal<LinkedinAccessTokenContext>(id, firstName, lastName, displayName, email, accessTokenContext, getOAuthProvider());
+                    new OAuthPrincipal<LinkedinAccessTokenContext>(id, firstName, lastName, displayName, email, avatar, accessTokenContext, getOAuthProvider());
 
             return principal;
 

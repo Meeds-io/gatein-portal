@@ -38,18 +38,24 @@ public class OAuthPrincipal<T extends AccessTokenContext> implements Principal {
     private final String lastName;
     private final String displayName;
     private final String email;
+    private final String avatar;
     private final T accessToken;
     private final OAuthProviderType<T> oauthProviderType;
 
 
     public OAuthPrincipal(String userName, String firstName, String lastName, String displayName, String email, T accessToken, OAuthProviderType<T> oauthProviderType) {
+        this(userName, firstName, lastName, displayName, email, null, accessToken, oauthProviderType);
+    }
+
+    public OAuthPrincipal(String userName, String firstName, String lastName, String displayName, String email, String avatar, T accessToken, OAuthProviderType<T> oauthProviderType) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.displayName = displayName;
         this.email = email;
-        this.oauthProviderType = oauthProviderType;
+        this.avatar = avatar;
         this.accessToken = accessToken;
+        this.oauthProviderType = oauthProviderType;
     }
 
     @Override
@@ -76,6 +82,10 @@ public class OAuthPrincipal<T extends AccessTokenContext> implements Principal {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getAvatar() {
+        return avatar;
     }
 
     public T getAccessToken() {

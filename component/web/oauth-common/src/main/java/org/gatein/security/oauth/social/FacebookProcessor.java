@@ -230,6 +230,33 @@ public class FacebookProcessor {
         return facebookPrincipal;
     }
 
+    public String getUserAvatarURL(String accessToken) {
+        return new FacebookRequest<String>() {
+            @Override
+            protected URL createURL(String accessToken) throws IOException {
+                String urlString = new StringBuilder(FacebookConstants.PROFILE_ENDPOINT_URL).append("/picture?type=large&format=json&redirect=false")
+                        .append("&access_token=").append(URLEncoder.encode(accessToken, "UTF-8")).toString();
+                if (trace)
+                  log.trace("Profile read:" + urlString);
+
+                return new URL(urlString);
+            }
+
+            @Override
+            protected String parseResponse(String httpResponse) throws JSONException {
+                JSONObject jsonObject = new JSONObject(httpResponse);
+                if (jsonObject.has("data")) {
+                  JSONObject data = jsonObject.getJSONObject("data");
+                  if (data.has("url")) {
+                    return data.getString("url");
+                  }
+                }
+                return "";
+            }
+
+        }.executeRequest(accessToken);
+    }
+
     public void revokeToken(String accessToken) {
         try {
             String urlString = new StringBuilder(FacebookConstants.PROFILE_ENDPOINT_URL).append("/permissions?access_token=")

@@ -161,6 +161,12 @@ public class GateInFacebookProcessorImpl implements GateInFacebookProcessor {
     }
 
     @Override
+    public String getAvatar(FacebookAccessTokenContext accessTokenContext) {
+        String accessToken = accessTokenContext.getAccessToken();
+        return facebookProcessor.getUserAvatarURL(accessToken);
+    }
+
+  @Override
     public void saveAccessTokenAttributesToUserProfile(UserProfile userProfile, OAuthCodec codec, FacebookAccessTokenContext accessTokenContext) {
         String realAccessToken = accessTokenContext.getAccessToken();
         String encodedAccessToken = codec.encodeString(realAccessToken);

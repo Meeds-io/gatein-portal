@@ -60,6 +60,7 @@ public class FacebookFilter extends OAuthProviderFilter<FacebookAccessTokenConte
                                                                            InteractionState<FacebookAccessTokenContext> interactionState) {
         FacebookAccessTokenContext accessTokenContext = interactionState.getAccessTokenContext();
         FacebookPrincipal principal = ((GateInFacebookProcessor)getOauthProviderProcessor()).getPrincipal(accessTokenContext);
+        String avatarURL = ((GateInFacebookProcessor)getOauthProviderProcessor()).getAvatar(accessTokenContext);
 
         if (principal == null) {
             log.error("Principal was null");
@@ -71,7 +72,7 @@ public class FacebookFilter extends OAuthProviderFilter<FacebookAccessTokenConte
             }
 
             OAuthPrincipal<FacebookAccessTokenContext> oauthPrincipal = OAuthUtils.convertFacebookPrincipalToOAuthPrincipal(
-                    principal, getOAuthProvider(), accessTokenContext);
+                    principal, avatarURL, getOAuthProvider(), accessTokenContext);
 
             return oauthPrincipal;
         }

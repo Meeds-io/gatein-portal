@@ -43,4 +43,5 @@ public interface GateInFacebookProcessor extends OAuthProviderProcessor<Facebook
      */
     FacebookPrincipal getPrincipal(FacebookAccessTokenContext accessTokenContext) throws OAuthException;
 
+    String getAvatar(FacebookAccessTokenContext accessTokenContext);
 }
