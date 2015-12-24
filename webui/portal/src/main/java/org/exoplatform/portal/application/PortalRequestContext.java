@@ -500,7 +500,7 @@ public class PortalRequestContext extends WebuiRequestContext {
 
     public final Writer getWriter() throws Exception {
         if (writer_ == null) {
-            writer_ = new PortalPrinter(response_.getOutputStream(), true, 30000);
+            writer_ = new PortalPrinter(response_.getOutputStream(), false, 30000);
         }
         return writer_;
     }

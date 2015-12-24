@@ -255,8 +255,8 @@ public class PortalRequestHandler extends WebRequestHandler {
             }
         } finally {
 
-            // We close the writer here once and for all
-            Safe.close(context.getWriter());
+            // We flush the writer here for all
+            context.getWriter().flush();
 
             //
             try {
