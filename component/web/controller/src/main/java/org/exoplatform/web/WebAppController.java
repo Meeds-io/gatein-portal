@@ -39,7 +39,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.exoplatform.commons.utils.Safe;
+import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
@@ -329,11 +332,17 @@ public class WebAppController implements Startable {
                             }
 
                             if (!started && handler.getRequiresLifeCycle()) {
+                                started = true;
+                                ExoContainer container = ExoContainerContext.getCurrentContainer();
                                 if (debug) {
                                     log.debug("Starting RequestLifeCycle for handler " + handler);
+  
+                                    if (!(container instanceof PortalContainer)) {
+                                        //We need this log to trace the issue for TA-423 if the bug still happen
+                                        log.debug("current container is " + container + ", it should be a PortalContainer instance to start a portal request lifecycle");                                    
+                                    }
                                 }
-                                RequestLifeCycle.begin(ExoContainerContext.getCurrentContainer());
-                                started = true;
+                                RequestLifeCycle.begin(container);
                             }
 
                             //
