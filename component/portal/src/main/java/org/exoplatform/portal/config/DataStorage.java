@@ -55,7 +55,7 @@ public interface DataStorage {
     String PORTAL_CONFIG_UPDATED = "org.exoplatform.portal.config.DataStorage.portalConfigUpdated".intern();
 
     /**
-     * Create a PortalConfig in database <br/>
+     * Create a PortalConfig in database <br>
      * Then broadcast PORTAL_CONFIG_CREATED event
      *
      * @param config
@@ -63,7 +63,7 @@ public interface DataStorage {
     void create(PortalConfig config) throws Exception;
 
     /**
-     * This method should update the PortalConfig object <br/>
+     * This method should update the PortalConfig object <br>
      * Then broadcast PORTAL_CONFIG_UPDATED event
      *
      * @param config
@@ -86,7 +86,7 @@ public interface DataStorage {
     PortalConfig getPortalConfig(String ownerType, String portalName) throws Exception;
 
     /**
-     * Remove the PortalConfig from the database <br/>
+     * Remove the PortalConfig from the database <br>
      * Then broadcast PORTAL_CONFIG_REMOVED event
      *
      * @param config
@@ -116,22 +116,21 @@ public interface DataStorage {
     void remove(Page page);
 
     /**
-     * This method should create or udate the given page object <br />
+     * This method should create or udate the given page object <br>
      * Then broasdcast PAGE_CREATED event
      *
      * @deprecated This is replaced by {@link PageService#savePage(org.exoplatform.portal.mop.page.PageContext)}
      *
      * @param page
-     * @throws Exception
      */
     @Deprecated
     void create(Page page);
 
     /**
      * Saves a page. If a page with the same id already exists then a merge operation will occur, otherwise it throws
-     * {@link IllegalStateException} <br />
+     * {@link IllegalStateException} <br>
      *
-     * The operation returns a list of the change object that describes the changes that occured during the save operation. <br/>
+     * The operation returns a list of the change object that describes the changes that occured during the save operation. <br>
      *
      * Then broadcast PAGE_UPDATED event
      *
@@ -158,7 +157,7 @@ public interface DataStorage {
     <S> S load(ApplicationState<S> state, ApplicationType<S> type) throws Exception;
 
     /**
-     * Save content state <br />
+     * Save content state <br>
      *
      * @param state - ApplicationState object. It must be CloneApplicationState or PersistentApplicationState object
      * @param preferences - object to be saved
@@ -227,7 +226,7 @@ public interface DataStorage {
     List<String> getAllGroupNames() throws Exception;
 
     /**
-     * Returns a String array that contains two elements. The first one is the site type and the second one is site name. <br/>
+     * Returns a String array that contains two elements. The first one is the site type and the second one is site name. <br>
      *
      * @param applicationStorageId
      * @return

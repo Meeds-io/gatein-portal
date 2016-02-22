@@ -26,8 +26,8 @@ import java.util.List;
 /**
  * This service is used to register the gadget with portal. Developer uses this service to manage list of gadgets.
  * <p>
- * Created by The eXo Platform SAS<br/>
- * Jun 18, 2008<br/>
+ * Created by The eXo Platform SAS<br>
+ * Jun 18, 2008<br>
  * </p>
  */
 public interface GadgetRegistryService {
@@ -44,7 +44,6 @@ public interface GadgetRegistryService {
      *
      * @param name the name of gadget
      * @return Gadget object or null if not found
-     * @throws Exception
      */
     Gadget getGadget(String name);
 
@@ -57,11 +56,10 @@ public interface GadgetRegistryService {
     List<Gadget> getAllGadgets() throws Exception;
 
     /**
-     * Gets all of available gadgets from the database.</br> The list of gadgets are sorted.
+     * Gets all of available gadgets from the database.<br> The list of gadgets are sorted.
      *
      * @param sortComparator The comparator is used to control the order of gadgets
      * @return a list of gadgets
-     * @throws Exception
      */
     List<Gadget> getAllGadgets(Comparator<Gadget> sortComparator);
 
@@ -77,7 +75,6 @@ public interface GadgetRegistryService {
      * Removes the gadget from the database. If can't find Gadget with that name in database, this will throw Exception
      *
      * @param name the name of gadget
-     * @throws Exception
      */
     void removeGadget(String name);
 

@@ -197,7 +197,6 @@ public class PropertyResolverReader extends Reader {
      *
      * @param name the property name
      * @return the property value
-     * @throws IOException any IOException
      */
     protected String resolve(String name) {
         return name;

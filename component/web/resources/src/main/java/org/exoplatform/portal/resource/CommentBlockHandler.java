@@ -22,7 +22,6 @@ package org.exoplatform.portal.resource;
  * Designed to plugged into SkipCommentReader for custom handling of comment block
  *
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 6/28/11
  */
 public abstract class CommentBlockHandler {
 

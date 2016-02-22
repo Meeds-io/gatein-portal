@@ -59,7 +59,7 @@ public class GateInSkinConfigDeployer extends AbstractResourceDeployer {
     }
 
     /**
-     * @see org.exoplatform.portal.resource.AbstractResourceDeployer#add(org.gatein.wci.WebApp)
+     * @see org.exoplatform.portal.resource.AbstractResourceDeployer#add(WebApp, URL)
      */
     @Override
     protected void add(final WebApp webApp, final URL url) {

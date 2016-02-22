@@ -24,7 +24,6 @@ import org.exoplatform.container.PortalContainer;
 
 /**
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 4/5/11
  */
 public class ApplicationMonitoringFilter implements ActionFilter, RenderFilter, EventFilter, ResourceFilter {
 

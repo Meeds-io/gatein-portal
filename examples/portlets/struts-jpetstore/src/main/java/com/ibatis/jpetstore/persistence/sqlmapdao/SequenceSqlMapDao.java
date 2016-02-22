@@ -14,7 +14,7 @@ public class SequenceSqlMapDao extends BaseSqlMapDao implements SequenceDao {
     /**
      * This is a generic sequence ID generator that is based on a database table called 'SEQUENCE', which contains two columns
      * (NAME, NEXTID).
-     * <p/>
+     * <br>
      * This approach should work with any database.
      *
      * @param name The name of the sequence.

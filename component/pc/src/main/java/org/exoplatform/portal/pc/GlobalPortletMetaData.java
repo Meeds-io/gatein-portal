@@ -31,7 +31,6 @@ import org.gatein.pc.portlet.impl.metadata.filter.FilterMetaData;
 
 /**
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 3/31/11
  */
 public class GlobalPortletMetaData {
     private PortletApplication10MetaData wrappedMetaData;

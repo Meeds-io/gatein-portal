@@ -98,7 +98,7 @@ public class Safe {
     /**
      * Wrap the set so that it is unmodifiable when it is not null, otherwise returns null.
      *
-     * @todo it would be nice to avoid to rewrap unmodifiable set (not sure it is non proprietary possible)
+     * TODO it would be nice to avoid to rewrap unmodifiable set (not sure it is non proprietary possible)
      * @param set the set to wrap
      * @param <E> the set generic element type
      * @return the unmodifiable set

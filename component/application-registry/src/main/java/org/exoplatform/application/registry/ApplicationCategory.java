@@ -57,7 +57,7 @@ public class ApplicationCategory implements Serializable {
     }
 
     /**
-     * Return display name <br/>
+     * Return display name <br>
      * If it's null or empty and checkEmpty is true, return name instead
      *
      * @param checkEmpty

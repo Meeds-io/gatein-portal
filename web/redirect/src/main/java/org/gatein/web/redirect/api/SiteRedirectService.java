@@ -67,7 +67,7 @@ public interface SiteRedirectService {
     /**
      * Returns the list of alternative sites for the specified URL
      *
-     * @param site The site
+     * @param originSite The site
      * @param onlyEnabled If only enabled sites should be returned
      * @return The list of alternative site names
      */

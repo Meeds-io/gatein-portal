@@ -28,7 +28,6 @@ import org.exoplatform.commons.utils.PageList;
  * May 7, 2004
  *
  * @author: Tuan Nguyen
- * @email: tuan08@users.sourceforge.net
  * @version: $Id: ResourceBundleService.java 5799 2006-05-28 17:55:42Z geaz $ This class is used to manage the Resoucebunlde. It
  *           should work like the java.util.ResourceBundle class except that the properties file can be in the database or a a
  *           directory. The class java.util.ResourceBundle require that the properties file has to be in the classpath.
@@ -73,7 +72,6 @@ public interface ResourceBundleService {
      *
      * @param id The id of the resource bundle data
      * @return A ResourceBundleData instance or no record is found.
-     * @throws Exception
      */
     ResourceBundleData getResourceBundleData(String id);
 
@@ -82,7 +80,6 @@ public interface ResourceBundleService {
      *
      * @param id The id of the data record
      * @return A ResourceBundleData instance
-     * @throws Exception
      */
     ResourceBundleData removeResourceBundleData(String id);
 
@@ -90,7 +87,6 @@ public interface ResourceBundleService {
      * This method shoudl create or update a ResourceBundleData instance
      *
      * @param data the ResourceBundleData instance to update or create
-     * @throws Exception
      */
     void saveResourceBundle(ResourceBundleData data);
 
@@ -99,7 +95,6 @@ public interface ResourceBundleService {
      *
      * @param q The search criteria
      * @return A PageDescription Iterator
-     * @throws Exception
      */
     PageList<ResourceBundleData> findResourceDescriptions(Query q);
 

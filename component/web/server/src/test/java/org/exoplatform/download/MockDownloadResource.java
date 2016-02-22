@@ -23,7 +23,6 @@ import java.io.InputStream;
 
 /**
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 11/19/12
  */
 public class MockDownloadResource extends DownloadResource
 {

@@ -24,7 +24,7 @@ import org.exoplatform.webui.form.UIFormInput;
 
 /**
  * Created by The eXo Platform SARL Author : Dang Van Minh minhdv81@yahoo.com Jun 7, 2006
- * <p/>
+ * <br>
  * Validates whether this value has a length between min and max
  */
 @Serialized

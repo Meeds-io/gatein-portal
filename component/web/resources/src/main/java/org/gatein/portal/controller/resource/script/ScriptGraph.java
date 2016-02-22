@@ -62,13 +62,13 @@ public class ScriptGraph {
 
     /**
      * <p>
-     * </p>
      * Resolve a collection of pair of resource id and fetch mode, each entry of the map will be processed in the order
      * specified by the iteration of the {@link java.util.Map#entrySet()}. For a given pair the fetch mode may be null or not.
      * When the fetch mode is null, the default fetch mode of the resource is used. When the fetch mode is not null, this fetch
      * mode may override the resource fetch mode if it implies this particular fetch mode. This algorithm tolerates the absence
      * of resources, for instance if a resource is specified (among the pairs or by a transitive dependency) and does not exist,
-     * the resource will be skipped.</p>
+     * the resource will be skipped.
+     * </p>
      *
      * @param pairs the pairs to resolve
      * @return the resources sorted

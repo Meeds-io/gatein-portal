@@ -60,7 +60,7 @@ public interface OAuthProviderProcessor<T extends AccessTokenContext> {
 
     /**
      * Possibility to create new OAuth interaction with custom scope (not just the scope which is provided in configuration of this OAuth processor)
-     * @see {@link #processOAuthInteraction(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)}
+     * @see #processOAuthInteraction(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      *
      * @param httpRequest
      * @param httpResponse

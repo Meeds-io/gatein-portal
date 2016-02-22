@@ -36,7 +36,6 @@ import org.gatein.common.io.UndeclaredIOException;
  * the output stream except for the {@link #close()} method.
  * </p>
  *
- * <p>
  * The <tt>failureFlow</tt> property modifies the control flow of the method invocation when the output stream throws an
  * {@link java.io.IOException}.
  *
@@ -46,8 +45,6 @@ import org.gatein.common.io.UndeclaredIOException;
  * <li>The {@link IOFailureFlow#THROW_UNDECLARED} value throws instead a {@link UndeclaredIOException} exception wrapping the
  * original exception.</li>
  * </ul>
- *
- * </p>
  *
  * <p>
  * The class provides direct write access to the underlying output stream when the client of the stream can provides bytes

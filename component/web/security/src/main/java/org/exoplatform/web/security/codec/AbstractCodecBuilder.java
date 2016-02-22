@@ -22,7 +22,6 @@ import java.util.Map;
 
 /**
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 6/15/12
  */
 public abstract class AbstractCodecBuilder {
     public abstract AbstractCodec build(Map<String, String> config);

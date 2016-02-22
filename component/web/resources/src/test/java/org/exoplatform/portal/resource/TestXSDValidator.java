@@ -37,7 +37,6 @@ import org.xml.sax.SAXException;
 
 /**
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 5/23/12
  */
 public class TestXSDValidator extends TestCase {
     private static final Validator VALIDATOR;

@@ -35,7 +35,6 @@ public interface ResourceRenderer {
      * Returns an output stream for performing resource rendering.
      *
      * @return a stream
-     * @throws IOException any io exception
      */
     BinaryOutput getOutput();
 

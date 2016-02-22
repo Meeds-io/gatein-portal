@@ -31,7 +31,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 11/19/12
  */
 @ConfiguredBy(
    {

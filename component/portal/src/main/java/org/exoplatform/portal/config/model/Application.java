@@ -30,7 +30,6 @@ import org.exoplatform.portal.pom.spi.wsrp.WSRP;
  * May 13, 2004
  *
  * @author: Tuan Nguyen
- * @email: tuan08@users.sourceforge.net
  * @version: $Id: Portlet.java,v 1.7 2004/09/30 01:00:05 tuan08 Exp $
  **/
 public class Application<S> extends ModelObject {

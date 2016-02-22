@@ -12,191 +12,191 @@ import org.apache.struts.action.ActionMapping;
 
 /**
  * BeanAction is an extension to the typical Struts Action class that
- * <p/>
+ * <br>
  * enables mappings to bean methods. This allows for a more typical
- * <p/>
+ * <br>
  * Object Oriented design where each object has behaviour as part of
- * <p/>
+ * <br>
  * its definition. Instead of writing separate Actions and Forms,
- * <p/>
+ * <br>
  * BeanAction allows you to simply have a Bean, which models both
- * <p/>
+ * <br>
  * the state and the methods that operate on that state.
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * In addition to the simpler packaging, BeanAction also simplifies the
- * <p/>
+ * <br>
  * Struts progamming paradigm and reduces dependency on Struts. Using
- * <p/>
+ * <br>
  * this pattern could allow easier migration to newer frameworks like JSF.
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * The method signatures are greatly simplified to the following
- * <p/>
+ * <br>
  *
  * <pre>
- * <p/>
+ * <br>
  * public String myActionMethod() {
- * <p/>
+ * <br>
  *   //..work
- * <p/>
+ * <br>
  *   return "success";
- * <p/>
+ * <br>
  * }
- * <p/>
+ * <br>
  * </pre>
- * <p/>
+ * <br>
  * The return parameter becomes simply the name of the forward (as defined
- * <p/>
+ * <br>
  * in the config file as usual). Form parameters, request, response, session,
- * <p/>
+ * <br>
  * attributes, and cookies are all accessed via the ActionContext class (see the
- * <p/>
+ * <br>
  * ActionContext javadocs for more).
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * The forms that you map to a BaseAction mapping must be a subclass of the
- * <p/>
+ * <br>
  * BaseBean class. BaseBean continues to simplify the validation and
- * <p/>
+ * <br>
  * reset methods by removing the parameters from the signature as was done with
- * <p/>
+ * <br>
  * the above action method example.
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * There are 3 ways to map a BeanAction in the struts configuration file.
- * <p/>
+ * <br>
  * They are as follows.
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * <B>URL Pattern</B>
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * This approach uses the end of the action definition to determine which
- * <p/>
+ * <br>
  * method to call on the Bean. For example if you request the URL:
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * http://localhost/jpetstore4/shop/viewOrder.do
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * Then the method called would be "viewOrder" (of the mapped bean as specified
- * <p/>
+ * <br>
  * by the name="" parameter in the mapping below). The mapping used for this
- * <p/>
+ * <br>
  * approach is as follows.
- * <p/>
+ * <br>
  *
  * <pre>
- * <p/>
+ * <br>
  *  &lt;action path="/shop/<b>viewOrder</b>" type="org.apache.struts.beanaction.BeanAction"
- * <p/>
+ * <br>
  *    name="orderBean" scope="session"
- * <p/>
+ * <br>
  *    validate="false"&gt;
- * <p/>
+ * <br>
  *    &lt;forward name="success" path="/order/ViewOrder.jsp"/&gt;
- * <p/>
+ * <br>
  *  &lt;/action&gt;
- * <p/>
+ * <br>
  * </pre>
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * <B>Method Parameter</B>
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * This approach uses the Struts action parameter within the mapping
- * <p/>
+ * <br>
  * to determine the method to call on the Bean. For example the
- * <p/>
+ * <br>
  * following action mapping would cause the "viewOrder" method to
- * <p/>
+ * <br>
  * be called on the bean ("orderBean"). The mapping used for this
- * <p/>
+ * <br>
  * approach is as follows.
- * <p/>
+ * <br>
  *
  * <pre>
- * <p/>
+ * <br>
  *  &lt;action path="/shop/viewOrder" type="org.apache.struts.beanaction.BeanAction"
- * <p/>
+ * <br>
  *    <b>name="orderBean" parameter="viewOrder"</b> scope="session"
- * <p/>
+ * <br>
  *    validate="false"&gt;
- * <p/>
+ * <br>
  *    &lt;forward name="success" path="/order/ViewOrder.jsp"/&gt;
- * <p/>
+ * <br>
  *  &lt;/action&gt;
- * <p/>
+ * <br>
  * </pre>
- * <p/>
+ * <br>
  * <B>No Method call</B>
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * BeanAction will ignore any Struts action mappings without beans associated
- * <p/>
+ * <br>
  * to them (i.e. no name="" attribute in the mapping). If you do want to associate
- * <p/>
+ * <br>
  * a bean to the action mapping, but do not want a method to be called, simply
- * <p/>
+ * <br>
  * set the parameter to an asterisk ("*"). The mapping used for this approach
- * <p/>
+ * <br>
  * is as follows (no method will be called).
- * <p/>
+ * <br>
  *
  * <pre>
- * <p/>
+ * <br>
  *  &lt;action path="/shop/viewOrder" type="org.apache.struts.beanaction.BeanAction"
- * <p/>
+ * <br>
  *    <b>name="orderBean" parameter="*"</b> scope="session"
- * <p/>
+ * <br>
  *    validate="false"&gt;
- * <p/>
+ * <br>
  *    &lt;forward name="success" path="/order/ViewOrder.jsp"/&gt;
- * <p/>
+ * <br>
  *  &lt;/action&gt;
- * <p/>
+ * <br>
  * </pre>
- * <p/>
- * <p/>
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
+ * <br>
+ * <br>
  * TO-DO List
- * <p/>
+ * <br>
  * <ul>
- * <p/>
+ * <br>
  * <li>Ignore mappings to methods that don't exist.
- * <p/>
+ * <br>
  * </ul>
- * <p/>
+ * <br>
  * </p>
- * <p/>
+ * <br>
  * <B>A WORK IN PROGRESS</B>
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * <i>The BeanAction Struts extension is a work in progress. While it demonstrates
- * <p/>
+ * <br>
  * good patterns for application development, the framework itself is very new and
- * <p/>
+ * <br>
  * should not be considered stable. Your comments and suggestions are welcome.
- * <p/>
+ * <br>
  * Please visit <a href="http://www.ibatis.com">http://www.ibatis.com</a> for contact information.</i>
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * Date: Mar 11, 2004 10:03:56 PM
  *
  * @author Clinton Begin

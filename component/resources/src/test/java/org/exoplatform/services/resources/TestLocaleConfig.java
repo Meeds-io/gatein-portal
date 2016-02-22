@@ -31,7 +31,6 @@ import org.exoplatform.services.resources.LocaleConfigService;
  *
  * @author: Tuan Nguyen
  * @version: $Id: TestLocaleConfig.java 5799 2006-05-28 17:55:42Z geaz $
- * @email: tuan08@yahoo.com
  */
 public class TestLocaleConfig extends AbstractResourceBundleTest {
 

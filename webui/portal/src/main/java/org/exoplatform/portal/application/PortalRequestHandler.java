@@ -112,16 +112,16 @@ public class PortalRequestHandler extends WebRequestHandler {
      *
      * Here are the steps done in the method:
      *
-     * 1) Get the PortalApplication reference from the controller <br/>
-     * 2) Create a PortalRequestContext object that is a convenient wrapper on all the request information <br/>
+     * 1) Get the PortalApplication reference from the controller <br>
+     * 2) Create a PortalRequestContext object that is a convenient wrapper on all the request information <br>
      * 3) Get the collection of ApplicationLifecycle referenced in the PortalApplication and defined in
-     * the webui-configuration.xml of the portal application <br/>
-     * 4) Set that context in a ThreadLocal to easily access it <br/>
+     * the webui-configuration.xml of the portal application <br>
+     * 4) Set that context in a ThreadLocal to easily access it <br>
      * 5) Check if user have permission to access portal, if not, send 403 status code,
-     * if user has not login, redirect to login page <br/>
+     * if user has not login, redirect to login page <br>
      * 6) dispatch to processRequest method, this is protected method, we can extend and override this method to
      * write a new requestHandler base on PortalRequestHandler (@see {@link StandaloneAppRequestHandler})
-     * 7) set the header Cache-Control to no-cache or to the value specified in the portal configuration <br/>
+     * 7) set the header Cache-Control to no-cache or to the value specified in the portal configuration <br>
      *
      */
     @SuppressWarnings("unchecked")
@@ -190,15 +190,15 @@ public class PortalRequestHandler extends WebRequestHandler {
     /**
      * This method do the main job on processing a portal request:
      *
-     * 1) Call onStartRequest() on each ApplicationLifecycle object <br/>
-     * 2) Get the StateManager object from the PortalApplication (also referenced in the XML file) <br/>
+     * 1) Call onStartRequest() on each ApplicationLifecycle object <br>
+     * 2) Get the StateManager object from the PortalApplication (also referenced in the XML file) <br>
      * 3) Use the StateManager to get a reference on the root UI component: UIApplication;
-     * the method used is restoreUIRootComponent(context) <br/>
-     * 4) If the UI component is not the current one in used in the PortalContextRequest, then replace it <br/>
-     * 5) Process decode on the PortalApplication <br/>
-     * 6) Process Action on the PortalApplication <br/>
-     * 7) Process Render on the UIApplication UI component <br/>
-     * 8) call onEndRequest on all the ApplicationLifecycle <br/>
+     * the method used is restoreUIRootComponent(context) <br>
+     * 4) If the UI component is not the current one in used in the PortalContextRequest, then replace it <br>
+     * 5) Process decode on the PortalApplication <br>
+     * 6) Process Action on the PortalApplication <br>
+     * 7) Process Render on the UIApplication UI component <br>
+     * 8) call onEndRequest on all the ApplicationLifecycle <br>
      * 9) Release the context from the thread
      *
      * @param context

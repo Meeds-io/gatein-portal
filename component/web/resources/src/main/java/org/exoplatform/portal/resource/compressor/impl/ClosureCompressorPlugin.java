@@ -36,15 +36,15 @@ import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.WarningLevel;
 
 /**
- * A compressor based on the Google <a href="http://code.google.com/closure/>Closure Tools</a> javascript compiler. This plugin
+ * A compressor based on the Google <a href="http://code.google.com/closure/">Closure Tools</a> javascript compiler. This plugin
  * compresses javascript resources and provides three levels of compression, configured via the <code>level</code> init param:
  * <ul>
  * <li><code>basic</code> encodes with the <code>WHITESPACE_ONLY</code> Closure level</li>
  * <li><code>simple</code> encodes with the <code>SIMPLE_OPTIMIZATIONS</code> Closure level</li>
  * <li><code>advanced</code> encodes with the <code>ADVANCED_OPTIMIZATIONS</code> Closure level</li>
  * </ul>
- * The precise meaning of the Closure levels are described on <a
- * href="http://code.google.com/closure/compiler/docs/compilation_levels.html>this page</a>.
+ * The precise meaning of the Closure levels are described on
+ * <a href="http://code.google.com/closure/compiler/docs/compilation_levels.html">this page</a>.
  */
 public class ClosureCompressorPlugin extends BaseResourceCompressorPlugin {
 

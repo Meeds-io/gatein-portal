@@ -46,7 +46,7 @@ import java.util.List;
  * <p>
  * Created by The eXo Platform SAS Author : liem.nguyen ncliam@gmail.com Jun 5, 2009
  * </p>
- * <p>
+ *
  * On 2013-01-02 the followig was added by ppalaga@redhat.com:
  * <ul>
  * <li>Passwords encrypted symmetrically before they are stored. The functionaliy was taken from <a
@@ -85,7 +85,7 @@ import java.util.List;
  * </ul>
  * </li>
  * </ul>
- * </p>
+
  * <p>
  * It should be considered in the future if the password field can be removed altogether from {@link TokenEntry}.
  * </p>

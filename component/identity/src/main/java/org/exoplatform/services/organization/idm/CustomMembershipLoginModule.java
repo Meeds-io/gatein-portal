@@ -41,7 +41,7 @@ import org.exoplatform.services.security.jaas.AbstractLoginModule;
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  * @author <a href="mailto:vrockai@redhat.com">Viliam Rockai</a>
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
+ * @author <a href="mailto:boleslaw.dawidowicz@redhat.com">Boleslaw Dawidowicz</a>
  */
 public class CustomMembershipLoginModule extends AbstractLoginModule {
     /** Logger. */

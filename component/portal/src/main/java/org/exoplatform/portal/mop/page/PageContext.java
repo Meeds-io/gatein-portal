@@ -54,11 +54,10 @@ public class PageContext {
 
     /**
      * Updates the page state the behavior is not the same wether or not the page is persistent:
+     * When the page is persistent, any state is allowed:
      * <ul>
-     * <li>When the page is persistent, any state is allowed:
      * <li>A non null state overrides the current persistent state.</li>
      * <li>The null state means to reset the state to the persistent state.</li>
-     * </li>
      * <li>When the page is transient, only a non null state is allowed as it will be used for creation purpose.</li>
      * </ul>
      *

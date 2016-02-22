@@ -34,15 +34,15 @@ import org.exoplatform.webui.application.portlet.PortletRequestContext;
 import org.exoplatform.webui.core.lifecycle.UIApplicationLifecycle;
 
 /**
- * Root UI component of portlets written using GateIn WebUI framework should extends this class <br/>
- * There are 3 WebUI lifecycle methods, that are called during JSR 286 portlet lifecycle : <br/>
- * - processDecode - decode and bind parameters from the request to WebUI component<br/>
- * - processAction - triggered when there is a request for portlet ActionURL, or a WebUI event<br/>
- * - processRender - mapped to JSR 286 render method<br/>
- * - serveResource - mapped to JSR 286 serveResource method<br/>
+ * Root UI component of portlets written using GateIn WebUI framework should extends this class <br>
+ * There are 3 WebUI lifecycle methods, that are called during JSR 286 portlet lifecycle : <br>
+ * - processDecode - decode and bind parameters from the request to WebUI component<br>
+ * - processAction - triggered when there is a request for portlet ActionURL, or a WebUI event<br>
+ * - processRender - mapped to JSR 286 render method<br>
+ * - serveResource - mapped to JSR 286 serveResource method<br>
  *
  * Portlet request go through this class and then be delegated to child WebUI components with the help of UIApplicationLifecycle.
- * Use ComponentConfig annotation to config lifecycle class for WebUI component. <br/>
+ * Use ComponentConfig annotation to config lifecycle class for WebUI component. <br>
  *
  * This class also provides machanism to show a WebUI popup message
  *

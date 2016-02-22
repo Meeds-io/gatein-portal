@@ -51,7 +51,7 @@ import org.jibx.runtime.IUnmarshallingContext;
 
 /**
  * May 10, 2006
- * <p/>
+ * <br>
  * Manages the ComponentConfig of a list of components.
  *
  * @see ComponentConfig
@@ -59,7 +59,7 @@ import org.jibx.runtime.IUnmarshallingContext;
 public class ConfigurationManager {
     /**
      * todo (julien) : this map should be synchronized somehow
-     * <p/>
+     * <br>
      * The components of which we manage the configuration
      */
     // private Map<String, Component> configs_ = new HashMap<String, Component>();

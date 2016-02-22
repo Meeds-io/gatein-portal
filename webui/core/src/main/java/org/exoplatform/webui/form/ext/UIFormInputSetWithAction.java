@@ -352,7 +352,6 @@ public class UIFormInputSetWithAction extends UIFormInputSet implements UIFormIn
      *
      * @param validator the validator
      * @return the uI form input
-     * @throws Exception the exception
      */
     @SuppressWarnings("unused")
     public UIFormInput addValidator(Class validator) {

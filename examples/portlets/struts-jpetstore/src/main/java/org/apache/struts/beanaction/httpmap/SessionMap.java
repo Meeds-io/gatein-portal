@@ -8,9 +8,9 @@ import javax.servlet.http.HttpSession;
 
 /**
  * Map to wrap session scope attributes.
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * Date: Mar 11, 2004 10:35:42 PM
  *
  * @author Clinton Begin

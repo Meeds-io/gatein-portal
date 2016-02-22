@@ -71,8 +71,8 @@ import org.exoplatform.services.resources.LocalePolicy;
  *   &lt;filter-name&gt;LocalizationFilter&lt;/filter-name&gt;
  *   &lt;filter-class&gt;org.exoplatform.portal.application.localization.LocalizationFilter&lt;/filter-class&gt;
  *   &lt;init-param&gt;
- *     &lt;param-name>PortalLocale&lt;/param-name&gt;
- *     &lt;param-value>fr_FR&lt;/param-value&gt;
+ *     &lt;param-name&gt;PortalLocale&lt;/param-name&gt;
+ *     &lt;param-value&gt;fr_FR&lt;/param-value&gt;
  *   &lt;/init-param&gt;
  * &lt;/filter&gt;
  * </pre>

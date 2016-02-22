@@ -31,8 +31,8 @@ import org.exoplatform.webui.form.UIFormInputBase;
 
 /**
  * <p>
- * Represent an html checkbox input <br/>
- * This class is a replacement for {@link org.exoplatform.webui.form.UIFormCheckBoxInput} <br/>
+ * Represent an html checkbox input <br>
+ * This class is a replacement for {@link org.exoplatform.webui.form.UIFormCheckBoxInput} <br>
  * Still support raising event when user click the checkbox, but now we only accept boolean value.
  * </p>
  *

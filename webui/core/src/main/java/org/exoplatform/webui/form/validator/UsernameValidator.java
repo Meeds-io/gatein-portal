@@ -25,7 +25,6 @@ import org.exoplatform.webui.form.UIFormInput;
  * or digit and cannot contain consecutive underscore, dot or both.
  *
  * @author <a href="mailto:haint@exoplatform.com">Nguyen Thanh Hai</a>
- * @date Sep 28, 2011
  */
 
 @Serialized

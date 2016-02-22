@@ -109,15 +109,15 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * This UI component represent a portlet window on a page. <br/>
- * Each user request to a portlet will be passed through this class then delegate call to the portlet container<br/>
- * UIPortletLifecycle do the main request router: delegate the job to portlet action listeners according to the url parameters<br/>
+ * This UI component represent a portlet window on a page. <br>
+ * Each user request to a portlet will be passed through this class then delegate call to the portlet container<br>
+ * UIPortletLifecycle do the main request router: delegate the job to portlet action listeners according to the url parameters<br>
  *
  * ProcessAction, ServeResource, Render action listeners will receive event if request url contain parameter
- * point to them, those event will delegate call to portlet container to call JSR 286 portlet lifecycle method<br/>
+ * point to them, those event will delegate call to portlet container to call JSR 286 portlet lifecycle method<br>
  *
  * ProcessEvents, ChangePortletMode, ChangeWindowState listener will receive event after the portlet action invocation response.
- * (dispatched during the process of ProcessActionListener)<br/>
+ * (dispatched during the process of ProcessActionListener)<br>
  *
  * DeleteComponent, EditPortlet action listener is portal specific listener, come from the UI of portal
  *
@@ -399,9 +399,9 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
     }
 
     /**
-     * Get localized displayName metadata configured in portlet.xml.<br/>
-     * If can't find localized displayName, return portlet name.<br/>
-     * If portlet doesn't exists anymore, return empty string.<br/>
+     * Get localized displayName metadata configured in portlet.xml.<br>
+     * If can't find localized displayName, return portlet name.<br>
+     * If portlet doesn't exists anymore, return empty string.<br>
      * This value is cached in session, that means it only query to portlet container one time
      * @return display name
      */
@@ -1035,12 +1035,12 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
 
     /**
      * Returns the title showed on the InfoBar. The title is computed in following manner.
-     * <p/>
+     * <br>
      * 1. First, the method getTitle(), inherited from UIPortalComponent is called. The getTitle() returns what users set in the
      * PortletSetting tab, the current method returns call result if it is not null.
-     * <p/>
+     * <br>
      * 2. configuredTitle, which is the localized value of javax.portlet.title is returned if it is not null.
-     * <p/>
+     * <br>
      * 3. If the method does not terminate at neither (1) nor (2), the configured display name is returned.
      *
      * @return
@@ -1059,12 +1059,12 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
     }
 
     /**
-     * Parsing response from portlet container. The response contains:<br/>
-     * html markup, portlet title, response properties:<br/>
-     * - JS resource dependency (defined in gatein-resources.xml)<br/>
-     * - html header<br/>
-     * - cookie<br/>
-     * - extra markup header<br/>
+     * Parsing response from portlet container. The response contains:<br>
+     * html markup, portlet title, response properties:<br>
+     * - JS resource dependency (defined in gatein-resources.xml)<br>
+     * - html header<br>
+     * - cookie<br>
+     * - extra markup header<br>
      * If errors occur during portlet lifecycle processing. PortletExceptionHandleService is called.
      * Add plugins to this service to customize portlet error handler
      * @param pir - response object from portlet container

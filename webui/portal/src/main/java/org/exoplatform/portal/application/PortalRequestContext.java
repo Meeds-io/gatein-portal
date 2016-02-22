@@ -162,10 +162,10 @@ public class PortalRequestContext extends WebuiRequestContext {
 
     /**
      * Analyze a request and split this request's URI to get useful information then keep it in following properties of
-     * PortalRequestContext :<br/>
-     * 1. <code>requestURI</code> : The decoded URI of this request <br/>
-     * 2. <code>portalOwner</code> : The portal name ( "classic" for instance )<br/>
-     * 3. <code>portalURI</code> : The URI to current portal ( "/portal/public/classic/ for instance )<br/>
+     * PortalRequestContext :<br>
+     * 1. <code>requestURI</code> : The decoded URI of this request <br>
+     * 2. <code>portalOwner</code> : The portal name ( "classic" for instance )<br>
+     * 3. <code>portalURI</code> : The URI to current portal ( "/portal/public/classic/ for instance )<br>
      * 4. <code>nodePath</code> : The path that is used to reflect to a navigation node
      */
     public PortalRequestContext(WebuiApplication app, ControllerContext controllerContext, String requestSiteType,
@@ -533,11 +533,11 @@ public class PortalRequestContext extends WebuiRequestContext {
 
     /**
      * Sets a boolean value to force whether portal will be fully rendered and it is only effective to an Ajax request.
-     * <p/>
+     * <br>
      *
-     * if the value is set to <code>true</code>, it means :<br/>
+     * if the value is set to <code>true</code>, it means :<br>
      *
-     * 1) Only portal ui components are rendered <br/>
+     * 1) Only portal ui components are rendered <br>
      * 2) Portlets will be fully rendered if are inner of the portal ui components being updated
      *
      * @param forceFullUpdate
@@ -553,7 +553,7 @@ public class PortalRequestContext extends WebuiRequestContext {
      * Call to this method makes sense only in the scope of an AJAX request.
      *
      * Invoking ignoreAJAXUpdateOnPortlets(true) as there is need to update only UI components of portal (ie: the components
-     * outside portlet windows) are updated by AJAX. In the request response, all the blocks <PortletRespond > are empty. The
+     * outside portlet windows) are updated by AJAX. In the request response, all the blocks PortletRespond are empty. The
      * content displayed in portlet windows are retrieved by non-AJAX render request to associated portlet object.
      *
      *

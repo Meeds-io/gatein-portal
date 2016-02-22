@@ -195,7 +195,7 @@ public class OAuthUtils {
     }
 
     /**
-     * Decode given String to map. For example for input: accessToken=123456&expires=20071458 it returns map with two keys
+     * Decode given String to map. For example for input: {@code accessToken=123456&expires=20071458} it returns map with two keys
      * "accessToken" and "expires" and their corresponding values
      *
      * @param encodedData

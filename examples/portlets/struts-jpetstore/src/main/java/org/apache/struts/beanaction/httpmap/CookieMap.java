@@ -8,9 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Map to wrap cookie names and values (READ ONLY).
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * Date: Mar 11, 2004 11:31:35 PM
  *
  * @author Clinton Begin

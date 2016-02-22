@@ -32,7 +32,7 @@ import org.exoplatform.web.resource.config.xml.FCKConfigListener;
  * It creates the html code for the FCKeditor based on the following things:
  * <ul>
  * <li>browser's capabilities</li>
- * <li>different properties settings managed by the {@link PropertiesLoader}</li>
+ * <li>different properties settings managed by the {@link org.exoplatform.commons.utils.PropertiesLoader}</li>
  * <li>settings from the 'caller', eg. jsp-pages</li>
  * </ul>
  *
@@ -63,7 +63,7 @@ public class FCKEditor {
 
     /**
      * Main constructor.<br>
-     * All important settings are done here and will be preset by there defaults taken from {@link PropertiesLoader}.
+     * All important settings are done here and will be preset by there defaults taken from {@link org.exoplatform.commons.utils.PropertiesLoader}.
      *
      * @param request request object
      * @param instanceName unique name

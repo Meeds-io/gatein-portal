@@ -27,7 +27,6 @@ import org.xml.sax.SAXParseException;
 
 /**
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 10/12/12
  */
 public class TestEncodingDetector extends TestCase {
 

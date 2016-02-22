@@ -38,7 +38,7 @@ import com.thoughtworks.selenium.SeleniumException;
  * event implements this interface, and the object created with that class is registered with a component using the component's
  * <code>addTestCaseFailListener<code> method. When
  * the AbstractTestCase event occurs, that object's appropriate
- * method is invoked. <br/>
+ * method is invoked. <br>
  * TestCaseFailListener is responsible for decoding most of the parameters which are passed to selenium tests.
  * <table>
  * <thead>

@@ -44,7 +44,7 @@ public class SiteConfigTemplates {
     }
 
     /**
-     * @param location the locationPath to set
+     * @param locationPath the locationPath to set
      */
     public void setLocation(String locationPath) {
         this.location = locationPath;

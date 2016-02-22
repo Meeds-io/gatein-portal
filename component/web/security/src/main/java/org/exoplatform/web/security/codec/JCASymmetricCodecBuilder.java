@@ -28,7 +28,6 @@ import javax.crypto.SecretKey;
 
 /**
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 6/15/12
  */
 public class JCASymmetricCodecBuilder extends AbstractCodecBuilder {
     @Override

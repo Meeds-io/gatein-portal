@@ -221,7 +221,7 @@ public class UIStandaloneApplication extends UIApplication {
      *
      * <p>
      * The portal url template are calculated base on the current request and site state. Something like :
-     * <code>"/portal/g/:platform:administrators/administration/registry?portal:componentId={portal:uicomponentId}&portal:action={portal:action}" ;</code>
+     * {@code "/portal/g/:platform:administrators/administration/registry?portal:componentId={portal:uicomponentId}&portal:action={portal:action}" ;}
      *
      * @return return portal url template
      * @throws java.io.UnsupportedEncodingException

@@ -51,7 +51,6 @@ import org.gatein.common.logging.LoggerFactory;
  * {@link org.exoplatform.commons.chromattic.ChromatticManager} manager.
  * </p>
  *
- * <p>
  * The plugin takes an instance of {@link org.exoplatform.container.xml.InitParams} as parameter that contains the following
  * entries:
  *
@@ -61,7 +60,6 @@ import org.gatein.common.logging.LoggerFactory;
  * <li>The <code>entities</code> list value that contains the list of chromattic entities that will be registered against the
  * builder chromattic builder</li>
  * </ul>
- * </p>
  *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$

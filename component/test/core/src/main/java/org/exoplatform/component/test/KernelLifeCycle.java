@@ -35,7 +35,8 @@ import org.junit.runners.model.Statement;
  * The following example runs a kernel for the whole test case:
  * </p>
  *
- * <code><pre>
+ * <pre>
+ * {@code
  * &#064;ConfiguredBy(&#064;ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/my-configuration.xml"))
  * public class ClassScopedTestCase {
  *
@@ -53,13 +54,15 @@ import org.junit.runners.model.Statement;
  *     assertSame(container, kernel.getContainer());
  *   }
  * }
- * </pre></code>
+ * }
+ * </pre>
  *
  * <p>
  * The kernel life cycle can also follow the test methods of a test case:
  * </p>
  *
- * <code><pre>
+ * <pre>
+ * {@code
  * public class MethodScopedTestCase {
  *
  *   &#064;Rule
@@ -78,7 +81,8 @@ import org.junit.runners.model.Statement;
  *     assertNotSame(container, kernel.getContainer());
  *   }
  * }
- * </pre></code>
+ * }
+ * </pre>
  *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */

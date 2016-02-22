@@ -117,8 +117,7 @@ public class I18N {
     }
 
     /**
-     * Provide a string representation of the locale argument according to the <a
-     * href="RFC 1766">http://www.ietf.org/rfc/rfc1766.txt</a>:
+     * Provide a string representation of the locale argument according to the http://www.ietf.org/rfc/rfc1766.txt :
      * <ul>
      * <li>locale with a language only will return the language string</li>
      * <li>otherwise it returns the language and country separated by an hyphen '-'</li>
@@ -142,7 +141,7 @@ public class I18N {
     }
 
     /**
-     * Parse the <a href="RFC 1766">http://www.ietf.org/rfc/rfc1766.txt</a> string representation and returns a locale. See
+     * Parse the http://www.ietf.org/rfc/rfc1766.txt string representation and returns a locale. See
      * {@link #toTagIdentifier(java.util.Locale)} method for more details.
      *
      * @param s the RFC1766 representation to parse

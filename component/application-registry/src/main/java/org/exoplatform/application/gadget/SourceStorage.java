@@ -24,9 +24,9 @@ package org.exoplatform.application.gadget;
  */
 public interface SourceStorage {
     /**
-     * Return {@link Source} object of gadget that name provided in gadget object param <br/>
-     * If can't find gadget with that name, return null <br/>
-     * If gadget is remote, throw Exception <br/>
+     * Return {@link Source} object of gadget that name provided in gadget object param <br>
+     * If can't find gadget with that name, return null <br>
+     * If gadget is remote, throw Exception <br>
      *
      * @param gadget - Gadget object used to retrieved gadget's name
      */
@@ -35,7 +35,7 @@ public interface SourceStorage {
     /**
      * This method will save source to database to a specify path
      *
-     * @param dirPath
+     * @param gadget
      * @param source
      * @throws Exception
      */
@@ -46,7 +46,6 @@ public interface SourceStorage {
      * the source for the local gadgets.
      *
      * @param sourcePath the source path
-     * @throws Exception any exception
      */
     void removeSource(String sourcePath);
 

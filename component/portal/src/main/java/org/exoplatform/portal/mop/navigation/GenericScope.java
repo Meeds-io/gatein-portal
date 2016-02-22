@@ -133,7 +133,6 @@ public class GenericScope {
     }
 
     /**
-     * <p>
      * A scope with the shape of a tree branch following the rules:
      * <ul>
      * <li>the first node with depth 0 will have all of its children visited</li>
@@ -144,7 +143,6 @@ public class GenericScope {
      * <li>any other node will have its visit mode delegated to the <code>federated</code> scope argument with the same
      * arguments except the depth that will be subtracted the <code>path</code> list argument size.</li>
      * </ul>
-     * </p>
      *
      * @param path the names that describing the tree path
      * @param federated the federated scope

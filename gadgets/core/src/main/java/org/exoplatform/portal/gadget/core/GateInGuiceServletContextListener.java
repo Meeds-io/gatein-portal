@@ -13,7 +13,7 @@ import org.gatein.common.logging.LoggerFactory;
 
 /**
  *
- * Extending the GuiceServletContextListener to setup a ThreadLocal<GateInContainerConfigLoader> variable wrapping the
+ * Extending the GuiceServletContextListener to setup a {@code ThreadLocal<GateInContainerConfigLoader>} variable wrapping the
  * ServletContext. That makes the ServletContext accessible within the scope of thread executing the method contextInitialized
  *
  *

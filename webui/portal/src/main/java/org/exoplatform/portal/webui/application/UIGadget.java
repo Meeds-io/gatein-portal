@@ -112,8 +112,6 @@ public class UIGadget extends UIComponent {
 
     /**
      * Initializes a newly created <code>UIGadget</code> object
-     *
-     * @throws Exception if can't initialize object
      */
     public UIGadget() {
         // That value will be overriden when it is mapped onto a data storage
@@ -256,7 +254,7 @@ public class UIGadget extends UIComponent {
     }
 
     /**
-     * Check if content of gadget has <UserPref>? (Content is parsed from gadget specification in .xml file)
+     * Check if content of gadget has {@code <UserPref>} ? (Content is parsed from gadget specification in .xml file)
      *
      * @return boolean
      */

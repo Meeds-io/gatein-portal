@@ -28,7 +28,6 @@ import java.io.Reader;
  * A subclass of BufferedReader which skip the comment block
  *
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 6/27/11
  */
 public class SkipCommentReader extends BufferedReader {
 

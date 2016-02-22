@@ -47,7 +47,7 @@ import org.exoplatform.webui.form.UIFormInput;
  * several configurations that can be activated when a validator instance is created by passing it the name of the configuration
  * to be activated. A configuration is created by adding an entry in configuration.properties using the {@link #KEY_PREFIX}
  * prefix followed by the name of the configuration, a period '.' and the name of the validation aspect to modify.
- * <p/>
+ * <br>
  * Currently supported validation aspects, where {configuration} is a configuration's name:
  * <ul>
  * <li>{@link #KEY_PREFIX}{configuration}.length.min: the minimal length of the validated field</li>

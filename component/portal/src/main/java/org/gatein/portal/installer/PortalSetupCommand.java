@@ -366,7 +366,7 @@ public class PortalSetupCommand {
     /**
      * Prints an error message if there is any and command usage to stderr.
      *
-     * @param string
+     * @param error
      */
     public void usage(Throwable error) {
         if (error != null) {
@@ -397,8 +397,7 @@ public class PortalSetupCommand {
     /**
      * Validates the parameters and asks the user for missing information on the console if necessary.
      *
-     * @throws IOException
-     * @throws FileNotFoundException
+     * @throws SetupCommandException
      *
      */
     public void validate() throws SetupCommandException {

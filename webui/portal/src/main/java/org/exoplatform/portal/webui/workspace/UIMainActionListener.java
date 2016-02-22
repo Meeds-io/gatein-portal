@@ -209,7 +209,7 @@ public class UIMainActionListener {
     public static class EditPageInFullPreviewActionListener extends EditInlineActionListener {
 
         /**
-         * @see org.exoplatform.portal.webui.workspace.UIMainActionListener.EditInlineActionListener#authorizeEdit(org.exoplatform.portal.webui.portal.UIPortal, org.exoplatform.portal.webui.workspace.UIPortalApplication)
+         * @see org.exoplatform.portal.webui.workspace.UIMainActionListener.EditInlineActionListener#authorizeEditSite(UIPortal, UIPortalApplication)
          */
         @Override
         public boolean authorizeEditSite(UIPortal currentPortal, UIPortalApplication portalApp) {

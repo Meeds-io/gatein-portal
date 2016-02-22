@@ -126,7 +126,7 @@ public class XMLResourceBundleParser {
     }
 
     /**
-     * Load an xml resource bundle as a {@link Map<String,String>} object.
+     * Load an xml resource bundle as a {@code Map<String,String>} object.
      *
      * @param in the input source
      * @return the properties object

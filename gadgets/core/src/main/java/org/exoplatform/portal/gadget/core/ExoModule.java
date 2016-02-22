@@ -30,7 +30,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
 /**
- * The goal of the module is to bind the {@link org.apache.shindig.common.ContainerConfig} interface to the
+ * The goal of the module is to bind the {@link org.apache.shindig.config.ContainerConfig} interface to the
  * {@link org.exoplatform.portal.gadget.core.ExoContainerConfig} implementation instead of the default implementation annotated
  * on the container config interface.
  *

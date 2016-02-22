@@ -69,7 +69,7 @@ public class OAuthPersistenceUtils {
 
 
     /**
-     * Remove very long attribute. For parameters description {@see #saveLongAttribute}
+     * Remove very long attribute. For parameters description see {@link #saveLongAttribute(String, UserProfile, String, boolean, int)}
      */
     public static void removeLongAttribute(UserProfile userProfile, String attributePrefix, boolean useSuffixInFirstAttribute) {
         boolean chunkRemoved;
@@ -91,7 +91,7 @@ public class OAuthPersistenceUtils {
 
 
     /**
-     * Get very long attribute. For parameters description {@see #saveLongAttribute}
+     * Get very long attribute. For parameters description see {@link #saveLongAttribute(String, UserProfile, String, boolean, int)}
      * @return very long attribute from all chunks
      */
     public static String getLongAttribute(UserProfile userProfile, String attributePrefix, boolean useSuffixInFirstAttribute) {

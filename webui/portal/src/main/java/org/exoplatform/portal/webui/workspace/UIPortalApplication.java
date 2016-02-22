@@ -240,12 +240,12 @@ public class UIPortalApplication extends UIApplication {
 
 
     /**
-     * The constructor of this class is used to build the tree of UI components that will be aggregated in the portal page.<br/>
-     * 1) The component is stored in the current PortalRequestContext ThreadLocal<br/>
-     * 2) The configuration for the portal associated with the current user request is extracted from the PortalRequestContext<br/>
+     * The constructor of this class is used to build the tree of UI components that will be aggregated in the portal page.<br>
+     * 1) The component is stored in the current PortalRequestContext ThreadLocal<br>
+     * 2) The configuration for the portal associated with the current user request is extracted from the PortalRequestContext<br>
      * 3) Then according to the context path, either a public or private portal is initiated. Usually a public portal does not
-     * contain the left column and only the private one has it.<br/>
-     * 4) The skin to use is setup <br/>
+     * contain the left column and only the private one has it.<br>
+     * 4) The skin to use is setup <br>
      * 5) Finally, the current component is associated with the current portal owner
      *
      * @throws Exception
@@ -488,7 +488,7 @@ public class UIPortalApplication extends UIApplication {
     /**
      * Return a map of JS resource ids (required to be load for current page) and boolean:
      * true if that script should be push on the header before html.
-     * false if that script should be load lazily after html has been loaded <br/>
+     * false if that script should be load lazily after html has been loaded <br>
      *
      * JS resources always contains SHARED/bootstrap required to be loaded eagerly
      * and optionally (by configuration) contains: portal js, portlet js, and resouces registered to be load
@@ -552,11 +552,11 @@ public class UIPortalApplication extends UIApplication {
 
     /**
      * Return corresponding collection of Skin objects depends on current skin name,
-     * this object help to build URL that point to SkinResourceRequestHandler. this handler is responsible to serves for css files <br/>
+     * this object help to build URL that point to SkinResourceRequestHandler. this handler is responsible to serves for css files <br>
      *
      * The collection contains:
-     * - portal skin modules <br/>
-     * - skin for specific site<br/>
+     * - portal skin modules <br>
+     * - skin for specific site<br>
      */
     public Collection<Skin> getPortalSkins() {
         SkinService skinService = getApplicationComponent(SkinService.class);
@@ -727,10 +727,10 @@ public class UIPortalApplication extends UIApplication {
     }
 
     /**
-     * The processAction() method is doing 3 actions: <br/>
+     * The processAction() method is doing 3 actions: <br>
      * 1) if this is a non ajax request and the last is an ajax one, then we check if the requested nodePath is equal to last
-     * non ajax nodePath and is not equal to the last nodePath, the server performs a 302 redirect on the last nodePath.<br/>
-     * 2) if the nodePath exist but is equals to the current one then we also call super and stops here.<br/>
+     * non ajax nodePath and is not equal to the last nodePath, the server performs a 302 redirect on the last nodePath.<br>
+     * 2) if the nodePath exist but is equals to the current one then we also call super and stops here.<br>
      * 3) if the requested nodePath is not equals to the current one or current page no longer exists, then an event of type
      * PageNodeEvent.CHANGE_NODE is sent to the associated EventListener; a call to super is then done.
      */
@@ -798,11 +798,11 @@ public class UIPortalApplication extends UIApplication {
      * second calls, request have the "ajaxRequest" parameter set to true in the URL. In that case the algorithm is a bit more
      * complex: a) The list of components that should be updated is extracted using the context.getUIComponentToUpdateByAjax()
      * method. That list was setup during the process action phase b) Portlets and other UI components to update are split in 2
-     * different lists c) Portlets full content are returned and set with the tag <div class="PortalResponse"> d) Block to
-     * updates (which are UI components) are set within the <div class="PortalResponseData"> tag e) Extra markup headers are in the
-     * <div class="MarkupHeadElements"> tag f) additional scripts are in <div class="ImmediateScripts">, JS GMD modules will be loaded by
+     * different lists c) Portlets full content are returned and set with the tag {@code <div class="PortalResponse">} d) Block to
+     * updates (which are UI components) are set within the {@code <div class="PortalResponseData">} tag e) Extra markup headers are in the
+     * {@code <div class="MarkupHeadElements">} tag f) additional scripts are in {@code <div class="ImmediateScripts">}, JS GMD modules will be loaded by
      * generated JS command on AMD js loader, and is put into PortalResponseScript block g) Then the scripts and the
-     * skins to reload are set in the <div class="PortalResponseScript">
+     * skins to reload are set in the {@code <div class="PortalResponseScript">}
      */
     public void processRender(WebuiRequestContext context) throws Exception {
         PortalRequestContext pcontext = (PortalRequestContext) context;
@@ -947,8 +947,6 @@ public class UIPortalApplication extends UIApplication {
 
     /**
      * Use {@link PortalRequestContext#setUserPortalConfig(UserPortalConfig)} instead
-     *
-     * @return
      */
     @Deprecated
     public void setUserPortalConfig(UserPortalConfig userPortalConfig) {
@@ -956,8 +954,8 @@ public class UIPortalApplication extends UIApplication {
     }
 
     /**
-     * Reload portal properties. This is needed to be called when it is changing Portal site<br/>
-     * If user has been authenticated, get the skin name setting from user profile.<br/>
+     * Reload portal properties. This is needed to be called when it is changing Portal site<br>
+     * If user has been authenticated, get the skin name setting from user profile.<br>
      * anonymous user or no skin setting in user profile, use the skin setting in portal config
      *
      * @throws Exception
@@ -993,7 +991,7 @@ public class UIPortalApplication extends UIApplication {
      *
      * <p>
      * The portal url template are calculated base on the current request and site state. Something like :
-     * <code>"/portal/g/:platform:administrators/administration/registry?portal:componentId={portal:uicomponentId}&portal:action={portal:action}" ;</code>
+     * {@code "/portal/g/:platform:administrators/administration/registry?portal:componentId={portal:uicomponentId}&portal:action={portal:action}" ;}
      *
      * @return return portal url template
      * @throws UnsupportedEncodingException

@@ -50,7 +50,6 @@ public interface DescriptionService {
      * relevant match. The <code>locale2</code> argument is optional.
      * </p>
      *
-     * <p>
      * The resolution follows those rules:
      * <ul>
      * <li>The resolution is performed against the locale1.</li>
@@ -58,7 +57,6 @@ public interface DescriptionService {
      * <li>Otherwise null is returned.
      * <li>
      * </ul>
-     * </p>
      *
      * @param id the object id
      * @param locale2 the first locale

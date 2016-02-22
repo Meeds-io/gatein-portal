@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Map to wrap request scope attributes.
- * <p/>
+ * <br>
  * Date: Mar 11, 2004 10:35:34 PM
  *
  * @author Clinton Begin

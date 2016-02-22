@@ -81,7 +81,7 @@ public class NodeBean {
     }
 
     /**
-     * Constructs a new {@link NavigationNodeBean} encapsulating the {@link org.gatein.api.navigation.Node} instance specified
+     * Constructs a new {@link NodeBean} encapsulating the {@link org.gatein.api.navigation.Node} instance specified
      * in the parameter.
      *
      * @param node A node to be encapsulated by this NavigationNodeBean.
@@ -103,7 +103,7 @@ public class NodeBean {
     }
 
     /**
-     * Sets the current {@link NavigationNodeBean} node active state. The active state indicates that this bean is being
+     * Sets the current {@link NodeBean} node active state. The active state indicates that this bean is being
      * currently accessed in the user interface.
      *
      * @param active A boolean value.

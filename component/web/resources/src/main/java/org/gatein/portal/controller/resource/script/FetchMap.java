@@ -26,9 +26,9 @@ import java.util.Map;
 
 /**
  * <p>
- * </p>
  * Extends an {@link HashMap} to add convenient method for safely adding a fetch mode to a map. The method
- * {@link #add(Object, FetchMode)} will add the mode only if the new mode implies the previous mode in the map.</p>
+ * {@link #add(Object, FetchMode)} will add the mode only if the new mode implies the previous mode in the map.
+ * </p>
  *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */

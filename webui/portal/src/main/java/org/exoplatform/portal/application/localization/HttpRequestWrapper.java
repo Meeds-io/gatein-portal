@@ -48,7 +48,7 @@ public class HttpRequestWrapper extends HttpServletRequestWrapper {
     }
 
     /**
-     * Note: Keep the implementation here in sync with {@link org.exoplatform.portal.webui.application.ExoUserContext#getLocale}
+     * Note: Keep the implementation here in sync with org.exoplatform.portal.webui.application.ExoUserContext#getLocale()
      *
      * @return
      */

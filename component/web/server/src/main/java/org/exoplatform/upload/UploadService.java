@@ -254,7 +254,7 @@ public class UploadService {
     }
 
     /**
-     * Remove the UploadResource and its temporary file that associated with given <code>uploadId</code>. <br/>
+     * Remove the UploadResource and its temporary file that associated with given <code>uploadId</code>. <br>
      * If <code>uploadId</code> is null or UploadResource is null, do nothing
      *
      * @param uploadId uploadId of UploadResource will be removed

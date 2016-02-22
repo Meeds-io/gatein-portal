@@ -71,7 +71,6 @@ public class ToolbarUtils {
      *
      * @param remoteUser the remote user
      * @return true, if successful
-     * @throws Exception the exception
      */
     public static boolean canEditCurrentPortal(String remoteUser) {
         if (remoteUser == null)

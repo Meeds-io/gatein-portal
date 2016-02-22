@@ -24,8 +24,8 @@
 package org.gatein.common.transaction;
 
 /**
- * Listener for perform some actions at the specified point of JTA transaction lifecycle.<br />
- * Transaction lifecycle needs to be managed through {@link JTAUserTransactionLifecycleService} to have listeners executed.<br />
+ * Listener for perform some actions at the specified point of JTA transaction lifecycle.<br>
+ * Transaction lifecycle needs to be managed through {@link JTAUserTransactionLifecycleService} to have listeners executed.<br>
  *
  * For now, we have shared instance of one registered listener for all transactions, so listener implementations need to be
  * thread-safe

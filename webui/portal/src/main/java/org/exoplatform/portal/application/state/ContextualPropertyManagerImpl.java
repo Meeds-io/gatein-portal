@@ -30,7 +30,6 @@ import org.picocontainer.Startable;
 
 /**
  * @author <a href="mailto:hoang281283@gmail.com">Minh Hoang TO</a>
- * @date
  */
 
 public class ContextualPropertyManagerImpl implements ContextualPropertyManager, Startable {

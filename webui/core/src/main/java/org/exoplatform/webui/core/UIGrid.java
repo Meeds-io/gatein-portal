@@ -28,7 +28,7 @@ import org.exoplatform.webui.config.annotation.ComponentConfig;
 
 /**
  * Created by The eXo Platform SARL Author : Tuan Nguyen tuan08@users.sourceforge.net May 7, 2006
- * <p/>
+ * <br>
  * A grid element (represented by an HTML table) that can be paginated with a UIPageIterator
  *
  * @see UIPageIterator

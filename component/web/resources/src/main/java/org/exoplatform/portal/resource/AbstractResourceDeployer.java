@@ -77,7 +77,6 @@ public abstract class AbstractResourceDeployer implements WebAppListener {
      * Called on web application remove event if the application contains {@value #GATEIN_CONFIG_RESOURCE} file.
      *
      * @param webApp
-     * @param url
      */
     protected abstract void remove(WebApp webApp);
 

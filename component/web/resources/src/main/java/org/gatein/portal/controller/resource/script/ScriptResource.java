@@ -42,9 +42,9 @@ import org.gatein.portal.controller.resource.script.Module.Local.Content;
  * </p>
  *
  * <p>
- * </p>
  * This class implements the {@link Comparable} interface, however the natural ordering provided here is not consistent with
- * equals, therefore this class should not be used as a key in a {@link java.util.TreeMap} for instance.</p>
+ * equals, therefore this class should not be used as a key in a {@link java.util.TreeMap} for instance.
+ * </p>
  *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */

@@ -44,7 +44,7 @@ public class ResourceBundleDescription implements Serializable {
     }
 
     /**
-     * @hibernate.id generator-class="assigned"
+     *
      **/
     public String getId() {
         if (id_ == null) {
@@ -66,7 +66,7 @@ public class ResourceBundleDescription implements Serializable {
     }
 
     /**
-     * @hibernate.property
+     *
      **/
     public String getName() {
         return name_;
@@ -77,7 +77,7 @@ public class ResourceBundleDescription implements Serializable {
     }
 
     /**
-     * @hibernate.property
+     *
      **/
     public String getLanguage() {
         return language_;
@@ -88,7 +88,7 @@ public class ResourceBundleDescription implements Serializable {
     }
 
     /**
-     * @hibernate.property
+     *
      **/
     public String getCountry() {
         return country_;
@@ -99,7 +99,7 @@ public class ResourceBundleDescription implements Serializable {
     }
 
     /**
-     * @hibernate.property
+     *
      **/
     public String getVariant() {
         return variant_;
@@ -110,7 +110,7 @@ public class ResourceBundleDescription implements Serializable {
     }
 
     /**
-     * @hibernate.property
+     *
      **/
     public String getResourceType() {
         return resourceType_;

@@ -36,8 +36,8 @@ import org.xml.sax.SAXException;
  * to find out if the declared encoding is the same as the actual encoding.
  *
  * Usage Example:
- * <code>new XMLDeclarationParser("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").parse().get(XMLDeclarationParser.ENCODING)</code>
- * returns <code>"UTF-8"</code>
+ * {@code new XMLDeclarationParser("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").parse().get(XMLDeclarationParser.ENCODING)}
+ * returns {@code "UTF-8"}
  *
  * @author ppalaga@redhat.com
  *

@@ -246,8 +246,8 @@ public class SkinService extends AbstractResourceService implements Startable {
      * @param module skin module identifier
      * @param skinName skin name
      * @param cssPath path uri to the css file. This is relative to the root context, use leading '/'
+     * @param priority priority to support sorting in skin list
      * @param overwrite if any previous skin should be replaced by that one
-     * @param cssPriority priority to support sorting in skin list
      */
     public void addPortalSkin(String module, String skinName, String cssPath, int priority, boolean overwrite) {
         availableSkins_.add(skinName);
@@ -355,7 +355,7 @@ public class SkinService extends AbstractResourceService implements Startable {
      * @param module skin module identifier
      * @param skinName skin name
      * @param cssPath path uri to the css file. This is relative to the root context, use leading '/'
-     * @param scontext the webapp's {@link javax.servlet.ServletContext}
+     * @param cssData
      */
     @Deprecated
     public void addSkin(String module, String skinName, String cssPath, String cssData) {
@@ -443,7 +443,6 @@ public class SkinService extends AbstractResourceService implements Startable {
      *
      * @param context
      * @param renderer the webapp's {@link org.exoplatform.portal.resource.ResourceRenderer}
-     * @param path path uri to the css file
      * @param compress
      * @throws RenderingException
      * @throws IOException
@@ -588,7 +587,6 @@ public class SkinService extends AbstractResourceService implements Startable {
      * In development mode, it always returns {@link Long#MAX_VALUE}. Return null if cached css can not be found
      *
      * @param context
-     * @param path - path must not be null
      */
     public long getLastModified(ControllerContext context) {
         String resource = "/" + context.getParameter(ResourceRequestHandler.RESOURCE_QN) + ".css";
@@ -667,7 +665,6 @@ public class SkinService extends AbstractResourceService implements Startable {
      * Remove SkinConfig from Portal Skin Config by SkinKey
      *
      * @param keys SkinKey list these will be removed
-     * @throws Exception
      */
     public void removeSkins(List<SkinKey> keys) {
         if (keys == null) {
@@ -683,7 +680,6 @@ public class SkinService extends AbstractResourceService implements Startable {
      * Remove Skin from Portal available Skin by skin name
      *
      * @param skinName name of skin that will be removed
-     * @throws Exception
      */
     public void removeSupportedSkin(String skinName) {
         availableSkins_.remove(skinName);
@@ -740,7 +736,7 @@ public class SkinService extends AbstractResourceService implements Startable {
     }
 
     /**
-     * Apply CSS for Skin <br/>
+     * Apply CSS for Skin <br>
      * If skin is null, do nothing
      *
      * @param context

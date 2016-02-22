@@ -37,7 +37,7 @@ import org.exoplatform.webui.form.validator.Validator;
 
 /**
  * Author : Nhu Dinh Thuan nhudinhthuan@exoplatform.com Sep 14, 2006
- * <p/>
+ * <br>
  * Represents a multi value selector
  */
 @ComponentConfig(events = {@EventConfig(listeners = UIFormMultiValueInputSet.AddActionListener.class, phase = Phase.DECODE),
@@ -111,7 +111,6 @@ public class UIFormMultiValueInputSet extends UIFormInputContainer<List> {
      *
      * @param values
      * @throws SecurityException
-     * @throws NoSuchMethodException
      */
     public void setConstructorParameterValues(Object[] values) throws SecurityException {
         this.constructorParams_ = values;

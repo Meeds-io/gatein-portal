@@ -49,7 +49,6 @@ import org.jibx.runtime.IUnmarshallingContext;
  * @author: Tuan Nguyen
  * @version: $Id: TestConverter.java,v 1.6 2004/07/20 12:41:09 tuan08 Exp $
  * @since: 0.0
- * @email: tuan08@yahoo.com
  */
 public class TestJIBXXmlMapping extends AbstractGateInTest {
 

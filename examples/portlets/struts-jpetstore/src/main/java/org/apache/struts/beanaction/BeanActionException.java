@@ -2,13 +2,13 @@ package org.apache.struts.beanaction;
 
 /**
  * This exception is thrown internally by BeanAction and
- * <p/>
+ * <br>
  * can also be used by bean action methods as a general
- * <p/>
+ * <br>
  * or base exception.
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * Date: Mar 13, 2004 8:17:00 PM
  *
  * @author Clinton Begin

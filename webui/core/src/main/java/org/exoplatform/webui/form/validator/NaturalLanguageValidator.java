@@ -21,7 +21,6 @@ import org.exoplatform.webui.form.UIFormInput;
 
 /**
  * @author <a href="mailto:haint@exoplatform.com">Nguyen Thanh Hai</a>
- * @datOct 11, 2011
  *
  *         Validates whether this value is composed of letters or spaces
  */

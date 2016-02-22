@@ -251,7 +251,6 @@ public class WebAppController implements Startable {
      * Register an handler as a component plugin, this method is invoked by the kernel with reflection.
      *
      * @param handler the handler
-     * @throws Exception any exception
      */
     public void register(WebRequestHandler handler) {
         handlers.put(handler.getHandlerName(), handler);
@@ -288,7 +287,7 @@ public class WebAppController implements Startable {
      * </p>
      *
      * <p>
-     * During a request the request life cycle is demarcated by calls to {@link RequestLifeCycle#begin(ExoContainer);} and
+     * During a request the request life cycle is demarcated by calls to {@link RequestLifeCycle#begin(ExoContainer)} and
      * {@link RequestLifeCycle#end()}.
      * </p>
      *

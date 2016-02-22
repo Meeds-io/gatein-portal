@@ -27,7 +27,6 @@ import org.exoplatform.webui.form.UIFormInput;
 
 /**
  * @author <a href="mailto:vrockai@redhat.com">Viliam Rockai</a>
- * @datOct 11, 2011
  *
  *         Validates whether this value is a personal name. It's adding two more special characters beside letters and spaces.
  *         Those are "-" (Jean-Claude) and "'" (O'Connor). See GTNPORTAL-2560.

@@ -30,7 +30,6 @@ import javax.crypto.SecretKey;
  * Symmetric codec bases on Java Cryptography Library
  *
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 6/15/12
  */
 public class JCASymmetricCodec extends AbstractCodec {
 

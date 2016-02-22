@@ -53,7 +53,7 @@ public class AutoReseedRandom extends SecureRandom implements Runnable {
     public static final String DEFAULT_RANDOM_ALGORITHM = "SHA1PRNG";
 
     /**
-     * Default random algorithm provider {@value #DEFAULT_RANDOM_ALGORITHM_PROVIDER}.
+     * Default random algorithm provider.
      */
     public static final String DEFAULT_RANDOM_ALGORITHM_PROVIDER = null;
 
@@ -63,7 +63,7 @@ public class AutoReseedRandom extends SecureRandom implements Runnable {
     public static final int DEFAULT_SEED_LENGTH = 32;
 
     /**
-     * Name of the reseeding thread {@value #RESEEDING_THREAD_NAME}.
+     * Name of the reseeding thread.
      */
     private static final String RESEEDING_THREAD_NAME = AutoReseedRandom.class.getSimpleName() + " reseeding";
 
@@ -87,8 +87,8 @@ public class AutoReseedRandom extends SecureRandom implements Runnable {
     private final String algorithm;
 
     /**
-     * See {@link SecureRandom#getInstance(String, String)}. {@link #DEFAULT_RANDOM_ALGORITHM_PROVIDER} (
-     * {@value #DEFAULT_RANDOM_ALGORITHM_PROVIDER}) is used in the default constructor. You may want to consider using
+     * See {@link SecureRandom#getInstance(String, String)}. {@link #DEFAULT_RANDOM_ALGORITHM_PROVIDER}
+     * is used in the default constructor. You may want to consider using
      * {@code "NativePRNG"} on some platforms if you require stronger cryptography.
      */
     private final String algorithmProvider;
@@ -105,7 +105,7 @@ public class AutoReseedRandom extends SecureRandom implements Runnable {
     /**
      * @param algorithm See {@link SecureRandom#getInstance(String, String)}.
      * @param algorithmProvider See {@link SecureRandom#getInstance(String, String)}. In most cases you will want to use
-     *        {@link #DEFAULT_RANDOM_ALGORITHM_PROVIDER} ({@value #DEFAULT_RANDOM_ALGORITHM_PROVIDER}) which will lead to using
+     *        {@link #DEFAULT_RANDOM_ALGORITHM_PROVIDER} which will lead to using
      *        {@link SecureRandom#getInstance(String)} instead of {@link SecureRandom#getInstance(String, String)}. You may want
      *        to consider using {@code "NativePRNG"}, {@code "SUN"} or other providers if you have special requirements.
      * @param seedLength number of Bytes, see {@link SecureRandom#generateSeed(int)}.

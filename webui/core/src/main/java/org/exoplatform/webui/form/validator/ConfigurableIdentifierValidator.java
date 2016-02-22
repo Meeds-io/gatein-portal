@@ -27,7 +27,7 @@ import org.exoplatform.webui.form.UIFormInput;
 
 /**
  * Created by The eXo Platform SARL Author : Dang Van Minh minhdv81@yahoo.com Jun 7, 2006
- * <p/>
+ * <br>
  * Validates whether the value is composed of letters, digit , '_' or '-'h First character could not be digit or '-'
  */
 public class ConfigurableIdentifierValidator extends MultipleConditionsValidator implements Serializable {

@@ -29,14 +29,13 @@ import org.gatein.common.logging.LoggerFactory;
 
 /**
  * <p>
- * </p>
  * The scope manager manages the life cycle of a scope value (which means a mere string) associated with the current thread
  * aimed to scope state. The scope manager takes it values from the current repository service name when it is associated with a
- * request on a container containing the repository service.</p>
+ * request on a container containing the repository service.
+ * </p>
  *
  * <p>
  * The manager implements the {@link ComponentRequestLifecycle}
- * </p>
  * interface to be aware of the request life cycle.</p>
  *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

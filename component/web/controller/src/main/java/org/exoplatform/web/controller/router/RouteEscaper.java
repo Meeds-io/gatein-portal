@@ -28,7 +28,7 @@ import org.exoplatform.web.controller.regexp.REVisitor;
  * <ul>
  * <li>substitute any char occurence of the source <i>s</i> by the destination <i>d</i></li>
  * <li>replace the <i>any</i> by the negated destination character <i>[^]</i></li>
- * <li>append <i>&&[^s]</i> to any top character class</li>
+ * <li>append <i>{@code &&[^s]}</i> to any top character class</li>
  * </ul>
  *
  * A few examples with <i>/</i> replaced by <i>_</i>:
@@ -36,8 +36,8 @@ import org.exoplatform.web.controller.regexp.REVisitor;
  * <ul>
  * <li><i>/</i> becomes <i>_</i></li>
  * <li><i>.</i> becomes <i>[^/]</i></li>
- * <li><i>[a/]</i> becomes <i>[a_&[^/]]</i></li>
- * <li><i>[,-1]</i> becomes <i>[,-.0-1_&&[^/]]</i></li>
+ * <li><i>[a/]</i> becomes <i>{@code [a_&[^/]]}</i></li>
+ * <li><i>[,-1]</i> becomes <i>{@code [,-.0-1_&&[^/]]}</i></li>
  * </ul>
  *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

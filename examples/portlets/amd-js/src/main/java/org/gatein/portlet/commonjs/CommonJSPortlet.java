@@ -29,7 +29,6 @@ import javax.portlet.RenderResponse;
 
 /**
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 8/30/12
  */
 public class CommonJSPortlet extends GenericPortlet {
     @Override

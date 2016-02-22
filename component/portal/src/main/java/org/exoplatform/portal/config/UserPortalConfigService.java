@@ -184,25 +184,23 @@ public class UserPortalConfigService implements Startable {
      * <p>
      * Build and returns an instance of <tt>UserPortalConfig</tt>.
      * </p>
-     * <p/>
+     * <br>
      * <p>
      * To return a valid config, the current thread must be associated with an identity that will grant him access to the portal
      * as returned by the {@link UserACL#hasPermission(org.exoplatform.portal.config.model.PortalConfig)} method.
      * </p>
-     * <p/>
-     * <p>
-     * The navigation loaded on the <tt>UserPortalConfig<tt> object are obtained according to the specified user
+     * <br>
+     * The navigation loaded on the <tt>UserPortalConfig</tt> object are obtained according to the specified user
      * argument. The portal navigation is always loaded. If the specified user is null then the navigation of the guest
      * group as configured by {@link org.exoplatform.portal.config.UserACL#getGuestsGroup()} is also loaded, otherwise
      * the navigations are loaded according to the following rules:
-     * <p/>
+     * <br>
      * <ul> <li>The navigation corresponding to the user is loaded.</li> <li>When the user is root according to the value
      * returned by {@link org.exoplatform.portal.config.UserACL#getSuperUser()} then the navigation of all groups are
      * loaded.</li> <li>When the user is not root, then all its groups are added except the guest group as configued per
      * {@link org.exoplatform.portal.config.UserACL#getGuestsGroup()}.</li> </ul>
-     * <p/>
+     * <br>
      * All the navigations are sorted using the value returned by {@link org.exoplatform.portal.config.model.PageNavigation#getPriority()}.
-     * </p>
      *
      * @param portalName the portal name
      * @param accessUser the user name

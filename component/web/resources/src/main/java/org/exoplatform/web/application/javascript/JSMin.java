@@ -117,10 +117,10 @@ public class JSMin {
     }
 
     /**
-     * action -- do something! What you do is determined by the argument: <br/>
-     * 1. Output A. Copy B to A. Get the next B. <br/>
-     * 2. Copy B to A. Get the next B. (Delete A). <br/>
-     * 3. Get the next B. (Delete B). action treats a string as a single character. <br/>
+     * action -- do something! What you do is determined by the argument: <br>
+     * 1. Output A. Copy B to A. Get the next B. <br>
+     * 2. Copy B to A. Get the next B. (Delete A). <br>
+     * 3. Get the next B. (Delete B). action treats a string as a single character. <br>
      * Wow! action recognizes a regular expression if it is preceded by ( or , or =.
      */
 

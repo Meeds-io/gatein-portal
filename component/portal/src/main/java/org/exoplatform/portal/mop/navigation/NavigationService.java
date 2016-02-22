@@ -126,7 +126,7 @@ public interface NavigationService {
      *
      * <p>
      * The update operation compares the actual tree and the most recent version of the same tree. When the
-     * <code>scope</scope> argument is not null, it will be used to augment the tree with new nodes. During the
+     * <code>scope</code> argument is not null, it will be used to augment the tree with new nodes. During the
      * operation, any modification done to the tree wil be reported as a change to the optional <code>listener</code> argument.
      * </p>
      *
@@ -157,7 +157,7 @@ public interface NavigationService {
      *
      * <p>
      * The rebase operation compares the actual tree and the most recent version of the same tree. When the
-     * <code>scope</scope> argument is not null, it will be used to augment the tree with new nodes. During the
+     * <code>scope</code> argument is not null, it will be used to augment the tree with new nodes. During the
      * operation, any modification done to the tree wil be reported as a change to the optional <code>listener</code> argument.
      * </p>
      *

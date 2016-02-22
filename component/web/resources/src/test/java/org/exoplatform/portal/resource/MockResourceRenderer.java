@@ -28,7 +28,6 @@ import org.exoplatform.commons.utils.BinaryOutput;
  * A simple ResourceRenderer used in JUnit tests of SkinService
  *
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 6/29/11
  */
 public class MockResourceRenderer implements ResourceRenderer {
 

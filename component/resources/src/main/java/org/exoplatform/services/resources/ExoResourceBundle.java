@@ -30,7 +30,6 @@ import java.util.ResourceBundle;
  * May 7, 2004
  *
  * @author: Tuan Nguyen
- * @email: tuan08@users.sourceforge.net
  * @version: $Id: ExoResourceBundle.java 9439 2006-10-12 03:28:53Z thuannd $
  **/
 @SuppressWarnings("serial")

@@ -22,7 +22,6 @@ import org.exoplatform.web.controller.QualifiedName;
 
 /**
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 11/4/11
  */
 public class RequestNavigationData {
     public static final QualifiedName REQUEST_PATH = QualifiedName.create("gtn", "path");

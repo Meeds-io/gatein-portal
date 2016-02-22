@@ -58,7 +58,6 @@ public abstract class WebRequestHandler extends BaseComponentPlugin {
      * Destroy callback.
      *
      * @param controller the controller
-     * @throws Exception any exception
      */
     public void onDestroy(WebAppController controller) {
     }

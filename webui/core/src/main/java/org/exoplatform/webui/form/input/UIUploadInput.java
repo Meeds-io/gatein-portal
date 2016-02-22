@@ -38,8 +38,6 @@ import org.exoplatform.webui.form.UIFormInputBase;
 /**
  * @author <a href="mailto:haint@exoplatform.com">Nguyen Thanh Hai</a>
  *
- * @datJul 19, 2011
- *
  *         This is instead of UIFormUploadInput.
  */
 

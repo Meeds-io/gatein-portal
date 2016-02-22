@@ -29,7 +29,6 @@ import javax.portlet.RenderResponse;
 
 /**
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 5/31/12
  */
 public class JQueryPortlet extends GenericPortlet {
     @Override

@@ -118,7 +118,7 @@ public class Utils {
 
     /**
      * Splits a string according to a string separator.
-     * <p/>
+     * <br>
      * The provided index defines the beginning of the splitted chunks in the returned array. The values from the beginning up
      * to the value index - 1 will be null values.
      *

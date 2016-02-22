@@ -8,9 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Map to wrap application scope attributes.
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * Date: Mar 11, 2004 11:21:25 PM
  *
  * @author Clinton Begin

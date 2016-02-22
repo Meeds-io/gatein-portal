@@ -52,7 +52,7 @@ public interface ApplicationRegistryService {
     List<ApplicationCategory> getApplicationCategories(Comparator<ApplicationCategory> sortComparator) throws Exception;
 
     /**
-     * Return ApplicationCategory with name provided <br/>
+     * Return ApplicationCategory with name provided <br>
      * if not found, return null
      *
      * @param name - ApplicationCategory's name
@@ -60,7 +60,7 @@ public interface ApplicationRegistryService {
     ApplicationCategory getApplicationCategory(String name);
 
     /**
-     * Save an ApplicationCategory to database <br/>
+     * Save an ApplicationCategory to database <br>
      * If it doesn't exist, a new one will be created, if not, it will be updated
      *
      * @param category - ApplicationCategory object that will be saved
@@ -68,7 +68,7 @@ public interface ApplicationRegistryService {
     void save(ApplicationCategory category);
 
     /**
-     * Remove application category (and all application in it) from database <br/>
+     * Remove application category (and all application in it) from database <br>
      * If it doesn't exist, it will be ignored
      *
      * @param category - ApplicationCategory object that will be removed
@@ -94,7 +94,7 @@ public interface ApplicationRegistryService {
             ApplicationType<?>... appTypes);
 
     /**
-     * Return list of all Application in database (unsorted) <br/>
+     * Return list of all Application in database (unsorted) <br>
      * If there are not any Application in database, return an empty list
      */
     List<Application> getAllApplications() throws Exception;
@@ -107,7 +107,7 @@ public interface ApplicationRegistryService {
     Application getApplication(String id) throws Exception;
 
     /**
-     * Return Application in specific category and have name provided in param <br/>
+     * Return Application in specific category and have name provided in param <br>
      * If it can't be found, return null
      *
      * @param category - name of application category
@@ -116,9 +116,9 @@ public interface ApplicationRegistryService {
     Application getApplication(String category, String name);
 
     /**
-     * Save Application in an ApplicationCategory <br/>
-     * If ApplicationCategory or Application don't exist, they'll be created <br/>
-     * If Application has been already existed, it will be updated <br/>
+     * Save Application in an ApplicationCategory <br>
+     * If ApplicationCategory or Application don't exist, they'll be created <br>
+     * If Application has been already existed, it will be updated <br>
      *
      * @param category - ApplicationCategory that your application'll be saved to
      * @param application - Application that will be saved
@@ -126,7 +126,7 @@ public interface ApplicationRegistryService {
     void save(ApplicationCategory category, Application application);
 
     /**
-     * Update an Application <br/>
+     * Update an Application <br>
      * It must be existed in database, if not, this will throw an IllegalStateException
      *
      * @param application - Application that you want to update
@@ -134,7 +134,7 @@ public interface ApplicationRegistryService {
     void update(Application application);
 
     /**
-     * Remove an Application from database <br/>
+     * Remove an Application from database <br>
      * If it can't be found, it will be ignored (no exception)
      *
      * @param app - Application that you want to remove, must not be null
@@ -142,17 +142,17 @@ public interface ApplicationRegistryService {
     void remove(Application app);
 
     /**
-     * Get all deployed portlet, add to portlet's ApplicationCategory <br/>
-     * If ApplicationCategory currently doesn't exist, it'll be created <br/>
+     * Get all deployed portlet, add to portlet's ApplicationCategory <br>
+     * If ApplicationCategory currently doesn't exist, it'll be created <br>
      * If Application've already existed, it'll be ignored
      */
     void importAllPortlets() throws Exception;
 
     // TODO: dang.tung
     /**
-     * Get all Gadget, add to eXoGadgets application category <br/>
-     * When first added, it's access permission will be Everyone <br/>
-     * If ApplicationCategory currently doesn't exist, it'll be created <br/>
+     * Get all Gadget, add to eXoGadgets application category <br>
+     * When first added, it's access permission will be Everyone <br>
+     * If ApplicationCategory currently doesn't exist, it'll be created <br>
      * Gadget that has been imported will be ignored
      */
     void importExoGadgets() throws Exception;

@@ -26,7 +26,7 @@ import java.security.SecureRandom;
 
 /**
  * A {@link SaltedHashService} implementation which does not do any hashing at all. It simply returns the plaintext password
- * from {@link #getSaltedHash(String, SecureRandom)} and tests the string equality of {@code password} and {@code saltedHash} in
+ * from {@link #getSaltedHash(String)} and tests the string equality of {@code password} and {@code saltedHash} in
  * {@link #validate(String, String)}.
  *
  * This class is intended to be used in tests and maybe also in some real life scenarios where backwards compatibility requires

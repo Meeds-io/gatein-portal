@@ -28,7 +28,6 @@ import junit.framework.TestCase;
 
 /**
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>
- * @date 6/28/11
  */
 public class TestSkipCommentReader extends TestCase {
 

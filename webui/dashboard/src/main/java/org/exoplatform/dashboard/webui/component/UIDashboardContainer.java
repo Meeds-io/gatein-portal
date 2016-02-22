@@ -159,7 +159,6 @@ public class UIDashboardContainer extends org.exoplatform.webui.core.UIContainer
      * @param gadget UIGadget to add in UIDashboardContainer
      * @param col index of column to add
      * @param row index of row to add
-     * @return <code>UIGadget</code> object which added in
      * @see UIGadget
      */
     public void addUIGadget(final UIGadget gadget, final int col, final int row) {
@@ -192,8 +191,8 @@ public class UIDashboardContainer extends org.exoplatform.webui.core.UIContainer
      * Gets an UIGadget which has applicationInstanceUniqueId_ according to specified Id
      *
      * @param gadgetId applicationInstanceUniqueId_ of UIGadget
-     * @return <code>null</code> if UIGadget doesn't exist<br>
-     *         <code>UIGadget<code> otherwise
+     * @return null if UIGadget doesn't exist<br>
+     *         UIGadget otherwise
      * @see UIGadget
      */
     public UIGadget getUIGadget(final String gadgetId) {
@@ -374,7 +373,7 @@ public class UIDashboardContainer extends org.exoplatform.webui.core.UIContainer
      * Creates a Container from a xml template
      *
      * @param xml template of Container
-     * @return <code>null</code> if template is not suitable for {@link Container}<br />
+     * @return <code>null</code> if template is not suitable for {@link Container}<br>
      *         <code>Container</code> otherwise
      * @throws Exception if have problems in unmarshal process
      * @see IUnmarshallingContext#unmarshalDocument(java.io.InputStream, String)

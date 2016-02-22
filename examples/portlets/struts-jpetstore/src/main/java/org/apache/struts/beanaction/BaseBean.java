@@ -8,27 +8,27 @@ import org.apache.struts.validator.ValidatorActionForm;
 
 /**
  * All actions mapped through the BeanAction class should be mapped
- * <p/>
+ * <br>
  * to a subclass of BaseBean (or have no form bean mapping at all).
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * The BaseBean class simplifies the validate() and reset() methods
- * <p/>
+ * <br>
  * by allowing them to be managed without Struts dependencies. Quite
- * <p/>
+ * <br>
  * simply, subclasses can override the parameterless validate()
- * <p/>
+ * <br>
  * and reset() methods and set errors and messages using the ActionContext
- * <p/>
+ * <br>
  * class.
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * <i>Note: Full error, message and internationalization support is not complete.</i>
- * <p/>
- * <p/>
- * <p/>
+ * <br>
+ * <br>
+ * <br>
  * Date: Mar 12, 2004 9:20:39 PM
  *
  * @author Clinton Begin
