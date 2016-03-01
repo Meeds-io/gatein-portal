@@ -48,6 +48,8 @@ public class LocaleConfigServiceImpl implements LocaleConfigService {
 
     private static Log log = ExoLogger.getLogger(LocaleConfigServiceImpl.class);
 
+    private DocumentBuilderFactory factory;
+
     private LocaleConfig defaultConfig_;
 
     private Map<String, LocaleConfig> configs_;
@@ -63,6 +65,7 @@ public class LocaleConfigServiceImpl implements LocaleConfigService {
 
     public LocaleConfigServiceImpl(InitParams params, ConfigurationManager cmanager) throws Exception {
         configs_ = new HashMap<String, LocaleConfig>(10);
+        factory = DocumentBuilderFactory.newInstance();
         String confResource = params.getValueParam("locale.config.file").getValue();
         InputStream is = cmanager.getInputStream(confResource);
         parseConfiguration(is);
@@ -94,7 +97,6 @@ public class LocaleConfigServiceImpl implements LocaleConfigService {
     }
 
     protected void parseConfiguration(InputStream is) throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setIgnoringComments(true);
         factory.setCoalescing(true);
         factory.setNamespaceAware(false);

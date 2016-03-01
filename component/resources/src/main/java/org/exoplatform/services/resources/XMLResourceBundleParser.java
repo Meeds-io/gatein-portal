@@ -67,6 +67,8 @@ import org.xml.sax.SAXException;
  */
 public class XMLResourceBundleParser {
 
+    private static DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+
     /**
      * @see #asMap(org.xml.sax.InputSource)
      */
@@ -140,8 +142,8 @@ public class XMLResourceBundleParser {
         if (in == null) {
             throw new IllegalArgumentException("No null input source allowed");
         }
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
+
+        DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
         Document document = builder.parse(in);
         Element bundleElt = document.getDocumentElement();
         HashMap<String, String> bundle = new HashMap<String, String>();

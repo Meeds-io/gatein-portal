@@ -43,17 +43,29 @@ public class XMLValidator {
     /** . */
     private final ResourceEntityResolver resolver;
 
+    private DocumentBuilderFactory documentBuilderFactory;
+
     /** . */
     private final Logger log = LoggerFactory.getLogger(XMLValidator.class);
 
     public XMLValidator(Class clazz, String systemId, String resourcePath) {
         schemas = new String[] { systemId };
         resolver = new ResourceEntityResolver(clazz, systemId, resourcePath);
+        createDocumentBuilderFactory();
     }
 
     public XMLValidator(Class clazz, Map<String, String> systemIdToResourcePath) {
         schemas = systemIdToResourcePath.keySet().toArray(new String[0]);
         resolver = new ResourceEntityResolver(clazz, systemIdToResourcePath);
+        createDocumentBuilderFactory();
+    }
+
+    private void createDocumentBuilderFactory() {
+        documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setAttribute("http://java.sun.com/xml/jaxp/properties/schemaLanguage", "http://www.w3.org/2001/XMLSchema");
+        documentBuilderFactory.setAttribute("http://java.sun.com/xml/jaxp/properties/schemaSource", schemas);
+        documentBuilderFactory.setNamespaceAware(true);
+        documentBuilderFactory.setValidating(true);
     }
 
     /**
@@ -70,15 +82,8 @@ public class XMLValidator {
         }
 
         //
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setAttribute("http://java.sun.com/xml/jaxp/properties/schemaLanguage", "http://www.w3.org/2001/XMLSchema");
-        factory.setAttribute("http://java.sun.com/xml/jaxp/properties/schemaSource", schemas);
-        factory.setNamespaceAware(true);
-        factory.setValidating(true);
-
-        //
         try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
             ValidationReporter reporter = new ValidationReporter(log, source.getIdentifier());
             builder.setErrorHandler(reporter);
             builder.setEntityResolver(resolver);

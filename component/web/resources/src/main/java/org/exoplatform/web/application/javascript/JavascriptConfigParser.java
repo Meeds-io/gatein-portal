@@ -110,12 +110,15 @@ public class JavascriptConfigParser {
     /** . */
     private final String contextPath;
 
+    private DocumentBuilderFactory documentBuilderFactory;
+
     private static final String SCRIPT_RESOURCE_DESCRIPTORS_ATTR = "gatein.script.resource.descriptors";
 
     private static final Log log = ExoLogger.getExoLogger(JavascriptConfigParser.class);
 
     public JavascriptConfigParser(String contextPath) {
         this.contextPath = contextPath;
+        this.documentBuilderFactory = DocumentBuilderFactory.newInstance();
     }
 
     public static void processConfigResource(InputStream is, JavascriptConfigService service, ServletContext scontext) {
@@ -145,7 +148,7 @@ public class JavascriptConfigParser {
 
     public List<ScriptResourceDescriptor> parseConfig(InputStream is) {
         try {
-            DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilder docBuilder = documentBuilderFactory.newDocumentBuilder();
             Document document = docBuilder.parse(is);
             return parseScripts(document);
         } catch (Exception e) {
