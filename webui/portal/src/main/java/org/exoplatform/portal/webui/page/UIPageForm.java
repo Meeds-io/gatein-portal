@@ -207,8 +207,8 @@ public class UIPageForm extends UIFormTabPane {
         }
 
         UserPortalConfigService userPortalConfigService = getApplicationComponent(UserPortalConfigService.class);
-        List<String> groups = userPortalConfigService.getMakableNavigations(pcontext.getRemoteUser(), true);
-        if (groups.size() > 0) {
+        Boolean hasNav = userPortalConfigService.hasMakableNavigations(pcontext.getRemoteUser(), true);
+        if (hasNav) {
             ownerTypes.add(new SelectItemOption<String>(SiteType.GROUP.getName()));
         }
 

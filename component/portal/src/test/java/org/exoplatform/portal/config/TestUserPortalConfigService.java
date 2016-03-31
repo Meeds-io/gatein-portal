@@ -397,6 +397,16 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
             }
         }.execute(null);
     }
+    
+    public void testHasMakableNavigations() {
+        new UnitTest() {
+            public void execute() throws Exception {
+                assertEquals(true, userPortalConfigSer_.hasMakableNavigations("root", true)); //super user
+                assertEquals(false, userPortalConfigSer_.hasMakableNavigations(null, true)); // remote user is null
+                assertEquals(true, userPortalConfigSer_.hasMakableNavigations("john", true)); //john is an administrator so he has at least a membership in adminstration group
+            }
+        }.execute(null);
+    }
 
     public void testRootGetPage() {
         new UnitTest() {
