@@ -284,8 +284,7 @@ public class UserPortalConfigService implements Startable {
         } else if (remoteUser.equals(userACL_.getSuperUser())) {
             hasNav = true; // as the super user is member of all groups
         } else {
-            groups = orgService_.getGroupHandler().resolveGroupByMembership(remoteUser,
-                                                                            userACL_.getMakableMT());
+            groups = orgService_.getGroupHandler().resolveGroupByMembership(remoteUser, userACL_.getMakableMT());
             if (groups != null && groups.size() > 0) {
                   if (withSite) {
                       for (Group group : groups) {
@@ -302,6 +301,7 @@ public class UserPortalConfigService implements Startable {
         }
  
         return hasNav;
+	}
     /**
      * Create a user site for the specified user. It will perform the following:
      * <ul>
