@@ -412,6 +412,7 @@
         eval($("<div />").html(script).text());
         return;
       } catch (err) {
+        console.error(err.message);
       }
       var elements = script.split(';');
       if (elements != null && elements.length > 0) {
