@@ -389,6 +389,7 @@
             <field name="maxEntries"><int>${gatein.cache.mop.maxnodes:5000}</int></field>
             <field name="lifespan"><long>${gatein.cache.mop.expiration:600000}</long></field>
             <field name="replicated"><boolean>true</boolean></field>
+            <field name="avoidValueReplication"><boolean>true</boolean></field>
           </object>
         </object-param>
         <!-- NavigationService configuration -->
