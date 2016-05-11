@@ -272,7 +272,7 @@ public class ExoFallbackIdentityStoreRepository extends FallbackIdentityStoreRep
      * @param invocationCtx
      * @param identityType
      * @param criteria
-     * @return Collection<IdentityObject>
+     * @return Collection&lt;IdentityObject&gt;
      * @throws IdentityException
      */
     @Override
