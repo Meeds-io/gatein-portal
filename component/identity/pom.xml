@@ -66,6 +66,12 @@
       <groupId>org.picketlink.idm</groupId>
       <artifactId>picketlink-idm-hibernate</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.picketlink.idm</groupId>
+      <artifactId>picketlink-idm-spi</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.picketlink.idm</groupId>
       <artifactId>picketlink-idm-ldap</artifactId>
@@ -95,7 +101,21 @@
       <classifier>test-sources</classifier>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.staxnav</groupId>
+      <artifactId>staxnav.core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+       <groupId>sun-opends</groupId>
+       <artifactId>OpenDS</artifactId>
+       <scope>test</scope>
+    </dependency>
+    <dependency>
+       <groupId>berkeleydb</groupId>
+       <artifactId>je</artifactId>
+       <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

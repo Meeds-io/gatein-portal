@@ -1,0 +1,41 @@
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ JBoss, a division of Red Hat                                              ~
+  ~ Copyright 2006, Red Hat Middleware, LLC, and individual                   ~
+  ~ contributors as indicated by the @authors tag. See the                    ~
+  ~ copyright.txt in the distribution for a full listing of                   ~
+  ~ individual contributors.                                                  ~
+  ~                                                                           ~
+  ~ This is free software; you can redistribute it and/or modify it           ~
+  ~ under the terms of the GNU Lesser General Public License as               ~
+  ~ published by the Free Software Foundation; either version 2.1 of          ~
+  ~ the License, or (at your option) any later version.                       ~
+  ~                                                                           ~
+  ~ This software is distributed in the hope that it will be useful,          ~
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of            ~
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU          ~
+  ~ Lesser General Public License for more details.                           ~
+  ~                                                                           ~
+  ~ You should have received a copy of the GNU Lesser General Public          ~
+  ~ License along with this software; if not, write to the Free               ~
+  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA        ~
+  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.                  ~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<directories>
+   <directory>
+      <directory-name>EmbeddedOpenDS</directory-name>
+      <description>ldap://localhost:10389</description>
+      <!--identity configuration file-->
+      <config-file>test-identity-config.xml</config-file>
+      <host>localhost</host>
+      <port>10389</port>
+      <context-factory>com.sun.jndi.ldap.LdapCtxFactory</context-factory>
+      <admin-dn>cn=Directory Manager</admin-dn>
+      <admin-password>password</admin-password>
+      <!--ldif from which LDAP will be populated before each test-->
+      <populate-ldif>ldap/ldap/initial-empty-opends.ldif</populate-ldif>
+      <!--<populate-ldif></populate-ldif>-->
+      <!--DN that will be removed to perform cleanup after each test-->
+      <cleanup-dn>o=jbid,dc=example,dc=com</cleanup-dn>
+   </directory>
+</directories>

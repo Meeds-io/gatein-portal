@@ -386,7 +386,7 @@
               </collection>
             </field>
 
-            <field name="user">
+          <field name="user">
               <collection type="java.util.ArrayList">
                 <value>
                   <object type="org.exoplatform.services.organization.OrganizationConfig$User">

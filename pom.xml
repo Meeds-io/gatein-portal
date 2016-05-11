@@ -64,6 +64,8 @@
     <org.jboss.portletbridge.version>3.3.1.Final</org.jboss.portletbridge.version>
     <version.cdi.portlet.integration>1.0.3.Final</version.cdi.portlet.integration>
     <version.org.gatein.naming>1.1.1.Final</version.org.gatein.naming>
+    <sun-opends.version>1.0.0</sun-opends.version>
+    <berkeleydb.version>3.2.76</berkeleydb.version>
 
     <!-- to move to gatein-dep -->
     <version.scribe>1.3.5</version.scribe>
@@ -1117,6 +1119,18 @@
         <groupId>org.gatein.naming</groupId>
         <artifactId>gatein-naming</artifactId>
         <version>${version.org.gatein.naming}</version>
+      </dependency>
+      <dependency>
+         <groupId>sun-opends</groupId>
+         <artifactId>OpenDS</artifactId>
+         <version>${sun-opends.version}</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>berkeleydb</groupId>
+         <artifactId>je</artifactId>
+         <version>${berkeleydb.version}</version>
+         <scope>test</scope>
       </dependency>
     </dependencies>
 
