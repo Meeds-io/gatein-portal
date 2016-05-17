@@ -187,12 +187,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
     private void touchImport() {
         RequestLifeCycle.begin(PortalContainer.getInstance());
         try {
-            POMSession session = pomMgr.getSession();
-            Workspace workspace = session.getWorkspace();
-            Imported imported = workspace.adapt(Imported.class);
-            imported.setLastModificationDate(new Date());
-            imported.setStatus(Status.DONE.status());
-            session.save();
+            dataStorage_.saveImportStatus(Status.DONE);
         } finally {
             RequestLifeCycle.end();
         }
@@ -201,32 +196,17 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
     private boolean performImport() throws Exception {
         RequestLifeCycle.begin(PortalContainer.getInstance());
         try {
+            boolean perform = true;
 
-            POMSession session = pomMgr.getSession();
-
-            // Obtain the status
-            Workspace workspace = session.getWorkspace();
-            boolean perform = !workspace.isAdapted(Imported.class);
-
-            // We mark it
-            if (perform) {
-                Imported imported = workspace.adapt(Imported.class);
-                imported.setCreationDate(new Date());
-
-                // for legacy checking
+            Status st = dataStorage_.getImportStatus();
+            if (st != null) {
+                perform = (Status.WANT_REIMPORT == st);
+            } else {
                 if (dataStorage_.getPortalConfig(defaultPortal) != null) {
                     perform = false;
-                    imported.setStatus(Status.DONE.status());
+                    dataStorage_.saveImportStatus(Status.DONE);
                 } else {
                     isFirstStartup = true;
-                }
-                session.save();
-            } else {
-                Imported imported = workspace.adapt(Imported.class);
-                Integer st = imported.getStatus();
-                if (st != null) {
-                    Status status = Status.getStatus(st);
-                    perform = (Status.WANT_REIMPORT == status);
                 }
             }
             return perform;

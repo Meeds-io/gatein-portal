@@ -21,6 +21,7 @@ package org.exoplatform.portal.pom.config;
 
 import java.io.ByteArrayInputStream;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,6 +44,7 @@ import org.exoplatform.portal.config.model.PersistentApplicationState;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.EventType;
+import org.exoplatform.portal.mop.importer.Imported;
 import org.exoplatform.portal.pom.config.tasks.PageTask;
 import org.exoplatform.portal.pom.config.tasks.PortalConfigTask;
 import org.exoplatform.portal.pom.config.tasks.PreferencesTask;
@@ -64,6 +66,7 @@ import org.gatein.common.logging.LoggerFactory;
 import org.gatein.common.transaction.JTAUserTransactionLifecycleService;
 import org.gatein.mop.api.workspace.ObjectType;
 import org.gatein.mop.api.workspace.Site;
+import org.gatein.mop.api.workspace.Workspace;
 import org.gatein.mop.api.workspace.WorkspaceObject;
 import org.gatein.mop.api.workspace.ui.UIComponent;
 import org.gatein.mop.api.workspace.ui.UIWindow;
@@ -342,5 +345,36 @@ public class POMDataStorage implements ModelDataStorage {
             return data;
         }
         throw new NoSuchDataException("Could not load the application data specified by the ID: " + applicationStorageId);
+    }
+
+    @Override
+    public org.exoplatform.portal.mop.importer.Imported.Status getImportStatus() {      
+        POMSession session = pomMgr.getSession();
+  
+        // Obtain the status
+        Workspace workspace = session.getWorkspace();
+        Imported imported = workspace.adapt(Imported.class);
+        Integer st = imported.getStatus();
+        if (st != null) {
+            org.exoplatform.portal.mop.importer.Imported.Status status = org.exoplatform.portal.mop.importer.Imported.Status.getStatus(st);
+            return status;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void saveImportStatus(org.exoplatform.portal.mop.importer.Imported.Status status) {
+        POMSession session = pomMgr.getSession();
+  
+        // Obtain the status
+        Workspace workspace = session.getWorkspace();        
+        Imported imported = workspace.adapt(Imported.class);
+        if (imported.getCreationDate() == null) {
+          imported.setCreationDate(new Date());
+        }
+        imported.setLastModificationDate(new Date());
+        imported.setStatus(status.status());
+        session.save();
     }
 }

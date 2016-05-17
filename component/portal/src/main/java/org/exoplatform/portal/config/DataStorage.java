@@ -31,6 +31,7 @@ import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.importer.Imported.Status;
 import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.pom.config.tasks.PreferencesTask;
 import org.exoplatform.portal.pom.data.ModelChange;
@@ -228,5 +229,9 @@ public interface DataStorage {
     <A> A adapt(ModelObject modelObject, Class<A> type);
 
     <A> A adapt(ModelObject modelObject, Class<A> type, boolean create);
+
+    Status getImportStatus();
+
+    void saveImportStatus(Status status);
 
 }

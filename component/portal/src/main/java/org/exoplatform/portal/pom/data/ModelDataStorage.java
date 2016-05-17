@@ -27,6 +27,7 @@ import org.exoplatform.portal.config.Query;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.mop.importer.Imported.Status;
 
 /**
  * Created by The eXo Platform SAS Apr 19, 2007
@@ -83,5 +84,9 @@ public interface ModelDataStorage {
     <A> A adapt(ModelData modelData, Class<A> type);
 
     <A> A adapt(ModelData modelData, Class<A> type, boolean create);
+
+    Status getImportStatus();
+
+    void saveImportStatus(Status status);
 
 }

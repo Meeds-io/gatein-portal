@@ -35,6 +35,7 @@ import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.importer.Imported.Status;
 import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.pom.data.ApplicationData;
 import org.exoplatform.portal.pom.data.ModelChange;
@@ -292,5 +293,15 @@ public class DataStorageImpl implements DataStorage {
             // TODO: Throw something else
             throw ex;
         }
+    }
+
+    @Override
+    public Status getImportStatus() {
+      return delegate.getImportStatus();
+    }
+
+    @Override
+    public void saveImportStatus(Status status) {
+      delegate.saveImportStatus(status);
     }
 }
