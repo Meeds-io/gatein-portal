@@ -38,11 +38,6 @@
   <dependencies>
     <dependency>
       <groupId>org.gatein.integration</groupId>
-      <artifactId>extension-config</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.gatein.integration</groupId>
       <artifactId>extension-war</artifactId>
       <version>${project.version}</version>
       <type>war</type>
@@ -130,12 +125,6 @@
               <artifactId>wsrp-admin-gui</artifactId>
               <contextRoot>wsrp-admin-gui</contextRoot>
             </webModule>
-            <jarModule>
-              <groupId>org.gatein.integration</groupId>
-              <artifactId>extension-config</artifactId>
-              <includeInApplicationXml>true</includeInApplicationXml>
-              <bundleDir>/</bundleDir>
-            </jarModule>
             <jarModule>
               <groupId>org.gatein.integration</groupId>
               <artifactId>extension-component</artifactId>
