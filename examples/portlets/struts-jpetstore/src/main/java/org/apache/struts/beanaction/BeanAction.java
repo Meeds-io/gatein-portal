@@ -176,12 +176,9 @@ import org.apache.struts.action.ActionMapping;
  * TO-DO List
  * <br>
  * <ul>
- * <br>
  * <li>Ignore mappings to methods that don't exist.
- * <br>
  * </ul>
  * <br>
- * </p>
  * <br>
  * <B>A WORK IN PROGRESS</B>
  * <br>
