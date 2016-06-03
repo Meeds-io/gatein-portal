@@ -32,6 +32,7 @@ import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.MapResourceBundle;
 import org.exoplatform.commons.utils.PageList;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.log.ExoLogger;
@@ -47,11 +48,13 @@ public class SimpleResourceBundleService extends BaseResourceBundleService {
 
     private final ConcurrentMap<String, ResourceBundleData> bundles = new ConcurrentHashMap<String, ResourceBundleData>();
 
-    public SimpleResourceBundleService(InitParams params, CacheService cService, LocaleConfigService localeService)
+    public SimpleResourceBundleService(PortalContainer portalContainer,
+                                       InitParams params, CacheService cService, LocaleConfigService localeService)
             throws Exception {
         log_ = ExoLogger.getLogger("org.exoplatform.services.resources");
         localeService_ = localeService;
         cache_ = cService.getCacheInstance(ResourceBundleData.class.getSimpleName());
+        portalContainer_ = portalContainer;
         initParams(params);
     }
 

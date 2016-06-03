@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import javax.servlet.ServletContext;
 import org.exoplatform.commons.cache.future.FutureCache;
 import org.exoplatform.commons.cache.future.FutureExoCache;
 import org.exoplatform.commons.cache.future.Loader;
@@ -38,6 +39,8 @@ import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.commons.utils.MapResourceBundle;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.RootContainer.PortalContainerPostInitTask;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.log.Log;
@@ -58,6 +61,13 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
 
     protected Log log_;
 
+    protected ClassLoader cl;
+
+    /**
+     * List of local loaded
+     */
+    protected List<String> localeList_ = Collections.synchronizedList(new ArrayList<String>());;
+
     protected volatile List<String> classpathResources_;
 
     protected volatile String[] portalResourceBundleNames_;
@@ -65,6 +75,9 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
     protected LocaleConfigService localeService_;
 
     protected ExoCache<String, ResourceBundle> cache_;
+
+    protected PortalContainer portalContainer_;
+
 
     private volatile FutureCache<String, ResourceBundle, ResourceBundleContext> futureCache_;
 
@@ -139,10 +152,33 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
             return;
 
         // init resources
-        List<String> initResources = initResources_;
-        for (String resource : initResources) {
-            initResources(resource, Thread.currentThread().getContextClassLoader());
-        }
+        cl = Thread.currentThread().getContextClassLoader();
+        final List<String> initResources = initResources_;
+        final  Collection<LocaleConfig> localeConfigs = localeService_.getLocalConfigs();
+        //Load resources for default local
+        loadResourcesForLocale(localeService_.getDefaultLocaleConfig().getLocale());
+
+        PortalContainer.addInitTask(portalContainer_.getPortalContext(), new PortalContainerPostInitTask(){
+            @Override
+            public void execute(ServletContext context, PortalContainer portalContainer)
+            {
+                // Execute the load resources in an asynchronous way
+                new Thread(new Runnable(){
+                    @Override
+                    public void run(){
+                        //iterate all resources
+                        for (Iterator<LocaleConfig> iter = localeConfigs.iterator(); iter.hasNext();){
+                            LocaleConfig localeConfig = iter.next();
+                            //Skip loaded resources before container startup
+                            if (localeList_.contains(localeConfig.getLocale().getLanguage())){
+                                continue;
+                            }
+                            loadResourcesForLocale(localeConfig.getLocale());
+                        }
+                    }
+                },"ResourceBundleThread").start();
+            }
+        });
     }
 
     /**
@@ -180,20 +216,10 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
         return false;
     }
 
-    protected void initResources(String baseName, ClassLoader cl) {
+    protected void initResources(String baseName, Locale locale, ClassLoader cl) {
         String name = baseName.replace('.', '/');
         try {
-            Collection<LocaleConfig> localeConfigs = localeService_.getLocalConfigs();
-            // String defaultLang =
-            // localeService_.getDefaultLocaleConfig().getLanguage();
-            Locale defaultLocale = localeService_.getDefaultLocaleConfig().getLocale();
-
-            for (Iterator<LocaleConfig> iter = localeConfigs.iterator(); iter.hasNext();) {
-                LocaleConfig localeConfig = iter.next();
-                // String language = localeConfig.getLanguage();
-                // String content = getResourceBundleContent(name, language,
-                // defaultLang, cl);
-                Locale locale = localeConfig.getLocale();
+                Locale defaultLocale = localeService_.getDefaultLocaleConfig().getLocale();
                 String language = locale.getLanguage();
                 String country = locale.getCountry();
                 String variant = locale.getVariant();
@@ -208,7 +234,6 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
                     data.setVariant(variant);
                     data.setData(content);
                     saveResourceBundle(data);
-                }
             }
         } catch (Exception ex) {
             log_.error("Error while reading the resource bundle : " + baseName, ex);
@@ -326,6 +351,19 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
 
         return null;
 
+    }
+
+    protected List<String> getInitResources_()
+    {
+        return initResources_;
+    }
+
+    protected void loadResourcesForLocale(Locale locale)
+    {
+        for (String resource : getInitResources_()) {
+            initResources(resource, locale, cl);
+        }
+        localeList_.add(locale.getLanguage());
     }
 
     /**
@@ -495,6 +533,11 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
         @Override
         ResourceBundle get(String id) {
             ResourceBundle res = null;
+            //local resources is not yet loaded
+            if (!localeList_.contains(locale.getLanguage())){
+                //force the load of local resources
+                loadResourcesForLocale(locale);
+            }
             try {
                 String rootId = name + "_" + localeService_.getDefaultLocaleConfig().getLanguage();
                 ResourceBundle parent = getResourceBundleFromDb(rootId, null, locale);
@@ -535,6 +578,11 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
             try {
                 outputBundled = new MapResourceBundle(locale);
                 for (int i = 0; i < name.length; i++) {
+                    //local resources is not yet loaded
+                    if (!localeList_.contains(locale.getLanguage())){
+                        //force the load of local resources
+                        loadResourcesForLocale(locale);
+                    }
                     ResourceBundle temp = getResourceBundle(name[i], locale, cl);
                     if (temp != null) {
                         outputBundled.merge(temp);
