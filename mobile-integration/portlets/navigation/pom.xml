@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.gatein.portal</groupId>
     <artifactId>responsive-portlets</artifactId>
-    <version>4.4.x-PLF-SNAPSHOT</version>
+    <version>4.4.0-M01-PLF</version>
   </parent>
 
   <groupId>org.gatein.portal</groupId>
