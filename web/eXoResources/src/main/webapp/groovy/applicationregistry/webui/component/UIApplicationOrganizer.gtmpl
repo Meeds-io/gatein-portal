@@ -79,10 +79,10 @@ rcontext.getJavascriptManager().require("SHARED/bts_tooltip").require("SHARED/jq
                 <%
                 boolean isSelectedApp = false;
                 for(application in apps) {
-                  if(application.getApplicationName().equals(selectedApp.getApplicationName())) isSelectedApp = true;
+                  if(application.getId().equals(selectedApp.getId())) isSelectedApp = true;
                   else isSelectedApp = false;
-                  String appName= application.getApplicationName();
-                  def applicationLabel = application.getDisplayName() 
+                  String appName= application.getId();
+                  def applicationLabel = application.getDisplayName();
 							    String displayApplicationName = (applicationLabel.length() <= 30) ? applicationLabel : applicationLabel.substring(0, 27)+"...";
                   displayApplicationName = encoder.encode(displayApplicationName);
                 %>

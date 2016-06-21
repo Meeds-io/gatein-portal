@@ -250,7 +250,7 @@ public class UIAddApplicationForm extends UIForm {
 
             // check portet name is exist
             for (Application application : appRegService.getApplications(selectedCate)) {
-                if (application.getContentId().equals(tmp.getContentId())) {
+                if (application.getType().getName().equals(tmp.getType().getName()) && application.getApplicationName().equals(tmp.getApplicationName())) {
                     ctx.getUIApplication().addMessage(new ApplicationMessage("UIAddApplicationForm.msg.PortletExist", null));
                     return;
                 }

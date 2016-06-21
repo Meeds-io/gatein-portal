@@ -90,7 +90,7 @@ public class UIPortletInfo extends UIContainer {
 
         for (ApplicationCategory category : allCategories) {
             for (Application application : appRegService.getApplications(category)) {
-                if (application.getContentId().equals(portlet_.getId())) {
+                if (application.getApplicationName().equals(portlet_.getName())) {
                     nameList.add(category.getDisplayName(true));
                 }
             }

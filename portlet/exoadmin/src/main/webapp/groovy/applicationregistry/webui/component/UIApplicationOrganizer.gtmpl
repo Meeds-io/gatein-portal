@@ -62,10 +62,10 @@ def selectedApp = uicomponent.getSelectedApplication();
 								for(application in apps) {
 									if(application.getApplicationName().equals(selectedApp.getApplicationName())) cssClass = "SelectedItem";
 									else cssClass = "NormalItem";
-									String appName= application.getApplicationName();
+									String appName= application.getId();
 								%>
 									<div class="ItemContent $cssClass ClearFix">
-									<% def applicationLabel = application.getDisplayName() 
+									<% def applicationLabel = application.getDisplayName();
 									String displayApplicationName = (applicationLabel.length() <= 30) ? applicationLabel : applicationLabel.substring(0, 27)+"...";
                                                                         displayApplicationName = encoder.encode(displayApplicationName);
 									%>

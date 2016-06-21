@@ -177,7 +177,7 @@ public class UIApplicationOrganizer extends UIContainer {
 
     public Application getApplication(String name) {
         for (Application ele : applications) {
-            if (ele.getApplicationName().equals(name)) {
+            if (ele.getId().equals(name)) {
                 return ele;
             }
         }
@@ -186,7 +186,7 @@ public class UIApplicationOrganizer extends UIContainer {
 
     public void selectApplication(String name) throws Exception {
         for (Application ele : applications) {
-            if (ele.getApplicationName().equals(name)) {
+            if (ele.getId().equals(name)) {
                 setSelectedApplication(ele);
                 break;
 

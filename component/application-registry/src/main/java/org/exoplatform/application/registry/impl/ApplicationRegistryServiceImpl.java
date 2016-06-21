@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.chromattic.api.ChromatticSession;
+
 import org.exoplatform.application.gadget.Gadget;
 import org.exoplatform.application.gadget.GadgetRegistryService;
 import org.exoplatform.application.registry.Application;
@@ -44,6 +45,7 @@ import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.pom.config.POMSessionManager;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.wsrp.WSRP;
+
 import org.gatein.common.i18n.LocalizedString;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -301,7 +303,7 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
         }
 
         //
-        ContentDefinition contentDef = categoryDef.getContentMap().get(application.getApplicationName());
+        ContentDefinition contentDef = findApp(categoryDef, application.getType(), application.getApplicationName());
         if (contentDef == null) {
             throw new IllegalStateException();
         }
@@ -324,10 +326,27 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
 
         //
         if (categoryDef != null) {
+            ContentDefinition content = findApp(categoryDef, app.getType(), app.getApplicationName());
+            if (content != null) {
+                categoryDef.getContentMap().remove(content.getName());
+            }
 
-            String contentName = app.getApplicationName();
-            categoryDef.getContentMap().remove(contentName);
         }
+    }
+
+    // EXOGTN-2213: To keep it backward compatible with existing data from previous version.
+    // We introduce this method to look for an application in a category based on application type and its name.
+    private ContentDefinition findApp(CategoryDefinition categoryDef, ApplicationType appType, String appName) {
+        if (categoryDef != null && appType != null && appName != null) {
+            for (ContentDefinition contentDef : categoryDef.getContentList()) {
+                Application application = load(contentDef);
+                if (isApplicationType(application, appType) && appName.equals(application.getApplicationName())) {
+                    return contentDef;
+                }
+            }
+        }
+
+        return null;
     }
 
     public void importExoGadgets() throws Exception {
@@ -356,13 +375,16 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
 
             //
             for (Gadget ele : eXoGadgets) {
-                ContentDefinition app = category.getContentMap().get(ele.getName());
-                if (app == null) {
-                    app = category.createContent(ele.getName(), org.exoplatform.portal.pom.spi.gadget.Gadget.CONTENT_TYPE,
+                Application app = new Application();
+                app.setApplicationName(ele.getName());
+                app.setType(ApplicationType.GADGET);
+                ContentDefinition contentDef = findApp(category, ApplicationType.GADGET, ele.getName());
+                if (contentDef == null) {
+                    contentDef = category.createContent(ele.getName(), org.exoplatform.portal.pom.spi.gadget.Gadget.CONTENT_TYPE,
                             ele.getName());
-                    app.setDisplayName(ele.getTitle());
-                    app.setDescription(ele.getDescription());
-                    app.setAccessPermissions(permissions);
+                    contentDef.setDisplayName(ele.getTitle());
+                    contentDef.setDescription(ele.getDescription());
+                    contentDef.setAccessPermissions(permissions);
                 }
             }
         }
@@ -383,7 +405,7 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
         portlet: for (org.gatein.pc.api.Portlet portlet : portlets) {
             PortletInfo info = portlet.getInfo();
             String portletApplicationName = info.getApplicationName();
-            String portletName = portlet.getContext().getId();
+            String portletName = info.getName();
 
             // Need to sanitize portlet and application names in case they contain characters that would
             // cause an improper Application name
@@ -447,9 +469,15 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
                     category.setAccessPermissions(permissions);
                 }
 
-                //
-                ContentDefinition app = category.getContentMap().get(portletName);
-                if (app == null) {
+                // Check if the portlet has already existed in this category
+                ApplicationType appType;
+                if (remote) {
+                    appType = ApplicationType.WSRP_PORTLET;
+                } else {
+                    appType = ApplicationType.PORTLET;
+                }
+                ContentDefinition contentDef = findApp(category, appType, portletName);
+                if (contentDef == null) {
                     LocalizedString descriptionLS = metaInfo.getMetaValue(MetaInfo.DESCRIPTION);
                     LocalizedString displayNameLS = metaInfo.getMetaValue(MetaInfo.DISPLAY_NAME);
                     String displayName = getLocalizedStringValue(displayNameLS, portletName);
@@ -466,22 +494,10 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
                         contentId = info.getApplicationName() + "/" + info.getName();
                     }
 
-                    // Check if the portlet has already existed in this category
-                    List<Application> applications = load(category).getApplications();
-                    boolean isExist = false;
-                    for (Application application : applications) {
-                        if (application.getContentId().equals(contentId)) {
-                            isExist = true;
-                            break;
-                        }
-                    }
-
-                    if (!isExist) {
-                        app = category.createContent(portletName, contentType, contentId);
-                        app.setDisplayName(displayName);
-                        app.setDescription(getLocalizedStringValue(descriptionLS, portletName));
-                        app.setAccessPermissions(permissions);
-                    }
+                    contentDef = category.createContent(portletName, contentType, contentId);
+                    contentDef.setDisplayName(displayName);
+                    contentDef.setDescription(getLocalizedStringValue(descriptionLS, portletName));
+                    contentDef.setAccessPermissions(permissions);
                 }
             }
         }
@@ -550,7 +566,12 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
         application.setId(contentDef.getCategory().getName() + "/" + contentDef.getName());
         application.setCategoryName(contentDef.getCategory().getName());
         application.setType(applicationType);
-        application.setApplicationName(contentDef.getName());
+        if (ApplicationType.PORTLET.getName().equals(applicationType.getName())) {
+            String[] compositeId = customization.getContentId().split("/");
+            application.setApplicationName(compositeId[compositeId.length - 1]);
+        } else {
+            application.setApplicationName(customization.getContentId());
+        }
         application.setIconURL(getApplicationIconURL(contentDef));
         application.setDisplayName(contentDef.getDisplayName());
         application.setDescription(contentDef.getDescription());
