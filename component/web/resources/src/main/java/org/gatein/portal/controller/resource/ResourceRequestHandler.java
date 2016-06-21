@@ -135,8 +135,11 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
     /** . */
     private final FutureMap<ScriptKey, ScriptResult, ControllerContext> cache;
 
+    /** . */
+    private final ScriptLoader loader = new ScriptLoader();
+
     public ResourceRequestHandler() {
-        this.cache = new FutureMap<ScriptKey, ScriptResult, ControllerContext>(new ScriptLoader());
+        this.cache = new FutureMap<ScriptKey, ScriptResult, ControllerContext>(loader);
     }
 
     @Override
@@ -178,7 +181,12 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
             ScriptKey key = new ScriptKey(resource, "min".equals(compressParam), locale);
 
             //
-            ScriptResult result = cache.get(context, key);
+            ScriptResult result;
+            if (PropertyManager.isDevelopping()) {
+                result = loader.retrieve(context, key);
+            } else {
+                result = cache.get(context, key);
+            }
             HttpServletResponse response = context.getResponse();
             HttpServletRequest request = context.getRequest();
 

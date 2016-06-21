@@ -60,7 +60,7 @@ class ScriptKey implements Serializable {
         }
         if (obj instanceof ScriptKey) {
             ScriptKey that = (ScriptKey) obj;
-            return id.equals(that.id) && minified && that.minified && Safe.equals(locale, that.locale);
+            return id.equals(that.id) && (minified == that.minified) && Safe.equals(locale, that.locale);
         }
         return false;
     }
