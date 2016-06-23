@@ -1,3 +1,6 @@
+transaction.log
+packaging/jboss-as7/pkg/${jbossas.modules.target.dir}
+packaging/jboss-as7/pkg/${jbossas.target.dir}
 target
 release.properties
 *.versionsBackup
