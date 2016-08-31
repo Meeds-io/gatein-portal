@@ -12,7 +12,7 @@ import org.picketlink.idm.impl.api.PasswordCredential;
 import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObject;
 import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectCredential;
 import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectCredentialType;
-import org.picketlink.idm.impl.store.hibernate.HibernateIdentityStoreImpl;
+import org.picketlink.idm.impl.store.hibernate.PatchedHibernateIdentityStoreImpl;
 import org.picketlink.idm.spi.model.IdentityObject;
 import org.picketlink.idm.spi.model.IdentityObjectCredentialType;
 import org.picketlink.idm.spi.store.IdentityStore;
@@ -23,7 +23,7 @@ import org.picketlink.idm.spi.store.IdentityStoreInvocationContext;
  * extends the class HibernateIdentityStoreImpl from PicketLink Idm to benefit from its methods in the implementation of isFirstlyCreatedIn() method declared in the IdentityStoreSource interface
  *in order to customize the Hibernate store
  */
-public class ExoHibernateIdentityStoreImpl extends HibernateIdentityStoreImpl implements IdentityStore, IdentityStoreSource, Serializable {
+public class ExoHibernateIdentityStoreImpl extends PatchedHibernateIdentityStoreImpl implements IdentityStore, IdentityStoreSource, Serializable {
 
     private static Logger log = Logger.getLogger(ExoHibernateIdentityStoreImpl.class.getName());
 
