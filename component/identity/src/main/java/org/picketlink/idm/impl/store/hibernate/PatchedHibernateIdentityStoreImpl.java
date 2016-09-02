@@ -78,7 +78,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 
 /**
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
+ * @author Boleslaw Dawidowicz
  * @version : 0.1 $
  */
 public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Serializable
