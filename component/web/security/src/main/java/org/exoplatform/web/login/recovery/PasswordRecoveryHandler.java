@@ -167,7 +167,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
             }
 
             req.setAttribute("tokenId", tokenId);
-            req.setAttribute("username", username);
+            req.setAttribute("username", escapeXssCharacters(username));
 
             return dispatch("/forgotpassword/jsp/reset_password.jsp", servletContext, req, res);
 
@@ -202,7 +202,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
                         }
                     }
 
-                    req.setAttribute("username", user);
+                    req.setAttribute("username", escapeXssCharacters(user));
                 } else {
                     req.setAttribute("error", bundle.getString("gatein.forgotPassword.emptyUserOrEmail"));
                 }
@@ -352,4 +352,12 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
 
       return user;
   }
+
+    public String escapeXssCharacters(String message){
+        message = (message == null) ? null : message.replace("&", "&amp").replace("<","&lt;").replace(">","&gt;")
+                                    .replace("\"","&quot;")
+                                    .replace("'","&#x27;")
+                                    .replace("/","&#x2F;");
+        return message;
+    }
 }
