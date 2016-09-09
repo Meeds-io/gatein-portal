@@ -186,6 +186,7 @@ public class LoginServlet extends AbstractHttpServlet {
                         }
                         Cookie cookie = new Cookie(COOKIE_NAME, cookieToken);
                         cookie.setPath(req.getContextPath());
+                        cookie.setHttpOnly(true);
                         cookie.setMaxAge((int) tokenService.getValidityTime());
                         resp.addCookie(cookie);
 
