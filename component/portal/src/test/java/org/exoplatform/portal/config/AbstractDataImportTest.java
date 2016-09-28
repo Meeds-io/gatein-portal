@@ -166,6 +166,33 @@ public abstract class AbstractDataImportTest extends AbstractGateInTest {
         bootstrap.dispose();
     }
 
+    public void testTwoBootsWithPortalConfigOverrideFlag() throws Exception {
+        KernelBootstrap bootstrap = new KernelBootstrap();
+        bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.test.jcr-configuration.xml");
+        bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.identity-configuration.xml");
+        bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration.xml");
+        bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport3-configuration.xml");
+
+        //
+        setSystemProperty("override.1", "true");
+        setSystemProperty("override.2", "false");
+        setSystemProperty("import.mode.1", getMode().toString());
+        setSystemProperty("import.portal.1", getConfig1());
+
+        bootstrap.boot();
+        PortalContainer container = bootstrap.getContainer();
+        afterFirstBoot(container);
+        bootstrap.dispose();
+
+        //
+        setSystemProperty("import.portal.1", getConfig2());
+
+        bootstrap.boot();
+        container = bootstrap.getContainer();
+        afterSecondBootWithOverride(container);
+        bootstrap.dispose();
+    }
+
     public void testTwoBootsWithWantReimport() throws Exception {
         KernelBootstrap bootstrap = new KernelBootstrap();
         bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.test.jcr-configuration.xml");

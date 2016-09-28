@@ -41,7 +41,10 @@ public final class NewPortalConfig {
 
     private String importMode;
 
-    private boolean override;
+    /*
+     * Object type is used for override attribute in order to support both string and boolean types of the corresponding configuration field for backward compatibility reasons. 
+     */
+    private Object override;
 
     /**
      * @deprecated use the location instead
@@ -146,8 +149,11 @@ public final class NewPortalConfig {
         this.importMode = importMode;
     }
 
-    public boolean getOverrideMode() {
-      return override;
+    public Boolean getOverrideMode() {
+      if (override != null) {
+        return override instanceof String ? "true".equals((String) override) : (Boolean) override;
+      }
+      return null;
     }
 
     public void setOverrideMode(boolean overrideMode) {
