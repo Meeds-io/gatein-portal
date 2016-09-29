@@ -189,7 +189,7 @@ public abstract class AbstractDataImportTest extends AbstractGateInTest {
 
         bootstrap.boot();
         container = bootstrap.getContainer();
-        afterSecondBootWithOverride(container);
+        afterSecondBoot(container);
         bootstrap.dispose();
     }
 
