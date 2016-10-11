@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
@@ -56,6 +57,8 @@ public class DataStorageImpl implements DataStorage {
     private ModelDataStorage delegate;
 
     private ListenerService listenerServ_;
+
+    private Container sharedLayout = null;
 
     public DataStorageImpl(ModelDataStorage delegate, ListenerService listenerServ) {
         this.delegate = delegate;
@@ -113,7 +116,10 @@ public class DataStorageImpl implements DataStorage {
     }
 
     public Container getSharedLayout() throws Exception {
-        return delegate.getSharedLayout();
+        if (PropertyManager.isDevelopping() || sharedLayout == null) {
+          sharedLayout = delegate.getSharedLayout();
+        }
+        return sharedLayout;
     }
 
     public PortalConfig getPortalConfig(String portalName) throws Exception {
