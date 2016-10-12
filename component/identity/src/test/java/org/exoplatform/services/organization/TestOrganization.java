@@ -33,9 +33,12 @@ import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.component.ComponentRequestLifecycle;
-import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl;
+import org.exoplatform.services.organization.idm.UpdateLoginTimeListener;
+import org.exoplatform.services.security.ConversationRegistry;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 
 /**
  * Created by The eXo Platform SARL Author : Tung Pham thanhtungty@gmail.com Nov 13, 2007
@@ -56,8 +59,10 @@ public class TestOrganization extends AbstractKernelTest {
     protected static final String DEFAULT_PASSWORD = "defaultpassword";
     protected static final String DESCRIPTION = " Description";
 
+    protected UpdateLoginTimeListener updateLoginTimeListener;
+
     protected OrganizationService organizationService;
-    
+
     protected UserHandler userHandler_;
 
     protected UserProfileHandler profileHandler_;
@@ -73,6 +78,7 @@ public class TestOrganization extends AbstractKernelTest {
         super.setUp();
         begin();
         PortalContainer container = getContainer();
+        updateLoginTimeListener = new UpdateLoginTimeListener(container);
         organizationService = (OrganizationService) container.getComponentInstance(OrganizationService.class);
         userHandler_ = organizationService.getUserHandler();
         profileHandler_ = organizationService.getUserProfileHandler();
@@ -154,6 +160,7 @@ public class TestOrganization extends AbstractKernelTest {
 
     public void testLastLoginTime() throws Exception {
         UserHandler uHandler = organizationService.getUserHandler();
+
         User user = uHandler.findUserByName("root");
         Assert.assertNotNull(user);
 
@@ -161,21 +168,42 @@ public class TestOrganization extends AbstractKernelTest {
         Thread.sleep(1);
         Date current = new Date();
         Thread.sleep(1);
+        user = uHandler.findUserByName("root");
+        Assert.assertNotNull(user);
+        
+        Date oldLastLoginTime = user.getLastLoginTime();
+        Assert.assertNotNull(oldLastLoginTime);
+
         Assert.assertTrue(uHandler.authenticate("root", "gtn"));
         user = uHandler.findUserByName("root");
+        Assert.assertTrue(user.getLastLoginTime().equals(oldLastLoginTime));
+
+        Assert.assertTrue(uHandler.authenticate("root", "gtn"));
+        updateLoginTimeListener.onEvent(new Event<ConversationRegistry, ConversationState>("nothing", null,
+            new ConversationState(new Identity("root"))));
+        user = uHandler.findUserByName("root");
+        Assert.assertTrue(user.getLastLoginTime().after(oldLastLoginTime));
         Assert.assertTrue(user.getLastLoginTime().after(current));
 
-        // Assert that last login time is not updated if option is disabled in configuration
+        assertTrue(userHandler_.isUpdateLastLoginTime());
+
         if (organizationService instanceof PicketLinkIDMOrganizationServiceImpl) {
             // Hack, but sufficient for now..
             ((PicketLinkIDMOrganizationServiceImpl)organizationService).getConfiguration().setUpdateLastLoginTimeAfterAuthentication(false);
+            assertFalse(userHandler_.isUpdateLastLoginTime());
+
             Thread.sleep(1);
             current = new Date();
             Thread.sleep(1);
+
             Assert.assertTrue(uHandler.authenticate("root", "gtn"));
+            updateLoginTimeListener.onEvent(new Event<ConversationRegistry, ConversationState>("nothing", null,
+                new ConversationState(new Identity("root"))));
+
             user = uHandler.findUserByName("root");
             Assert.assertTrue(user.getLastLoginTime().before(current));
             ((PicketLinkIDMOrganizationServiceImpl)organizationService).getConfiguration().setUpdateLastLoginTimeAfterAuthentication(true);
+            assertTrue(userHandler_.isUpdateLastLoginTime());
         }
     }
 

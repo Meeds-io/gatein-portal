@@ -285,6 +285,11 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         return exoUser;
     }
 
+    @Override
+    public boolean isUpdateLastLoginTime() {
+      return orgService.getConfiguration().isUpdateLastLoginTimeAfterAuthentication();
+    }
+
     //
     public User findUserByName(String userName) throws Exception {
         return findUserByName(userName, UserStatus.ENABLED);
@@ -385,12 +390,6 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
                 handleException("Cannot authenticate user: " + username + "; ", e);
 
             }
-        }
-
-        if (authenticated && orgService.getConfiguration().isUpdateLastLoginTimeAfterAuthentication()) {
-            UserImpl userImpl = (UserImpl) user;
-            userImpl.setLastLoginTime(Calendar.getInstance().getTime());
-            saveUser(userImpl, false);
         }
 
         if (log.isTraceEnabled()) {
