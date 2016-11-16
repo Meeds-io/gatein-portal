@@ -25,11 +25,6 @@ package org.exoplatform.services.organization.idm;
 
 import java.security.PrivilegedAction;
 
-import org.exoplatform.commons.utils.SecurityHelper;
-import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.services.cache.CacheService;
-import org.exoplatform.services.database.impl.HibernateServiceImpl;
-import org.gatein.common.classloader.DelegatingClassLoader;
 import org.hibernate.SessionFactory;
 import org.hibernate.SessionFactoryObserver;
 import org.hibernate.cfg.Configuration;
@@ -38,6 +33,11 @@ import org.hibernate.service.BootstrapServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.service.internal.StandardServiceRegistryImpl;
+
+import org.exoplatform.commons.utils.SecurityHelper;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.services.cache.CacheService;
+import org.exoplatform.services.database.impl.HibernateServiceImpl;
 
 /**
  * Custom implementation of {@link org.exoplatform.services.database.HibernateService} compatible with Hibernate4
@@ -84,32 +84,7 @@ public class CustomHibernateServiceImpl extends HibernateServiceImpl {
             }
         });
 
-        final ClassLoader old = SecurityHelper.doPrivilegedAction(new PrivilegedAction<ClassLoader>() {
-            public ClassLoader run() {
-                return Thread.currentThread().getContextClassLoader();
-            }
-        });
-
-        try {
-            SecurityHelper.doPrivilegedAction(new PrivilegedAction<Void>() {
-                public Void run() {
-                    DelegatingClassLoader cl = new DelegatingClassLoader(old,
-                            org.picketlink.idm.api.IdentitySessionFactory.class.getClassLoader());
-                    Thread.currentThread().setContextClassLoader(cl);
-                    return null;
-                }
-            });
-            return conf.buildSessionFactory(serviceRegistry);
-        } finally {
-            if (old != null) {
-                SecurityHelper.doPrivilegedAction(new PrivilegedAction<Void>() {
-                    public Void run() {
-                        Thread.currentThread().setContextClassLoader(old);
-                        return null;
-                    }
-                });
-            }
-        }
+        return conf.buildSessionFactory(serviceRegistry);
     }
 
     /**
