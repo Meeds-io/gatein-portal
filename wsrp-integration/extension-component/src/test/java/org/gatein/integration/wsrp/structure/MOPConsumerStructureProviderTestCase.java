@@ -92,7 +92,7 @@ public class MOPConsumerStructureProviderTestCase extends TestCase {
     }
 
     public void testAssignPortletToWindow() {
-        String newCustomizationId = "/app.new";
+        String newCustomizationId = "/app:new";
         String newWindowName = "portlet";
         provider.assignPortletToWindow(PortletContext.createPortletContext(newCustomizationId), "window11", getPageIdFor("page1"),
                 newWindowName);
