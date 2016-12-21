@@ -23,13 +23,13 @@
   <msg name="title">Services Management</msg>
   <msg name="services">Services</msg>
   <msg name="name">Naam</msg>
-  <msg name="description">Description</msg>
+  <msg name="description">Beschrijving</msg>
   <msg name="noDescription">Geen beschrijving</msg>
-  <msg name="method">Method</msg>
+  <msg name="method">Methode</msg>
   <msg name="property">Property</msg>
   <msg name="parameters">Parameters</msg>
-  <msg name="action">Action</msg>
-  <msg name="value">Value</msg>
+  <msg name="action">Actie</msg>
+  <msg name="value">Waarde</msg>
   <msg name="services_url">Diensten URL</msg>
   <msg name="failManage">Tijdelijke beheren diensten niet in andere host totdat we OAuth ondersteunen</msg>
   <msg name="noServices">Geen service is beschikbaar of u bent niet voldoende gemachtigd</msg>
