@@ -3254,7 +3254,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
                         matches = true;
                      }
                   }
-                  
+
                   if (!matches)
                   {
                      toRemove.add(object);

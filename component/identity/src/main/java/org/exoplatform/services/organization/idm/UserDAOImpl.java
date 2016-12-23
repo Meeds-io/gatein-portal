@@ -197,7 +197,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         orgService.flush();
         IdentitySession session = service_.getIdentitySession();
         User foundUser = getPopulatedUser(userName, session, UserStatus.ANY);
-        
+
         if (!disableUserActived()) {
             log.debug("disableUserActived option is set to FALSE, setEnabled method will be ignored");
             return foundUser;
@@ -320,7 +320,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         UserQueryBuilder qb = service_.getIdentitySession().createUserQueryBuilder();
         boolean enabledOnly = filterDisabledUsersInQueries();
         if (enabledOnly) {
-            qb = addDisabledUserFilter(qb);
+            qb = addEnabledUserFilter(qb);
         }
         return new LazyPageList<User>(new IDMUserListAccess(qb, pageSize, true, enabledOnly ? UserStatus.ENABLED : UserStatus.DISABLED), pageSize);
     }
@@ -340,14 +340,14 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
             switch (userStatus) {
                 case DISABLED:
                     if (filterDisabledUsersInQueries()) {
-                        qb = addEnabledUserFilter(qb);
+                        qb = addDisabledUserFilter(qb);
                     }
                     break;
                 case ANY:
                     break;
                 case ENABLED:
                     if (filterDisabledUsersInQueries()) {
-                        qb = addDisabledUserFilter(qb);
+                        qb = addEnabledUserFilter(qb);
                     }
                     break;
             }
@@ -493,14 +493,14 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
             switch (userStatus) {
                 case DISABLED:
                     if (filterDisabledUsersInQueries()) {
-                        qb = addEnabledUserFilter(qb);
+                        qb = addDisabledUserFilter(qb);
                     }
                     break;
                 case ANY:
                     break;
                 case ENABLED:
                     if (filterDisabledUsersInQueries()) {
-                        qb = addDisabledUserFilter(qb);
+                        qb = addEnabledUserFilter(qb);
                     }
                     break;
             }            
@@ -611,14 +611,14 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
             switch (userStatus) {
                 case DISABLED:
                     if (filterDisabledUsersInQueries()) {
-                        qb = addEnabledUserFilter(qb);
+                        qb = addDisabledUserFilter(qb);
                     }
                     break;
                 case ANY:
                     break;
                 case ENABLED:
                     if (filterDisabledUsersInQueries()) {
-                        qb = addDisabledUserFilter(qb);
+                        qb = addEnabledUserFilter(qb);
                     }
                     break;
             }
@@ -871,11 +871,11 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         }
     }
 
-    private UserQueryBuilder addDisabledUserFilter(UserQueryBuilder qb) throws Exception {
+    private UserQueryBuilder addEnabledUserFilter(UserQueryBuilder qb) throws Exception {
         return qb.attributeValuesFilter(UserDAOImpl.USER_ENABLED, new String[] {Boolean.TRUE.toString()});
     }
 
-    private UserQueryBuilder addEnabledUserFilter(UserQueryBuilder qb) throws Exception {
+    private UserQueryBuilder addDisabledUserFilter(UserQueryBuilder qb) throws Exception {
         return qb.attributeValuesFilter(UserDAOImpl.USER_ENABLED, new String[] {Boolean.FALSE.toString()});
     }
 

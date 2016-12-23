@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.commons.lang.StringUtils;
+import org.exoplatform.services.organization.idm.UserDAOImpl;
 import org.gatein.portal.idm.IdentityStoreSource;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.IdentitySearchCriteriaImpl;
@@ -299,6 +302,15 @@ public class ExoFallbackIdentityStoreRepository extends FallbackIdentityStoreRep
             if (criteria != null) {
                 c = new IdentitySearchCriteriaImpl(criteria);
                 c.setPaged(false);
+                //DB + LDAP Store Activated : remove from criteria attr (enabled==true)
+                Map<String, String[]> attrs= c.getValues();
+                Iterator<Map.Entry<String,String[]>> it= attrs.entrySet().iterator();
+                while (it.hasNext()){
+                    Map.Entry<String,String[]> entry = it.next();
+                    if(UserDAOImpl.USER_ENABLED.equals(entry.getKey()) && entry.getValue().length==1 && "true".equals(entry.getValue()[0])) {
+                        it.remove();
+                    }
+                }
             }
             // Get results from default store with not paged criteria
             defaultIOs = defaultIdentityStore.findIdentityObject(defaultInvocationContext, identityType, c);

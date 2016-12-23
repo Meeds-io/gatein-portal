@@ -46,7 +46,7 @@
     <identity-stores>
       <identity-store>
         <id>HibernateStore</id>
-        <class>org.picketlink.idm.impl.store.hibernate.HibernateIdentityStoreImpl</class>
+        <class>org.gatein.portal.idm.impl.store.hibernate.ExoHibernateIdentityStoreImpl</class>
         <external-config/>
         <supported-relationship-types>
           <relationship-type>JBOSS_IDENTITY_MEMBERSHIP</relationship-type>

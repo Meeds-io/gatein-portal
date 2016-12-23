@@ -20,6 +20,7 @@
 package org.exoplatform.services.organization.idm;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.exoplatform.commons.utils.ListAccess;
@@ -31,9 +32,11 @@ import org.exoplatform.services.organization.impl.UserImpl;
 import org.gatein.common.logging.LogLevel;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+import org.picketlink.idm.api.Attribute;
 import org.picketlink.idm.api.SortOrder;
 import org.picketlink.idm.api.query.UserQuery;
 import org.picketlink.idm.api.query.UserQueryBuilder;
+import org.picketlink.idm.impl.api.query.UserQueryBuilderImpl;
 
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
@@ -81,11 +84,27 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
         if (fullResults == null) {
             getOrganizationService().flush();
 
-            userQueryBuilder.page(index, length);
-            UserQuery query = userQueryBuilder.sort(SortOrder.ASCENDING).createQuery();
-            users = getIDMService().getIdentitySession().list(query);
+            if (this.userStatus == UserStatus.ENABLED) {
+                //In the case of LDAP activated store, pagination will be disabled setPage(false)
+                userQueryBuilder.page(index, length);
+                UserQuery query = userQueryBuilder.sort(SortOrder.ASCENDING).createQuery();
+                List<org.picketlink.idm.api.User> allUsers = getIDMService().getIdentitySession().list(query);
+                //Need to check all returned users is enabled
+                //In the case of enabled store DB + LDAP PersistenceManager return All users from
+                //LDAP and enbled user from DB
+                users = filterUserEnabled(allUsers, index, length);
+            }else{
+                userQueryBuilder.page(index, length);
+                UserQuery query = userQueryBuilder.sort(SortOrder.ASCENDING).createQuery();
+                users = getIDMService().getIdentitySession().list(query);
+            }
         } else {
-            users = fullResults.subList(index, index + length);
+            if (this.userStatus == UserStatus.ENABLED) {
+                //Need to check all returned users is enabled
+                users = filterUserEnabled(fullResults, index, length);
+            }else{
+                users = fullResults.subList(index, index + length);
+            }
         }
 
         User[] exoUsers = new User[length];
@@ -140,7 +159,11 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
                 userQueryBuilder.page(0, 0);
                 UserQuery query = userQueryBuilder.sort(SortOrder.ASCENDING).createQuery();
                 fullResults = getIDMService().getIdentitySession().list(query);
-                result = fullResults.size();
+                if (this.userStatus == UserStatus.ENABLED) {
+                    result = filterUserEnabled(fullResults,0,0).size();
+                }else{
+                    result = fullResults.size();
+                }
             }
 
             size = result;
@@ -163,5 +186,25 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
     PicketLinkIDMOrganizationServiceImpl getOrganizationService() {
         return (PicketLinkIDMOrganizationServiceImpl) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(
                 OrganizationService.class);
+    }
+
+    private List<org.picketlink.idm.api.User> filterUserEnabled(List<org.picketlink.idm.api.User> fullResults,int index, int length) throws Exception {
+        List<org.picketlink.idm.api.User> result = new ArrayList<org.picketlink.idm.api.User>();
+        if (fullResults != null && fullResults.size() > 0) {
+            int offset = 0;
+            for (org.picketlink.idm.api.User user : fullResults) {
+                Attribute attr = getIDMService().getIdentitySession().getAttributesManager().getAttribute(user.getKey(), UserDAOImpl.USER_ENABLED);
+                if (attr == null || attr.getValue().toString().equals("true")) {
+                    if (offset >= index) {
+                        result.add(user);
+                        if (length != 0 && result.size() == length) {
+                            break;
+                        }
+                    }
+                    offset++;
+                }
+            }
+        }
+        return result;
     }
 }

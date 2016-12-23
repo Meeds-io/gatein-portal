@@ -89,12 +89,18 @@ public class UIGridUsers extends UIComponent {
     }
 
     public Object getFieldValue(Object bean, String field) throws Exception {
-        Method method = ReflectionUtil.getGetBindingMethod(bean, field);
-        return method.invoke(bean, ReflectionUtil.EMPTY_ARGS);
+        if (bean != null) {
+            Method method = ReflectionUtil.getGetBindingMethod(bean, field);
+            return method.invoke(bean, ReflectionUtil.EMPTY_ARGS);
+        }
+        return null;
     }
 
     public String getBeanIdFor(Object bean) throws Exception {
-        return getFieldValue(bean, beanIdField_).toString();
+        if(bean != null){
+            return getFieldValue(bean, beanIdField_).toString();
+        }
+        return null;
     }
 
     @SuppressWarnings("unchecked")

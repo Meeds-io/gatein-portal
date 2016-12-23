@@ -89,6 +89,9 @@
       <% } else {
          def rowStyle = "";
          for (bean in uicomponent.getBeans()) {
+           if(bean == null){
+              continue;
+           }
             def beanIdField = uicomponent.getBeanIdField();
             def beanId = uicomponent.getBeanIdFor(bean);
             if (bean instanceof org.exoplatform.services.organization.User) {

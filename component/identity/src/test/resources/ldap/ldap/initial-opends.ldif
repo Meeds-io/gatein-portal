@@ -33,6 +33,42 @@ sn: Duke
 userPassword: admin
 mail: email@email.com
 
+dn: uid=tolik,ou=People,o=test,dc=portal,dc=example,dc=com
+objectclass: top
+objectclass: inetOrgPerson
+objectclass: person
+uid: tolik
+cn: tolik
+sn: Portal tolik
+userPassword: tolik
+mail: email@test
+
+dn: uid=rolik,ou=People,o=test,dc=portal,dc=example,dc=com
+objectclass: top
+objectclass: inetOrgPerson
+objectclass: person
+uid: rolik
+cn: rolik
+sn: rolik User
+userPassword: rolik
+
+dn: uid=bolik,ou=People,o=test,dc=portal,dc=example,dc=com
+objectclass: top
+objectclass: inetOrgPerson
+objectclass: person
+uid: bolik
+cn: bolik
+sn: bolik User
+
+dn: uid=volik,ou=People,o=test,dc=portal,dc=example,dc=com
+objectclass: top
+objectclass: inetOrgPerson
+objectclass: person
+uid: volik
+cn: volik
+sn: volik User
+userPassword: volik
+
 dn: uid=user,ou=People,o=test,dc=portal,dc=example,dc=com
 objectclass: top
 objectclass: inetOrgPerson
