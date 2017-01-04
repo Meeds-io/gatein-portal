@@ -178,7 +178,7 @@ public class ExoFallbackIdentityStoreRepository extends FallbackIdentityStoreRep
 
     /**
      *  Override findIdentityObject() method in order to add an inconsidered case in
-     *  Original implementation which is mappedStores > 1 && identityObjectType is not
+     *  Original implementation which is mappedStores greater than 1 and identityObjectType is not
      *  explicitely managed by default store (Hibernate)
      *  
      * {@inheritDoc}
