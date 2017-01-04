@@ -17,6 +17,11 @@ objectclass: top
 objectclass: organization
 o: test
 
+dn: ou=GroupsHierarchy,o=test,dc=portal,dc=example,dc=com
+objectclass: top
+objectclass: organizationalUnit
+ou: Groups
+
 dn: ou=People,o=test,dc=portal,dc=example,dc=com
 objectclass: top
 objectclass: organizationalUnit
@@ -196,6 +201,21 @@ dn: cn=OrganizationB,ou=Groups,o=test,dc=portal,dc=example,dc=com
 objectClass: top
 objectClass: groupOfNames
 cn: OrganizationB
+description: Some organization
+member: cn=User,ou=Roles,o=test,dc=portal,dc=example,dc=com
+member: cn=Admin,ou=Roles,o=test,dc=portal,dc=example,dc=com
+
+dn: cn=OrganizationC,ou=GroupsHierarchy,o=test,dc=portal,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: OrganizationC
+description: Some organization
+member: cn=SubOrganizationC,ou=GroupsHierarchy,o=test,dc=portal,dc=example,dc=com
+
+dn: cn=SubOrganizationC,ou=GroupsHierarchy,o=test,dc=portal,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: SubOrganizationC
 description: Some organization
 member: cn=User,ou=Roles,o=test,dc=portal,dc=example,dc=com
 member: cn=Admin,ou=Roles,o=test,dc=portal,dc=example,dc=com

@@ -68,6 +68,46 @@
 	<component>
 		<key>org.exoplatform.services.organization.OrganizationService</key>
 		<type>org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl</type>
+        <init-params>
+          <object-param>
+            <name>configuration</name>
+            <object type="org.exoplatform.services.organization.idm.Config">
+              <field name="forceMembershipOfMappedTypes">
+                <boolean>true</boolean>
+              </field>
+              <field name="associationMembershipType">
+                <string>member</string>
+              </field>
+              <field name="groupTypeMappings">
+                <map type="java.util.HashMap">
+                  <entry>
+                    <key>
+                      <string>/</string>
+                    </key>
+                    <value>
+                      <string>root_type</string>
+                    </value>
+                  </entry>
+                  <entry>
+                    <key>
+                      <string>/organization_hierarcy/*</string>
+                    </key>
+                    <value>
+                      <string>organization_hierarcy_type</string>
+                    </value>
+                  </entry>
+                </map>
+              </field>
+              <field name="ignoreMappedMembershipTypeGroupList">
+                <collection type="java.util.ArrayList" item-type="java.lang.String">
+                  <value>
+                    <string>/organization_hierarcy/*</string>
+                  </value>
+                </collection>
+              </field>
+            </object>
+          </object-param>
+        </init-params>
 	</component>
 
 	<component>

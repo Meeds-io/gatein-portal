@@ -98,8 +98,7 @@ public class TestOrganization extends AbstractKernelTest {
     @Override
     protected void tearDown() throws Exception {
         deleteGroup(GROUP_1);
-        deleteGroup(GROUP_2);
-        deleteGroup(GROUP_3);
+        deleteGroup("/" + GROUP_1);
 
         deleteUser(USER_1);
         deleteUser(USER_2);
@@ -128,7 +127,7 @@ public class TestOrganization extends AbstractKernelTest {
         assertEquals(GROUP_1, group.getGroupName());
         assertEquals(GROUP_1 + DESCRIPTION, group.getDescription());
 
-        group = groupHandler.findGroupById(GROUP_3);
+        group = groupHandler.findGroupById("/" + GROUP_1 + "/" + GROUP_3);
         assertNotNull(group);
         assertEquals(GROUP_3, group.getGroupName());
     }
@@ -283,9 +282,10 @@ public class TestOrganization extends AbstractKernelTest {
             newGroup.setDescription(name + DESCRIPTION);
             newGroup.setLabel(name);
             if (parentGroup != null) {
-                groupHandler.addChild(parentGroup, newGroup, true);
+              groupHandler.addChild(parentGroup, newGroup, true);
+            } else {
+              groupHandler.saveGroup(newGroup, true);
             }
-            groupHandler.saveGroup(newGroup, true);
         }
 
         catch (Exception e) {
@@ -297,8 +297,17 @@ public class TestOrganization extends AbstractKernelTest {
         GroupHandler groupHandler = organizationService.getGroupHandler();
         try {
             Group group = groupHandler.findGroupById(name);
-            groupHandler.removeGroup(group, true);
+            if(group == null) {
+              log.warn("Cannot find group with id '" + name + "'");
+            } else {
+              Collection<Group> groups = groupHandler.findGroups(group);
+              for (Group childGroup : groups) {
+                groupHandler.removeGroup(childGroup, true);
+              }
+              groupHandler.removeGroup(group, true);
+            }
         } catch (Exception e) {
+          log.error("Error while deleting group", e);
         }
     }
 

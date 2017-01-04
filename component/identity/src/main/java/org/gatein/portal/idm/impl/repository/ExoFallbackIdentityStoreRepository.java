@@ -14,10 +14,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.exoplatform.services.organization.idm.UserDAOImpl;
+
 import org.gatein.portal.idm.IdentityStoreSource;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.IdentitySearchCriteriaImpl;
+import org.picketlink.idm.impl.api.session.managers.RoleManagerImpl;
 import org.picketlink.idm.impl.repository.FallbackIdentityStoreRepository;
 import org.picketlink.idm.impl.repository.RepositoryIdentityStoreSessionImpl;
 import org.picketlink.idm.impl.store.SimpleIdentityStoreInvocationContext;
@@ -26,6 +29,7 @@ import org.picketlink.idm.spi.configuration.metadata.IdentityRepositoryConfigura
 import org.picketlink.idm.spi.configuration.metadata.IdentityStoreMappingMetaData;
 import org.picketlink.idm.spi.model.IdentityObject;
 import org.picketlink.idm.spi.model.IdentityObjectAttribute;
+import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
 import org.picketlink.idm.spi.model.IdentityObjectType;
 import org.picketlink.idm.spi.search.IdentityObjectSearchCriteria;
 import org.picketlink.idm.spi.store.AttributeStore;
@@ -171,6 +175,114 @@ public class ExoFallbackIdentityStoreRepository extends FallbackIdentityStoreRep
 
         return new SimpleIdentityStoreInvocationContext(targetSession, invocationCtx.getRealmId(), String.valueOf(this.hashCode()));
     }
+
+    /**
+     *  Override findIdentityObject() method in order to add an inconsidered case in
+     *  Original implementation which is mappedStores > 1 && identityObjectType is not
+     *  explicitely managed by default store (Hibernate)
+     *  
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<IdentityObject> findIdentityObject(IdentityStoreInvocationContext invocationCxt,
+                                                         IdentityObject identity,
+                                                         IdentityObjectRelationshipType relationshipType,
+                                                         Collection<IdentityObjectType> excludes,
+                                                         boolean parent,
+                                                        IdentityObjectSearchCriteria criteria) throws IdentityException
+    {
+
+      try
+      {
+        List<IdentityStore> mappedStores = resolveIdentityStores(identity.getIdentityType());
+
+        IdentityStoreInvocationContext defaultCtx = resolveInvocationContext(defaultIdentityStore, invocationCxt);
+
+        // Maybe only default store match
+        if (mappedStores.size() == 1 && mappedStores.contains(defaultIdentityStore))
+        {
+           return defaultIdentityStore.findIdentityObject(defaultCtx, identity, relationshipType, parent, criteria);
+        }
+
+        // For the merge no paging
+        IdentitySearchCriteriaImpl c = null;
+
+        if (criteria != null)
+        {
+           c = new IdentitySearchCriteriaImpl(criteria);
+           c.setPaged(false);
+        }
+
+        Collection<IdentityObject> results = new LinkedList<IdentityObject>();
+
+        // Filter out duplicates results
+        HashSet<IdentityObject> merged = new HashSet<IdentityObject>();
+
+        for (IdentityStore mappedStore : mappedStores)
+        {
+           IdentityStoreInvocationContext mappedCtx = resolveInvocationContext(mappedStore, invocationCxt);
+
+           // If object is in the store but there is no rel type provided or it is not a role
+           // So don't try to look for roles where they are not supported...
+           if (hasIdentityObject(mappedCtx, mappedStore, identity)
+              && (relationshipType == null
+              || !RoleManagerImpl.ROLE.getName().equals(relationshipType.getName())
+              || mappedStore.getSupportedFeatures().isNamedRelationshipsSupported())
+              ) {
+               /* Begin changes */
+               results = mappedStore.findIdentityObject(mappedCtx, identity, relationshipType, parent, c);
+               merged.addAll(results);
+               /* End changes */
+           }
+        }
+
+        // So always check with default if it wasn't already done
+        if(!mappedStores.contains(defaultIdentityStore)) {
+          Collection<IdentityObject> objects = defaultIdentityStore.findIdentityObject(defaultCtx, identity, relationshipType, parent, c);
+          // If default store contain related relationships merge and sort/page once more
+          if (objects != null && objects.size() != 0)
+          {
+             merged.addAll(objects);
+          }
+        }
+
+        // So as things were merged criteria need to be reapplied
+        if (criteria == null)
+        {
+          results = merged;
+        }
+        else
+        {
+          LinkedList<IdentityObject> processed = new LinkedList<IdentityObject>(merged);
+
+          //TODO: hardcoded - expects List
+          if (criteria.isSorted())
+          {
+             sortByName(processed, criteria.isAscending());
+          }
+
+          results = processed;
+
+          //TODO: hardcoded - expects List
+          if (criteria.isPaged())
+          {
+             results = cutPageFromResults(processed, criteria);
+          }
+        }
+
+        return results;
+      }
+      catch (IdentityException e)
+      {
+         if (log.isLoggable(Level.FINER))
+         {
+            log.log(Level.FINER, "Exception occurred: ", e);
+         }
+
+         throw e;
+      }
+
+   }
 
     /**override findIdentityObjectByUniqueAttribute() method in order to add
      *  the mandatoryStoredObjects option of the new LDAP configuration into consideration
