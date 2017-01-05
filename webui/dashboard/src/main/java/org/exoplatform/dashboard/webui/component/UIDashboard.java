@@ -118,7 +118,7 @@ public class UIDashboard extends UIContainer {
             boolean isShow = Boolean.parseBoolean(pcontext.getRequestParameter("isShow"));
             uiDashboard.setShowSelectPopup(isShow);
             String windowId = uiDashboard.getChild(UIDashboardContainer.class).getWindowId();
-            event.getRequestContext().addUIComponentToUpdateByAjax(uiDashboard.getChild(UIPopupWindow.class));
+            event.getRequestContext().addUIComponentToUpdateByAjax(uiDashboard);
             if (isShow) {
                 event.getRequestContext().getJavascriptManager().require("SHARED/dashboard", "dashboard")
                         .addScripts("dashboard.UIDashboard.onLoad('" + windowId + "'," + uiDashboard.canEdit() + ");");
