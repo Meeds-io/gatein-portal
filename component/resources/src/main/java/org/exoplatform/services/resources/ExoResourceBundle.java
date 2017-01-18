@@ -34,6 +34,7 @@ import java.util.ResourceBundle;
  **/
 @SuppressWarnings("serial")
 public class ExoResourceBundle extends ListResourceBundle implements Serializable {
+    public static final ExoResourceBundle NULL_OBJECT = new ExoResourceBundle((String) null);
 
     /** . */
     private final ResourceBundleData data;
