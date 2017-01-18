@@ -135,14 +135,17 @@ public class TestLDAPOrganization extends TestOrganization {
   }
 
   public void testFindEnabledUsers() throws Exception {
-    ListAccess<User> listEnabled = organization.getUserHandler().findAllUsers(UserStatus.ENABLED);
-    ListAccess<User> listDisabled = organization.getUserHandler().findAllUsers(UserStatus.DISABLED);
-    ListAccess<User> listAll =organization.getUserHandler().findAllUsers(UserStatus.ANY);
+    Query query = new Query();
+    query.setUserName("*");
+
+    ListAccess<User> listEnabled = organization.getUserHandler().findUsersByQuery(query, UserStatus.ENABLED);
+    ListAccess<User> listDisabled = organization.getUserHandler().findUsersByQuery(query, UserStatus.DISABLED);
+    ListAccess<User> listAll =organization.getUserHandler().findUsersByQuery(query, UserStatus.ANY);
     assertNotNull(listDisabled);
     assertNotNull(listAll);
     assertNotNull(listEnabled);
-    assertEquals(0, listDisabled.getSize());
-    assertEquals(listAll.getSize(), listEnabled.getSize());
+    assertEquals(0, listDisabled.load(0, listDisabled.getSize()).length);
+    assertEquals(listAll.load(0, listAll.getSize()).length, listEnabled.load(0, listEnabled.getSize()).length);
 
     User adminUser = organization.getUserHandler().findUserByName("jduke", UserStatus.ENABLED);
     assertNotNull(adminUser);
@@ -159,14 +162,14 @@ public class TestLDAPOrganization extends TestOrganization {
     adminUser = organization.getUserHandler().findUserByName("jduke", UserStatus.ANY);
     assertNotNull(adminUser);
 
-    ListAccess<User> newListEnabled = organization.getUserHandler().findAllUsers(UserStatus.ENABLED);
-    ListAccess<User> newListDisabled = organization.getUserHandler().findAllUsers(UserStatus.DISABLED);
-    ListAccess<User> newListAll = organization.getUserHandler().findAllUsers(UserStatus.ANY);
+    ListAccess<User> newListEnabled = organization.getUserHandler().findUsersByQuery(query, UserStatus.ENABLED);
+    ListAccess<User> newListDisabled = organization.getUserHandler().findUsersByQuery(query, UserStatus.DISABLED);
+    ListAccess<User> newListAll = organization.getUserHandler().findUsersByQuery(query, UserStatus.ANY);
 
     assertNotNull(newListEnabled);
     assertNotNull(newListDisabled);
     assertNotNull(newListAll);
-    assertEquals(1, newListDisabled.getSize());
+    assertEquals(1, newListDisabled.load(0, newListDisabled.getSize()).length);
     assertEquals("jduke", newListDisabled.load(0,1)[0].getUserName());
     for(int i=0; i< newListEnabled.getSize(); i++){
       assertNotSame("jduke",newListEnabled.load(i,1)[0].getUserName() );

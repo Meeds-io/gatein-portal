@@ -322,7 +322,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         if (enabledOnly) {
             qb = addEnabledUserFilter(qb);
         }
-        return new LazyPageList<User>(new IDMUserListAccess(qb, pageSize, true, enabledOnly ? UserStatus.ENABLED : UserStatus.DISABLED), pageSize);
+        return new LazyPageList<User>(new IDMUserListAccess(qb, pageSize, true, countPaginatedUsers(), enabledOnly ? UserStatus.ENABLED : UserStatus.DISABLED), pageSize);
     }
 
     public ListAccess<User> findAllUsers() throws Exception {
@@ -352,7 +352,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
                     break;
             }
         }
-        return new IDMUserListAccess(qb, 20, !countPaginatedUsers(), userStatus);
+        return new IDMUserListAccess(qb, 20, !countPaginatedUsers(), countPaginatedUsers(), userStatus);
     }
 
     //
@@ -507,9 +507,9 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         }
 
         if (q.getUserName() == null && q.getEmail() == null && q.getFirstName() == null && q.getLastName() == null) {
-            list = new IDMUserListAccess(qb, 20, !countPaginatedUsers(), userStatus);
+            list = new IDMUserListAccess(qb, 20, !countPaginatedUsers(), countPaginatedUsers(), userStatus);
         } else {
-            list = new IDMUserListAccess(qb, 20, false, userStatus);
+            list = new IDMUserListAccess(qb, 20, false, countPaginatedUsers(), userStatus);
         }
 
         if (cache != null) {
@@ -624,7 +624,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
             }
         }
 
-        return new IDMUserListAccess(qb, 20, false, userStatus);
+        return new IDMUserListAccess(qb, 20, false, countPaginatedUsers(), userStatus);
     }
 
     //

@@ -281,8 +281,8 @@
                can be duplicated in returned user list.
                If this value is set to true GateIn will perform whole non paginated query and filter it after.
                It will result in more accurate results and paginated list size info however can affect performance
-               If you have DB only setup, it's recommended to switch this option to false. This will help to have better performance.
-               If you have DB+LDAP setup, it's recommended to switch this option to true, otherwise you can have inaccurate results -->
+               If you have DB only setup, it's recommended to switch this option to true. This will help to have better performance.
+               If you have DB+LDAP setup, it's recommended to switch this option to false, otherwise you can have inaccurate results -->
           <field name="countPaginatedUsers">
             <boolean>true</boolean>
           </field>

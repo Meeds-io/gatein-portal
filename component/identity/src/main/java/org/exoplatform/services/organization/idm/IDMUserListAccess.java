@@ -20,15 +20,13 @@
 package org.exoplatform.services.organization.idm;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.User;
-import org.exoplatform.services.organization.UserStatus;
-import org.exoplatform.services.organization.impl.UserImpl;
 import org.gatein.common.logging.LogLevel;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -36,7 +34,13 @@ import org.picketlink.idm.api.Attribute;
 import org.picketlink.idm.api.SortOrder;
 import org.picketlink.idm.api.query.UserQuery;
 import org.picketlink.idm.api.query.UserQueryBuilder;
-import org.picketlink.idm.impl.api.query.UserQueryBuilderImpl;
+
+import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.UserStatus;
+import org.exoplatform.services.organization.impl.UserImpl;
 
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
@@ -58,11 +62,14 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
 
     private User lastExisting;
 
-    public IDMUserListAccess(UserQueryBuilder userQueryBuilder, int pageSize, boolean countAll, UserStatus userStatus) {
+    private boolean isDBOnly;
+
+    public IDMUserListAccess(UserQueryBuilder userQueryBuilder, int pageSize, boolean countAll, boolean isDBOnly, UserStatus userStatus) {
         this.userQueryBuilder = userQueryBuilder;
         this.pageSize = pageSize;
         this.countAll = countAll;
         this.userStatus = userStatus;
+        this.isDBOnly = isDBOnly;
     }
 
     public User[] load(int index, int length) throws Exception {
@@ -79,30 +86,23 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
             throw new IllegalArgumentException("Try to get more than number users can retrieve");
         }
 
-        List<org.picketlink.idm.api.User> users = null;
+        Collection<org.picketlink.idm.api.User> users = null;
 
         if (fullResults == null) {
             getOrganizationService().flush();
 
-            if (this.userStatus == UserStatus.ENABLED) {
-                //In the case of LDAP activated store, pagination will be disabled setPage(false)
-                userQueryBuilder.page(index, length);
-                UserQuery query = userQueryBuilder.sort(SortOrder.ASCENDING).createQuery();
-                List<org.picketlink.idm.api.User> allUsers = getIDMService().getIdentitySession().list(query);
-                //Need to check all returned users is enabled
-                //In the case of enabled store DB + LDAP PersistenceManager return All users from
-                //LDAP and enbled user from DB
-                users = filterUserEnabled(allUsers, index, length);
-            }else{
-                userQueryBuilder.page(index, length);
-                UserQuery query = userQueryBuilder.sort(SortOrder.ASCENDING).createQuery();
-                users = getIDMService().getIdentitySession().list(query);
+            userQueryBuilder.page(index, length);
+            UserQuery query = userQueryBuilder.sort(SortOrder.ASCENDING).createQuery();
+            users = getIDMService().getIdentitySession().list(query);
+
+            if ((this.userStatus == UserStatus.ENABLED || this.userStatus == UserStatus.DISABLED) && !isDBOnly) {
+                users= filterUserByStatus(users, this.userStatus, index, length);
             }
         } else {
-            if (this.userStatus == UserStatus.ENABLED) {
+            if ((this.userStatus == UserStatus.ENABLED || this.userStatus == UserStatus.DISABLED) && !isDBOnly) {
                 //Need to check all returned users is enabled
-                users = filterUserEnabled(fullResults, index, length);
-            }else{
+                users = filterUserByStatus(fullResults, this.userStatus, index, length);
+            } else{
                 users = fullResults.subList(index, index + length);
             }
         }
@@ -111,13 +111,11 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
 
         int i = 0;
 
-        for (; i < users.size(); i++) {
-            org.picketlink.idm.api.User user = users.get(i);
-
+        for (org.picketlink.idm.api.User user : users) {
             User gtnUser = new UserImpl(user.getId());
             ((UserDAOImpl) getOrganizationService().getUserHandler()).populateUser(gtnUser, getIDMService()
                     .getIdentitySession());
-            exoUsers[i] = gtnUser;
+            exoUsers[i++] = gtnUser;
             lastExisting = gtnUser;
         }
 
@@ -127,7 +125,7 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
                 exoUsers[i] = lastExisting;
             }
         }
-
+        
         if (log.isTraceEnabled()) {
             Tools.logMethodOut(log, LogLevel.TRACE, "load", exoUsers);
         }
@@ -145,7 +143,6 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
         int result;
 
         if (size < 0) {
-
             if (fullResults != null) {
                 result = fullResults.size();
             } else if (countAll) {
@@ -156,14 +153,15 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
 //             result = getIDMService().getIdentitySession().getPersistenceManager().getUserCount(enabledOnly);
                 result = getIDMService().getIdentitySession().getPersistenceManager().getUserCount();
             } else {
-                userQueryBuilder.page(0, 0);
-                UserQuery query = userQueryBuilder.sort(SortOrder.ASCENDING).createQuery();
-                fullResults = getIDMService().getIdentitySession().list(query);
-                if (this.userStatus == UserStatus.ENABLED) {
-                    result = filterUserEnabled(fullResults,0,0).size();
-                }else{
-                    result = fullResults.size();
-                }
+              userQueryBuilder.page(0, 0);
+              UserQuery query = userQueryBuilder.sort(SortOrder.ASCENDING).createQuery();
+              fullResults = getIDMService().getIdentitySession().list(query);
+
+              if ((this.userStatus == UserStatus.ENABLED || this.userStatus == UserStatus.DISABLED) && !isDBOnly) {
+                result = filterUserByStatus(fullResults, this.userStatus, 0, fullResults.size()).size();
+              } else {
+                result = fullResults.size();
+              }
             }
 
             size = result;
@@ -188,18 +186,17 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
                 OrganizationService.class);
     }
 
-    private List<org.picketlink.idm.api.User> filterUserEnabled(List<org.picketlink.idm.api.User> fullResults,int index, int length) throws Exception {
-        List<org.picketlink.idm.api.User> result = new ArrayList<org.picketlink.idm.api.User>();
+    private Set<org.picketlink.idm.api.User> filterUserByStatus(Collection<org.picketlink.idm.api.User> fullResults, UserStatus userStatus, int index, int length) throws Exception {
+        Set<org.picketlink.idm.api.User> result = new LinkedHashSet<org.picketlink.idm.api.User>();
         if (fullResults != null && fullResults.size() > 0) {
             int offset = 0;
-            for (org.picketlink.idm.api.User user : fullResults) {
+            Iterator<org.picketlink.idm.api.User> iterator = fullResults.iterator();
+            while (iterator.hasNext() && result.size() < length) {
+              org.picketlink.idm.api.User user = iterator.next();
                 Attribute attr = getIDMService().getIdentitySession().getAttributesManager().getAttribute(user.getKey(), UserDAOImpl.USER_ENABLED);
-                if (attr == null || attr.getValue().toString().equals("true")) {
+                if ((userStatus == UserStatus.ENABLED && (attr == null || attr.getValue().toString().equals("true"))) || (userStatus == UserStatus.DISABLED && attr != null && attr.getValue().toString().equals("false"))) {
                     if (offset >= index) {
                         result.add(user);
-                        if (length != 0 && result.size() == length) {
-                            break;
-                        }
                     }
                     offset++;
                 }
