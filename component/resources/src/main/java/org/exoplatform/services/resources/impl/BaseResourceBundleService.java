@@ -414,11 +414,12 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
                 // Throw the RuntimeException if it occurs to remain compatible with the old behavior
                 throw ctx.e;
             } else {
-                return result;
+              return result == ExoResourceBundle.NULL_OBJECT ? null : result;
             }
         } else {
             // Case 2: ResourceBundle of portal
-            return getFutureCache().get(new GetResourceBundleFromDbContext(name, locale), id);
+            ResourceBundle resourceBundle = getFutureCache().get(new GetResourceBundleFromDbContext(name, locale), id);
+            return resourceBundle == ExoResourceBundle.NULL_OBJECT ? null : resourceBundle;
         }
     }
 

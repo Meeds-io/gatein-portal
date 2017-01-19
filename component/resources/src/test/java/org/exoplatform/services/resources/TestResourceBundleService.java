@@ -124,6 +124,9 @@ public class TestResourceBundleService extends AbstractKernelTest {
         res = service_.getResourceBundle(baseName, Locale.GERMAN);
         assertEquals("English", res.getString("language"));
         assertEquals("base_en.properties", res.getString("base_en"));
+
+        res = service_.getResourceBundle("NotExistingFile", Locale.ENGLISH);
+        assertNull(res);
     }
 
     public void testResourceBundleServiceUpdate() throws Exception {
