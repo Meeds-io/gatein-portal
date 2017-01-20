@@ -255,7 +255,26 @@
 		   if(language == undefined) {
 			   language = "";
 		   }
-		   window.location = url + "&language=" + language;
+		   var originalParams = "";
+		   var originalUrl = window.location.href;
+	           var parametersFirstIndex = originalUrl.indexOf('?');
+		   if(parametersFirstIndex > 0) {
+		     originalParams = originalUrl.substring(parametersFirstIndex + 1, originalUrl.length);
+		     var startSearchIndex = originalParams.indexOf("&language=");
+		     if(startSearchIndex > -1) {
+		       // Index used to search the original parameters
+		       var startIndexOfOriginalParams = originalParams.indexOf("&", startSearchIndex + "&language=".length);
+		       if(startIndexOfOriginalParams > -1) {
+		         originalParams = originalParams.substring(startIndexOfOriginalParams, originalParams.length);
+		       } else {
+		         originalParams = "";
+		       }
+		     }
+		     if(originalParams.length > 0 && originalParams.indexOf("&") != 0) {
+		       originalParams = "&" + originalParams;
+		     }
+		   }
+		   window.location = url + "&language=" + language + originalParams;
 		}
 	};
 
