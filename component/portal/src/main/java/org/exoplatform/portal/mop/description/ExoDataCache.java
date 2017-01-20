@@ -46,14 +46,7 @@ public class ExoDataCache extends DataCache {
 
     public ExoDataCache(CacheService cacheService) {
         this.cache = cacheService.getCacheInstance(DescriptionService.class.getSimpleName());
-        this.values = new FutureExoCache<CacheKey, CacheValue, POMSession>(valueLoader, cache) {
-            @Override
-            protected void put(CacheKey key, CacheValue entry) {
-                // Do nothing on purpose
-                // as data in inserted with the putValue method
-                // during the getValue method
-            }
-        };
+        this.values = new FutureExoCache<CacheKey, CacheValue, POMSession>(valueLoader, cache);
     }
 
     @Override

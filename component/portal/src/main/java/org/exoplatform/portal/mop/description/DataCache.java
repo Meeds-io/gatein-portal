@@ -53,7 +53,7 @@ abstract class DataCache {
                 return foo;
             }
         }
-        return null;
+        return CacheValue.NULL_VALUE;
     }
 
     protected abstract void putValue(CacheKey key, CacheValue value);

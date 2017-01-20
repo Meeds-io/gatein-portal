@@ -28,6 +28,8 @@ import org.exoplatform.portal.mop.Described;
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
 public class CacheValue implements Serializable {
+  
+    public static final CacheValue NULL_VALUE = new CacheValue();
 
     /** . */
     private static final AtomicLong SEQUENCE = new AtomicLong();
@@ -40,6 +42,12 @@ public class CacheValue implements Serializable {
 
     /** . */
     final Described.State state;
+
+    private CacheValue() {
+      state = null;
+      serial = 0;
+      origin = null;
+    }
 
     public CacheValue(CacheKey origin, long serial, Described.State state) {
         this.origin = origin;
