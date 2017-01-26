@@ -46,9 +46,15 @@
       this.datePattern = datePattern;
       this.value = value;
 
-      this.months = new Array();
-      this.months = monthNames.split(',');
-      this.months.pop();
+      var monthnamesLocalized = msg.getMessage("monthnames");
+      if (monthnamesLocalized != null && typeof (monthnamesLocalized) == "object") {
+          this.months = monthnamesLocalized;
+      } else {
+          this.months = new Array();
+          this.months = monthNames.split(',');
+          this.months.pop();
+      }
+
 
       var weekdays = msg.getMessage("weekdays");
       if (weekdays != null && typeof (weekdays) == "object") {

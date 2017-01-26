@@ -60,6 +60,20 @@
 	      "${weekdays.fri}",
 	      "${weekdays.sat}"
 	  ],
+	  monthnames  :[
+          "${months.jan}",
+          "${months.feb}",
+          "${months.mar}",
+          "${months.apr}",
+          "${months.may}",
+          "${months.jun}",
+          "${months.jul}",
+          "${months.aug}",
+          "${months.sep}",
+          "${months.oct}",
+          "${months.nov}",
+          "${months.dec}"
+	  ],
 	  Save : "${Save}",
 	  Cancel : "${Cancel}"
 	};
