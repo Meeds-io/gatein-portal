@@ -178,6 +178,12 @@
 
   <component>
     <type>org.exoplatform.groovyscript.text.TemplateService</type>
+    <init-params>
+      <value-param>
+        <name>templates.collect.statistics</name>
+        <value>${exo.statistics.groovy.template.enabled:true}</value>
+      </value-param>
+    </init-params>
   </component>
 
   <component>
