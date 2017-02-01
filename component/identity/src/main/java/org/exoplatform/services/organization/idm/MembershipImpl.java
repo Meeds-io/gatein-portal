@@ -19,12 +19,16 @@
 
 package org.exoplatform.services.organization.idm;
 
+import java.io.Serializable;
+
 import org.exoplatform.services.organization.Membership;
 
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
  */
 public class MembershipImpl implements Membership, Comparable {
+    private static final long serialVersionUID = -8572523969777642576L;
+
     private String membershipType = "member";
 
     private String userName = null;

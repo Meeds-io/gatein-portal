@@ -24,6 +24,11 @@
                xsi:schemaLocation="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd http://www.exoplaform.org/xml/ns/kernel_1_2.xsd"
                xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
 
+  <component>
+    <key>org.exoplatform.services.organization.search.UserSearchService</key>
+    <type>org.exoplatform.services.organization.search.UserSearchServiceImpl</type>
+  </component>
+
   <external-component-plugins>
     <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
     <component-plugin>

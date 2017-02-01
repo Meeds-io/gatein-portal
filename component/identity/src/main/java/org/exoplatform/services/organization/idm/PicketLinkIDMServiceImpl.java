@@ -87,9 +87,6 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
 
     private InfinispanCacheFactory infinispanCacheFactory = InfinispanCacheFactory.getInstance();
 
-    private PicketLinkIDMServiceImpl() {
-    }
-
     public PicketLinkIDMServiceImpl(ExoContainerContext exoContainerContext, InitParams initParams,
             HibernateService hibernateService, ConfigurationManager confManager, PicketLinkIDMCacheService picketLinkIDMCache,
             InitialContextInitializer dependency) throws Exception {
@@ -140,6 +137,7 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
                     "hibernateSessionFactory");
 
             if (apiCacheConfig != null) {
+                log.warn("The parameter 'apiCacheProvider' has been deprecated. It has been replaced by caches in Organization Service top layer. Thus, the parameter should be removed.");
 
                 InputStream configStream = confManager.getInputStream(apiCacheConfig.getValue());
 
@@ -165,6 +163,8 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
             }
 
             if (storeCacheConfig != null) {
+                log.warn("The parameter 'storeCacheProvider' has been deprecated. It has been replaced by caches in Organization Service top layer. Thus, the parameter should be removed.");
+
                 InputStream configStream = confManager.getInputStream(storeCacheConfig.getValue());
 
                 if (configStream == null) {

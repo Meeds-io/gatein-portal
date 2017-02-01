@@ -16,6 +16,10 @@
 	xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
 
 
+  <component>
+    <type>org.exoplatform.services.organization.cache.OrganizationCacheHandler</type>
+  </component>
+
 	<component>
 		<key>org.exoplatform.services.organization.idm.PicketLinkIDMCacheService</key>
 		<type>org.exoplatform.services.organization.idm.PicketLinkIDMCacheService</type>
@@ -51,17 +55,6 @@
 				<name>config</name>
 				<value>jar:/conf/exo.portal.component.identity-picketlink-idm-ldap-config.xml</value>
 			</value-param>
-
-            <value-param>
-                <name>apiCacheConfig</name>
-                <value>jar:/conf/cache/infinispan.xml</value>
-            </value-param>
-
-            <value-param>
-                <name>storeCacheConfig</name>
-                <value>jar:/conf/cache/infinispan.xml</value>
-            </value-param>
-
         </init-params>
 	</component>
 

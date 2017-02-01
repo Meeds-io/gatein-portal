@@ -30,12 +30,6 @@
             <identity-type-mappings>
                 <user-mapping>USER</user-mapping>
             </identity-type-mappings>
-            <options>
-                    <option>
-                        <name>cache.providerRegistryName</name>
-                        <value>apiCacheProvider</value>
-                    </option>
-            </options>
         </realm>
     </realms>
     <repositories>
@@ -290,10 +284,6 @@
                         <name>customSystemProperties</name>
                         <value>com.sun.jndi.ldap.connect.pool.maxsize=300000</value>
                         <value>com.sun.jndi.ldap.connect.pool.protocol=plain ssl</value>
-                    </option>
-                    <option>
-                        <name>cache.providerRegistryName</name>
-                        <value>storeCacheProvider</value>
                     </option>
                     <option>
                         <name>allowNotCaseSensitiveSearch</name>

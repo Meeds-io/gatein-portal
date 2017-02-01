@@ -36,10 +36,6 @@
           <value>true</value>
         </option>
         <option>
-          <name>cache.providerRegistryName</name>
-          <value>apiCacheProvider</value>
-        </option>
-        <option>
           <name>credentialEncoder.class</name>
           <value>${exo.plidm.password.class:org.picketlink.idm.impl.credential.DatabaseReadingSaltEncoder}</value>
         </option>

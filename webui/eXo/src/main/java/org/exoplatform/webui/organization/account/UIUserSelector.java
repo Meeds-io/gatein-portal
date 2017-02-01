@@ -19,100 +19,80 @@
 
 package org.exoplatform.webui.organization.account;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.exoplatform.commons.serialization.api.annotations.Serialized;
-import org.exoplatform.commons.utils.*;
-import org.exoplatform.services.organization.*;
+import org.exoplatform.commons.utils.LazyPageList;
+import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.search.UserSearchService;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
-import org.exoplatform.webui.core.*;
+import org.exoplatform.webui.core.UIApplication;
+import org.exoplatform.webui.core.UIComponent;
+import org.exoplatform.webui.core.UIPageIterator;
+import org.exoplatform.webui.core.UIPopupComponent;
 import org.exoplatform.webui.core.lifecycle.UIFormLifecycle;
-import org.exoplatform.webui.core.model.SelectItemOption;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.Event.Phase;
 import org.exoplatform.webui.event.EventListener;
 import org.exoplatform.webui.form.UIForm;
 import org.exoplatform.webui.form.UIFormCheckBoxInput;
-import org.exoplatform.webui.form.UIFormSelectBox;
 import org.exoplatform.webui.form.UIFormStringInput;
-
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by The eXo Platform SARL Author : Pham Tuan phamtuanchip@gmail.com Dec 11, 2007 Modified: dang.tung tungcnw@gmail.com
  * Nov 22, 2008
  */
+@SuppressWarnings("deprecation")
 @ComponentConfig(lifecycle = UIFormLifecycle.class, template = "system:/groovy/webui/organization/account/UIUserSelector.gtmpl", events = {
         @EventConfig(listeners = UIUserSelector.AddActionListener.class, phase = Phase.DECODE),
         @EventConfig(listeners = UIUserSelector.AddUserActionListener.class, phase = Phase.DECODE),
         @EventConfig(listeners = UIUserSelector.SearchActionListener.class, phase = Phase.DECODE),
-        @EventConfig(listeners = UIUserSelector.SearchGroupActionListener.class, phase = Phase.DECODE),
-        @EventConfig(listeners = UIUserSelector.SelectGroupActionListener.class, phase = Phase.DECODE),
-        @EventConfig(listeners = UIUserSelector.FindGroupActionListener.class, phase = Phase.DECODE),
         @EventConfig(listeners = UIUserSelector.ShowPageActionListener.class, phase = Phase.DECODE),
         @EventConfig(listeners = UIUserSelector.CloseActionListener.class, phase = Phase.DECODE) })
 @Serialized
 public class UIUserSelector extends UIForm implements UIPopupComponent {
     public static final String FIELD_KEYWORD = "Quick Search";
 
-    public static final String FIELD_FILTER = "filter";
-
-    public static final String FIELD_GROUP = "group";
-
-    public static String USER_NAME = "userName";
-
-    public static String LAST_NAME = "lastName";
-
-    public static String FIRST_NAME = "firstName";
-
-    public static String EMAIL = "email";
-
     protected Map<String, User> userData_ = new HashMap<String, User>();
 
     private boolean isShowSearch_ = false;
 
-    private boolean isShowSearchGroup = true;
-
     private boolean isShowSearchUser = true;
 
-    protected String groupId_ = null;
-
-    protected Collection<String> pars_;
-
-    public UIPageIterator uiIterator_;
+    private UIPageIterator uiIterator_;
 
     private String selectedUsers;
 
     private boolean multi = true;
 
-    private UserStatus statusFilter = UserStatus.ENABLED;
-
-    private LazyPageList lazyPageList;
-
     public UIUserSelector() throws Exception {
         addUIFormInput(new UIFormStringInput(FIELD_KEYWORD, FIELD_KEYWORD, null));
-        addUIFormInput(new UIFormSelectBox(FIELD_FILTER, FIELD_FILTER, getFilters()));
-        addUIFormInput(new UIFormStringInput(FIELD_GROUP, FIELD_GROUP, null));
         isShowSearch_ = true;
-        OrganizationService service = getApplicationComponent(OrganizationService.class);
-        ListAccess<User>  userList = service.getUserHandler().findAllUsers();
-        lazyPageList = new LazyPageList(userList, 10);
         uiIterator_ = new UIPageIterator();
-        uiIterator_.setPageList(lazyPageList);
+        computePageList(null);
         uiIterator_.setId("UISelectUserPage");
-
-        // create group selector
-        UIPopupWindow uiPopup = addChild(UIPopupWindow.class, null, "UIPopupGroupSelector");
-        uiPopup.setWindowSize(540, 0);
-        UIGroupSelector uiGroup = createUIComponent(UIGroupSelector.class, null, null);
-        uiPopup.setUIComponent(uiGroup);
-        uiGroup.setId("GroupSelector");
-        uiGroup.getChild(UITree.class).setId("TreeGroupSelector");
-        uiGroup.getChild(UIBreadcumbs.class).setId("BreadcumbsGroupSelector");
     }
 
-    @SuppressWarnings("unchecked")
+    private void computePageList(String keyword) {
+      UserSearchService userSearchService = getApplicationComponent(UserSearchService.class);
+      try {
+        ListAccess<User> userList = userSearchService.searchUsers(keyword);
+        uiIterator_.setPageList(new LazyPageList<>(userList, 10));
+      } catch (Exception e) {
+        UIApplication uiApp = getAncestorOfType(UIApplication.class);
+        uiApp.addMessage(new ApplicationMessage("UIUserSelector.errorListingUsers", null));
+      }
+    }
+
+    @SuppressWarnings({ "unchecked" })
     public List<User> getData() throws Exception {
         if (getMulti()) {
             for (Object obj : uiIterator_.getCurrentPageData()) {
@@ -157,23 +137,6 @@ public class UIUserSelector extends UIForm implements UIPopupComponent {
         return uiIterator_.getCurrentPage();
     }
 
-    // update data, review later
-    // public void init(Collection<String> pars) throws Exception{
-    // OrganizationService service = getApplicationComponent(OrganizationService.class) ;
-    // ObjectPageList objPageList = new ObjectPageList(service.getUserHandler().getUserPageList(0).getAll(), 10) ;
-    // uiIterator_.setPageList(objPageList) ;
-    // pars_ = pars ;
-    // }
-
-    private List<SelectItemOption<String>> getFilters() {
-        List<SelectItemOption<String>> options = new ArrayList<SelectItemOption<String>>();
-        options.add(new SelectItemOption<String>(USER_NAME, USER_NAME));
-        options.add(new SelectItemOption<String>(LAST_NAME, LAST_NAME));
-        options.add(new SelectItemOption<String>(FIRST_NAME, FIRST_NAME));
-        options.add(new SelectItemOption<String>(EMAIL, EMAIL));
-        return options;
-    }
-
     public String[] getActions() {
         return new String[] { "Add", "Close" };
     }
@@ -200,88 +163,24 @@ public class UIUserSelector extends UIForm implements UIPopupComponent {
         return isShowSearch_;
     }
 
-    public void setShowSearchGroup(boolean isShowSearchGroup) {
-        this.isShowSearchGroup = isShowSearchGroup;
-    }
-
-    public boolean isShowSearchGroup() {
-        return isShowSearchGroup;
-    }
-
     public void setShowSearchUser(boolean isShowSearchUser) {
         this.isShowSearchUser = isShowSearchUser;
     }
 
-    public void search(String keyword, String filter, String groupId) throws Exception {
-        OrganizationService service = getApplicationComponent(OrganizationService.class);
-        Query q = new Query();
-        if (keyword != null && (keyword = keyword.trim()).length() != 0) {
-            if (keyword.indexOf("*") < 0) {
-                if (keyword.charAt(0) != '*')
-                    keyword = "*" + keyword;
-                if (keyword.charAt(keyword.length() - 1) != '*')
-                    keyword += "*";
-            }
-            keyword = keyword.replace('?', '_');
-            if (USER_NAME.equals(filter)) {
-                q.setUserName(keyword);
-            }
-            if (LAST_NAME.equals(filter)) {
-                q.setLastName(keyword);
-            }
-            if (FIRST_NAME.equals(filter)) {
-                q.setFirstName(keyword);
-            }
-            if (EMAIL.equals(filter)) {
-                q.setEmail(keyword);
-            }
-        }
-
-        if (groupId != null && (groupId = groupId.trim()).length() != 0) {
-          // Provide method to search in specific group
-          List results = new CopyOnWriteArrayList();
-          results.addAll(service.getUserHandler().findUsers(q).getAll());
-          // remove if user doesn't exist in selected group
-          MembershipHandler memberShipHandler = service.getMembershipHandler();
-          for (Object user : results) {
-            if (memberShipHandler.findMembershipsByUserAndGroup(((User)user).getUserName(), groupId).size() == 0) {
-              results.remove(user);
-            }
-          }
-          PageList objPageList = new SerializablePageList(new ListAccessImpl(User.class, results), 10);
-          uiIterator_.setPageList(objPageList);
-        } else {
-          uiIterator_.setPageList(new SerializablePageList(service.getUserHandler().findUsersByQuery(q, statusFilter),10));
-        }
+    public void search(String keyword) throws Exception {
+        computePageList(keyword);
     }
 
     public boolean isShowSearchUser() {
         return isShowSearchUser;
     }
 
-    public UserStatus getStatusFilter() {
-        return statusFilter;
-    }
-
-    public void setStatusFilter(UserStatus statusFilter) {
-        this.statusFilter = statusFilter;
-    }
-
-    public String getSelectedGroup() {
-        return getUIStringInput(FIELD_GROUP).getValue();
-    }
-
-    public void setSelectedGroup(String selectedGroup) {
-        getUIStringInput(FIELD_GROUP).setValue(selectedGroup);
-    }
-
     public static class AddActionListener extends EventListener<UIUserSelector> {
         public void execute(Event<UIUserSelector> event) throws Exception {
             UIUserSelector uiForm = event.getSource();
-            StringBuilder sb = new StringBuilder();
-
+            // Used to compute checked combo box
             uiForm.setSelectedItem();
-
+            StringBuilder sb = new StringBuilder();
             // get item from selected item map
             Set<String> items = uiForm.uiIterator_.getSelectedItems();
             if (items.size() == 0) {
@@ -303,18 +202,6 @@ public class UIUserSelector extends UIForm implements UIPopupComponent {
         }
     }
 
-    // TODO maybe check duplicate user in method:
-    // OrganizationService.getUserHandler().findUsersByGroup(groupId)
-    public PageList removeDuplicate(PageList users) throws Exception {
-        List after = new ArrayList();
-        for (Object u : users.getAll()) {
-            if (after.contains(u))
-                continue;
-            after.add(u);
-        }
-        return new ObjectPageList(after, 10);
-    }
-
     public static class AddUserActionListener extends EventListener<UIUserSelector> {
         public void execute(Event<UIUserSelector> event) throws Exception {
             UIUserSelector uiForm = event.getSource();
@@ -332,64 +219,23 @@ public class UIUserSelector extends UIForm implements UIPopupComponent {
         getUIStringInput(FIELD_KEYWORD).setValue(value);
     }
 
+    @SuppressWarnings({ "unchecked" })
     private void setSelectedItem() throws Exception {
         for (Object o : this.uiIterator_.getCurrentPageData()) {
             User u = (User) o;
-            UIFormCheckBoxInput input = this.getUIFormCheckBoxInput(u.getUserName());
+            UIFormCheckBoxInput<Boolean> input = this.getUIFormCheckBoxInput(u.getUserName());
             if (input != null) {
                 this.uiIterator_.setSelectedItem(u.getUserName(), input.isChecked());
             }
         }
     }
 
-    public static class SelectGroupActionListener extends EventListener<UIGroupSelector> {
-        public void execute(Event<UIGroupSelector> event) throws Exception {
-            UIGroupSelector uiSelectGroupForm = event.getSource();
-            UIUserSelector uiSelectUserForm = uiSelectGroupForm.<UIComponent> getParent().getParent();
-            String groupId = event.getRequestContext().getRequestParameter(OBJECTID);
-            uiSelectUserForm.setSelectedGroup(groupId);
-            OrganizationService service = uiSelectGroupForm.getApplicationComponent(OrganizationService.class);
-            PageList users = uiSelectUserForm.removeDuplicate(service.getUserHandler().findUsersByGroup(groupId));
-            users.setPageSize(10);
-            uiSelectUserForm.uiIterator_.setPageList(users);
-            uiSelectUserForm.setKeyword(null);
-            event.getRequestContext().addUIComponentToUpdateByAjax(uiSelectUserForm);
-        }
-    }
-
-    public static class FindGroupActionListener extends EventListener<UIUserSelector> {
-        public void execute(Event<UIUserSelector> event) throws Exception {
-            UIUserSelector uiSelectUserForm = event.getSource();
-            String groupId = uiSelectUserForm.getSelectedGroup();
-            OrganizationService service = uiSelectUserForm.getApplicationComponent(OrganizationService.class);
-
-            PageList users = PageList.EMPTY_LIST;
-            if (groupId != null && groupId.trim().length() != 0) {
-                if (service.getGroupHandler().findGroupById(groupId) != null) {
-                    users = uiSelectUserForm.removeDuplicate(service.getUserHandler().findUsersByGroup(groupId));
-                }
-            } else {
-                users = service.getUserHandler().findUsers(new Query());
-            }
-            users.setPageSize(10);
-            uiSelectUserForm.uiIterator_.setPageList(users);
-            uiSelectUserForm.setKeyword(null);
-            event.getRequestContext().addUIComponentToUpdateByAjax(uiSelectUserForm);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
     public static class SearchActionListener extends EventListener<UIUserSelector> {
         public void execute(Event<UIUserSelector> event) throws Exception {
             UIUserSelector uiForm = event.getSource();
 
             String keyword = uiForm.getUIStringInput(FIELD_KEYWORD).getValue();
-            String filter = uiForm.getUIFormSelectBox(FIELD_FILTER).getValue();
-            String groupId = uiForm.getSelectedGroup();
-            uiForm.search(keyword, filter, groupId);
-            if (filter == null || filter.trim().length() == 0)
-                return;
-
+            uiForm.search(keyword);
             event.getRequestContext().addUIComponentToUpdateByAjax(uiForm);
         }
     }
@@ -398,13 +244,6 @@ public class UIUserSelector extends UIForm implements UIPopupComponent {
         public void execute(Event<UIUserSelector> event) throws Exception {
             UIUserSelector uiForm = event.getSource();
             uiForm.<UIComponent> getParent().broadcast(event, event.getExecutionPhase());
-        }
-    }
-
-    public static class SearchGroupActionListener extends EventListener<UIUserSelector> {
-        public void execute(Event<UIUserSelector> event) throws Exception {
-            UIUserSelector uiForm = event.getSource();
-            uiForm.getChild(UIPopupWindow.class).setShow(true);
         }
     }
 
