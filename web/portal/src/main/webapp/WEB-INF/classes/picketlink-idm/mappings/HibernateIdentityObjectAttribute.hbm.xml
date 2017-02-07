@@ -39,7 +39,9 @@
          fetch="join"
          batch-size="20">
       <cache usage="transactional"/>
-      <key column="TEXT_ATTR_VALUE_ID"/>
+      <key>
+        <column name="TEXT_ATTR_VALUE_ID" index="TEXT_ATTR_VALUE_ID_IDX"></column>
+      </key>
       <element type="string"
                column="ATTR_VALUE"/>
     </set>
