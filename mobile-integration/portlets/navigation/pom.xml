@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.gatein.portal</groupId>
+    <groupId>org.exoplatform.gatein.portal</groupId>
     <artifactId>responsive-portlets</artifactId>
-    <version>4.5.x-PLF-SNAPSHOT</version>
+    <version>5.0.x-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.gatein.portal</groupId>
+  <groupId>org.exoplatform.gatein.portal</groupId>
   <artifactId>portlet.responsive.navigation</artifactId>
   <packaging>war</packaging>
   <name>GateIn Portal Responsive Navigation Portlet</name>
@@ -43,7 +43,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.gatein.pc</groupId>
+      <groupId>org.exoplatform.gatein.pc</groupId>
       <artifactId>pc-portlet</artifactId>
       <scope>provided</scope>
     </dependency>

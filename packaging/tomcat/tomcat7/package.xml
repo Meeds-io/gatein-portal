@@ -56,7 +56,7 @@
 
     <!-- Tomcat 7 specific dependencies -->
     <copy
-        file="${maven.dependency.org.gatein.wci.wci-tomcat7.jar.path}"
+        file="${maven.dependency.org.exoplatform.gatein.wci.wci-tomcat7.jar.path}"
         todir="${maven.project.build.directory}/tomcat/lib"/>
 
     <copy 
@@ -69,7 +69,7 @@
     </copy>
 
     <!-- Extract common config from packaging.common artifact to gatein/conf -->
-    <unzip src="${org.gatein.portal:exo.portal.packaging.common:jar}"
+    <unzip src="${org.exoplatform.gatein.portal:exo.portal.packaging.common:jar}"
            dest="${maven.project.build.directory}/tomcat/gatein/conf">
       <patternset>
         <exclude name="META-INF/"/>

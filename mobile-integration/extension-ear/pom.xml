@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.gatein.portal</groupId>
+    <groupId>org.exoplatform.gatein.portal</groupId>
     <artifactId>mobile-integration</artifactId>
-    <version>4.5.x-PLF-SNAPSHOT</version>
+    <version>5.0.x-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.gatein.portal</groupId>
+  <groupId>org.exoplatform.gatein.portal</groupId>
   <artifactId>mobile-extension-ear</artifactId>
   <packaging>ear</packaging>
   <name>GateIn Portal Mobile Integration EAR</name>
@@ -17,56 +17,56 @@
   <dependencies>
     <!-- The mobile skin -->
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>responsive-skin</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <!-- The mobile login page -->
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>mobile-extension-login</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
     <!-- The mobile portlets -->
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>portlet.responsive.header</artifactId>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>portlet.responsive.banner</artifactId>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>portlet.responsive.community</artifactId>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>portlet.responsive.features</artifactId>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>portlet.responsive.footer</artifactId>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>portlet.responsive.navigation</artifactId>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>mobile-extension-configuration</artifactId>
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal.portlet</groupId>
+      <groupId>org.exoplatform.gatein.portal.portlet</groupId>
       <artifactId>redirect</artifactId>
       <type>war</type>
     </dependency>
@@ -82,70 +82,70 @@
           <displayName>gatein-wsrp-integration</displayName>
           <modules>
             <webModule>
-              <groupId>org.gatein.portal</groupId>
+              <groupId>org.exoplatform.gatein.portal</groupId>
               <artifactId>responsive-skin</artifactId>
               <contextRoot>/gatein-responsive-skin</contextRoot>
               <bundleFileName>gatein-responsive-skin.war</bundleFileName>
               <unpack>true</unpack>
             </webModule>
             <webModule>
-              <groupId>org.gatein.portal</groupId>
+              <groupId>org.exoplatform.gatein.portal</groupId>
               <artifactId>mobile-extension-login</artifactId>
               <contextRoot>/gatein-mobile-login</contextRoot>
               <bundleFileName>gatein-mobile-login.war</bundleFileName>
               <unpack>true</unpack>
             </webModule>
             <webModule>
-              <groupId>org.gatein.portal</groupId>
+              <groupId>org.exoplatform.gatein.portal</groupId>
               <artifactId>portlet.responsive.header</artifactId>
               <contextRoot>/responsive-header-portlet</contextRoot>
               <bundleFileName>responsive-header-portlet.war</bundleFileName>
               <unpack>true</unpack>
             </webModule>
             <webModule>
-              <groupId>org.gatein.portal</groupId>
+              <groupId>org.exoplatform.gatein.portal</groupId>
               <artifactId>portlet.responsive.features</artifactId>
               <contextRoot>/responsive-features-portlet</contextRoot>
               <bundleFileName>responsive-features-portlet.war</bundleFileName>
               <unpack>true</unpack>
             </webModule>
             <webModule>
-              <groupId>org.gatein.portal</groupId>
+              <groupId>org.exoplatform.gatein.portal</groupId>
               <artifactId>portlet.responsive.banner</artifactId>
               <contextRoot>/responsive-banner-portlet</contextRoot>
               <bundleFileName>responsive-banner-portlet.war</bundleFileName>
               <unpack>true</unpack>
             </webModule>
             <webModule>
-              <groupId>org.gatein.portal</groupId>
+              <groupId>org.exoplatform.gatein.portal</groupId>
               <artifactId>portlet.responsive.community</artifactId>
               <contextRoot>/responsive-community-portlet</contextRoot>
               <bundleFileName>responsive-community-portlet.war</bundleFileName>
               <unpack>true</unpack>
             </webModule>
             <webModule>
-              <groupId>org.gatein.portal</groupId>
+              <groupId>org.exoplatform.gatein.portal</groupId>
               <artifactId>portlet.responsive.footer</artifactId>
               <contextRoot>/responsive-footer-portlet</contextRoot>
               <bundleFileName>responsive-footer-portlet.war</bundleFileName>
               <unpack>true</unpack>
             </webModule>
             <webModule>
-              <groupId>org.gatein.portal</groupId>
+              <groupId>org.exoplatform.gatein.portal</groupId>
               <artifactId>portlet.responsive.navigation</artifactId>
               <contextRoot>/responsive-navigation-portlet</contextRoot>
               <bundleFileName>responsive-navigation-portlet.war</bundleFileName>
               <unpack>true</unpack>
             </webModule>
             <webModule>
-              <groupId>org.gatein.portal</groupId>
+              <groupId>org.exoplatform.gatein.portal</groupId>
               <artifactId>mobile-extension-configuration</artifactId>
               <contextRoot>/gatein-mobile-configuration</contextRoot>
               <bundleFileName>gatein-mobile-configuration.war</bundleFileName>
               <unpack>true</unpack>
             </webModule>
             <webModule>
-              <groupId>org.gatein.portal.portlet</groupId>
+              <groupId>org.exoplatform.gatein.portal.portlet</groupId>
               <artifactId>redirect</artifactId>
               <contextRoot>/redirect-portlet</contextRoot>
               <bundleFileName>redirect-portlet.war</bundleFileName>

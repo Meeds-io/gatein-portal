@@ -51,7 +51,7 @@ import javax.servlet.ServletContext;
 @ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-configuration.xml") })
 public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
     // The value must be the same with the version property in
-    // META-INF/maven/org.gatein.portal/exo.portal.component.web.resources/pom.properties
+    // META-INF/maven/org.exoplatform.gatein.portal/exo.portal.component.web.resources/pom.properties
     protected static final String ASSETS_VERSION = "PORTAL-VERSION";
 
     protected SkinService skinService;

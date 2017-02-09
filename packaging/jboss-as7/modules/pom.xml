@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <parent>
-    <groupId>org.gatein.portal</groupId>
+    <groupId>org.exoplatform.gatein.portal</groupId>
     <artifactId>exo.portal.packaging.jboss7</artifactId>
-    <version>4.5.x-PLF-SNAPSHOT</version>
+    <version>5.0.x-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -18,7 +18,7 @@
   <dependencies>
 
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>jboss-as7-integration-extension</artifactId>
     </dependency>
     <dependency>
@@ -26,11 +26,11 @@
       <artifactId>gatein-naming</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.wci</groupId>
+      <groupId>org.exoplatform.gatein.wci</groupId>
       <artifactId>wci-jboss7</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.gatein.wci</groupId>
+          <groupId>org.exoplatform.gatein.wci</groupId>
           <artifactId>wci-wci</artifactId>
         </exclusion>
         <exclusion>
@@ -45,7 +45,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.gatein.wci</groupId>
+      <groupId>org.exoplatform.gatein.wci</groupId>
       <artifactId>wci-wci</artifactId>
       <exclusions>
         <exclusion>
@@ -90,7 +90,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.gatein.pc</groupId>
+      <groupId>org.exoplatform.gatein.pc</groupId>
       <artifactId>pc-api</artifactId>
       <exclusions>
         <exclusion>
@@ -109,15 +109,15 @@
     </dependency>
 
     <dependency>
-      <groupId>org.gatein.pc</groupId>
+      <groupId>org.exoplatform.gatein.pc</groupId>
       <artifactId>pc-portlet</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.gatein.pc</groupId>
+          <groupId>org.exoplatform.gatein.pc</groupId>
           <artifactId>pc-api</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.gatein.wci</groupId>
+          <groupId>org.exoplatform.gatein.wci</groupId>
           <artifactId>wci-wci</artifactId>
         </exclusion>
         <exclusion>
@@ -580,7 +580,7 @@
 
     <!-- Gatein PC -->
     <dependency>
-      <groupId>org.gatein.pc</groupId>
+      <groupId>org.exoplatform.gatein.pc</groupId>
       <artifactId>pc-api</artifactId>
       <exclusions>
         <exclusion>
@@ -590,7 +590,7 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.gatein.pc</groupId>
+      <groupId>org.exoplatform.gatein.pc</groupId>
       <artifactId>pc-portlet</artifactId>
       <exclusions>
         <exclusion>
@@ -600,7 +600,7 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.gatein.pc</groupId>
+      <groupId>org.exoplatform.gatein.pc</groupId>
       <artifactId>pc-controller</artifactId>
       <exclusions>
         <exclusion>
@@ -614,11 +614,11 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.gatein.pc</groupId>
+      <groupId>org.exoplatform.gatein.pc</groupId>
       <artifactId>pc-federation</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.pc</groupId>
+      <groupId>org.exoplatform.gatein.pc</groupId>
       <artifactId>pc-bridge</artifactId>
     </dependency>
 
@@ -729,23 +729,23 @@
 
     <!-- GateIn SSO -->
     <dependency>
-      <groupId>org.gatein.sso</groupId>
+      <groupId>org.exoplatform.gatein.sso</groupId>
       <artifactId>sso-auth-callback</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.sso</groupId>
+      <groupId>org.exoplatform.gatein.sso</groupId>
       <artifactId>sso-agent</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.sso</groupId>
+      <groupId>org.exoplatform.gatein.sso</groupId>
       <artifactId>spnego</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.sso</groupId>
+      <groupId>org.exoplatform.gatein.sso</groupId>
       <artifactId>sso-saml-plugin</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.sso</groupId>
+      <groupId>org.exoplatform.gatein.sso</groupId>
       <artifactId>sso-integration</artifactId>
     </dependency>
     <dependency>
@@ -763,11 +763,11 @@
 
     <!-- GateIn OAuth -->
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.web.oauth-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.web.oauth-web</artifactId>
     </dependency>
     <dependency>
@@ -801,91 +801,91 @@
 
     <!-- GateIn -->
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.application-registry</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.common</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.identity</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.management</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.pc</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.portal</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.resources</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.scripting</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.web.api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.web.controller</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.web.resources</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.web.security</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.web.security-jboss</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.web.server</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.webui.core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.webui.dashboard</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.webui.eXo</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.webui.framework</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.webui.portal</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.webui.portlet</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.gadgets-core</artifactId>
     </dependency>
     <dependency>

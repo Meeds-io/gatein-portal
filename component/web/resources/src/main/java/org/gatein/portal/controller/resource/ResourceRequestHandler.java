@@ -61,7 +61,7 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
     public static final String SUPPORT_GATEIN_RESOURCES = "org.gatein.supports.gatein-resources.";
 
     /** . */
-    private static String PATH = "META-INF/maven/org.gatein.portal/exo.portal.component.web.resources/pom.properties";
+    private static String PATH = "META-INF/maven/org.exoplatform.gatein.portal/exo.portal.component.web.resources/pom.properties";
 
     /** . */
     private static final Logger log = LoggerFactory.getLogger(ResourceRequestHandler.class);

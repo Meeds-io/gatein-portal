@@ -201,7 +201,7 @@
       </copy>
 
       <!-- Extract common config from packaging.common artifact to gatein/conf -->
-      <unzip src="${org.gatein.portal:exo.portal.packaging.common:jar}" dest="${jbossas.target.dir}/standalone/configuration/gatein">
+      <unzip src="${org.exoplatform.gatein.portal:exo.portal.packaging.common:jar}" dest="${jbossas.target.dir}/standalone/configuration/gatein">
         <patternset>
           <exclude name="META-INF/"/>
         </patternset>

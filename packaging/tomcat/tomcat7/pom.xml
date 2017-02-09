@@ -4,9 +4,9 @@
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.gatein.portal</groupId>
+    <groupId>org.exoplatform.gatein.portal</groupId>
     <artifactId>exo.portal.packaging.tomcat</artifactId>
-    <version>4.5.x-PLF-SNAPSHOT</version>
+    <version>5.0.x-SNAPSHOT</version>
   </parent>
   <artifactId>exo.portal.packaging.tomcat.tomcat7</artifactId>
   <packaging>jar</packaging>
@@ -21,11 +21,11 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.gatein.wci</groupId>
+      <groupId>org.exoplatform.gatein.wci</groupId>
       <artifactId>wci-tomcat7</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.portal</groupId>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.packaging.common</artifactId>
     </dependency>
     <dependency>
