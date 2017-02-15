@@ -19,25 +19,6 @@
 
 package org.exoplatform.portal.resource;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.ServletContext;
-
 import org.exoplatform.commons.cache.future.FutureMap;
 import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.commons.utils.BinaryOutput;
@@ -45,11 +26,7 @@ import org.exoplatform.commons.utils.ByteArrayOutput;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.commons.utils.Safe;
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.management.annotations.Impact;
-import org.exoplatform.management.annotations.ImpactType;
-import org.exoplatform.management.annotations.Managed;
-import org.exoplatform.management.annotations.ManagedDescription;
-import org.exoplatform.management.annotations.ManagedName;
+import org.exoplatform.management.annotations.*;
 import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
 import org.exoplatform.management.rest.annotations.RESTEndpoint;
@@ -67,6 +44,15 @@ import org.gatein.portal.controller.resource.ResourceRequestHandler;
 import org.gatein.wci.ServletContainerFactory;
 import org.gatein.wci.WebAppListener;
 import org.picocontainer.Startable;
+
+import javax.servlet.ServletContext;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Managed
 @NameTemplate({ @Property(key = "view", value = "portal"), @Property(key = "service", value = "management"),
@@ -400,6 +386,15 @@ public class SkinService extends AbstractResourceService implements Startable {
      */
     public Set<String> getAvailableSkinNames() {
         return availableSkins_;
+    }
+
+    /**
+     * Get skin configurations of all the currently registered skins.
+     *
+     * @return an unmodifiable Set of the currently registered skin configs
+     */
+    public Map<SkinKey, SkinConfig> getSkinConfigs() {
+        return skinConfigs_;
     }
 
     /**
