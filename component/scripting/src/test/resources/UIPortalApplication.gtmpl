@@ -45,7 +45,7 @@
     def url = customSkin.createURL(rcontext.controllerContext);
     url.setOrientation(orientation);
     %>
-    <link id="${customSkin.id}" rel="stylesheet" type="text/css" href= "$url" />
+      <link id="${customSkin.id}" rel="stylesheet" type="text/css" href= "$url" />
     <%}%>
      <script type="text/javascript">
      // This variable must be used only to initialize other variables otherwise

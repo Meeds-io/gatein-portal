@@ -86,10 +86,14 @@ public class SkinService extends AbstractResourceService implements Startable {
 
     public static final String DEFAULT_SKIN = "Default";
 
+    public static final String CUSTOM_MODULE_ID = "customModule";
+
     /** The deployer. */
     private final WebAppListener deployer;
 
     private final Map<SkinKey, SkinConfig> portalSkins_;
+
+    private final Map<SkinKey, SkinConfig> customPortalSkins_;
 
     private final Map<SkinKey, SkinConfig> skinConfigs_;
 
@@ -165,6 +169,7 @@ public class SkinService extends AbstractResourceService implements Startable {
 
         //
         portalSkins_ = new LinkedHashMap<SkinKey, SkinConfig>();
+        customPortalSkins_ = new LinkedHashMap<SkinKey, SkinConfig>();
         skinConfigs_ = new LinkedHashMap<SkinKey, SkinConfig>(20);
         availableSkins_ = new HashSet<String>(5);
         ltCache = new FutureMap<String, CachedStylesheet, SkinContext>(loader);
@@ -245,8 +250,11 @@ public class SkinService extends AbstractResourceService implements Startable {
             }
 
             skinConfig = new SimpleSkin(this, module, skinName, cssPath, priority);
-            portalSkins_.put(key, skinConfig);
-
+            if (!module.equals(CUSTOM_MODULE_ID)) {
+                portalSkins_.put(key, skinConfig);
+            } else {
+                customPortalSkins_.put(key, skinConfig);
+            }
             if (log.isDebugEnabled()) {
                 log.debug("Adding Portal skin : Bind " + key + " to " + skinConfig);
             }
@@ -389,15 +397,6 @@ public class SkinService extends AbstractResourceService implements Startable {
     }
 
     /**
-     * Get skin configurations of all the currently registered skins.
-     *
-     * @return an unmodifiable Set of the currently registered skin configs
-     */
-    public Map<SkinKey, SkinConfig> getSkinConfigs() {
-        return skinConfigs_;
-    }
-
-    /**
      * Return the CSS content of the file specified by the given URI.
      *
      *
@@ -526,6 +525,27 @@ public class SkinService extends AbstractResourceService implements Startable {
         }
 
         return visitor.getSkins();
+    }
+
+    /**
+     * Return the collection of custom portal skins
+     *
+     * @param skinName
+     * @return the map of custom portal skins
+     */
+    public Collection<SkinConfig> getCustomPortalSkins(String skinName) {
+        Set<SkinKey> keys = customPortalSkins_.keySet();
+        List<SkinConfig> customPortalSkins = new ArrayList<SkinConfig>();
+        for (SkinKey key : keys) {
+            if (key.getName().equals(skinName))
+                customPortalSkins.add(customPortalSkins_.get(key));
+        }
+        Collections.sort(customPortalSkins, new Comparator<SkinConfig>() {
+            public int compare(SkinConfig o1, SkinConfig o2) {
+                return o1.getCSSPriority() - o2.getCSSPriority();
+            }
+        });
+        return customPortalSkins;
     }
 
     /**

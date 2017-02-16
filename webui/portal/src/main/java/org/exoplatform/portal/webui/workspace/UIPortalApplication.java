@@ -90,8 +90,6 @@ public class UIPortalApplication extends UIApplication {
      */
     public static final String DEFAULT_MODE_PROPERTY = "gatein.portal.pageEditor.defaultEditMode";
 
-    public static final String CUSTOM_STYLE_ID = "eXoCustom_customSkin";
-
     public enum EditMode {
         /**
          * Edit mode with plain rectangles in place of portlets.
@@ -568,18 +566,9 @@ public class UIPortalApplication extends UIApplication {
         return portletConfigs;
     }
 
-    private Set<SkinConfig> getCustomSkins() {
-        Set<SkinConfig> customSkins = new HashSet<SkinConfig>();
+    private Collection<SkinConfig> getCustomSkins() {
         SkinService skinService = getApplicationComponent(SkinService.class);
-        Iterator<SkinConfig> it = skinService.getSkinConfigs().values().iterator();
-        SkinConfig skinConfig;
-        while (it.hasNext()) {
-            skinConfig = it.next();
-            if (skinConfig.getId().equals(CUSTOM_STYLE_ID)) {
-                customSkins.add(skinConfig);
-            }
-        }
-        return customSkins;
+        return skinService.getCustomPortalSkins(skin_);
     }
 
     private void getPortalPortletSkinConfig(Set<SkinConfig> portletConfigs, UIComponent component) {
