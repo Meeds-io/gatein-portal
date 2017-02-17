@@ -31,9 +31,32 @@
 	  ajaxPost : function(formElement, callback) {
 	    if (!callback)
 	      callback = null;
-	    var queryString = $(formElement).serialize();
+	    var queryString = this.getQueryString(formElement);
 	    var url = formElement.action + "&ajaxRequest=true";
 	    ajaxPost(url, queryString, callback);
+	  },
+
+	  getQueryString : function(formElement) {
+	    var form = $(formElement).find('.dateInput');
+	    if (form.size() > 0) {
+	      var elements = $(formElement).serializeArray();
+	      //append the appropriate time zone to the form element
+	      elements.forEach(function(elem) {
+	        if ($("[name='"+elem.name+"']")[0].className === "dateInput") {
+	          var dateString = elem.value;
+	          var timezone = new Date().getTimezoneOffset() / -60;
+	          if (timezone >= 0) {
+	            dateString = dateString + " +0" + Math.abs(timezone) + "00";
+	          } else {
+	            dateString = dateString + " -0" + Math.abs(timezone) + "00";
+	          }
+	          elem.value = dateString;
+	        }
+	      });
+	      return $.param(elements);
+	    } else {
+	      return $(formElement).serialize();
+	    }
 	  },
 	
 	  /**

@@ -145,8 +145,8 @@ public class UIFormDateTimeInput extends UIFormInputBase<String> {
         if (!getDatePattern_().contains("HH")) {
             setDatePattern_(getDatePattern_().replaceAll("H", "HH"));
         }
-        if (getDatePattern_().contains("a")) {
-            setDatePattern_(getDatePattern_().replaceAll("a", ""));
+        if (getDatePattern_().contains(" a")) {
+            setDatePattern_(getDatePattern_().replaceAll(" a", ""));
         }
 
         dateFormat_ = new SimpleDateFormat(getDatePattern_());
@@ -176,6 +176,10 @@ public class UIFormDateTimeInput extends UIFormInputBase<String> {
 
         String value = getValue();
 
+        if (value != null && value.contains("+")) {
+            value = value.substring(0, value.indexOf("+") - 1);
+        }
+
         if (value != null && value.length() > 0) {
             value = HTMLEntityEncoder.getInstance().encodeHTMLAttribute(value);
         } else {
@@ -187,7 +191,7 @@ public class UIFormDateTimeInput extends UIFormInputBase<String> {
                 "uiCalendar.setFirstDayOfWeek(" + Calendar.getInstance(context.getLocale()).getFirstDayOfWeek() + ");");
         Writer w = context.getWriter();
 
-        w.write("<input type=\"text\" onfocus='eXo.webui.UICalendar.init(this,");
+        w.write("<input type=\"text\" class=\"dateInput\" onfocus='eXo.webui.UICalendar.init(this,");
         w.write(String.valueOf(isDisplayTime_));
         w.write(",\"");
         w.write(getDatePattern_());
