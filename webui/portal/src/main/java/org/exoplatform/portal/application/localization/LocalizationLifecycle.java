@@ -21,10 +21,6 @@
  */
 package org.exoplatform.portal.application.localization;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -36,10 +32,7 @@ import javax.servlet.http.HttpSession;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.portal.Constants;
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.application.UserProfileLifecycle;
-import org.exoplatform.portal.config.DataStorage;
-import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.localization.LocaleContextInfoUtils;
 import org.exoplatform.portal.webui.workspace.UIPortalApplication;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -105,46 +98,13 @@ public class LocalizationLifecycle implements ApplicationRequestPhaseLifecycle<W
 
         PortalRequestContext reqCtx = (PortalRequestContext) context;
         ExoContainer container = app.getApplicationServiceContainer();
-
-        LocaleConfigService localeConfigService = (LocaleConfigService) container
-                .getComponentInstanceOfType(LocaleConfigService.class);
+        //
         LocalePolicy localePolicy = (LocalePolicy) container.getComponentInstanceOfType(LocalePolicy.class);
-
-        LocaleContextInfo localeCtx = new LocaleContextInfo();
-
-        Set<Locale> supportedLocales = new HashSet<Locale>();
-        for (LocaleConfig lc : localeConfigService.getLocalConfigs()) {
-            supportedLocales.add(lc.getLocale());
-        }
-        localeCtx.setSupportedLocales(supportedLocales);
-
         HttpServletRequest request = HttpServletRequest.class.cast(context.getRequest());
-        localeCtx.setBrowserLocales(Collections.list(request.getLocales()));
-        localeCtx.setCookieLocales(getCookieLocales(request));
-        localeCtx.setSessionLocale(getSessionLocale(request));
-        localeCtx.setUserProfileLocale(getUserProfileLocale(reqCtx));
-        localeCtx.setRemoteUser(reqCtx.getRemoteUser());
-
-        DataStorage dataStorage = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
-        PortalConfig pConfig = null;
-        try {
-            pConfig = dataStorage.getPortalConfig(SiteType.PORTAL.getName(), reqCtx.getPortalOwner());
-            if (pConfig == null)
-                log.warn("No UserPortalConfig available! Portal locale set to 'en'");
-        } catch (Exception ignored) {
-            if (log.isDebugEnabled())
-                log.debug("IGNORED: Failed to load UserPortalConfig: ", ignored);
-        }
-
-        String portalLocaleName = "en";
-        if (pConfig != null)
-            portalLocaleName = pConfig.getLocale();
-
-        Locale portalLocale = LocaleContextInfo.getLocale(portalLocaleName);
-        localeCtx.setPortalLocale(portalLocale);
-
-        localeCtx.setRequestLocale(reqCtx.getRequestLocale());
-
+        LocaleContextInfo localeCtx = LocaleContextInfoUtils.buildLocaleContextInfo(request);
+        //
+        Set<Locale> supportedLocales = LocaleContextInfoUtils.getSupportedLocales();
+        //
         Locale locale = localePolicy.determineLocale(localeCtx);
         boolean supported = supportedLocales.contains(locale);
 
@@ -219,22 +179,7 @@ public class LocalizationLifecycle implements ApplicationRequestPhaseLifecycle<W
      */
     public void onDestroy(Application app) throws Exception {
     }
-
-    /**
-     * Use {@link UserProfile} already loaded by {@link org.exoplatform.portal.application.UserProfileLifecycle} or load one
-     * ourselves.
-     *
-     * @param context current PortalRequestContext
-     * @return Locale from user's profile or null
-     */
-    private Locale getUserProfileLocale(PortalRequestContext context) {
-        String lang = null;
-
-        UserProfile userProfile = getLoadedProfile(context);
-        lang = userProfile == null ? null : userProfile.getUserInfoMap().get(Constants.USER_LANGUAGE);
-        return (lang != null) ? LocaleContextInfo.getLocale(lang) : null;
-    }
-
+    
     private UserProfile loadUserProfile(ExoContainer container, PortalRequestContext context) {
         UserProfile userProfile = null;
         OrganizationService svc = (OrganizationService) container.getComponentInstanceOfType(OrganizationService.class);
@@ -256,29 +201,7 @@ public class LocalizationLifecycle implements ApplicationRequestPhaseLifecycle<W
         }
         return userProfile;
     }
-
-    private UserProfile getLoadedProfile(PortalRequestContext context) {
-        return (UserProfile) context.getAttribute(UserProfileLifecycle.USER_PROFILE_ATTRIBUTE_NAME);
-    }
-
-    public static List<Locale> getCookieLocales(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (LOCALE_COOKIE.equals(cookie.getName())) {
-                    List<Locale> locales = new ArrayList<Locale>();
-                    locales.add(LocaleContextInfo.getLocale(cookie.getValue()));
-                    return locales;
-                }
-            }
-        }
-        return Collections.emptyList();
-    }
-
-    public static Locale getSessionLocale(HttpServletRequest request) {
-        return getLocaleFromSession(request, LOCALE_SESSION_ATTR);
-    }
-
+    
     public static Locale getPreviousLocale(HttpServletRequest request) {
         return getLocaleFromSession(request, PREV_LOCALE_SESSION_ATTR);
     }

@@ -22,8 +22,6 @@
 package org.exoplatform.portal.application.localization;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -36,17 +34,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.component.ComponentRequestLifecycle;
-import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.web.AbstractFilter;
-import org.exoplatform.portal.Constants;
 import org.exoplatform.portal.application.PortalRequestContext;
+import org.exoplatform.portal.localization.LocaleContextInfoUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.UserProfile;
-import org.exoplatform.services.resources.LocaleConfig;
-import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.LocalePolicy;
 
@@ -130,25 +122,12 @@ public class LocalizationFilter extends AbstractFilter {
                 return;
             }
 
-            LocaleConfigService localeConfigService = (LocaleConfigService) container
-                    .getComponentInstanceOfType(LocaleConfigService.class);
             LocalePolicy localePolicy = (LocalePolicy) container.getComponentInstanceOfType(LocalePolicy.class);
 
-            LocaleContextInfo localeCtx = new LocaleContextInfo();
+            LocaleContextInfo localeCtx = LocaleContextInfoUtils.buildLocaleContextInfo(req);
 
-            Set<Locale> supportedLocales = new HashSet();
-            for (LocaleConfig lc : localeConfigService.getLocalConfigs()) {
-                supportedLocales.add(lc.getLocale());
-            }
-            localeCtx.setSupportedLocales(supportedLocales);
-
-            localeCtx.setBrowserLocales(Collections.list(request.getLocales()));
-            localeCtx.setCookieLocales(LocalizationLifecycle.getCookieLocales(req));
-            localeCtx.setSessionLocale(LocalizationLifecycle.getSessionLocale(req));
-            localeCtx.setUserProfileLocale(getUserProfileLocale(container, req.getRemoteUser()));
-            localeCtx.setRemoteUser(req.getRemoteUser());
-
-            localeCtx.setPortalLocale(checkPortalLocaleSupported(portalLocale, supportedLocales));
+            Set<Locale> supportedLocales = LocaleContextInfoUtils.getSupportedLocales();
+            
             Locale locale = localePolicy.determineLocale(localeCtx);
             boolean supported = supportedLocales.contains(locale);
 
@@ -170,65 +149,7 @@ public class LocalizationFilter extends AbstractFilter {
             currentLocale.remove();
         }
     }
-
-    private Locale checkPortalLocaleSupported(Locale portalLocale, Set<Locale> supportedLocales) {
-        if (supportedLocales.contains(portalLocale))
-            return portalLocale;
-        if ("".equals(portalLocale.getCountry()) == false) {
-            Locale loc = new Locale(portalLocale.getLanguage());
-            if (supportedLocales.contains(loc)) {
-                log.warn("portalLocale not supported: " + LocaleContextInfo.getLocaleAsString(portalLocale)
-                        + ". Falling back to '" + portalLocale.getLanguage() + "'.");
-                this.portalLocale = loc;
-                return loc;
-            }
-        }
-
-        log.warn("portalLocale not supported: " + LocaleContextInfo.getLocaleAsString(portalLocale)
-                + ". Falling back to Locale.ENGLISH.");
-        this.portalLocale = Locale.ENGLISH;
-        return portalLocale;
-    }
-
-    private Locale getUserProfileLocale(ExoContainer container, String user) {
-        UserProfile userProfile = null;
-        OrganizationService svc = (OrganizationService) container.getComponentInstanceOfType(OrganizationService.class);
-
-        if (user != null) {
-            try {
-                beginContext(svc);
-                userProfile = svc.getUserProfileHandler().findUserProfileByName(user);
-            } catch (Exception ignored) {
-                log.error("IGNORED: Failed to load UserProfile for username: " + user, ignored);
-            } finally {
-                try {
-                    endContext(svc);
-                } catch (Exception ignored) {
-                    // we don't care
-                }
-            }
-
-            if (userProfile == null && log.isDebugEnabled())
-                log.debug("Could not load user profile for " + user);
-        }
-
-        String lang = userProfile == null ? null : userProfile.getUserInfoMap().get(Constants.USER_LANGUAGE);
-        return (lang != null) ? LocaleContextInfo.getLocale(lang) : null;
-    }
-
-    public void beginContext(OrganizationService orgService) {
-        if (orgService instanceof ComponentRequestLifecycle) {
-            RequestLifeCycle.begin((ComponentRequestLifecycle) orgService);
-        }
-    }
-
-    public void endContext(OrganizationService orgService) {
-        // do the same check as in beginContext to make it symmetric
-        if (orgService instanceof ComponentRequestLifecycle) {
-            RequestLifeCycle.end();
-        }
-    }
-
+    
     public void destroy() {
     }
 

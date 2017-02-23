@@ -66,6 +66,7 @@
     <version.org.gatein.naming>1.1.1.Final</version.org.gatein.naming>
     <sun-opends.version>1.0.0</sun-opends.version>
     <berkeleydb.version>3.2.76</berkeleydb.version>
+    <org.powermock.version>1.6.5</org.powermock.version>
 
     <!-- to move to gatein-dep -->
     <version.scribe>1.3.5</version.scribe>
@@ -1132,6 +1133,22 @@
          <artifactId>je</artifactId>
          <version>${berkeleydb.version}</version>
          <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock</artifactId>
+        <version>${org.powermock.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-module-junit4</artifactId>
+        <version>${org.powermock.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-api-mockito</artifactId>
+        <version>${org.powermock.version}</version>
       </dependency>
     </dependencies>
 

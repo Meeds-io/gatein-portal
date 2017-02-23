@@ -23,14 +23,11 @@ import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.Constants;
+import org.exoplatform.portal.localization.LocaleContextInfoUtils;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.Query;
 import org.exoplatform.services.organization.UserHandler;
-import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserStatus;
-import org.exoplatform.services.resources.LocaleConfig;
-import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.LocalePolicy;
 
@@ -49,15 +46,11 @@ import org.gatein.wci.security.Credentials;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -99,7 +92,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
             requestLocale = I18N.parseTagIdentifier(lang);
             locale = requestLocale;
         } else {
-            locale = calculateLocale(context, req.getLocale());
+            locale = calculateLocale(context);
         }
         currentLocale.set(locale);
         req.setAttribute("request_locale", locale);
@@ -241,31 +234,15 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
     //TODO: how to reuse some method from LocalizationLifecycle
     private static final String LOCALE_COOKIE = "LOCALE";
     private static final String LOCALE_SESSION_ATTR = "org.gatein.LOCALE";
-    private Locale calculateLocale(ControllerContext context, Locale requestLocale) {
-        LocaleConfigService localeConfigService = getService(LocaleConfigService.class);
+    private Locale calculateLocale(ControllerContext context) {
         LocalePolicy localePolicy = getService(LocalePolicy.class);
-
-        LocaleContextInfo localeCtx = new LocaleContextInfo();
-
-        Set<Locale> supportedLocales = new HashSet<Locale>();
-        for (LocaleConfig lc : localeConfigService.getLocalConfigs()) {
-            supportedLocales.add(lc.getLocale());
-        }
-        localeCtx.setSupportedLocales(supportedLocales);
-
+    
         HttpServletRequest request = HttpServletRequest.class.cast(context.getRequest());
-        localeCtx.setBrowserLocales(Collections.list(request.getLocales()));
-        localeCtx.setCookieLocales(getCookieLocales(request));
-        localeCtx.setSessionLocale(getSessionLocale(request));
-        localeCtx.setUserProfileLocale(getUserProfileLocale(request));
-        localeCtx.setRemoteUser(request.getRemoteUser());
+    
+        LocaleContextInfo localeCtx = LocaleContextInfoUtils.buildLocaleContextInfo(request);
 
-        String portalLocaleName = "en";
-        Locale portalLocale = LocaleContextInfo.getLocale(portalLocaleName);
-        localeCtx.setPortalLocale(portalLocale);
-
-        localeCtx.setRequestLocale(requestLocale);
-
+        Set<Locale> supportedLocales = LocaleContextInfoUtils.getSupportedLocales();
+        
         Locale locale = localePolicy.determineLocale(localeCtx);
         boolean supported = supportedLocales.contains(locale);
 
@@ -281,54 +258,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
 
         return locale;
     }
-
-    private static List<Locale> getCookieLocales(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (LOCALE_COOKIE.equals(cookie.getName())) {
-                    List<Locale> locales = new ArrayList<Locale>();
-                    locales.add(LocaleContextInfo.getLocale(cookie.getValue()));
-                    return locales;
-                }
-            }
-        }
-        return Collections.emptyList();
-    }
-
-    private static Locale getSessionLocale(HttpServletRequest request) {
-        return getLocaleFromSession(request, LOCALE_SESSION_ATTR);
-    }
-
-    private static Locale getLocaleFromSession(HttpServletRequest request, String attrName) {
-        String lang = null;
-        HttpSession session = request.getSession(false);
-        if (session != null)
-            lang = (String) session.getAttribute(attrName);
-        return (lang != null) ? LocaleContextInfo.getLocale(lang) : null;
-    }
-
-    private Locale getUserProfileLocale(HttpServletRequest req) {
-        UserProfile userProfile = loadUserProfile(req);
-        String lang = userProfile == null ? null : userProfile.getUserInfoMap().get(Constants.USER_LANGUAGE);
-        return (lang != null) ? LocaleContextInfo.getLocale(lang) : null;
-    }
-
-    private UserProfile loadUserProfile(HttpServletRequest req) {
-        UserProfile userProfile = null;
-
-        String user = req.getRemoteUser();
-        if (user != null) {
-            try {
-                OrganizationService svc = getService(OrganizationService.class);
-                userProfile = svc.getUserProfileHandler().findUserProfileByName(user);
-            } catch (Exception ignored) {
-                log.error("IGNORED: Failed to load UserProfile for username: " + user, ignored);
-            }
-        }
-        return userProfile;
-    }
-
+    
     private User findUser(OrganizationService orgService, String usernameOrEmail) throws Exception {
       if (usernameOrEmail == null || usernameOrEmail.isEmpty()) {
           return null;
