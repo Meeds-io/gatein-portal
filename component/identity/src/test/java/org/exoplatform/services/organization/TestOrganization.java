@@ -34,6 +34,7 @@ import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.listener.Event;
+import org.exoplatform.services.organization.idm.Config;
 import org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl;
 import org.exoplatform.services.organization.idm.UpdateLoginTimeListener;
 import org.exoplatform.services.security.ConversationRegistry;
@@ -106,6 +107,13 @@ public class TestOrganization extends AbstractKernelTest {
 
         end();
         super.tearDown();
+    }
+
+    public void testIDMConfiguration(){
+        PicketLinkIDMOrganizationServiceImpl idmService = getContainer().getComponentInstanceOfType(PicketLinkIDMOrganizationServiceImpl.class);
+        Config config =idmService.getConfiguration();
+        assertTrue(config.isCountPaginatedUsers());
+        assertFalse(config.isSkipPaginationInMembershipQuery());
     }
 
     public void testFindGroupNotFound() throws Exception {

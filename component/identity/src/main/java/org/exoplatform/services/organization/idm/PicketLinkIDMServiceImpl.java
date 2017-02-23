@@ -79,6 +79,8 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
 
     private IdentityConfiguration identityConfiguration;
 
+    private IdentityConfigurationMetaData configMD;
+
     private IntegrationCache integrationCache;
 
     private HibernateService hibernateService;
@@ -129,10 +131,10 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
                 throw new IllegalStateException("Cannot fine resource: " + this.config);
             }
 
-            IdentityConfigurationMetaData configMD = JAXB2IdentityConfiguration.createConfigurationMetaData(confManager
+            this.configMD = JAXB2IdentityConfiguration.createConfigurationMetaData(confManager
                     .getInputStream(this.config));
 
-            identityConfiguration = new IdentityConfigurationImpl().configure(configMD);
+            identityConfiguration = new IdentityConfigurationImpl().configure(this.configMD);
 
             identityConfiguration.getIdentityConfigurationRegistry().register(hibernateService.getSessionFactory(),
                     "hibernateSessionFactory");
@@ -228,5 +230,13 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
 
     public HibernateService getHibernateService() {
         return hibernateService;
+    }
+
+    public IdentityConfigurationMetaData getConfigMD() {
+        return this.configMD;
+    }
+
+    public void setConfigMD(IdentityConfigurationMetaData configMD) {
+        this.configMD = configMD;
     }
 }

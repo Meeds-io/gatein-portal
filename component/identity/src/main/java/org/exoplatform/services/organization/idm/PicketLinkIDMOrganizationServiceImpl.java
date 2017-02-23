@@ -31,7 +31,11 @@ import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.common.transaction.JTAUserTransactionLifecycleService;
 import org.picketlink.idm.api.Transaction;
+import org.picketlink.idm.spi.configuration.metadata.IdentityConfigurationMetaData;
+import org.picketlink.idm.spi.configuration.metadata.IdentityStoreConfigurationMetaData;
 import org.picocontainer.Startable;
+
+import java.util.List;
 
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
@@ -73,6 +77,20 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
 
             if (configurationParam != null) {
                 this.configuration = (Config) configurationParam.getObject();
+            }
+            IdentityConfigurationMetaData configMD =((PicketLinkIDMServiceImpl) idmService).getConfigMD();
+            List<IdentityStoreConfigurationMetaData>  identityStores = null;
+            if(configMD != null){
+                identityStores = configMD.getIdentityStores();
+            }
+            /*If you have DB only setup*/
+            if(identityStores != null && identityStores.size() > 1){
+                this.configuration.setCountPaginatedUsers(false);
+                this.configuration.setSkipPaginationInMembershipQuery(true);
+            }else{
+             /*If you have DB+LDAP setup*/
+                this.configuration.setCountPaginatedUsers(true);
+                this.configuration.setSkipPaginationInMembershipQuery(false);
             }
 
         }

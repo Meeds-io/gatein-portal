@@ -105,9 +105,6 @@
                   </value>
                 </collection>
               </field>
-              <field name="countPaginatedUsers">
-                <boolean>false</boolean>
-              </field>
             </object>
           </object-param>
         </init-params>
