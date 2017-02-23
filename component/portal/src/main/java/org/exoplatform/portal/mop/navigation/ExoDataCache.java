@@ -48,8 +48,7 @@ public class ExoDataCache extends DataCache {
         public Serializable retrieve(POMSession session, ScopedKey<?> scopedKey) throws Exception {
             Object key = scopedKey.getKey();
             if (key instanceof SiteKey) {
-                NavigationData data = loadNavigation(session, (SiteKey) key);
-                return data == NavigationData.EMPTY ? null : data;
+                return loadNavigation(session, (SiteKey) key);
             } else {
                 return loadNode(session, (String) key);
             }
@@ -80,7 +79,8 @@ public class ExoDataCache extends DataCache {
 
     @Override
     protected NavigationData getNavigation(POMSession session, SiteKey key) {
-        return (NavigationData) objects.get(session, ScopedKey.create(key));
+        NavigationData navigationData = (NavigationData) objects.get(session, ScopedKey.create(key));
+        return navigationData != null && (navigationData == NavigationData.EMPTY || navigationData.key == null) ? null : navigationData;
     }
 
     @Override

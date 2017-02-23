@@ -87,7 +87,7 @@ public class NavigationServiceImpl implements NavigationService {
         //
         POMSession session = manager.getSession();
         NavigationData data = dataCache.getNavigationData(session, key);
-        return data != null && data != NavigationData.EMPTY ? new NavigationContext(data) : null;
+        return data != null && data != NavigationData.EMPTY && data.key != null ? new NavigationContext(data) : null;
     }
 
     @Override

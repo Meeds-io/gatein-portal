@@ -238,7 +238,7 @@
               </field>
               <field name="defaultStrategy"><string>LIRS</string></field>
               <field name="defaultMaxIdle"><long>-1</long></field>
-              <field name="defaultWakeUpInterval"><long>500</long></field>
+              <field name="defaultWakeUpInterval"><long>${exo.cache.expiration.wakeupinterval:5000}</long></field>
             </object>
           </object-param>
        </init-params>

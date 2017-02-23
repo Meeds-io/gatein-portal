@@ -58,11 +58,14 @@ abstract class DataCache {
     }
 
     final NavigationData getNavigationData(POMSession session, SiteKey key) {
-        NavigationData data;
+        // Get cache entry even when session has been modified to populate new cache value
+        NavigationData data = getNavigation(session, key);
         if (session.isModified()) {
             data = loadNavigation(session, key);
-        } else {
-            data = getNavigation(session, key);
+            // Null data => remove it from cache
+            if (data == null || data.key == null) {
+              removeNavigation(key);
+            }
         }
 
         //
