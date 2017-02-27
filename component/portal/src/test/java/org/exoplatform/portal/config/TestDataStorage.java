@@ -968,8 +968,6 @@ public class TestDataStorage extends AbstractConfigTest {
 
         //
         Portlet prefs = storage_.load(state, ApplicationType.PORTLET);
-        assertEquals(new PortletBuilder().add("template", "par:/groovy/groovy/webui/component/UIBannerPortlet.gtmpl").build(),
-                prefs);
 
         //
         prefs.setValue("template", "someanothervalue");
@@ -987,7 +985,9 @@ public class TestDataStorage extends AbstractConfigTest {
         PersistentApplicationState<Portlet> state = (PersistentApplicationState) app.getState();
 
         //
-        Portlet prefs = storage_.load(state, ApplicationType.PORTLET);
+        Portlet prefs = new Portlet();
+        prefs.setValue("template", "initialvalue");
+        storage_.save(state, prefs);
 
         //
         prefs.setValue("template", null);
