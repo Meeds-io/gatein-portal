@@ -19,9 +19,13 @@ package org.exoplatform.services.organization.idm;
 import java.util.Calendar;
 
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.component.ComponentRequestLifecycle;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.listener.Asynchronous;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
@@ -30,6 +34,8 @@ import org.exoplatform.services.security.ConversationState;
 
 @Asynchronous
 public class UpdateLoginTimeListener extends Listener<ConversationRegistry, ConversationState> {
+  private static final Log LOG = ExoLogger.getLogger(UpdateLoginTimeListener.class);
+
   public static final String  USER_PROFILE = "UserProfile";
 
   private PortalContainer     container;
@@ -41,16 +47,22 @@ public class UpdateLoginTimeListener extends Listener<ConversationRegistry, Conv
   }
 
   @Override
-  public void onEvent(Event<ConversationRegistry, ConversationState> event) throws Exception {
+  public void onEvent(Event<ConversationRegistry, ConversationState> event) {
     if (organizationService == null) {
       organizationService = this.container.getComponentInstanceOfType(OrganizationService.class);
     }
-
     UserHandler userHandler = organizationService.getUserHandler();
-    if (userHandler.isUpdateLastLoginTime()) {
-
-      ConversationState state = event.getData();
-      String userId = state.getIdentity().getUserId();
+    if (!userHandler.isUpdateLastLoginTime()) {
+      return;
+    }
+    ConversationState state = event.getData();
+    String userId = state.getIdentity().getUserId();
+    boolean transactionOpened = false;
+    if(organizationService instanceof ComponentRequestLifecycle) {
+      RequestLifeCycle.begin((ComponentRequestLifecycle)organizationService);
+      transactionOpened = true;
+    }
+    try {
       User user = (User) state.getAttribute(USER_PROFILE);
 
       if (user == null) {
@@ -60,6 +72,12 @@ public class UpdateLoginTimeListener extends Listener<ConversationRegistry, Conv
 
       user.setLastLoginTime(Calendar.getInstance().getTime());
       userHandler.saveUser(user, false);
+    } catch (Exception e) {
+      LOG.error("Error while updating the last login time for user {}", userId, e);
+    } finally {
+      if(transactionOpened) {
+        RequestLifeCycle.end();
+      }
     }
   }
 }
