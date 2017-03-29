@@ -1,6 +1,7 @@
 <%
  import org.exoplatform.services.organization.User;
  import org.exoplatform.webui.core.UIPopupWindow;
+ import org.apache.commons.lang.StringEscapeUtils;
  uiform.begin()
  def rcontext = _ctx.getRequestContext(); 
  boolean isMulti = uicomponent.getMulti();
@@ -109,8 +110,8 @@
 									</td>
 									<% } %>
 									<% String userName = data.getUserName() != null ? data.getUserName() : ""; 
-										 String firstName = data.getFirstName() != null ? data.getFirstName() : "";
-										 String lastName = data.getLastName() != null ? data.getLastName() : "";
+										 String firstName = data.getFirstName() != null ? StringEscapeUtils.escapeHtml(data.getFirstName()) : "";
+										 String lastName = data.getLastName() != null ? StringEscapeUtils.escapeHtml(data.getLastName()) : "";
 										 String userEmail = data.getEmail() != null ? data.getEmail() : ""; 
 									%>
 									<td><div class="Text" title='$userName'><%= userName %></div></td>
