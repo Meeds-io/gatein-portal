@@ -191,7 +191,11 @@ public class UIFormDateTimeInput extends UIFormInputBase<String> {
                 "uiCalendar.setFirstDayOfWeek(" + Calendar.getInstance(context.getLocale()).getFirstDayOfWeek() + ");");
         Writer w = context.getWriter();
 
-        w.write("<input type=\"text\" class=\"dateInput\" onfocus='eXo.webui.UICalendar.init(this,");
+        w.write("<input type=\"text\"");
+        if(isDisplayTime_) {
+            w.write(" class=\"dateTimeInput\"");
+        }
+        w.write(" onfocus='eXo.webui.UICalendar.init(this,");
         w.write(String.valueOf(isDisplayTime_));
         w.write(",\"");
         w.write(getDatePattern_());
