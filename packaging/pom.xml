@@ -41,35 +41,8 @@
       </activation>
       <modules>
         <module>common</module>
-        <module>tomcat</module>
         <!--<module>jetty</module>-->
         <module>jboss-as7</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>pkg-tomcat</id>
-      <activation>
-        <property>
-          <name>gatein.dev</name>
-          <value>tomcat</value>
-        </property>
-      </activation>
-      <modules>
-        <module>common</module>
-        <module>tomcat</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>pkg-tomcat7</id>
-      <activation>
-        <property>
-          <name>gatein.dev</name>
-          <value>tomcat7</value>
-        </property>
-      </activation>
-      <modules>
-        <module>common</module>
-        <module>tomcat</module>
       </modules>
     </profile>
     <profile>
