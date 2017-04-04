@@ -334,7 +334,7 @@
       </dependency>
       <dependency>
         <groupId>org.exoplatform.gatein.wci</groupId>
-        <artifactId>wci-tomcat7</artifactId>
+        <artifactId>wci-tomcat8</artifactId>
         <version>${org.exoplatform.gatein.wci.version}</version>
       </dependency>
       <dependency>
