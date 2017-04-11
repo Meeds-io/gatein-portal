@@ -7,6 +7,7 @@
   String skin = uicomponent.getSkin();
   def portalSkins = uicomponent.getPortalSkins() ;
   def portletSkins = uicomponent.getPortletSkins() ;
+  def customSkins = uicomponent.getCustomSkins();
   def scriptsPaths = uicomponent.getJavascriptURLs();
   def lang = uicomponent.getLocale().getLanguage();
   def title = rcontext.getTitle();
@@ -39,6 +40,12 @@
     url.setOrientation(orientation);
     %>
       <link id="${portletSkin.id}" rel="stylesheet" type="text/css" href= "$url" />
+    <%}%>
+    <%for(customSkin in customSkins) {
+    def url = customSkin.createURL(rcontext.controllerContext);
+    url.setOrientation(orientation);
+    %>
+      <link id="${customSkin.id}" rel="stylesheet" type="text/css" href= "$url" />
     <%}%>
      <script type="text/javascript">
      // This variable must be used only to initialize other variables otherwise

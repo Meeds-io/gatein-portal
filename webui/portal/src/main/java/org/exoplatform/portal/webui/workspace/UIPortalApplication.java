@@ -19,22 +19,6 @@
 
 package org.exoplatform.portal.webui.workspace;
 
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.commons.utils.Safe;
@@ -47,11 +31,7 @@ import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.resource.Skin;
-import org.exoplatform.portal.resource.SkinConfig;
-import org.exoplatform.portal.resource.SkinService;
-import org.exoplatform.portal.resource.SkinURL;
-import org.exoplatform.portal.resource.SkinVisitor;
+import org.exoplatform.portal.resource.*;
 import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.page.UIPageActionListener.ChangeNodeActionListener;
 import org.exoplatform.portal.webui.page.UISiteBody;
@@ -89,6 +69,11 @@ import org.gatein.portal.controller.resource.script.FetchMode;
 import org.gatein.portal.controller.resource.script.Module;
 import org.gatein.portal.controller.resource.script.ScriptResource;
 import org.json.JSONObject;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.util.*;
 
 /**
  * This extends the UIApplication and hence is a sibling of UIPortletApplication (used by any eXo Portlets as the Parent class
@@ -579,6 +564,11 @@ public class UIPortalApplication extends UIApplication {
             getPortalPortletSkinConfig(portletConfigs, child);
         }
         return portletConfigs;
+    }
+
+    private Collection<SkinConfig> getCustomSkins() {
+        SkinService skinService = getApplicationComponent(SkinService.class);
+        return skinService.getCustomPortalSkins(skin_);
     }
 
     private void getPortalPortletSkinConfig(Set<SkinConfig> portletConfigs, UIComponent component) {

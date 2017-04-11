@@ -19,25 +19,6 @@
 
 package org.exoplatform.portal.resource;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.ServletContext;
-
 import org.exoplatform.commons.cache.future.FutureMap;
 import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.commons.utils.BinaryOutput;
@@ -45,11 +26,7 @@ import org.exoplatform.commons.utils.ByteArrayOutput;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.commons.utils.Safe;
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.management.annotations.Impact;
-import org.exoplatform.management.annotations.ImpactType;
-import org.exoplatform.management.annotations.Managed;
-import org.exoplatform.management.annotations.ManagedDescription;
-import org.exoplatform.management.annotations.ManagedName;
+import org.exoplatform.management.annotations.*;
 import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
 import org.exoplatform.management.rest.annotations.RESTEndpoint;
@@ -67,6 +44,15 @@ import org.gatein.portal.controller.resource.ResourceRequestHandler;
 import org.gatein.wci.ServletContainerFactory;
 import org.gatein.wci.WebAppListener;
 import org.picocontainer.Startable;
+
+import javax.servlet.ServletContext;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Managed
 @NameTemplate({ @Property(key = "view", value = "portal"), @Property(key = "service", value = "management"),
@@ -100,10 +86,14 @@ public class SkinService extends AbstractResourceService implements Startable {
 
     public static final String DEFAULT_SKIN = "Default";
 
+    public static final String CUSTOM_MODULE_ID = "customModule";
+
     /** The deployer. */
     private final WebAppListener deployer;
 
     private final Map<SkinKey, SkinConfig> portalSkins_;
+
+    private final Map<SkinKey, SkinConfig> customPortalSkins_;
 
     private final Map<SkinKey, SkinConfig> skinConfigs_;
 
@@ -179,6 +169,7 @@ public class SkinService extends AbstractResourceService implements Startable {
 
         //
         portalSkins_ = new LinkedHashMap<SkinKey, SkinConfig>();
+        customPortalSkins_ = new LinkedHashMap<SkinKey, SkinConfig>();
         skinConfigs_ = new LinkedHashMap<SkinKey, SkinConfig>(20);
         availableSkins_ = new HashSet<String>(5);
         ltCache = new FutureMap<String, CachedStylesheet, SkinContext>(loader);
@@ -259,8 +250,11 @@ public class SkinService extends AbstractResourceService implements Startable {
             }
 
             skinConfig = new SimpleSkin(this, module, skinName, cssPath, priority);
-            portalSkins_.put(key, skinConfig);
-
+            if (!module.equals(CUSTOM_MODULE_ID)) {
+                portalSkins_.put(key, skinConfig);
+            } else {
+                customPortalSkins_.put(key, skinConfig);
+            }
             if (log.isDebugEnabled()) {
                 log.debug("Adding Portal skin : Bind " + key + " to " + skinConfig);
             }
@@ -531,6 +525,27 @@ public class SkinService extends AbstractResourceService implements Startable {
         }
 
         return visitor.getSkins();
+    }
+
+    /**
+     * Return the collection of custom portal skins
+     *
+     * @param skinName
+     * @return the map of custom portal skins
+     */
+    public Collection<SkinConfig> getCustomPortalSkins(String skinName) {
+        Set<SkinKey> keys = customPortalSkins_.keySet();
+        List<SkinConfig> customPortalSkins = new ArrayList<SkinConfig>();
+        for (SkinKey key : keys) {
+            if (key.getName().equals(skinName))
+                customPortalSkins.add(customPortalSkins_.get(key));
+        }
+        Collections.sort(customPortalSkins, new Comparator<SkinConfig>() {
+            public int compare(SkinConfig o1, SkinConfig o2) {
+                return o1.getCSSPriority() - o2.getCSSPriority();
+            }
+        });
+        return customPortalSkins;
     }
 
     /**
