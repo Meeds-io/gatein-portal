@@ -28,8 +28,12 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.utils.LazyPageList;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.ComponentPlugin;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.portal.config.model.Application;
@@ -86,6 +90,10 @@ public class UserPortalConfigService implements Startable {
 
     /** . */
     private final ImportMode defaultImportMode;
+
+    private PortalConfig defaultPortalConfig;
+
+    public static final String DEFAULT_PORTAL_SKIN = "Default";
 
     private Log log = ExoLogger.getLogger("Portal:UserPortalConfigService");
 
@@ -540,6 +548,8 @@ public class UserPortalConfigService implements Startable {
         } catch (Exception e) {
             log.error("Could not import initial data", e);
         }
+
+        loadDefaultPortalConfig();
     }
 
     public void stop() {
@@ -564,5 +574,48 @@ public class UserPortalConfigService implements Startable {
 
     public PortalConfig getPortalConfigFromTemplate(String templateName) {
         return newPortalConfigListener_.getPortalConfigFromTemplate(PortalConfig.PORTAL_TYPE, templateName);
+    }
+
+    /**
+     * Get the skin name of the default portal
+     * @return Skin name of the default portal
+     */
+    public String getDefaultPortalSkinName() {
+        return defaultPortalConfig != null && StringUtils.isNotBlank(defaultPortalConfig.getSkin()) ?
+                defaultPortalConfig.getSkin() : DEFAULT_PORTAL_SKIN;
+    }
+
+    /**
+     * Get the PortalConfig object of the default portal
+     * @return PortalConfig object of the default portal
+     */
+    public PortalConfig getDefaultPortalConfig() {
+        return defaultPortalConfig;
+    }
+
+    /**
+     * Set the PortalConfig object of the default portal
+     * @param defaultPortalConfig PortalConfig object of the default portal
+     */
+    public void setDefaultPortalConfig(PortalConfig defaultPortalConfig) {
+        this.defaultPortalConfig = defaultPortalConfig;
+    }
+
+    /**
+     * Load the PortalConfig object of the default portal
+     */
+    protected void loadDefaultPortalConfig() {
+        String defaultPortal = this.getDefaultPortal();
+
+        if(defaultPortal != null) {
+            try {
+                RequestLifeCycle.begin(ExoContainerContext.getCurrentContainer());
+                defaultPortalConfig = getDataStorage().getPortalConfig(defaultPortal);
+            } catch (Exception e) {
+                log.error("Cannot retrieve data of portal " + defaultPortal, e);
+            } finally {
+                RequestLifeCycle.end();
+            }
+        }
     }
 }

@@ -298,6 +298,17 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
         }.execute(null);
     }
 
+    public void testGetDefaultPortalConfig() {
+        new UnitTest() {
+            public void execute() throws Exception {
+                PortalConfig portalConfig = userPortalConfigSer_.getDefaultPortalConfig();
+                assertNotNull(portalConfig);
+                assertEquals(PortalConfig.PORTAL_TYPE, portalConfig.getType());
+                assertEquals("classic", portalConfig.getName());
+            }
+        }.execute(null);
+    }
+
     public void testNavigationOrder() {
         new UnitTest() {
             public void execute() throws Exception {

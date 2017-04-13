@@ -486,6 +486,12 @@
   <external-component-plugins>
     <target-component>org.exoplatform.services.listener.ListenerService</target-component>
     <component-plugin>
+      <name>org.exoplatform.portal.config.DataStorage.portalConfigUpdated</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.portal.config.DefaultPortalConfigUpdateListener</type>
+    </component-plugin>
+
+    <component-plugin>
       <name>org.exoplatform.portal.config.DataStorage.portalConfigRemoved</name>
       <set-method>addListener</set-method>
       <type>org.exoplatform.portal.pom.config.cache.LayoutUpdateListener</type>
