@@ -19,32 +19,17 @@
 
 package org.exoplatform.services.organization.idm;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import javax.naming.InvalidNameException;
-
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.ListAccessImpl;
 import org.exoplatform.commons.utils.ListenerStack;
-import org.exoplatform.services.organization.Group;
-import org.exoplatform.services.organization.Membership;
-import org.exoplatform.services.organization.MembershipEventListener;
-import org.exoplatform.services.organization.MembershipHandler;
-import org.exoplatform.services.organization.MembershipType;
-import org.exoplatform.services.organization.User;
-import org.exoplatform.services.organization.UserStatus;
+import org.exoplatform.services.organization.*;
 import org.gatein.common.logging.LogLevel;
-import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.RoleType;
 import org.picketlink.idm.common.exception.IdentityException;
+
+import javax.naming.InvalidNameException;
+import java.util.*;
 
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
@@ -544,10 +529,10 @@ public class MembershipDAOImpl extends AbstractDAOImpl implements MembershipHand
         HashSet<MembershipImpl> memberships = new HashSet<MembershipImpl>();
 
         for (Role role : roles) {
-            Group g = ((GroupDAOImpl) orgService.getGroupHandler()).convertGroup(role.getGroup());
-            if (isCreateMembership(role.getRoleType().getName(), g.getId())) {
+            String groupId = ((GroupDAOImpl) orgService.getGroupHandler()).getGroupId(role.getGroup(), null);
+            if (isCreateMembership(role.getRoleType().getName(), groupId)) {
                 MembershipImpl m = new MembershipImpl();
-                m.setGroupId(g.getId());
+                m.setGroupId(groupId);
                 m.setUserName(role.getUser().getId());
 
                 // LDAP store may return raw membership type as role type
@@ -574,8 +559,8 @@ public class MembershipDAOImpl extends AbstractDAOImpl implements MembershipHand
 
             for (org.picketlink.idm.api.Group group : groups) {
                 MembershipImpl m = new MembershipImpl();
-                Group g = ((GroupDAOImpl) orgService.getGroupHandler()).convertGroup(group);
-                m.setGroupId(g.getId());
+                String groupId = ((GroupDAOImpl) orgService.getGroupHandler()).getGroupId(group, null);
+                m.setGroupId(groupId);
                 m.setUserName(userName);
                 m.setMembershipType(getAssociationMapping());
                 memberships.add(m);

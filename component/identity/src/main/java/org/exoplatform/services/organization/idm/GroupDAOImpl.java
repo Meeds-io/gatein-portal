@@ -19,17 +19,6 @@
 
 package org.exoplatform.services.organization.idm;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupEventListener;
 import org.exoplatform.services.organization.GroupHandler;
@@ -39,6 +28,8 @@ import org.picketlink.idm.api.Attribute;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.SimpleAttribute;
+
+import java.util.*;
 
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
@@ -682,7 +673,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
      * @return
      * @throws Exception
      */
-    private String getGroupId(org.picketlink.idm.api.Group jbidGroup, List<org.picketlink.idm.api.Group> processed)
+    protected String getGroupId(org.picketlink.idm.api.Group jbidGroup, List<org.picketlink.idm.api.Group> processed)
             throws Exception {
         if (log.isTraceEnabled()) {
             Tools.logMethodIn(log, LogLevel.TRACE, "getGroupId",
