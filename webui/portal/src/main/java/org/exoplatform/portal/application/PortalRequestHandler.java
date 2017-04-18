@@ -38,6 +38,7 @@ import org.exoplatform.portal.config.model.PortalProperties;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.web.ControllerContext;
+import org.exoplatform.web.PortalHttpServletResponseWrapper;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.WebRequestHandler;
 import org.exoplatform.web.application.ApplicationLifecycle;
@@ -209,6 +210,9 @@ public class PortalRequestHandler extends WebRequestHandler {
     protected void processRequest(PortalRequestContext context, PortalApplication app) throws Exception {
         WebuiRequestContext.setCurrentInstance(context);
         PortalRequestImpl.createInstance(context);
+        if (context.getResponse() instanceof PortalHttpServletResponseWrapper) {
+          ((PortalHttpServletResponseWrapper) context.getResponse()).setWrapMethods(true);
+        }
 
         UIApplication uiApp = app.getStateManager().restoreUIRootComponent(context);
 
@@ -254,6 +258,11 @@ public class PortalRequestHandler extends WebRequestHandler {
                 log.error("Error while handling request", NonStaleModelEx);
             }
         } finally {
+            if (context.getResponse() instanceof PortalHttpServletResponseWrapper) {
+              PortalHttpServletResponseWrapper portalHttpServletResponseWrapper = (PortalHttpServletResponseWrapper) context.getResponse();
+              portalHttpServletResponseWrapper.commit();
+              portalHttpServletResponseWrapper.setWrapMethods(false);
+            }
 
             // We flush the writer here for all
             context.getWriter().flush();

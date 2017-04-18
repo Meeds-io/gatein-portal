@@ -56,7 +56,11 @@ public abstract class AbstractResourceDeployer implements WebAppListener {
                     break;
                 case WebAppLifeCycleEvent.REMOVED:
                     webApp = event.getWebApp();
-                    url = getGateinResourcesXml(webApp);
+                    try {
+                      url = getGateinResourcesXml(webApp);
+                    } catch (Exception e) {
+                      // Could not access resources when Wildfly is stopping
+                    }
                     if (url != null) {
                         remove(event.getWebApp());
                     }

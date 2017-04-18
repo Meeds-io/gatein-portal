@@ -345,7 +345,8 @@ public class WebAppController implements Startable {
                             }
 
                             //
-                            processed = handler.execute(new ControllerContext(this, router, req, res, parameters));
+                            PortalHttpServletResponseWrapper httpServletResponseWrapper = new PortalHttpServletResponseWrapper(res);
+                            processed = handler.execute(new ControllerContext(this, router, req, httpServletResponseWrapper, parameters));
                         } else {
                             if (debug) {
                                 log.debug("No handler " + handlerKey + " for request path=" + portalPath + ", parameters="

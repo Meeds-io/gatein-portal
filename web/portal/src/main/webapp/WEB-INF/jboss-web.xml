@@ -22,31 +22,5 @@
 
 <jboss-web>
   <security-domain>java:/jaas/gatein-domain</security-domain>
-  <valve>
-    <class-name>org.gatein.portal.security.jboss.PortalClusteredSSOSupportValve</class-name>
-    <param>
-      <param-name>requireClusterProfile</param-name>
-      <param-value>true</param-value>
-    </param>
-  </valve>
-  <valve>
-    <class-name>org.gatein.sso.integration.SSODelegateValve</class-name>
-    <param>
-      <param-name>ssoDelegationEnabled</param-name>
-      <param-value>#{gatein.sso.valve.enabled:false}</param-value>
-    </param>
-    <param>
-      <param-name>delegateValveClassName</param-name>
-      <param-value>#{gatein.sso.valve.class}</param-value>
-    </param>
-    <param>
-      <param-name>samlSPConfigFile</param-name>
-      <param-value>#{gatein.sso.saml.config.file}</param-value>
-    </param>
-  </valve>
-  <session-config>
-   <cookie-config>
-       <path>/</path>
-   </cookie-config>
-  </session-config>
+  <context-root>portal</context-root>
 </jboss-web>

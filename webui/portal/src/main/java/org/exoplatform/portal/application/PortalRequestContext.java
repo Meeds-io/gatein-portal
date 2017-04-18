@@ -119,6 +119,9 @@ public class PortalRequestContext extends WebuiRequestContext {
     private final String portalURI;
 
     /** . */
+    private final String contextPath;
+
+    /** . */
     private final SiteKey siteKey;
 
     /** The locale from the request. */
@@ -181,6 +184,7 @@ public class PortalRequestContext extends WebuiRequestContext {
         request_ = controllerContext.getRequest();
         response_ = controllerContext.getResponse();
         response_.setBufferSize(1024 * 100);
+        contextPath = request_.getContextPath();
         setSessionId(request_.getSession().getId());
 
         // The encoding needs to be set before reading any of the parameters since the parameters's encoding
@@ -329,10 +333,10 @@ public class PortalRequestContext extends WebuiRequestContext {
         //. Check SSO Enable
         ExoContainer container = getApplication().getApplicationServiceContainer();
         SSOHelper ssoHelper = container.getComponentInstanceOfType(SSOHelper.class);
-        if(ssoHelper != null && ssoHelper.isSSOEnabled()) {
-            loginPath.append(request_.getContextPath()).append(ssoHelper.getSSORedirectURLSuffix());
+        if(ssoHelper != null && ssoHelper.isSSOEnabled() && ssoHelper.skipJSPRedirection()) {
+            loginPath.append(getPortalContextPath()).append(ssoHelper.getSSORedirectURLSuffix());
         } else {
-            loginPath.append(request_.getContextPath()).append("/").append(DO_LOGIN_PATTERN);
+            loginPath.append(getPortalContextPath()).append("/").append(DO_LOGIN_PATTERN);
         }
 
         loginPath.append("?initialURI=").append(URLEncoder.encode(initialURI.toString(), "UTF-8"));
@@ -433,7 +437,7 @@ public class PortalRequestContext extends WebuiRequestContext {
     }
 
     public final String getRequestContextPath() {
-        return request_.getContextPath();
+        return contextPath;
     }
 
     @Override
