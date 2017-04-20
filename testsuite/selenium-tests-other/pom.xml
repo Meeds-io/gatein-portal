@@ -47,7 +47,6 @@
     <selenium.host.port>8080</selenium.host.port>
     <selenium.host2>localhost</selenium.host2>
     <selenium.host2.port>8080</selenium.host2.port>
-    <wsrp.version>v1</wsrp.version>
     <org.selenium.maven-plugin.version>1.0.1</org.selenium.maven-plugin.version>
     <cargo.timeout>240000</cargo.timeout>
     <cargo.jvmargs.additional />
@@ -244,10 +243,6 @@
                     <property>
                       <name>portal.path</name>
                       <value>${portal.path}</value>
-                    </property>
-                    <property>
-                      <name>wsrp.version</name>
-                      <value>${wsrp.version}</value>
                     </property>
                     <property>
                       <name>method</name>
