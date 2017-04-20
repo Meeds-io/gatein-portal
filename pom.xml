@@ -129,10 +129,8 @@
     <module>web</module>
     <module>examples</module>
     <module>starter</module>
-    <module>wsrp-integration</module>
     <module>mobile-integration</module>
     <module>cdi</module>
-    <module>packaging</module>
     <module>testsuite</module>
   </modules>
 
