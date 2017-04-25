@@ -52,6 +52,10 @@ class CompositeSkin implements Skin {
     private final String urlPrefix;
 
     CompositeSkin(SkinService service, Collection<SkinConfig> skins) {
+        this(service, skins, null);
+    }
+
+    CompositeSkin(SkinService service, Collection<SkinConfig> skins, String compositeId) {
         TreeMap<String, SkinConfig> urlSkins = new TreeMap<String, SkinConfig>();
         for (SkinConfig skin : skins) {
             urlSkins.put(skin.getCSSPath(), skin);
@@ -82,7 +86,11 @@ class CompositeSkin implements Skin {
 
         //
         this.service = service;
-        this.id = id.toString();
+        if (compositeId != null) {
+            this.id = compositeId;
+        } else {
+            this.id = id.toString();
+        }
         this.urlPrefix = builder.toString();
     }
 

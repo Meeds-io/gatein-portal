@@ -370,7 +370,11 @@ public class SkinService extends AbstractResourceService implements Startable {
      * @return the merged skin
      */
     public Skin merge(Collection<SkinConfig> skins) {
-        return new CompositeSkin(this, skins);
+        return merge(skins, null);
+    }
+
+    public Skin merge(Collection<SkinConfig> skins, String id) {
+        return new CompositeSkin(this, skins, id);
     }
 
     /**

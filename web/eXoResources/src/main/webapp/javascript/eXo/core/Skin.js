@@ -17,23 +17,34 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-(function() {
-	eXo.core.Skin = {
-			/**
-			 * Adds a css file, idnetified by url, to the page
-			 * componentId identifies the component to which the style applies
-			 */
-			addSkin : function(componentId, url) {
-				var skin = document.getElementById(componentId) ;
-				if(skin != null) return ;
-				var link = document.createElement('link') ;
-				link.setAttribute('id', componentId) ;
-				link.setAttribute('rel', 'stylesheet') ;
-				link.setAttribute('type', 'text/css') ;
-				link.setAttribute('href', url) ;
-				var head = document.getElementsByTagName("head")[0] ;
-				head.appendChild(link) ;
-			}
-	};
-	return eXo.core.Skin;	
+(function () {
+  eXo.core.Skin = {
+    /**
+     * Adds a css file, idnetified by url, to the page
+     * componentId identifies the component to which the style applies
+     */
+    addSkin: function (componentId, url, replaceIfExist) {
+      var link = document.getElementById(componentId);
+      if (link != null) {
+        if (replaceIfExist) {
+          link.setAttribute('href', url);
+        }
+        return;
+      }
+
+      link = document.createElement('link');
+      link.setAttribute('id', componentId);
+      link.setAttribute('rel', 'stylesheet');
+      link.setAttribute('type', 'text/css');
+      link.setAttribute('href', url);
+      var head = document.getElementsByTagName("head")[0];
+      var customModule = document.getElementById("customModule");
+      if (customModule) {
+        head.insertBefore(link, customModule);
+      } else {
+        head.appendChild(link);
+      }
+    }
+  };
+  return eXo.core.Skin;
 })();

@@ -90,6 +90,8 @@ public class UIPortalApplication extends UIApplication {
      */
     public static final String DEFAULT_MODE_PROPERTY = "gatein.portal.pageEditor.defaultEditMode";
 
+    public static final String PORTAL_PORTLETS_SKIN_ID = "portalPortletSkins";
+
     public enum EditMode {
         /**
          * Edit mode with plain rectangles in place of portlets.
@@ -607,8 +609,7 @@ public class UIPortalApplication extends UIApplication {
         // Determine portlets visible on the page
         List<UIPortlet> uiportlets = new ArrayList<UIPortlet>();
         UIWorkingWorkspace uiWorkingWS = getChildById(UI_WORKING_WS_ID);
-        UIPortal uiPortal = uiWorkingWS.findFirstComponentOfType(UIPortal.class);
-        uiPortal.findComponentOfType(uiportlets, UIPortlet.class);
+        uiWorkingWS.findComponentOfType(uiportlets, UIPortlet.class);
         UIPortalToolPanel toolPanel = uiWorkingWS.findFirstComponentOfType(UIPortalToolPanel.class);
         if (toolPanel != null && toolPanel.isRendered()) {
             toolPanel.findComponentOfType(uiportlets, UIPortlet.class);
@@ -620,7 +621,7 @@ public class UIPortalApplication extends UIApplication {
         // don't merge portlet if portlet not available
         if (!portalPortletSkins.isEmpty()) {
             SkinService skinService = getApplicationComponent(SkinService.class);
-            portletSkins.add(skinService.merge(portalPortletSkins));
+            portletSkins.add(skinService.merge(portalPortletSkins, PORTAL_PORTLETS_SKIN_ID));
         }
 
         //
@@ -906,14 +907,23 @@ public class UIPortalApplication extends UIApplication {
                 }
             }
         }
-        List<SkinConfig> skins = new ArrayList<SkinConfig>();
+
         SkinService skinService = getApplicationComponent(SkinService.class);
+
+        List<SkinConfig> skins = new ArrayList<SkinConfig>();
+        Set<SkinConfig> portalPortletSkins = getPortalPortletSkins();
+        boolean reloadPortalPortletSkins = false;
         for (UIPortlet uiPortlet : uiportlets) {
             String skinId = uiPortlet.getSkinId();
             if (skinId != null) {
                 SkinConfig skinConfig = skinService.getSkin(skinId, skin_);
-                if (skinConfig != null)
-                    skins.add(skinConfig);
+                if (skinConfig != null) {
+                    if (portalPortletSkins.contains(skinConfig)) {
+                        reloadPortalPortletSkins = true;
+                    } else {
+                        skins.add(skinConfig);
+                    }
+                }
             }
         }
         StringBuilder b = new StringBuilder(1000);
@@ -922,6 +932,14 @@ public class UIPortalApplication extends UIApplication {
             url.setOrientation(orientation_);
             b.append("skin.addSkin('").append(ele.getId()).append("','").append(url).append("');\n");
         }
+
+        if (reloadPortalPortletSkins) {
+            Skin skin = skinService.merge(portalPortletSkins, PORTAL_PORTLETS_SKIN_ID);
+            SkinURL url = skin.createURL(context);
+            url.setOrientation(orientation_);
+            b.append("skin.addSkin('").append(skin.getId()).append("','").append(url).append("', true);\n");
+        }
+
         return b.toString();
     }
 
