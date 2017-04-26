@@ -37,7 +37,6 @@
     <module>server</module>
     <module>resources</module>
     <module>api</module>
-    <module>security-jboss</module>
     <module>oauth-common</module>
     <module>oauth-web</module>
     <module>sso</module>

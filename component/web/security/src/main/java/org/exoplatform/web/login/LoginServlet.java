@@ -26,9 +26,11 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.exoplatform.container.ExoContainer;
@@ -253,9 +255,17 @@ public class LoginServlet extends AbstractHttpServlet {
 
             String disabledUser = (String)req.getAttribute(FilterDisabledLoginModule.DISABLED_USER_NAME);
             boolean meetDisabledUser = disabledUser != null;
+            ServletContext servletContext = getServletContext();
+            final String portalContextPath = servletContext.getContextPath();
+            HttpServletRequest wrappedRequest = new HttpServletRequestWrapper(req) {
+              @Override
+              public String getContextPath() {
+                return portalContextPath;
+              }
+            };
             if(ssoHelper.skipJSPRedirection() && meetDisabledUser) {
                 resp.setContentType("text/html; charset=UTF-8");
-                getServletContext().getRequestDispatcher("/login/jsp/disabled.jsp").include(req, resp);
+                getServletContext().getRequestDispatcher("/login/jsp/disabled.jsp").include(wrappedRequest, resp);
             } else if (ssoHelper.skipJSPRedirection()) {
                 String ssoRedirectUrl = req.getContextPath() + ssoHelper.getSSORedirectURLSuffix();
                 ssoRedirectUrl = resp.encodeRedirectURL(ssoRedirectUrl);
@@ -271,7 +281,7 @@ public class LoginServlet extends AbstractHttpServlet {
                 }
 
                 resp.setContentType("text/html; charset=UTF-8");
-                getServletContext().getRequestDispatcher(loginPath.toString()).include(req, resp);
+                getServletContext().getRequestDispatcher(loginPath.toString()).include(wrappedRequest, resp);
             }
         }
     }

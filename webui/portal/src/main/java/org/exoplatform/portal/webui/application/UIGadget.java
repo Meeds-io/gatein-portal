@@ -143,7 +143,7 @@ public class UIGadget extends UIComponent {
         HttpServletRequest request = portalRC.getRequest();
         StringBuilder urlBuilder = new StringBuilder(request.getScheme());
         urlBuilder.append("://").append(request.getServerName()).append(":").append(request.getServerPort());
-        urlBuilder.append(request.getContextPath()).append("/standalone/").append(storageId);
+        urlBuilder.append(portalRC.getPortalContextPath()).append("/standalone/").append(storageId);
 
         HttpServletResponse response = portalRC.getResponse();
         return response.encodeURL(urlBuilder.toString());
