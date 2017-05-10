@@ -1,22 +1,6 @@
 package org.gatein.portal.idm.impl.repository;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.apache.commons.lang.StringUtils;
-
 import org.exoplatform.services.organization.idm.UserDAOImpl;
-
 import org.gatein.portal.idm.IdentityStoreSource;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.IdentitySearchCriteriaImpl;
@@ -36,6 +20,10 @@ import org.picketlink.idm.spi.store.AttributeStore;
 import org.picketlink.idm.spi.store.IdentityStore;
 import org.picketlink.idm.spi.store.IdentityStoreInvocationContext;
 import org.picketlink.idm.spi.store.IdentityStoreSession;
+
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -299,11 +287,7 @@ public class ExoFallbackIdentityStoreRepository extends FallbackIdentityStoreRep
         IdentityObject io = null;
         for (IdentityStore targetStore : targetStores) {
             IdentityStoreInvocationContext targetCtx = resolveInvocationContext(targetStore, invocationContext);
-            try {
-                io = targetStore.findIdentityObject(targetCtx, name, identityObjectType);
-            } catch (IdentityException e) {
-                log.log(Level.SEVERE, "Failed to find IdentityObject in target store: ", e);
-            }
+            io = targetStore.findIdentityObject(targetCtx, name, identityObjectType);
             if (io != null) {
                 break;
             }
@@ -314,12 +298,7 @@ public class ExoFallbackIdentityStoreRepository extends FallbackIdentityStoreRep
                 IdentityStore mandatoryStore = mandatoryStores.get(identityObjectType.getName());
 
                 IdentityStoreInvocationContext mappedContext = resolveInvocationContext(mandatoryStore, invocationContext);
-                try {
-                    mandatoryIO = mandatoryStore.findIdentityObject(mappedContext, name, identityObjectType);
-                } catch (IdentityException e) {
-                    log.log(Level.SEVERE, "Failed to find IdentityObject in target store: ", e);
-                }
-
+                mandatoryIO = mandatoryStore.findIdentityObject(mappedContext, name, identityObjectType);
                 if (mandatoryIO == null) {
                     return null;
                 }
@@ -327,12 +306,7 @@ public class ExoFallbackIdentityStoreRepository extends FallbackIdentityStoreRep
 
             return io;
         }
-
-        try {
-            io = defaultIdentityStore.findIdentityObject(resolveInvocationContext(defaultIdentityStore, invocationContext), name, identityObjectType);
-        } catch (IdentityException e) {
-            log.log(Level.SEVERE, "Failed to find IdentityObject in default store: ", e);
-        }
+        io = defaultIdentityStore.findIdentityObject(resolveInvocationContext(defaultIdentityStore, invocationContext), name, identityObjectType);
         return io;
     }
 
