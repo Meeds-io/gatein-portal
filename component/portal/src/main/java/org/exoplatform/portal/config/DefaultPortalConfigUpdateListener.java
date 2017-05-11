@@ -11,17 +11,13 @@ import org.exoplatform.services.listener.Listener;
  */
 public class DefaultPortalConfigUpdateListener extends Listener {
 
-  private UserPortalConfigService userPortalConfigService;
-
-  public DefaultPortalConfigUpdateListener(UserPortalConfigService userPortalConfigService) {
-    this.userPortalConfigService = userPortalConfigService;
-  }
-
   @Override
   public void onEvent(Event event) throws Exception {
     if(event.getData() instanceof PortalConfig) {
       PortalConfig portalConfig = (PortalConfig) event.getData();
       // update only when the updated site is the default site
+      UserPortalConfigService userPortalConfigService = ExoContainerContext.getCurrentContainer()
+              .getComponentInstanceOfType(UserPortalConfigService.class);
       if(StringUtils.equals(userPortalConfigService.getDefaultPortal(), portalConfig.getName())) {
         userPortalConfigService.setDefaultPortalConfig(portalConfig);
       }
