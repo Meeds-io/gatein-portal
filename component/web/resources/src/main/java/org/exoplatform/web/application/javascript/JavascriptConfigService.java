@@ -99,16 +99,20 @@ public class JavascriptConfigService extends AbstractResourceService implements 
     }
 
     public Reader getScript(ResourceId resourceId, Locale locale) throws Exception {
+        return getCompositeScript(resourceId, locale);
+    }
+
+    public CompositeReader getCompositeScript(ResourceId resourceId, Locale locale) throws Exception {
         if (ResourceScope.GROUP.equals(resourceId.getScope())) {
             ScriptGroup loadGroup = scripts.getLoadGroup(resourceId.getName());
             if (loadGroup != null) {
                 List<Reader> readers = new ArrayList<Reader>(loadGroup.getDependencies().size());
                 for (ResourceId id : loadGroup.getDependencies()) {
-                    Reader rd = getScript(id, locale);
+                    Reader rd = getCompositeScript(id, locale);
                     if (rd != null) {
-                        readers.add(new StringReader("\n//Begin " + id));
+                        readers.add(new StringReader("\n//Begin " + id + "\n"));
                         readers.add(rd);
-                        readers.add(new StringReader("\n//End " + id));
+                        readers.add(new StringReader("\n//End " + id + "\n"));
                     }
                 }
                 return new CompositeReader(readers);
@@ -129,6 +133,7 @@ public class JavascriptConfigService extends AbstractResourceService implements 
                 boolean isModule = FetchMode.ON_LOAD.equals(resource.getFetchMode());
 
                 if (isModule) {
+
                     JSONArray deps = new JSONArray();
                     LinkedList<String> params = new LinkedList<String>();
                     List<String> argNames = new LinkedList<String>();
@@ -173,7 +178,13 @@ public class JavascriptConfigService extends AbstractResourceService implements 
                 }
 
                 //
+                boolean isMinify = true;
                 for (Module js : modules) {
+                    //we always only have 0 or 1 moudle actually
+                    if (js instanceof Module.Local) {
+                        isMinify = ((Module.Local)js).isMinify();
+                    }
+
                     Reader jScript = getJavascript(js, locale);
                     if (jScript != null) {
                         readers.add(new StringReader(buffer.toString()));
@@ -191,7 +202,7 @@ public class JavascriptConfigService extends AbstractResourceService implements 
                 }
                 readers.add(new StringReader(buffer.toString()));
 
-                return new CompositeReader(readers);
+                return new CompositeReader.MinifiableReader(readers, isMinify);
             } else {
                 return null;
             }

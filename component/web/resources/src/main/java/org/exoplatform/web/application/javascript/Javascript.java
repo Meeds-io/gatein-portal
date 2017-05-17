@@ -88,11 +88,17 @@ public abstract class Javascript {
         /** . */
         protected final String resourceBundle;
 
+        protected final boolean minify;
+
         public Local(ResourceId resource, String contextPath, String path, String resourceBundle, int priority) {
             this(resource, contextPath, new Content[] { new Content(path) }, resourceBundle, priority);
         }
 
         public Local(ResourceId resource, String contextPath, Content[] contents, String resourceBundle, int priority) {
+            this(resource, contextPath, contents, resourceBundle, priority, true);
+        }
+
+        public Local(ResourceId resource, String contextPath, Content[] contents, String resourceBundle, int priority, boolean minify) {
             super(resource, contextPath, priority);
 
             //
@@ -101,11 +107,16 @@ public abstract class Javascript {
             }
             this.contents = contents;
             this.resourceBundle = resourceBundle;
+            this.minify = minify;
         }
 
         @Override
         Module addModuleTo(ScriptResource resource) {
-            return resource.addLocalModule(contextPath, contents, resourceBundle, priority);
+            return resource.addLocalModule(contextPath, contents, resourceBundle, priority, minify);
+        }
+
+        public boolean isMinify() {
+            return minify;
         }
 
         public Content[] getContents() {

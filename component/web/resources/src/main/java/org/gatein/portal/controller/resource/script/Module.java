@@ -105,11 +105,17 @@ public abstract class Module {
         /** . */
         private final Map<QualifiedName, String> parameters;
 
+        private final boolean minify;
+
         Local(ScriptResource resource, String contextPath, String path, String resourceBundle, int priority) {
             this(resource, contextPath, new Content[] { new Content(path) }, resourceBundle, priority);
         }
 
         Local(ScriptResource resource, String contextPath, Content[] contents, String resourceBundle, int priority) {
+            this(resource, contextPath, contents, resourceBundle, priority, true);
+        }
+
+        Local(ScriptResource resource, String contextPath, Content[] contents, String resourceBundle, int priority, boolean minify) {
             super(resource, contextPath, priority);
 
             //
@@ -125,6 +131,7 @@ public abstract class Module {
             this.contents = contents;
             this.parameters = parameters;
             this.resourceBundle = resourceBundle;
+            this.minify = minify;
         }
 
         public String getPath() {
@@ -146,6 +153,10 @@ public abstract class Module {
 
         public Map<QualifiedName, String> getParameters() {
             return parameters;
+        }
+
+        public boolean isMinify() {
+            return minify;
         }
 
         @Override

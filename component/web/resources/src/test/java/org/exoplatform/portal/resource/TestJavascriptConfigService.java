@@ -73,6 +73,7 @@ public class TestJavascriptConfigService extends AbstractWebResourceTest {
             resources.put("/js/module2.js", "ddd;");
             resources.put("/js/common.js", "kkk;");
             resources.put("/js/pluginTest.js", "iii;");
+            resources.put("/js/exclude.js", "eee;");
             //trim all space character: tab, space, non-breaking space...
             resources.put("/js/normalize_test.js", " \n \t /* // */  //  /* \n  /* /*  */  \n  ggg; // /* */ \n");
             mockServletContext = new MockJSServletContext("mockwebapp", resources);
@@ -116,6 +117,13 @@ public class TestJavascriptConfigService extends AbstractWebResourceTest {
         assertReader(commonjs, jsService.getScript(new ResourceId(ResourceScope.SHARED, "commonjs"), null));
     }
 
+    public void testExcludeJS() throws Exception {
+        String excludejs = "\ndefine('SHARED/excludejs', [], function() {"
+                + "\nvar require = eXo.require, requirejs = eXo.require,define = eXo.define;\neXo.define.names=[];"
+                + "\neXo.define.deps=[];" + "\nreturn eee;\n});";
+        assertReader(excludejs, jsService.getScript(new ResourceId(ResourceScope.SHARED, "excludejs"), null));
+    }
+
     public void testRequireJSPlugin() throws Exception {
         String pluginTest = "\ndefine('SHARED/pluginTest', [\"SHARED/text!/path/to/file.js\",\"SHARED/text!/path/to/file2.js\"],"
                 + " function(text,text_1) {"
@@ -126,10 +134,10 @@ public class TestJavascriptConfigService extends AbstractWebResourceTest {
     }
 
     public void testGroupingScript() throws Exception {
-        String module1 = "\n//Begin SHARED/module1\ndefine('SHARED/module1', [], function() {"
+        String module1 = "\n//Begin SHARED/module1\n\ndefine('SHARED/module1', [], function() {"
                 + "\nvar require = eXo.require, requirejs = eXo.require,define = eXo.define;\neXo.define.names=[];\neXo.define.deps=[];"
                 + "\nreturn ccc;\n});\n//End SHARED/module1";
-        String module2 = "\n//Begin SHARED/module2\ndefine('SHARED/module2', [\"SHARED/module1\"], function(mod1) {"
+        String module2 = "\n//Begin SHARED/module2\n\ndefine('SHARED/module2', [\"SHARED/module1\"], function(mod1) {"
                 + "\nvar require = eXo.require, requirejs = eXo.require,define = eXo.define;\neXo.define.names=[\"mod1\"];\neXo.define.deps=[mod1];"
                 + "\nreturn ddd;\n});\n//End SHARED/module2";
 
@@ -140,7 +148,7 @@ public class TestJavascriptConfigService extends AbstractWebResourceTest {
         String result = buffer.toString();
         result = result.replace(module1, "");
         result = result.replace(module2, "");
-        assertTrue(result.isEmpty());
+        assertTrue(result.trim().isEmpty());
     }
 
     public void testGetJSConfig() throws Exception {

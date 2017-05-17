@@ -155,7 +155,11 @@ public class ScriptResource extends BaseScriptResource<ScriptResource> implement
     }
 
     public Module.Local addLocalModule(String contextPath, Content[] contents, String resourceBundle, int priority) {
-        Module.Local module = new Module.Local(this, contextPath, contents, resourceBundle, priority);
+        return addLocalModule(contextPath, contents, resourceBundle, priority, true);
+    }
+
+    public Module.Local addLocalModule(String contextPath, Content[] contents, String resourceBundle, int priority, boolean minify) {
+        Module.Local module = new Module.Local(this, contextPath, contents, resourceBundle, priority, minify);
         modules.add(module);
         return module;
     }

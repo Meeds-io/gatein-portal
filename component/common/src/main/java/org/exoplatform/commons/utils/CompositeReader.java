@@ -21,8 +21,9 @@ package org.exoplatform.commons.utils;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Iterator;
+import java.util.*;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.gatein.common.io.IOTools;
 import org.gatein.common.util.Tools;
 
@@ -48,6 +49,18 @@ public class CompositeReader extends Reader {
     public CompositeReader(Iterator<Reader> compounds) throws NullPointerException {
         this.compounds = compounds;
         this.current = null;
+    }
+
+    public List<Reader> getCompounds() {
+        return IteratorUtils.toList(compounds);
+    }
+
+    public static boolean isMinify(Reader reader) {
+        if (reader != null && reader instanceof MinifiableReader) {
+            return ((MinifiableReader)reader).isMinify();
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -90,5 +103,18 @@ public class CompositeReader extends Reader {
             IOTools.safeClose(compounds.next());
         }
         compounds = null;
+    }
+
+    public static class MinifiableReader extends CompositeReader {
+        private boolean minify;
+
+        public MinifiableReader(Iterable<Reader> compounds, boolean isMinify) {
+            super(compounds);
+            this.minify = isMinify;
+        }
+
+        public boolean isMinify() {
+            return minify;
+        }
     }
 }

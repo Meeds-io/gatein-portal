@@ -301,6 +301,9 @@ public class JavascriptConfigParser {
             for (Element scriptElt : XMLTools.getChildren(element, SCRIPT_TAG)) {
                 String resourceBundle = parseOptString(scriptElt, "resource-bundle");
 
+                String minifyStr = parseOptString(scriptElt, "minify");
+                boolean minify = minifyStr == null || Boolean.parseBoolean(minifyStr);
+
                 List<Content> contents = new LinkedList<Content>();
                 Element adapter = XMLTools.getUniqueChild(scriptElt, ADAPTER_TAG, false);
                 String scriptPath = parseOptString(scriptElt, "path");
@@ -323,7 +326,7 @@ public class JavascriptConfigParser {
                 Content[] tmp = contents.toArray(new Content[contents.size()]);
 
                 //
-                Javascript script = new Javascript.Local(desc.id, contextPath, tmp, resourceBundle, 0);
+                Javascript script = new Javascript.Local(desc.id, contextPath, tmp, resourceBundle, 0, minify);
                 desc.modules.add(script);
             }
         }

@@ -118,6 +118,33 @@ public class TestParser extends AbstractGateInTest {
         assertEquals("/local_module.js", ((Javascript.Local) local).getContents()[0].getSource());
     }
 
+    public void testExclude() throws Exception {
+        String config = "" + "<gatein-resources>" + "<portal>" + "<name>foo</name>" + "<module>" + "<script>"
+                + "<name>local_module</name>" + "<path>/local_module.js</path>" + "</script>" + "</module>" + "</portal>"
+                + "</gatein-resources>";
+        String configExclude = "" + "<gatein-resources>" + "<portal>" + "<name>foo</name>" + "<module>" + "<script>"
+                + "<name>local_module</name>" + "<minify>false</minify><path>/local_module.js</path>" + "</script>" + "</module>" + "</portal>"
+                + "</gatein-resources>";
+
+        //
+        JavascriptConfigParser parser = new JavascriptConfigParser("/mypath");
+        List<ScriptResourceDescriptor> scripts = parser.parseConfig(new ByteArrayInputStream(config.getBytes("UTF-8")));
+        //by default, the script will be minified
+        ScriptResourceDescriptor desc = scripts.get(0);
+        List<Javascript> modules = desc.getModules();
+        Javascript local = modules.get(0);
+        assertTrue(((Javascript.Local) local).isMinify());
+
+        //exclude script from compressor
+        parser = new JavascriptConfigParser("/mypath");
+        scripts = parser.parseConfig(new ByteArrayInputStream(configExclude.getBytes("UTF-8")));
+        desc = scripts.get(0);
+        modules = desc.getModules();
+        local = modules.get(0);
+        assertTrue(local instanceof Javascript.Local);
+        assertFalse(((Javascript.Local) local).isMinify());
+    }
+
     public void testResourceBundle() throws Exception {
         String config = "" + "<gatein-resources>" + "<portal>" + "<name>foo</name>" + "<module>" + "<script>"
                 + "<name>foo_module</name>" + "<path>/foo_module.js</path>" + "<resource-bundle>my_bundle</resource-bundle>"
