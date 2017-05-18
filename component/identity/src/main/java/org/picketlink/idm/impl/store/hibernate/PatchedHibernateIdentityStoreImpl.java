@@ -3229,6 +3229,13 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
                //Nothing
             }
 
+            // If the attribute key is enable, consider its absene as it was equals to true
+            if (!presentAttrs.containsKey(mappedAttributeName) && entry.getKey().equals("enabled") && entry.getValue() != null && entry.getValue().length == 1
+                && entry.getValue()[0].equalsIgnoreCase("true")) {
+              continue;
+            }
+
+
             if (mappedAttributeName == null)
             {
                toRemove.add(object);

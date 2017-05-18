@@ -161,7 +161,6 @@ public class TestOrganization extends AbstractKernelTest {
         List iterator = users.getAll();
         for (Object test : iterator) {
             User a = (User) test;
-            System.out.println(a.getUserName());
         }
     }
 
