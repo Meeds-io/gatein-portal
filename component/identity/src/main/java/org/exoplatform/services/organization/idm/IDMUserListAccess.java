@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.gatein.common.logging.LogLevel;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -82,7 +83,8 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
         }
 
         //As test suppose, we should throw exception when try to load more element than size
-        if(index + length > this.getSize()) {
+        int totalSize = this.getSize();
+        if(index + length > totalSize) {
             throw new IllegalArgumentException("Try to get more than number users can retrieve");
         }
 
@@ -120,16 +122,29 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
         }
 
         if (length > users.size()) {
-
-            for (; i < length; i++) {
-                exoUsers[i] = lastExisting;
+            int additionalLength = length - users.size();
+            int additionalIndex = index + length;
+            if((additionalIndex + additionalLength) > totalSize) {
+              additionalLength = totalSize - additionalIndex;
+            }
+            if(additionalLength > 0) {
+              User[] additionalUsers = load(additionalIndex, additionalLength);
+              if(additionalUsers != null) {
+                for (User user : additionalUsers) {
+                  if(user != null && StringUtils.isNotBlank(user.getUserName())) {
+                    exoUsers[i++] = user;
+                  }
+                }
+              }
+            }
+            while (i < length) {
+              exoUsers[i++] = lastExisting;
             }
         }
-        
+
         if (log.isTraceEnabled()) {
             Tools.logMethodOut(log, LogLevel.TRACE, "load", exoUsers);
         }
-
         return exoUsers;
     }
 
@@ -195,10 +210,15 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
               org.picketlink.idm.api.User user = iterator.next();
                 Attribute attr = getIDMService().getIdentitySession().getAttributesManager().getAttribute(user.getKey(), UserDAOImpl.USER_ENABLED);
                 if ((userStatus == UserStatus.ENABLED && (attr == null || attr.getValue().toString().equals("true"))) || (userStatus == UserStatus.DISABLED && attr != null && attr.getValue().toString().equals("false"))) {
-                    if (offset >= index) {
-                        result.add(user);
+                    // Check if we have to get a subset of real fullResults or from results returned by a query
+                    if(this.fullResults == fullResults) {
+                      if (offset >= index) {
+                          result.add(user);
+                      }
+                      offset++;
+                    } else {
+                      result.add(user);
                     }
-                    offset++;
                 }
             }
         }

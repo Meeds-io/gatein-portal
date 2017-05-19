@@ -4,8 +4,12 @@ import exo.portal.component.identiy.opendsconfig.opends.OpenDSService;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import junit.framework.Assert;
+
+import org.apache.commons.lang.StringUtils;
 
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.component.test.ConfigurationUnit;
@@ -166,6 +170,42 @@ public class TestLDAPOrganization extends TestOrganization {
     assertEquals("jduke", newListDisabled.load(0,1)[0].getUserName());
     for(int i=0; i< newListEnabled.getSize(); i++){
       assertNotSame("jduke",newListEnabled.load(i,1)[0].getUserName() );
+    }
+  }
+
+  public void testFindUsersWithPagination() throws Exception {
+    begin();
+    ListAccess<User> userListAccess = organization.getUserHandler().findAllUsers();
+
+    coherenceTestofReturnedResults(userListAccess);
+
+    Query query = new Query();
+    query.setUserName("jduke");
+
+    userListAccess = organization.getUserHandler().findUsersByQuery(query);
+    coherenceTestofReturnedResults(userListAccess);
+  }
+
+  private void coherenceTestofReturnedResults(ListAccess<User> userListAccess) throws Exception {
+    int usersCount = userListAccess.getSize();
+    assertTrue(usersCount > 3);
+
+    int pageSize = 2;
+    int index = 0;
+
+    Set<String> foundUsernames = new HashSet<>();
+    while (index < pageSize * 2 && index < usersCount) {
+      int usersToLoad = (index + pageSize) > usersCount ? (usersCount - index) : pageSize;
+      User[] users = userListAccess.load(index, usersToLoad);
+      index += users.length;
+      assertTrue(index <= usersCount);
+      for (User user : users) {
+        if(user != null && StringUtils.isBlank(user.getUserName())) {
+          continue;
+        }
+        assertFalse(foundUsernames.contains(user.getUserName()));
+        foundUsernames.add(user.getUserName());
+      }
     }
   }
 
