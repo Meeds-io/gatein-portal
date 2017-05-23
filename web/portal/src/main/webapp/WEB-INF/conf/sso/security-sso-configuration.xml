@@ -41,7 +41,7 @@
       </value-param>
       <value-param>
         <name>SSORedirectURLSuffix</name>
-        <value>/sso</value>
+        <value>${gatein.sso.uri.suffix:/sso}</value>
       </value-param>
     </init-params>
   </component>
