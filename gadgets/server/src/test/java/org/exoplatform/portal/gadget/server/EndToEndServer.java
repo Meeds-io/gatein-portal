@@ -21,6 +21,7 @@ package org.exoplatform.portal.gadget.server;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +31,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.shindig.common.PropertiesModule;
 import org.apache.shindig.common.cache.ehcache.EhCacheModule;
 import org.apache.shindig.gadgets.DefaultGuiceModule;
+import org.apache.shindig.gadgets.admin.GadgetAdminModule;
+import org.apache.shindig.gadgets.oauth2.OAuth2MessageModule;
+import org.apache.shindig.gadgets.oauth2.OAuth2Module;
+import org.apache.shindig.gadgets.oauth2.handler.OAuth2HandlerModule;
+import org.apache.shindig.gadgets.oauth2.persistence.sample.OAuth2PersistenceModule;
 import org.apache.shindig.gadgets.servlet.AuthenticationModule;
 import org.apache.shindig.gadgets.servlet.ConcatProxyServlet;
 import org.apache.shindig.gadgets.servlet.GadgetRenderingServlet;
@@ -37,6 +43,7 @@ import org.apache.shindig.gadgets.servlet.JsServlet;
 import org.apache.shindig.gadgets.servlet.MakeRequestServlet;
 import org.exoplatform.portal.gadget.core.ExoModule;
 import org.exoplatform.portal.gadget.core.ExoOAuthModule;
+import org.exoplatform.portal.gadget.core.ExoPropertiesModule;
 import org.exoplatform.portal.gadget.core.GateInGuiceServletContextListener;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ResourceHandler;
@@ -103,6 +110,7 @@ public class EndToEndServer {
     private Server createServer(int port) throws Exception {
         System.setProperty("shindig.port", String.valueOf(port));
         System.setProperty("jetty.port", String.valueOf(port));
+        System.setProperty("gatein.gadgets.dir", "src/test/resources/conf/gadgets");
         System.setProperty("gatein.gadgets.securitytokenkeyfile", "src/test/resources/conf/gadgets/key.txt");
 
         Server newServer = new Server(port);
@@ -118,8 +126,9 @@ public class EndToEndServer {
 
         Map<String, String> initParams = Maps.newHashMap();
         String modules = Joiner.on(":").join(ExoModule.class.getName(), ExoOAuthModule.class.getName(),
-                DefaultGuiceModule.class.getName(), AuthenticationModule.class.getName(), PropertiesModule.class.getName(),
-                EhCacheModule.class.getName());
+                OAuth2Module.class.getName(), OAuth2MessageModule.class.getName(), OAuth2HandlerModule.class.getName(),
+                OAuth2PersistenceModule.class.getName(), DefaultGuiceModule.class.getName(),
+                AuthenticationModule.class.getName(), ExoPropertiesModule.class.getName(), GadgetAdminModule.class.getName());
 
         initParams.put(GateInGuiceServletContextListener.MODULES_ATTRIBUTE, modules);
         context.setInitParams(initParams);

@@ -45,7 +45,7 @@
   <dependencies>
     <!-- project dependencies -->
     <dependency>
-      <groupId>org.gatein.shindig</groupId>
+      <groupId>org.apache.shindig</groupId>
       <artifactId>shindig-features</artifactId>
       <scope>provided</scope>
     </dependency>
@@ -86,11 +86,6 @@
       <artifactId>icu4j</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>net.sourceforge.nekohtml</groupId>
-      <artifactId>nekohtml</artifactId>
-      <scope>provided</scope>
-    </dependency>
 
     <dependency>
       <groupId>xerces</groupId>
@@ -105,12 +100,6 @@
     </dependency>
 
     <dependency>
-      <groupId>nu.validator.htmlparser</groupId>
-      <artifactId>htmlparser</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>commons-digester</groupId>
       <artifactId>commons-digester</artifactId>
       <scope>provided</scope>
@@ -118,7 +107,7 @@
 
     <!-- Test scope -->
     <dependency>
-      <groupId>org.gatein.shindig</groupId>
+      <groupId>org.apache.shindig</groupId>
       <artifactId>shindig-common</artifactId>
       <classifier>tests</classifier>
       <scope>test</scope>
@@ -132,6 +121,12 @@
       <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.gadgets-core</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>de.l3s.boilerpipe</groupId>
+          <artifactId>boilerpipe</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.gatein.portal</groupId>
@@ -152,6 +147,12 @@
     <dependency>
       <groupId>net.sourceforge.htmlunit</groupId>
       <artifactId>htmlunit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.nekohtml</groupId>
+      <artifactId>nekohtml</artifactId>
+      <version>1.9.22</version>
       <scope>test</scope>
     </dependency>
     <dependency>

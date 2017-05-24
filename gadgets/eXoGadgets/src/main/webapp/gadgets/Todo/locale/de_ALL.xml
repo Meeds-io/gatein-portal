@@ -20,10 +20,6 @@
 -->
 
 <messagebundle>
-  <msg name="save">
-    Speichern
-  </msg>
-  <msg name="type_here">
-    Hier neue Aufgabe eingeben
-  </msg>
+  <msg name="save">Speicher</msg>
+  <msg name="type_here">Hier neue Aufgabe eingeben</msg>
 </messagebundle>

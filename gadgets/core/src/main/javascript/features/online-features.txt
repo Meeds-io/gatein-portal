@@ -1,6 +1,3 @@
 #
 #  THe list of features that require running in ONLINE mode
 #
-
-features/analytics/feature.xml
-features/com.google.gadgets.analytics/feature.xml

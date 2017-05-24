@@ -78,7 +78,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.gatein.shindig</groupId>
+      <groupId>org.apache.shindig</groupId>
       <artifactId>shindig-common</artifactId>
       <type>jar</type>
       <exclusions>

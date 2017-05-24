@@ -45,10 +45,6 @@
             <artifactId>junit</artifactId>
          </exclusion>
          <exclusion>
-            <groupId>args4j</groupId>
-            <artifactId>args4j</artifactId>
-         </exclusion>
-         <exclusion>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
          </exclusion>

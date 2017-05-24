@@ -66,7 +66,7 @@ public class ExoPropertiesModule extends PropertiesModule {
         }
     }
 
-    private Properties readPropertyFile(String propertyFile) {
+    protected Properties readPropertyFile(String propertyFile) {
         Properties properties = null;
         InputStream is = null;
 

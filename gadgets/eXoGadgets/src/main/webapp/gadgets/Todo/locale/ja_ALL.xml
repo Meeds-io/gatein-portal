@@ -20,10 +20,6 @@
 -->
 
 <messagebundle>
-  <msg name="save">
-    保存
-  </msg>
-  <msg name="type_here">
-    新しいタスクを入力してください。
-  </msg>
+  <msg name="save">保存</msg>
+  <msg name="type_here">新しいタスクを入力してください。</msg>
 </messagebundle>

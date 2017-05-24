@@ -21,8 +21,12 @@ package org.exoplatform.portal.gadget.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.shindig.auth.AbstractSecurityToken;
 import org.apache.shindig.auth.BlobCrypterSecurityToken;
+import org.apache.shindig.auth.BlobCrypterSecurityTokenCodec;
 import org.apache.shindig.common.crypto.BasicBlobCrypter;
 import org.apache.shindig.common.crypto.BlobCrypter;
 import org.apache.shindig.common.crypto.BlobCrypterException;
@@ -30,6 +34,8 @@ import org.apache.shindig.common.util.TimeSource;
 import org.exoplatform.web.application.RequestContext;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+
+import javax.inject.Inject;
 
 public class ExoDefaultSecurityTokenGenerator implements SecurityTokenGenerator {
     private final TimeSource timeSource;
@@ -44,18 +50,17 @@ public class ExoDefaultSecurityTokenGenerator implements SecurityTokenGenerator 
     protected String createToken(String gadgetURL, String owner, String viewer, Long moduleId, String container) {
         try {
             BlobCrypter blobCrypter = getBlobCrypter();
-            BlobCrypterSecurityToken t = new BlobCrypterSecurityToken(blobCrypter, container, null);
 
-            t.setAppUrl(gadgetURL);
-            t.setModuleId(moduleId);
-            t.setOwnerId(owner);
-            t.setViewerId(viewer);
-            t.setTrustedJson("trusted");
+            Map<String, String> values = new HashMap<>();
+            values.put(BlobCrypterSecurityToken.Keys.APP_URL.getKey(), gadgetURL);
+            values.put(BlobCrypterSecurityToken.Keys.MODULE_ID.getKey(), String.valueOf(moduleId));
+            values.put(BlobCrypterSecurityToken.Keys.OWNER.getKey(), owner);
+            values.put(BlobCrypterSecurityToken.Keys.VIEWER.getKey(), viewer);
+            values.put(BlobCrypterSecurityToken.Keys.TRUSTED_JSON.getKey(), "");
+            BlobCrypterSecurityToken t = new BlobCrypterSecurityToken(container, null, null, values);
 
-            return t.encrypt();
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        } catch (BlobCrypterException e) {
+            return t.getContainer() + ':' + blobCrypter.wrap(t.toMap());
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
         return null;
@@ -72,7 +77,7 @@ public class ExoDefaultSecurityTokenGenerator implements SecurityTokenGenerator 
 
     protected BlobCrypter getBlobCrypter() throws IOException {
         String fileName = getKeyFilePath();
-        BasicBlobCrypter c = new BasicBlobCrypter(new File(fileName));
+        BasicBlobCrypter c = new BasicBlobCrypter(fileName);
         c.timeSource = timeSource;
         return c;
     }

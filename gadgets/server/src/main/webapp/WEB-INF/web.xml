@@ -35,9 +35,13 @@
       org.apache.shindig.gadgets.DefaultGuiceModule:
       org.apache.shindig.gadgets.servlet.AuthenticationModule:
       org.exoplatform.portal.gadget.core.ExoOAuthModule:
-      org.apache.shindig.common.cache.ehcache.EhCacheModule:
+      org.apache.shindig.gadgets.oauth2.OAuth2Module:
+      org.apache.shindig.gadgets.oauth2.OAuth2MessageModule:
+      org.apache.shindig.gadgets.oauth2.handler.OAuth2HandlerModule:
+      org.apache.shindig.gadgets.oauth2.persistence.sample.OAuth2PersistenceModule:
       org.exoplatform.portal.gadget.core.ExoModule:
-      org.exoplatform.portal.gadget.core.ExtraFeatureModule
+      org.exoplatform.portal.gadget.core.ExtraFeatureModule:
+      org.apache.shindig.gadgets.admin.GadgetAdminModule
     </param-value>
   </context-param>
 

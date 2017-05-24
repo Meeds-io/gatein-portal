@@ -163,7 +163,7 @@ public class ExoContainerConfig extends GateInJsonContainerConfig {
 
     @Override
     public Object getProperty(String container, String property) {
-        if (property.equals(BlobCrypterSecurityTokenCodec.SECURITY_TOKEN_KEY_FILE) && tokenKey_ != null) {
+        if (property.equals(BlobCrypterSecurityTokenCodec.SECURITY_TOKEN_KEY) && tokenKey_ != null) {
             return tokenKey_;
         }
         if (property.equals(ExoOAuthModule.SIGNING_KEY_FILE) && signingKey_ != null) {

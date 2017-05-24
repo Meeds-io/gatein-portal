@@ -38,11 +38,7 @@ import javax.el.ValueExpression;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shindig.common.JsonSerializer;
 import org.apache.shindig.common.util.ResourceLoader;
-import org.apache.shindig.config.AbstractContainerConfig;
-import org.apache.shindig.config.ContainerConfig;
-import org.apache.shindig.config.ContainerConfigELResolver;
-import org.apache.shindig.config.ContainerConfigException;
-import org.apache.shindig.config.DynamicConfigProperty;
+import org.apache.shindig.config.*;
 import org.apache.shindig.expressions.Expressions;
 import org.exoplatform.container.RootContainer;
 import org.json.JSONArray;
@@ -62,7 +58,7 @@ import com.google.inject.name.Named;
  * User: Minh Hoang TO - hoang281283@gmail.com Date: 1/10/11 Time: 2:12 PM
  */
 @Singleton
-public class GateInJsonContainerConfig extends AbstractContainerConfig {
+public class GateInJsonContainerConfig extends ExpressionContainerConfig {
 
     private static final Logger LOG = Logger.getLogger(GateInJsonContainerConfig.class.getName());
     public static final char FILE_SEPARATOR = ',';
@@ -81,6 +77,7 @@ public class GateInJsonContainerConfig extends AbstractContainerConfig {
     @Inject
     public GateInJsonContainerConfig(@Named("shindig.containers.default") String containers, Expressions expressions)
             throws ContainerConfigException {
+        super(expressions);
         this.expressions = expressions;
         config = createContainers(loadContainers(containers));
         init();
@@ -90,6 +87,7 @@ public class GateInJsonContainerConfig extends AbstractContainerConfig {
      * Creates a new configuration from a JSON Object, for use in testing.
      */
     public GateInJsonContainerConfig(JSONObject json, Expressions expressions) {
+        super(expressions);
         this.expressions = expressions;
         config = createContainers(json);
         init();

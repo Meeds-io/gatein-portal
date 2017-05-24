@@ -20,10 +20,6 @@
 -->
 
 <messagebundle>
-  <msg name="save">
-    保存
-  </msg>
-  <msg name="type_here">
-    在此增加新的任务
-  </msg>
+  <msg name="save">保存</msg>
+  <msg name="type_here">在此增加新的任务</msg>
 </messagebundle>
