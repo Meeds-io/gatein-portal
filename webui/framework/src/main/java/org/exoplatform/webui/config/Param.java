@@ -22,6 +22,7 @@ package org.exoplatform.webui.config;
 import java.io.InputStream;
 import java.security.PrivilegedAction;
 
+import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.commons.utils.SecurityHelper;
 import org.exoplatform.resolver.ResourceResolver;
 import org.exoplatform.webui.application.WebuiRequestContext;
@@ -74,7 +75,6 @@ public class Param {
         return object;
     }
 
-    @SuppressWarnings("unchecked")
     public Object getMapGroovyObject(WebuiRequestContext context) throws Exception {
         if (object == null) {
             synchronized (this) {
@@ -83,8 +83,7 @@ public class Param {
                     InputStream is = resolver.getInputStream(value);
                     Binding binding = new Binding();
                     GroovyShell shell = new GroovyShell(prepareClassLoader(), binding);
-                    object = shell.evaluate(is);
-                    is.close();
+                    object = shell.evaluate(IOUtil.getStreamContentAsString(is));
                 }
             }
         }
@@ -97,8 +96,7 @@ public class Param {
             InputStream is = resolver.getInputStream(value);
             Binding binding = new Binding();
             GroovyShell shell = new GroovyShell(prepareClassLoader(), binding);
-            object = shell.evaluate(is);
-            is.close();
+            object = shell.evaluate(IOUtil.getStreamContentAsString(is));
             return object;
         } catch (Exception e) {
             log.error("A  problem in the groovy script : " + value, e);
