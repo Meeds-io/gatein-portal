@@ -26,16 +26,16 @@
         xsi:schemaLocation="urn:infinispan:config:8.0 http://www.infinispan.org/schemas/infinispan-config-8.0.xsd"
         xmlns="urn:infinispan:config:8.0">
 
-  <cache-container  default-cache="local-configuration" statistics="true" shutdown-hook="REGISTER">
-    <local-cache-configuration name="local-configuration" statistics="false" statistics-available="false">
-      <locking isolation="READ_COMMITTED" write-skew="false" acquire-timeout="20000" striping="false"/>
-      <transaction locking="OPTIMISTIC" mode="NON_XA"/>
-      <eviction strategy="LRU" max-entries="1000000"/>
-      <expiration interval="5000" lifespan="180000"/>
-    </local-cache-configuration>
+    <cache-container  default-cache="local-configuration" statistics="true" shutdown-hook="REGISTER">
+        <local-cache-configuration name="local-configuration" statistics="false" statistics-available="false">
+            <locking isolation="READ_COMMITTED" write-skew="false" acquire-timeout="20000" striping="false"/>
+            <transaction locking="OPTIMISTIC" mode="NON_XA"/>
+            <eviction strategy="LRU" max-entries="1000000"/>
+            <expiration interval="5000" lifespan="180000"/>
+        </local-cache-configuration>
 
-    <local-cache name="idm-portal-api" configuration="local-configuration"></local-cache>
-    <local-cache name="idm-portal-store" configuration="local-configuration"></local-cache>
+        <local-cache name="idm-portal-api" configuration="local-configuration"></local-cache>
+        <local-cache name="idm-portal-store" configuration="local-configuration"></local-cache>
 
-  </cache-container>
+    </cache-container>
 </infinispan>

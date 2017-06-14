@@ -5,12 +5,13 @@ import org.exoplatform.services.organization.UserStatus;
 import org.gatein.common.NotYetImplemented;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+import org.gatein.portal.idm.impl.cache.infinispan.AbstractInfinispanCacheProvider;
+import org.gatein.portal.idm.impl.cache.infinispan.tree.Fqn;
+import org.gatein.portal.idm.impl.cache.infinispan.tree.Node;
+import org.gatein.portal.idm.impl.cache.infinispan.tree.TreeCache;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.common.exception.IdentityException;
-import org.picketlink.idm.impl.cache.AbstractInfinispanCacheProvider;
-import org.picketlink.idm.impl.tree.Fqn;
-import org.picketlink.idm.impl.tree.Node;
-import org.picketlink.idm.impl.tree.TreeCache;
+
 
 /*
  * JBoss, a division of Red Hat

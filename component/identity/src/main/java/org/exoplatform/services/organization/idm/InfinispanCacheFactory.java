@@ -29,6 +29,8 @@ import org.exoplatform.container.monitor.jvm.J2EEServerInfo;
 import org.gatein.common.classloader.DelegatingClassLoader;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+import org.gatein.portal.idm.impl.cache.infinispan.InfinispanAPICacheProviderImpl;
+import org.gatein.portal.idm.impl.cache.infinispan.InfinispanIdentityStoreCacheProviderImpl;
 import org.infinispan.Cache;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
@@ -36,12 +38,10 @@ import org.infinispan.configuration.global.GlobalConfiguration;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
+import org.infinispan.transaction.lookup.GenericTransactionManagerLookup;
 import org.infinispan.transaction.lookup.JBossStandaloneJTAManagerLookup;
-import org.infinispan.transaction.lookup.JBossTransactionManagerLookup;
 import org.infinispan.transaction.lookup.TransactionManagerLookup;
 import org.picketlink.idm.cache.APICacheProvider;
-import org.picketlink.idm.impl.cache.InfinispanAPICacheProviderImpl;
-import org.picketlink.idm.impl.cache.InfinispanIdentityStoreCacheProviderImpl;
 import org.picketlink.idm.spi.cache.IdentityStoreCacheProvider;
 
 /**
@@ -179,8 +179,9 @@ class InfinispanCacheFactory {
      * @return JBossTransactionManagerLookup if we are in AS7 or JBossStandaloneJTAManagerLookup otherwise
      */
     private TransactionManagerLookup getTransactionManagerLookup() {
+        //ISPN-2915 Deprecate JBossTransactionManagerLookup as it is redundant
         if (new J2EEServerInfo().isJBoss()) {
-            return new JBossTransactionManagerLookup();
+            return new GenericTransactionManagerLookup();
         } else {
             return new JBossStandaloneJTAManagerLookup();
         }
