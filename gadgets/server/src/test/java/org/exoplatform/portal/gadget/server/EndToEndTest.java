@@ -90,7 +90,7 @@ public class EndToEndTest extends AbstractPortalTest {
         webClient.setAjaxController(new NicelyResynchronizingAjaxController());
         webClient.waitForBackgroundJavaScript(2000);
         webClient.setHTMLParserListener(HTMLParserListener.LOG_REPORTER);
-        webClient.setTimeout(10000);
+        webClient.setTimeout(30000);
 
         alertHandler = new CollectingAlertHandler();
         webClient.setAlertHandler(alertHandler);
