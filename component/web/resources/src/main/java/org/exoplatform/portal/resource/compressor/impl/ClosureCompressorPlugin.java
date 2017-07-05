@@ -21,6 +21,8 @@ package org.exoplatform.portal.resource.compressor.impl;
 import java.io.Reader;
 import java.io.Writer;
 
+import com.google.javascript.jscomp.*;
+import com.google.javascript.jscomp.Compiler;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.management.annotations.Managed;
@@ -28,12 +30,6 @@ import org.exoplatform.management.annotations.ManagedDescription;
 import org.exoplatform.portal.resource.compressor.BaseResourceCompressorPlugin;
 import org.exoplatform.portal.resource.compressor.ResourceCompressorException;
 import org.exoplatform.portal.resource.compressor.ResourceType;
-
-import com.google.javascript.jscomp.CompilationLevel;
-import com.google.javascript.jscomp.Compiler;
-import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.JSSourceFile;
-import com.google.javascript.jscomp.WarningLevel;
 
 /**
  * A compressor based on the Google <a href="http://code.google.com/closure/">Closure Tools</a> javascript compiler. This plugin
@@ -115,6 +111,7 @@ public class ClosureCompressorPlugin extends BaseResourceCompressorPlugin {
         //
         Compiler compiler = new Compiler();
         CompilerOptions options = new CompilerOptions();
+        options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
         level.setOptionsForCompilationLevel(options);
         WarningLevel.QUIET.setOptionsForWarningLevel(options);
         JSSourceFile extern = JSSourceFile.fromCode("extern", "");

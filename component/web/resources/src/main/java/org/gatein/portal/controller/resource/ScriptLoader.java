@@ -24,6 +24,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 
+import com.google.javascript.jscomp.*;
+import com.google.javascript.jscomp.Compiler;
 import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.commons.utils.CharsetTextEncoder;
 import org.exoplatform.commons.utils.Safe;
@@ -32,14 +34,6 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.gatein.common.io.IOTools;
-
-import com.google.javascript.jscomp.CompilationLevel;
-import com.google.javascript.jscomp.Compiler;
-import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.JSError;
-import com.google.javascript.jscomp.JSSourceFile;
-import com.google.javascript.jscomp.LoggerErrorManager;
-import com.google.javascript.jscomp.Result;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -58,6 +52,7 @@ class ScriptLoader implements Loader<ScriptKey, ScriptResult, ControllerContext>
             if (key.minified) {
                 CompilationLevel level = CompilationLevel.SIMPLE_OPTIMIZATIONS;
                 CompilerOptions options = new CompilerOptions();
+                options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
                 level.setOptionsForCompilationLevel(options);
                 com.google.javascript.jscomp.Compiler compiler = new Compiler();
                 compiler.setErrorManager(new LoggerErrorManager(java.util.logging.Logger.getLogger(ResourceRequestHandler.class
