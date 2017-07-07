@@ -27,6 +27,14 @@ public class TestGateInResourceParser extends TestCase {
         assertDescriptorCanBeLoaded("org/exoplatform/portal/resource/gatein-resources-1_2.xml");
     }
 
+    public void testResources1_3() throws MalformedURLException {
+        assertDescriptorCanBeLoaded("org/exoplatform/portal/resource/gatein-resources-1_3.xml");
+    }
+
+    public void testResources1_4() throws MalformedURLException {
+        assertDescriptorCanBeLoaded("org/exoplatform/portal/resource/gatein-resources-1_4.xml");
+    }
+
     private void assertDescriptorCanBeLoaded(String descriptorPath) {
         URL url = Thread.currentThread().getContextClassLoader().getResource(descriptorPath);
         assertNotNull("The " + descriptorPath + " can not be found", url);

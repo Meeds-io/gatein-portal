@@ -241,8 +241,8 @@
 
   <xs:complexType name="script">
     <xs:sequence>
+      <xs:element name="minify" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
       <xs:choice>
-        <xs:element name="minify" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
         <xs:element name="path" type="xs:string" minOccurs="1" maxOccurs="1"/>
         <xs:element name="adapter" type="adapter" minOccurs="1" maxOccurs="1"/>
       </xs:choice>

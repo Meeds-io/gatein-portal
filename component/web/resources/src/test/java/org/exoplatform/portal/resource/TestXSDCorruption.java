@@ -55,5 +55,6 @@ public class TestXSDCorruption extends TestCase {
         assertHash("f5e48fdbfd1631ab0278a097447a3892", "gatein_resources_1_1.xsd");
         assertHash("7925f1cd0a91dcb6a95f8dcb87973792", "gatein_resources_1_2.xsd");
         assertHash("5a8602c916aee90249d7e5b8885de56e", "gatein_resources_1_3.xsd");
+        assertHash("2c088070b254bc324a29fcf91aef382a", "gatein_resources_1_4.xsd");
     }
 }
