@@ -639,6 +639,24 @@
     </depends>
   </module>
 
+  <!-- JQuery NiceScroll plugin -->
+  <module>
+    <name>jq_nicescroll</name>
+    <load-group>webuiExt</load-group>
+    <script>
+      <adapter>
+        (function($) {
+        var _$ = window.jQuery; window.jQuery = $;
+        <include>/javascript/jquery.nicescroll.min.js</include>
+        window.jQuery = _$;
+        })($);
+      </adapter>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
   <!-- IphoneStyle plugin -->
   <module>
     <name>iphoneStyleCheckbox</name>
