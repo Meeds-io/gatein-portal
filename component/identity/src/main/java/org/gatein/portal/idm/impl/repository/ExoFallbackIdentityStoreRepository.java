@@ -442,6 +442,11 @@ public class ExoFallbackIdentityStoreRepository extends FallbackIdentityStoreRep
                         results.addAll(identityObjects);
                     } catch (IdentityException e) {
                         log.log(Level.SEVERE, "Exception occurred: ", e);
+                        //if exception occurs during getting identities
+                        //like LDAP temporary connection problem
+                        //we don't want to delete identities
+                        //so, stop the execution
+                        throw e;
                     }
                 }
             }

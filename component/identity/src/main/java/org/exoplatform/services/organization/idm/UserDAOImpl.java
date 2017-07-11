@@ -742,6 +742,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
             log.debug("Can NOT find any user with username is NULL");
         } catch (Exception e) {
             handleException("Cannot obtain user: " + userName + "; ", e);
+            throw e;
         }
 
         if (u == null) {
