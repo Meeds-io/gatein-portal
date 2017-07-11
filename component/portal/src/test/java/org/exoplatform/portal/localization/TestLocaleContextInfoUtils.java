@@ -1,5 +1,6 @@
 package org.exoplatform.portal.localization;
 
+import org.apache.commons.lang.LocaleUtils;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.Constants;
@@ -110,7 +111,7 @@ public class TestLocaleContextInfoUtils {
     // return portal locale when it is set AND user locale is null
     //
     when(dataStorage.getPortalConfig(anyString()))
-            .thenReturn(getPortalConfigInstanceWithGivenLocale(LocaleFactory.DEFAULT_FACTORY.createLocale("fr")));
+            .thenReturn(getPortalConfigInstanceWithGivenLocale(LocaleUtils.toLocale("fr")));
     when(userProfileHandler.findUserProfileByName(anyString()))
             .thenReturn(getUserProfileInstanceWithGivenLocale(null));
 
@@ -143,7 +144,7 @@ public class TestLocaleContextInfoUtils {
     //
     when(dataStorage.getPortalConfig(anyString())).thenReturn(null);
     when(userProfileHandler.findUserProfileByName(anyString()))
-            .thenReturn(getUserProfileInstanceWithGivenLocale(LocaleFactory.DEFAULT_FACTORY.createLocale("de")));
+            .thenReturn(getUserProfileInstanceWithGivenLocale(LocaleUtils.toLocale("de")));
 
     // when
     LocaleContextInfo localCtx = LocaleContextInfoUtils.buildLocaleContextInfo(request);
@@ -202,7 +203,7 @@ public class TestLocaleContextInfoUtils {
     // return portal locale when it is set AND user locale is null
     //
     when(dataStorage.getPortalConfig(anyString()))
-            .thenReturn(getPortalConfigInstanceWithGivenLocale(LocaleFactory.DEFAULT_FACTORY.createLocale("fr")));
+            .thenReturn(getPortalConfigInstanceWithGivenLocale(LocaleUtils.toLocale("pt_BR")));
     when(userProfileHandler.findUserProfileByName(anyString()))
             .thenReturn(getUserProfileInstanceWithGivenLocale(null));
 
@@ -212,11 +213,15 @@ public class TestLocaleContextInfoUtils {
     // then
     assertNotNull(localCtx1);
     assertEquals(localCtx1.getRemoteUser(), "exo");
-    assertEquals(localCtx1.getPortalLocale().getLanguage(),"fr");
+    Locale portalLocale = localCtx1.getPortalLocale();
+    assertEquals(portalLocale.getLanguage(),"pt");
+    assertEquals(portalLocale.getCountry(),"BR");
     assertEquals(localCtx1.getCookieLocales(), null);
     assertEquals(localCtx1.getSessionLocale(), null);
     assertEquals(localCtx1.getSupportedLocales().size(), 1);
-    assertEquals(localCtx1.getSupportedLocales().iterator().next().getLanguage(), "es");
+    Locale supportedLocale = localCtx1.getSupportedLocales().iterator().next();
+    assertEquals(supportedLocale.getLanguage(), "es");
+    assertEquals(supportedLocale.getCountry(), "ES");
     assertEquals(localCtx1.getUserProfileLocale(), null);
     assertEquals(localCtx1.getBrowserLocales(), null);
   }
@@ -234,7 +239,7 @@ public class TestLocaleContextInfoUtils {
     //
     when(dataStorage.getPortalConfig(anyString())).thenReturn(null);
     when(userProfileHandler.findUserProfileByName(anyString()))
-            .thenReturn(getUserProfileInstanceWithGivenLocale(LocaleFactory.DEFAULT_FACTORY.createLocale("de")));
+            .thenReturn(getUserProfileInstanceWithGivenLocale(LocaleUtils.toLocale("de")));
 
     // when
     LocaleContextInfo localCtx1 = LocaleContextInfoUtils.buildLocaleContextInfo(userId);
@@ -272,7 +277,7 @@ public class TestLocaleContextInfoUtils {
 
   private PortalConfig getPortalConfigInstanceWithGivenLocale(Locale locale) {
     PortalConfig portalConfig = new PortalConfig();
-    portalConfig.setLocale(locale.getLanguage());
+    portalConfig.setLocale(locale.toString());
     return portalConfig;
   }
   

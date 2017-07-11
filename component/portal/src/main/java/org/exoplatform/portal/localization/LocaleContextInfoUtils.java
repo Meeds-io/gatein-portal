@@ -1,5 +1,6 @@
 package org.exoplatform.portal.localization;
 
+import org.apache.commons.lang.LocaleUtils;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -12,7 +13,6 @@ import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.LocaleContextInfo;
-import org.gatein.common.i18n.LocaleFactory;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 
@@ -52,7 +52,7 @@ public class LocaleContextInfoUtils {
     String username = request.getRemoteUser();
     // get session locale
     String lastLocaleLangauge = getPreviousLocale(request) == null ? null : getPreviousLocale(request).toString();
-    Locale sessionLocale = lastLocaleLangauge == null ? getSessionLocale(request) : new Locale(lastLocaleLangauge);
+    Locale sessionLocale = lastLocaleLangauge == null ? getSessionLocale(request) : LocaleUtils.toLocale(lastLocaleLangauge);
     localeCtx.setSessionLocale(sessionLocale);
     // continue setting localCtx with data fetched from request
     localeCtx.setUserProfileLocale(getUserLocale(username));
@@ -167,7 +167,7 @@ public class LocaleContextInfoUtils {
         lang = profile.getAttribute(Constants.USER_LANGUAGE);
       }
       if (lang != null && lang.trim().length() > 0) {
-        return LocaleFactory.DEFAULT_FACTORY.createLocale(lang);
+        return LocaleUtils.toLocale(lang);
       }
     }
     return null;
@@ -204,7 +204,7 @@ public class LocaleContextInfoUtils {
       }
     }
     //  return portal Locale, if not set then return the JVM Locale
-    return (lang != null && lang.trim().length() > 0) ? LocaleFactory.DEFAULT_FACTORY.createLocale(lang) : Locale.getDefault();
+    return (lang != null && lang.trim().length() > 0) ? LocaleUtils.toLocale(lang) : Locale.getDefault();
   }
   
   /**
