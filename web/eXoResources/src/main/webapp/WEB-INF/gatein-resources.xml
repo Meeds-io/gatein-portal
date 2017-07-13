@@ -639,15 +639,15 @@
     </depends>
   </module>
 
-  <!-- JQuery NiceScroll plugin -->
+  <!-- JQuery perfect scrollbar plugin -->
   <module>
-    <name>jq_nicescroll</name>
+    <name>jq_perfect_scrollbar</name>
     <load-group>webuiExt</load-group>
     <script>
       <adapter>
         (function($) {
         var _$ = window.jQuery; window.jQuery = $;
-        <include>/javascript/jquery.nicescroll.min.js</include>
+        <include>/javascript/perfect-scrollbar.jquery.min.js</include>
         window.jQuery = _$;
         })($);
       </adapter>
