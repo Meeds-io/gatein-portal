@@ -19,36 +19,13 @@
 
 package org.exoplatform.webui.organization.account;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.exoplatform.commons.serialization.api.annotations.Serialized;
-import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.commons.utils.ListAccessImpl;
-import org.exoplatform.commons.utils.ObjectPageList;
-import org.exoplatform.commons.utils.PageList;
-import org.exoplatform.commons.utils.SerializablePageList;
-import org.exoplatform.services.organization.MembershipHandler;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.Query;
-import org.exoplatform.services.organization.User;
-import org.exoplatform.services.organization.UserStatus;
+import org.exoplatform.commons.utils.*;
+import org.exoplatform.services.organization.*;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
-import org.exoplatform.webui.core.UIApplication;
-import org.exoplatform.webui.core.UIBreadcumbs;
-import org.exoplatform.webui.core.UIComponent;
-import org.exoplatform.webui.core.UIPageIterator;
-import org.exoplatform.webui.core.UIPopupComponent;
-import org.exoplatform.webui.core.UIPopupWindow;
-import org.exoplatform.webui.core.UITree;
+import org.exoplatform.webui.core.*;
 import org.exoplatform.webui.core.lifecycle.UIFormLifecycle;
 import org.exoplatform.webui.core.model.SelectItemOption;
 import org.exoplatform.webui.event.Event;
@@ -58,6 +35,9 @@ import org.exoplatform.webui.form.UIForm;
 import org.exoplatform.webui.form.UIFormCheckBoxInput;
 import org.exoplatform.webui.form.UIFormSelectBox;
 import org.exoplatform.webui.form.UIFormStringInput;
+
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by The eXo Platform SARL Author : Pham Tuan phamtuanchip@gmail.com Dec 11, 2007 Modified: dang.tung tungcnw@gmail.com
@@ -108,15 +88,18 @@ public class UIUserSelector extends UIForm implements UIPopupComponent {
 
     private UserStatus statusFilter = UserStatus.ENABLED;
 
+    private LazyPageList lazyPageList;
+
     public UIUserSelector() throws Exception {
         addUIFormInput(new UIFormStringInput(FIELD_KEYWORD, FIELD_KEYWORD, null));
         addUIFormInput(new UIFormSelectBox(FIELD_FILTER, FIELD_FILTER, getFilters()));
         addUIFormInput(new UIFormStringInput(FIELD_GROUP, FIELD_GROUP, null));
         isShowSearch_ = true;
         OrganizationService service = getApplicationComponent(OrganizationService.class);
-        ObjectPageList objPageList = new ObjectPageList(service.getUserHandler().findUsers(new Query()).getAll(), 10);
+        ListAccess<User>  userList = service.getUserHandler().findAllUsers();
+        lazyPageList = new LazyPageList(userList, 10);
         uiIterator_ = new UIPageIterator();
-        uiIterator_.setPageList(objPageList);
+        uiIterator_.setPageList(lazyPageList);
         uiIterator_.setId("UISelectUserPage");
 
         // create group selector
