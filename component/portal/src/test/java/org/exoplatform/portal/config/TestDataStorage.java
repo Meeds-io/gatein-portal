@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import junit.framework.AssertionFailedError;
 
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
@@ -622,6 +623,7 @@ public class TestDataStorage extends AbstractConfigTest {
             @Override
             public void run() {
                 begin();
+                ExoContainerContext.setCurrentContainer(getContainer());
                 try {
                     List<String> isolatedNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
                     assertEquals(new HashSet<String>(names), new HashSet<String>(isolatedNames));
@@ -666,6 +668,7 @@ public class TestDataStorage extends AbstractConfigTest {
         new Thread() {
             public void run() {
                 begin();
+                ExoContainerContext.setCurrentContainer(getContainer());
                 try {
                     List<String> isolatedNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
                     assertTrue("Was expecting " + isolatedNames + " to contain " + names, isolatedNames.containsAll(names));
