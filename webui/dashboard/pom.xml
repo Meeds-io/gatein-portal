@@ -22,22 +22,49 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.exoplatform.gatein.portal</groupId>
-    <artifactId>exo.portal.parent</artifactId>
-    <version>6.0.x-portal-rdbms-SNAPSHOT</version>
-    <relativePath>../../../pom.xml</relativePath>
+    <artifactId>exo.portal.webui</artifactId>
+    <version>5.3.x-portal-rdbms-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>exo.portal.sample.portal.jar</artifactId>
-  <name>GateIn Portal Sample Portal Java Classes</name>
+  <artifactId>exo.portal.webui.dashboard</artifactId>
   <packaging>jar</packaging>
-  <url>http://www.exoplatform.org</url>
-  <description>GateIn Sample Portal Java Classes</description>
+  <name>GateIn Portal WebUI Dashboard</name>
 
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.gatein.portal</groupId>
-      <artifactId>exo.portal.component.web.api</artifactId>
+      <artifactId>exo.portal.webui.portal</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.gatein.portal</groupId>
+      <artifactId>exo.portal.webui.eXo</artifactId>
     </dependency>
   </dependencies>
+
+  <build>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <outputDirectory>target/classes</outputDirectory>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+          <include>**/*.drl</include>
+          <include>**/*.vm</include>
+          <include>**/*.doc</include>
+          <include>**/*.xls</include>
+          <include>**/*.ppt</include>
+          <include>**/*.txt</include>
+          <include>**/*.jar</include>
+          <include>**/*.pom</include>
+          <include>**/*.sha1</include>
+          <include>**/*.conf</include>
+          <include>**/*.gtmpl</include>
+          <include>**/*.groovy</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
 </project>

@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.exoplatform.gatein.portal</groupId>
     <artifactId>responsive-portlets</artifactId>
-    <version>6.0.x-SNAPSHOT</version>
+    <version>6.0.x-portal-rdbms-SNAPSHOT</version>
   </parent>
 
 
