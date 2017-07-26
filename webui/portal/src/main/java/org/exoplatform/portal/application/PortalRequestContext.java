@@ -30,7 +30,6 @@ import java.io.Writer;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -576,11 +575,12 @@ public class PortalRequestContext extends WebuiRequestContext {
         setResponseComplete(true);
         response_.sendRedirect(url);
     }
-
+    
+ 
+  
     public void setHeaders(Map<String, String> headers) {
-        Set<String> keys = headers.keySet();
-        for (Iterator<String> iter = keys.iterator(); iter.hasNext();) {
-            String key = iter.next();
+        final Set<String> keys = headers.keySet();
+        for (final String key : keys) {
             response_.setHeader(key, headers.get(key));
         }
     }
