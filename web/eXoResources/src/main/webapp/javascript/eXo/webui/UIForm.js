@@ -38,7 +38,7 @@
 
 	  getQueryString : function(formElement) {
 	    var form = $(formElement).find('.dateTimeInput');
-	    if (form.size() > 0) {
+	    if (form.length > 0) {
 	      var elements = $(formElement).serializeArray();
 	      //append the appropriate time zone to the form element
 	      elements.forEach(function(elem) {
