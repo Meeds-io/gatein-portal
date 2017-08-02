@@ -220,6 +220,14 @@ description: Some organization
 member: cn=User,ou=Roles,o=test,dc=portal,dc=example,dc=com
 member: cn=Admin,ou=Roles,o=test,dc=portal,dc=example,dc=com
 
+dn: cn=filteredSubOrganizationC,ou=GroupsHierarchy,o=test,dc=portal,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: filteredSubOrganizationC
+description: Some organization
+member: cn=User,ou=Roles,o=test,dc=portal,dc=example,dc=com
+member: cn=Admin,ou=Roles,o=test,dc=portal,dc=example,dc=com
+
 dn: ou=Organizations,o=test,dc=portal,dc=example,dc=com
 objectclass: top
 objectclass: organizationalUnit

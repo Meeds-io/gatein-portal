@@ -1,20 +1,9 @@
 package org.exoplatform.services.organization;
 
-import exo.portal.component.identiy.opendsconfig.opends.OpenDSService;
-
-import java.util.Collection;
-import java.util.Date;
-
-import junit.framework.Assert;
-
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
-import org.exoplatform.services.organization.idm.*;
 
 /**
  * Created by exo on 5/5/16.
@@ -56,6 +45,10 @@ public class TestLDAPUserOnlyOrganization extends TestLDAPOrganization {
 
   public void testFindUser() throws Exception {
     // Disable this test because it deletes an entry from LDAP
+  }
+
+  public void testFindFilteredGroup() throws Exception {
+    // Needed only to build
   }
 
 }

@@ -1,16 +1,8 @@
 package org.exoplatform.services.organization;
 
 import exo.portal.component.identiy.opendsconfig.opends.OpenDSService;
-
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
 import junit.framework.Assert;
-
 import org.apache.commons.lang.StringUtils;
-
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
@@ -18,7 +10,15 @@ import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.organization.idm.*;
+import org.exoplatform.services.organization.idm.Config;
+import org.exoplatform.services.organization.idm.PicketLinkIDMCacheService;
+import org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl;
+import org.exoplatform.services.organization.idm.UserDAOImpl;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by exo on 5/5/16.
@@ -117,6 +117,15 @@ public class TestLDAPOrganization extends TestOrganization {
 
       Collection childGoups = handler.findGroups(group);
       Assert.assertTrue(childGoups.size() > 0);
+  }
+
+  public void testFindFilteredGroup() throws Exception {
+    GroupHandler handler = organizationService.getGroupHandler();
+    Group filteredGroup = handler.findGroupById("/organization_hierarcy/filteredSubOrganizationC");
+    assertNull(filteredGroup);
+
+    Group existingGroup =  handler.findGroupById("/organization_hierarcy/OrganizationC");
+    assertNotNull(existingGroup);
   }
 
   public void testFindUser() throws Exception {

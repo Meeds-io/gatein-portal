@@ -122,6 +122,7 @@
             </identity-store>
             <identity-store>
                 <id>PortalLDAPStore</id>
+                <!-- the new ExoLDAPIdentityStoreImpl is already in use -->
                 <class>org.picketlink.idm.impl.store.ldap.ExoLDAPIdentityStoreImpl</class>
                 <external-config/>
                 <supported-relationship-types>
@@ -229,7 +230,7 @@
                         </option>
                         <option>
                           <name>entrySearchFilter</name>
-                          <value><![CDATA[(&(cn={0})(objectClass=groupOfNames))]]></value>
+                          <value><![CDATA[(&(cn={0})(objectClass=groupOfNames)(!(cn=filteredSubOrganizationC)))]]></value>
                         </option>
                         <option>
                           <name>parentMembershipAttributePlaceholder</name>
