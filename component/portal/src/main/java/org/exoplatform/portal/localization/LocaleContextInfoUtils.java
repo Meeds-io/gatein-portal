@@ -121,8 +121,10 @@ public class LocaleContextInfoUtils {
     LocaleConfigService localeConfigService = ExoContainerContext.getCurrentContainer()
             .getComponentInstanceOfType(LocaleConfigService.class);
     Set<Locale> supportedLocales = new HashSet();
-    for (LocaleConfig lc : localeConfigService.getLocalConfigs()) {
-      supportedLocales.add(lc.getLocale());
+    if (localeConfigService != null) {
+      for (LocaleConfig lc : localeConfigService.getLocalConfigs()) {
+        supportedLocales.add(lc.getLocale());
+      }
     }
     return supportedLocales;
   }
