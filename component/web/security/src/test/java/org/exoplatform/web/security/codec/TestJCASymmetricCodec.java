@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +37,7 @@ import javax.crypto.SecretKey;
  */
 public class TestJCASymmetricCodec extends TestCase {
 
-    public void testDefaultCodec() {
+    public void testDefaultCodec() throws Exception {
         URL keyFile = Thread.currentThread().getContextClassLoader().getResource("conf/key.txt");
 
         if (System.getProperty("java.vendor").toLowerCase().contains("ibm")) {
@@ -49,7 +50,7 @@ public class TestJCASymmetricCodec extends TestCase {
 
         Map<String, String> config = new HashMap<String, String>();
         config.put("gatein.codec.jca.symmetric.keyalg", "AES");
-        config.put("gatein.codec.jca.symmetric.keystore", keyFile.getPath());
+        config.put("gatein.codec.jca.symmetric.keystore", URLDecoder.decode(keyFile.getPath(), "UTF-8"));
         config.put("gatein.codec.jca.symmetric.storetype", "JCEKS");
         config.put("gatein.codec.jca.symmetric.alias", "gtnKey");
         config.put("gatein.codec.jca.symmetric.keypass", "gtnKeyPass");

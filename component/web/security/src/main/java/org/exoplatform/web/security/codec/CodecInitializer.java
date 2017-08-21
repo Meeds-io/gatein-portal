@@ -23,12 +23,8 @@
 
 package org.exoplatform.web.security.codec;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.URLDecoder;
 import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.Map;
@@ -135,6 +131,11 @@ public class CodecInitializer {
                 }
             }
 
+            try {
+                gtnConfDir = URLDecoder.decode(gtnConfDir, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                log.error("fail to decode the path " + gtnConfDir, e);
+            }
             File f = new File(gtnConfDir + "/codec/codeckey.txt");
             if (!f.exists()) {
                 File codecDir = f.getParentFile();
