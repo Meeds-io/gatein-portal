@@ -40,6 +40,9 @@ import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.navigation.VisitMode;
 import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.IdentityConstants;
+
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 
@@ -150,7 +153,13 @@ public class UserPortalImpl implements UserPortal {
                 } else {
                     Collection<?> groups = null;
                     try {
-                        groups = service.getOrganizationService().getGroupHandler().findGroupsOfUser(userName);
+                        ConversationState conv = ConversationState.getCurrent();
+                        if (conv != null && conv.getIdentity() != null && !IdentityConstants.ANONIM.equals(conv.getIdentity().getUserId())
+                            && !IdentityConstants.SYSTEM.equals(conv.getIdentity().getUserId())) {
+                          groups = conv.getIdentity().getGroups();
+                        } else {
+                          groups = service.getOrganizationService().getGroupHandler().findGroupsOfUser(userName);
+                        }
                     } catch (Exception e) {
                         if(log.isDebugEnabled()) {
                             log.debug("Could not retrieve groups", e);
@@ -160,8 +169,12 @@ public class UserPortalImpl implements UserPortal {
 
                     if(groups != null) {
                         for (Object group : groups) {
-                            Group m = (Group) group;
-                            String groupId = m.getId().trim();
+                            String groupId = null;
+                            if(group instanceof Group) {
+                              groupId = ((Group) group).getId().trim();
+                            } else {
+                              groupId = group.toString().trim();
+                            }
                             if (!groupId.equals(service.getUserACL().getGuestsGroup())) {
                                 NavigationContext groupNavigation = service.getNavigationService().loadNavigation(
                                         SiteKey.group(groupId));
