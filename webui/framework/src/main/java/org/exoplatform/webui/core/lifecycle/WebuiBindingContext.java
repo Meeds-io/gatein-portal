@@ -146,4 +146,8 @@ public class WebuiBindingContext extends BindingContext {
     public void userRes(String mesgKey) {
 
     }
+
+    public void include(String name, ResourceResolver resourceResolver) throws Exception {
+        service_.include(name, clone(), resourceResolver);
+    }
 }

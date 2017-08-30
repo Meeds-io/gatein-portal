@@ -157,8 +157,16 @@ public class TemplateService implements Startable {
     public void include(String name, BindingContext context) throws Exception {
         if (context == null)
             throw new Exception("Binding cannot be null");
+        include(name, context, context.getResourceResolver());
+    }
+
+    public void include(String name, BindingContext context, ResourceResolver resourceResolver) throws Exception {
+        if (context == null)
+            throw new IllegalArgumentException("Binding cannot be null");
+        if (resourceResolver == null)
+            throw new IllegalArgumentException("Resource resolver cannot be null");
         context.put("_ctx", context);
-        GroovyTemplate template = getTemplate(name, context.getResourceResolver());
+        GroovyTemplate template = getTemplate(name, resourceResolver);
         template.render(context.getWriter(), context, (Locale) context.get("locale"));
     }
 
