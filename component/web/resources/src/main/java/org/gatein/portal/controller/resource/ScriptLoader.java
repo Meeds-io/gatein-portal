@@ -56,11 +56,6 @@ class ScriptLoader implements Loader<ScriptKey, ScriptResult, ControllerContext>
             Reader result;
             //
             if (key.minified) {
-                CompilationLevel level = CompilationLevel.SIMPLE_OPTIMIZATIONS;
-                CompilerOptions options = new CompilerOptions();
-                options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
-                level.setOptionsForCompilationLevel(options);
-
                 List<Reader> minifiedReaders = new ArrayList<>();
                 if (CompositeReader.isMinify(script)) {
                     ScriptResult.Error error = minify(sourceName, script, minifiedReaders);
@@ -106,6 +101,8 @@ class ScriptLoader implements Loader<ScriptKey, ScriptResult, ControllerContext>
     private ScriptResult.Error minify(String sourceName, Reader reader, List<Reader> minifiedReaders) throws IOException {
         CompilationLevel level = CompilationLevel.SIMPLE_OPTIMIZATIONS;
         CompilerOptions options = new CompilerOptions();
+        options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
+        options.setLanguageIn(CompilerOptions.LanguageMode.ECMASCRIPT5);
         level.setOptionsForCompilationLevel(options);
 
         StringWriter code = new StringWriter();
