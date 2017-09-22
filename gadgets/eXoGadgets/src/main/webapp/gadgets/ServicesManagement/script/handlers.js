@@ -96,7 +96,7 @@ ServicesManagement.prototype.registerHandler = function() {
       eXo.gadget.ServicesManagement.renderMethodDetail(method);
     });
 
-	$('.MethodActionButton').live('click', function(event) {
+  $('body').on('click', '.MethodActionButton', function(event) {
 		event.preventDefault();
 		var tr = this.parentNode.parentNode;
 		var methodName = gadgets.util.unescapeString($(".methodName", tr).text());
@@ -111,7 +111,7 @@ ServicesManagement.prototype.registerHandler = function() {
 		eXo.gadget.ServicesManagement.makeRequest(execLink, eXo.gadget.ServicesManagement.showMinimessage, param, "text", reqMethod);
 	});
 
-	$('.PropertyActionButton').live('click', function(event) {
+  $('body').on('click', '.PropertyActionButton', function(event) {
       event.preventDefault();
       var tr = this.parentNode.parentNode;
       var propName = gadgets.util.unescapeString($(".propName", tr).text());
