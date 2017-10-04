@@ -94,18 +94,19 @@ public class TestGadgetRegistryService extends AbstractApplicationRegistryTest {
 
     public void testRemoteGadget() throws Exception {
         String gadgetName = "remote_test";
+        //load xml from local file instead of other server which may cause error
+        //This doens't change the test purpose: we're using mock importer, and this is for testing the service
         TestGadgetImporter importer = new TestGadgetImporter(configurationManager, gadgetName,
-                "http://www.labpixies.com/campaigns/weather/weather.xml", false);
-        try {
-            importer.doImport();
-            assertEquals(1, service_.getAllGadgets().size());
-            assertEquals(gadgetName, service_.getGadget(gadgetName).getName());
-            service_.removeGadget(gadgetName);
-            assertNull(service_.getGadget(gadgetName));
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            e.printStackTrace();
-        }
+                "org/exoplatform/application/gadgets/weather.xml", false);
+        importer.doImport();
+        assertEquals(1, service_.getAllGadgets().size());
+        assertEquals(gadgetName, service_.getGadget(gadgetName).getName());
+        service_.removeGadget(gadgetName);
+        assertNull(service_.getGadget(gadgetName));
+    }
+
+    public void testUrl() {
+
     }
 
     class TestGadgetImporter extends GadgetImporter {
@@ -125,24 +126,14 @@ public class TestGadgetRegistryService extends AbstractApplicationRegistryTest {
 
         @Override
         protected byte[] getGadgetBytes(String gadgetURI) throws IOException {
-            if (local_) {
-                String filePath = "classpath:/" + gadgetURI;
-                InputStream in;
-                try {
-                    in = configurationManager.getInputStream(filePath);
-                    if (in != null) {
-                        return IOTools.getBytes(in);
-                    }
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            } else if (!local_) {
-                URL url;
-                url = new URL(gadgetURI);
-                return URLTools.getContent(url, 5000, 5000);
+            String filePath = "classpath:/" + gadgetURI;
+            InputStream in = null;
+            try {
+                in = configurationManager.getInputStream(filePath);
+                return IOTools.getBytes(in);
+            } catch (Exception e) {
+                throw new IOException("not found " + filePath, e);
             }
-
-            throw new IllegalArgumentException("Gadget URI is not correct");
         }
 
         @Override
