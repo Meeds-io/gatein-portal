@@ -372,11 +372,7 @@ ServicesManagement.prototype.objToTable = function(obj) {
 };
 
 ServicesManagement.prototype.resetHeight = function() {
-	if ($.browser.safari) {
-		gadgets.window.adjustHeight($(".UIGadget").height());
-	} else {
-		gadgets.window.adjustHeight();
-	}
+	gadgets.window.adjustHeight();
 };
 
 eXo.gadget.ServicesManagement = new ServicesManagement();

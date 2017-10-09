@@ -76,7 +76,7 @@
     <%}%>
     <%}%>
     <link href="<%=loginCssPath%>" rel="stylesheet" type="text/css"/>
-    <script type="text/javascript" src="/eXoResources/javascript/jquery-1.7.1.js"></script>
+    <script type="text/javascript" src="/eXoResources/javascript/jquery-3.2.1.js"></script>
     <script type="text/javascript" src="/eXoResources/javascript/eXo/webui/FormValidation.js"></script>
 </head>
 <body class="modal-open">

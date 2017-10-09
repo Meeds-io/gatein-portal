@@ -27,9 +27,9 @@
 
 
   <scripts>
-    <name>jquery-1.6.4</name>
+    <name>jquery-3.2.1</name>
     <script>
-      <path>/javascript/jquery-1.6.4.js</path>
+      <path>/javascript/jquery-3.2.1.js</path>
     </script>
   </scripts>
 
@@ -40,7 +40,7 @@
         <path>/javascript/version.js</path>
       </script>
       <depends>
-        <scripts>jquery-1.6.4</scripts>
+        <scripts>jquery-3.2.1</scripts>
       </depends>
       <depends>
         <scripts>bootstrap</scripts>
