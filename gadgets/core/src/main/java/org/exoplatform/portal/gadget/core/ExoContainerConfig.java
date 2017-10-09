@@ -19,13 +19,9 @@
 
 package org.exoplatform.portal.gadget.core;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import org.apache.shindig.auth.BlobCrypterSecurityTokenCodec;
 import org.apache.shindig.config.ContainerConfigException;
 import org.apache.shindig.expressions.Expressions;
@@ -35,11 +31,13 @@ import org.exoplatform.container.RootContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-import sun.misc.BASE64Encoder;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 /**
  * <p>
@@ -195,8 +193,8 @@ public class ExoContainerConfig extends GateInJsonContainerConfig {
             random.setSeed(System.currentTimeMillis());
             byte[] bytes = new byte[32];
             random.nextBytes(bytes);
-            BASE64Encoder encoder = new BASE64Encoder();
-            return encoder.encode(bytes);
+            Base64.Encoder encoder = Base64.getEncoder();
+            return encoder.encodeToString(bytes);
         } catch (NoSuchAlgorithmException e) {
             throw new AssertionError(e);
         }
