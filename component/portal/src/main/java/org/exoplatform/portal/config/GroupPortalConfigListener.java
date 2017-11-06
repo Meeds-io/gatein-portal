@@ -28,6 +28,8 @@ import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupEventListener;
 import org.exoplatform.services.organization.GroupHandler;
@@ -44,11 +46,17 @@ public class GroupPortalConfigListener extends GroupEventListener {
     private final UserPortalConfigService portalConfigService;
 
     /** . */
+    private final DataStorage dataStorage;
+
+    /** . */
     private final OrganizationService orgService;
 
-    public GroupPortalConfigListener(UserPortalConfigService portalConfigService, OrganizationService orgService) {
+    private static Log LOG = ExoLogger.getLogger(GroupPortalConfigListener.class);
+
+    public GroupPortalConfigListener(UserPortalConfigService portalConfigService, OrganizationService orgService, DataStorage dataStorage) {
         this.portalConfigService = portalConfigService;
         this.orgService = orgService;
+        this.dataStorage = dataStorage;
     }
 
     public void preDelete(Group group) throws Exception {
@@ -110,7 +118,11 @@ public class GroupPortalConfigListener extends GroupEventListener {
             }
 
             // Create the portal from the template
-            portalConfigService.createGroupSite(groupId);
+            if (dataStorage.getPortalConfig(PortalConfig.GROUP_TYPE, groupId) == null) {
+                portalConfigService.createGroupSite(groupId);
+            } else {
+                LOG.debug("The group site {} already exists. Ignore creating from listener", groupId);
+            }
         } finally {
             RequestLifeCycle.end();
         }
