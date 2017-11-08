@@ -28,15 +28,22 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.Set;
 
 import org.exoplatform.commons.cache.future.FutureMap;
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.commons.utils.Safe;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.application.ResourceRequestFilter;
 import org.exoplatform.portal.resource.AbstractResourceDeployer;
+import org.exoplatform.services.resources.LocaleConfig;
+import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.WebRequestHandler;
@@ -53,6 +60,8 @@ import org.gatein.wci.WebAppListener;
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
 public class ResourceRequestHandler extends WebRequestHandler implements WebAppListener {
+
+    public static final String HANDLER_NAME = "script";
 
     public static final String IF_MODIFIED_SINCE = "If-Modified-Since";
 
@@ -144,7 +153,7 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
 
     @Override
     public String getHandlerName() {
-        return "script";
+        return HANDLER_NAME;
     }
 
     @Override
@@ -272,5 +281,48 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
                 servletContext.removeAttribute(SUPPORT_GATEIN_RESOURCES);
             }
         }
+    }
+
+    /**
+     * Get cached Javascript Modules ids
+     */
+    public Collection<String> getJavascriptModules() {
+      List<String> keys = new ArrayList<>();
+
+      Set<ScriptKey> cacheKeys = cache.getKeys();
+      for (ScriptKey scriptKey : cacheKeys) {
+        keys.add(scriptKey.id.toString());
+      }
+      return keys;
+    }
+
+    /**
+     * Reload Javascript Modules by clearing cache
+     */
+    public void reloadJavascriptModules() {
+      cache.clear();
+    }
+
+    /**
+     * Reload Javascript Module by its id like 'SHARED/jquery'
+     * 
+     * @param jsModule
+     */
+    public void reloadJavascriptModule(String jsModule) {
+      String[] scriptIdParts = jsModule.split("/");
+      if(scriptIdParts.length != 2) {
+        throw new IllegalArgumentException("js module have to be identified by 'SCOPE/id' like 'SHARED/jquery' ");
+      }
+
+      ResourceScope scope = ResourceScope.valueOf(ResourceScope.class, scriptIdParts[0]);
+      ResourceId resource = new ResourceId(scope, scriptIdParts[1]);
+      LocaleConfigService localeService = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(LocaleConfigService.class);
+      Collection<LocaleConfig> localConfigs = localeService.getLocalConfigs();
+      for (LocaleConfig localeConfig : localConfigs) {
+        ScriptKey key = new ScriptKey(resource, true, localeConfig.getLocale());
+        cache.remove(key);
+      }
+      ScriptKey key = new ScriptKey(resource, true, null);
+      cache.remove(key);
     }
 }

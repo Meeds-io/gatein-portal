@@ -221,6 +221,10 @@ public class WebAppController implements Startable {
         }
     }
 
+    public WebRequestHandler getHandler(String handlerName) {
+      return handlers.get(handlerName);
+    }
+
     /**
      * Add application (portlet, gadget) to the global application map if and only if it has not been registered yet.
      *

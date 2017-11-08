@@ -26,6 +26,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -42,13 +43,23 @@ import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.utils.CompositeReader;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.management.annotations.Impact;
+import org.exoplatform.management.annotations.ImpactType;
+import org.exoplatform.management.annotations.Managed;
+import org.exoplatform.management.annotations.ManagedDescription;
+import org.exoplatform.management.annotations.ManagedName;
+import org.exoplatform.management.jmx.annotations.NameTemplate;
+import org.exoplatform.management.jmx.annotations.Property;
+import org.exoplatform.management.rest.annotations.RESTEndpoint;
 import org.exoplatform.portal.resource.AbstractResourceService;
 import org.exoplatform.portal.resource.compressor.ResourceCompressor;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.web.ControllerContext;
+import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.controller.router.URIWriter;
 import org.gatein.portal.controller.resource.ResourceId;
+import org.gatein.portal.controller.resource.ResourceRequestHandler;
 import org.gatein.portal.controller.resource.ResourceScope;
 import org.gatein.portal.controller.resource.script.BaseScriptResource;
 import org.gatein.portal.controller.resource.script.FetchMode;
@@ -64,6 +75,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.picocontainer.Startable;
 
+@Managed
+@NameTemplate({ @Property(key = "view", value = "portal"), @Property(key = "service", value = "management"),
+        @Property(key = "type", value = "javascript") })
+@ManagedDescription("Javascript config service")
+@RESTEndpoint(path = "javascriptService")
 public class JavascriptConfigService extends AbstractResourceService implements Startable {
 
     /** Our logger. */
@@ -300,6 +316,33 @@ public class JavascriptConfigService extends AbstractResourceService implements 
     public void start() {
         log.debug("Registering JavascriptConfigService for servlet container events");
         ServletContainerFactory.getServletContainer().addWebAppListener(deployer);
+    }
+
+    @Managed
+    @ManagedDescription("Retrieve all javascript modules IDs")
+    @Impact(ImpactType.READ)
+    public Collection<String> getJavascriptKeys() {
+      WebAppController webAppController = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(WebAppController.class);
+      ResourceRequestHandler handler = (ResourceRequestHandler) webAppController.getHandler(ResourceRequestHandler.HANDLER_NAME);
+      return handler.getJavascriptModules();
+    }
+
+    @Managed
+    @ManagedDescription("Reload all javascript modules")
+    @Impact(ImpactType.WRITE)
+    public void reloadJavascripts() {
+      WebAppController webAppController = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(WebAppController.class);
+      ResourceRequestHandler handler = (ResourceRequestHandler) webAppController.getHandler(ResourceRequestHandler.HANDLER_NAME);
+      handler.reloadJavascriptModules();
+    }
+
+    @Managed
+    @ManagedDescription("Reload a selected javascript module by its ID")
+    @Impact(ImpactType.WRITE)
+    public void reloadJavascript(@ManagedDescription("JS Module: SCOPE/NAME") @ManagedName("jsModule") String jsModule) {
+      WebAppController webAppController = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(WebAppController.class);
+      ResourceRequestHandler handler = (ResourceRequestHandler) webAppController.getHandler(ResourceRequestHandler.HANDLER_NAME);
+      handler.reloadJavascriptModule(jsModule);
     }
 
     /**
