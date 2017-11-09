@@ -86,6 +86,8 @@ import org.exoplatform.webui.organization.UIPermissionSelector;
         @ComponentConfig(type = UIFormInputSet.class, id = "PermissionSetting", template = "system:/groovy/webui/core/UITabSelector.gtmpl", events = { @EventConfig(listeners = UIFormInputSet.SelectComponentActionListener.class) }) })
 public class UIPortalForm extends UIFormTabPane {
 
+    private static final String PORTAL_SETTING_FORM_INPUTSET_NAME = "PortalSetting";
+
     private static final String FIELD_NAME = "name";
 
     private static final String FIELD_SKIN = "skin";
@@ -108,6 +110,7 @@ public class UIPortalForm extends UIFormTabPane {
 
     private static final String FIELD_DESCRIPTION = "description";
 
+
     private String portalOwner_;
 
     private List<SelectItemOption<String>> languages = new ArrayList<SelectItemOption<String>>();
@@ -117,7 +120,7 @@ public class UIPortalForm extends UIFormTabPane {
         addUIFormInput(uiTemplateInput);
         setSelectedTab(uiTemplateInput.getId());
 
-        UIFormInputSet uiPortalSetting = this.<UIFormInputSet> getChildById("PortalSetting");
+        UIFormInputSet uiPortalSetting = this.<UIFormInputSet> getChildById(PORTAL_SETTING_FORM_INPUTSET_NAME);
         UIFormStringInput uiNameInput = uiPortalSetting.getUIStringInput(FIELD_NAME);
         uiNameInput.setReadOnly(false);
 
@@ -146,7 +149,7 @@ public class UIPortalForm extends UIFormTabPane {
     public UIPortalForm() throws Exception {
         super("UIPortalForm");
         createDefaultItem();
-        setSelectedTab("PortalSetting");
+        setSelectedTab(PORTAL_SETTING_FORM_INPUTSET_NAME);
     }
 
     public void setBindingBean() throws Exception {
@@ -167,7 +170,10 @@ public class UIPortalForm extends UIFormTabPane {
         }
 
         invokeGetBindingBean(editPortal);
-        ((UIFormStringInput) getChild(UIFormInputSet.class).getChildById(FIELD_NAME)).setValue(getPortalOwner());
+
+        UIFormInputSet uiSettingSet = getChildById(PORTAL_SETTING_FORM_INPUTSET_NAME);
+
+        ((UIFormStringInput) uiSettingSet.getChildById(FIELD_NAME)).setValue(getPortalOwner());
 
         LocaleConfigService localeConfigService = getApplicationComponent(LocaleConfigService.class);
         LocaleConfig localeConfig = localeConfigService.getLocaleConfig(editPortal.getLocale());
@@ -176,7 +182,13 @@ public class UIPortalForm extends UIFormTabPane {
             lang += "_" + localeConfig.getLocale().getCountry();
         }
 
-        this.<UIFormInputSet> getChildById("PortalSetting").<UIFormSelectBox> getChildById(FIELD_LOCALE).setValue(lang);
+        ((UIFormStringInput) uiSettingSet.getChildById(FIELD_LOCALE)).setValue(lang);
+
+        if(editPortal.getSkin() == null) {
+            SkinService skinService = this.getApplicationComponent(SkinService.class);
+            ((UIFormStringInput) uiSettingSet.getChildById(FIELD_SKIN)).setValue(skinService.getDefaultSkin());
+        }
+
         setActions(new String[] { "Save", "Close" });
     }
 
@@ -219,7 +231,7 @@ public class UIPortalForm extends UIFormTabPane {
         }
         Collections.sort(languages, new LanguagesComparator());
 
-        UIFormInputSet uiSettingSet = new UIFormInputSet("PortalSetting");
+        UIFormInputSet uiSettingSet = new UIFormInputSet(PORTAL_SETTING_FORM_INPUTSET_NAME);
         UIFormInputSet uiPropertiesSet = new UIFormInputSet("Properties");
         uiSettingSet.addUIFormInput(new UIFormStringInput(FIELD_NAME, FIELD_NAME, null).addValidator(MandatoryValidator.class)
                 .addValidator(StringLengthValidator.class, 3, 30).addValidator(IdentifierValidator.class).setReadOnly(true));

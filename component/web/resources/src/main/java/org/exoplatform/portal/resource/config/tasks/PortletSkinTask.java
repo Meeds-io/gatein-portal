@@ -42,7 +42,7 @@ public class PortletSkinTask extends AbstractSkinModule implements SkinConfigTas
     private String portletName;
 
     public PortletSkinTask() {
-        super(SkinService.DEFAULT_SKIN);
+        super(null);
         this.overwrite = true;
     }
 
@@ -73,8 +73,11 @@ public class PortletSkinTask extends AbstractSkinModule implements SkinConfigTas
     }
 
     public void execute(SkinService skinService, ServletContext scontext) {
-        if (portletName == null || skinName == null || cssPath == null) {
+        if (portletName == null || cssPath == null) {
             return;
+        }
+        if(skinName == null) {
+            skinName = skinService.getDefaultSkin();
         }
         if (applicationName == null) {
             applicationName = scontext.getContextPath();

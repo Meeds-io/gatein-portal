@@ -19,6 +19,7 @@
 
 package org.exoplatform.portal.resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.cache.future.FutureMap;
 import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.commons.utils.BinaryOutput;
@@ -26,6 +27,8 @@ import org.exoplatform.commons.utils.ByteArrayOutput;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.commons.utils.Safe;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.management.annotations.*;
 import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
@@ -84,7 +87,9 @@ public class SkinService extends AbstractResourceService implements Startable {
     /** Immutable and therefore thread safe. */
     private static final Pattern RT = Pattern.compile("[^{;]*;\\s*/\\*\\s*orientation=rt\\s*\\*/");
 
-    public static final String DEFAULT_SKIN = "Default";
+    public static final String DEFAULT_SKIN_PARAM_NAME = "skin.default";
+
+    private static final String DEFAULT_SKIN = "Default";
 
     public static final String CUSTOM_MODULE_ID = "customModule";
 
@@ -104,6 +109,8 @@ public class SkinService extends AbstractResourceService implements Startable {
     private final FutureMap<String, CachedStylesheet, SkinContext> rtCache;
 
     private final Map<String, Set<String>> portletThemes_;
+
+    private String defaultSkin;
 
     /**
      * The name of the portal container
@@ -142,7 +149,7 @@ public class SkinService extends AbstractResourceService implements Startable {
         }
     }
 
-    public SkinService(ExoContainerContext context, ResourceCompressor compressor) {
+    public SkinService(InitParams initParams, ExoContainerContext context, ResourceCompressor compressor) {
         super(compressor);
         Loader<String, CachedStylesheet, SkinContext> loader = new Loader<String, CachedStylesheet, SkinContext>() {
             public CachedStylesheet retrieve(SkinContext context, String key) throws Exception {
@@ -178,7 +185,23 @@ public class SkinService extends AbstractResourceService implements Startable {
         portalContainerName = context.getPortalContainerName();
         deployer = new GateInSkinConfigDeployer(portalContainerName, this);
 
+        defaultSkin = DEFAULT_SKIN;
+        if(initParams != null) {
+            ValueParam defaultSkinValueParam = initParams.getValueParam(DEFAULT_SKIN_PARAM_NAME);
+            if (defaultSkinValueParam != null && StringUtils.isNotEmpty(defaultSkinValueParam.getValue())) {
+                defaultSkin = defaultSkinValueParam.getValue();
+            }
+        }
+
         addResourceResolver(new CompositeResourceResolver(portalContainerName, skinConfigs_));
+    }
+
+    public String getDefaultSkin() {
+        if(!availableSkins_.contains(defaultSkin)) {
+            log.warn("Skin \"{}\" does not exist, switching to skin \"Default\" as the default skin", defaultSkin);
+            defaultSkin = DEFAULT_SKIN;
+        }
+        return defaultSkin;
     }
 
     /**
@@ -497,6 +520,10 @@ public class SkinService extends AbstractResourceService implements Startable {
      * @return all org.exoplatform.portal.resource.SkinConfig of Portal Skin
      */
     public Collection<SkinConfig> getPortalSkins(String skinName) {
+        if(StringUtils.isEmpty(skinName)) {
+            skinName = getDefaultSkin();
+        }
+
         Set<SkinKey> keys = portalSkins_.keySet();
         List<SkinConfig> portalSkins = new ArrayList<SkinConfig>();
         for (SkinKey key : keys) {
@@ -538,6 +565,10 @@ public class SkinService extends AbstractResourceService implements Startable {
      * @return the map of custom portal skins
      */
     public Collection<SkinConfig> getCustomPortalSkins(String skinName) {
+        if(StringUtils.isEmpty(skinName)) {
+            skinName = getDefaultSkin();
+        }
+
         Set<SkinKey> keys = customPortalSkins_.keySet();
         List<SkinConfig> customPortalSkins = new ArrayList<SkinConfig>();
         for (SkinKey key : keys) {
@@ -566,12 +597,16 @@ public class SkinService extends AbstractResourceService implements Startable {
      *
      * @param module
      * @param skinName
-     * @return SkinConfig by SkinKey(module, skinName), or SkinConfig by SkinKey(module, SkinService.DEFAULT_SKIN)
+     * @return SkinConfig by SkinKey(module, skinName), or SkinConfig by SkinKey(module, defaultSkin)
      */
     public SkinConfig getSkin(String module, String skinName) {
+        if(StringUtils.isEmpty(skinName)) {
+          skinName = getDefaultSkin();
+        }
+
         SkinConfig config = skinConfigs_.get(new SkinKey(module, skinName));
         if (config == null) {
-            config = skinConfigs_.get(new SkinKey(module, SkinService.DEFAULT_SKIN));
+            config = skinConfigs_.get(new SkinKey(module, getDefaultSkin()));
         }
         return config;
     }
@@ -647,7 +682,7 @@ public class SkinService extends AbstractResourceService implements Startable {
     public void removeSkin(String module, String skinName) {
         SkinKey key;
         if (skinName.length() == 0) {
-            key = new SkinKey(module, DEFAULT_SKIN);
+            key = new SkinKey(module, getDefaultSkin());
         } else {
             key = new SkinKey(module, skinName);
         }

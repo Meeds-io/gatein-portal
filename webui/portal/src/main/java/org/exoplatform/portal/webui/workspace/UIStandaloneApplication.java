@@ -61,7 +61,7 @@ public class UIStandaloneApplication extends UIApplication {
 
     private Locale locale_ = Locale.ENGLISH;
 
-    private String skin_ = "Default";
+    private String skin_ = null;
 
     private Orientation orientation_ = Orientation.LT;
 

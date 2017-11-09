@@ -151,8 +151,6 @@ public class PortalConfig extends ModelObject {
     }
 
     public String getSkin() {
-        if (skin == null || skin.length() < 1)
-            return "Default";
         return skin;
     }
 

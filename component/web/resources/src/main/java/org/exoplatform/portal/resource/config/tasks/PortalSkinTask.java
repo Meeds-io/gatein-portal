@@ -42,7 +42,7 @@ public class PortalSkinTask extends AbstractSkinModule implements SkinConfigTask
     private String moduleName;
 
     public PortalSkinTask() {
-        super(SkinService.DEFAULT_SKIN);
+        super(null);
         this.overwrite = true;
         this.moduleName = DEFAULT_MODULE_NAME;
     }
@@ -64,8 +64,11 @@ public class PortalSkinTask extends AbstractSkinModule implements SkinConfigTask
     }
 
     public void execute(SkinService skinService, ServletContext scontext) {
-        if (moduleName == null || skinName == null || cssPath == null) {
+        if (moduleName == null || cssPath == null) {
             return;
+        }
+        if(skinName == null) {
+            skinName = skinService.getDefaultSkin();
         }
         String contextPath = scontext.getContextPath();
         String fullCSSPath = contextPath + cssPath;

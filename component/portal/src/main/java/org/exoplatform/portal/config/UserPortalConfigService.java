@@ -93,8 +93,6 @@ public class UserPortalConfigService implements Startable {
 
     private PortalConfig defaultPortalConfig;
 
-    public static final String DEFAULT_PORTAL_SKIN = "Default";
-
     private Log log = ExoLogger.getLogger("Portal:UserPortalConfigService");
 
     public UserPortalConfigService(UserACL userACL, DataStorage storage, OrganizationService orgService,
@@ -582,7 +580,7 @@ public class UserPortalConfigService implements Startable {
      */
     public String getDefaultPortalSkinName() {
         return defaultPortalConfig != null && StringUtils.isNotBlank(defaultPortalConfig.getSkin()) ?
-                defaultPortalConfig.getSkin() : DEFAULT_PORTAL_SKIN;
+                defaultPortalConfig.getSkin() : null;
     }
 
     /**

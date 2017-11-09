@@ -171,7 +171,9 @@ public class UIPortalApplication extends UIApplication {
 
     public static final String UI_MASK_WS_ID = "UIMaskWorkspace";
 
-    private String skin_ = SkinService.DEFAULT_SKIN;
+    private SkinService skinService;
+
+    private String skin_;
 
     private boolean isSessionOpen = false;
 
@@ -267,6 +269,10 @@ public class UIPortalApplication extends UIApplication {
         setOrientation(localeConfig.getOrientation());
 
         // -------------------------------------------------------------------------------
+
+        skinService = getApplicationComponent(SkinService.class);
+        skin_ = skinService.getDefaultSkin();
+
         context.setUIApplication(this);
 
         this.all_UIPortals = new HashMap<SiteKey, UIPortal>(5);
@@ -662,7 +668,7 @@ public class UIPortalApplication extends UIApplication {
     private SkinConfig getDefaultPortletSkinConfig(UIPortlet portlet) {
         String portletId = portlet.getSkinId();
         if (portletId != null) {
-            return getSkin(portletId, SkinService.DEFAULT_SKIN);
+            return getSkin(portletId, skinService.getDefaultSkin());
         } else {
             return null;
         }
