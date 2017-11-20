@@ -420,7 +420,7 @@
           try {
             eval(elements[i]);
           } catch (err) {
-            alert(err + " : " + elements[i] + "  -- " + i);
+            console.error(err + " : " + elements[i] + "  -- " + i);
           }
         }
       }
@@ -574,11 +574,11 @@
         var blockToUpdate = this;
         var target = parentBlock.find("#" + blockToUpdate.blockId);
         if (target.length == 0)
-          alert(msg.getMessage("TargetBlockNotFound", new Array(
+          console.error(msg.getMessage("TargetBlockNotFound", new Array(
               blockToUpdate.blockId)));
         var newData = $(blockToUpdate.data).find("#" + blockToUpdate.blockId);
         if (newData.length == 0)
-          alert(msg.getMessage("BlockUpdateNotFound", new Array(
+          console.error(msg.getMessage("BlockUpdateNotFound", new Array(
               blockToUpdate.blockId)));
         // target.parentNode.replaceChild(newData, target);
         target.html(newData.html());
@@ -701,7 +701,7 @@
         eXo.portal.AjaxRequest.maskLayer = null;
         eXo.portal.CurrentRequest = null;
       } catch (error) {
-        alert(error.message);
+        console.error(error.message);
       }
       
       //Remove modal-open class that was added by UIPopupWindow.js
