@@ -22,6 +22,11 @@
 	 * log out of user session
 	 */
 	eXo.portal.logout = function() {
+		// Dispatch logout event
+		var logoutEvent = document.createEvent('Event');
+		logoutEvent.initEvent('exo-logout', true, true);
+		window.dispatchEvent(logoutEvent);
+		// Perform logout
 		window.location = eXo.env.server.createPortalURL("UIPortal", "Logout", false) ;
 	} ;
 	
