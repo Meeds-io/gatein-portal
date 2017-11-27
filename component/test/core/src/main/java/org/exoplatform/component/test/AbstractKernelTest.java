@@ -23,10 +23,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-import junit.framework.TestSuite;
-
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
+
+import junit.framework.TestSuite;
 
 /**
  * An abstract test that takes care of running the unit tests with the semantic described by the {#link GateInTestClassLoader}.
@@ -39,9 +41,15 @@ public class AbstractKernelTest extends AbstractGateInTest {
     /** . */
     private static KernelBootstrap bootstrap;
 
-    /** . */
-    private static final Map<Class<?>, AtomicLong> counters = new HashMap<Class<?>, AtomicLong>();
+    private boolean forceContainerReload = false;
 
+    /**
+     * This is made static because the Class attributes are initialized each
+     * method run, since the class is instantiated each Test method run
+     */
+    private static final Map<String, AtomicLong> COUNTERS = new HashMap<String, AtomicLong>();
+
+    /** . */
     protected AbstractKernelTest() {
         super();
     }
@@ -51,7 +59,15 @@ public class AbstractKernelTest extends AbstractGateInTest {
     }
 
     public PortalContainer getContainer() {
-        return bootstrap != null ? bootstrap.getContainer() : null;
+        return bootstrap == null ? bootContainer() : bootstrap.getContainer();
+    }
+
+    public void setForceContainerReload(boolean forceContainerReload) {
+      this.forceContainerReload = forceContainerReload;
+    }
+
+    public boolean isForceContainerReload() {
+      return forceContainerReload;
     }
 
     protected void begin() {
@@ -64,41 +80,84 @@ public class AbstractKernelTest extends AbstractGateInTest {
 
     @Override
     protected void beforeRunBare() {
-        Class<?> key = getClass();
-
-        //
-        if (!counters.containsKey(key)) {
-            counters.put(key, new AtomicLong(new TestSuite(getClass()).testCount()));
-
-            //
-            bootstrap = new KernelBootstrap(Thread.currentThread().getContextClassLoader());
-
-            // Configure ourselves
-            bootstrap.addConfiguration(getClass());
-
-            //
-            bootstrap.boot();
-        }
-
-        //
-        // List<Throwable> failures = new ArrayList<Throwable>();
+      String className = getClass().getName();
+      if(!COUNTERS.containsKey(className)) {
+        AtomicLong classTestCount = new AtomicLong(new TestSuite(getClass()).testCount());
+        COUNTERS.put(getClass().getName(), classTestCount);
+      }
+      beforeClass();
+      super.beforeRunBare();
     }
 
     @Override
     protected void afterRunBare() {
-        Class<?> key = getClass();
+      String className = getClass().getName();
+      if(COUNTERS.containsKey(className) && COUNTERS.get(className).decrementAndGet() == 0) {
+        COUNTERS.remove(className);
+        super.afterRunBare();
+        afterClass();
+      }
+    }
 
+    protected void beforeClass() {
         //
-        if (counters.get(key).decrementAndGet() == 0) {
+        if (isPortalContainerPresent()) {
+          if (isForceContainerReload()) {
+            log.warn("PortalContainer seems to not be properly stopped by previous tests. PortalContainer will be forced to restart.");
+            if (bootstrap == null) {
+              forceStop();
+            } else {
+              bootstrap.dispose();
+            }
+            bootContainer();
+          } else {
+            log.warn("PortalContainer seems to not be properly stopped by previous tests. PortalContainer is not started again with Test "
+                + getClass().getName() + " configuration files. The flag forceContainerReload = false");
+          }
+        } else {
+            bootContainer();
+        }
+    }
+
+    private void forceStop() {
+      RootContainer.getInstance().stop();
+      ExoContainerContext.setCurrentContainer(null);
+    }
+
+    protected void afterClass() {
+        //
+        if (bootstrap != null) {
             bootstrap.dispose();
 
             //
             bootstrap = null;
-        }
+        } else if(isPortalContainerPresent()) {
+          log.warn("PortalContainer seems to be not properly stopped. PortalContainer will be stopped in class " + getClass().getName() + ".");
 
-        /*
-         * if (failures.size() > 0) { Throwable failure = failures.get(0); AssertionFailedError afe = new
-         * AssertionFailedError(); afe.initCause(failure); throw afe; }
-         */
+          if (isForceContainerReload()) {
+            forceStop();
+          } else {
+            log.warn("PortalContainer will not be stopped sine the flag forceContainerReload = false");
+          }
+        }
     }
+
+    private PortalContainer bootContainer() {
+      //
+      bootstrap = new KernelBootstrap(Thread.currentThread().getContextClassLoader());
+
+      // Configure ourselves
+      bootstrap.addConfiguration(getClass());
+
+      //
+      bootstrap.boot();
+
+      //
+      return bootstrap.getContainer();
+    }
+
+    private boolean isPortalContainerPresent() {
+      return PortalContainer.getInstanceIfPresent() != null;
+    }
+
 }
