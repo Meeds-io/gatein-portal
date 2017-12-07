@@ -120,6 +120,11 @@
 
     if (!selector) {
       selector = $this.attr('href')
+      // Workaround SOC-5912: fix incompatibity with jQuery 3
+      if (selector == "#") {
+        selector = null;
+      }
+      // End Workaround
       selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') //strip for ie7
     }
 
