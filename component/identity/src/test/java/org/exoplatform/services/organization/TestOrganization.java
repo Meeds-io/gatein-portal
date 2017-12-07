@@ -27,6 +27,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.component.test.ConfigurationUnit;
@@ -40,6 +41,7 @@ import org.exoplatform.services.organization.idm.UpdateLoginTimeListener;
 import org.exoplatform.services.security.ConversationRegistry;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
+
 
 /**
  * Created by The eXo Platform SARL Author : Tung Pham thanhtungty@gmail.com Nov 13, 2007
@@ -59,6 +61,7 @@ public class TestOrganization extends AbstractKernelTest {
     protected static final String USER_3 = "testOrganization_user3";
     protected static final String DEFAULT_PASSWORD = "defaultpassword";
     protected static final String DESCRIPTION = " Description";
+
 
     protected UpdateLoginTimeListener updateLoginTimeListener;
 
@@ -146,6 +149,29 @@ public class TestOrganization extends AbstractKernelTest {
             Collection<Group> groups = groupHandler.findGroupsOfUser(USER_1);
             assertNotNull(groups);
             assertTrue(groups.size() >= 1);
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    public void testConsistencyMembershipListAccess() throws Exception {
+        GroupHandler groupHandler = organizationService.getGroupHandler();
+        Group group = groupHandler.findGroupById(GROUP_1);
+        User testUser = userHandler_.findUserByName("root");
+
+        MembershipType mt = mtHandler_.findMembershipType("test");
+        if (mt == null) {
+            mt = mtHandler_.createMembershipTypeInstance();
+            mt.setName("test");
+            mtHandler_.createMembershipType(mt, true);
+        }
+        membershipHandler_.linkMembership(testUser, group, mt, true);
+
+
+        ListAccess<Membership> listAccess = membershipHandler_.findAllMembershipsByGroup(group);
+        assertEquals(1, listAccess.getSize());
+        try {
+            Membership[] mbs = listAccess.load(0, 3);
         } catch (Exception e) {
             fail();
         }

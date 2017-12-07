@@ -77,7 +77,8 @@ public class IDMMembershipListAccess implements ListAccess<Membership>, Serializ
 
         if (fullResults != null) {
             // If we already have fullResults (all pages) we can simply sublist them
-            roles = fullResults.subList(index, index + length);
+            int toIndex = (index + length > fullResults.size()) ? fullResults.size() : index + length;
+            roles = fullResults.subList(index, toIndex);
         } else {
             // Decide if use paginated query or skip pagination and obtain full results
             IdentitySearchCriteria crit = usePaginatedQuery ? new IdentitySearchCriteriaImpl().page(index, length) : new IdentitySearchCriteriaImpl().page(0, size);
@@ -94,16 +95,18 @@ public class IDMMembershipListAccess implements ListAccess<Membership>, Serializ
             // If pagination wasn't used, we have all roles and we can save them for future
             if (!usePaginatedQuery) {
                 fullResults = roles;
-                roles = fullResults.subList(index, index + length);
+                int toIndex = (index + length > fullResults.size()) ? fullResults.size() : index + length;
+                roles = fullResults.subList(index, toIndex);
             }
         }
 
         Membership[] memberships = new Membership[length];
 
-        //
         int i = 0;
+        int size = roles.size();
 
-        for (; i < length; i++) {
+
+        for (; i < size; i++) {
 
             Role role = roles.get(i);
 
@@ -127,7 +130,7 @@ public class IDMMembershipListAccess implements ListAccess<Membership>, Serializ
         }
 
         // Size can be greater then number of existing memberships
-        if (length > roles.size()) {
+        if (length > size) {
             for (; i < length; i++) {
                 memberships[i] = lastExisting;
             }
