@@ -45,6 +45,16 @@ public class NullObject implements Serializable {
         return instance;
     }
 
+    @Override
+    public int hashCode() {
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return true;
+    }
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         // Nothing to do
     }

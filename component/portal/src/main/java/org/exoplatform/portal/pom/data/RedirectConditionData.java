@@ -24,6 +24,7 @@ package org.exoplatform.portal.pom.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.exoplatform.portal.config.model.DevicePropertyCondition;
 import org.exoplatform.portal.config.model.RedirectCondition;
@@ -83,5 +84,21 @@ public class RedirectConditionData extends ComponentData {
             redirectCondition.setUserAgentConditions(userAgentConditionData.build());
         }
         return redirectCondition;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RedirectConditionData)) return false;
+        if (!super.equals(o)) return false;
+        RedirectConditionData that = (RedirectConditionData) o;
+        return Objects.equals(redirectName, that.redirectName) &&
+                Objects.equals(userAgentConditionData, that.userAgentConditionData) &&
+                Objects.equals(devicePropertyConditionData, that.devicePropertyConditionData);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), redirectName, userAgentConditionData, devicePropertyConditionData);
     }
 }

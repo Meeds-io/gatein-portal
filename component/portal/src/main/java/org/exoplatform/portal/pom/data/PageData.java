@@ -70,4 +70,23 @@ public class PageData extends ContainerData {
     public boolean isShowMaxWindow() {
         return showMaxWindow;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PageData)) return false;
+        if (!super.equals(o)) return false;
+
+        PageData pageData = (PageData) o;
+
+        return key != null ? key.equals(pageData.key) : pageData.key == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (key != null ? key.hashCode() : 0);
+        return result;
+    }
 }

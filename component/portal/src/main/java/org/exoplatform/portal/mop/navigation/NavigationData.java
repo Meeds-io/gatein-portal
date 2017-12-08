@@ -20,7 +20,9 @@
 package org.exoplatform.portal.mop.navigation;
 
 import java.io.Serializable;
+import java.util.Objects;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.pom.data.MappedAttributes;
 import org.gatein.mop.api.workspace.Navigation;
@@ -72,5 +74,24 @@ public class NavigationData implements Serializable {
         } else {
             return this;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof NavigationData)) return false;
+
+        NavigationData that = (NavigationData) o;
+
+        if (key != null ? !key.equals(that.key) : that.key != null) return false;
+        return StringUtils.equals(rootId,that.rootId);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = key != null ? key.hashCode() : 0;
+        result = 31 * result + (rootId != null ? rootId.hashCode() : 0);
+        return result;
     }
 }

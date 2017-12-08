@@ -37,7 +37,7 @@ class Retrieval<K, V, C> implements Callable<V> {
         //
         if (value != null) {
             // Cache it, it is made available to other threads (unless someone removes it)
-            cache.put(key, value);
+            cache.putOnly(key, value);
 
             // Return value
             return value;

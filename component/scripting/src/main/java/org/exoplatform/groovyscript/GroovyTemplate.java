@@ -18,6 +18,7 @@
  */
 package org.exoplatform.groovyscript;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.services.jcr.impl.Constants;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -196,40 +197,22 @@ public class GroovyTemplate implements Externalizable {
         templateText = new String(bytes, Constants.DEFAULT_ENCODING);
     }
 
-   @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((templateId == null) ? 0 : templateId.hashCode());
-        result = prime * result + ((templateName == null) ? 0 : templateName.hashCode());
-        result = prime * result + ((templateText == null) ? 0 : templateText.hashCode());
-        return result;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GroovyTemplate)) return false;
+
+        GroovyTemplate that = (GroovyTemplate) o;
+
+        return StringUtils.equals(templateId, that.templateId) &&
+                StringUtils.equals(templateName, that.templateName);
+
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        GroovyTemplate other = (GroovyTemplate)obj;
-        if (templateId == null) {
-            if (other.templateId != null)
-                return false;
-        } else if (!templateId.equals(other.templateId))
-            return false;
-        if (templateName == null) {
-            if (other.templateName != null)
-                return false;
-        } else if (!templateName.equals(other.templateName))
-            return false;
-        if (templateText == null) {
-            if (other.templateText != null)
-                return false;
-        } else if (!templateText.equals(other.templateText))
-            return false;
-        return true;
+    public int hashCode() {
+        int result = templateId != null ? templateId.hashCode() : 0;
+        result = 31 * result + (templateName != null ? templateName.hashCode() : 0);
+        return result;
     }
 }

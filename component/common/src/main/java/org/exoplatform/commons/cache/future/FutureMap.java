@@ -63,4 +63,9 @@ public class FutureMap<K extends Serializable, V, C> extends FutureCache<K, V, C
         data.put(key, value);
     }
 
+    @Override
+    protected void putOnly(K key, V value)
+    {
+        put(key, value);
+    }
 }

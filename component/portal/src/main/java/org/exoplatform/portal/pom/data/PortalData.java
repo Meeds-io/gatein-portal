@@ -18,8 +18,11 @@
  */
 package org.exoplatform.portal.pom.data;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -119,5 +122,26 @@ public class PortalData extends ModelData {
 
     public String getLabel() {
         return label;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PortalData)) return false;
+        if (!super.equals(o)) return false;
+
+        PortalData that = (PortalData) o;
+
+        if (key != null ? !key.equals(that.key) : that.key != null) return false;
+        return StringUtils.equals(locale, that.locale);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (key != null ? key.hashCode() : 0);
+        result = 31 * result + (locale != null ? locale.hashCode() : 0);
+        return result;
     }
 }

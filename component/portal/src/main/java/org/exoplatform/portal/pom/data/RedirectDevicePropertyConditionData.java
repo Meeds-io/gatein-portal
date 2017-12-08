@@ -22,6 +22,7 @@
  ******************************************************************************/
 package org.exoplatform.portal.pom.data;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.exoplatform.portal.config.model.DevicePropertyCondition;
@@ -96,5 +97,23 @@ public class RedirectDevicePropertyConditionData extends ComponentData {
         devicePropertyCondition.setStorageName(getStorageName());
 
         return devicePropertyCondition;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RedirectDevicePropertyConditionData)) return false;
+        if (!super.equals(o)) return false;
+        RedirectDevicePropertyConditionData that = (RedirectDevicePropertyConditionData) o;
+        return Objects.equals(propertyName, that.propertyName) &&
+                Objects.equals(lessThan, that.lessThan) &&
+                Objects.equals(greaterThan, that.greaterThan) &&
+                Objects.equals(equals, that.equals) &&
+                Objects.equals(matches, that.matches);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), propertyName, lessThan, greaterThan, equals, matches);
     }
 }

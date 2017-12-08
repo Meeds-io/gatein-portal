@@ -21,6 +21,7 @@ package org.exoplatform.portal.mop;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.StringUtils;
 import org.chromattic.api.annotations.MixinType;
 import org.chromattic.api.annotations.Property;
 import org.exoplatform.commons.utils.Safe;
@@ -116,16 +117,23 @@ public abstract class Described {
             return description;
         }
 
+
         @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (obj instanceof State) {
-                State that = (State) obj;
-                return Safe.equals(name, that.name) && Safe.equals(description, that.description);
-            }
-            return false;
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof State)) return false;
+
+            State state = (State) o;
+
+           return (StringUtils.equals(name, state.name) && StringUtils.equals(description, state.description));
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = name != null ? name.hashCode() : 0;
+            result = 31 * result + (description != null ? description.hashCode() : 0);
+            return result;
         }
 
         @Override

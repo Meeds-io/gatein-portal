@@ -24,6 +24,7 @@ package org.exoplatform.portal.pom.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.exoplatform.portal.config.model.UserAgentConditions;
 
@@ -61,4 +62,18 @@ public class RedirectUserAgentConditionData extends ComponentData {
         return userAgentCondition;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RedirectUserAgentConditionData)) return false;
+        if (!super.equals(o)) return false;
+        RedirectUserAgentConditionData that = (RedirectUserAgentConditionData) o;
+        return Objects.equals(userAgentContains, that.userAgentContains) &&
+                Objects.equals(userAgentDoesNotContain, that.userAgentDoesNotContain);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), userAgentContains, userAgentDoesNotContain);
+    }
 }

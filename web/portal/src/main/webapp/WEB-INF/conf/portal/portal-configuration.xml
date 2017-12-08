@@ -388,7 +388,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="maxEntries"><int>${gatein.cache.mop.maxnodes:5000}</int></field>
             <field name="lifespan"><long>${gatein.cache.mop.expiration:600000}</long></field>
-            <field name="replicated"><boolean>true</boolean></field>
+            <field name="cacheMode"><string>${exo.cache.portal.mop.cacheMode:replication}</string></field>
           </object>
         </object-param>
         <!-- NavigationService configuration -->
@@ -410,7 +410,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="maxEntries"><int>${gatein.cache.navigation.maxnodes:5000}</int></field>
             <field name="lifespan"><long>${gatein.cache.navigation.expiration:600000}</long></field>
-            <field name="replicated"><boolean>true</boolean></field>
+            <field name="cacheMode"><string>${exo.cache.portal.navigation.cacheMode:replication}</string></field>
           </object>
         </object-param>
         <!-- DescriptionService configuration -->
@@ -432,7 +432,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="maxEntries"><int>${gatein.cache.description.maxnodes:5000}</int></field>
             <field name="lifespan"><long>${gatein.cache.description.expiration:600000}</long></field>
-            <field name="replicated"><boolean>true</boolean></field>
+            <field name="cacheMode"><string>${exo.cache.portal.description.cacheMode:replication}</string></field>
           </object>
         </object-param>
         <!-- PageService configuration -->
@@ -454,7 +454,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="maxEntries"><int>${gatein.cache.page.maxnodes:5000}</int></field>
             <field name="lifespan"><long>${gatein.cache.page.expiration:600000}</long></field>
-            <field name="replicated"><boolean>true</boolean></field>
+            <field name="cacheMode"><string>${exo.cache.portal.page.cacheMode:replication}</string></field>
           </object>
         </object-param>
         <!-- TemplateService configuration -->
@@ -476,7 +476,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="maxEntries"><int>${gatein.cache.template.maxnodes:5000}</int></field>
             <field name="lifespan"><long>${gatein.cache.template.expiration:600000}</long></field>
-            <field name="replicated"><boolean>true</boolean></field>
+            <field name="cacheMode"><string>${exo.cache.portal.template.cacheMode:replication}</string></field>
           </object>
         </object-param>
       </init-params>

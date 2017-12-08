@@ -97,7 +97,7 @@ public class PageKey implements Serializable {
 
     @Override
     public int hashCode() {
-        return site.hashCode() ^ name.hashCode();
+        return site.getName().hashCode() ^ name.hashCode();
     }
 
     @Override
@@ -109,7 +109,7 @@ public class PageKey implements Serializable {
         // We need to use class equality here
         if (obj != null && getClass().equals(obj.getClass())) {
             PageKey that = (PageKey) obj;
-            return site.equals(that.site) && name.equals(that.name);
+            return site.getName().equals(that.site.getName()) && name.equals(that.name);
         }
 
         //

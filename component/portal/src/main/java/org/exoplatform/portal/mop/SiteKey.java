@@ -94,7 +94,7 @@ public final class SiteKey implements Serializable {
 
     @Override
     public int hashCode() {
-        return name.hashCode() ^ type.hashCode();
+        return name.hashCode() ^ type.getName().hashCode();
     }
 
     @Override
@@ -106,7 +106,7 @@ public final class SiteKey implements Serializable {
         // We need to use class equality here
         if (obj != null && getClass().equals(obj.getClass())) {
             SiteKey that = (SiteKey) obj;
-            return type.equals(that.type) && name.equals(that.name);
+            return type.getName().equals(that.type.getName()) && name.equals(that.name);
         }
 
         //

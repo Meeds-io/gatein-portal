@@ -100,7 +100,6 @@ public class KernelLifeCycle implements TestRule {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                //
                 bootstrap = new KernelBootstrap(Thread.currentThread().getContextClassLoader());
 
                 // Add configuration if any
