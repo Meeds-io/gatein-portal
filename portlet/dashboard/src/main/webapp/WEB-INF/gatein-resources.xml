@@ -30,7 +30,6 @@
   <portlet-skin>
     <application-name>dashboard</application-name>
     <portlet-name>GadgetPortlet</portlet-name>
-    <skin-name>Default</skin-name>
     <css-path>/skin/gadget/webui/component/UIGadgetPortlet/DefaultStylesheet.css</css-path>
   </portlet-skin>
 
