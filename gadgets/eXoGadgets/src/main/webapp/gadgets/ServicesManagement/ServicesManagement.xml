@@ -45,6 +45,7 @@
     <Locale lang="ar" messages="locale/ar_ALL.xml"/>
     <Locale lang="de" messages="locale/de_ALL.xml"/>
     <Locale lang="pt_BR" messages="locale/pt_BR_ALL.xml"/>
+    <Locale lang="pt_PT" messages="locale/pt_PT_ALL.xml"/>
     <Locale lang="it" messages="locale/it_ALL.xml"/>
     <Locale lang="ru" messages="locale/ru_ALL.xml"/>
     <Locale lang="tr" messages="locale/tr_ALL.xml"/>
