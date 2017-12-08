@@ -33,8 +33,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
+import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.web.AbstractHttpServlet;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.Query;
+import org.exoplatform.services.organization.User;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.web.security.AuthenticationRegistry;
 import org.exoplatform.web.security.security.AbstractTokenService;
@@ -85,6 +92,8 @@ public class LoginServlet extends AbstractHttpServlet {
     public static final String COOKIE_NAME = "rememberme";
 
     public static final String OAUTH_COOKIE_NAME = "oauth_rememberme";
+
+    private static final String IS_CASE_INSENSITIVE = "exo.auth.case.insensitive";
 
     //value of this field need equals with org.gatein.security.oauth.common.OAuthConstants.ATTRIBUTE_REMEMBER_ME
     public static final String SESSION_ATTRIBUTE_REMEMBER_ME = "_rememberme";
@@ -152,8 +161,41 @@ public class LoginServlet extends AbstractHttpServlet {
 
         //
         int status;
+        boolean case_insensitive_bool = true;
+        String case_insensitive_str = PropertyManager.getProperty(IS_CASE_INSENSITIVE);
+        if(case_insensitive_str != null) {
+            case_insensitive_bool = Boolean.valueOf(case_insensitive_str);
+        }
         if (req.getRemoteUser() == null) {
             if (username != null && password != null) {
+                if(case_insensitive_bool) {
+                    try {
+                        OrganizationService organizationService =
+                                (OrganizationService) ExoContainerContext.getCurrentContainer()
+                                        .getComponentInstance(OrganizationService.class);
+                        Query query = new Query();
+                        query.setUserName(username);
+                        ListAccess<User> users = organizationService.getUserHandler().findUsersByQuery(query);
+                        if (users.getSize() >= 1) {
+                            String loadedUsername = "";
+                            User[] listusers = users.load(0, users.getSize());
+                            int found = 0;
+                            for (User user : listusers) {
+                                if (username.equalsIgnoreCase(user.getUserName())) {
+                                    loadedUsername = user.getUserName();
+                                    found ++;
+                                }
+                            }
+                            if(found == 1 && StringUtils.isNotBlank(loadedUsername)) {
+                                username = loadedUsername;
+                            } else {
+                                log.warn("duplicate entry for user " + username);
+                            }
+                        }
+                    } catch (Exception exception) {
+                        log.warn("Error while retrieving user " + username + " from IDM stores ", exception);
+                    }
+                }
                 Credentials credentials = new Credentials(username, password);
                 ServletContainer container = ServletContainerFactory.getServletContainer();
 
