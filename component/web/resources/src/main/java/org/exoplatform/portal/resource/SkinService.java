@@ -273,10 +273,10 @@ public class SkinService extends AbstractResourceService implements Startable {
             }
 
             skinConfig = new SimpleSkin(this, module, skinName, cssPath, priority);
-            if (!module.equals(CUSTOM_MODULE_ID)) {
-                portalSkins_.put(key, skinConfig);
-            } else {
+            if (module.startsWith(CUSTOM_MODULE_ID)) {
                 customPortalSkins_.put(key, skinConfig);
+            } else {
+                portalSkins_.put(key, skinConfig);
             }
             if (log.isDebugEnabled()) {
                 log.debug("Adding Portal skin : Bind " + key + " to " + skinConfig);
