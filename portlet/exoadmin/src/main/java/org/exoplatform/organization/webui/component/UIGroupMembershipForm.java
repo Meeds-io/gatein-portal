@@ -50,7 +50,7 @@ import org.exoplatform.webui.form.UIForm;
 import org.exoplatform.webui.form.UIFormSelectBox;
 import org.exoplatform.webui.form.UIFormStringInput;
 import org.exoplatform.webui.form.validator.MandatoryValidator;
-import org.exoplatform.webui.organization.account.UIUserSelector;
+import org.exoplatform.webui.organization.account.UIUserGroupSelector;
 
 /**
  * Created by The eXo Platform SARL Author : chungnv nguyenchung136@yahoo.com Jun 23, 2006 1:55:22 PM
@@ -143,9 +143,9 @@ public class UIGroupMembershipForm extends UIForm {
         listOption.add(option);
     }
 
-    public static class AddActionListener extends EventListener<UIUserSelector> {
-        public void execute(Event<UIUserSelector> event) throws Exception {
-            UIUserSelector uiForm = event.getSource();
+    public static class AddActionListener extends EventListener<UIUserGroupSelector> {
+        public void execute(Event<UIUserGroupSelector> event) throws Exception {
+            UIUserGroupSelector uiForm = event.getSource();
             UIGroupMembershipForm uiParent = uiForm.getAncestorOfType(UIGroupMembershipForm.class);
             uiParent.setUserName(uiForm.getSelectedUsers());
             UIPopupWindow uiPopup = uiParent.getChild(UIPopupWindow.class);
@@ -155,9 +155,9 @@ public class UIGroupMembershipForm extends UIForm {
         }
     }
 
-    public static class CloseActionListener extends EventListener<UIUserSelector> {
-        public void execute(Event<UIUserSelector> event) throws Exception {
-            UIUserSelector uiForm = event.getSource();
+    public static class CloseActionListener extends EventListener<UIUserGroupSelector> {
+        public void execute(Event<UIUserGroupSelector> event) throws Exception {
+            UIUserGroupSelector uiForm = event.getSource();
             UIGroupMembershipForm uiParent = uiForm.getAncestorOfType(UIGroupMembershipForm.class);
             UIPopupWindow uiPopup = uiParent.getChild(UIPopupWindow.class);
             uiPopup.setUIComponent(null);
@@ -258,15 +258,15 @@ public class UIGroupMembershipForm extends UIForm {
         public void execute(Event<UIGroupMembershipForm> event) throws Exception {
             UIGroupMembershipForm uiGroupForm = event.getSource();
             UIPopupWindow searchUserPopup = uiGroupForm.getChild(UIPopupWindow.class);
-            UIUserSelector userSelector = uiGroupForm.createUIComponent(UIUserSelector.class, null, null);
+            UIUserGroupSelector userSelector = uiGroupForm.createUIComponent(UIUserGroupSelector.class, null, null);
             userSelector.setShowSearchGroup(false);
             String userName = uiGroupForm.getUIStringInput(USER_NAME).getValue();
-            userSelector.getUIStringInput(UIUserSelector.FIELD_KEYWORD).setValue(userName);
+            userSelector.getUIStringInput(UIUserGroupSelector.FIELD_KEYWORD).setValue(userName);
             searchUserPopup.setUIComponent(userSelector);
             searchUserPopup.setShow(true);
 
             // TODO tamnd PORTAL-3010 searching a user in the add member form does not work.
-            String filter = userSelector.getUIFormSelectBox(UIUserSelector.FIELD_FILTER).getValue();
+            String filter = userSelector.getUIFormSelectBox(UIUserGroupSelector.FIELD_FILTER).getValue();
             String groupId = userSelector.getSelectedGroup();
 
             userSelector.search(userName, filter, groupId);

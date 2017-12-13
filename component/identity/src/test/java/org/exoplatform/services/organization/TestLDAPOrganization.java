@@ -14,6 +14,7 @@ import org.exoplatform.services.organization.idm.Config;
 import org.exoplatform.services.organization.idm.PicketLinkIDMCacheService;
 import org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl;
 import org.exoplatform.services.organization.idm.UserDAOImpl;
+import org.exoplatform.services.organization.idm.cache.CacheableUserHandlerImpl;
 
 import java.util.Collection;
 import java.util.Date;
@@ -135,6 +136,9 @@ public class TestLDAPOrganization extends TestOrganization {
     assertNotNull(test2);
     openDSService.cleanUpDN("uid=admin,ou=People,o=test,dc=portal,dc=example,dc=com");
     picketLinkIDMCacheService.invalidateAll();
+    if (organization.getUserHandler() instanceof CacheableUserHandlerImpl) {
+      ((CacheableUserHandlerImpl) organization.getUserHandler()).clearCache();
+    }
     test2 = organization.getUserHandler().findUserByName("admin");
     assertNull(test2);
     end();

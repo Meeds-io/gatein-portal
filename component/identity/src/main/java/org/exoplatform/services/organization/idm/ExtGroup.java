@@ -29,7 +29,9 @@ import org.exoplatform.services.organization.Group;
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
  */
-public class ExtGroup implements Group, Serializable, Comparable {
+public class ExtGroup implements Group, Comparable {
+    private static final long serialVersionUID = -7379104016885124958L;
+
     private String id;
 
     private String parentId;

@@ -24,6 +24,10 @@
 
 
   <component>
+    <type>org.exoplatform.services.organization.cache.OrganizationCacheHandler</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.services.organization.idm.PicketLinkIDMCacheService</key>
     <type>org.exoplatform.services.organization.idm.PicketLinkIDMCacheService</type>
   </component>

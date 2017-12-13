@@ -32,10 +32,6 @@
       </identity-type-mappings>
       <options>
         <option>
-          <name>cache.providerRegistryName</name>
-          <value>apiCacheProvider</value>
-        </option>
-        <option>
           <name>credentialEncoder.class</name>
           <value>org.picketlink.idm.impl.credential.DatabaseReadingSaltEncoder</value>
         </option>
@@ -55,10 +51,6 @@
         <option>
           <name>template</name>
           <value>true</value>
-        </option>
-        <option>
-          <name>cache.providerRegistryName</name>
-          <value>apiCacheProvider</value>
         </option>
         <option>
           <name>credentialEncoder.class</name>
@@ -368,10 +360,6 @@
             <name>customSystemProperties</name>
             <value>com.sun.jndi.ldap.connect.pool.maxsize=300000</value>
             <value>com.sun.jndi.ldap.connect.pool.protocol=plain ssl</value>
-          </option>
-          <option>
-            <name>cache.providerRegistryName</name>
-            <value>storeCacheProvider</value>
           </option>
           <option>
             <name>allowNotCaseSensitiveSearch</name>

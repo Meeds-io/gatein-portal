@@ -54,6 +54,8 @@ public class Config {
 
     private List<String> ignoreMappedMembershipTypeGroupList = new ArrayList<String>();
 
+    private boolean useCache = true;
+
     private boolean useJTA = false;
 
     private boolean sortGroups = true;
@@ -365,5 +367,13 @@ public class Config {
 
     public void setUpdateLastLoginTimeAfterAuthentication(boolean updateLastLoginTimeAfterAuthentication) {
         this.updateLastLoginTimeAfterAuthentication = updateLastLoginTimeAfterAuthentication;
+    }
+
+    public boolean isUseCache() {
+      return useCache;
+    }
+
+    public void setUseCache(boolean useCache) {
+      this.useCache = useCache;
     }
 }

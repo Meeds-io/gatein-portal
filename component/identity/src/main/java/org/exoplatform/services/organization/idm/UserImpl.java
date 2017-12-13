@@ -35,7 +35,9 @@ import java.io.Serializable;
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 @Deprecated
-public class UserImpl extends org.exoplatform.services.organization.impl.UserImpl implements Serializable {
+public class UserImpl extends org.exoplatform.services.organization.impl.UserImpl {
+    private static final long serialVersionUID = -4898913382977839329L;
+
     private String displayName;
 
     public UserImpl() {

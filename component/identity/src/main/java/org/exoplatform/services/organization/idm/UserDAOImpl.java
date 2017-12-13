@@ -133,10 +133,11 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
             preSave(user, true);
         }
 
+        org.picketlink.idm.api.User plIDMUser = null;
         try {
             orgService.flush();
 
-            session.getPersistenceManager().createUser(user.getUserName());
+            plIDMUser = session.getPersistenceManager().createUser(user.getUserName());
         } catch (Exception e) {
             handleException("Identity operation error: ", e);
             throw e;
@@ -147,7 +148,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         }
 
         try {
-            persistUserInfo(user, session, true);
+            persistUserInfo(user, plIDMUser, session, true);
         } catch (Exception e) {
             // Workaround due to issues in Picketlink
             // 1. it has not support transaction for LDAP yet
@@ -180,7 +181,8 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
             preSave(user, false);
         }
 
-        persistUserInfo(user, session, false);
+        org.picketlink.idm.api.User plIDMUser = session.getPersistenceManager().findUser(user.getUserName());
+        persistUserInfo(user, plIDMUser, session, false);
 
         if (broadcast) {
             postSave(user, false);
@@ -664,6 +666,10 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
     }
 
     public void persistUserInfo(User user, IdentitySession session, boolean isNew) throws Exception {
+      persistUserInfo(user, null, session, isNew);
+    }
+
+    public void persistUserInfo(User user, org.picketlink.idm.api.User plIDMUser, IdentitySession session, boolean isNew) throws Exception {
         orgService.flush();
 
         AttributesManager am = session.getAttributesManager();
@@ -710,7 +716,10 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
                 attributes.add(new SimpleAttribute(USER_PASSWORD, user.getPassword()));
             } else {
                 try {
-                    am.updatePassword(session.getPersistenceManager().findUser(user.getUserName()), user.getPassword());
+                    if (plIDMUser == null) {
+                      plIDMUser = session.getPersistenceManager().findUser(user.getUserName());
+                    }
+                    am.updatePassword(plIDMUser, user.getPassword());
                 } catch (Exception e) {
                     handleException("Cannot update password: " + user.getUserName() + "; ", e);
                     throw e;

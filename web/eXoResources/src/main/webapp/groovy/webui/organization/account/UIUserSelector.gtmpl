@@ -5,43 +5,30 @@
  uiform.begin()
  def rcontext = _ctx.getRequestContext();
  boolean isMulti = uicomponent.getMulti();
- def groupLabel = uiform.getLabel(uiform.FIELD_GROUP);
  def searchLabel = uiform.getLabel(uiform.getLabel('searchUser'));
  rcontext.getJavascriptManager().require("SHARED/selectors", "selectors")
-                                .addScripts("selectors.UIUserSelector.init('$uiform.id','$groupLabel','$searchLabel');")
+                                .addScripts("selectors.UIUserSelector.init('$uiform.id','','$searchLabel');")
                                 .require("SHARED/bts_tooltip").require("SHARED/jquery", "\$")
                                 .addScripts("\$('.uiUserSelector *[rel=\"tooltip\"]').tooltip();");
 %>
 <div class="uiUserSelector" id="UIUserSelector">
 	<div class="selectUserContainer resizable">
-			<%if(uicomponent.isShowSearch()){%>
-      <div class="uiSearch clearfix">
-        <% if(uicomponent.isShowSearchGroup()) { %>
-			<span class="pull-left searchByGroup">
-				<span class="inputLarge ">
-				<%uiform.renderField(uiform.FIELD_GROUP)%>
-				<a href="javascript:void(0);" onclick="<%=uicomponent.event('FindGroup')%>" style="display: none;"><span></span></a>
+		<%if(uicomponent.isShowSearch()){%>
+	       <div class="uiSearch clearfix">
+			<% if(uicomponent.isShowSearchUser()) {%>
+				<span class="searchByUser">
+					<span class="inputXLarge">
+						<a id="" class="btnSearchUser" data-placement="left" rel="tooltip" href="javascript:void(0);" onclick="<%=uicomponent.event('Search')%>" data-original-title="Quick Search">
+						  <i class="uiIconSearch uiIconLightGray"><span class="skipHidden"><%=uiform.getLabel(uiform.FIELD_KEYWORD)%></span></i>
+						</a>
+						<%uiform.renderField(uiform.FIELD_KEYWORD)%>
+					</span>
+					<span class="selectboxMedium">
+					</span>
 				</span>
-				<a class="actionIcon" href="javascript:void(0);" onclick="<%=uicomponent.event('SearchGroup')%>" rel="tooltip" data-placement="bottom" title="<%=uiform.getLabel(uiform.FIELD_GROUP)%>">
-					<i class="uiIconSearch uiIconLightGray"><span class="skipHidden"><%=uiform.getLabel(uiform.FIELD_GROUP)%></span></i>
-				</a>
-			</span>
-        <% }  
-		if(uicomponent.isShowSearchUser()) {%>
-			<span class="searchByUser">
-				<span class="inputLarge ">
-					<a id="" class="btnSearchUser" data-placement="left" rel="tooltip" href="javascript:void(0);" onclick="<%=uicomponent.event('Search')%>" data-original-title="Quick Search">
-					  <i class="uiIconSearch uiIconLightGray"><span class="skipHidden"><%=uiform.getLabel(uiform.FIELD_KEYWORD)%></span></i>
-					</a>
-					<%uiform.renderField(uiform.FIELD_KEYWORD)%>
-				</span>
-				<span class="selectboxMedium">
-				<%uiform.renderField(uiform.FIELD_FILTER)%>
-				</span>
-			</span>
-        <% } %>
-      </div>
-			<%}%>
+	        <% } %>
+	       </div>
+		<%}%>
       
 			<table id="UIListUsers" class="uiGrid table table-hover table-striped">
 				<thead>
@@ -126,6 +113,5 @@
 		<%}%>
 	</div>
 	<% } %>
-	<%uicomponent.renderChild(UIPopupWindow.class);%>
 </div>
 <% uiform.end() %>

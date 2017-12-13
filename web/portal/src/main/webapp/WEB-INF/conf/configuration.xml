@@ -35,6 +35,7 @@
 
   <!--PicketLink IDM integration-->
   <import>war:/conf/organization/idm-configuration.xml</import>
+  <import>war:/conf/organization/search-configuration.xml</import>
 
   <!--Former exo implementations-->
   <!--<import>war:/conf/organization/exo/hibernate-configuration.xml</import>-->
