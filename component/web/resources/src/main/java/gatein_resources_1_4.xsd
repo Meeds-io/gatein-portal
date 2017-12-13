@@ -59,7 +59,7 @@
   <!-- Declares a portal skin resource -->
   <xs:complexType name="portal-skin">
     <xs:sequence>
-      <xs:element name="skin-name" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="skin-name" type="xs:string" minOccurs="1" maxOccurs="1"/>
       <xs:element name="skin-module" type="xs:string" minOccurs="0" maxOccurs="1"/>
       <xs:element name="css-path" type="xs:string" minOccurs="1" maxOccurs="1"/>
       <xs:element name="css-priority" type="xs:integer" minOccurs="0" maxOccurs="1"/>
@@ -77,7 +77,7 @@
       <xs:element name="portlet-name" type="xs:string" minOccurs="1" maxOccurs="1"/>
 
       <!-- The name of the skin to load -->
-      <xs:element name="skin-name" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="skin-name" type="xs:string" minOccurs="1" maxOccurs="1"/>
 
       <!-- The css path of the skin relative to the application context -->
       <xs:element name="css-path" type="xs:string" minOccurs="1" maxOccurs="1"/>
