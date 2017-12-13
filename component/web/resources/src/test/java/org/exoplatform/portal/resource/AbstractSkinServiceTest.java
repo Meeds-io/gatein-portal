@@ -117,6 +117,30 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
         assertTrue(skinService.mainResolver.resolvers.contains(resResolver));
     }
 
+    public void testPortalSkin() {
+        String contextPath = mockServletContext.getContextPath();
+
+        SkinConfig portalSkin = skinService.getPortalSkin("CoreSkin", "TestSkin");
+        assertNotNull(portalSkin);
+        assertEquals("CoreSkin", portalSkin.getModule());
+        assertEquals(contextPath + "/skin/core/Stylesheet.css", portalSkin.getCSSPath());
+
+        portalSkin = skinService.getPortalSkin("Module2", "TestSkin");
+        assertNotNull(portalSkin);
+        assertEquals("Module2", portalSkin.getModule());
+        assertEquals(contextPath + "/skin/module2/Stylesheet.css", portalSkin.getCSSPath());
+
+        portalSkin = skinService.getPortalSkin("Module3", "TestSkin");
+        assertNotNull(portalSkin);
+        assertEquals("Module3", portalSkin.getModule());
+        assertEquals(contextPath + "/skin/module3/Stylesheet.css", portalSkin.getCSSPath());
+
+        portalSkin = skinService.getPortalSkin("Module1", "TestSkin");
+        assertNotNull(portalSkin);
+        assertEquals("Module1", portalSkin.getModule());
+        assertEquals(contextPath + "/skin/module1/Stylesheet.css", portalSkin.getCSSPath());
+    }
+
     public void testPortalSkinAndPriority() {
         Collection<SkinConfig> portalSkinConfigs = skinService.getPortalSkins("TestSkin");
         String contextPath = mockServletContext.getContextPath();

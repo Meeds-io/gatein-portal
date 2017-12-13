@@ -612,6 +612,22 @@ public class SkinService extends AbstractResourceService implements Startable {
     }
 
     /**
+     * Return a Portal SkinConfig mapping by the module and skin name
+     *
+     * @param module
+     * @param skinName
+     * 
+     * @return SkinConfig by SkinKey(module, skinName), or SkinConfig by SkinKey(module, SkinService.DEFAULT_SKIN)
+     */
+    public SkinConfig getPortalSkin(String module, String skinName) {
+      SkinConfig portalSkin = getPortalSkin(module, skinName, portalSkins_);
+      if (portalSkin == null) {
+        portalSkin = getPortalSkin(module, skinName, customPortalSkins_);
+      }
+      return portalSkin;
+    }
+
+    /**
      * Remove SkinKey from SkinCache by portalName and skinName
      *
      * @deprecated the method name is wrong to the behaviour it does. Use {@link #removeSkin(String, String)} instead
@@ -903,6 +919,18 @@ public class SkinService extends AbstractResourceService implements Startable {
         }
         matcher.appendTail(tmpBuilder);
         return tmpBuilder.toString();
+    }
+
+    private SkinConfig getPortalSkin(String module, String skinName, Map<SkinKey, SkinConfig> portalSkins) {
+      if(StringUtils.isEmpty(skinName)) {
+        skinName = getDefaultSkin();
+      }
+
+      SkinConfig config = portalSkins.get(new SkinKey(module, skinName));
+      if (config == null) {
+          config = portalSkins.get(new SkinKey(module, getDefaultSkin()));
+      }
+      return config;
     }
 
     /**
