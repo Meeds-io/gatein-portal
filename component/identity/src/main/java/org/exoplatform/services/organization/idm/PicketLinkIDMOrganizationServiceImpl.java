@@ -211,8 +211,9 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
             }
         } else {
             try {
-                if (idmService_.getIdentitySession().getTransaction().isActive()) {
-                    idmService_.getIdentitySession().getTransaction().commit();
+                Transaction transaction = idmService_.getIdentitySession().getTransaction();
+                if (transaction.isActive()) {
+                    transaction.commit();
                 }
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
@@ -226,10 +227,27 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
         try {
             // We need to restart Hibernate transaction if it's available. First rollback old one and then start new one
             Transaction idmTransaction = idmService_.getIdentitySession().getTransaction();
-            if (idmTransaction.isActive()) {
-                idmTransaction.rollback();
-                idmTransaction.start();
-                log.info("IDM error recovery finished. Old transaction has been rolled-back and new transaction has been started");
+            if (idmTransaction != null && idmTransaction.isActive()) {
+                try {
+                  log.info("IDM Transaction rollback");
+                  idmTransaction.rollback();
+                  log.info("IDM Transaction has been rolled-backed");
+                } catch (Exception e1) {
+                  log.warn("Error during IDM Transaction rollback.", e1);
+                }
+                try {
+                  log.info("IDM Transaction restart");
+                  idmTransaction.start();
+                  log.info("IDM Transaction restarted");
+                } catch (Exception e1) {
+                  log.warn("Error during IDM Transaction restart, a new transaction will be started", e1);
+                  idmService_.getIdentitySession().beginTransaction();
+                  log.info("New IDM Transaction started");
+                }
+            } else {
+              log.info("New IDM Transaction start");
+              idmService_.getIdentitySession().beginTransaction();
+              log.info("New IDM Transaction started");
             }
         } catch (Exception e1) {
             log.warn("Error during recovery of old error", e1);
