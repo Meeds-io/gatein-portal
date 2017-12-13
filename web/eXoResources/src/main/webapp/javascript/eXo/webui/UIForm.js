@@ -37,12 +37,12 @@
 	  },
 
 	  getQueryString : function(formElement) {
-	    var form = $(formElement).find('.dateTimeInput');
-	    if (form.length > 0) {
+	    var dateInput = $(formElement).find('.dateTimeInput');
+	    if (dateInput.length > 0) {
 	      var elements = $(formElement).serializeArray();
 	      //append the appropriate time zone to the form element
 	      elements.forEach(function(elem) {
-	        if ($("[name='"+elem.name+"']")[0].className === "dateTimeInput") {
+	        if ($("[name='"+elem.name+"']")[0].className === "dateTimeInput" && elem.value != "") {
 	          var dateString = elem.value;
 	          var timezone = new Date().getTimezoneOffset() / -60;
 	          if (timezone >= 0) {
