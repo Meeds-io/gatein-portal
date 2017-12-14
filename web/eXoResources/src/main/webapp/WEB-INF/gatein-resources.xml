@@ -711,6 +711,9 @@
       <module>jquery</module>
     </depends>
     <depends>
+      <module>uiMaskLayer</module>
+    </depends>
+    <depends>
       <module>portalRequest</module>
     </depends>
     <depends>

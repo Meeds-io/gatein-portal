@@ -17,7 +17,7 @@
  * site: http://www.fsf.org.
  */
 
-(function($, base) {
+(function($, base, uiMaskLayer) {
 	var uiUploadInput = {
 	  listUpload : [],
 	  refreshTime : 1000,
@@ -226,6 +226,7 @@
 	  },
 
 	  deleteUpload : function(id) {
+	    uiMaskLayer.removeMasks($("#MaskLayer")[0]);
 		  var url = uiUploadInput.deleteURL + id;
 		  ajaxAsyncGetRequest(url, false);
 
@@ -249,6 +250,7 @@
 	  },
 
 	  abortUpload : function(id) {
+	    uiMaskLayer.removeMasks($("#MaskLayer")[0]);
 		  uiUploadInput.remove(id);
 		  var url = uiUploadInput.abortURL + id;
 		  ajaxAsyncGetRequest(url, false);
@@ -622,4 +624,4 @@
 	  UIUpload : uiUpload,
 	  UIUploadInput : uiUploadInput
 	};
-})($, base);
+})($, base, uiMaskLayer);
