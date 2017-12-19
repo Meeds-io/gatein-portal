@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.exoplatform.gatein.portal</groupId>
     <artifactId>mobile-integration</artifactId>
-    <version>5.0.x-SNAPSHOT</version>
+    <version>5.1.x-SNAPSHOT</version>
   </parent>
 
   <groupId>org.exoplatform.gatein.portal</groupId>
