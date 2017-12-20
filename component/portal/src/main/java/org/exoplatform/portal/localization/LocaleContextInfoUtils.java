@@ -1,13 +1,16 @@
 package org.exoplatform.portal.localization;
 
 import org.apache.commons.lang.LocaleUtils;
+
+import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.portal.Constants;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.pom.config.POMSessionManager;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.resources.LocaleConfig;
@@ -120,7 +123,7 @@ public class LocaleContextInfoUtils {
   public static  Set<Locale> getSupportedLocales() {
     LocaleConfigService localeConfigService = ExoContainerContext.getCurrentContainer()
             .getComponentInstanceOfType(LocaleConfigService.class);
-    Set<Locale> supportedLocales = new HashSet();
+    Set<Locale> supportedLocales = new HashSet<>();
     if (localeConfigService != null) {
       for (LocaleConfig lc : localeConfigService.getLocalConfigs()) {
         supportedLocales.add(lc.getLocale());
@@ -182,27 +185,15 @@ public class LocaleContextInfoUtils {
   private static Locale getPortalLocale() {
     String lang = "";
     //
-    UserPortalConfigService userPortalConfigService = ExoContainerContext.getCurrentContainer()
-            .getComponentInstanceOfType(UserPortalConfigService.class);
-    POMSessionManager pomSessionManager = ExoContainerContext.getCurrentContainer().
-            getComponentInstanceOfType(POMSessionManager.class);
-    if(userPortalConfigService != null && pomSessionManager != null) {
-      // initialise pomsession
-      if (pomSessionManager.getSession() == null) {
-        pomSessionManager.openSession();
-      }
-      //
-      try {
-        PortalConfig config = userPortalConfigService.getDataStorage().getPortalConfig(userPortalConfigService.getDefaultPortal());
-        if (config != null) {
-          lang = config.getLocale();
-        }
-      } catch (Exception e) {
-        LOG.debug("Can't load default portal config ", e);
-      } finally {
-        if (pomSessionManager.getSession() != null) {
-          pomSessionManager.getSession().close();
-        }
+    ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
+    if (currentContainer instanceof RootContainer) {
+      currentContainer = PortalContainer.getInstance();
+    }
+    UserPortalConfigService userPortalConfigService = currentContainer.getComponentInstanceOfType(UserPortalConfigService.class);
+    if(userPortalConfigService != null) {
+      PortalConfig config = userPortalConfigService.getDefaultPortalConfig();
+      if (config != null) {
+        lang = config.getLocale();
       }
     }
     //  return portal Locale, if not set then return the JVM Locale

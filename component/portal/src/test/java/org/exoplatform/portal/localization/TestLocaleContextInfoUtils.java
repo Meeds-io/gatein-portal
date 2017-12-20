@@ -42,7 +42,6 @@ public class TestLocaleContextInfoUtils {
   OrganizationService organizationService;
   UserProfileHandler userProfileHandler;
   UserPortalConfigService userPortalConfigService;
-  DataStorage dataStorage;
   HttpServletRequest request;
   ExoContainer exoContainer;
 
@@ -54,7 +53,6 @@ public class TestLocaleContextInfoUtils {
     organizationService = mock(OrganizationService.class);
     userProfileHandler = mock(UserProfileHandler.class);
     userPortalConfigService = mock(UserPortalConfigService.class);
-    dataStorage = mock(DataStorage.class);
     request = Mockito.mock(HttpServletRequest.class);
 
     ExoContainerContext.setCurrentContainer(exoContainer);
@@ -64,7 +62,6 @@ public class TestLocaleContextInfoUtils {
     when(exoContainer.getComponentInstanceOfType(eq(OrganizationService.class))).thenReturn(organizationService);
     when(exoContainer.getComponentInstanceOfType(eq(UserPortalConfigService.class))).thenReturn(userPortalConfigService);
     when(organizationService.getUserProfileHandler()).thenReturn(userProfileHandler);
-    when(userPortalConfigService.getDataStorage()).thenReturn(dataStorage);
     when(pomSessionManager.getSession()).thenReturn(null);
   }
 
@@ -77,7 +74,7 @@ public class TestLocaleContextInfoUtils {
     when(request.getRemoteUser()).thenReturn("root");
     
     when(userPortalConfigService.getDefaultPortal()).thenReturn("intranet");
-    when(dataStorage.getPortalConfig(anyString())).thenReturn(null);
+    when(userPortalConfigService.getDefaultPortalConfig()).thenReturn(null);
     when(userProfileHandler.findUserProfileByName(anyString()))
             .thenReturn(getUserProfileInstanceWithGivenLocale(null));
 
@@ -110,8 +107,7 @@ public class TestLocaleContextInfoUtils {
     //
     // return portal locale when it is set AND user locale is null
     //
-    when(dataStorage.getPortalConfig(anyString()))
-            .thenReturn(getPortalConfigInstanceWithGivenLocale(LocaleUtils.toLocale("fr")));
+    when(userPortalConfigService.getDefaultPortalConfig()).thenReturn(getPortalConfigInstanceWithGivenLocale(LocaleUtils.toLocale("fr")));
     when(userProfileHandler.findUserProfileByName(anyString()))
             .thenReturn(getUserProfileInstanceWithGivenLocale(null));
 
@@ -142,7 +138,7 @@ public class TestLocaleContextInfoUtils {
     //
     // return user locale if set
     //
-    when(dataStorage.getPortalConfig(anyString())).thenReturn(null);
+    when(userPortalConfigService.getDefaultPortalConfig()).thenReturn(null);
     when(userProfileHandler.findUserProfileByName(anyString()))
             .thenReturn(getUserProfileInstanceWithGivenLocale(LocaleUtils.toLocale("de")));
 
@@ -172,7 +168,7 @@ public class TestLocaleContextInfoUtils {
     //
     // return JVM locale if Portal locale and user locale are null
     //
-    when(dataStorage.getPortalConfig(anyString())).thenReturn(null);
+    when(userPortalConfigService.getDefaultPortalConfig()).thenReturn(null);
     when(userProfileHandler.findUserProfileByName(anyString()))
             .thenReturn(getUserProfileInstanceWithGivenLocale(null));
     
@@ -202,8 +198,7 @@ public class TestLocaleContextInfoUtils {
     //
     // return portal locale when it is set AND user locale is null
     //
-    when(dataStorage.getPortalConfig(anyString()))
-            .thenReturn(getPortalConfigInstanceWithGivenLocale(LocaleUtils.toLocale("pt_BR")));
+    when(userPortalConfigService.getDefaultPortalConfig()).thenReturn(getPortalConfigInstanceWithGivenLocale(LocaleUtils.toLocale("pt_BR")));
     when(userProfileHandler.findUserProfileByName(anyString()))
             .thenReturn(getUserProfileInstanceWithGivenLocale(null));
 
@@ -237,7 +232,7 @@ public class TestLocaleContextInfoUtils {
     //
     // return user locale if set
     //
-    when(dataStorage.getPortalConfig(anyString())).thenReturn(null);
+    when(userPortalConfigService.getDefaultPortalConfig()).thenReturn(null);
     when(userProfileHandler.findUserProfileByName(anyString()))
             .thenReturn(getUserProfileInstanceWithGivenLocale(LocaleUtils.toLocale("de")));
 
