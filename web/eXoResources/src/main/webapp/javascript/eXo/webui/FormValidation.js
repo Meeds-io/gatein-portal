@@ -63,7 +63,7 @@
   function getInputs(form) {
     var $form = $(form);
     if ($form) {
-      return $(form).find('[data-validation');
+      return $(form).find('[data-validation]');
     }
     return [];
   }
