@@ -85,15 +85,12 @@ public class UIPortletInfo extends UIContainer {
 
     private String getCategorieNames() throws Exception {
         ApplicationRegistryService appRegService = getApplicationComponent(ApplicationRegistryService.class);
-        List<ApplicationCategory> allCategories = appRegService.getApplicationCategories();
         List<String> nameList = new ArrayList<String>();
+        ApplicationType appType = portlet_.isRemote() ? ApplicationType.WSRP_PORTLET : ApplicationType.PORTLET;
 
-        for (ApplicationCategory category : allCategories) {
-            for (Application application : appRegService.getApplications(category)) {
-                if (application.getApplicationName().equals(portlet_.getName())) {
-                    nameList.add(category.getDisplayName(true));
-                }
-            }
+        List<ApplicationCategory> categories = appRegService.getApplicationCategories(portlet_.getName(), appType, null);
+        for (ApplicationCategory category : categories) {
+            nameList.add(category.getDisplayName(true));
         }
         StringBuffer names = new StringBuffer("");
         for (String name : nameList) {

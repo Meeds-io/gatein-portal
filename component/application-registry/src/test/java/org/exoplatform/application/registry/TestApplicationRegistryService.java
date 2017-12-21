@@ -111,6 +111,35 @@ public class TestApplicationRegistryService extends AbstractApplicationRegistryT
         assertNull(returnedCategory1);
     }
 
+    public void testGetAppCategories() {
+        String offline = "Offline";
+        ApplicationCategory offlineCat = createAppCategory(offline, "None");
+        service_.save(offlineCat);
+
+        String online = "Online";
+        ApplicationCategory onlineCat = createAppCategory(online, "None");
+        service_.save(onlineCat);
+
+        String[] officeApps = { "MSOffice", "OpenOffice" };
+        Application msApp = createApplication(officeApps[0], offline);
+        service_.save(offlineCat, msApp);
+
+        Application openApp = createApplication(officeApps[1], offline);
+        service_.save(onlineCat, openApp);
+
+        List<ApplicationCategory> categories = service_.getApplicationCategories("MSOffice",
+                ApplicationType.PORTLET, null);
+        assertFalse(categories.isEmpty());
+
+        categories = service_.getApplicationCategories("MSOffice",
+                ApplicationType.GADGET, null);
+        assertTrue(categories.isEmpty());
+
+        categories = service_.getApplicationCategories(null,
+                ApplicationType.PORTLET, null);
+        assertEquals(2, categories.size());
+    }
+
     public void testAppCategoryGetByAccessUser() throws Exception {
         String officeCategoryName = "Office";
         ApplicationCategory officeCategory = createAppCategory(officeCategoryName, "None");

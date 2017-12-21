@@ -78,14 +78,14 @@ public class UIGadgetInfo extends UIContainer {
 
     public String getCategorieNames() throws Exception {
         ApplicationRegistryService appRegService = getApplicationComponent(ApplicationRegistryService.class);
-        List<ApplicationCategory> allCategories = appRegService.getApplicationCategories();
         List<String> nameList = new ArrayList<String>();
 
-        for (ApplicationCategory category : allCategories) {
-            if (appRegService.getApplication(category.getName(), gadget_.getName()) != null) {
-                nameList.add(category.getDisplayName(true));
-            }
+        List<ApplicationCategory> categories = appRegService.getApplicationCategories(gadget_.getName(),
+                ApplicationType.GADGET, null);
+        for (ApplicationCategory category : categories) {
+            nameList.add(category.getDisplayName(true));
         }
+
         StringBuffer names = new StringBuffer("");
         for (String name : nameList) {
             names.append(name);

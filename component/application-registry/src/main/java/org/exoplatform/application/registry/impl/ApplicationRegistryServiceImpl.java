@@ -145,6 +145,27 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
         return categories;
     }
 
+    public List<ApplicationCategory> getApplicationCategories(String appName, ApplicationType appType,
+                                                              Comparator<ApplicationCategory> sortComparator) {
+        List<ApplicationCategory> categories = new ArrayList<>();
+
+        for (ApplicationCategory category : getApplicationCategories(sortComparator, null, appType)) {
+            if (appName != null) {
+                for (Application application : category.getApplications()) {
+                    if (appName.equals(application.getApplicationName())) {
+                        categories.add(category);
+                        break;
+                    }
+                }
+            } else {
+                categories.add(category);
+            }
+        }
+
+        //
+        return categories;
+    }
+
     public List<ApplicationCategory> getApplicationCategories(String accessUser, ApplicationType<?>... appTypes)
             throws Exception {
         return getApplicationCategories(null, accessUser, appTypes);

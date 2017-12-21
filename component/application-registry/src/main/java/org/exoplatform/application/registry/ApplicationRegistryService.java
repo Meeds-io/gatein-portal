@@ -52,6 +52,16 @@ public interface ApplicationRegistryService {
     List<ApplicationCategory> getApplicationCategories(Comparator<ApplicationCategory> sortComparator) throws Exception;
 
     /**
+     * Return list of all app categories of app determined by name and type
+     *
+     * @param appName - application name
+     * @param appType - type of app: local, remote, gadget
+     * @param sortComparator - Comparator used to sort the returned list
+     */
+    List<ApplicationCategory> getApplicationCategories(String appName, ApplicationType appType,
+                                                       Comparator<ApplicationCategory> sortComparator);
+
+    /**
      * Return ApplicationCategory with name provided <br>
      * if not found, return null
      *
