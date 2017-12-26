@@ -125,4 +125,8 @@ public class ChromatticManager implements ComponentRequestLifecycle {
         boolean save = sync.getSaveOnClose();
         endRequest(save);
     }
+
+    public boolean isStarted(ExoContainer container) {
+        return currentSynchronization.get() == null ? false : true;
+    }
 }

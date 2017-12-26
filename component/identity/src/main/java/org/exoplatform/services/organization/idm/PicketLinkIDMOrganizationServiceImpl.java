@@ -162,6 +162,16 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
                 if (traceLoggingEnabled) {
                     log.trace("Starting UserTransaction in method startRequest");
                 }
+
+                try {
+                    if(jtaTransactionLifecycleService.getUserTransaction().getStatus() != Status.STATUS_NO_TRANSACTION &&
+                            jtaTransactionLifecycleService.getUserTransaction().getStatus() != Status.STATUS_ACTIVE){
+                        //Commit or Rollback JTA transaction according to it's current status
+                        jtaTransactionLifecycleService.finishJTATransaction();
+                    }
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
                 jtaTransactionLifecycleService.beginJTATransaction();
             } else {
 
@@ -225,6 +235,21 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
                 recoverFromIDMError(e);
             }
         }
+    }
+
+    public boolean isStarted(ExoContainer container) {
+        try {
+            if (configuration.isUseJTA()) {
+                return jtaTransactionLifecycleService.getUserTransaction() == null ? false :
+                        jtaTransactionLifecycleService.getUserTransaction().getStatus()== Status.STATUS_ACTIVE;
+            } else {
+                return (idmService_.getIdentitySession() == null || idmService_.getIdentitySession().getTransaction() == null) ? false :
+                        idmService_.getIdentitySession().getTransaction().isActive();
+            }
+        } catch (Exception e) {
+            log.error("Error while checking on Transaction status : ", e);
+        }
+        return false;
     }
 
     // Should be used only for non-JTA environment
