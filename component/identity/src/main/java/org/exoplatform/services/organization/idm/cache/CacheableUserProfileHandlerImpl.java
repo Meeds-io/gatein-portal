@@ -89,7 +89,8 @@ public class CacheableUserProfileHandlerImpl extends UserProfileDAOImpl {
     if (disableCacheInThread.get() == null || !disableCacheInThread.get()) {
       userProfile = (UserProfile) userProfileCache.get(userName);
       userProfile = (userProfile == null || userProfile == NULL_OBJECT
-          || StringUtils.isBlank(userProfile.getUserName())) ? null : userProfile;
+          || StringUtils.isBlank(userProfile.getUserName())
+          || userProfile.getUserInfoMap() == null || userProfile.getUserInfoMap().isEmpty()) ? null : userProfile;
       if (userProfile != null)
         return userProfile;
     }
