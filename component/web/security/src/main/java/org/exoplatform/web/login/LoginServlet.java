@@ -161,41 +161,13 @@ public class LoginServlet extends AbstractHttpServlet {
 
         //
         int status;
-        boolean case_insensitive_bool = true;
-        String case_insensitive_str = PropertyManager.getProperty(IS_CASE_INSENSITIVE);
-        if(case_insensitive_str != null) {
-            case_insensitive_bool = Boolean.valueOf(case_insensitive_str);
+        boolean caseInsensitive = true;
+        String caseInsensitiveString = PropertyManager.getProperty(IS_CASE_INSENSITIVE);
+        if(caseInsensitiveString != null) {
+            caseInsensitive = Boolean.valueOf(caseInsensitiveString);
         }
         if (req.getRemoteUser() == null) {
             if (username != null && password != null) {
-                if(case_insensitive_bool) {
-                    try {
-                        OrganizationService organizationService =
-                                (OrganizationService) ExoContainerContext.getCurrentContainer()
-                                        .getComponentInstance(OrganizationService.class);
-                        Query query = new Query();
-                        query.setUserName(username);
-                        ListAccess<User> users = organizationService.getUserHandler().findUsersByQuery(query);
-                        if (users.getSize() >= 1) {
-                            String loadedUsername = "";
-                            User[] listusers = users.load(0, users.getSize());
-                            int found = 0;
-                            for (User user : listusers) {
-                                if (username.equalsIgnoreCase(user.getUserName())) {
-                                    loadedUsername = user.getUserName();
-                                    found ++;
-                                }
-                            }
-                            if(found == 1 && StringUtils.isNotBlank(loadedUsername)) {
-                                username = loadedUsername;
-                            } else {
-                                log.warn("duplicate entry for user " + username);
-                            }
-                        }
-                    } catch (Exception exception) {
-                        log.warn("Error while retrieving user " + username + " from IDM stores ", exception);
-                    }
-                }
                 Credentials credentials = new Credentials(username, password);
                 ServletContainer container = ServletContainerFactory.getServletContainer();
 
@@ -203,9 +175,18 @@ public class LoginServlet extends AbstractHttpServlet {
                 try {
                     container.login(req, resp, credentials);
                 } catch (AuthenticationException e) {
-                    log.debug("User authentication failed");
-                    if (log.isTraceEnabled()) {
-                        log.trace(e.getMessage(), e);
+                    if (caseInsensitive) {
+                        username = getUserNameCaseInsensitive(username);
+                        if (username != null) {
+                          try {
+                            credentials = new Credentials(username, password);
+                            container.login(req, resp, credentials);
+                          } catch (AuthenticationException e1) {
+                            log.trace("User " + username + " authentication failed", e1);
+                          }
+                        }
+                    } else {
+                      log.trace("User " + username + " authentication failed", e);
                     }
                 }
 
@@ -346,5 +327,44 @@ public class LoginServlet extends AbstractHttpServlet {
             log.trace("Binding credentials to temporary authentication registry for user " + credentials.getUsername());
         }
         authRegistry.setCredentials(req, credentials);
+    }
+
+    /**
+     * Get username from database case insensitive
+     * 
+     * @param username
+     * @return
+     */
+    private String getUserNameCaseInsensitive(String username) {
+      try {
+          OrganizationService organizationService =
+                  (OrganizationService) ExoContainerContext.getCurrentContainer()
+                          .getComponentInstance(OrganizationService.class);
+          Query query = new Query();
+          query.setUserName(username);
+          ListAccess<User> users = organizationService.getUserHandler().findUsersByQuery(query);
+          if (users.getSize() >= 1) {
+              String loadedUsername = "";
+              User[] listusers = users.load(0, users.getSize());
+              int found = 0;
+              for (User user : listusers) {
+                  if (username.equalsIgnoreCase(user.getUserName())) {
+                      loadedUsername = user.getUserName();
+                      found ++;
+                  }
+              }
+              if(found == 1 && StringUtils.isNotBlank(loadedUsername)) {
+                  if (StringUtils.equals(username, loadedUsername)) {
+                    return null;
+                  }
+                  username = loadedUsername;
+              } else {
+                  log.warn("duplicate entry for user " + username);
+              }
+          }
+      } catch (Exception exception) {
+          log.warn("Error while retrieving user " + username + " from IDM stores ", exception);
+      }
+      return username;
     }
 }
