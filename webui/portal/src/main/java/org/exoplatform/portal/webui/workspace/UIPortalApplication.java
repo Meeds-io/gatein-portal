@@ -269,10 +269,6 @@ public class UIPortalApplication extends UIApplication {
         setOrientation(localeConfig.getOrientation());
 
         // -------------------------------------------------------------------------------
-
-        skinService = getApplicationComponent(SkinService.class);
-        skin_ = skinService.getDefaultSkin();
-
         context.setUIApplication(this);
 
         this.all_UIPortals = new HashMap<SiteKey, UIPortal>(5);
@@ -600,11 +596,6 @@ public class UIPortalApplication extends UIApplication {
         this.skin_ = skin;
     }
 
-    private SkinConfig getSkin(String module, String skin) {
-        SkinService skinService = getApplicationComponent(SkinService.class);
-        return skinService.getSkin(module, skin);
-    }
-
     /**
      * Returns a set of portlets skin that have to be added in the HTML head tag.
      *Those portlets doesn't belongs to portal
@@ -633,9 +624,6 @@ public class UIPortalApplication extends UIApplication {
         //
         for (UIPortlet uiPortlet : uiportlets) {
             SkinConfig skinConfig = getPortletSkinConfig(uiPortlet);
-            if (skinConfig == null) {
-                skinConfig = getDefaultPortletSkinConfig(uiPortlet);
-            }
             if (skinConfig != null && !portalPortletSkins.contains(skinConfig)) {
                 portletSkins.add(skinConfig);
             }
@@ -665,19 +653,11 @@ public class UIPortalApplication extends UIApplication {
         return (new HashSet<Skin>(portletSkins));
     }
 
-    private SkinConfig getDefaultPortletSkinConfig(UIPortlet portlet) {
-        String portletId = portlet.getSkinId();
-        if (portletId != null) {
-            return getSkin(portletId, skinService.getDefaultSkin());
-        } else {
-            return null;
-        }
-    }
-
     private SkinConfig getPortletSkinConfig(UIPortlet portlet) {
         String portletId = portlet.getSkinId();
         if (portletId != null) {
-            return getSkin(portletId, skin_);
+            SkinService skinService = getApplicationComponent(SkinService.class);
+            return skinService.getSkin(portletId, skin_);
         } else {
             return null;
         }
@@ -995,8 +975,12 @@ public class UIPortalApplication extends UIApplication {
             skin_ = portalSkin;
         } else {
             String userPortalConfigSkin = context.getUserPortalConfig().getPortalConfig().getSkin();
-            if (userPortalConfigSkin != null && userPortalConfigSkin.trim().length() > 0)
+            if (userPortalConfigSkin != null && userPortalConfigSkin.trim().length() > 0) {
                 skin_ = userPortalConfigSkin;
+            } else {
+                SkinService skinService = getApplicationComponent(SkinService.class);
+                skin_ = skinService.getDefaultSkin();
+            }
         }
     }
 
