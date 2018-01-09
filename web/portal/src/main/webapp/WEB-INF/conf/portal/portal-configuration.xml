@@ -457,6 +457,28 @@
             <field name="cacheMode"><string>${exo.cache.portal.page.cacheMode:replication}</string></field>
           </object>
         </object-param>
+        <!-- DataStorage portal config configuration -->
+        <object-param>
+          <name>cache.config.PortalConfig</name>
+          <description>The JBoss Cache configuration for the DataStorage portal config</description>
+          <object type="org.exoplatform.services.cache.ExoCacheConfig">
+            <field name="name"><string>portal.PortalConfig</string></field>
+            <field name="maxSize"><int>${gatein.cache.portalconfig.maxsize:5000}</int></field>
+            <field name="liveTime"><long>${gatein.cache.portalconfig.livetime:86400}</long></field>
+            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
+          </object>
+        </object-param>
+        <object-param profiles="cluster">
+          <name>cache.config.PortalConfig</name>
+          <description>The JBoss Cache configuration for the DataStorage portal config</description>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>portal.PortalConfig</string></field>
+            <field name="strategy"><string>LIRS</string></field>
+            <field name="maxEntries"><int>${gatein.cache.portalconfig.maxnodes:5000}</int></field>
+            <field name="lifespan"><long>${gatein.cache.portalconfig.expiration:86400000}</long></field>
+            <field name="cacheMode"><string>${exo.cache.portal.portalconfig.cacheMode:replication}</string></field>
+          </object>
+        </object-param>
         <!-- TemplateService configuration -->
         <object-param>
           <name>cache.config.TemplateService</name>
