@@ -19,21 +19,13 @@
 
 package org.exoplatform.services.organization.idm;
 
-import java.io.Serializable;
-
 import org.exoplatform.services.organization.Membership;
 
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
  */
-public class MembershipImpl implements Membership, Comparable {
+public class MembershipImpl extends org.exoplatform.services.organization.impl.MembershipImpl implements Comparable {
     private static final long serialVersionUID = -8572523969777642576L;
-
-    private String membershipType = "member";
-
-    private String userName = null;
-
-    private String groupId = null;
 
     public MembershipImpl() {
     }
@@ -43,56 +35,32 @@ public class MembershipImpl implements Membership, Comparable {
 
         // Id can be pure "//" in some cases
         if (fields[0] != null) {
-            membershipType = fields[0];
+            setMembershipType(fields[0]);
         }
         if (fields[1] != null) {
-            userName = fields[1];
+            setUserName(fields[1]);
         }
         if (fields[2] != null) {
-            groupId = fields[2];
+            setGroupId(fields[2]);
         }
     }
 
     public String getId() {
         StringBuffer id = new StringBuffer();
 
-        if (membershipType != null) {
-            id.append(membershipType);
+        if (getMembershipType() != null) {
+            id.append(getMembershipType());
         }
         id.append(":");
-        if (userName != null) {
-            id.append(userName);
+        if (getUserName() != null) {
+            id.append(getUserName());
         }
         id.append(":");
-        if (groupId != null) {
-            id.append(groupId);
+        if (getGroupId() != null) {
+            id.append(getGroupId());
         }
 
         return id.toString();
-    }
-
-    public String getMembershipType() {
-        return membershipType;
-    }
-
-    public void setMembershipType(String membershipType) {
-        this.membershipType = membershipType;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
     }
 
     @Override
@@ -106,13 +74,13 @@ public class MembershipImpl implements Membership, Comparable {
 
         MembershipImpl that = (MembershipImpl) o;
 
-        if (groupId != null ? !groupId.equals(that.groupId) : that.groupId != null) {
+        if (getGroupId() != null ? !getGroupId().equals(that.getGroupId()) : that.getGroupId() != null) {
             return false;
         }
-        if (membershipType != null ? !membershipType.equals(that.membershipType) : that.membershipType != null) {
+        if (getMembershipType() != null ? !getMembershipType().equals(that.getMembershipType()) : that.getMembershipType() != null) {
             return false;
         }
-        if (userName != null ? !userName.equals(that.userName) : that.userName != null) {
+        if (getUserName() != null ? !getUserName().equals(that.getUserName()) : that.getUserName() != null) {
             return false;
         }
 
@@ -121,25 +89,25 @@ public class MembershipImpl implements Membership, Comparable {
 
     @Override
     public int hashCode() {
-        int result = membershipType != null ? membershipType.hashCode() : 0;
-        result = 31 * result + (userName != null ? userName.hashCode() : 0);
-        result = 31 * result + (groupId != null ? groupId.hashCode() : 0);
+        int result = getMembershipType() != null ? getMembershipType().hashCode() : 0;
+        result = 31 * result + (getUserName() != null ? getUserName().hashCode() : 0);
+        result = 31 * result + (getGroupId() != null ? getGroupId().hashCode() : 0);
         return result;
     }
 
     public int compareTo(Object o) {
-        if (!(o instanceof Membership) || userName == null) {
+        if (!(o instanceof Membership) || getUserName() == null) {
             return 0;
         }
 
         Membership m = (Membership) o;
 
-        return userName.compareTo(m.getUserName());
+        return getUserName().compareTo(m.getUserName());
     }
 
     @Override
     public String toString() {
-        return "MembershipImpl{" + "membershipType='" + membershipType + '\'' + ", userName='" + userName + '\''
-                + ", groupId='" + groupId + '\'' + '}';
+        return "MembershipImpl{" + "MembershipType='" + getMembershipType() + '\'' + ", userName='" + getUserName() + '\''
+                + ", GroupId ='" + getGroupId() + '\'' + '}';
     }
 }

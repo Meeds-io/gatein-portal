@@ -16,16 +16,15 @@
  */
 package org.exoplatform.services.organization.idm.cache;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
 
 import org.exoplatform.services.cache.CachedObjectSelector;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.cache.ObjectCacheInfo;
+import org.exoplatform.services.organization.ExtendedCloneable;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.cache.MembershipCacheKey;
@@ -92,7 +91,7 @@ public class CacheableGroupHandlerImpl extends GroupDAOImpl {
         cacheGroup(group);
       }
     }
-    return group == null ? null : (Group) SerializationUtils.clone((Serializable) group);
+    return group == null ? null : (Group) ((ExtendedCloneable) group).clone();
   }
 
   /**
@@ -226,7 +225,7 @@ public class CacheableGroupHandlerImpl extends GroupDAOImpl {
         ((GroupImpl) group).setId(groupId);
       }
     }
-    groupCache.put(groupId, (Group) SerializationUtils.clone((Serializable) group));
+    groupCache.put(groupId, (Group) ((ExtendedCloneable) group).clone());
   }
 
   private static final String computeChildrenKey(Group parent) {

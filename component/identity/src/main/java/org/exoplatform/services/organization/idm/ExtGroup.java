@@ -22,76 +22,25 @@
 
 package org.exoplatform.services.organization.idm;
 
-import java.io.Serializable;
-
 import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.impl.GroupImpl;
 
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
  */
-public class ExtGroup implements Group, Comparable {
+public class ExtGroup extends GroupImpl implements Comparable {
     private static final long serialVersionUID = -7379104016885124958L;
-
-    private String id;
-
-    private String parentId;
-
-    private String groupName;
-
-    private String label;
-
-    private String desc;
 
     public ExtGroup() {
 
     }
 
     public ExtGroup(String name) {
-        groupName = name;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(String parentId) {
-        this.parentId = parentId;
-    }
-
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String name) {
-        this.groupName = name;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String s) {
-        label = s;
-    }
-
-    public String getDescription() {
-        return desc;
-    }
-
-    public void setDescription(String s) {
-        desc = s;
+        super(name);
     }
 
     public String toString() {
-        return "Group[" + id + "|" + groupName + "]";
+        return "Group[" + getId() + "|" + getGroupName() + "]";
     }
 
     @Override
@@ -105,19 +54,19 @@ public class ExtGroup implements Group, Comparable {
 
         ExtGroup extGroup = (ExtGroup) o;
 
-        if (desc != null ? !desc.equals(extGroup.desc) : extGroup.desc != null) {
+        if (getDescription() != null ? !getDescription().equals(extGroup.getDescription()) : extGroup.getDescription() != null) {
             return false;
         }
-        if (groupName != null ? !groupName.equals(extGroup.groupName) : extGroup.groupName != null) {
+        if (getGroupName() != null ? !getGroupName().equals(extGroup.getGroupName()) : extGroup.getGroupName() != null) {
             return false;
         }
-        if (id != null ? !id.equals(extGroup.id) : extGroup.id != null) {
+        if (getId() != null ? !getId().equals(extGroup.getId()) : extGroup.getId() != null) {
             return false;
         }
-        if (label != null ? !label.equals(extGroup.label) : extGroup.label != null) {
+        if (getLabel() != null ? !getLabel().equals(extGroup.getLabel()) : extGroup.getLabel() != null) {
             return false;
         }
-        if (parentId != null ? !parentId.equals(extGroup.parentId) : extGroup.parentId != null) {
+        if (getParentId() != null ? !getParentId().equals(extGroup.getParentId()) : extGroup.getParentId() != null) {
             return false;
         }
 
@@ -126,11 +75,11 @@ public class ExtGroup implements Group, Comparable {
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
-        result = 31 * result + (groupName != null ? groupName.hashCode() : 0);
-        result = 31 * result + (label != null ? label.hashCode() : 0);
-        result = 31 * result + (desc != null ? desc.hashCode() : 0);
+        int result = getId() != null ? getId().hashCode() : 0;
+        result = 31 * result + (getParentId() != null ? getParentId().hashCode() : 0);
+        result = 31 * result + (getGroupName() != null ? getGroupName().hashCode() : 0);
+        result = 31 * result + (getLabel() != null ? getLabel().hashCode() : 0);
+        result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
         return result;
     }
 
@@ -141,7 +90,7 @@ public class ExtGroup implements Group, Comparable {
 
         Group group = (Group) o;
 
-        return groupName.compareTo(group.getGroupName());
+        return getGroupName().compareTo(group.getGroupName());
 
     }
 }

@@ -16,12 +16,10 @@
  */
 package org.exoplatform.services.organization.idm.cache;
 
-import java.io.Serializable;
 import java.util.Collection;
 
-import org.apache.commons.lang.SerializationUtils;
-
 import org.exoplatform.services.cache.ExoCache;
+import org.exoplatform.services.organization.ExtendedCloneable;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.MembershipType;
@@ -75,7 +73,7 @@ public class CacheableMembershipHandlerImpl extends MembershipDAOImpl {
         cacheMembership(membership);
       }
     }
-    return membership == null ? null : (Membership) SerializationUtils.clone((Serializable) membership);
+    return membership == null ? null : (Membership) ((ExtendedCloneable) membership).clone();
   }
 
   /**
@@ -95,7 +93,7 @@ public class CacheableMembershipHandlerImpl extends MembershipDAOImpl {
       }
     }
 
-    return membership == null ? null : (Membership) SerializationUtils.clone((Serializable) membership);
+    return membership == null ? null : (Membership) ((ExtendedCloneable) membership).clone();
   }
 
   /**
@@ -215,7 +213,7 @@ public class CacheableMembershipHandlerImpl extends MembershipDAOImpl {
   }
 
   private void cacheMembership(Membership membership) {
-    membership = (Membership) SerializationUtils.clone((Serializable) membership);
+    membership = (Membership) ((ExtendedCloneable) membership).clone();
     membershipCache.put(new MembershipCacheKey(membership), membership);
   }
 }

@@ -16,12 +16,10 @@
  */
 package org.exoplatform.services.organization.idm.cache;
 
-import java.io.Serializable;
 import java.util.List;
 
-import org.apache.commons.lang.SerializationUtils;
-
 import org.exoplatform.services.cache.ExoCache;
+import org.exoplatform.services.organization.ExtendedCloneable;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserProfile;
@@ -136,7 +134,7 @@ public class CacheableUserHandlerImpl extends UserDAOImpl {
       }
     }
 
-    return user == null ? null : (status.matches(user.isEnabled()) ? (User) SerializationUtils.clone((Serializable) user) : null);
+    return user == null ? null : (status.matches(user.isEnabled()) ? (User) ((ExtendedCloneable) user).clone() : null);
   }
 
   public void clearCache() {
@@ -144,7 +142,7 @@ public class CacheableUserHandlerImpl extends UserDAOImpl {
   }
 
   private void cacheUser(User user) {
-    user = (User) SerializationUtils.clone((Serializable) user);
+    user = (User) ((ExtendedCloneable) user).clone();
     userCache.put(user.getUserName(), user);
   }
 
