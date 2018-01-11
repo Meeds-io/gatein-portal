@@ -59,11 +59,7 @@ public class CacheableUserProfileHandlerImpl extends UserProfileDAOImpl {
   public UserProfile findUserProfileByName(String userName) throws Exception {
     UserProfile userProfile = null;
     if (disableCacheInThread.get() == null || !disableCacheInThread.get()) {
-      userProfile = (UserProfile) userProfileCache.get(userName);
-      if (userProfile == null) {
-        userProfile = NULL_OBJECT;
-        userProfileCache.put(userName, userProfile);
-      }
+      userProfile = userProfileCache.get(userName);
     }
 
     if (userProfile == null) {

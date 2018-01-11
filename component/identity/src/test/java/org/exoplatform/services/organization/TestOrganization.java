@@ -38,6 +38,8 @@ import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.organization.idm.Config;
 import org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl;
 import org.exoplatform.services.organization.idm.UpdateLoginTimeListener;
+import org.exoplatform.services.organization.idm.cache.CacheableUserProfileHandlerImpl;
+import org.exoplatform.services.organization.impl.UserProfileImpl;
 import org.exoplatform.services.security.ConversationRegistry;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
@@ -301,6 +303,38 @@ public class TestOrganization extends AbstractKernelTest {
         MembershipType membershipType = mtHandler_.findMembershipType(mt.getName());
         assertNotNull("Membership type " + testType + " must be exist", membershipType);
         assertEquals("Expect mebershiptype is:", testType, mtHandler_.findMembershipType(testType).getName());
+    }
+
+    public void testFindUserProfile() throws Exception {
+        // Given
+        UserProfileHandler userProfileHandler = organizationService.getUserProfileHandler();
+        UserProfile userProfile = new UserProfileImpl(USER_1);
+        userProfile.setAttribute("user.employer", "eXo");
+        userProfileHandler.saveUserProfile(userProfile, false);
+        if (userProfileHandler instanceof CacheableUserProfileHandlerImpl) {
+            ((CacheableUserProfileHandlerImpl) userProfileHandler).clearCache();
+        }
+
+        // When
+        UserProfile fetchedUserProfile = userProfileHandler.findUserProfileByName(USER_1);
+
+        // Then
+        assertNotNull(fetchedUserProfile);
+        assertEquals(USER_1, fetchedUserProfile.getUserName());
+    }
+
+    public void testNotFindUserProfile() throws Exception {
+        // Given
+        UserProfileHandler userProfileHandler = organizationService.getUserProfileHandler();
+        if (userProfileHandler instanceof CacheableUserProfileHandlerImpl) {
+            ((CacheableUserProfileHandlerImpl) userProfileHandler).clearCache();
+        }
+
+        // When
+        UserProfile userProfile = userProfileHandler.findUserProfileByName("not_existing_user");
+
+        // Then
+        assertNull(userProfile);
     }
 
     protected void createGroup(String parent, String name) {
