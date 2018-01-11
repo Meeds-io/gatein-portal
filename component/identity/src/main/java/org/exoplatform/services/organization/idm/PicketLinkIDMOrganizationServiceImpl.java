@@ -60,6 +60,8 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
 
     private JTAUserTransactionLifecycleService jtaTransactionLifecycleService;
 
+    private  OrganizationCacheHandler organizationCacheHandler;
+
     private static final Logger log = LoggerFactory.getLogger(PicketLinkIDMOrganizationServiceImpl.class);
     private static final boolean traceLoggingEnabled = log.isTraceEnabled();
 
@@ -70,6 +72,7 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
                                                   JTAUserTransactionLifecycleService jtaTransactionLifecycleService, OrganizationCacheHandler organizationCacheHandler) throws Exception {
       this.idmService_ = (PicketLinkIDMServiceImpl) idmService;
       this.jtaTransactionLifecycleService = jtaTransactionLifecycleService;
+      this.organizationCacheHandler = organizationCacheHandler;
 
       if (params != null) {
         // Options
@@ -286,6 +289,26 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
 
     public Config getConfiguration() {
         return configuration;
+    }
+
+    public void clearCaches(){
+        if(organizationCacheHandler != null && (this.configuration == null || this.configuration.isUseCache())) {
+            if(groupDAO_ != null && groupDAO_ instanceof CacheableGroupHandlerImpl){
+                ((CacheableGroupHandlerImpl) groupDAO_).clearCache();
+            }
+            if(userDAO_ != null && userDAO_ instanceof CacheableGroupHandlerImpl){
+                ((CacheableGroupHandlerImpl) userDAO_).clearCache();
+            }
+            if(userProfileDAO_ != null && userProfileDAO_ instanceof CacheableGroupHandlerImpl){
+                ((CacheableGroupHandlerImpl) userProfileDAO_).clearCache();
+            }
+            if(membershipDAO_ != null && membershipDAO_ instanceof CacheableGroupHandlerImpl){
+                ((CacheableGroupHandlerImpl) membershipDAO_).clearCache();
+            }
+            if(membershipTypeDAO_ != null && membershipTypeDAO_ instanceof CacheableGroupHandlerImpl){
+                ((CacheableGroupHandlerImpl) membershipTypeDAO_).clearCache();
+            }
+        }
     }
 
     public void setConfiguration(Config configuration) {

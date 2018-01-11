@@ -106,11 +106,14 @@ public class DisabledUserMigrationScript {
     }
 
     public void setEnabled(String userName, boolean enabled) throws Exception {
-        Attribute[] attrs = new Attribute[] { new SimpleAttribute(UserDAOImpl.USER_ENABLED, String.valueOf(enabled)) };
-
         IdentitySession session = getIdentitySession();
         AttributesManager am = session.getAttributesManager();
-        am.updateAttributes(userName, attrs);
+        if (enabled){
+            am.removeAttributes(userName, new String[]{UserDAOImpl.USER_ENABLED});
+        } else {
+            Attribute[] attrs = new Attribute[] { new SimpleAttribute(UserDAOImpl.USER_ENABLED, String.valueOf(enabled)) };
+            am.updateAttributes(userName, attrs);
+        }
     }
 
     public void startTransaction() throws Exception {

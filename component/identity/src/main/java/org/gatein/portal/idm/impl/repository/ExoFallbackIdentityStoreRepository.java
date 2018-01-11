@@ -393,7 +393,7 @@ public class ExoFallbackIdentityStoreRepository extends FallbackIdentityStoreRep
                 Iterator<Map.Entry<String,String[]>> it= attrs.entrySet().iterator();
                 while (it.hasNext()){
                     Map.Entry<String,String[]> entry = it.next();
-                    if(UserDAOImpl.USER_ENABLED.equals(entry.getKey()) && entry.getValue().length==1 && "true".equals(entry.getValue()[0])) {
+                    if(UserDAOImpl.USER_ENABLED.equals(entry.getKey()) && entry.getValue().length==0) {
                         it.remove();
                     }
                 }

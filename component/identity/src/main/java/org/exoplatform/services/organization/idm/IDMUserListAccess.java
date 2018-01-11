@@ -209,7 +209,7 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
             while (iterator.hasNext() && result.size() < length) {
               org.picketlink.idm.api.User user = iterator.next();
                 Attribute attr = getIDMService().getIdentitySession().getAttributesManager().getAttribute(user.getKey(), UserDAOImpl.USER_ENABLED);
-                if ((userStatus == UserStatus.ENABLED && (attr == null || attr.getValue().toString().equals("true"))) || (userStatus == UserStatus.DISABLED && attr != null && attr.getValue().toString().equals("false"))) {
+                if ((userStatus == UserStatus.ENABLED && attr == null) || (userStatus == UserStatus.DISABLED && attr != null && attr.getValue().toString().equals("false"))) {
                     // Check if we have to get a subset of real fullResults or from results returned by a query
                     if(this.fullResults == fullResults) {
                       if (offset >= index) {
