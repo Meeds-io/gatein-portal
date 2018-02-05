@@ -18,6 +18,8 @@ package org.exoplatform.services.organization.idm.cache;
 
 import java.util.Collection;
 
+import org.exoplatform.commons.cache.future.FutureExoCache;
+import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.organization.ExtendedCloneable;
 import org.exoplatform.services.organization.Group;
@@ -34,6 +36,8 @@ import org.exoplatform.services.organization.idm.PicketLinkIDMService;
 public class CacheableMembershipHandlerImpl extends MembershipDAOImpl {
 
   private final ExoCache<MembershipCacheKey, Object> membershipCache;
+
+  private final FutureExoCache<MembershipCacheKey, Object, MembershipCacheOperationType> futureMembershipCache;
 
   /**
    * Used to avoid this problem 
@@ -55,6 +59,24 @@ public class CacheableMembershipHandlerImpl extends MembershipDAOImpl {
                                         boolean useCacheList) {
     super(orgService, service);
     this.membershipCache = organizationCacheHandler.getMembershipCache();
+    futureMembershipCache = new FutureExoCache<>(new Loader<MembershipCacheKey, Object, MembershipCacheOperationType>() {
+      @Override
+      public Object retrieve(MembershipCacheOperationType context, MembershipCacheKey key) throws Exception {
+        disableCacheInThread.set(true);
+        try {
+          switch (context) {
+          case MEMBERSHIP_BY_ID:
+            return findMembershipByUserGroupAndType(key.getUserName(), key.getGroupId(), key.getType());
+          case MEMBERSHIPS_FOR_USER:
+            return findMembershipsByUser(key.getUserName());
+          default:
+            throw new IllegalArgumentException("context value " + context + " is not recognized");
+          }
+        } finally {
+          disableCacheInThread.set(false);
+        }
+      }
+    }, membershipCache);
     this.useCacheList = useCacheList;
   }
 
@@ -62,51 +84,32 @@ public class CacheableMembershipHandlerImpl extends MembershipDAOImpl {
    * {@inheritDoc}
    */
   public Membership findMembership(String id) throws Exception {
-    Membership membership = null;
     if (disableCacheInThread.get() == null || !disableCacheInThread.get()) {
-      membership = (Membership) membershipCache.get(new MembershipCacheKey(new MembershipImpl(id)));
+      Membership membership = (Membership) futureMembershipCache.get(MembershipCacheOperationType.MEMBERSHIP_BY_ID, new MembershipCacheKey(new MembershipImpl(id)));
+      return membership == null ? null : (Membership) ((ExtendedCloneable) membership).clone();
+    } else {
+      return super.findMembership(id);
     }
-    if (membership == null) {
-      membership = super.findMembership(id);
-
-      if (membership != null) {
-        cacheMembership(membership);
-      }
-    }
-    return membership == null ? null : (Membership) ((ExtendedCloneable) membership).clone();
   }
 
   /**
    * {@inheritDoc}
    */
   public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type) throws Exception {
-    Membership membership = null;
     if (disableCacheInThread.get() == null || !disableCacheInThread.get()) {
-      membership = (Membership) membershipCache.get(new MembershipCacheKey(userName, groupId, type));
+      Membership membership = (Membership) futureMembershipCache.get(MembershipCacheOperationType.MEMBERSHIP_BY_ID, new MembershipCacheKey(userName, groupId, type));
+      return membership == null ? null : (Membership) ((ExtendedCloneable) membership).clone();
+    } else {
+      return super.findMembershipByUserGroupAndType(userName, groupId, type);
     }
-
-    if (membership == null) {
-      membership = super.findMembershipByUserGroupAndType(userName, groupId, type);
-
-      if (membership != null) {
-        cacheMembership(membership);
-      }
-    }
-
-    return membership == null ? null : (Membership) ((ExtendedCloneable) membership).clone();
   }
 
   /**
    * {@inheritDoc}
    */
-  public Collection<Membership> findMembershipsByGroup(Group group) throws Exception {
-    @SuppressWarnings("unchecked")
-    Collection<Membership> memberships = super.findMembershipsByGroup(group);
-    for (Membership membership : memberships) {
-      cacheMembership(membership);
-    }
-
-    return memberships;
+  @SuppressWarnings("rawtypes")
+  public Collection findMembershipsByGroup(Group group) throws Exception {
+    return super.findMembershipsByGroup(group);
   }
 
   /**
@@ -114,33 +117,20 @@ public class CacheableMembershipHandlerImpl extends MembershipDAOImpl {
    */
   @SuppressWarnings("unchecked")
   public Collection<Membership> findMembershipsByUser(String userName) throws Exception {
-    Collection<Membership> memberships = null;
-    MembershipCacheKey cacheKey = new MembershipCacheKey(userName, null, null);
     if (useCacheList && (disableCacheInThread.get() == null || !disableCacheInThread.get())) {
-      memberships = (Collection<Membership>) membershipCache.get(cacheKey);
+      MembershipCacheKey cacheKey = new MembershipCacheKey(userName, null, null);
+      return (Collection<Membership>) futureMembershipCache.get(MembershipCacheOperationType.MEMBERSHIPS_FOR_USER, cacheKey);
+    } else {
+      return super.findMembershipsByUser(userName);
     }
-    if (memberships == null) {
-      memberships = super.findMembershipsByUser(userName);
-      if (useCacheList) {
-        membershipCache.put(cacheKey, memberships);
-      }
-      for (Membership membership : memberships) {
-        cacheMembership(membership);
-      }
-    }
-    return memberships;
   }
 
   /**
    * {@inheritDoc}
    */
-  public Collection<Membership> findMembershipsByUserAndGroup(String userName, String groupId) throws Exception {
-    @SuppressWarnings("unchecked")
-    Collection<Membership> memberships = super.findMembershipsByUserAndGroup(userName, groupId);
-    for (Membership membership : memberships) {
-      cacheMembership(membership);
-    }
-    return memberships;
+  @SuppressWarnings("rawtypes")
+  public Collection findMembershipsByUserAndGroup(String userName, String groupId) throws Exception {
+    return super.findMembershipsByUserAndGroup(userName, groupId);
   }
 
   /**
@@ -181,9 +171,14 @@ public class CacheableMembershipHandlerImpl extends MembershipDAOImpl {
 
   @Override
   public void linkMembership(User user, Group g, MembershipType mt, boolean broadcast) throws Exception {
-    super.linkMembership(user, g, mt, broadcast);
-    if (useCacheList) {
-      membershipCache.remove(new MembershipCacheKey(user.getUserName(), null, null));
+    disableCacheInThread.set(true);
+    try {
+      super.linkMembership(user, g, mt, broadcast);
+      if (useCacheList) {
+        membershipCache.remove(new MembershipCacheKey(user.getUserName(), null, null));
+      }
+    } finally {
+      disableCacheInThread.set(false);
     }
   }
 
@@ -212,8 +207,7 @@ public class CacheableMembershipHandlerImpl extends MembershipDAOImpl {
     membershipCache.clearCache();
   }
 
-  private void cacheMembership(Membership membership) {
-    membership = (Membership) ((ExtendedCloneable) membership).clone();
-    membershipCache.put(new MembershipCacheKey(membership), membership);
+  public enum MembershipCacheOperationType {
+    MEMBERSHIP_BY_ID, MEMBERSHIPS_FOR_USER
   }
 }

@@ -18,6 +18,8 @@ package org.exoplatform.services.organization.idm.cache;
 
 import java.util.Collection;
 
+import org.exoplatform.commons.cache.future.FutureExoCache;
+import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.services.cache.CachedObjectSelector;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.cache.ObjectCacheInfo;
@@ -36,6 +38,8 @@ public class CacheableMembershipTypeHandlerImpl extends MembershipTypeDAOImpl {
 
   private final ExoCache<MembershipCacheKey, Object> membershipCache;
 
+  private final FutureExoCache<String, MembershipType, Object> futureMembershipTypeCache;
+
   /**
    * Used to avoid this problem 
    * 1/ Delete from cache
@@ -53,6 +57,17 @@ public class CacheableMembershipTypeHandlerImpl extends MembershipTypeDAOImpl {
                                             PicketLinkIDMService service) {
     super(orgService, service);
     this.membershipTypeCache = organizationCacheHandler.getMembershipTypeCache();
+    futureMembershipTypeCache = new FutureExoCache<>(new Loader<String, MembershipType, Object>() {
+      @Override
+      public MembershipType retrieve(Object context, String key) throws Exception {
+        disableCacheInThread.set(true);
+        try {
+          return findMembershipType(key);
+        } finally {
+          disableCacheInThread.set(false);
+        }
+      }
+    }, membershipTypeCache);
     this.membershipCache = organizationCacheHandler.getMembershipCache();
   }
 
@@ -60,32 +75,19 @@ public class CacheableMembershipTypeHandlerImpl extends MembershipTypeDAOImpl {
    * {@inheritDoc}
    */
   public MembershipType findMembershipType(String name) throws Exception {
-    MembershipType membershipType = null;
     if (disableCacheInThread.get() == null || !disableCacheInThread.get()) {
-      membershipType = (MembershipType) membershipTypeCache.get(name);
-      if (membershipType != null) {
-        return membershipType;
-      }
+      MembershipType membershipType = futureMembershipTypeCache.get(null, name);
+      return membershipType == null ? membershipType : ((MembershipTypeImpl) membershipType).clone();
+    } else {
+      return super.findMembershipType(name);
     }
-
-    membershipType = super.findMembershipType(name);
-    if (membershipType != null) {
-      cacheMembershipType(membershipType);
-    }
-
-    return membershipType == null ? membershipType : ((MembershipTypeImpl) membershipType).clone();
   }
 
   /**
    * {@inheritDoc}
    */
   public Collection<MembershipType> findMembershipTypes() throws Exception {
-
-    Collection<MembershipType> membershipTypes = super.findMembershipTypes();
-    for (MembershipType membershipType : membershipTypes)
-      cacheMembershipType(membershipType);
-
-    return membershipTypes;
+    return super.findMembershipTypes();
   }
 
   /**
@@ -109,27 +111,27 @@ public class CacheableMembershipTypeHandlerImpl extends MembershipTypeDAOImpl {
 
   @Override
   public MembershipType createMembershipType(MembershipType mt, boolean broadcast) throws Exception {
-    MembershipType membershipType = super.createMembershipType(mt, broadcast);
-    cacheMembershipType(membershipType);
-    return membershipType;
+    mt = super.createMembershipType(mt, broadcast);
+    membershipTypeCache.remove(mt.getName());
+    return mt;
   }
 
   /**
    * {@inheritDoc}
    */
   public MembershipType saveMembershipType(MembershipType mt, boolean broadcast) throws Exception {
-    MembershipType membershipType = super.saveMembershipType(mt, broadcast);
-    cacheMembershipType(membershipType);
-
-    return membershipType;
+    disableCacheInThread.set(true);
+    try {
+      mt = super.saveMembershipType(mt, broadcast);
+      membershipTypeCache.remove(mt.getName());
+      return mt;
+    } finally {
+      disableCacheInThread.set(false);
+    }
   }
 
   public void clearCache() {
     membershipTypeCache.clearCache();
-  }
-
-  private void cacheMembershipType(MembershipType membershipType) {
-    membershipTypeCache.put(membershipType.getName(), ((MembershipTypeImpl) membershipType).clone());
   }
 
   public static final class ClearMembershipCacheByMembershipTypeSelector

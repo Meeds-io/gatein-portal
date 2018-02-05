@@ -20,6 +20,8 @@ import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.exoplatform.commons.cache.future.FutureExoCache;
+import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.cache.OrganizationCacheHandler;
@@ -28,7 +30,6 @@ import org.exoplatform.services.organization.idm.PicketLinkIDMService;
 import org.exoplatform.services.organization.idm.UserProfileDAOImpl;
 import org.exoplatform.services.organization.impl.UserProfileImpl;
 
-@SuppressWarnings("deprecation")
 public class CacheableUserProfileHandlerImpl extends UserProfileDAOImpl {
   private UserProfile                         NULL_OBJECT          = createUserProfileInstance();
 
@@ -45,12 +46,36 @@ public class CacheableUserProfileHandlerImpl extends UserProfileDAOImpl {
 
   private final ExoCache<String, UserProfile> userProfileCache;
 
+  private final FutureExoCache<String, UserProfile, UserProfileCacheOperationType> futureUserProfile;
+
   @SuppressWarnings("unchecked")
   public CacheableUserProfileHandlerImpl(OrganizationCacheHandler organizationCacheHandler,
                                          PicketLinkIDMOrganizationServiceImpl orgService,
                                          PicketLinkIDMService service) {
     super(orgService, service);
     this.userProfileCache = organizationCacheHandler.getUserProfileCache();
+    futureUserProfile = new FutureExoCache<>(new Loader<String, UserProfile, UserProfileCacheOperationType>() {
+      @Override
+      public UserProfile retrieve(UserProfileCacheOperationType context, String key) throws Exception {
+        disableCacheInThread.set(true);
+        try {
+          UserProfile userProfile = null;
+          switch (context) {
+          case PROFILE_BY_USERNAME_NO_NULL:
+            userProfile = findUserProfileByName(key);
+            break;
+          case PROFILE_BY_USERNAME:
+            userProfile = getProfile(key);
+            break;
+          default:
+            throw new IllegalArgumentException("Unrecognized context value " + context);
+          }
+          return userProfile == null || userProfile.getUserInfoMap() == null || userProfile.getUserInfoMap().isEmpty() ? NULL_OBJECT : userProfile;
+        } finally {
+          disableCacheInThread.set(false);
+        }
+      }
+    }, userProfileCache);
   }
 
   /**
@@ -59,21 +84,17 @@ public class CacheableUserProfileHandlerImpl extends UserProfileDAOImpl {
   public UserProfile findUserProfileByName(String userName) throws Exception {
     UserProfile userProfile = null;
     if (disableCacheInThread.get() == null || !disableCacheInThread.get()) {
-      userProfile = userProfileCache.get(userName);
+      userProfile = futureUserProfile.get(UserProfileCacheOperationType.PROFILE_BY_USERNAME_NO_NULL, userName);
+    } else {
+      return super.findUserProfileByName(userName);
     }
 
-    if (userProfile == null) {
-      userProfile = super.findUserProfileByName(userName);
-      if (userProfile == null) {
-        userProfile = NULL_OBJECT;
-        userProfileCache.put(userName, userProfile);
-      } else {
-        userProfile.setUserName(userName);
-        cacheUserProfile(userProfile);
-      }
+    if (userProfile == null || userProfile == NULL_OBJECT
+        || StringUtils.isBlank(userProfile.getUserName())
+        || userProfile.getUserInfoMap() == null || userProfile.getUserInfoMap().isEmpty()) {
+      userProfile = null;
     }
-
-    return userProfile == NULL_OBJECT ? null : ((UserProfileImpl) userProfile).clone();
+    return userProfile == null ? null : ((UserProfileImpl)userProfile).clone();
   }
 
   /**
@@ -83,35 +104,25 @@ public class CacheableUserProfileHandlerImpl extends UserProfileDAOImpl {
   public UserProfile getProfile(String userName) {
     UserProfile userProfile = null;
     if (disableCacheInThread.get() == null || !disableCacheInThread.get()) {
-      userProfile = (UserProfile) userProfileCache.get(userName);
-      userProfile = (userProfile == null || userProfile == NULL_OBJECT
-          || StringUtils.isBlank(userProfile.getUserName())
-          || userProfile.getUserInfoMap() == null || userProfile.getUserInfoMap().isEmpty()) ? null : userProfile;
-      if (userProfile != null)
-        return userProfile;
-    }
-
-    userProfile = super.getProfile(userName);
-    if (userProfile == null) {
-      userProfile = NULL_OBJECT;
+      userProfile = futureUserProfile.get(UserProfileCacheOperationType.PROFILE_BY_USERNAME, userName);
     } else {
-      userProfile.setUserName(userName);
+      userProfile = super.getProfile(userName);
     }
-    cacheUserProfile(userProfile);
 
-    return userProfile == NULL_OBJECT ? null : userProfile;
+    if (userProfile == null || userProfile == NULL_OBJECT
+        || StringUtils.isBlank(userProfile.getUserName())
+        || userProfile.getUserInfoMap() == null || userProfile.getUserInfoMap().isEmpty()) {
+      userProfile = null;
+    }
+    return userProfile == null ? null : ((UserProfileImpl)userProfile).clone();
   }
 
   /**
    * {@inheritDoc}
    */
-  public Collection<UserProfile> findUserProfiles() throws Exception {
-    @SuppressWarnings("unchecked")
-    Collection<UserProfile> userProfiles = super.findUserProfiles();
-    for (UserProfile userProfile : userProfiles)
-      cacheUserProfile(userProfile);
-
-    return userProfiles;
+  @SuppressWarnings("rawtypes")
+  public Collection findUserProfiles() throws Exception {
+    return super.findUserProfiles();
   }
 
   /**
@@ -133,18 +144,20 @@ public class CacheableUserProfileHandlerImpl extends UserProfileDAOImpl {
    * {@inheritDoc}
    */
   public void saveUserProfile(UserProfile profile, boolean broadcast) throws Exception {
-    super.saveUserProfile(profile, broadcast);
-    cacheUserProfile(profile);
+    disableCacheInThread.set(true);
+    try {
+      super.saveUserProfile(profile, broadcast);
+      userProfileCache.remove(profile.getUserName());
+    } finally {
+      disableCacheInThread.set(false);
+    }
   }
 
   public void clearCache() {
     userProfileCache.clearCache();
   }
 
-  private void cacheUserProfile(UserProfile userProfile) {
-    if (StringUtils.isNotBlank(userProfile.getUserName())) {
-      userProfileCache.put(userProfile.getUserName(), ((UserProfileImpl) userProfile).clone());
-    }
+  public enum UserProfileCacheOperationType {
+    PROFILE_BY_USERNAME_NO_NULL, PROFILE_BY_USERNAME
   }
-
 }

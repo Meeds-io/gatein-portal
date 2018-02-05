@@ -18,6 +18,8 @@ package org.exoplatform.services.organization.idm.cache;
 
 import java.util.List;
 
+import org.exoplatform.commons.cache.future.FutureExoCache;
+import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.organization.ExtendedCloneable;
 import org.exoplatform.services.organization.Membership;
@@ -33,6 +35,8 @@ import org.exoplatform.services.organization.idm.UserDAOImpl;
 public class CacheableUserHandlerImpl extends UserDAOImpl {
 
   private final ExoCache<String, User>               userCache;
+
+  private final FutureExoCache<String, User, UserStatus> futureUserCache;
 
   private final ExoCache<String, UserProfile>        userProfileCache;
 
@@ -55,6 +59,17 @@ public class CacheableUserHandlerImpl extends UserDAOImpl {
                                   PicketLinkIDMService idmService) {
     super(orgService, idmService);
     this.userCache = organizationCacheHandler.getUserCache();
+    futureUserCache = new FutureExoCache<>(new Loader<String, User, UserStatus>() {
+      @Override
+      public User retrieve(UserStatus context, String key) throws Exception {
+        disableCacheInThread.set(true);
+        try {
+          return findUserByName(key, context);
+        } finally {
+          disableCacheInThread.set(false);
+        }
+      }
+    }, userCache);
     this.userProfileCache = organizationCacheHandler.getUserProfileCache();
     this.membershipCache = organizationCacheHandler.getMembershipCache();
   }
@@ -93,16 +108,26 @@ public class CacheableUserHandlerImpl extends UserDAOImpl {
    * {@inheritDoc}
    */
   public void saveUser(User user, boolean broadcast) throws Exception {
-    super.saveUser(user, broadcast);
-    cacheUser(user);
+    disableCacheInThread.set(true);
+    try {
+      super.saveUser(user, broadcast);
+      userCache.remove(user.getUserName());
+    } finally {
+      disableCacheInThread.set(false);
+    }
   }
 
   /**
    * {@inheritDoc}
    */
   public void createUser(User user, boolean broadcast) throws Exception {
-    super.createUser(user, broadcast);
-    cacheUser(user);
+    disableCacheInThread.set(true);
+    try {
+      super.createUser(user, broadcast);
+      userCache.remove(user.getUserName());
+    } finally {
+      disableCacheInThread.set(false);
+    }
   }
 
   /**
@@ -110,11 +135,7 @@ public class CacheableUserHandlerImpl extends UserDAOImpl {
    */
   public User setEnabled(String userName, boolean enabled, boolean broadcast) throws Exception {
     User result = super.setEnabled(userName, enabled, broadcast);
-    if (result == null) {
-      userCache.remove(userName);
-    } else {
-      cacheUser(result);
-    }
+    userCache.remove(userName);
     return result;
   }
 
@@ -124,26 +145,15 @@ public class CacheableUserHandlerImpl extends UserDAOImpl {
   public User findUserByName(String userName, UserStatus status) throws Exception {
     User user = null;
     if (disableCacheInThread.get() == null || !disableCacheInThread.get()) {
-      user = userCache.get(userName);
-    }
-
-    if (user == null) {
+      user = futureUserCache.get(status, userName);
+    } else {
       user = super.findUserByName(userName, status);
-      if (user != null) {
-        cacheUser(user);
-      }
     }
-
     return user == null ? null : (status.matches(user.isEnabled()) ? (User) ((ExtendedCloneable) user).clone() : null);
   }
 
   public void clearCache() {
     userCache.clearCache();
-  }
-
-  private void cacheUser(User user) {
-    user = (User) ((ExtendedCloneable) user).clone();
-    userCache.put(user.getUserName(), user);
   }
 
 }
