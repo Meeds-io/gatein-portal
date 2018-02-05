@@ -54,11 +54,16 @@ public class GetTestCase extends TestCase {
     public void testThrowException() {
         FutureMap<String, String, Callable<String>> futureCache = new FutureMap<String, String, Callable<String>>(
                 new StringLoader());
-        Assert.assertEquals(null, futureCache.get(new Callable<String>() {
-            public String call() throws Exception {
-                throw new Exception("DON'T FREAK OUT");
-            }
-        }, "foo"));
+        try {
+          futureCache.get(new Callable<String>() {
+              public String call() throws Exception {
+                  throw new Exception("DON'T FREAK OUT");
+              }
+          }, "foo");
+          fail("An exception should be thrown");
+        } catch (Exception e) {
+          // Expected
+        }
         Assert.assertFalse(futureCache.data.containsKey("foo"));
     }
 

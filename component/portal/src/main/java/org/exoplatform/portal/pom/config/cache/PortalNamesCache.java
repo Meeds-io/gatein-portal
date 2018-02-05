@@ -19,8 +19,6 @@
 
 package org.exoplatform.portal.pom.config.cache;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.exoplatform.commons.utils.LazyPageList;
@@ -48,14 +46,18 @@ public class PortalNamesCache extends TaskExecutionDecorator {
         if (!session.isModified()) {
             if (task instanceof SearchTask.FindSiteKey) {
                 SearchTask.FindSiteKey find = (SearchTask.FindSiteKey) task;
-                List<PortalKey> data = (List<PortalKey>) session.getFromCache(find.getKey());
-                if (data == null) {
-                    V result = super.execute(session, task);
-                    LazyPageList<PortalKey> list = (LazyPageList<PortalKey>) result;
-                    session.putInCache(find.getKey(), Collections.unmodifiableList(new ArrayList<PortalKey>(list.getAll())));
-                    return result;
+                Object objectFromCache = session.getFromCache(find.getKey(), new DataCacheContext(this, task, session));
+                if (objectFromCache == null) {
+                    return null;
                 } else {
-                    return (V) new LazyPageList<PortalKey>(new ListAccessImpl<PortalKey>(PortalKey.class, data), 10);
+                    if (objectFromCache instanceof LazyPageList) {
+                      return (V) objectFromCache;
+                    } else if (objectFromCache instanceof List) {
+                      List<PortalKey> data = (List<PortalKey>) objectFromCache;
+                      return (V) new LazyPageList<PortalKey>(new ListAccessImpl<PortalKey>(PortalKey.class, data), 10);
+                    } else {
+                      throw new IllegalStateException("Unknown data type " + objectFromCache.getClass());
+                    }
                 }
             } else if (task instanceof PortalConfigTask.Save || task instanceof PortalConfigTask.Remove) {
                 V result = super.execute(session, task);

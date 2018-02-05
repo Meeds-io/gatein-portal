@@ -33,10 +33,6 @@ import org.chromattic.api.ChromatticSession;
 import org.chromattic.api.UndeclaredRepositoryException;
 import org.chromattic.api.query.QueryResult;
 import org.chromattic.ext.format.BaseEncodingObjectFormatter;
-import org.exoplatform.commons.chromattic.SessionContext;
-import org.exoplatform.commons.chromattic.SynchronizationListener;
-import org.exoplatform.commons.chromattic.SynchronizationStatus;
-import org.exoplatform.portal.config.NoSuchDataException;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.mop.api.Model;
@@ -49,6 +45,14 @@ import org.gatein.mop.core.api.ModelImpl;
 import org.gatein.mop.core.api.workspace.NavigationImpl;
 import org.gatein.mop.core.api.workspace.PageImpl;
 
+import org.exoplatform.commons.chromattic.SessionContext;
+import org.exoplatform.commons.chromattic.SynchronizationListener;
+import org.exoplatform.commons.chromattic.SynchronizationStatus;
+import org.exoplatform.portal.config.NoSuchDataException;
+import org.exoplatform.portal.pom.config.cache.CacheableDataTask;
+import org.exoplatform.portal.pom.config.cache.DataCache;
+import org.exoplatform.portal.pom.config.cache.DataCacheContext;
+
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
@@ -59,7 +63,7 @@ public final class POMSession {
     private static final Logger log = LoggerFactory.getLogger(POMSession.class);
 
     /** . */
-    private static final Map<ObjectType<?>, Class> mapping = new HashMap<ObjectType<?>, Class>();
+    private static final Map<ObjectType<?>, Class<?>> mapping = new HashMap<ObjectType<?>, Class<?>>();
 
     static {
         mapping.put(ObjectType.PAGE, PageImpl.class);
@@ -103,18 +107,11 @@ public final class POMSession {
         this.context = context;
     }
 
-    public Object getFromCache(Serializable key) {
+    public Object getFromCache(Serializable key, DataCacheContext cacheContext) {
         if (isModified()) {
             throw new IllegalStateException("Cannot read object in shared cache from a modified session");
         }
-        return mgr.cacheGet(key);
-    }
-
-    public void putInCache(Serializable key, Object value) {
-        if (isModified()) {
-            throw new IllegalStateException("Cannot put object in shared cache from a modified session");
-        }
-        mgr.cachePut(key, value);
+        return mgr.cacheGet(key, cacheContext);
     }
 
     public void scheduleForEviction(Serializable key) {
@@ -252,6 +249,7 @@ public final class POMSession {
 
         // Temporary work around, to fix in MOP and then remove
         ChromatticSession session = context.getSession();
+        @SuppressWarnings("unchecked")
         Class<O> mappedClass = (Class<O>) mapping.get(type);
         return session.createQueryBuilder(mappedClass).where(statement).get().objects((long) offset, (long) limit);
     }

@@ -38,18 +38,13 @@ public class DataCache extends TaskExecutionDecorator {
     /** . */
     private final Logger log = LoggerFactory.getLogger(DataCache.class);
 
-    /** . */
-    private final AtomicLong readCount = new AtomicLong();
-
-    /** . */
-    private boolean cluster = ExoContainer.getProfiles().contains("cluster");
-
     public DataCache(TaskExecutor next) {
         super(next);
     }
 
     public <V> V execute(POMSession session, POMTask<V> task) throws Exception {
         if (task instanceof CacheableDataTask) {
+            @SuppressWarnings("unchecked")
             CacheableDataTask<?, V> loadTask = (CacheableDataTask<?, V>) task;
             switch (loadTask.getAccessMode()) {
                 case READ:
@@ -100,14 +95,14 @@ public class DataCache extends TaskExecutionDecorator {
 
         //
         if (!session.isModified()) {
-            Object o = session.getFromCache(key);
+            Object o = session.getFromCache(key, new DataCacheContext(this, task, session));
             if (log.isTraceEnabled()) {
                 log.trace("Retrieved " + o + " for key " + key);
             }
 
             V v = null;
             if (o != null) {
-                if (o == NullObject.get()) {
+                if (o instanceof NullObject) {
                     if (log.isTraceEnabled()) {
                         log.trace("Returning null as found null object marker");
                     }
@@ -121,45 +116,7 @@ public class DataCache extends TaskExecutionDecorator {
                     }
                 }
             }
-
-            //
-            if (v != null) {
-                if (log.isTraceEnabled()) {
-                    log.trace("Returning object " + v + " for key " + key);
-                }
-                return v;
-            } else {
-                readCount.incrementAndGet();
-
-                //
-                if (log.isTraceEnabled()) {
-                    log.trace("Object not found in cache for key " + key + " about to retrieve it");
-                }
-
-                //
-                v = super.execute(session, task);
-                if (log.isTraceEnabled()) {
-                    log.trace("Retrieved object " + v + " key " + key + " that will be returned");
-                }
-
-                //
-                if (!session.isModified()) {
-                    if (v == null) {
-                        if (log.isTraceEnabled()) {
-                            log.trace("Updating cache with null object for key " + key);
-                        }
-                        session.putInCache(key, NullObject.get());
-                    } else {
-                        if (log.isTraceEnabled()) {
-                            log.trace("Updating cache with object " + v + " for key " + key);
-                        }
-                        session.putInCache(key, v);
-                    }
-                }
-
-                //
-                return v;
-            }
+            return v;
         } else {
             if (log.isTraceEnabled()) {
                 log.trace("Session was modified, object for key " + key + " is directly retrieved");
@@ -168,9 +125,5 @@ public class DataCache extends TaskExecutionDecorator {
             //
             return super.execute(session, task);
         }
-    }
-
-    public long getReadCount() {
-        return readCount.longValue();
     }
 }

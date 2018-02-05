@@ -104,12 +104,14 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
     public TestUserPortalConfigService(String name) {
         super(name);
 
+        setForceContainerReload(true);
         //
         registered = false;
     }
 
     @Override
     protected void setUp() throws Exception {
+        super.setUp();
         Listener listener = new Listener() {
             @Override
             public void onEvent(Event event) throws Exception {
@@ -562,22 +564,6 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
                 assertTrue(((Application) container.getChildren().get(1)).getType() == ApplicationType.PORTLET);
 
                 groupHandler.removeGroup(group, true);
-            }
-        }.execute(null);
-    }
-
-    public void testCacheUserPortalConfig() {
-        new UnitTest() {
-            public void execute() throws Exception {
-                mgr.clearCache();
-                DataCache cache = mgr.getDecorator(DataCache.class);
-                long readCount0 = cache.getReadCount();
-                userPortalConfigSer_.getUserPortalConfig("classic", null);
-                long readCount1 = cache.getReadCount();
-                assertTrue(readCount1 > readCount0);
-                userPortalConfigSer_.getUserPortalConfig("classic", null);
-                long readCount2 = cache.getReadCount();
-                assertEquals(readCount1, readCount2);
             }
         }.execute(null);
     }

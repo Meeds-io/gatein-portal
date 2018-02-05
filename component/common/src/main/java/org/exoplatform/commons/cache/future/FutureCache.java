@@ -131,7 +131,7 @@ public abstract class FutureCache<K, V, C> {
                         retrieval.current = Thread.currentThread();
                         retrieval.future.run();
                     } catch (Exception e) {
-                        log.error("Retrieval of resource " + key + " threw an exception", e);
+                        throw new RuntimeException("Retrieval of resource " + key + " threw an exception", e);
                     } finally {
                         retrieval.current = null;
                     }
@@ -145,7 +145,7 @@ public abstract class FutureCache<K, V, C> {
                     try {
                         value = retrieval.future.get();
                     } catch (ExecutionException e) {
-                        log.error("Computing of resource " + key + " threw an exception", e.getCause());
+                      throw new RuntimeException("Computing of resource " + key + " threw an exception", e);
                     } catch (InterruptedException e) {
                         // We should handle interruped exception in some manner
                         log.error("Retrieval of resource " + key + " threw an exception", e);
