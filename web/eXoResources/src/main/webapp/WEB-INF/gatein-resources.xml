@@ -109,6 +109,7 @@
     <supported-locale>pl</supported-locale>
     <supported-locale>ca</supported-locale>
     <supported-locale>in</supported-locale>
+    <supported-locale>fil</supported-locale>
     <script>
       <path>/javascript/eXo/i18n/I18NMessage.js</path>
       <resource-bundle>eXo.portal</resource-bundle>
@@ -222,6 +223,7 @@
     <supported-locale>pl</supported-locale>
     <supported-locale>ca</supported-locale>
     <supported-locale>in</supported-locale>
+    <supported-locale>fil</supported-locale>
     <script>
       <path>/javascript/eXo/gadget/UIGadget.js</path>
       <resource-bundle>eXo.portal</resource-bundle>

@@ -19,6 +19,8 @@
 
 package org.exoplatform.commons.utils;
 
+import org.apache.commons.lang3.LocaleUtils;
+
 import java.util.Locale;
 
 
@@ -43,10 +45,6 @@ public class I18N {
         return locale.toString();
     }
 
-    private static boolean isLetter(char c) {
-        return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
-    }
-
     /**
      * Parse the java string representation and returns a locale. See {@link #toJavaIdentifier(java.util.Locale)} method for
      * more details.
@@ -57,63 +55,7 @@ public class I18N {
      * @throws IllegalArgumentException if the string cannot be parsed to a locale
      */
     public static Locale parseJavaIdentifier(String s) throws NullPointerException, IllegalArgumentException {
-        if (s.length() == 0) {
-            throw new IllegalArgumentException("Empty locale");
-        }
-
-        //
-        char c0 = s.charAt(0);
-        if (c0 == '_') {
-            return parseCountry("", s, 0);
-        } else if (!isLetter(c0) || s.length() < 2 || !isLetter(s.charAt(1))) {
-            throw new IllegalArgumentException("Invalid Java Locale identifier: '" + s + "'");
-        } else {
-            return parseCountry(s.substring(0, 2), s, 2);
-        }
-    }
-
-    private static Locale parseCountry(String lang, String s, int index) throws IllegalArgumentException {
-        if (s.length() == index) {
-            return new Locale(lang);
-        } else if (s.charAt(index) != '_' || s.length() < index + 3) {
-            throw new IllegalArgumentException();
-        } else {
-            char c0 = s.charAt(index + 1);
-            if (c0 == '_') {
-                if (lang.length() == 0) {
-                    throw new IllegalArgumentException();
-                } else {
-                    return parseVariant(lang, "", s, index + 1);
-                }
-            } else if (!isLetter(c0) || !isLetter(s.charAt(index + 2))) {
-                throw new IllegalArgumentException();
-            } else {
-                return parseVariant(lang, s.substring(index + 1, index + 3), s, index + 3);
-            }
-        }
-    }
-
-    private static Locale parseVariant(String lang, String country, String s, int index) throws IllegalArgumentException {
-        if (s.length() == index) {
-            return new Locale(lang, country);
-        } else if (s.charAt(index) != '_' || s.length() < index + 2) {
-            throw new IllegalArgumentException();
-        } else {
-            final String variant;
-            if ("ja_JP_JP_#u-ca-japanese".equals(s)) {
-                variant = "JP";
-            } else if ("th_TH_TH_#u-nu-thai".equals(s)) {
-                variant = "TH";
-            } else {
-                for (int i = index + 1; i < s.length(); i++) {
-                    if (!isLetter(s.charAt(i))) {
-                        throw new IllegalArgumentException("Invalid Java Locale identifier: '" + s + "'");
-                    }
-                }
-                variant = s.substring(index + 1);
-            }
-            return new Locale(lang, country, variant);
-        }
+        return LocaleUtils.toLocale(s);
     }
 
     /**
@@ -153,11 +95,15 @@ public class I18N {
         if (s == null) {
             throw new NullPointerException("No null string accepted");
         }
-        if (s.length() == 2) {
-            return new Locale(s.substring(0, 2));
+        if (s.length() == 2 || s.length() == 3) {
+            return new Locale(s);
         } else if (s.length() == 5 && s.charAt(2) == '-') {
             String lang = s.substring(0, 2);
             String country = s.substring(3, 5);
+            return new Locale(lang, country);
+        } else if (s.length() == 6 && s.charAt(3) == '-') {
+            String lang = s.substring(0, 3);
+            String country = s.substring(4, 6);
             return new Locale(lang, country);
         } else {
             throw new IllegalArgumentException("Locale " + s + " cannot be parsed");

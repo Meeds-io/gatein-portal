@@ -66,6 +66,7 @@
     <Locale lang="he" messages="locale/he_ALL.xml"/>
     <Locale lang="hu" messages="locale/hu_ALL.xml"/>
     <Locale lang="in" messages="locale/in_ALL.xml"/>
+    <Locale lang="fil" messages="locale/fil_ALL.xml"/>
     <Require feature="dynamic-height"/>
     <Require feature="minimessage"/>
     <Require feature="views"/>

@@ -29,13 +29,11 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import org.apache.commons.lang.LocaleUtils;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.monitor.jvm.J2EEServerInfo;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.config.model.Properties;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.gatein.api.ApiException;
@@ -44,9 +42,7 @@ import org.gatein.api.Util;
 import org.gatein.api.common.Attributes;
 import org.gatein.api.internal.ObjectToStringBuilder;
 import org.gatein.api.internal.Parameters;
-import org.gatein.api.security.Group;
 import org.gatein.api.security.Permission;
-import org.gatein.api.security.User;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>

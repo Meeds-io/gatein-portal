@@ -62,6 +62,7 @@
     <jcip.version>1.0</jcip.version>
     <commons-dbcp.version>1.4</commons-dbcp.version>
     <commons-logging.version>1.1.1</commons-logging.version>
+    <commons-lang3.version>3.3.2</commons-lang3.version>
     <com.google.javascript.version>v20131014</com.google.javascript.version>
     <com.google.guava.version>18.0</com.google.guava.version>
     <jboss-dmr.version>1.1.1.Final</jboss-dmr.version>
@@ -942,6 +943,12 @@
             <artifactId>xercesImpl</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${commons-lang3.version}</version>
       </dependency>
 
       <!-- Portlet Bridge -->

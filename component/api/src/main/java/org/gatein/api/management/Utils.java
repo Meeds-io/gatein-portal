@@ -22,7 +22,7 @@
 
 package org.gatein.api.management;
 
-import org.apache.commons.lang.LocaleUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.gatein.api.Portal;
 import org.gatein.api.PortalRequest;
 import org.gatein.api.common.Pagination;

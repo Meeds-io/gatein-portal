@@ -1,10 +1,9 @@
 package org.exoplatform.portal.localization;
 
-import org.apache.commons.lang.LocaleUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.Constants;
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.pom.config.POMSessionManager;
@@ -16,7 +15,6 @@ import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.impl.LocaleConfigImpl;
-import org.gatein.common.i18n.LocaleFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

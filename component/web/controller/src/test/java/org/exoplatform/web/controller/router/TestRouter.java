@@ -42,9 +42,9 @@ public class TestRouter extends AbstractTestController {
         expected = new HashMap<QualifiedName, String>();
         expected.put(WebAppController.HANDLER_PARAM, "portal");
         expected.put(Names.GTN_SITETYPE, "portal");
-        expected.put(Names.GTN_LANG, "");
-        expected.put(Names.GTN_SITENAME, "non");
-        expected.put(Names.GTN_PATH, "exist/point");
+        expected.put(Names.GTN_LANG, "non");
+        expected.put(Names.GTN_SITENAME, "exist");
+        expected.put(Names.GTN_PATH, "point");
         assertEquals(expected, params);
 
         assertFalse(matcher.hasNext());

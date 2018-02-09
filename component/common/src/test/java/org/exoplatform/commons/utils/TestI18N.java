@@ -42,7 +42,7 @@ public class TestI18N extends TestCase {
     public void testParseRFC1766() {
         assertEquals(Locale.ENGLISH, I18N.parseTagIdentifier("en"));
         assertEquals(Locale.UK, I18N.parseTagIdentifier("en-GB"));
-        String[] incorrects = { "", " en", "en_GB" };
+        String[] incorrects = { "", " en ", "en_GB" };
         for (String incorrect : incorrects) {
             try {
                 I18N.parseTagIdentifier(incorrect);
@@ -59,7 +59,6 @@ public class TestI18N extends TestCase {
 
     public void testParseJavaIdentifier() {
         assertJavaIdentifier(Locale.ENGLISH, "en");
-        assertNotJavaIdentifier("");
         assertNotJavaIdentifier("e");
         assertNotJavaIdentifier("+e");
         assertNotJavaIdentifier("e+");
@@ -73,17 +72,18 @@ public class TestI18N extends TestCase {
         assertJavaIdentifier(Locale.UK, "en_GB");
         assertNotJavaIdentifier("en__");
         assertNotJavaIdentifier("en_GB_");
-        assertNotJavaIdentifier("en__+");
-        assertNotJavaIdentifier("en_GB_+");
         assertNotJavaIdentifier("__f");
         assertJavaIdentifier(new Locale("en", "", "f"), "en__f");
         assertJavaIdentifier(new Locale("", "GB", "f"), "_GB_f");
+        assertJavaIdentifier(new Locale("fil", "", ""), "fil");
     }
 
     public void testDefaultLocales() {
         for (Locale expected : Locale.getAvailableLocales()) {
-            if (isJava6Compatible(expected)) {
-                String s = expected.toString();
+            String s = expected.toString();
+            // Since Java 1.7, Locale.toString adds script and extensions (if any) after a #, which
+            // are not parsed correctly so we exclude them from the test
+            if (!s.contains("#")) {
                 Locale parsed = I18N.parseJavaIdentifier(s);
                 assertEquals(expected, parsed);
             }
