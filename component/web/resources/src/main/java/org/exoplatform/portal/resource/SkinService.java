@@ -196,6 +196,17 @@ public class SkinService extends AbstractResourceService implements Startable {
         addResourceResolver(new CompositeResourceResolver(portalContainerName, skinConfigs_));
     }
 
+    public void addSkinConfig(SkinConfigPlugin skinConfigPlugin) {
+      if (!skinConfigPlugin.getAvailableSkins().isEmpty()) {
+        for (String newSkin : skinConfigPlugin.getAvailableSkins()) {
+          availableSkins_.add(newSkin);
+        }
+      }
+      if (StringUtils.isNotBlank(skinConfigPlugin.getDefaultSkin())) {
+        defaultSkin = skinConfigPlugin.getDefaultSkin();
+      }
+    }
+
     public String getDefaultSkin() {
         if(!availableSkins_.contains(defaultSkin)) {
             log.warn("Skin \"{}\" does not exist, switching to skin \"Default\" as the default skin", defaultSkin);
