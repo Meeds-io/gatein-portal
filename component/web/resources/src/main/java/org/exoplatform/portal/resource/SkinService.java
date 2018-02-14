@@ -708,7 +708,7 @@ public class SkinService extends AbstractResourceService implements Startable {
      */
     public void removeSkin(String module, String skinName) {
         SkinKey key;
-        if (skinName.length() == 0) {
+        if (skinName == null || skinName.length() == 0) {
             key = new SkinKey(module, getDefaultSkin());
         } else {
             key = new SkinKey(module, skinName);

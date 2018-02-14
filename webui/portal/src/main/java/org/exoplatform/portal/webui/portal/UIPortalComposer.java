@@ -193,7 +193,7 @@ public class UIPortalComposer extends UIContainer {
         }
 
         SkinService skinService = getApplicationComponent(SkinService.class);
-        skinService.invalidatePortalSkinCache(editPortal.getName(), editPortal.getSkin());
+        skinService.removeSkin(editPortal.getName(), editPortal.getSkin());
         try {
             dataStorage.save(portalConfig);
         } catch (StaleModelException ex) {
