@@ -402,7 +402,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="maxEntries"><int>${gatein.cache.idm.user.maxnodes:5000}</int></field>
             <field name="lifespan"><long>${gatein.cache.idm.user.expiration:3600000}</long></field>
-            <field name="cacheMode"><string>${exo.cache.portal.user.cacheMode:replication}</string></field>
+            <field name="cacheMode"><string>${exo.cache.portal.user.cacheMode:asyncInvalidation}</string></field>
           </object>
         </object-param>
         
@@ -424,7 +424,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="maxEntries"><int>${gatein.cache.idm.profile.maxnodes:5000}</int></field>
             <field name="lifespan"><long>${gatein.cache.idm.profile.expiration:3600000}</long></field>
-            <field name="cacheMode"><string>${exo.cache.portal.profile.cacheMode:replication}</string></field>
+            <field name="cacheMode"><string>${exo.cache.portal.profile.cacheMode:asyncInvalidation}</string></field>
           </object>
         </object-param>
         
@@ -446,7 +446,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="maxEntries"><int>${gatein.cache.idm.membership.maxnodes:5000}</int></field>
             <field name="lifespan"><long>${gatein.cache.idm.membership.expiration:3600000}</long></field>
-            <field name="cacheMode"><string>${exo.cache.portal.membership.cacheMode:replication}</string></field>
+            <field name="cacheMode"><string>${exo.cache.portal.membership.cacheMode:asyncInvalidation}</string></field>
           </object>
         </object-param>
         
@@ -468,7 +468,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="maxEntries"><int>${gatein.cache.idm.role.maxnodes:5000}</int></field>
             <field name="lifespan"><long>${gatein.cache.idm.role.expiration:3600000}</long></field>
-            <field name="cacheMode"><string>${exo.cache.portal.role.cacheMode:replication}</string></field>
+            <field name="cacheMode"><string>${exo.cache.portal.role.cacheMode:asyncInvalidation}</string></field>
           </object>
         </object-param>
         
@@ -490,7 +490,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="maxEntries"><int>${gatein.cache.idm.group.maxnodes:5000}</int></field>
             <field name="lifespan"><long>${gatein.cache.idm.group.expiration:-1}</long></field>
-            <field name="cacheMode"><string>${exo.cache.portal.group.cacheMode:replication}</string></field>
+            <field name="cacheMode"><string>${exo.cache.portal.group.cacheMode:asyncInvalidation}</string></field>
           </object>
         </object-param>
       </init-params>
