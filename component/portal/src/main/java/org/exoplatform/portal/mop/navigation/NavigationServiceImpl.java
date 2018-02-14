@@ -330,6 +330,7 @@ public class NavigationServiceImpl implements NavigationService {
         TreeUpdate.perform(tree, NodeContextUpdateAdapter.<N> create(), rebased.root, NodeContextUpdateAdapter.<N> create(),
                 listener, rebased);
 
+        session.save();
         //
         dataCache.removeNodeData(session, persister.toEvict);
     }

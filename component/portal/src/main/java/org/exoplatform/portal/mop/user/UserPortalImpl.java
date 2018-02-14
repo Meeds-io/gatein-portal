@@ -250,6 +250,7 @@ public class UserPortalImpl implements UserPortal {
             throw new NullPointerException("No null node accepted");
         }
         service.getNavigationService().saveNode(node.context, new UserNodeListener(listener));
+        navigations = null;
         node.filter();
     }
 
