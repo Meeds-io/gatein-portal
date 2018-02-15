@@ -163,7 +163,7 @@ public class TestDataStorage extends AbstractConfigTest {
         String description = "This is new portal for testing";
         PortalConfig portal = new PortalConfig();
         portal.setType("portal");
-        portal.setName("foo");
+        portal.setName("foo1");
         portal.setLocale("en");
         portal.setLabel(label);
         portal.setDescription(description);
@@ -175,7 +175,7 @@ public class TestDataStorage extends AbstractConfigTest {
         portal = storage_.getPortalConfig(portal.getName());
         assertNotNull(portal);
         assertEquals("portal", portal.getType());
-        assertEquals("foo", portal.getName());
+        assertEquals("foo1", portal.getName());
         assertEquals(label, portal.getLabel());
         assertEquals(description, portal.getDescription());
     }
@@ -212,9 +212,21 @@ public class TestDataStorage extends AbstractConfigTest {
     }
 
     public void testSavePage() throws Exception {
+        PortalConfig portal = new PortalConfig();
+        portal.setType("portal");
+        portal.setName("test2");
+        portal.setLocale("en");
+        portal.setLabel("Test 2");
+        portal.setDescription("Test 2");
+        portal.setAccessPermissions(new String[] { UserACL.EVERYONE });
+  
+        //
+        storage_.create(portal);
+        assertEquals(1, events.size());
+
         Page page = new Page();
         page.setOwnerType(PortalConfig.PORTAL_TYPE);
-        page.setOwnerId("test");
+        page.setOwnerId(portal.getName());
         page.setName("foo");
         page.setShowMaxWindow(false);
 
@@ -225,7 +237,7 @@ public class TestDataStorage extends AbstractConfigTest {
         } catch (NoSuchDataException e) {
         }
         pageService.savePage(new PageContext(page.getPageKey(), null));
-        assertEquals(1, events.size());
+        assertEquals(2, events.size());
 
         //
         PageContext pageContext = pageService.loadPage(page.getPageKey());
@@ -237,13 +249,13 @@ public class TestDataStorage extends AbstractConfigTest {
         page2.setTitle("MyTitle2");
         page2.setShowMaxWindow(true);
         storage_.save(page2);
-        assertEquals(2, events.size());
+        assertEquals(3, events.size());
 
         page2 = storage_.getPage(page.getPageId());
         assertNotNull(page2);
-        assertEquals("portal::test::foo", page2.getPageId());
+        assertEquals("portal::" + portal.getName() + "::foo", page2.getPageId());
         assertEquals("portal", page2.getOwnerType());
-        assertEquals("test", page2.getOwnerId());
+        assertEquals(portal.getName(), page2.getOwnerId());
         assertEquals("foo", page2.getName());
         assertNull(page2.getTitle());
         assertEquals(0, page2.getChildren().size());
