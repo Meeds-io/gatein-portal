@@ -135,7 +135,7 @@ public class UIGadget extends UIComponent {
     }
 
     public String getId() {
-        return storageName;
+        return storageId;
     }
 
     public String getStandaloneURL() {
