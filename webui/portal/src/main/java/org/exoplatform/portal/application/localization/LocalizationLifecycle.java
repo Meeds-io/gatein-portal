@@ -102,6 +102,7 @@ public class LocalizationLifecycle implements ApplicationRequestPhaseLifecycle<W
         LocalePolicy localePolicy = (LocalePolicy) container.getComponentInstanceOfType(LocalePolicy.class);
         HttpServletRequest request = HttpServletRequest.class.cast(context.getRequest());
         LocaleContextInfo localeCtx = LocaleContextInfoUtils.buildLocaleContextInfo(request);
+        localeCtx.setRequestLocale(reqCtx.getRequestLocale());
         //
         Set<Locale> supportedLocales = LocaleContextInfoUtils.getSupportedLocales();
         //
