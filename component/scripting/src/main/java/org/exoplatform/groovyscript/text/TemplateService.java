@@ -21,9 +21,13 @@ package org.exoplatform.groovyscript.text;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.exoplatform.commons.cache.future.FutureCache;
 import org.exoplatform.commons.cache.future.FutureExoCache;
@@ -65,7 +69,7 @@ import groovy.text.Template;
 @RESTEndpoint(path = "templateservice")
 public class TemplateService implements Startable {
   
-    private ExecutorService executorService = Executors.newCachedThreadPool();
+    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 
     private GroovyTemplateEngine engine_;
 
@@ -76,6 +80,8 @@ public class TemplateService implements Startable {
     private boolean cacheTemplate_ = true;
 
     private boolean collectTemplateStatistics_ = true;
+
+    private Vector<TemplateStatisticTime> statisticTimes = new Vector<>();
 
     private final Loader<ResourceKey, GroovyTemplate, ResourceResolver> loader = new Loader<ResourceKey, GroovyTemplate, ResourceResolver>() {
         public GroovyTemplate retrieve(ResourceResolver context, ResourceKey key) throws Exception {
@@ -135,14 +141,8 @@ public class TemplateService implements Startable {
           final ResourceResolver resourceResolver = context.getResourceResolver();
           final Long time = endTime - startTime;
           final TemplateStatistic templateStatistic = statisticService.getTemplateStatistic(name);
-
-          executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-              templateStatistic.setResolver(resourceResolver);
-              templateStatistic.setTime(time);
-            }
-          });
+          templateStatistic.setResolver(resourceResolver);
+          statisticTimes.add(new TemplateStatisticTime(templateStatistic, time));
         }
     }
 
@@ -249,10 +249,35 @@ public class TemplateService implements Startable {
     }
 
     @Override
-    public void start() {}
-    
+    public void start() {
+      executorService.scheduleAtFixedRate(new Runnable() {
+        @Override
+        public void run() {
+          List<TemplateStatisticTime> templateStatisticTimes = new ArrayList<>(statisticTimes);
+          statisticTimes.clear();
+          for (TemplateStatisticTime templateStatisticTime : templateStatisticTimes) {
+            templateStatisticTime.computeStatistic();
+          }
+        }
+      }, 1, 1, TimeUnit.MINUTES);
+    }
+
     @Override
     public void stop() {
       executorService.shutdown();
+    }
+
+    public static class TemplateStatisticTime {
+      private TemplateStatistic templateStatistic;
+      private long time;
+
+      public TemplateStatisticTime(TemplateStatistic templateStatistic, long time) {
+        this.templateStatistic = templateStatistic;
+        this.time = time;
+      }
+
+      public void computeStatistic() {
+        templateStatistic.setTime(time);
+      }
     }
 }
