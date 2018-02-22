@@ -21,16 +21,16 @@
 -->
 <messagebundle>
   <msg name="title">Services Management</msg>
-  <msg name="services">Mga serbisyo</msg>
+  <msg name="services">Services</msg>
   <msg name="name">Name</msg>
-  <msg name="description">Description</msg>
+  <msg name="description">Açıqlama</msg>
   <msg name="noDescription">No description</msg>
-  <msg name="method">Paraan</msg>
+  <msg name="method">Method</msg>
   <msg name="property">Property</msg>
-  <msg name="parameters">Mga parameter</msg>
+  <msg name="parameters">Parameters</msg>
   <msg name="action">Action</msg>
-  <msg name="value">Halaga</msg>
-  <msg name="services_url">URL ng mga serbisyo</msg>
+  <msg name="value">Value</msg>
+  <msg name="services_url">Services URL</msg>
   <msg name="failManage">Temporary can't manage services from other host until we support OAuth</msg>
   <msg name="noServices">No service's available or you don't have enough permission</msg>
   <msg name="noMethod">No method</msg>

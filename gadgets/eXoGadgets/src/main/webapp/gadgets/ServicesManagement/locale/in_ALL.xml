@@ -29,11 +29,11 @@
   <msg name="property">Property</msg>
   <msg name="parameters">Parameters</msg>
   <msg name="action">Action</msg>
-  <msg name="value">Value</msg>
-  <msg name="services_url">Services URL</msg>
-  <msg name="failManage">Temporary can't manage services from other host until we support OAuth</msg>
-  <msg name="noServices">No service's available or you don't have enough permission</msg>
-  <msg name="noMethod">No method</msg>
-  <msg name="noProperty">No property</msg>
-  <msg name="badURL">Error while retrieving data, please check your URL preference</msg>
+  <msg name="value">Nilai</msg>
+  <msg name="services_url">URL layanan</msg>
+  <msg name="failManage">OAuth tidak didukung, servis dari host lain tidak dapat dilakukan.</msg>
+  <msg name="noServices">Tidak ada servis yang tersedia, atau, anda tidak memiliki cukup hak akses.</msg>
+  <msg name="noMethod">Tidak ada metode</msg>
+  <msg name="noProperty">Tidak ada properti.</msg>
+  <msg name="badURL">Terjadi kesalahan saat menampilkan data, mohon periksa kembali URL yang anda masukkan</msg>
 </messagebundle>
