@@ -106,7 +106,7 @@ public class PortalImplTest extends AbstractApiTest {
         runWithFault(new Runnable() {
             @Override
             public void run() {
-                portal.createSite(new SiteId("newsite"), "basic");
+                portal.createSite(new SiteId("newsite2"), "basic");
             }
         });
     }

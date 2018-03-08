@@ -76,7 +76,8 @@ public class DataStorageImpl implements DataStorage {
         this.futurePortalConfigCache = new FutureExoCache<>(new Loader<PortalKey, PortalData, Object>() {
           @Override
           public PortalData retrieve(Object context, PortalKey key) throws Exception {
-            return delegate.getPortalConfig(key);
+            PortalData portalConfig = delegate.getPortalConfig(key);
+            return portalConfig == null ? PortalData.NULL_OBJECT : portalConfig;
           }
         }, portalConfigCache);
     }
@@ -291,7 +292,7 @@ public class DataStorageImpl implements DataStorage {
     public PortalConfig getPortalConfig(String ownerType, String portalName) throws Exception {
       PortalKey key = new PortalKey(ownerType, portalName);
       PortalData data = futurePortalConfigCache.get(null, key);
-      return data != null ? new PortalConfig(data) : null;
+      return data != null && data.getKey() != null ? new PortalConfig(data) : null;
     }
 
     public Dashboard loadDashboard(String dashboardId) throws Exception {

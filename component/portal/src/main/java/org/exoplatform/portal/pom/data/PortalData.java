@@ -31,6 +31,8 @@ import java.util.Objects;
  */
 public class PortalData extends ModelData {
 
+    public static final PortalData NULL_OBJECT = new PortalData();
+
     /** . */
     private final PortalKey key;
 
@@ -57,6 +59,20 @@ public class PortalData extends ModelData {
     private final String description;
 
     private final List<RedirectData> redirects;
+
+    private PortalData() {
+      super(null, null);
+      this.key = null;
+      this.locale = null;
+      this.label = null;
+      this.description = null;
+      this.accessPermissions = null;
+      this.editPermission = null;
+      this.properties = null;
+      this.skin = null;
+      this.portalLayout = null;
+      this.redirects = null;
+    }
 
     public PortalData(String storageId, String name, String type, String locale, String label, String description,
             List<String> accessPermissions, String editPermission, Map<String, String> properties, String skin,
