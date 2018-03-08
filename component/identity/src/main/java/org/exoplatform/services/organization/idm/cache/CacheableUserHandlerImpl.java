@@ -104,6 +104,17 @@ public class CacheableUserHandlerImpl extends UserDAOImpl {
     return user;
   }
 
+  @Override
+  public boolean authenticate(String username, String password) throws Exception {
+    boolean authenticate = super.authenticate(username, password);
+    if (authenticate) {
+      if (membershipCache.get(username) != null) {
+        membershipCache.remove(username);
+      }
+    }
+    return authenticate;
+  }
+
   /**
    * {@inheritDoc}
    */
