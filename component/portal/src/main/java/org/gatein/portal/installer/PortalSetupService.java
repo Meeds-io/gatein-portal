@@ -78,6 +78,7 @@ public class PortalSetupService implements Startable {
 
     private OrganizationService orgService;
     private RepositoryService jcrService;
+    private boolean enable;
 
     public PortalSetupService(InitParams params, OrganizationService orgService, RepositoryService jcrService) throws Exception {
 
@@ -93,6 +94,8 @@ public class PortalSetupService implements Startable {
         //
         this.orgService = orgService;
         this.jcrService = jcrService;
+        String config = PropertyManager.getProperty(PortalSetupService.GATEIN_SETUP_ENABLE);
+        this.enable = Boolean.parseBoolean(config);
     }
 
     @Override
@@ -259,8 +262,7 @@ public class PortalSetupService implements Startable {
     }
 
     public boolean isEnable() {
-        String config = PropertyManager.getProperty(PortalSetupService.GATEIN_SETUP_ENABLE);
-        return Boolean.parseBoolean(config);
+        return enable;
     }
 
     public void setFlag() {
