@@ -99,6 +99,8 @@ public class JavascriptConfigService extends AbstractResourceService implements 
 
     public static final Pattern JS_ID_PATTERN = Pattern.compile("^[a-zA-Z_$][0-9a-zA-Z_$]*$");
 
+    public final Map<ResourceId, String> scriptURLs = new HashMap<ResourceId, String>();
+
     /** . */
     public static final Comparator<Module> MODULE_COMPARATOR = new Comparator<Module>() {
         public int compare(Module o1, Module o2) {
@@ -264,7 +266,6 @@ public class JavascriptConfigService extends AbstractResourceService implements 
         JSONObject paths = new JSONObject();
         JSONObject shim = new JSONObject();
 
-        Map<ResourceId, String> groupURLs = new HashMap<ResourceId, String>();
         for (ScriptResource resource : getAllResources()) {
             if (!resource.isEmpty() || ResourceScope.SHARED.equals(resource.getId().getScope())) {
                 String name = resource.getId().toString();
@@ -285,13 +286,20 @@ public class JavascriptConfigService extends AbstractResourceService implements 
                 ScriptGroup group = resource.getGroup();
                 if (group != null) {
                     ResourceId grpId = group.getId();
-                    url = groupURLs.get(grpId);
-                    if (url == null) {
+                    url = scriptURLs.get(grpId);
+                    if (!scriptURLs.containsKey(grpId)) {
                         url = buildURL(grpId, controllerContext, locale);
-                        groupURLs.put(grpId, url);
+                        scriptURLs.put(grpId, url);
+                    } else {
+                      url = scriptURLs.get(grpId);
                     }
                 } else {
-                    url = buildURL(resource.getId(), controllerContext, locale);
+                    if(!scriptURLs.containsKey(resource.getId())) {
+                      url = buildURL(resource.getId(), controllerContext, locale);
+                      scriptURLs.put(resource.getId(), url);
+                    } else {
+                      url = scriptURLs.get(resource.getId());
+                    }
                 }
                 paths.put(name, url);
             }
