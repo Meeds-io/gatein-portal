@@ -42,6 +42,10 @@
 	      nocache) {
 		  window.gadgets = window.gadgets || {};
 		  eXo.gadgets = window.gadgets;
+		  if (metadata && !metadata.secureToken && metadata.gadgets && metadata.gadgets.length == 1
+		      && metadata.gadgets[0].secureToken) {
+		    metadata = metadata.gadgets[0];
+		  }
 		  gadgets.pubsubURL = hostName + '/js/gatein-container.js?c=1'
 		      + (debug ? "&debug=1" : "") + (nocache ? "&nocache=1" : "&nocache=0");
 		  var args = arguments;
@@ -63,15 +67,23 @@
 		  if (metadata != null) {
 			  // Check if gadget's height is not set and current view is canvas. By
 				// default, gadget's height is 800px
-			  if (metadata.modulePrefs.height == 0 && view == 'canvas') {
+			  if (metadata.modulePrefs && metadata.modulePrefs.height == 0 && view == 'canvas') {
 				  metadata.modulePrefs.height = "800px";
 			  }
-			  gadget = gadgets.container.createGadget({
-			    specUrl : url,
-			    height : metadata.modulePrefs.height,
-			    secureToken : metadata.secureToken,
-			    view : view
-			  });
+        if (metadata.modulePrefs && metadata.modulePrefs.height) {
+          gadget = gadgets.container.createGadget({
+            specUrl : url,
+            height : metadata.modulePrefs.height,
+            secureToken : metadata.secureToken,
+            view : view
+          });
+        } else {
+          gadget = gadgets.container.createGadget({
+            specUrl : url,
+            secureToken : metadata.secureToken,
+            view : view
+          });
+        }
 			  gadget.metadata = metadata;
 		  } else {
 			  gadget = gadgets.container.createGadget({
@@ -417,6 +429,14 @@
 		  base.Browser.fillUpFreeSpace(portletFrag[0]);
 	  }
 	};
+
+  if (!eXo) {
+    eXo = {};
+  }
+  if (!eXo.gadget) {
+    eXo.gadget = {};
+  }
+  eXo.gadget.UIGadget = eXoGadget;
 
 	return {
 		UIGadget : eXoGadget
