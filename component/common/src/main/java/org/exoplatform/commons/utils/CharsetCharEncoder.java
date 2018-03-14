@@ -26,6 +26,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CodingErrorAction;
 
 
 /**
@@ -72,6 +73,9 @@ public class CharsetCharEncoder implements CharEncoder {
          */
         try {
             CharsetEncoder encoder = charset.newEncoder();
+            encoder.onMalformedInput(CodingErrorAction.REPLACE);
+            encoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
+            encoder.replaceWith("\u25A1".getBytes());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             OutputStreamWriter writer = new OutputStreamWriter(baos, encoder);
             writer.write(c);
