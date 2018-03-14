@@ -19,6 +19,8 @@
 
 package org.exoplatform.portal.application;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.gatein.common.concurrent.AtomicPositiveLong;
 import org.gatein.common.concurrent.LongSampler;
 
@@ -58,7 +60,7 @@ public class ApplicationStatistic {
      * @param timeMillis the time to log in milliseconds
      */
     public void logTime(long timeMillis) {
-
+      CompletableFuture.runAsync(() -> {
         //
         times.add(timeMillis);
 
@@ -73,6 +75,7 @@ public class ApplicationStatistic {
 
         //
         countRequest++;
+      });
     }
 
     public double getMaxTime() {
