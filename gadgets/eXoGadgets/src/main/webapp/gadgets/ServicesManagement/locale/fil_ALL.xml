@@ -20,20 +20,20 @@
 
 -->
 <messagebundle>
-  <msg name="title">Services Management</msg>
+  <msg name="title">Ang pangangasiwa ng mga Serbisyo</msg>
   <msg name="services">Mga serbisyo</msg>
-  <msg name="name">Name</msg>
-  <msg name="description">Description</msg>
-  <msg name="noDescription">No description</msg>
+  <msg name="name">Ang pangalan</msg>
+  <msg name="description">Pagsasalaysay</msg>
+  <msg name="noDescription">Walang Paglalarawan</msg>
   <msg name="method">Paraan</msg>
-  <msg name="property">Property</msg>
+  <msg name="property">Ang pag aari</msg>
   <msg name="parameters">Mga parameter</msg>
-  <msg name="action">Action</msg>
+  <msg name="action">Ang Aksyon</msg>
   <msg name="value">Halaga</msg>
   <msg name="services_url">URL ng mga serbisyo</msg>
-  <msg name="failManage">Temporary can't manage services from other host until we support OAuth</msg>
-  <msg name="noServices">No service's available or you don't have enough permission</msg>
-  <msg name="noMethod">No method</msg>
-  <msg name="noProperty">No property</msg>
-  <msg name="badURL">Error while retrieving data, please check your URL preference</msg>
+  <msg name="failManage">Pansamantalang hindi manage ang mga serbisyo mula sa ibang host hanggang sa masuportahan namin ang OAuth</msg>
+  <msg name="noServices">Walang serbisyo na magagamit o wala kang sapat na permiso</msg>
+  <msg name="noMethod">Hindi pamamaraan</msg>
+  <msg name="noProperty">Hindi katangian</msg>
+  <msg name="badURL">May problema habang kinukuha ang datos, mangyaring suriin ang iyong URL na preperensya</msg>
 </messagebundle>

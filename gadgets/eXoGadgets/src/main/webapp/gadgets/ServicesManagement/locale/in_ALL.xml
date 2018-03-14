@@ -20,15 +20,15 @@
 
 -->
 <messagebundle>
-  <msg name="title">Services Management</msg>
-  <msg name="services">Services</msg>
-  <msg name="name">Name</msg>
-  <msg name="description">Description</msg>
-  <msg name="noDescription">No description</msg>
-  <msg name="method">Method</msg>
-  <msg name="property">Property</msg>
-  <msg name="parameters">Parameters</msg>
-  <msg name="action">Action</msg>
+  <msg name="title">Layanan Servis</msg>
+  <msg name="services">Jasa</msg>
+  <msg name="name">Nama</msg>
+  <msg name="description">Deskripsi</msg>
+  <msg name="noDescription">Tidak ada keterangan</msg>
+  <msg name="method">Metode</msg>
+  <msg name="property">Properti</msg>
+  <msg name="parameters">Parameter</msg>
+  <msg name="action">Aksi</msg>
   <msg name="value">Nilai</msg>
   <msg name="services_url">URL layanan</msg>
   <msg name="failManage">OAuth tidak didukung, servis dari host lain tidak dapat dilakukan.</msg>
