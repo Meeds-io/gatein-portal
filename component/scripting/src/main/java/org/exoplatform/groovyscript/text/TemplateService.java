@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -142,7 +142,9 @@ public class TemplateService implements Startable {
           final Long time = endTime - startTime;
           final TemplateStatistic templateStatistic = statisticService.getTemplateStatistic(name);
           templateStatistic.setResolver(resourceResolver);
-          statisticTimes.add(new TemplateStatisticTime(templateStatistic, time));
+          CompletableFuture.runAsync(() -> {
+            statisticTimes.add(new TemplateStatisticTime(templateStatistic, time));
+          });
         }
     }
 
