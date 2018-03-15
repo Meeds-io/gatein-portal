@@ -111,9 +111,9 @@ public class FacebookProcessor {
 
             @Override
             protected String parseResponse(String httpResponse) throws JSONException {
-                Map<String, String> params = OAuthUtils.formUrlDecode(httpResponse);
-                String accessToken = params.get(OAuthConstants.ACCESS_TOKEN_PARAMETER);
-                String expires = params.get(FacebookConstants.EXPIRES);
+                JSONObject json = new JSONObject(httpResponse);
+                String accessToken = json.getString(OAuthConstants.ACCESS_TOKEN_PARAMETER);
+                String expires = json.getString(FacebookConstants.EXPIRES);
                 if (trace)
                     log.trace("Access Token=" + accessToken + " :: Expires=" + expires);
 

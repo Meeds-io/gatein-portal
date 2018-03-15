@@ -39,5 +39,5 @@ public class FacebookConstants {
 
     public static final String WEB_SERVER = "web_server";
 
-    public static final String EXPIRES = "expires";
+    public static final String EXPIRES = "expires_in";
 }
