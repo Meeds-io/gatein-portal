@@ -95,8 +95,12 @@ public class CacheableGroupHandlerImpl extends GroupDAOImpl {
     disableCacheInThread.set(true);
     try {
       super.addChild(parent, child, broadcast);
-      if (useCacheList && parent != null) {
-        groupCache.remove(computeChildrenKey(parent));
+      if (useCacheList) {
+        if (parent == null) {
+          groupCache.remove(computeChildrenKey((String) null));
+        } else {
+          groupCache.remove(computeChildrenKey(parent));
+        }
       }
     } finally {
       disableCacheInThread.set(false);
@@ -199,6 +203,11 @@ public class CacheableGroupHandlerImpl extends GroupDAOImpl {
     try {
       super.saveGroup(group, broadcast);
       groupCache.remove(getGroupId(group));
+      if (group.getParentId() == null) {
+        groupCache.remove(computeChildrenKey((String) null));
+      } else {
+        groupCache.remove(computeChildrenKey(group.getParentId()));
+      }
     } finally {
       disableCacheInThread.set(false);
     }

@@ -38,6 +38,7 @@ import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.organization.idm.Config;
 import org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl;
 import org.exoplatform.services.organization.idm.UpdateLoginTimeListener;
+import org.exoplatform.services.organization.idm.cache.CacheableGroupHandlerImpl;
 import org.exoplatform.services.organization.idm.cache.CacheableUserProfileHandlerImpl;
 import org.exoplatform.services.organization.impl.UserProfileImpl;
 import org.exoplatform.services.security.ConversationRegistry;
@@ -125,6 +126,27 @@ public class TestOrganization extends AbstractKernelTest {
         GroupHandler groupHander = organizationService.getGroupHandler();
         Group group = groupHander.findGroupById(GROUP_1 + "NOTFOUND");
         assertNull(group);
+    }
+
+    public void testSaveAndFindGroupFromRoot() throws Exception {
+        GroupHandler handler = organizationService.getGroupHandler();
+        assertTrue(handler instanceof CacheableGroupHandlerImpl);
+
+        Collection<?> allGroups = handler.findGroups(null);
+        Group newGroup = handler.createGroupInstance();
+        newGroup.setGroupName("abc");
+        newGroup.setLabel("abc");
+        handler.addChild(null, newGroup, true);
+
+        allGroups = handler.findGroups(null);
+        Assert.assertTrue(allGroups.size() > 0);
+        boolean found = false;
+        for (Object object : allGroups) {
+          if (((Group) object).getId().equals("/abc")) {
+            found = true;
+          }
+        }
+        assertTrue(found);
     }
 
     public void testFindGroupFromRoot() throws Exception {
