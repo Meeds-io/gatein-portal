@@ -216,6 +216,12 @@
 	    var intLeft = eXo.core.Mouse.mousexInPage
 	        - (offset.left - contextMenu.offsetLeft)
 	        + fixWidthForIE7;
+        var overflowValue = intLeft + contextMenu.offsetWidth - $(window).width();
+        
+        if(overflowValue > 0) { // if the context menu overflow we subtract the overflow value from left value
+          intLeft -= overflowValue;
+        }
+        
 	    if (eXo.core.I18n.isRT()) {
 	      // scrollWidth is width of browser scrollbar
 	      var scrollWidth = 16;
