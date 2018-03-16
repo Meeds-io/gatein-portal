@@ -34,7 +34,7 @@ public class TestRouter extends AbstractTestController {
         assertFalse(matcher.hasNext());
 
         //
-        matcher = router.matcher("/non/exist/point", null);
+        matcher = router.matcher("/abc", null);
 
         assertTrue(matcher.hasNext());
         params = matcher.next();
@@ -42,7 +42,23 @@ public class TestRouter extends AbstractTestController {
         expected = new HashMap<QualifiedName, String>();
         expected.put(WebAppController.HANDLER_PARAM, "portal");
         expected.put(Names.GTN_SITETYPE, "portal");
-        expected.put(Names.GTN_LANG, "non");
+        expected.put(Names.GTN_SITENAME, "abc");
+        expected.put(Names.GTN_LANG, "");
+        expected.put(Names.GTN_PATH, "");
+        assertEquals(expected, params);
+
+        assertFalse(matcher.hasNext());
+
+        //
+        matcher = router.matcher("/fr/exist/point", null);
+
+        assertTrue(matcher.hasNext());
+        params = matcher.next();
+        assertEquals("portal", params.get(WebAppController.HANDLER_PARAM));
+        expected = new HashMap<QualifiedName, String>();
+        expected.put(WebAppController.HANDLER_PARAM, "portal");
+        expected.put(Names.GTN_SITETYPE, "portal");
+        expected.put(Names.GTN_LANG, "fr");
         expected.put(Names.GTN_SITENAME, "exist");
         expected.put(Names.GTN_PATH, "point");
         assertEquals(expected, params);
