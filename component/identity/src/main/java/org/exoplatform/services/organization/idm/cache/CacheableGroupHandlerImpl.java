@@ -246,9 +246,7 @@ public class CacheableGroupHandlerImpl extends GroupDAOImpl {
       this.groupId = groupId;
       if (clearCachedChildrenList) {
         this.childrenKey = computeChildrenKey(groupId);
-        if (StringUtils.isNotBlank(parentId)) {
-          this.parentCachedChildrenKey = computeChildrenKey(parentId);
-        }
+        this.parentCachedChildrenKey = computeChildrenKey(parentId);
       }
     }
 

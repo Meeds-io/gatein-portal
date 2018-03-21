@@ -128,6 +128,21 @@ public class TestOrganization extends AbstractKernelTest {
         assertNull(group);
     }
 
+    public void testFindGroupAfterDelete() throws Exception {
+        GroupHandler groupHander = organizationService.getGroupHandler();
+        Collection<Group> rootGroups = groupHander.findGroups(null);
+        int rootGroupsSize = rootGroups.size();
+
+        String testGroupId = "TestGroupToDelete";
+        createGroup(null, testGroupId);
+        rootGroups = groupHander.findGroups(null);
+        assertEquals(rootGroupsSize + 1, rootGroups.size());
+
+        deleteGroup(testGroupId);
+        rootGroups = groupHander.findGroups(null);
+        assertEquals(rootGroupsSize, rootGroups.size());
+    }
+
     public void testSaveAndFindGroupFromRoot() throws Exception {
         GroupHandler handler = organizationService.getGroupHandler();
         assertTrue(handler instanceof CacheableGroupHandlerImpl);
@@ -370,14 +385,8 @@ public class TestOrganization extends AbstractKernelTest {
             newGroup.setGroupName(name);
             newGroup.setDescription(name + DESCRIPTION);
             newGroup.setLabel(name);
-            if (parentGroup != null) {
-              groupHandler.addChild(parentGroup, newGroup, true);
-            } else {
-              groupHandler.saveGroup(newGroup, true);
-            }
-        }
-
-        catch (Exception e) {
+            groupHandler.addChild(parentGroup, newGroup, true);
+        } catch (Exception e) {
             fail("Error on create group [" + name + "] " + e.getMessage(), e);
         }
     }
