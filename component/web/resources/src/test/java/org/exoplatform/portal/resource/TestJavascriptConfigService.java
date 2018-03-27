@@ -24,10 +24,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.ServletContext;
 
@@ -40,6 +37,8 @@ import org.exoplatform.web.application.javascript.JavascriptConfigParser;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.controller.router.URIWriter;
+
+import org.apache.commons.lang.StringUtils;
 import org.gatein.common.io.IOTools;
 import org.gatein.portal.controller.resource.ResourceId;
 import org.gatein.portal.controller.resource.ResourceScope;
@@ -194,6 +193,24 @@ public class TestJavascriptConfigService extends AbstractWebResourceTest {
         assertEquals("mock_url_of_module1.js", remoteURL);
     }
 
+    public void testGenerateURLWithLocale() throws Exception {
+      ScriptResource resource = jsService.getResource(new ResourceId(ResourceScope.SHARED, "text"));
+      resource.addSupportedLocale(Locale.ENGLISH);
+      resource.addSupportedLocale(Locale.FRENCH);
+
+      JSONObject config = jsService.getJSConfig(CONTROLLER_CONTEXT, Locale.ENGLISH);
+      assertNotNull(config);
+      assertNotNull(config.getJSONObject("paths"));
+      assertNotNull(config.getJSONObject("paths").getString("SHARED/text"));
+      assertEquals("mock_url_of_text-en", config.getJSONObject("paths").getString("SHARED/text"));
+
+      config = jsService.getJSConfig(CONTROLLER_CONTEXT, Locale.FRENCH);
+      assertNotNull(config);
+      assertNotNull(config.getJSONObject("paths"));
+      assertNotNull(config.getJSONObject("paths").getString("SHARED/text"));
+      assertEquals("mock_url_of_text-fr", config.getJSONObject("paths").getString("SHARED/text"));
+    }
+
     public void testNormalize() throws Exception {
         String normalizedJS = "\ndefine('SHARED/normalize_test', [], function() {"
                 + "\nvar require = eXo.require, requirejs = eXo.require,define = eXo.define;\neXo.define.names=[];\neXo.define.deps=[];"
@@ -273,7 +290,9 @@ public class TestJavascriptConfigService extends AbstractWebResourceTest {
 
         @Override
         public void renderURL(Map<QualifiedName, String> parameters, URIWriter uriWriter) throws IOException {
-            uriWriter.appendSegment("mock_url_of_" + parameters.get(QualifiedName.create("gtn", "resource")) + ".js");
+            String lang = parameters.get(QualifiedName.create("gtn", "lang"));
+            lang = StringUtils.isBlank(lang) ? "" : "-" + lang;
+            uriWriter.appendSegment("mock_url_of_" + parameters.get(QualifiedName.create("gtn", "resource")) + lang + ".js");
         }
     }
 

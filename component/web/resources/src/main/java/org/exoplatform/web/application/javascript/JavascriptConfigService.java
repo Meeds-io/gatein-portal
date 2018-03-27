@@ -99,7 +99,7 @@ public class JavascriptConfigService extends AbstractResourceService implements 
 
     public static final Pattern JS_ID_PATTERN = Pattern.compile("^[a-zA-Z_$][0-9a-zA-Z_$]*$");
 
-    public final Map<ResourceId, String> scriptURLs = new HashMap<ResourceId, String>();
+    public final Map<String, String> scriptURLs = new HashMap<>();
 
     /** . */
     public static final Comparator<Module> MODULE_COMPARATOR = new Comparator<Module>() {
@@ -286,19 +286,18 @@ public class JavascriptConfigService extends AbstractResourceService implements 
                 ScriptGroup group = resource.getGroup();
                 if (group != null) {
                     ResourceId grpId = group.getId();
-                    url = scriptURLs.get(grpId);
-                    if (!scriptURLs.containsKey(grpId)) {
-                        url = buildURL(grpId, controllerContext, locale);
-                        scriptURLs.put(grpId, url);
-                    } else {
-                      url = scriptURLs.get(grpId);
+                    String key = grpId.toString() + "-" + (locale == null ? "" : locale.toString());
+                    url = scriptURLs.get(key);
+                    if (url == null) {
+                      url = buildURL(grpId, controllerContext, locale);
+                      scriptURLs.put(key, url);
                     }
                 } else {
-                    if(!scriptURLs.containsKey(resource.getId())) {
+                    String key = resource.getId().toString() + "-" + (locale == null ? "" : locale.toString());
+                    url = scriptURLs.get(key);
+                    if(url == null) {
                       url = buildURL(resource.getId(), controllerContext, locale);
-                      scriptURLs.put(resource.getId(), url);
-                    } else {
-                      url = scriptURLs.get(resource.getId());
+                      scriptURLs.put(key, url);
                     }
                 }
                 paths.put(name, url);
