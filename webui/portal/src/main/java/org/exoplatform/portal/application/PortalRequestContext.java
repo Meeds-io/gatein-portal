@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.Constants;
 import org.exoplatform.commons.utils.ExpressionUtil;
 import org.exoplatform.commons.utils.PortalPrinter;
@@ -127,7 +129,7 @@ public class PortalRequestContext extends WebuiRequestContext {
     private final Locale requestLocale;
 
     /** . */
-    private final HttpServletRequest request_;
+    private  HttpServletRequest request_;
 
     /** . */
     private final HttpServletResponse response_;
@@ -161,6 +163,8 @@ public class PortalRequestContext extends WebuiRequestContext {
     public JavascriptManager getJavascriptManager() {
         return jsmanager_;
     }
+
+    private String pageTitle = null;
 
     /**
      * Analyze a request and split this request's URI to get useful information then keep it in following properties of
@@ -349,8 +353,15 @@ public class PortalRequestContext extends WebuiRequestContext {
         sendRedirect(loginPath.toString());
     }
 
+    public void setPageTitle(String title) {
+        this.pageTitle = title;
+    }
+
     public String getTitle() throws Exception {
-        String title = (String) request_.getAttribute(REQUEST_TITLE);
+        if(pageTitle != null){
+            return pageTitle;
+        }
+        String title = (String) getRequest().getAttribute(REQUEST_TITLE);
 
         //
         if (title == null) {
@@ -369,11 +380,16 @@ public class PortalRequestContext extends WebuiRequestContext {
                 //
                 if (page != null) {
                     title = page.getState().getDisplayName();
-                    String resolvedTitle = ExpressionUtil.getExpressionValue(this.getApplicationResourceBundle(), title);
-                    if (resolvedTitle != null) {
-                        return resolvedTitle;
+                    // testing to ensure first that the title is a I18N expression
+                    if(ExpressionUtil.isResourceBindingExpression(title)) {
+                        String resolvedTitle = ExpressionUtil.getExpressionValue(this.getApplicationResourceBundle(), title);
+                        // testing to see if the label was translated correctly
+                        if (StringUtils.isNotBlank(resolvedTitle) && !resolvedTitle.equals(title)) {
+                            return resolvedTitle;
+                        }
                     }
                 }
+                // translating the label using the userNode
                 title = node.getResolvedLabel();
             }
         }
@@ -517,7 +533,7 @@ public class PortalRequestContext extends WebuiRequestContext {
     }
 
     @SuppressWarnings("unchecked")
-    public final HttpServletRequest getRequest() {
+    public  HttpServletRequest getRequest() {
         return request_;
     }
 
