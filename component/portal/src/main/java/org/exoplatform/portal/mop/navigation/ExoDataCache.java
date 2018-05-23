@@ -37,6 +37,8 @@ import org.exoplatform.services.cache.ExoCache;
  */
 public class ExoDataCache extends DataCache {
 
+    private final static String CACHE_NAME = "portal.NavigationService";
+
     /** . */
     protected ExoCache<ScopedKey<?>, Serializable> cache;
 
@@ -56,7 +58,7 @@ public class ExoDataCache extends DataCache {
     };
 
     public ExoDataCache(CacheService cacheService) {
-        this.cache = cacheService.getCacheInstance(NavigationService.class.getSimpleName());
+        this.cache = cacheService.getCacheInstance(CACHE_NAME);
         this.objects = new FutureExoCache<ScopedKey<?>, Serializable, POMSession>(navigationLoader, cache);
     }
 

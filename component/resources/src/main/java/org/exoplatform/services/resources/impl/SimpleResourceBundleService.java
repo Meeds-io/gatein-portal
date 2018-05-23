@@ -48,12 +48,14 @@ public class SimpleResourceBundleService extends BaseResourceBundleService {
 
     private final ConcurrentMap<String, ResourceBundleData> bundles = new ConcurrentHashMap<String, ResourceBundleData>();
 
+    private final static String CACHE_NAME = "portal.ResourceBundleData";
+
     public SimpleResourceBundleService(PortalContainer portalContainer,
                                        InitParams params, CacheService cService, LocaleConfigService localeService)
             throws Exception {
         log_ = ExoLogger.getLogger("org.exoplatform.services.resources");
         localeService_ = localeService;
-        cache_ = cService.getCacheInstance(ResourceBundleData.class.getSimpleName());
+        cache_ = cService.getCacheInstance(CACHE_NAME);
         portalContainer_ = portalContainer;
         initParams(params);
     }

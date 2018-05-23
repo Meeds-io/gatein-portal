@@ -54,6 +54,8 @@ public class POMSessionManager implements Startable {
     /** . */
     private final Logger log = LoggerFactory.getLogger(POMSessionManager.class);
 
+    private final static String CACHE_NAME = "portal.MOPSessionManager";
+
     /** . */
     private MOPService pomService;
 
@@ -75,7 +77,7 @@ public class POMSessionManager implements Startable {
     public POMSessionManager(RepositoryService repositoryService, ChromatticManager manager, CacheService cacheService) {
         //
         this.manager = manager;
-        this.cache = cacheService.getCacheInstance("MOPSessionManager");
+        this.cache = cacheService.getCacheInstance(CACHE_NAME);
         futureCache = new FutureExoCache<>(new Loader<ScopedKey<?>, Object, DataCacheContext>() {
           @Override
           public Object retrieve(DataCacheContext dataCacheContext, ScopedKey<?> key) throws Exception {

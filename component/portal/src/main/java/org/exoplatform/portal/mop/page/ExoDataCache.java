@@ -10,6 +10,8 @@ import org.exoplatform.services.cache.ExoCache;
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
 public class ExoDataCache extends DataCache {
 
+    private final static String CACHE_NAME = "portal.PageService";
+
     /** . */
     protected ExoCache<ScopedKey<PageKey>, PageData> cache;
 
@@ -25,7 +27,7 @@ public class ExoDataCache extends DataCache {
     };
 
     public ExoDataCache(CacheService cacheService) {
-        this.cache = cacheService.getCacheInstance(PageService.class.getSimpleName());
+        this.cache = cacheService.getCacheInstance(CACHE_NAME);
         this.objects = new FutureExoCache<ScopedKey<PageKey>, PageData, POMSession>(pageLoader, cache);
     }
 

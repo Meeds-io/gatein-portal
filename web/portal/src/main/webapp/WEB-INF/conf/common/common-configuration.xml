@@ -122,13 +122,10 @@
             <string>default</string>
           </field>
           <field name="maxSize">
-            <int>${gatein.cache.default.maxsize:300}</int>
+            <int>${exo.cache.default.MaxNodes:300}</int>
           </field>
           <field name="liveTime">
-            <long>${gatein.cache.default.livetime:600}</long>
-          </field>
-          <field name="distributed">
-            <boolean>false</boolean>
+            <long>${exo.cache.default.TimeToLive:600}</long>
           </field>
           <field name="implementation">
             <string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string>
@@ -239,13 +236,16 @@
                     <string>UNORDERED</string>
                   </value>
                   <value>
+                    <string>MANUAL</string>
+                  </value>
+                  <value>
                     <string>LIRS</string>
                   </value>
                 </collection>
               </field>
-              <field name="defaultStrategy"><string>LIRS</string></field>
-              <field name="defaultMaxIdle"><long>-1</long></field>
-              <field name="defaultWakeUpInterval"><long>${exo.cache.expiration.wakeupinterval:5000}</long></field>
+              <field name="defaultStrategy"><string>${exo.cache.eviction.defaultStrategy:LIRS}</string></field>
+              <field name="defaultMaxIdle"><long>${exo.cache.expiration.defaultMaxIdle:-1}</long></field>
+              <field name="defaultWakeUpInterval"><long>${exo.cache.expiration.defaultWakeUpInterval:5000}</long></field>
             </object>
           </object-param>
        </init-params>

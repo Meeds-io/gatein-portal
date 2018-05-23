@@ -66,13 +66,15 @@ public class DataStorageImpl implements DataStorage {
 
     protected ExoCache<PortalKey, PortalData> portalConfigCache;
 
+    private final static String CACHE_NAME = "portal.PortalConfig";
+
     protected FutureExoCache<PortalKey, PortalData, Object> futurePortalConfigCache;
 
     public DataStorageImpl(CacheService cacheService, ModelDataStorage delegate, ListenerService listenerServ) {
         this.delegate = delegate;
         this.listenerServ_ = listenerServ;
 
-        this.portalConfigCache = cacheService.getCacheInstance("portal.PortalConfig");
+        this.portalConfigCache = cacheService.getCacheInstance(CACHE_NAME);
         this.futurePortalConfigCache = new FutureExoCache<>(new Loader<PortalKey, PortalData, Object>() {
           @Override
           public PortalData retrieve(Object context, PortalKey key) throws Exception {

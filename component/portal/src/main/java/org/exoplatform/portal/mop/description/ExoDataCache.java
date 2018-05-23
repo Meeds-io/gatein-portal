@@ -31,6 +31,8 @@ import org.exoplatform.services.cache.ExoCache;
  */
 public class ExoDataCache extends DataCache {
 
+    private final static String CACHE_NAME = "portal.DescriptionService";
+
     /** . */
     protected ExoCache<CacheKey, CacheValue> cache;
 
@@ -45,7 +47,7 @@ public class ExoDataCache extends DataCache {
     };
 
     public ExoDataCache(CacheService cacheService) {
-        this.cache = cacheService.getCacheInstance(DescriptionService.class.getSimpleName());
+        this.cache = cacheService.getCacheInstance(CACHE_NAME);
         this.values = new FutureExoCache<CacheKey, CacheValue, POMSession>(valueLoader, cache);
     }
 

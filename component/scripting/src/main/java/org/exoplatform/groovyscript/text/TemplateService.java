@@ -71,6 +71,8 @@ public class TemplateService implements Startable {
   
     private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 
+    private final static String CACHE_NAME = "portal.TemplateService";
+
     private GroovyTemplateEngine engine_;
 
     private ExoCache<ResourceKey, GroovyTemplate> templatesCache_;
@@ -117,7 +119,7 @@ public class TemplateService implements Startable {
     public TemplateService(TemplateStatisticService statisticService, CacheService cservice, InitParams initParams) throws Exception {
         this.engine_ = new GroovyTemplateEngine();
         this.statisticService = statisticService;
-        this.templatesCache_ = cservice.getCacheInstance(TemplateService.class.getSimpleName());
+        this.templatesCache_ = cservice.getCacheInstance(CACHE_NAME);
         this.futureCache = new FutureExoCache<ResourceKey, GroovyTemplate, ResourceResolver>(loader, templatesCache_);
 
         if(initParams != null) {
