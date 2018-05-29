@@ -205,7 +205,7 @@ var requirejs, require, define;
 
     function newContext(contextName) {
         var config = {
-                waitSeconds: 7,
+                waitSeconds: 30,
                 baseUrl: './',
                 paths: {},
                 pkgs: {},
