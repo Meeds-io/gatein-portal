@@ -182,11 +182,6 @@ public class JavascriptConfigParser {
                     String js_path = param_ele.getElementsByTagName(JAVA_SCRIPT_PATH).item(0).getFirstChild().getNodeValue();
 
                     //
-                    log.warn(
-                            "<javascript> tag define for javascript: {} has ben deprecated, please use <scripts> or <module> instead",
-                            js_path);
-
-                    //
                     int priority;
                     try {
                         priority = Integer.valueOf(
