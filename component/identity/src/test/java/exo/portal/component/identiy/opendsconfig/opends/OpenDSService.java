@@ -240,13 +240,13 @@ public class OpenDSService
       }
    }
 
-   private void populateLDIFFile(String ldif) throws Exception {
+   public void populateLDIFFile(String ldif) throws Exception {
 
       URL ldifURL = Thread.currentThread().getContextClassLoader().getResource(ldif);
 
       log.info("LDIF: " + ldifURL.toURI().getPath());
       String[] cmd = new String[] { "-h", directoryConfig.getHost(), "-p", directoryConfig.getPort(), "-D",
-              directoryConfig.getAdminDN(), "-w", directoryConfig.getAdminPassword(), "-a", "-f", ldifURL.toURI().getPath() };
+              directoryConfig.getAdminDN(), "-w", directoryConfig.getAdminPassword(), "-a", "-c", "-f", ldifURL.toURI().getPath() };
 
       // Not sure why... but it actually does make a difference...
       if (directoryName.equals(EMBEDDED_OPEN_DS_DIRECTORY_NAME)) {

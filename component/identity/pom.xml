@@ -142,6 +142,7 @@
             <includes>
               <include>org/exoplatform/services/tck/organization/Test*.java</include>
               <include>org/exoplatform/services/organization/Test*.java</include>
+              <include>org/exoplatform/services/organization/externalstore/Test*.java</include>
             </includes>
             <excludes>
               <exclude>**/AbstractOrganizationServiceTest.java</exclude>

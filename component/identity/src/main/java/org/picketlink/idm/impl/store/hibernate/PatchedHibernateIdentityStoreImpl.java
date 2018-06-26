@@ -22,7 +22,23 @@
 
 package org.picketlink.idm.impl.store.hibernate;
 
-import org.exoplatform.services.organization.idm.UserDAOImpl;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Hibernate;
@@ -30,10 +46,23 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.type.StringType;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.helper.Tools;
-import org.picketlink.idm.impl.model.hibernate.*;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObject;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectAttribute;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectAttributeBinaryValue;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectCredential;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectCredentialBinaryValue;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectCredentialType;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectRelationship;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectRelationshipName;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectRelationshipType;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectType;
+import org.picketlink.idm.impl.model.hibernate.HibernateRealm;
 import org.picketlink.idm.impl.store.FeaturesMetaDataImpl;
 import org.picketlink.idm.impl.types.SimpleIdentityObject;
 import org.picketlink.idm.spi.configuration.IdentityStoreConfigurationContext;
@@ -56,27 +85,7 @@ import org.picketlink.idm.spi.store.IdentityStore;
 import org.picketlink.idm.spi.store.IdentityStoreInvocationContext;
 import org.picketlink.idm.spi.store.IdentityStoreSession;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
-import org.hibernate.cfg.Configuration;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
+import org.exoplatform.services.organization.idm.EntityMapperUtils;
 
 /**
  * @author Boleslaw Dawidowicz
@@ -3239,7 +3248,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
             }
 
             // If the attribute key is enable, consider its absence as it was equals to true
-            if (entry.getKey().equals(UserDAOImpl.USER_ENABLED) &&  entry.getValue() != null && entry.getValue().length == 0) {
+            if (entry.getKey().equals(EntityMapperUtils.USER_ENABLED) &&  entry.getValue() != null && entry.getValue().length == 0) {
                if(presentAttrs.containsKey(mappedAttributeName)){
                   toRemove.add(object);
                }

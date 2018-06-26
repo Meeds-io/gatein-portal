@@ -19,6 +19,7 @@
 
 package org.exoplatform.services.organization.idm;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.transaction.Status;
@@ -26,9 +27,12 @@ import javax.transaction.Status;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.common.transaction.JTAUserTransactionLifecycleService;
+import org.gatein.portal.idm.impl.repository.ExoFallbackIdentityStoreRepository;
+import org.gatein.portal.idm.impl.repository.ExoLegacyFallbackIdentityStoreRepository;
 import org.picketlink.idm.api.Transaction;
 import org.picketlink.idm.spi.configuration.metadata.IdentityConfigurationMetaData;
-import org.picketlink.idm.spi.configuration.metadata.IdentityStoreConfigurationMetaData;
+import org.picketlink.idm.spi.configuration.metadata.IdentityRepositoryConfigurationMetaData;
+import org.picketlink.idm.spi.configuration.metadata.IdentityStoreMappingMetaData;
 import org.picocontainer.Startable;
 
 import org.exoplatform.container.ExoContainer;
@@ -296,19 +300,59 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
             if(groupDAO_ != null && groupDAO_ instanceof CacheableGroupHandlerImpl){
                 ((CacheableGroupHandlerImpl) groupDAO_).clearCache();
             }
-            if(userDAO_ != null && userDAO_ instanceof CacheableGroupHandlerImpl){
-                ((CacheableGroupHandlerImpl) userDAO_).clearCache();
+            if(userDAO_ != null && userDAO_ instanceof CacheableUserHandlerImpl){
+                ((CacheableUserHandlerImpl) userDAO_).clearCache();
             }
-            if(userProfileDAO_ != null && userProfileDAO_ instanceof CacheableGroupHandlerImpl){
-                ((CacheableGroupHandlerImpl) userProfileDAO_).clearCache();
+            if(userProfileDAO_ != null && userProfileDAO_ instanceof CacheableUserProfileHandlerImpl){
+                ((CacheableUserProfileHandlerImpl) userProfileDAO_).clearCache();
             }
-            if(membershipDAO_ != null && membershipDAO_ instanceof CacheableGroupHandlerImpl){
-                ((CacheableGroupHandlerImpl) membershipDAO_).clearCache();
+            if(membershipDAO_ != null && membershipDAO_ instanceof CacheableMembershipHandlerImpl){
+                ((CacheableMembershipHandlerImpl) membershipDAO_).clearCache();
             }
-            if(membershipTypeDAO_ != null && membershipTypeDAO_ instanceof CacheableGroupHandlerImpl){
-                ((CacheableGroupHandlerImpl) membershipTypeDAO_).clearCache();
+            if(membershipTypeDAO_ != null && membershipTypeDAO_ instanceof CacheableMembershipTypeHandlerImpl){
+                ((CacheableMembershipTypeHandlerImpl) membershipTypeDAO_).clearCache();
             }
         }
+    }
+
+    public void setEnableCache(boolean enable) {
+      if (organizationCacheHandler != null && (this.configuration == null || this.configuration.isUseCache())) {
+        if (groupDAO_ != null && groupDAO_ instanceof CacheableGroupHandlerImpl) {
+          if (enable) {
+            ((CacheableGroupHandlerImpl) groupDAO_).enableCache();
+          } else {
+            ((CacheableGroupHandlerImpl) groupDAO_).disableCache();
+          }
+        }
+        if (userDAO_ != null && userDAO_ instanceof CacheableUserHandlerImpl) {
+          if (enable) {
+            ((CacheableUserHandlerImpl) userDAO_).enableCache();
+          } else {
+            ((CacheableUserHandlerImpl) userDAO_).disableCache();
+          }
+        }
+        if (userProfileDAO_ != null && userProfileDAO_ instanceof CacheableUserProfileHandlerImpl) {
+          if (enable) {
+            ((CacheableUserProfileHandlerImpl) userProfileDAO_).enableCache();
+          } else {
+            ((CacheableUserProfileHandlerImpl) userProfileDAO_).disableCache();
+          }
+        }
+        if (membershipDAO_ != null && membershipDAO_ instanceof CacheableMembershipHandlerImpl) {
+          if (enable) {
+            ((CacheableMembershipHandlerImpl) membershipDAO_).enableCache();
+          } else {
+            ((CacheableMembershipHandlerImpl) membershipDAO_).disableCache();
+          }
+        }
+        if (membershipTypeDAO_ != null && membershipTypeDAO_ instanceof CacheableMembershipTypeHandlerImpl) {
+          if (enable) {
+            ((CacheableMembershipTypeHandlerImpl) membershipTypeDAO_).enableCache();
+          } else {
+            ((CacheableMembershipTypeHandlerImpl) membershipTypeDAO_).disableCache();
+          }
+        }
+      }
     }
 
     public void setConfiguration(Config configuration) {
@@ -316,19 +360,40 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
     }
 
     private void initConfiguration(InitParams params) {
+      /* Default settings - DB Only */
+      this.configuration.setCountPaginatedUsers(true);
+      this.configuration.setSkipPaginationInMembershipQuery(false);
+  
       IdentityConfigurationMetaData configMD = ((PicketLinkIDMServiceImpl) this.idmService_).getConfigMD();
-      List<IdentityStoreConfigurationMetaData> identityStores = null;
-      if (configMD != null) {
-        identityStores = configMD.getIdentityStores();
+      if (configMD == null) {
+        return;
       }
-      /* If you have DB only setup */
-      if (identityStores != null && identityStores.size() > 1) {
-        this.configuration.setCountPaginatedUsers(false);
-        this.configuration.setSkipPaginationInMembershipQuery(true);
-      } else {
-        /* If you have DB+LDAP setup */
-        this.configuration.setCountPaginatedUsers(true);
-        this.configuration.setSkipPaginationInMembershipQuery(false);
+  
+      // Use DB Default settings if External Store API is used, else if Legacy
+      // LDAP Store was used, disable paginations
+      List<IdentityRepositoryConfigurationMetaData> repositories = configMD.getRepositories();
+      for (IdentityRepositoryConfigurationMetaData identityRepositoryConfigurationMetaData : repositories) {
+        if (identityRepositoryConfigurationMetaData.getClassName()
+                                                   .equals(ExoLegacyFallbackIdentityStoreRepository.class.getName())) {
+          List<IdentityStoreMappingMetaData> identityStoreMappings =
+                                                                   identityRepositoryConfigurationMetaData.getIdentityStoreToIdentityObjectTypeMappings();
+          if (identityStoreMappings != null && identityRepositoryConfigurationMetaData.getDefaultIdentityStoreId() != null
+              && !identityRepositoryConfigurationMetaData.getDefaultIdentityStoreId()
+                                                         .equals(identityStoreMappings.get(0).getIdentityStoreId())) {
+            this.configuration.setCountPaginatedUsers(false);
+            this.configuration.setSkipPaginationInMembershipQuery(true);
+          }
+        } else if (identityRepositoryConfigurationMetaData.getClassName()
+                                                          .equals(ExoFallbackIdentityStoreRepository.class.getName())) {
+          List<IdentityStoreMappingMetaData> identityStoreMappings =
+                                                                   identityRepositoryConfigurationMetaData.getIdentityStoreToIdentityObjectTypeMappings();
+          if (identityStoreMappings != null && identityStoreMappings.size() > 0
+              && !identityRepositoryConfigurationMetaData.getDefaultIdentityStoreId()
+                                                         .equals(identityStoreMappings.get(0).getIdentityStoreId())) {
+            IdentityStoreMappingMetaData mappingMetaData = identityStoreMappings.get(0);
+            mappingMetaData.getOptions().put("readOnly", Collections.singletonList("true"));
+          }
+        }
       }
     }
 }

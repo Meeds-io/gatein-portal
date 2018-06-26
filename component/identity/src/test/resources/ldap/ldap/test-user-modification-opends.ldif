@@ -1,0 +1,19 @@
+dn: uid=jduke10,ou=People,o=test,dc=portal,dc=example,dc=com
+objectclass: top
+objectclass: inetOrgPerson
+objectclass: person
+uid: jduke10
+cn: Java Duke10
+sn: Duke10
+userPassword: theduke
+mail: jduke10@email.com
+
+dn: uid=jduke11,ou=People,o=test,dc=portal,dc=example,dc=com
+objectclass: top
+objectclass: inetOrgPerson
+objectclass: person
+uid: jduke11
+cn: Java Duke
+sn: Duke1
+userPassword: theduke
+mail: jduke1@email.com

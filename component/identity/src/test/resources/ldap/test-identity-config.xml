@@ -75,7 +75,7 @@
       </repository>
       <repository>
          <id>RedHat Repository DB+LDAP</id>
-         <class>org.gatein.portal.idm.impl.repository.ExoFallbackIdentityStoreRepository</class>
+         <class>org.gatein.portal.idm.impl.repository.ExoLegacyFallbackIdentityStoreRepository</class>
          <external-config/>
          <default-identity-store-id>Hibernate Identity Store</default-identity-store-id>
          <default-attribute-store-id>Hibernate Identity Store</default-attribute-store-id>
@@ -110,7 +110,7 @@
       </repository>
       <repository>
          <id>Sample Portal Repository DB+LDAP</id>
-         <class>org.gatein.portal.idm.impl.repository.ExoFallbackIdentityStoreRepository</class>
+         <class>org.gatein.portal.idm.impl.repository.ExoLegacyFallbackIdentityStoreRepository</class>
          <external-config/>
          <default-identity-store-id>Hibernate Identity Store</default-identity-store-id>
          <default-attribute-store-id>Hibernate Identity Store</default-attribute-store-id>

@@ -133,7 +133,6 @@ public class UserProfileDAOImpl extends AbstractDAOImpl implements UserProfileHa
                 return profile;
             } catch (Exception exp) {
                 handleException("Exception occured when removing user profile", exp);
-                throw exp;
             }
         }
         return null;
@@ -301,7 +300,6 @@ public class UserProfileDAOImpl extends AbstractDAOImpl implements UserProfileHa
         } catch (Exception e) {
             // TODO:
             handleException("Identity operation error: ", e);
-            throw e;
         }
 
     }
@@ -318,7 +316,6 @@ public class UserProfileDAOImpl extends AbstractDAOImpl implements UserProfileHa
         } catch (Exception e) {
             // TODO:
             handleException("Identity operation error: ", e);
-            throw e;
         }
     }
 }

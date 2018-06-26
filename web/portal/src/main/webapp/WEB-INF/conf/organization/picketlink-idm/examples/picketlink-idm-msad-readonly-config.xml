@@ -291,7 +291,7 @@
               </option>
               <option>
                 <name>entrySearchFilter</name>
-                <value><![CDATA[(&(sAMAccountName={0})(objectClass=group))]]></value>
+                <value><![CDATA[(&(cn={0})(objectClass=group))]]></value>
               </option>
               <option>
                 <name>allowCreateEntry</name>

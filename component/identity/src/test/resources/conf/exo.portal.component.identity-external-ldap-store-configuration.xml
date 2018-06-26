@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- ~ Copyright (C) 2018 eXo Platform SAS. ~ ~ This is free software; you can redistribute it and/or modify it ~ under the terms of the GNU Lesser General Public License as ~ published by the Free Software Foundation; either version 2.1 of ~ the License, or (at your option) any later version. ~ ~ This software is distributed in the hope that it will be useful, ~ but WITHOUT ANY WARRANTY; without even the implied warranty of ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU ~ Lesser 
+  General Public License for more details. ~ ~ You should have received a copy of the GNU Lesser General Public ~ License along with this software; if not, write to the Free ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org. -->
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd http://www.exoplaform.org/xml/ns/kernel_1_2.xsd" xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
+
+  <component>
+    <key>org.exoplatform.services.organization.externalstore.IDMExternalStoreService</key>
+    <type>org.exoplatform.services.organization.idm.externalstore.PicketLinkIDMExternalStoreService</type>
+    <init-params>
+      <value-param>
+        <name>update.user.onlogin</name>
+        <description>Whether update user on login when the information
+          changes on external store or not
+        </description>
+        <value>true</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <type>org.exoplatform.services.organization.externalstore.IDMExternalStoreImportService</type>
+    <init-params>
+      <value-param>
+        <name>exo.idm.externalStore.import.cronExpression</name>
+        <description>Cron expression used to schedule the job that will
+          import periodically data from external store (Default value = every
+          day at 23:59 PM)
+        </description>
+        <value>0 59 23 ? * *</value>
+      </value-param>
+      <value-param>
+        <name>exo.idm.externalStore.delete.cronExpression</name>
+        <description>Cron expression used to schedule the job that will
+          delete periodically data from internal store that has been deleted
+          from external store (Default value = every Friday at 02:00 AM)
+        </description>
+        <value>0 0 2 ? * FRI</value>
+      </value-param>
+      <value-param>
+        <name>exo.idm.externalStore.queue.processing.cronExpression</name>
+        <description>Cron expression used to schedule the job that will
+          process periodically data injected in queue (Default value = every
+          day at 04:00 AM)
+        </description>
+        <value>0 0 4 ? * *</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.organization.externalstore.IDMQueueService</key>
+    <type>org.exoplatform.services.organization.idm.externalstore.IDMInMemoryQueueServiceImpl</type>
+    <init-params>
+      <value-param>
+        <name>exo.idm.queue.processing.error.retries.max</name>
+        <description>Max retries for a queue entry processing when it throws
+          an exception
+        </description>
+        <value>5</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <type>org.exoplatform.services.scheduler.impl.QuartzSheduler</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.services.scheduler.QueueTasks</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.scheduler.JobSchedulerService</key>
+    <type>org.exoplatform.services.scheduler.impl.JobSchedulerServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.organization.search.UserSearchService</key>
+    <type>org.exoplatform.services.organization.search.UserSearchServiceImpl</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.services.organization.cache.OrganizationCacheHandler</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.organization.idm.PicketLinkIDMCacheService</key>
+    <type>org.exoplatform.services.organization.idm.PicketLinkIDMCacheService</type>
+  </component>
+
+
+  <component>
+    <key>org.gatein.common.transaction.JTAUserTransactionLifecycleService</key>
+    <type>org.gatein.common.transaction.JTAUserTransactionLifecycleServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.infinispan.transaction.lookup.TransactionManagerLookup</key>
+    <type>org.exoplatform.services.transaction.infinispan.JBossStandaloneJTAManagerLookup</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.transaction.TransactionService</key>
+    <type>org.exoplatform.services.transaction.infinispan.JBossTransactionsService</type>
+    <init-params>
+      <value-param>
+        <name>timeout</name>
+        <value>300</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.organization.idm.PicketLinkIDMService</key>
+    <type>org.exoplatform.services.organization.idm.PicketLinkIDMServiceImpl</type>
+    <init-params>
+      <value-param>
+        <name>config</name>
+        <value>jar:/conf/exo.portal.component.identity-picketlink-idm-ldap-as-external-config.xml
+        </value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.organization.OrganizationService</key>
+    <type>org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl</type>
+    <init-params>
+      <object-param>
+        <name>configuration</name>
+        <object type="org.exoplatform.services.organization.idm.Config">
+          <field name="forceMembershipOfMappedTypes">
+            <boolean>true</boolean>
+          </field>
+          <field name="associationMembershipType">
+            <string>member</string>
+          </field>
+          <field name="groupTypeMappings">
+            <map type="java.util.HashMap">
+              <entry>
+                <key>
+                  <string>/</string>
+                </key>
+                <value>
+                  <string>root_type</string>
+                </value>
+              </entry>
+              <entry>
+                <key>
+                  <string>/organization_hierarchy/*</string>
+                </key>
+                <value>
+                  <string>organization_hierarchy_type</string>
+                </value>
+              </entry>
+              <entry>
+                <key>
+                  <string>/role_hierarchy/*</string>
+                </key>
+                <value>
+                  <string>role_hierarchy_type</string>
+                </value>
+              </entry>
+            </map>
+          </field>
+          <field name="ignoreMappedMembershipTypeGroupList">
+            <collection type="java.util.ArrayList" item-type="java.lang.String">
+              <value>
+                <string>/organization_hierarchy/*</string>
+              </value>
+              <value>
+                <string>/role_hierarchy/*</string>
+              </value>
+            </collection>
+          </field>
+        </object>
+      </object-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.cache.CacheService</key>
+    <jmx-name>cache:type=CacheService</jmx-name>
+    <type>org.exoplatform.services.cache.impl.CacheServiceImpl</type>
+    <init-params>
+      <object-param>
+        <name>cache.config.default</name>
+        <description>The default cache configuration</description>
+        <object type="org.exoplatform.services.cache.ExoCacheConfig">
+          <field name="name">
+            <string>default</string>
+          </field>
+          <field name="maxSize">
+            <int>300</int>
+          </field>
+          <field name="liveTime">
+            <long>60</long>
+          </field>
+          <field name="distributed">
+            <boolean>false</boolean>
+          </field>
+          <field name="implementation">
+            <string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache
+            </string>
+          </field>
+        </object>
+      </object-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.database.HibernateService</key>
+    <jmx-name>database:type=HibernateService</jmx-name>
+    <type>org.exoplatform.services.database.impl.HibernateServiceImpl</type>
+    <init-params>
+      <properties-param>
+        <name>hibernate.properties</name>
+        <description>Default Hibernate Service</description>
+        <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+        <property name="hibernate.show_sql" value="false"/>
+        <property name="hibernate.current_session_context_class" value="thread"/>
+        <property name="hibernate.cache.use_second_level_cache" value="false"/>
+        <property name="hibernate.cache.use_query_cache" value="false"/>
+        <property name="hibernate.connection.datasource" value="jdbcidm"/>
+        <property name="hibernate.c3p0.min_size" value="5"/>
+        <property name="hibernate.c3p0.max_size" value="20"/>
+        <property name="hibernate.c3p0.timeout" value="1800"/>
+        <property name="hibernate.c3p0.max_statements" value="50"/>
+      </properties-param>
+    </init-params>
+  </component>
+  <!-- <component> <key>org.exoplatform.container.PropertyConfigurator</key> <type>org.exoplatform.container.PropertyConfigurator</type> <init-params> <value-param> <name>properties.url</name> <value>jar:/conf/standalone/configuration.properties</value> </value-param> </init-params> </component> -->
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.database.HibernateService</target-component>
+    <component-plugin>
+      <name>add.hibernate.mapping</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.database.impl.AddHibernateMappingPlugin</type>
+      <init-params>
+        <values-param>
+          <name>hibernate.mapping</name>
+          <value>conf/mappings/HibernateRealm.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectCredentialBinaryValue.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectAttributeBinaryValue.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObject.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectCredential.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectCredentialType.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectAttribute.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectType.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectRelationship.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectRelationshipType.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectRelationshipName.hbm.xml</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
+    <component-plugin>
+      <name>bind.datasource</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.naming.BindReferencePlugin</type>
+      <init-params>
+        <value-param>
+          <name>bind-name</name>
+          <value>jdbcidm</value>
+        </value-param>
+        <value-param>
+          <name>class-name</name>
+          <value>javax.sql.DataSource</value>
+        </value-param>
+        <value-param>
+          <name>factory</name>
+          <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
+        </value-param>
+        <properties-param profiles="hsqldb">
+          <name>ref-addresses</name>
+          <description>ref-addresses</description>
+          <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
+          <property name="url" value="jdbc:hsqldb:file:${gatein.test.tmp.dir}/db/data/jdbcidm"/>
+          <property name="username" value="sa"/>
+          <property name="password" value=""/>
+        </properties-param>
+        <properties-param profiles="mysql">
+          <name>ref-addresses</name>
+          <description>ref-addresses</description>
+          <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+          <property name="url" value="jdbc:mysql://10.37.129.4/jdbcidm?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8"/>
+          <property name="username" value="root"/>
+          <property name="password" value=""/>
+        </properties-param>
+        <properties-param profiles="h2">
+          <name>ref-addresses</name>
+          <description>ref-addresses</description>
+          <property name="driverClassName" value="org.h2.Driver"/>
+          <property name="url" value="jdbc:h2:file:${gatein.test.tmp.dir}/db/data/jdbcidm;DB_CLOSE_DELAY=-1"/>
+          <property name="username" value="sa"/>
+          <property name="password" value="sa"/>
+        </properties-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
+    <component-plugin>
+      <name>init.service.listener</name>
+      <set-method>addListenerPlugin</set-method>
+      <type>org.exoplatform.services.organization.OrganizationDatabaseInitializer</type>
+      <description>this listener populate organization data for the first
+        launch
+      </description>
+      <init-params>
+        <value-param>
+          <name>checkDatabaseAlgorithm</name>
+          <description>check database</description>
+          <value>entry</value>
+        </value-param>
+        <value-param>
+          <name>printInformation</name>
+          <description>Print information init database</description>
+          <value>true</value>
+        </value-param>
+        <object-param>
+          <name>configuration</name>
+          <description>description</description>
+          <object type="org.exoplatform.services.organization.OrganizationConfig">
+            <field name="membershipType">
+              <collection type="java.util.ArrayList">
+                <value>
+                  <object type="org.exoplatform.services.organization.OrganizationConfig$MembershipType">
+                    <field name="type">
+                      <string>manager</string>
+                    </field>
+                    <field name="description">
+                      <string>manager membership type</string>
+                    </field>
+                  </object>
+                </value>
+                <value>
+                  <object type="org.exoplatform.services.organization.OrganizationConfig$MembershipType">
+                    <field name="type">
+                      <string>member</string>
+                    </field>
+                    <field name="description">
+                      <string>member membership type</string>
+                    </field>
+                  </object>
+                </value>
+              </collection>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+</configuration>

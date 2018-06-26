@@ -122,7 +122,7 @@ public class CacheableUserHandlerImpl extends UserDAOImpl {
     disableCacheInThread.set(true);
     try {
       super.saveUser(user, broadcast);
-      cacheUser(user);
+      userCache.remove(user.getUserName());
     } finally {
       disableCacheInThread.set(false);
     }
@@ -135,7 +135,7 @@ public class CacheableUserHandlerImpl extends UserDAOImpl {
     disableCacheInThread.set(true);
     try {
       super.createUser(user, broadcast);
-      cacheUser(user);
+      userCache.remove(user.getUserName());
     } finally {
       disableCacheInThread.set(false);
     }
@@ -167,9 +167,12 @@ public class CacheableUserHandlerImpl extends UserDAOImpl {
     userCache.clearCache();
   }
 
-  private void cacheUser(User user) {
-    user = (User) ((ExtendedCloneable) user).clone();
-    userCache.put(user.getUserName(), user);
+  public void disableCache() {
+    disableCacheInThread.set(true);
+  }
+
+  public void enableCache() {
+    disableCacheInThread.set(null);
   }
 
 }

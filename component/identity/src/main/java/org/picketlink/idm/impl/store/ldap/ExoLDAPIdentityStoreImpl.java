@@ -4,6 +4,7 @@ import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.NotYetImplementedException;
 import org.picketlink.idm.impl.helper.Tools;
 import org.picketlink.idm.impl.model.ldap.LDAPIdentityObjectImpl;
+import org.picketlink.idm.spi.configuration.IdentityStoreConfigurationContext;
 import org.picketlink.idm.spi.model.IdentityObject;
 import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
 import org.picketlink.idm.spi.model.IdentityObjectType;
@@ -16,7 +17,10 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
+import javax.naming.ldap.Control;
 import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.SortControl;
+
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,19 +31,20 @@ import java.util.regex.Pattern;
  * improve the fetching members of groups from Active directory by fixing the
  * way when retrieving the ID of the IdentityObject from LDAP in case CN is not
  * equal to the UID attribute value
- *
  */
 public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
 
-  private static Logger log = Logger.getLogger(LDAPIdentityStoreImpl.class.getName());
+  public static final String MODIFICATION_DATE_SINCE = "modificationDateSince";
+
+  private static Logger      log                     = Logger.getLogger(LDAPIdentityStoreImpl.class.getName());
 
   public ExoLDAPIdentityStoreImpl(String id) {
     super(id);
   }
 
   /**
-   *  retrieve the ID of the IdentityObject from LDAP according to the customer's configuration
-   *  (prevent problems when cn is not equal to the uid attribute )
+   * retrieve the ID of the IdentityObject from LDAP according to the customer's
+   * configuration (prevent problems when cn is not equal to the uid attribute )
    *
    * @param ctx the IdentityStoreInvocationContext
    * @param id the identity
@@ -73,7 +78,7 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
       if (matches.size() == 1) {
         type = matches.iterator().next();
       } else if (matches.size() > 1) {
-        //****** Begin changes ****/
+        // ****** Begin changes ****/
         // retrieve the UID attribute from the LDAP configuration
         List<SerializableSearchResult> searchResult = null;
         for (IdentityObjectType possibleTypeMatch : matches) {
@@ -91,7 +96,14 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
           String name = nameAttribute.get().toString();
           Object[] filterArgs = { name };
           if (filter != null) {
-            searchResult = this.searchIdentityObjects(ctx, entryCtxs, filter, filterArgs, new String[] { idAttributeName }, scope,null);
+            searchResult =
+                         this.searchIdentityObjects(ctx,
+                                                    entryCtxs,
+                                                    filter,
+                                                    filterArgs,
+                                                    new String[] { idAttributeName },
+                                                    scope,
+                                                    null);
             if (searchResult.size() > 0) {
               type = possibleTypeMatch;
               break;
@@ -145,7 +157,8 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
   }
 
   /**
-   * To fix the exception encountered when trying to retrieve filtered groups, we verify if findIdentityObject() returns null or not
+   * To fix the exception encountered when trying to retrieve filtered groups,
+   * we verify if findIdentityObject() returns null or not
    *
    * @param ctx the IdentityStoreInvocationContext
    * @param identity the IdentityObject
@@ -157,9 +170,18 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
    * @throws IdentityException
    */
   @Override
-  public Collection<IdentityObject> findIdentityObject(IdentityStoreInvocationContext ctx, IdentityObject identity, IdentityObjectRelationshipType relationshipType, Collection<IdentityObjectType> excludes, boolean parent, IdentityObjectSearchCriteria criteria) throws IdentityException {
+  public Collection<IdentityObject> findIdentityObject(IdentityStoreInvocationContext ctx,
+                                                       IdentityObject identity,
+                                                       IdentityObjectRelationshipType relationshipType,
+                                                       Collection<IdentityObjectType> excludes,
+                                                       boolean parent,
+                                                       IdentityObjectSearchCriteria criteria) throws IdentityException {
     if (log.isLoggable(Level.FINER)) {
-      Tools.logMethodIn(log, Level.FINER,"findIdentityObject", new Object[] { "IdentityObject", identity, "IdentityObjectRelationshipType", relationshipType, "parent", parent, "IdentityObjectSearchCriteria", criteria });
+      Tools.logMethodIn(log,
+                        Level.FINER,
+                        "findIdentityObject",
+                        new Object[] { "IdentityObject", identity, "IdentityObjectRelationshipType", relationshipType, "parent",
+                            parent, "IdentityObjectSearchCriteria", criteria });
     }
     if (relationshipType != null && !relationshipType.getName().equals(MEMBERSHIP_TYPE)) {
       throw new IdentityException("This store implementation supports only '" + MEMBERSHIP_TYPE + "' relationship type");
@@ -217,7 +239,9 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
         // if not parent then all parent entries need to be found
       } else {
         if (typeConfig.getChildMembershipAttributeName() == null) {
-          objects.addAll(findRelatedIdentityObjects(ctx, identity, ldapIO, criteria, true));
+          if (ldapIO != null) {
+            objects.addAll(findRelatedIdentityObjects(ctx, identity, ldapIO, criteria, true));
+          }
         } else {
           // Escape JNDI special characters
           Name jndiName = new CompositeName().add(ldapIO.getDn());
@@ -299,6 +323,170 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
     return ldapContext;
   }
 
+  /**
+   * This is an override of original implementation to be able to query on
+   * modification date.
+   * 
+   * {@inheritDoc}
+   */
+  @Override
+  public Collection<IdentityObject> findIdentityObject(IdentityStoreInvocationContext invocationCtx,
+                                                       IdentityObjectType type,
+                                                       IdentityObjectSearchCriteria criteria) throws IdentityException {
+
+    // TODO: page control with LDAP request control
+
+    if (log.isLoggable(Level.FINER)) {
+      Tools.logMethodIn(log,
+                        Level.FINER,
+                        "findIdentityObject",
+                        new Object[] { "IdentityObjectType", type, "IdentityObjectSearchCriteria", criteria });
+    }
+
+    String nameFilter = "*";
+
+    // Filter by name
+    if (criteria != null && criteria.getFilter() != null) {
+      nameFilter = criteria.getFilter();
+    }
+
+    checkIOType(type);
+
+    LinkedList<IdentityObject> objects = new LinkedList<IdentityObject>();
+
+    LDAPIdentityObjectTypeConfiguration typeConfiguration = getTypeConfiguration(invocationCtx, type);
+
+    try {
+      Control[] requestControls = null;
+
+      // Sort control
+      if (criteria != null && criteria.isSorted() && configuration.isSortExtensionSupported()) {
+        // TODO sort by attribute name
+        requestControls = new Control[] { new SortControl(typeConfiguration.getIdAttributeName(), Control.CRITICAL) };
+      }
+
+      StringBuilder af = new StringBuilder();
+
+      // Filter by attribute values
+      if (criteria != null && criteria.isFiltered()) {
+        af.append("(&");
+
+        for (Map.Entry<String, String[]> stringEntry : criteria.getValues().entrySet()) {
+          /* Begin changes */
+          if (MODIFICATION_DATE_SINCE.equals(stringEntry.getKey())) {
+            if (stringEntry.getValue() != null && stringEntry.getValue().length == 1) {
+              String value = stringEntry.getValue()[0];
+              af.append("(|")
+                .append("(createTimestamp>=")
+                .append(value)
+                .append("Z)")
+                .append("(modifyTimestamp>=")
+                .append(value)
+                .append("Z)")
+                .append("(whenCreated>=")
+                .append(value)
+                .append(".0Z)")
+                .append("(whenChanged>=")
+                .append(value)
+                .append(".0Z)")
+                .append(")");
+            }
+            continue;
+          }
+          /* End changes */
+          for (String value : stringEntry.getValue()) {
+            String attributeName = getTypeConfiguration(invocationCtx, type).getAttributeMapping(stringEntry.getKey());
+
+            if (attributeName == null) {
+              attributeName = stringEntry.getKey();
+            }
+
+            af.append("(").append(attributeName).append("=").append(value).append(")");
+          }
+        }
+
+        af.append(")");
+      }
+
+      String filter = getTypeConfiguration(invocationCtx, type).getEntrySearchFilter();
+      List<SerializableSearchResult> sr = null;
+
+      String[] entryCtxs = getTypeConfiguration(invocationCtx, type).getCtxDNs();
+      String scope = getTypeConfiguration(invocationCtx, type).getEntrySearchScope();
+
+      if (filter != null && filter.length() > 0) {
+
+        // Wildcards will be escabed by filterArgs
+        filter = filter.replaceAll("\\{0\\}", nameFilter);
+
+        sr = searchIdentityObjects(invocationCtx,
+                                   entryCtxs,
+                                   "(&(" + filter + ")" + af.toString() + ")",
+                                   null,
+                                   new String[] { typeConfiguration.getIdAttributeName() },
+                                   scope,
+                                   requestControls);
+      } else {
+        filter = "(".concat(typeConfiguration.getIdAttributeName()).concat("=").concat(nameFilter).concat(")");
+        sr = searchIdentityObjects(invocationCtx,
+                                   entryCtxs,
+                                   "(&(" + filter + ")" + af.toString() + ")",
+                                   null,
+                                   new String[] { typeConfiguration.getIdAttributeName() },
+                                   scope,
+                                   requestControls);
+      }
+
+      for (SerializableSearchResult res : sr) {
+        String dn = res.getNameInNamespace();
+        if (criteria != null && criteria.isSorted() && configuration.isSortExtensionSupported()) {
+          // It seams that the sort order is not configurable and
+          // sort control returns entries in descending order by default...
+          if (!criteria.isAscending()) {
+            objects.addFirst(createIdentityObjectInstance(invocationCtx, type, res.getAttributes(), dn));
+          } else {
+            objects.addLast(createIdentityObjectInstance(invocationCtx, type, res.getAttributes(), dn));
+          }
+        } else {
+          objects.add(createIdentityObjectInstance(invocationCtx, type, res.getAttributes(), dn));
+        }
+      }
+    } catch (NoSuchElementException e) {
+      // log.debug("No identity object found with name: " + name, e);
+    } catch (Exception e) {
+      if (log.isLoggable(Level.FINER)) {
+        log.log(Level.FINER, "Exception occurred: ", e);
+      }
+
+      throw new IdentityException("IdentityObject search failed.", e);
+    }
+
+    // In case sort extension is not supported
+    if (criteria != null && criteria.isSorted() && !configuration.isSortExtensionSupported()) {
+      sortByName(objects, criteria.isAscending());
+    }
+
+    if (criteria != null && criteria.isPaged()) {
+      objects = (LinkedList) cutPageFromResults(objects, criteria);
+    }
+
+    if (log.isLoggable(Level.FINER)) {
+      Tools.logMethodOut(log, Level.FINER, "findIdentityObject", objects);
+    }
+
+    return objects;
+  }
+
+  private void checkIOType(IdentityObjectType iot) throws IdentityException {
+    if (iot == null) {
+      throw new IllegalArgumentException("IdentityObjectType is null");
+    }
+
+    if (!getSupportedFeatures().isIdentityObjectTypeSupported(iot)) {
+      throw new IdentityException("IdentityType not supported by this IdentityStore implementation: " + iot);
+    }
+  }
+
   private LDAPIdentityObjectTypeConfiguration getTypeConfiguration(IdentityStoreInvocationContext ctx,
                                                                    IdentityObjectType type) throws IdentityException {
     return getConfiguration(ctx).getTypeConfiguration(type.getName());
@@ -319,6 +507,7 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
       }
     });
   }
+
   // TODO: dummy and inefficient temporary workaround. Need to be implemented
   // with ldap request control
   private <T> List<T> cutPageFromResults(List<T> objects, IdentityObjectSearchCriteria criteria) {
@@ -352,7 +541,8 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
         if (log.isLoggable(Level.FINER)) {
           log.finer("Failed to find IdentityObject in LDAP: " + io);
         }
-        throw new IdentityException("Provided IdentityObject is not present in the store. Cannot operate on not stored objects.", e);
+        throw new IdentityException("Provided IdentityObject is not present in the store. Cannot operate on not stored objects.",
+                                    e);
       }
     }
   }

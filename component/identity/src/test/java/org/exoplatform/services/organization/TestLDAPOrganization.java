@@ -114,7 +114,7 @@ public class TestLDAPOrganization extends TestOrganization {
 
   public void testFindGroupHierachy() throws Exception {
       GroupHandler handler = organizationService.getGroupHandler();
-      Group group = handler.findGroupById("/organization_hierarcy/OrganizationC");
+      Group group = handler.findGroupById("/organization_hierarchy/OrganizationC");
 
       Collection childGoups = handler.findGroups(group);
       Assert.assertTrue(childGoups.size() > 0);
@@ -122,10 +122,10 @@ public class TestLDAPOrganization extends TestOrganization {
 
   public void testFindFilteredGroup() throws Exception {
     GroupHandler handler = organizationService.getGroupHandler();
-    Group filteredGroup = handler.findGroupById("/organization_hierarcy/filteredSubOrganizationC");
+    Group filteredGroup = handler.findGroupById("/organization_hierarchy/filteredSubOrganizationC");
     assertNull(filteredGroup);
 
-    Group existingGroup =  handler.findGroupById("/organization_hierarcy/OrganizationC");
+    Group existingGroup =  handler.findGroupById("/organization_hierarchy/OrganizationC");
     assertNotNull(existingGroup);
   }
 

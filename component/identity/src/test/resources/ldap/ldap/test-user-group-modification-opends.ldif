@@ -1,0 +1,4 @@
+dn: cn=Admin,ou=Roles,o=test,dc=portal,dc=example,dc=com
+changetype: modify
+add: member
+member: uid=jduke10,ou=People,o=test,dc=portal,dc=example,dc=com

@@ -94,7 +94,6 @@ public class CacheableGroupHandlerImpl extends GroupDAOImpl {
   public void addChild(Group parent, Group child, boolean broadcast) throws Exception {
     disableCacheInThread.set(true);
     try {
-      super.addChild(parent, child, broadcast);
       if (useCacheList) {
         if (parent == null) {
           groupCache.remove(computeChildrenKey((String) null));
@@ -102,6 +101,7 @@ public class CacheableGroupHandlerImpl extends GroupDAOImpl {
           groupCache.remove(computeChildrenKey(parent));
         }
       }
+      super.addChild(parent, child, broadcast);
     } finally {
       disableCacheInThread.set(false);
     }
@@ -168,13 +168,13 @@ public class CacheableGroupHandlerImpl extends GroupDAOImpl {
     Group gr = null;
     disableCacheInThread.set(true);
     try {
-      gr = super.removeGroup(group, broadcast);
-
       String groupId = getGroupId(group);
 
       // Delete related cache entries
       groupCache.select(new ClearGroupCacheByGroupIdSelector(groupId, group.getParentId(), useCacheList));
       membershipCache.select(new ClearMembershipCacheByGroupIdSelector(groupId));
+
+      gr = super.removeGroup(group, broadcast);
     } finally {
       disableCacheInThread.set(false);
     }
@@ -185,7 +185,7 @@ public class CacheableGroupHandlerImpl extends GroupDAOImpl {
    * {@inheritDoc}
    */
   @Override
-  protected String getGroupId(org.picketlink.idm.api.Group jbidGroup,
+  public String getGroupId(org.picketlink.idm.api.Group jbidGroup,
                               List<org.picketlink.idm.api.Group> processed) throws Exception {
     if (disableCacheInThread.get() == null || !disableCacheInThread.get()) {
       Integer cacheKey = jbidGroup.hashCode();
@@ -201,13 +201,13 @@ public class CacheableGroupHandlerImpl extends GroupDAOImpl {
   public void saveGroup(Group group, boolean broadcast) throws Exception {
     disableCacheInThread.set(true);
     try {
-      super.saveGroup(group, broadcast);
       groupCache.remove(getGroupId(group));
       if (group.getParentId() == null) {
         groupCache.remove(computeChildrenKey((String) null));
       } else {
         groupCache.remove(computeChildrenKey(group.getParentId()));
       }
+      super.saveGroup(group, broadcast);
     } finally {
       disableCacheInThread.set(false);
     }
@@ -215,6 +215,14 @@ public class CacheableGroupHandlerImpl extends GroupDAOImpl {
 
   public void clearCache() {
     groupCache.clearCache();
+  }
+
+  public void disableCache() {
+    disableCacheInThread.set(true);
+  }
+
+  public void enableCache() {
+    disableCacheInThread.set(null);
   }
 
   private static final String computeChildrenKey(Group parent) {

@@ -38,6 +38,7 @@ import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.web.AbstractHttpServlet;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.Query;
@@ -336,9 +337,11 @@ public class LoginServlet extends AbstractHttpServlet {
      * @return
      */
     private String getUserNameCaseInsensitive(String username) {
+      ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
+      RequestLifeCycle.begin(currentContainer);
       try {
           OrganizationService organizationService =
-                  (OrganizationService) ExoContainerContext.getCurrentContainer()
+                  (OrganizationService) currentContainer
                           .getComponentInstance(OrganizationService.class);
           Query query = new Query();
           query.setUserName(username);
@@ -364,6 +367,8 @@ public class LoginServlet extends AbstractHttpServlet {
           }
       } catch (Exception exception) {
           log.warn("Error while retrieving user " + username + " from IDM stores ", exception);
+      } finally {
+        RequestLifeCycle.end();
       }
       return username;
     }

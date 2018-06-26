@@ -19,17 +19,15 @@
 
 package org.exoplatform.services.organization.idm;
 
-import org.exoplatform.services.organization.Group;
-import org.exoplatform.services.organization.GroupEventListener;
-import org.exoplatform.services.organization.GroupHandler;
-import org.exoplatform.services.organization.MembershipTypeHandler;
+import java.util.*;
+
 import org.gatein.common.logging.LogLevel;
 import org.picketlink.idm.api.Attribute;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.SimpleAttribute;
 
-import java.util.*;
+import org.exoplatform.services.organization.*;
 
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
@@ -43,6 +41,8 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
     private List<GroupEventListener> listeners_;
 
     private static final String CYCLIC_ID = "org.gatein.portal.identity.LOOPED_GROUP_ID";
+
+    org.picketlink.idm.api.Group rootGroup = null;
 
     public GroupDAOImpl(PicketLinkIDMOrganizationServiceImpl orgService, PicketLinkIDMService service) {
         super(orgService, service);
@@ -93,16 +93,15 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                         orgService.getConfiguration().getGroupType(parent.getParentId()));
             } catch (Exception e) {
                 handleException("Cannot obtain group: " + parentPLGroupName, e);
-                throw e;
             }
             if(parentGroup == null) {
                 throw new Exception("Parent group does not exist");
             }
 
-            ((ExtGroup) child).setId(parent.getId() + "/" + child.getGroupName());
+            child.setId(parent.getId() + "/" + child.getGroupName());
 
         } else {
-            ((ExtGroup) child).setId("/" + child.getGroupName());
+            child.setId("/" + child.getGroupName());
         }
 
         if (broadcast) {
@@ -110,7 +109,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         }
 
         if (parentGroup != null) {
-            ((ExtGroup) child).setParentId(parent.getId());
+            child.setParentId(parent.getId());
         }
         Group g = findGroupById(child.getId());
         if(g != null) {
@@ -140,9 +139,8 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                 }
         	} catch (IdentityException e1) {
                 handleException("Cannot deassociate groups: ", e1);
-                throw e1;
         	}
-            throw e;
+          throw e;
         }
 
         if (broadcast) {
@@ -182,7 +180,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                     orgService.getConfiguration().getGroupType(group.getParentId()));
         } catch (Exception e) {
             handleException("Cannot obtain group: " + plGroupName + "; ", e);
-            throw e;
         }
 
         if (jbidGroup == null) {
@@ -243,7 +240,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
         } catch (Exception e) {
             handleException("Cannot clear group relationships: " + plGroupName + "; ", e);
-            throw e;
         }
 
         try {
@@ -251,7 +247,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
         } catch (Exception e) {
             handleException("Cannot remove group: " + plGroupName + "; ", e);
-            throw e;
         }
 
         if (broadcast) {
@@ -610,7 +605,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         }
     }
 
-    protected Group convertGroup(org.picketlink.idm.api.Group jbidGroup) throws Exception {
+    public Group convertGroup(org.picketlink.idm.api.Group jbidGroup) throws Exception {
         if (log.isTraceEnabled()) {
             Tools.logMethodIn(log, LogLevel.TRACE, "convertGroup", new Object[] { "jbidGroup", jbidGroup });
         }
@@ -632,6 +627,9 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
         if (attrs.containsKey(GROUP_DESCRIPTION) && attrs.get(GROUP_DESCRIPTION).getValue() != null) {
             exoGroup.setDescription(attrs.get(GROUP_DESCRIPTION).getValue().toString());
+        }
+        if (attrs.containsKey(EntityMapperUtils.ORIGINATING_STORE) && attrs.get(EntityMapperUtils.ORIGINATING_STORE).getValue() != null) {
+            exoGroup.setOriginatingStore(attrs.get(EntityMapperUtils.ORIGINATING_STORE).getValue().toString());
         }
         if (attrs.containsKey(GROUP_LABEL) && attrs.get(GROUP_LABEL).getValue() != null) {
             exoGroup.setLabel(attrs.get(GROUP_LABEL).getValue().toString());
@@ -673,7 +671,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
      * @return
      * @throws Exception
      */
-    protected String getGroupId(org.picketlink.idm.api.Group jbidGroup, List<org.picketlink.idm.api.Group> processed)
+    public String getGroupId(org.picketlink.idm.api.Group jbidGroup, List<org.picketlink.idm.api.Group> processed)
             throws Exception {
         if (log.isTraceEnabled()) {
             Tools.logMethodIn(log, LogLevel.TRACE, "getGroupId",
@@ -811,7 +809,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         } catch (Exception e) {
             // TODO:
             handleException("Identity operation error: ", e);
-            throw e;
         }
 
         if (jbidGroup == null) {
@@ -833,6 +830,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
         String description = exoGroup.getDescription();
         String label = exoGroup.getLabel();
+        String originatingStore = exoGroup.getOriginatingStore();
 
         List<Attribute> attrsList = new ArrayList<Attribute>();
         if (description != null) {
@@ -841,6 +839,10 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
         if (label != null) {
             attrsList.add(new SimpleAttribute(GROUP_LABEL, label));
+        }
+
+        if (originatingStore != null) {
+            attrsList.add(new SimpleAttribute(EntityMapperUtils.ORIGINATING_STORE, originatingStore));
         }
 
         if (attrsList.size() > 0) {
@@ -853,7 +855,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
             } catch (Exception e) {
                 // TODO:
                 handleException("Identity operation error: ", e);
-                throw e;
             }
 
         }
@@ -909,15 +910,16 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
      * @return
      * @throws Exception
      */
-    protected org.picketlink.idm.api.Group obtainRootGroup() throws Exception{
-        org.picketlink.idm.api.Group rootGroup = null;
+    public org.picketlink.idm.api.Group obtainRootGroup() throws Exception{
+        if(rootGroup != null) {
+          return rootGroup;
+        }
         try {
             rootGroup = getIdentitySession().getPersistenceManager().findGroup(
                     orgService.getConfiguration().getRootGroupName(), orgService.getConfiguration().getGroupType("/"));
         } catch (Exception e) {
             // TODO:
             handleException("Identity operation error: ", e);
-            throw e;
         }
 
         if (rootGroup == null) {

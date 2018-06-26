@@ -1,0 +1,6 @@
+dn: cn=Delta,ou=Roles,o=test,dc=portal,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: Delta
+description: Delta group
+member: uid=jduke1,ou=People,o=test,dc=portal,dc=example,dc=com

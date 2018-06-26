@@ -134,6 +134,14 @@ public class CacheableMembershipTypeHandlerImpl extends MembershipTypeDAOImpl {
     membershipTypeCache.clearCache();
   }
 
+  public void disableCache() {
+    disableCacheInThread.set(true);
+  }
+
+  public void enableCache() {
+    disableCacheInThread.set(null);
+  }
+
   public static final class ClearMembershipCacheByMembershipTypeSelector
       implements CachedObjectSelector<MembershipCacheKey, Object> {
     private String membershipType;

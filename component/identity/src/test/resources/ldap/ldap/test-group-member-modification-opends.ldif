@@ -1,0 +1,3 @@
+dn: cn=Delta,ou=Roles,o=test,dc=portal,dc=example,dc=com
+changetype: modify
+delete: member

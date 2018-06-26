@@ -207,6 +207,14 @@ public class CacheableMembershipHandlerImpl extends MembershipDAOImpl {
     membershipCache.clearCache();
   }
 
+  public void disableCache() {
+    disableCacheInThread.set(true);
+  }
+
+  public void enableCache() {
+    disableCacheInThread.set(null);
+  }
+
   public enum MembershipCacheOperationType {
     MEMBERSHIP_BY_ID, MEMBERSHIPS_FOR_USER
   }

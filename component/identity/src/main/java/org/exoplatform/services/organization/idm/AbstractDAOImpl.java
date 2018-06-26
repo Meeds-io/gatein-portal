@@ -51,23 +51,31 @@ public class AbstractDAOImpl {
     }
 
     public void handleException(String messageToLog, Exception e) {
-        log.info(messageToLog, e);
-
-        // Mark JTA transaction to rollback-only if JTA setup is enabled
-        if (orgService.getConfiguration().isUseJTA()) {
-            try {
-                JTAUserTransactionLifecycleService transactionLfService = (JTAUserTransactionLifecycleService) ExoContainerContext
-                        .getCurrentContainer().getComponentInstanceOfType(JTAUserTransactionLifecycleService.class);
-                UserTransaction tx = transactionLfService.getUserTransaction();
-                if (tx.getStatus() == Status.STATUS_ACTIVE) {
-                    tx.setRollbackOnly();
-                }
-            } catch (Exception tre) {
-                log.warn("Unable to set Transaction status to be rollback only", tre);
-            }
-        } else {
-            orgService.recoverFromIDMError(e);
+        try {
+          // Mark JTA transaction to rollback-only if JTA setup is enabled
+          if (orgService.getConfiguration().isUseJTA()) {
+              try {
+                  JTAUserTransactionLifecycleService transactionLfService = (JTAUserTransactionLifecycleService) ExoContainerContext
+                          .getCurrentContainer().getComponentInstanceOfType(JTAUserTransactionLifecycleService.class);
+                  UserTransaction tx = transactionLfService.getUserTransaction();
+                  if (tx.getStatus() == Status.STATUS_ACTIVE) {
+                      tx.setRollbackOnly();
+                  }
+              } catch (Exception tre) {
+                  log.warn("Unable to set Transaction status to be rollback only", tre);
+              }
+          } else {
+              orgService.recoverFromIDMError(e);
+          }
+        } catch (Exception e1) {
+          // If an error happens when rollbacking the transaction, display the
+          // original error and after that the erro about rollbacking
+          log.warn(messageToLog, e);
+          log.warn("Error while rollbacking IDM Transaction due to previous error", e1);
         }
+        // Always throw the original exception to make sure that top layer services
+        // are triggered about the error
+        throw new RuntimeException(messageToLog, e);
     }
 
     protected IdentitySession getIdentitySession() throws Exception {

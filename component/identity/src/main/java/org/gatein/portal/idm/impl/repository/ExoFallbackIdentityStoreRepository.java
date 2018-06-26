@@ -1,617 +1,537 @@
 package org.gatein.portal.idm.impl.repository;
 
-import org.exoplatform.services.organization.idm.UserDAOImpl;
-import org.gatein.portal.idm.IdentityStoreSource;
+import java.util.*;
+
+import org.apache.commons.lang.StringUtils;
 import org.picketlink.idm.common.exception.IdentityException;
-import org.picketlink.idm.impl.api.IdentitySearchCriteriaImpl;
-import org.picketlink.idm.impl.api.session.managers.RoleManagerImpl;
-import org.picketlink.idm.impl.repository.FallbackIdentityStoreRepository;
-import org.picketlink.idm.impl.repository.RepositoryIdentityStoreSessionImpl;
+import org.picketlink.idm.impl.repository.AbstractIdentityStoreRepository;
 import org.picketlink.idm.impl.store.SimpleIdentityStoreInvocationContext;
 import org.picketlink.idm.spi.configuration.IdentityRepositoryConfigurationContext;
-import org.picketlink.idm.spi.configuration.metadata.IdentityRepositoryConfigurationMetaData;
-import org.picketlink.idm.spi.configuration.metadata.IdentityStoreMappingMetaData;
-import org.picketlink.idm.spi.model.IdentityObject;
-import org.picketlink.idm.spi.model.IdentityObjectAttribute;
-import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
-import org.picketlink.idm.spi.model.IdentityObjectType;
+import org.picketlink.idm.spi.configuration.IdentityStoreConfigurationContext;
+import org.picketlink.idm.spi.configuration.metadata.*;
+import org.picketlink.idm.spi.exception.OperationNotSupportedException;
+import org.picketlink.idm.spi.model.*;
 import org.picketlink.idm.spi.search.IdentityObjectSearchCriteria;
-import org.picketlink.idm.spi.store.AttributeStore;
-import org.picketlink.idm.spi.store.IdentityStore;
-import org.picketlink.idm.spi.store.IdentityStoreInvocationContext;
-import org.picketlink.idm.spi.store.IdentityStoreSession;
-
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.picketlink.idm.spi.store.*;
 
 /**
- * extends the class FallbackIdentityStoreRepository from PicketLink Idm in order to customize the PortalRepository
- * and to work with the mandatoryStoredObjects option which is added in the LDAP configuration
+ * An implementation used by External Store API to manage between internal and
+ * external store entities
  */
-public class ExoFallbackIdentityStoreRepository extends FallbackIdentityStoreRepository {
+public class ExoFallbackIdentityStoreRepository extends AbstractIdentityStoreRepository {
 
-    private static Logger log = Logger.getLogger(ExoFallbackIdentityStoreRepository.class.getName());
+  private static final long            serialVersionUID                     = -4857082329385386057L;
 
-    //New option added in the LDAP configuration
-    public static final String OPTION_MANDATORY_OBJECTS = "mandatoryStoredObjects";
+  private String                       id                                   = null;
 
-    // Map<MandatoryIdentityTypeIds, CorrespondingIdentityStore>
-    private Map<String, IdentityStore> mandatoryStores = new HashMap<String, IdentityStore>();
+  private String                       externalStoreId                      = null;
 
-    // Set<MandatoryIdentityTypeIds>
-    private Set<String> mandatoryStoresObjects = new HashSet<String>();
+  private IdentityStore                externalIdentityStore                = null;
 
-    private final Set<IdentityStore> configuredIdentityStores = new HashSet<IdentityStore>();
+  private AttributeStore               externalAttributeStore               = null;
 
-    public ExoFallbackIdentityStoreRepository(String id) {
-        super(id);
+  private IdentityStoreMappingMetaData externalIdentityStoreMappingMetaData = null;
+
+  private ThreadLocal<Boolean>         useExternalStore                     = new ThreadLocal<>();
+
+  private FeaturesMetaData             featuresMetaData                     = null;
+
+  public ExoFallbackIdentityStoreRepository(String id) {
+    this.id = id;
+  }
+
+  @Override
+  public void bootstrap(IdentityRepositoryConfigurationContext configurationContext,
+                        Map<String, IdentityStore> bootstrappedIdentityStores,
+                        Map<String, AttributeStore> bootstrappedAttributeStores) throws IdentityException {
+    IdentityRepositoryConfigurationMetaData configurationMD = configurationContext.getRepositoryConfigurationMetaData();
+    String defaultStoreId = configurationMD.getDefaultIdentityStoreId();
+    if (StringUtils.isBlank(defaultStoreId)) {
+      throw new IllegalStateException("Default store is not configured");
+    }
+    Set<String> identityStores = bootstrappedIdentityStores.keySet();
+    if ((identityStores.contains(defaultStoreId) && identityStores.size() > 2)
+        || (!identityStores.contains(defaultStoreId) && identityStores.size() > 1)) {
+      throw new IllegalStateException("More than 2 store are configured, only two stores at most are supported.");
     }
 
-    /**override bootstrap() method in order to add
-     *  the mandatoryStoredObjects option of the new LDAP configuration into consideration
-     * @param configurationContext
-     * @param bootstrappedIdentityStores
-     * @param bootstrappedAttributeStores
-     * @throws IdentityException
-     */
-    @Override
-    public void bootstrap(IdentityRepositoryConfigurationContext configurationContext, Map<String, IdentityStore> bootstrappedIdentityStores, Map<String, AttributeStore> bootstrappedAttributeStores)
-            throws IdentityException {
-        super.bootstrap(configurationContext, bootstrappedIdentityStores, bootstrappedAttributeStores);
-        // Helper collection to keep all identity stores in use
-        if (getIdentityStoreMappings().size() > 0) {
-            configuredIdentityStores.addAll(getMappedIdentityStores());
+    if ((identityStores.contains(defaultStoreId) && identityStores.size() > 1)
+        || (!identityStores.contains(defaultStoreId) && identityStores.size() > 0)) {
+      for (String storeId : identityStores) {
+        if (defaultStoreId.equals(storeId)) {
+          continue;
         }
-        IdentityRepositoryConfigurationMetaData configurationMD = configurationContext.getRepositoryConfigurationMetaData();
-        List<IdentityStoreMappingMetaData> mappingMDs = configurationMD.getIdentityStoreToIdentityObjectTypeMappings();
-        for (IdentityStoreMappingMetaData mappingMD : mappingMDs) {
-            String identityTypeIdsValue = mappingMD.getOptionSingleValue(OPTION_MANDATORY_OBJECTS);
-            if (identityTypeIdsValue != null && !identityTypeIdsValue.trim().isEmpty()) {
-                identityTypeIdsValue = identityTypeIdsValue.trim();
-                String identityStoreId = mappingMD.getIdentityStoreId();
-                String[] identityTypeIds = identityTypeIdsValue.split(",");
-                for (String identityTypeId : identityTypeIds) {
-                    identityTypeId = identityTypeId.trim();
-                    if (identityTypeId.isEmpty()) {
-                        continue;
-                    }
-                    if (!mappingMD.getIdentityObjectTypeMappings().contains(identityTypeId)) {
-                        log.warning("'mandatoryStoredObjects' parameter contains an identityTypeId that is not mapped in Store : " + identityStoreId);
-                        continue;
-                    }
-                    if (mandatoryStoresObjects.contains(identityTypeId)) {
-                        log.warning("'mandatoryStoredObjects' parameter contains an identityTypeId that is already defined as mandatory in a Store. This parameter value will be ignored in store: "
-                                + identityStoreId);
-                        continue;
-                    }
-                    Iterator<IdentityStore> identityStoresIterator = configuredIdentityStores.iterator();
-                    do {
-                        IdentityStore identityStore = identityStoresIterator.next();
-                        if (identityStore.getId().equals(identityStoreId)) {
-                            mandatoryStores.put(identityTypeId, identityStore);
-                        }
-                    } while (identityStoresIterator.hasNext() && !mandatoryStores.containsKey(identityTypeId));
-                    mandatoryStoresObjects.add(identityTypeId);
-                }
-            }
-        }
-    }
-
-    /**Add this original method from the FallbackIdentityStoreRepository class
-     * @param iot
-     * @return List<IdentityStore> used in the implementation of findIdentityObject() method
-     */
-    List<IdentityStore> resolveIdentityStores(IdentityObjectType iot) {
-
-        List<IdentityStore> ids = null;
-        try {
-            ids = getIdentityStores(iot);
-        } catch (IdentityException e) {
-            if (isAllowNotDefinedAttributes()) {
-                ids = new LinkedList<IdentityStore>();
-                ids.add(defaultIdentityStore);
-                return ids;
-            }
-            if (log.isLoggable(Level.FINER)) {
-                log.log(Level.FINER, "Exception occurred: ", e);
-            }
-            throw new IllegalStateException("Used IdentityObjectType not mapped. Consider using " + ALLOW_NOT_DEFINED_IDENTITY_OBJECT_TYPES_OPTION + " repository option switch: " + iot);
-        }
-        if (ids == null || ids.size() == 0) {
-            ids = new LinkedList<IdentityStore>();
-            ids.add(defaultIdentityStore);
-        } else {
-            boolean isReadOnly = true;
-            for (IdentityStore identityStore : ids) {
-                isReadOnly &= isIdentityStoreReadOnly(identityStore);
-            }
-            if (isReadOnly) {
-                ids.add(defaultIdentityStore);
-            }
-        }
-        return ids;
-    }
-
-    /**Add this original method from the FallbackIdentityStoreRepository class
-     * @param targetStore
-     * @param invocationCtx
-     * @return IdentityStoreInvocationContext used in the implementation of findIdentityObject() method
-     */
-    IdentityStoreInvocationContext resolveInvocationContext(IdentityStore targetStore, IdentityStoreInvocationContext invocationCtx) {
-        return resolveInvocationContext(targetStore.getId(), invocationCtx);
-    }
-
-    /**Add this original method from the FallbackIdentityStoreRepository class
-     * @param targetStore
-     * @param invocationCtx
-     * @return IdentityStoreInvocationContext used in the implementation of findIdentityObject() method
-     */
-    IdentityStoreInvocationContext resolveInvocationContext(AttributeStore targetStore, IdentityStoreInvocationContext invocationCtx) {
-        return resolveInvocationContext(targetStore.getId(), invocationCtx);
-    }
-
-    /** Add this original method from the FallbackIdentityStoreRepository class
-     * @param id
-     * @param invocationCtx
-     * @return IdentityStoreInvocationContext used in the implementation of findIdentityObject() method
-     */
-    IdentityStoreInvocationContext resolveInvocationContext(String id, IdentityStoreInvocationContext invocationCtx) {
-        RepositoryIdentityStoreSessionImpl repoSession = (RepositoryIdentityStoreSessionImpl) invocationCtx.getIdentityStoreSession();
-        IdentityStoreSession targetSession = repoSession.getIdentityStoreSession(id);
-
-        return new SimpleIdentityStoreInvocationContext(targetSession, invocationCtx.getRealmId(), String.valueOf(this.hashCode()));
-    }
-
-    /**
-     *  Override findIdentityObject() method in order to add an inconsidered case in
-     *  Original implementation which is mappedStores greater than 1 and identityObjectType is not
-     *  explicitely managed by default store (Hibernate)
-     *  
-     * {@inheritDoc}
-     */
-    @Override
-    public Collection<IdentityObject> findIdentityObject(IdentityStoreInvocationContext invocationCxt,
-                                                         IdentityObject identity,
-                                                         IdentityObjectRelationshipType relationshipType,
-                                                         Collection<IdentityObjectType> excludes,
-                                                         boolean parent,
-                                                        IdentityObjectSearchCriteria criteria) throws IdentityException
-    {
-
-      try
-      {
-        List<IdentityStore> mappedStores = resolveIdentityStores(identity.getIdentityType());
-
-        IdentityStoreInvocationContext defaultCtx = resolveInvocationContext(defaultIdentityStore, invocationCxt);
-
-        // Maybe only default store match
-        if (mappedStores.size() == 1 && mappedStores.contains(defaultIdentityStore))
-        {
-           return defaultIdentityStore.findIdentityObject(defaultCtx, identity, relationshipType, parent, criteria);
-        }
-
-        // For the merge no paging
-        IdentitySearchCriteriaImpl c = null;
-
-        if (criteria != null)
-        {
-           c = new IdentitySearchCriteriaImpl(criteria);
-           c.setPaged(false);
-        }
-
-        Collection<IdentityObject> results = new LinkedList<IdentityObject>();
-
-        // Filter out duplicates results
-        HashSet<IdentityObject> merged = new HashSet<IdentityObject>();
-
-        for (IdentityStore mappedStore : mappedStores)
-        {
-           IdentityStoreInvocationContext mappedCtx = resolveInvocationContext(mappedStore, invocationCxt);
-
-           // If object is in the store but there is no rel type provided or it is not a role
-           // So don't try to look for roles where they are not supported...
-           if (hasIdentityObject(mappedCtx, mappedStore, identity)
-              && (relationshipType == null
-              || !RoleManagerImpl.ROLE.getName().equals(relationshipType.getName())
-              || mappedStore.getSupportedFeatures().isNamedRelationshipsSupported())
-              ) {
-               /* Begin changes */
-               results = mappedStore.findIdentityObject(mappedCtx, identity, relationshipType, parent, c);
-               merged.addAll(results);
-               /* End changes */
-           }
-        }
-
-        // So always check with default if it wasn't already done
-        if(!mappedStores.contains(defaultIdentityStore)) {
-          Collection<IdentityObject> objects = defaultIdentityStore.findIdentityObject(defaultCtx, identity, relationshipType, parent, c);
-          // If default store contain related relationships merge and sort/page once more
-          if (objects != null && objects.size() != 0)
-          {
-             merged.addAll(objects);
-          }
-        }
-
-        // So as things were merged criteria need to be reapplied
-        if (criteria == null)
-        {
-          results = merged;
-        }
-        else
-        {
-          LinkedList<IdentityObject> processed = new LinkedList<IdentityObject>(merged);
-
-          //TODO: hardcoded - expects List
-          if (criteria.isSorted())
-          {
-             sortByName(processed, criteria.isAscending());
-          }
-
-          results = processed;
-
-          //TODO: hardcoded - expects List
-          if (criteria.isPaged())
-          {
-             results = cutPageFromResults(processed, criteria);
-          }
-        }
-
-        return results;
+        externalStoreId = storeId;
+        break;
       }
-      catch (IdentityException e)
-      {
-         if (log.isLoggable(Level.FINER))
-         {
-            log.log(Level.FINER, "Exception occurred: ", e);
-         }
+    }
 
-         throw e;
+    if (StringUtils.isNotBlank(externalStoreId)) {
+      externalIdentityStore = bootstrappedIdentityStores.get(externalStoreId);
+      externalAttributeStore = bootstrappedAttributeStores.get(externalStoreId);
+
+      // Keep only Hibernate Mapping
+      Iterator<IdentityStoreMappingMetaData> iterator = configurationMD.getIdentityStoreToIdentityObjectTypeMappings().iterator();
+      while (iterator.hasNext()) {
+        IdentityStoreMappingMetaData mappingMetaData = iterator.next();
+        if (!defaultStoreId.equals(mappingMetaData.getIdentityStoreId())) {
+          externalIdentityStoreMappingMetaData = mappingMetaData;
+          continue;
+        }
+      }
+    }
+
+    featuresMetaData = new FeaturesMetaData() {
+      public boolean isNamedRelationshipsSupported() {
+        return defaultIdentityStore.getSupportedFeatures().isNamedRelationshipsSupported();
       }
 
-   }
+      public boolean isRelationshipPropertiesSupported() {
+        return defaultIdentityStore.getSupportedFeatures().isRelationshipPropertiesSupported();
+      }
 
-    /**override findIdentityObjectByUniqueAttribute() method in order to add
-     *  the mandatoryStoredObjects option of the new LDAP configuration into consideration
-     * @param invocationContext
-     * @param name
-     * @param identityObjectType
-     * @return
-     * @throws IdentityException
-     */
-    @Override
-    public IdentityObject findIdentityObject(IdentityStoreInvocationContext invocationContext, String name, IdentityObjectType identityObjectType) throws IdentityException {
-        IdentityObject mandatoryIO = null;
-        List<IdentityStore> targetStores = resolveIdentityStores(identityObjectType);
-        IdentityObject io = null;
-        for (IdentityStore targetStore : targetStores) {
-            IdentityStoreInvocationContext targetCtx = resolveInvocationContext(targetStore, invocationContext);
-            io = targetStore.findIdentityObject(targetCtx, name, identityObjectType);
-            if (io != null) {
-                break;
-            }
-        }
-        if (io != null) {
-            IdentityStoreInvocationContext defaultInvocationContext = resolveInvocationContext(defaultIdentityStore, invocationContext);
-            if (!isFirstlyCreatedIn(defaultInvocationContext, defaultIdentityStore, io) && mandatoryStoresObjects.contains(identityObjectType.getName())) {
-                IdentityStore mandatoryStore = mandatoryStores.get(identityObjectType.getName());
+      public boolean isRelationshipNameAddRemoveSupported() {
+        return defaultIdentityStore.getSupportedFeatures().isRelationshipNameAddRemoveSupported();
+      }
 
-                IdentityStoreInvocationContext mappedContext = resolveInvocationContext(mandatoryStore, invocationContext);
-                mandatoryIO = mandatoryStore.findIdentityObject(mappedContext, name, identityObjectType);
-                if (mandatoryIO == null) {
-                    return null;
-                }
-            }
+      public boolean isSearchCriteriaTypeSupported(IdentityObjectType identityObjectType,
+                                                   IdentityObjectSearchCriteriaType storeSearchConstraint) {
+        return getIdentityStore().getSupportedFeatures().isSearchCriteriaTypeSupported(identityObjectType, storeSearchConstraint);
+      }
 
-            return io;
-        }
-        io = defaultIdentityStore.findIdentityObject(resolveInvocationContext(defaultIdentityStore, invocationContext), name, identityObjectType);
-        return io;
+      public Set<String> getSupportedIdentityObjectTypes() {
+        return getIdentityStore().getSupportedFeatures().getSupportedRelationshipTypes();
+      }
+
+      public boolean isIdentityObjectTypeSupported(IdentityObjectType identityObjectType) {
+        return getIdentityStore().getSupportedFeatures().isIdentityObjectTypeSupported(identityObjectType);
+      }
+
+      public boolean isRelationshipTypeSupported(IdentityObjectType fromType,
+                                                 IdentityObjectType toType,
+                                                 IdentityObjectRelationshipType relationshipType) throws IdentityException {
+        return getIdentityStore().getSupportedFeatures().isRelationshipTypeSupported(fromType, toType, relationshipType);
+      }
+
+      public Set<String> getSupportedRelationshipTypes() {
+        return getIdentityStore().getSupportedFeatures().getSupportedRelationshipTypes();
+      }
+
+      public boolean isCredentialSupported(IdentityObjectType identityObjectType, IdentityObjectCredentialType credentialType) {
+        return getIdentityStore().getSupportedFeatures().isCredentialSupported(identityObjectType, credentialType);
+      }
+
+      public boolean isIdentityObjectAddRemoveSupported(IdentityObjectType objectType) {
+        return getIdentityStore().getSupportedFeatures().isIdentityObjectAddRemoveSupported(objectType);
+      }
+
+      public boolean isRoleNameSearchCriteriaTypeSupported(IdentityObjectSearchCriteriaType constraint) {
+        return getIdentityStore().getSupportedFeatures().isRoleNameSearchCriteriaTypeSupported(constraint);
+      }
+    };
+
+    super.bootstrap(configurationContext, bootstrappedIdentityStores, bootstrappedAttributeStores);
+  }
+
+  public void bootstrap(IdentityStoreConfigurationContext configurationContext) throws IdentityException {
+    // Nothing
+  }
+
+  public IdentityStoreSession createIdentityStoreSession() throws IdentityException {
+    Map<String, IdentityStoreSession> sessions = new HashMap<String, IdentityStoreSession>();
+
+    sessions.put(getAttributeStore().getId(), getAttributeStore().createIdentityStoreSession());
+
+    if (!sessions.containsKey(getIdentityStore().getId())) {
+      sessions.put(getIdentityStore().getId(), getIdentityStore().createIdentityStoreSession());
     }
 
-    /**override findIdentityObjectByUniqueAttribute() method in order to add
-     *  the mandatoryStoredObjects option of the new LDAP configuration into consideration
-     * @param invocationContext
-     * @param id
-     * @return
-     * @throws IdentityException
-     */
-    @Override
-    public IdentityObject findIdentityObject(IdentityStoreInvocationContext invocationContext, String id) throws IdentityException {
-        // TODO: information about the store mapping should be encoded in id as now
-        // its like random guess and this kills performance ...
-        IdentityStoreInvocationContext defaultInvocationContext = resolveInvocationContext(defaultIdentityStore, invocationContext);
+    return new ExoRepositoryIdentityStoreSessionImpl(sessions, null);
+  }
 
-        for (IdentityStore identityStore : getIdentityStoreMappings().values()) {
-            IdentityStoreInvocationContext targetCtx = resolveInvocationContext(identityStore, invocationContext);
+  private AttributeStore getAttributeStore() {
+    if (isUseExternalStore()) {
+      return externalAttributeStore;
+    } else {
+      return defaultAttributeStore;
+    }
+  }
 
-            IdentityObject io = identityStore.findIdentityObject(targetCtx, id);
-            if (io != null) {
-                if (!isFirstlyCreatedIn(defaultInvocationContext, defaultIdentityStore, io) && mandatoryStoresObjects.contains(io.getIdentityType().getName())) {
-                    IdentityStore mandatoryStore = mandatoryStores.get(io.getIdentityType().getName());
+  public IdentityStore getIdentityStore() {
+    if (isUseExternalStore()) {
+      return externalIdentityStore;
+    } else {
+      return defaultIdentityStore;
+    }
+  }
 
-                    // If it's retrieved from mandatoryStore, so return it. No need to
-                    // check it again.
-                    if (identityStore.getId().equals(mandatoryStore.getId())) {
-                        return io;
-                    }
+  public IdentityStoreSession createIdentityStoreSession(Map<String, Object> sessionOptions) throws IdentityException {
+    Map<String, IdentityStoreSession> sessions = new HashMap<String, IdentityStoreSession>();
 
-                    IdentityStoreInvocationContext mappedContext = resolveInvocationContext(mandatoryStore, invocationContext);
-                    IdentityObject mandatoryIO = null;
-                    try {
-                        mandatoryIO = mandatoryStore.findIdentityObject(mappedContext, id);
-                    } catch (IdentityException e) {
-                        log.log(Level.SEVERE, "Failed to find IdentityObject in target store: ", e);
-                    }
+    sessions.put(getAttributeStore().getId(), getAttributeStore().createIdentityStoreSession(sessionOptions));
 
-                    if (mandatoryIO == null) {
-                        return null;
-                    }
-                }
-                return io;
-            }
-        }
-
-        return defaultIdentityStore.findIdentityObject(invocationContext, id);
+    if (!sessions.containsKey(getIdentityStore().getId())) {
+      sessions.put(getIdentityStore().getId(), getIdentityStore().createIdentityStoreSession(sessionOptions));
     }
 
-    /** override findIdentityObjectByUniqueAttribute() method in order to add
-     *  the mandatoryStoredObjects option of the new LDAP configuration into consideration
-     * @param invocationCtx
-     * @param identityType
-     * @param criteria
-     * @return Collection&lt;IdentityObject&gt;
-     * @throws IdentityException
-     */
-    @Override
-    public Collection<IdentityObject> findIdentityObject(IdentityStoreInvocationContext invocationCtx, IdentityObjectType identityType, IdentityObjectSearchCriteria criteria) throws IdentityException {
-        List<IdentityStore> targetStores = resolveIdentityStores(identityType);
+    return new ExoRepositoryIdentityStoreSessionImpl(sessions, sessionOptions);
+  }
 
-        Collection<IdentityObject> results = new LinkedList<IdentityObject>();
-        Collection<IdentityObject> defaultIOs = new LinkedList<IdentityObject>();
+  IdentityStoreInvocationContext resolveIdentityStoreInvocationContext(IdentityStoreInvocationContext invocationCtx) throws IdentityException {
+    return resolveInvocationContext(getIdentityStore().getId(), invocationCtx);
+  }
 
-        IdentityStoreInvocationContext defaultInvocationContext = resolveInvocationContext(defaultIdentityStore, invocationCtx);
-        if (targetStores.size() == 1 && targetStores.contains(defaultIdentityStore)) {
-            Collection<IdentityObject> resx = new LinkedList<IdentityObject>();
+  IdentityStoreInvocationContext resolveAttributeStoreInvocationContext(IdentityStoreInvocationContext invocationCtx) throws IdentityException {
+    return resolveInvocationContext(getAttributeStore().getId(), invocationCtx);
+  }
 
-            try {
-                resx = defaultIdentityStore.findIdentityObject(defaultInvocationContext, identityType, criteria);
-            } catch (IdentityException e) {
-                log.log(Level.SEVERE, "Exception occurred: ", e);
-            }
-
-            return resx;
-        } else {
-
-            IdentitySearchCriteriaImpl c = null;
-            if (criteria != null) {
-                c = new IdentitySearchCriteriaImpl(criteria);
-                c.setPaged(false);
-                //DB + LDAP Store Activated : remove from criteria attr (enabled==true)
-                Map<String, String[]> attrs= c.getValues();
-                Iterator<Map.Entry<String,String[]>> it= attrs.entrySet().iterator();
-                while (it.hasNext()){
-                    Map.Entry<String,String[]> entry = it.next();
-                    if(UserDAOImpl.USER_ENABLED.equals(entry.getKey()) && entry.getValue().length==0) {
-                        it.remove();
-                    }
-                }
-            }
-            // Get results from default store with not paged criteria
-            defaultIOs = defaultIdentityStore.findIdentityObject(defaultInvocationContext, identityType, c);
-
-            // if default store results are not present then apply criteria. Otherwise
-            // apply criteria without page
-            // as result need to be merged
-            if (defaultIOs.size() == 0 && targetStores.size() == 1) {
-                Collection<IdentityObject> resx = new LinkedList<IdentityObject>();
-
-                try {
-                    IdentityStore targetStore = targetStores.get(0);
-                    IdentityStoreInvocationContext targetCtx = resolveInvocationContext(targetStore, invocationCtx);
-                    resx = targetStore.findIdentityObject(targetCtx, identityType, criteria);
-                } catch (IdentityException e) {
-                    log.log(Level.SEVERE, "Exception occurred: ", e);
-                }
-
-                return resx;
-            } else {
-
-                for (IdentityStore targetStore : targetStores) {
-                    try {
-                        IdentityStoreInvocationContext targetCtx = resolveInvocationContext(targetStore, invocationCtx);
-
-                        Collection<IdentityObject> identityObjects = targetStore.findIdentityObject(targetCtx, identityType, c);
-
-                        if (mandatoryStoresObjects.contains(identityType.getName())) {
-                            IdentityStore mandatoryStore = mandatoryStores.get(identityType.getName());
-
-                            // Delete from result, identities not found in mandatory store
-                            if (!targetStore.getId().equals(mandatoryStore.getId())) {
-                                IdentityStoreInvocationContext mappedContext = resolveInvocationContext(mandatoryStore, invocationCtx);
-                                Iterator<IdentityObject> identityObjectsIterator = identityObjects.iterator();
-                                while (identityObjectsIterator.hasNext()) {
-                                    IdentityObject identityObject = identityObjectsIterator.next();
-                                    if (!isFirstlyCreatedIn(defaultInvocationContext, defaultIdentityStore, identityObject) && !hasIdentityObject(mappedContext, mandatoryStore, identityObject)) {
-                                        identityObjectsIterator.remove();
-                                    }
-                                }
-                            }
-                        }
-                        results.addAll(identityObjects);
-                    } catch (IdentityException e) {
-                        log.log(Level.SEVERE, "Exception occurred: ", e);
-                        //if exception occurs during getting identities
-                        //like LDAP temporary connection problem
-                        //we don't want to delete identities
-                        //so, stop the execution
-                        throw e;
-                    }
-                }
-            }
-        }
-        // Filter out duplicates
-        HashSet<IdentityObject> merged = new HashSet<IdentityObject>();
-        merged.addAll(results);
-        if (mandatoryStoresObjects.contains(identityType.getName())) {
-            IdentityStore mandatoryStore = mandatoryStores.get(identityType.getName());
-            // Delete from result, identities not found in mandatory store
-            if (!defaultIdentityStore.getId().equals(mandatoryStore.getId())) {
-                IdentityStoreInvocationContext mappedContext = resolveInvocationContext(mandatoryStore, invocationCtx);
-                Iterator<IdentityObject> identityObjectsIterator = defaultIOs.iterator();
-                while (identityObjectsIterator.hasNext()) {
-                    IdentityObject identityObject = identityObjectsIterator.next();
-                    if (!isFirstlyCreatedIn(defaultInvocationContext, defaultIdentityStore, identityObject) && !hasIdentityObject(mappedContext, mandatoryStore, identityObject)) {
-                        identityObjectsIterator.remove();
-                        // delete IdentityObject from default store because it was
-                        // deleted from mandatory store
-                        defaultIdentityStore.removeIdentityObject(defaultInvocationContext, identityObject);
-                    }
-                }
-            }
-        }
-        merged.addAll(defaultIOs);
-        // Apply criteria not applied at store level (sort/page)
-        if (criteria != null) {
-            LinkedList<IdentityObject> processed = new LinkedList<IdentityObject>(merged);
-            // TODO: hardcoded - expects List
-            if (criteria.isSorted()) {
-                sortByName(processed, criteria.isAscending());
-            }
-            results = processed;
-            // TODO: hardcoded - expects List
-            if (criteria.isPaged()) {
-                results = cutPageFromResults(processed, criteria);
-            }
-        } else {
-            results = merged;
-        }
-        return results;
+  IdentityStoreInvocationContext resolveInvocationContext(String id,
+                                                          IdentityStoreInvocationContext invocationCtx) throws IdentityException {
+    ExoRepositoryIdentityStoreSessionImpl repoSession =
+                                                      (ExoRepositoryIdentityStoreSessionImpl) invocationCtx.getIdentityStoreSession();
+    IdentityStoreSession targetSession = repoSession.getIdentityStoreSession(id);
+    if (targetSession == null && isUseExternalStore()) {
+      targetSession = getIdentityStore().createIdentityStoreSession(repoSession.getSessionOptions());
+      repoSession.addIdentityStoreSessionMapping(getIdentityStore().getId(), targetSession);
     }
 
-    /** Add this original method from the FallbackIdentityStoreRepository class because it has a private access in its original class
-     *  used in the implementation of findIdentityObject() method
-     * @param objects
-     * @param ascending
-     */
-    private void sortByName(List<IdentityObject> objects, final boolean ascending) {
-        Collections.sort(objects, new Comparator<IdentityObject>() {
-            public int compare(IdentityObject o1, IdentityObject o2) {
-                if (ascending) {
-                    return o1.getName().compareTo(o2.getName());
-                } else {
-                    return o2.getName().compareTo(o1.getName());
-                }
-            }
-        });
+    return new SimpleIdentityStoreInvocationContext(targetSession, invocationCtx.getRealmId(), String.valueOf(this.hashCode()));
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public FeaturesMetaData getSupportedFeatures() {
+    return featuresMetaData;
+  }
+
+  public IdentityObject createIdentityObject(IdentityStoreInvocationContext invocationCtx,
+                                             String name,
+                                             IdentityObjectType identityObjectType) throws IdentityException {
+    return getIdentityStore().createIdentityObject(resolveIdentityStoreInvocationContext(invocationCtx),
+                                                   name,
+                                                   identityObjectType);
+  }
+
+  public IdentityObject createIdentityObject(IdentityStoreInvocationContext invocationCtx,
+                                             String name,
+                                             IdentityObjectType identityObjectType,
+                                             Map<String, String[]> attributes) throws IdentityException {
+    return getIdentityStore().createIdentityObject(resolveIdentityStoreInvocationContext(invocationCtx),
+                                                   name,
+                                                   identityObjectType,
+                                                   attributes);
+  }
+
+  public void removeIdentityObject(IdentityStoreInvocationContext invocationCtx,
+                                   IdentityObject identity) throws IdentityException {
+    getIdentityStore().removeIdentityObject(resolveIdentityStoreInvocationContext(invocationCtx), identity);
+  }
+
+  public int getIdentityObjectsCount(IdentityStoreInvocationContext invocationCtx,
+                                     IdentityObjectType identityType) throws IdentityException {
+    return getIdentityStore().getIdentityObjectsCount(resolveIdentityStoreInvocationContext(invocationCtx), identityType);
+  }
+
+  public IdentityObject findIdentityObject(IdentityStoreInvocationContext invocationContext,
+                                           String name,
+                                           IdentityObjectType identityObjectType) throws IdentityException {
+    return getIdentityStore().findIdentityObject(resolveIdentityStoreInvocationContext(invocationContext),
+                                                 name,
+                                                 identityObjectType);
+  }
+
+  public IdentityObject findIdentityObject(IdentityStoreInvocationContext invocationContext, String id) throws IdentityException {
+    return getIdentityStore().findIdentityObject(resolveIdentityStoreInvocationContext(invocationContext), id);
+  }
+
+  public Collection<IdentityObject> findIdentityObject(IdentityStoreInvocationContext invocationCtx,
+                                                       IdentityObjectType identityType,
+                                                       IdentityObjectSearchCriteria criteria) throws IdentityException {
+    return getIdentityStore().findIdentityObject(resolveIdentityStoreInvocationContext(invocationCtx), identityType, criteria);
+  }
+
+  public int getIdentityObjectCount(IdentityStoreInvocationContext invocationCtx,
+                                    IdentityObject identity,
+                                    IdentityObjectRelationshipType relationshipType,
+                                    boolean parent,
+                                    IdentityObjectSearchCriteria criteria) throws IdentityException {
+    return getIdentityStore().getIdentityObjectCount(resolveIdentityStoreInvocationContext(invocationCtx),
+                                                     identity,
+                                                     relationshipType,
+                                                     parent,
+                                                     criteria);
+  }
+
+  public int getIdentityObjectCount(IdentityStoreInvocationContext ctx,
+                                    IdentityObject identity,
+                                    IdentityObjectRelationshipType relationshipType,
+                                    Collection<IdentityObjectType> excludes,
+                                    boolean parent,
+                                    IdentityObjectSearchCriteria criteria) throws IdentityException {
+    return getIdentityStore().getIdentityObjectCount(resolveIdentityStoreInvocationContext(ctx),
+                                                     identity,
+                                                     relationshipType,
+                                                     excludes,
+                                                     parent,
+                                                     criteria);
+  }
+
+  public Collection<IdentityObject> findIdentityObject(IdentityStoreInvocationContext invocationCtx,
+                                                       IdentityObject identity,
+                                                       IdentityObjectRelationshipType relationshipType,
+                                                       Collection<IdentityObjectType> excludes,
+                                                       boolean parent,
+                                                       IdentityObjectSearchCriteria criteria) throws IdentityException {
+    return getIdentityStore().findIdentityObject(resolveIdentityStoreInvocationContext(invocationCtx),
+                                                 identity,
+                                                 relationshipType,
+                                                 excludes,
+                                                 parent,
+                                                 criteria);
+  }
+
+  public Collection<IdentityObject> findIdentityObject(IdentityStoreInvocationContext invocationCtx,
+                                                       IdentityObject identity,
+                                                       IdentityObjectRelationshipType relationshipType,
+                                                       boolean parent,
+                                                       IdentityObjectSearchCriteria criteria) throws IdentityException {
+    return getIdentityStore().findIdentityObject(resolveIdentityStoreInvocationContext(invocationCtx),
+                                                 identity,
+                                                 relationshipType,
+                                                 parent,
+                                                 criteria);
+  }
+
+  public IdentityObjectRelationship createRelationship(IdentityStoreInvocationContext invocationCxt,
+                                                       IdentityObject fromIdentity,
+                                                       IdentityObject toIdentity,
+                                                       IdentityObjectRelationshipType relationshipType,
+                                                       String relationshipName,
+                                                       boolean createNames) throws IdentityException {
+    return getIdentityStore().createRelationship(resolveIdentityStoreInvocationContext(invocationCxt),
+                                                 fromIdentity,
+                                                 toIdentity,
+                                                 relationshipType,
+                                                 relationshipName,
+                                                 createNames);
+  }
+
+  public void removeRelationship(IdentityStoreInvocationContext invocationCxt,
+                                 IdentityObject fromIdentity,
+                                 IdentityObject toIdentity,
+                                 IdentityObjectRelationshipType relationshipType,
+                                 String relationshipName) throws IdentityException {
+    getIdentityStore().removeRelationship(resolveIdentityStoreInvocationContext(invocationCxt),
+                                          fromIdentity,
+                                          toIdentity,
+                                          relationshipType,
+                                          relationshipName);
+  }
+
+  public void removeRelationships(IdentityStoreInvocationContext invocationCtx,
+                                  IdentityObject identity1,
+                                  IdentityObject identity2,
+                                  boolean named) throws IdentityException {
+    getIdentityStore().removeRelationships(resolveIdentityStoreInvocationContext(invocationCtx), identity1, identity2, named);
+  }
+
+  public Set<IdentityObjectRelationship> resolveRelationships(IdentityStoreInvocationContext invocationCxt,
+                                                              IdentityObject fromIdentity,
+                                                              IdentityObject toIdentity,
+                                                              IdentityObjectRelationshipType relationshipType) throws IdentityException {
+    return getIdentityStore().resolveRelationships(resolveIdentityStoreInvocationContext(invocationCxt),
+                                                   fromIdentity,
+                                                   toIdentity,
+                                                   relationshipType);
+  }
+
+  public int getRelationshipsCount(IdentityStoreInvocationContext ctx,
+                                   IdentityObject identity,
+                                   IdentityObjectRelationshipType type,
+                                   boolean parent,
+                                   boolean named,
+                                   String name,
+                                   IdentityObjectSearchCriteria searchCriteria) throws IdentityException {
+    return getIdentityStore().getRelationshipsCount(resolveIdentityStoreInvocationContext(ctx),
+                                                    identity,
+                                                    type,
+                                                    parent,
+                                                    named,
+                                                    name,
+                                                    searchCriteria);
+  }
+
+  public Set<IdentityObjectRelationship> resolveRelationships(IdentityStoreInvocationContext invocationCtx,
+                                                              IdentityObject identity,
+                                                              IdentityObjectRelationshipType relationshipType,
+                                                              boolean parent,
+                                                              boolean named,
+                                                              String name,
+                                                              IdentityObjectSearchCriteria criteria) throws IdentityException {
+    return getIdentityStore().resolveRelationships(resolveIdentityStoreInvocationContext(invocationCtx),
+                                                   identity,
+                                                   relationshipType,
+                                                   parent,
+                                                   named,
+                                                   name,
+                                                   criteria);
+  }
+
+  public String createRelationshipName(IdentityStoreInvocationContext ctx, String name) throws IdentityException,
+                                                                                        OperationNotSupportedException {
+    return getIdentityStore().createRelationshipName(resolveIdentityStoreInvocationContext(ctx), name);
+  }
+
+  public String removeRelationshipName(IdentityStoreInvocationContext ctx, String name) throws IdentityException,
+                                                                                        OperationNotSupportedException {
+    return getIdentityStore().removeRelationshipName(resolveIdentityStoreInvocationContext(ctx), name);
+  }
+
+  public Set<String> getRelationshipNames(IdentityStoreInvocationContext ctx,
+                                          IdentityObjectSearchCriteria criteria) throws IdentityException,
+                                                                                 OperationNotSupportedException {
+    return getIdentityStore().getRelationshipNames(resolveIdentityStoreInvocationContext(ctx), criteria);
+  }
+
+  public Set<String> getRelationshipNames(IdentityStoreInvocationContext ctx,
+                                          IdentityObject identity,
+                                          IdentityObjectSearchCriteria criteria) throws IdentityException,
+                                                                                 OperationNotSupportedException {
+    return getIdentityStore().getRelationshipNames(resolveIdentityStoreInvocationContext(ctx), identity, criteria);
+  }
+
+  public Map<String, String> getRelationshipNameProperties(IdentityStoreInvocationContext ctx,
+                                                           String name) throws IdentityException, OperationNotSupportedException {
+    return getIdentityStore().getRelationshipNameProperties(resolveAttributeStoreInvocationContext(ctx), name);
+  }
+
+  public void setRelationshipNameProperties(IdentityStoreInvocationContext ctx,
+                                            String name,
+                                            Map<String, String> properties) throws IdentityException,
+                                                                            OperationNotSupportedException {
+    getIdentityStore().setRelationshipNameProperties(resolveIdentityStoreInvocationContext(ctx), name, properties);
+  }
+
+  public void removeRelationshipNameProperties(IdentityStoreInvocationContext ctx,
+                                               String name,
+                                               Set<String> properties) throws IdentityException, OperationNotSupportedException {
+    getIdentityStore().removeRelationshipNameProperties(resolveIdentityStoreInvocationContext(ctx), name, properties);
+  }
+
+  public Map<String, String> getRelationshipProperties(IdentityStoreInvocationContext ctx,
+                                                       IdentityObjectRelationship relationship) throws IdentityException,
+                                                                                                OperationNotSupportedException {
+    return getIdentityStore().getRelationshipProperties(resolveIdentityStoreInvocationContext(ctx), relationship);
+  }
+
+  public void setRelationshipProperties(IdentityStoreInvocationContext ctx,
+                                        IdentityObjectRelationship relationship,
+                                        Map<String, String> properties) throws IdentityException, OperationNotSupportedException {
+    getIdentityStore().setRelationshipProperties(resolveIdentityStoreInvocationContext(ctx), relationship, properties);
+  }
+
+  public void removeRelationshipProperties(IdentityStoreInvocationContext ctx,
+                                           IdentityObjectRelationship relationship,
+                                           Set<String> properties) throws IdentityException, OperationNotSupportedException {
+    getIdentityStore().removeRelationshipProperties(resolveIdentityStoreInvocationContext(ctx), relationship, properties);
+  }
+
+  public boolean validateCredential(IdentityStoreInvocationContext ctx,
+                                    IdentityObject identityObject,
+                                    IdentityObjectCredential credential) throws IdentityException {
+    return getIdentityStore().validateCredential(resolveIdentityStoreInvocationContext(ctx), identityObject, credential);
+  }
+
+  public void updateCredential(IdentityStoreInvocationContext ctx,
+                               IdentityObject identityObject,
+                               IdentityObjectCredential credential) throws IdentityException {
+    getIdentityStore().updateCredential(resolveIdentityStoreInvocationContext(ctx), identityObject, credential);
+  }
+
+  public Set<String> getSupportedAttributeNames(IdentityStoreInvocationContext invocationContext,
+                                                IdentityObjectType identityType) throws IdentityException {
+    return getAttributeStore().getSupportedAttributeNames(resolveAttributeStoreInvocationContext(invocationContext),
+                                                          identityType);
+  }
+
+  public Map<String, IdentityObjectAttributeMetaData> getAttributesMetaData(IdentityStoreInvocationContext invocationContext,
+                                                                            IdentityObjectType identityType) {
+    try {
+      return getAttributeStore().getAttributesMetaData(resolveAttributeStoreInvocationContext(invocationContext), identityType);
+    } catch (IdentityException e) {
+      throw new RuntimeException("Error while retrieving data from store", e);
     }
+  }
 
-    /** Add this original method from the FallbackIdentityStoreRepository class because it has a private access in its original class
-     * @param objects
-     * @param criteria
-     * @return List<IdentityObject> used in the implementation of findIdentityObject() method
-     */
-    private List<IdentityObject> cutPageFromResults(List<IdentityObject> objects, IdentityObjectSearchCriteria criteria) {
+  public Map<String, IdentityObjectAttribute> getAttributes(IdentityStoreInvocationContext invocationContext,
+                                                            IdentityObject identity) throws IdentityException {
+    return getAttributeStore().getAttributes(resolveAttributeStoreInvocationContext(invocationContext), identity);
+  }
 
-        List<IdentityObject> results = new LinkedList<IdentityObject>();
+  public IdentityObjectAttribute getAttribute(IdentityStoreInvocationContext invocationContext,
+                                              IdentityObject identity,
+                                              String name) throws IdentityException {
+    return getAttributeStore().getAttribute(resolveAttributeStoreInvocationContext(invocationContext), identity, name);
+  }
 
-        if (criteria.getMaxResults() == 0) {
-            for (int i = criteria.getFirstResult(); i < objects.size(); i++) {
-                if (i < objects.size()) {
-                    results.add(objects.get(i));
-                }
-            }
-        } else {
-            for (int i = criteria.getFirstResult(); i < criteria.getFirstResult() + criteria.getMaxResults(); i++) {
-                if (i < objects.size()) {
-                    results.add(objects.get(i));
-                }
-            }
-        }
-        return results;
-    }
+  public void updateAttributes(IdentityStoreInvocationContext invocationCtx,
+                               IdentityObject identity,
+                               IdentityObjectAttribute[] attributes) throws IdentityException {
+    getAttributeStore().updateAttributes(resolveAttributeStoreInvocationContext(invocationCtx), identity, attributes);
+  }
 
+  public void addAttributes(IdentityStoreInvocationContext invocationCtx,
+                            IdentityObject identity,
+                            IdentityObjectAttribute[] attributes) throws IdentityException {
+    getAttributeStore().addAttributes(resolveAttributeStoreInvocationContext(invocationCtx), identity, attributes);
+  }
 
-    /** re-implement isFirstlyCreatedIn() method, declared in the interface IdentityStoreSource, in order to add
-     * the mandatoryStoredObjects option of the new LDAP configuration into consideration
-     * @param mappedContext
-     * @param targetStore
-     * @param identityObject
-     * @return
-     * @throws IdentityException
-     */
-    private boolean isFirstlyCreatedIn(IdentityStoreInvocationContext mappedContext, IdentityStore targetStore, IdentityObject identityObject) throws IdentityException {
-        if (targetStore instanceof IdentityStoreSource) {
-            try {
-                if (!mandatoryStoresObjects.contains(identityObject.getIdentityType().getName())) {
-                    return true;
-                } else {
-                    return ((IdentityStoreSource) targetStore).isFirstlyCreatedIn(mappedContext, identityObject);
-                }
-            } catch (Exception e) {
-                throw new IdentityException(e);
-            }
-        }
-        return false;
-    }
+  public void removeAttributes(IdentityStoreInvocationContext invocationCtx,
+                               IdentityObject identity,
+                               String[] attributeNames) throws IdentityException {
+    getAttributeStore().removeAttributes(resolveAttributeStoreInvocationContext(invocationCtx), identity, attributeNames);
+  }
 
-    /** override findIdentityObjectByUniqueAttribute() method in order to add
-     *  the mandatoryStoredObjects option of the new LDAP configuration into consideration
-     * @param invocationCtx
-     * @param identityObjectType
-     * @param attribute
-     * @return
-     * @throws IdentityException
-     */
-    @Override
-    public IdentityObject findIdentityObjectByUniqueAttribute(IdentityStoreInvocationContext invocationCtx, IdentityObjectType identityObjectType, IdentityObjectAttribute attribute)
-            throws IdentityException {
-        try {
-            // Test is identity exists in mandatory store, else return null anyway
+  public IdentityObject findIdentityObjectByUniqueAttribute(IdentityStoreInvocationContext invocationCtx,
+                                                            IdentityObjectType identityObjectType,
+                                                            IdentityObjectAttribute attribute) throws IdentityException {
+    return getAttributeStore().findIdentityObjectByUniqueAttribute(resolveAttributeStoreInvocationContext(invocationCtx),
+                                                                   identityObjectType,
+                                                                   attribute);
+  }
 
-            if (mandatoryStoresObjects.contains(identityObjectType.getName())) {
-                IdentityStore mandatoryStore = mandatoryStores.get(identityObjectType.getName());
-                IdentityStoreInvocationContext mappedContext = resolveInvocationContext(mandatoryStore, invocationCtx);
-                Set<String> supportedAttrs = mandatoryStore.getSupportedAttributeNames(mappedContext, identityObjectType);
-                if (supportedAttrs.contains(attribute.getName())) {
-                    if (mandatoryStore.findIdentityObjectByUniqueAttribute(mappedContext, identityObjectType, attribute) == null) {
-                        return null;
-                    }
-                }
-            }
-            Collection<IdentityStore> mappedStores = resolveIdentityStores(identityObjectType);
-            IdentityObject result = null;
-            for (IdentityStore mappedStore : mappedStores) {
-                if (mappedStore != defaultAttributeStore) {
-                    IdentityStoreInvocationContext targetCtx = resolveInvocationContext(mappedStore, invocationCtx);
-                    Set<String> supportedAttrs = mappedStore.getSupportedAttributeNames(targetCtx, identityObjectType);
-                    if (supportedAttrs.contains(attribute.getName())) {
-                        result = mappedStore.findIdentityObjectByUniqueAttribute(targetCtx, identityObjectType, attribute);
-                    }
-                    // First with any result win
-                    if (result != null) {
-                        return result;
-                    }
-                }
-            }
-            // And if we are still here just go with default
-            IdentityStoreInvocationContext defaultCtx = resolveInvocationContext(defaultAttributeStore, invocationCtx);
+  public String getExternalStoreId() {
+    return externalStoreId;
+  }
 
-            if (isAllowNotDefinedAttributes()) {
-                result = defaultAttributeStore.findIdentityObjectByUniqueAttribute(defaultCtx, identityObjectType, attribute);
-            } else {
-                Set<String> supportedAttrs = defaultAttributeStore.getSupportedAttributeNames(defaultCtx, identityObjectType);
-                if (supportedAttrs.contains(attribute.getName())) {
-                    result = defaultAttributeStore.findIdentityObjectByUniqueAttribute(defaultCtx, identityObjectType, attribute);
-                }
-            }
-            return result;
-        } catch (IdentityException e) {
-            if (log.isLoggable(Level.FINER)) {
-                log.log(Level.FINER, "Exception occurred: ", e);
-            }
-            throw e;
-        }
-    }
+  public IdentityStore getExternalIdentityStore() {
+    return externalIdentityStore;
+  }
+
+  public IdentityStore getDefaultIdentityStore() {
+    return defaultIdentityStore;
+  }
+
+  public AttributeStore getExternalAttributeStore() {
+    return externalAttributeStore;
+  }
+
+  public IdentityStoreMappingMetaData getExternalIdentityStoreMappingMetaData() {
+    return externalIdentityStoreMappingMetaData;
+  }
+
+  public void setUseExternalStore(Boolean useExternalStore) {
+    this.useExternalStore.set(useExternalStore);
+  }
+
+  public boolean isUseExternalStore() {
+    Boolean isUseExternalStore = this.useExternalStore.get();
+    return isUseExternalStore != null && isUseExternalStore;
+  }
+
+  public boolean hasExternalStore() {
+    return externalIdentityStore != null;
+  }
 }

@@ -1,0 +1,4 @@
+dn: uid=jduke10,ou=People,o=test,dc=portal,dc=example,dc=com
+changetype: modify
+replace: sn
+sn: Duke

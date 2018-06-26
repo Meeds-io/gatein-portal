@@ -41,7 +41,6 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserStatus;
-import org.exoplatform.services.organization.impl.UserImpl;
 
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
@@ -65,12 +64,19 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
 
     private boolean isDBOnly;
 
-    public IDMUserListAccess(UserQueryBuilder userQueryBuilder, int pageSize, boolean countAll, boolean isDBOnly, UserStatus userStatus) {
+    private boolean loadUserAttributes;
+
+    public IDMUserListAccess(UserQueryBuilder userQueryBuilder, int pageSize, boolean countAll, boolean isDBOnly, boolean loadUserAttributes, UserStatus userStatus) {
         this.userQueryBuilder = userQueryBuilder;
         this.pageSize = pageSize;
         this.countAll = countAll;
         this.userStatus = userStatus;
         this.isDBOnly = isDBOnly;
+        this.loadUserAttributes = loadUserAttributes;
+    }
+
+    public IDMUserListAccess(UserQueryBuilder userQueryBuilder, int pageSize, boolean countAll, boolean isDBOnly, UserStatus userStatus) {
+      this(userQueryBuilder, pageSize, countAll, isDBOnly, true, userStatus);
     }
 
     public User[] load(int index, int length) throws Exception {
@@ -114,9 +120,13 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
         int i = 0;
 
         for (org.picketlink.idm.api.User user : users) {
-            User gtnUser = new UserImpl(user.getId());
-            ((UserDAOImpl) getOrganizationService().getUserHandler()).populateUser(gtnUser, getIDMService()
-                    .getIdentitySession());
+            User gtnUser = null;
+            if (loadUserAttributes) {
+              gtnUser = new UserImpl(user.getId());
+              ((UserDAOImpl) getOrganizationService().getUserHandler()).populateUser(gtnUser, getIDMService().getIdentitySession());
+            } else {
+              gtnUser = getOrganizationService().getUserHandler().createUserInstance(user.getId());
+            }
             exoUsers[i++] = gtnUser;
             lastExisting = gtnUser;
         }
@@ -192,6 +202,10 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
 
     }
 
+    public void setLoadUserAttributes(boolean loadUserAttributes) {
+      this.loadUserAttributes = loadUserAttributes;
+    }
+
     PicketLinkIDMService getIDMService() {
         return ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(PicketLinkIDMService.class);
     }
@@ -208,7 +222,7 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
             Iterator<org.picketlink.idm.api.User> iterator = fullResults.iterator();
             while (iterator.hasNext() && result.size() < length) {
               org.picketlink.idm.api.User user = iterator.next();
-                Attribute attr = getIDMService().getIdentitySession().getAttributesManager().getAttribute(user.getKey(), UserDAOImpl.USER_ENABLED);
+                Attribute attr = getIDMService().getIdentitySession().getAttributesManager().getAttribute(user.getKey(), EntityMapperUtils.USER_ENABLED);
                 if ((userStatus == UserStatus.ENABLED && attr == null) || (userStatus == UserStatus.DISABLED && attr != null && attr.getValue().toString().equals("false"))) {
                     // Check if we have to get a subset of real fullResults or from results returned by a query
                     if(this.fullResults == fullResults) {

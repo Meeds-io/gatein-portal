@@ -28,6 +28,7 @@ import java.util.Properties;
 import org.exoplatform.commons.utils.SecurityHelper;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.picketlink.idm.api.Attribute;
@@ -109,9 +110,9 @@ public class DisabledUserMigrationScript {
         IdentitySession session = getIdentitySession();
         AttributesManager am = session.getAttributesManager();
         if (enabled){
-            am.removeAttributes(userName, new String[]{UserDAOImpl.USER_ENABLED});
+            am.removeAttributes(userName, new String[]{EntityMapperUtils.USER_ENABLED});
         } else {
-            Attribute[] attrs = new Attribute[] { new SimpleAttribute(UserDAOImpl.USER_ENABLED, String.valueOf(enabled)) };
+            Attribute[] attrs = new Attribute[] { new SimpleAttribute(EntityMapperUtils.USER_ENABLED, String.valueOf(enabled)) };
             am.updateAttributes(userName, attrs);
         }
     }

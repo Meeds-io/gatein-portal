@@ -1,0 +1,8 @@
+dn: cn=OrganizationD,ou=GroupsHierarchy,o=test,dc=portal,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: OrganizationD
+description: Some organization
+member: uid=jduke,ou=People,o=test,dc=portal,dc=example,dc=com
+member: uid=jduke1,ou=People,o=test,dc=portal,dc=example,dc=com
+member: uid=jduke2,ou=People,o=test,dc=portal,dc=example,dc=com

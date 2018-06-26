@@ -83,10 +83,10 @@
                   </entry>
                   <entry>
                     <key>
-                      <string>/organization_hierarcy/*</string>
+                      <string>/organization_hierarchy/*</string>
                     </key>
                     <value>
-                      <string>organization_hierarcy_type</string>
+                      <string>organization_hierarchy_type</string>
                     </value>
                   </entry>
                 </map>
@@ -94,7 +94,7 @@
               <field name="ignoreMappedMembershipTypeGroupList">
                 <collection type="java.util.ArrayList" item-type="java.lang.String">
                   <value>
-                    <string>/organization_hierarcy/*</string>
+                    <string>/organization_hierarchy/*</string>
                   </value>
                 </collection>
               </field>

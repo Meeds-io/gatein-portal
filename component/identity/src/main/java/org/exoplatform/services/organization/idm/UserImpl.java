@@ -23,52 +23,18 @@
 
 package org.exoplatform.services.organization.idm;
 
-import java.io.Serializable;
-
-
 /**
- * TODO: This is temporary implementation, which should be removed after https://issues.jboss.org/browse/EXOJCR-1780 will be
- * fixed and available in GateIn.
- * Because issue https://issues.jboss.org/browse/EXOJCR-1780 was fixed and this class will be removed soon.
- * You should use {@link org.exoplatform.services.organization.impl.UserImpl} instead of this class for avoiding error in future.
- *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-@Deprecated
 public class UserImpl extends org.exoplatform.services.organization.impl.UserImpl {
-    private static final long serialVersionUID = -4898913382977839329L;
+  private static final long serialVersionUID = -4898913382977839329L;
 
-    private String displayName;
+  public UserImpl() {
+    super();
+  }
 
-    public UserImpl() {
-        super();
-    }
+  public UserImpl(String username) {
+    super(username);
+  }
 
-    public UserImpl(String username) {
-        super(username);
-    }
-
-    @Override
-    public String getFullName() {
-        return displayName != null ? displayName : getFirstName() + " " + getLastName();
-    }
-
-    @Override
-    public void setFullName(String fullName) {
-        this.displayName = fullName;
-    }
-
-    @Override
-    public void setDisplayName(String displayName) {
-        if (displayName != null) {
-            this.displayName = displayName.trim().isEmpty() ? null : displayName;
-        } else {
-            this.displayName = displayName;
-        }
-    }
-
-    @Override
-    public String getDisplayName() {
-        return this.displayName != null ? this.displayName : this.getFirstName() + " " + this.getLastName();
-    }
 }
