@@ -108,7 +108,7 @@ public class UIPortletForm extends UIFormTabPane {
                 .addUIFormInput(new UICheckBoxInput("showPortletMode", "showPortletMode", false))
                 .addUIFormInput(new UICheckBoxInput("showWindowState", "showWindowState", false))
                 .addUIFormInput(
-                        new UIFormTextAreaInput("description", "description", null).addValidator(NotHTMLTagValidator.class,
+                        new UIFormTextAreaInput("description", "description", null).addValidator(StringLengthValidator.class, 0, 255).addValidator(NotHTMLTagValidator.class,
                                 "UIPortletForm.msg.InvalidPortletDescription"));
         addUIFormInput(uiSettingSet);
         UIFormInputIconSelector uiIconSelector = new UIFormInputIconSelector("Icon", "icon");

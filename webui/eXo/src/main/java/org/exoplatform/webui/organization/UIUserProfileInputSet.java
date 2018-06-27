@@ -125,7 +125,7 @@ public class UIUserProfileInputSet extends UIFormInputSet {
                 continue;
             } else if (key.equalsIgnoreCase("user.jobtitle")) {
                 set.addUIFormInput(new UIFormStringInput(key, null, null).addValidator(UserConfigurableValidator.class,
-                        JOB_TITLE, UserConfigurableValidator.KEY_PREFIX + JOB_TITLE, false));
+                		JOB_TITLE, UserConfigurableValidator.KEY_PREFIX + JOB_TITLE, false));
                 continue;
             } else if (key.equalsIgnoreCase(Constants.USER_LANGUAGE)) {
                 UIFormSelectBox langSelectBox = new UIFormSelectBox(key, key, null);
