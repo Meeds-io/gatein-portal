@@ -34,28 +34,23 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.web.AbstractHttpServlet;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.Query;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.web.security.AuthenticationRegistry;
 import org.exoplatform.web.security.security.AbstractTokenService;
 import org.exoplatform.web.security.security.CookieTokenService;
 import org.exoplatform.web.security.sso.SSOHelper;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
 import org.gatein.wci.ServletContainer;
 import org.gatein.wci.ServletContainerFactory;
-import org.gatein.wci.authentication.AuthenticationEvent;
-import org.gatein.wci.authentication.AuthenticationEventType;
-import org.gatein.wci.authentication.AuthenticationException;
-import org.gatein.wci.authentication.AuthenticationListener;
+import org.gatein.wci.authentication.*;
 import org.gatein.wci.security.Credentials;
 
 /**
@@ -87,7 +82,7 @@ public class LoginServlet extends AbstractHttpServlet {
     private static final int FAILED = 2;
 
     /** . */
-    private static final Logger log = LoggerFactory.getLogger(LoginServlet.class);
+    private static final Log log = ExoLogger.getLogger(LoginServlet.class);
 
     /** . */
     public static final String COOKIE_NAME = "rememberme";
@@ -98,6 +93,8 @@ public class LoginServlet extends AbstractHttpServlet {
 
     //value of this field need equals with org.gatein.security.oauth.common.OAuthConstants.ATTRIBUTE_REMEMBER_ME
     public static final String SESSION_ATTRIBUTE_REMEMBER_ME = "_rememberme";
+
+    boolean caseInsensitive = true;
 
     /**
      * Register WCI authentication listener, which is used to bind credentials to temporary authentication registry after each
@@ -116,6 +113,13 @@ public class LoginServlet extends AbstractHttpServlet {
                 }
             }
         });
+        String caseInsensitiveString = PropertyManager.getProperty(IS_CASE_INSENSITIVE);
+        if (StringUtils.isNotBlank(caseInsensitiveString)
+            && ("true".equals(caseInsensitiveString) || "false".equals(caseInsensitiveString))) {
+          caseInsensitive = Boolean.valueOf(caseInsensitiveString);
+        } else {
+          log.warn("Wrong value {} for parameter {}. The default value 'true' will be used.", caseInsensitiveString, IS_CASE_INSENSITIVE);
+        }
     }
 
     /**
@@ -162,11 +166,6 @@ public class LoginServlet extends AbstractHttpServlet {
 
         //
         int status;
-        boolean caseInsensitive = true;
-        String caseInsensitiveString = PropertyManager.getProperty(IS_CASE_INSENSITIVE);
-        if(caseInsensitiveString != null) {
-            caseInsensitive = Boolean.valueOf(caseInsensitiveString);
-        }
         if (req.getRemoteUser() == null) {
             if (username != null && password != null) {
                 Credentials credentials = new Credentials(username, password);
@@ -174,21 +173,16 @@ public class LoginServlet extends AbstractHttpServlet {
 
                 // This will login or send an AuthenticationException
                 try {
-                    container.login(req, resp, credentials);
+                  if (caseInsensitive) {
+                    username = getExactUserName(username);
+                    credentials = new Credentials(username, password);
+                  }
+                  container.login(req, resp, credentials);
                 } catch (AuthenticationException e) {
-                    if (caseInsensitive) {
-                        username = getUserNameCaseInsensitive(username);
-                        if (username != null) {
-                          try {
-                            credentials = new Credentials(username, password);
-                            container.login(req, resp, credentials);
-                          } catch (AuthenticationException e1) {
-                            log.trace("User " + username + " authentication failed", e1);
-                          }
-                        }
-                    } else {
-                      log.trace("User " + username + " authentication failed", e);
-                    }
+                  log.debug("User authentication failed");
+                  if (log.isTraceEnabled()) {
+                      log.trace(e.getMessage(), e);
+                  }
                 }
 
                 //
@@ -331,40 +325,22 @@ public class LoginServlet extends AbstractHttpServlet {
     }
 
     /**
-     * Get username from database case insensitive
+     * Get exact username from database
      * 
      * @param username
      * @return
      */
-    private String getUserNameCaseInsensitive(String username) {
+    private String getExactUserName(String username) {
       ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
       RequestLifeCycle.begin(currentContainer);
       try {
-          OrganizationService organizationService =
-                  (OrganizationService) currentContainer
-                          .getComponentInstance(OrganizationService.class);
-          Query query = new Query();
-          query.setUserName(username);
-          ListAccess<User> users = organizationService.getUserHandler().findUsersByQuery(query);
-          if (users.getSize() >= 1) {
-              String loadedUsername = "";
-              User[] listusers = users.load(0, users.getSize());
-              int found = 0;
-              for (User user : listusers) {
-                  if (username.equalsIgnoreCase(user.getUserName())) {
-                      loadedUsername = user.getUserName();
-                      found ++;
-                  }
-              }
-              if(found == 1 && StringUtils.isNotBlank(loadedUsername)) {
-                  if (StringUtils.equals(username, loadedUsername)) {
-                    return null;
-                  }
-                  username = loadedUsername;
-              } else {
-                  log.warn("duplicate entry for user " + username);
-              }
-          }
+        OrganizationService organizationService =
+                (OrganizationService) currentContainer
+                        .getComponentInstance(OrganizationService.class);
+        User user = organizationService.getUserHandler().findUserByName(username);
+        if (user != null) {
+          username = user.getUserName();
+        }
       } catch (Exception exception) {
           log.warn("Error while retrieving user " + username + " from IDM stores ", exception);
       } finally {

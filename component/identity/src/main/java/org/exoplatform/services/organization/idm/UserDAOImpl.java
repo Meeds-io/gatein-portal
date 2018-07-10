@@ -780,7 +780,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
   }
 
   public User getPopulatedUser(String userName, IdentitySession session, UserStatus userStatus) throws Exception {
-    Object u = null;
+    org.picketlink.idm.api.User u = null;
 
     orgService.flush();
 
@@ -798,7 +798,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
       return null;
     }
 
-    User user = new UserImpl(userName);
+    User user = new UserImpl(u.getId());
     populateUser(user, session);
 
     if (disableUserActived()) {

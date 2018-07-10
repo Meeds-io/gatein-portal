@@ -25,7 +25,6 @@ import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.database.HibernateService;
-import org.exoplatform.services.organization.impl.UserImpl;
 
 @ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml") })
 public class TestBootstrap extends AbstractKernelTest {
@@ -46,13 +45,14 @@ public class TestBootstrap extends AbstractKernelTest {
         assertNotNull(organization);
 
         begin();
-        User test = new UserImpl("testUser");
+        User test = organization.getUserHandler().createUserInstance("testUser");
         organization.getUserHandler().createUser(test, false);
 
         test = organization.getUserHandler().findUserByName("toto");
         assertNull(test);
-        test = organization.getUserHandler().findUserByName("testUser");
+        test = organization.getUserHandler().findUserByName("testuser");
         assertNotNull(test);
+        assertEquals("testUser", test.getUserName());
         end();
     }
 

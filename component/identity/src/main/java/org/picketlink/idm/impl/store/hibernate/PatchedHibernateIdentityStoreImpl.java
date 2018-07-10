@@ -47,9 +47,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.helper.Tools;
 import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObject;
@@ -328,7 +326,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
 
       String allowNotCaseSensitiveSearch = configurationMD.getOptionSingleValue(ALLOW_NOT_CASE_SENSITIVE_SEARCH);
 
-      if (allowNotCaseSensitiveSearch != null && allowNotCaseSensitiveSearch.equalsIgnoreCase("true"))
+      if (allowNotCaseSensitiveSearch == null || allowNotCaseSensitiveSearch.equalsIgnoreCase("true"))
       {
          this.isAllowNotCaseSensitiveSearch = true;
       }
@@ -2940,14 +2938,16 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
 
       try
       {
-
-         hibernateObject = (HibernateIdentityObject)hibernateSession.createCriteria(HibernateIdentityObject.class)
-            .add(Restrictions.eq("name", io.getName()))
+        SimpleExpression nameSearchCriteria = Restrictions.eq("name", io.getName());
+        if (isAllowNotCaseSensitiveSearch()) {
+          nameSearchCriteria = nameSearchCriteria.ignoreCase();
+        }
+        hibernateObject = (HibernateIdentityObject)hibernateSession.createCriteria(HibernateIdentityObject.class)
+            .add(nameSearchCriteria)
             .add(Restrictions.eq("identityType", hibernateType))
             .add(Restrictions.eq("realm", realm))
             .setCacheable(true)
             .uniqueResult();
-
       }
       catch (Exception e)
       {
