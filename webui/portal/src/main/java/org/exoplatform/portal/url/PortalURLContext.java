@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.portal.application.PortalRequestHandler;
 import org.exoplatform.portal.mop.SiteKey;
@@ -148,6 +149,8 @@ public class PortalURLContext implements URLContext {
         for (QualifiedName parameterName : url.getParameterNames()) {
             String parameterValue = url.getParameterValue(parameterName);
             if (parameterValue != null) {
+                // XSS issue PLF-8071
+                parameterValue = parameterValue.replaceAll("&", "&amp;");
                 parameters.put(parameterName, parameterValue);
             }
         }
