@@ -128,6 +128,26 @@ public class TestOrganization extends AbstractKernelTest {
         assertNull(group);
     }
 
+    public void testFindGroupCaseInsensitive() throws Exception {
+      GroupHandler groupHandler = organizationService.getGroupHandler();
+      Group group = groupHandler.createGroupInstance();
+      group.setGroupName("TOTO");
+      group.setLabel("TOTO");
+      groupHandler.addChild(null, group, true);
+
+      group = groupHandler.createGroupInstance();
+      group.setGroupName("toto");
+      group.setLabel("toto");
+      groupHandler.addChild(null, group, true);
+
+      group = groupHandler.findGroupById("toto");
+      assertNotNull(group);
+      group = groupHandler.findGroupById("TOTO");
+      assertNotNull(group);
+      group = groupHandler.findGroupById("ToTO");
+      assertNull(group);
+    }
+
     public void testFindGroupAfterDelete() throws Exception {
         GroupHandler groupHander = organizationService.getGroupHandler();
         Collection<Group> rootGroups = groupHander.findGroups(null);

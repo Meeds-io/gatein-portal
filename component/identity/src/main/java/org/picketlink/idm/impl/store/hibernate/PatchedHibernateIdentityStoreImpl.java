@@ -39,13 +39,7 @@ import java.util.logging.Logger;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
-import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.*;
 import org.picketlink.idm.common.exception.IdentityException;
@@ -2939,7 +2933,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
       try
       {
         SimpleExpression nameSearchCriteria = Restrictions.eq("name", io.getName());
-        if (isAllowNotCaseSensitiveSearch()) {
+        if (isAllowNotCaseSensitiveSearch() && hibernateType.getName().equalsIgnoreCase("USER")) {
           nameSearchCriteria = nameSearchCriteria.ignoreCase();
         }
         hibernateObject = (HibernateIdentityObject)hibernateSession.createCriteria(HibernateIdentityObject.class)
@@ -2948,6 +2942,11 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
             .add(Restrictions.eq("realm", realm))
             .setCacheable(true)
             .uniqueResult();
+      }
+      catch (NonUniqueResultException e)
+      {
+        log.log(Level.SEVERE, "The identity of type '" + hibernateType.getName() + "' and with name '" + io.getName() + "' is not unique. Thus a null will be returned. ", e);
+        return null;
       }
       catch (Exception e)
       {
