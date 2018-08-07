@@ -431,6 +431,15 @@
       }
       newLayer.parent().css("top", -height + "px");
       return newLayer;
+    },
+
+    updatePortalMode: function(portalMode, portalEditLevel, fullPreview, isPageMaxWindow) {
+      eXo.portal.portalMode = portalMode;
+      eXo.portal.portalEditLevel = portalEditLevel;
+      eXo.portal.fullPreview = fullPreview;
+      eXo.portal.isPageMaxWindow = isPageMaxWindow;
+
+      $('body').trigger('exo-portal-mode-updated', [{isPageMaxWindow: isPageMaxWindow}]);
     }
   };
 

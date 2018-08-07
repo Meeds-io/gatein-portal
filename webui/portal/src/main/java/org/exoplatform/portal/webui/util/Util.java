@@ -196,12 +196,14 @@ public class Util {
     public static void updatePortalMode() {
         PortalRequestContext context = Util.getPortalRequestContext();
         UIPortalApplication uiPortalApp = (UIPortalApplication)context.getUIApplication();
+        boolean isShowMaxWindow = false;
+        UIPage page = uiPortalApp.findFirstComponentOfType(UIPage.class);
+        if (page != null && page.isShowMaxWindow()) {
+            isShowMaxWindow = true;
+        }
         context .getJavascriptManager()
                 .require("SHARED/portal", "portal")
-                .addScripts(
-                        "eXo.portal.portalMode=" + uiPortalApp.getModeState() + ";\n"
-                        + "eXo.portal.portalEditLevel='" + uiPortalApp.getEditLevel().toString() + "';\n"
-                        + "eXo.portal.fullPreview=" + Boolean.toString(UIPage.isFullPreview()) + ";\n");
+                .addScripts("portal.UIPortal.updatePortalMode(" + uiPortalApp.getModeState() + ", '" + uiPortalApp.getEditLevel().toString() + "', " + Boolean.toString(UIPage.isFullPreview()) + ", " + Boolean.toString(isShowMaxWindow)+ ");");
     }
 
 }
