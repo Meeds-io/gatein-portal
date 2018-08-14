@@ -425,7 +425,7 @@
             <field name="name"><string>portal.PortalConfig</string></field>
             <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.portalconfig.strategy:LIRS}</string></field>
             <field name="maxSize"><int>${exo.cache.portal.portalconfig.MaxNodes:1100}</int></field>
-            <field name="liveTime"><long>${exo.cache.portl.portalconfig.TimeToLive:86400}</long></field>
+            <field name="liveTime"><long>${exo.cache.portal.portalconfig.TimeToLive:86400}</long></field>
             <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.portalconfig.cacheMode:replication}</string></field>
           </object>
         </object-param>
