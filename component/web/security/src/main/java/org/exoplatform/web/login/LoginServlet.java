@@ -113,12 +113,15 @@ public class LoginServlet extends AbstractHttpServlet {
                 }
             }
         });
+
         String caseInsensitiveString = PropertyManager.getProperty(IS_CASE_INSENSITIVE);
-        if (StringUtils.isNotBlank(caseInsensitiveString)
-            && ("true".equals(caseInsensitiveString) || "false".equals(caseInsensitiveString))) {
-          caseInsensitive = Boolean.valueOf(caseInsensitiveString);
-        } else {
-          log.warn("Wrong value {} for parameter {}. The default value 'true' will be used.", caseInsensitiveString, IS_CASE_INSENSITIVE);
+        if (StringUtils.isNotBlank(caseInsensitiveString)) {
+          if ("true".equals(caseInsensitiveString) || "false".equals(caseInsensitiveString)) {
+            caseInsensitive = Boolean.valueOf(caseInsensitiveString);
+          } else {
+            log.warn("The value of the parameter {} is not valid ({}). The default value {} will be used.",
+                    IS_CASE_INSENSITIVE, caseInsensitiveString, caseInsensitive);
+          }
         }
     }
 
