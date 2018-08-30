@@ -405,10 +405,10 @@
           <description>Exo Cache cluster configuration for IDM User entity</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>portal.User</string></field>
-            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.user.strategy:LIRS}</string></field>
-            <field name="maxSize"><int>${exo.cache.portal.user.MaxNodes:1000}</int></field>
-            <field name="liveTime"><long>${exo.cache.portal.user.TimeToLive:86400}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.user.cacheMode:replication}</string></field>
+            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.idm.user.strategy:LIRS}</string></field>
+            <field name="maxSize"><int>${exo.cache.portal.idm.user.MaxNodes:1000}</int></field>
+            <field name="liveTime"><long>${exo.cache.portal.idm.user.TimeToLive:86400}</long></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.idm.user.cacheMode:replication}</string></field>
           </object>
         </object-param>
         
@@ -417,10 +417,10 @@
           <description>Exo Cache cluster configuration for IDM User Profile entity</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>portal.Profile</string></field>
-            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.profile.strategy:LIRS}</string></field>
-            <field name="maxSize"><int>${exo.cache.portal.profile.MaxNodes:1000}</int></field>
-            <field name="liveTime"><long>${exo.cache.portal.profile.TimeToLive:86400}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.profile.cacheMode:replication}</string></field>
+            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.idm.profile.strategy:LIRS}</string></field>
+            <field name="maxSize"><int>${exo.cache.portal.idm.profile.MaxNodes:1000}</int></field>
+            <field name="liveTime"><long>${exo.cache.portal.idm.profile.TimeToLive:86400}</long></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.idm.profile.cacheMode:replication}</string></field>
           </object>
         </object-param>
         
@@ -429,10 +429,10 @@
           <description>Exo Cache cluster configuration for IDM Membership entity</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>portal.Membership</string></field>
-            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.membership:LIRS}</string></field>
-            <field name="maxSize"><int>${exo.cache.portal.membership.MaxNodes:20000}</int></field>
-            <field name="liveTime"><long>${exo.cache.portal.membership.TimeToLive:86400}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.membership.cacheMode:replication}</string></field>
+            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.idm.membership:LIRS}</string></field>
+            <field name="maxSize"><int>${exo.cache.portal.idm.membership.MaxNodes:20000}</int></field>
+            <field name="liveTime"><long>${exo.cache.portal.idm.membership.TimeToLive:86400}</long></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.idm.membership.cacheMode:replication}</string></field>
           </object>
         </object-param>
         
@@ -441,10 +441,10 @@
           <description>Exo Cache cluster configuration for IDM Membership Type entity</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>portal.Role</string></field>
-            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.role.strategy:LIRS}</string></field>
-            <field name="maxSize"><int>${exo.cache.portal.role.MaxNodes:50}</int></field>
-            <field name="liveTime"><long>${exo.cache.portal.role.TimeToLive:86400}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.role.cacheMode:replication}</string></field>
+            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.idm.role.strategy:LIRS}</string></field>
+            <field name="maxSize"><int>${exo.cache.portal.idm.role.MaxNodes:50}</int></field>
+            <field name="liveTime"><long>${exo.cache.portal.idm.role.TimeToLive:86400}</long></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.idm.role.cacheMode:replication}</string></field>
           </object>
         </object-param>
         
@@ -453,10 +453,10 @@
           <description>Exo Cache cluster configuration for IDM Group entity</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>portal.Group</string></field>
-            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.group.strategy:LIRS}</string></field>
-            <field name="maxSize"><int>${exo.cache.portal.group.MaxNodes:100}</int></field>
-            <field name="liveTime"><long>${exo.cache.portal.group.TimeToLive:-1}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.group.cacheMode:replication}</string></field>
+            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.idm.group.strategy:LIRS}</string></field>
+            <field name="maxSize"><int>${exo.cache.portal.idm.group.MaxNodes:100}</int></field>
+            <field name="liveTime"><long>${exo.cache.portal.idm.group.TimeToLive:-1}</long></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.idm.group.cacheMode:replication}</string></field>
           </object>
         </object-param>
       </init-params>
