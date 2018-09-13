@@ -22,16 +22,11 @@ package org.exoplatform.portal.pom.config;
 import java.io.Serializable;
 import java.lang.reflect.UndeclaredThrowableException;
 
-import org.exoplatform.commons.cache.future.FutureExoCache;
-import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.commons.chromattic.ChromatticLifeCycle;
 import org.exoplatform.commons.chromattic.ChromatticManager;
 import org.exoplatform.commons.chromattic.SessionContext;
 import org.exoplatform.commons.scope.ScopedKey;
-import org.exoplatform.portal.pom.config.cache.CacheableDataTask;
 import org.exoplatform.portal.pom.config.cache.DataCache;
-import org.exoplatform.portal.pom.config.cache.DataCacheContext;
-import org.exoplatform.portal.pom.config.cache.NullObject;
 import org.exoplatform.portal.pom.config.cache.PortalNamesCache;
 import org.exoplatform.portal.pom.data.OwnerKey;
 import org.exoplatform.portal.pom.data.PortalKey;
@@ -63,9 +58,6 @@ public class POMSessionManager implements Startable {
     private final ExoCache<ScopedKey<?>, Object> cache;
 
     /** . */
-    private final FutureExoCache<ScopedKey<?>, Object, DataCacheContext> futureCache;
-
-    /** . */
     final ChromatticManager manager;
 
     /** . */
@@ -74,17 +66,14 @@ public class POMSessionManager implements Startable {
     /** . */
     private final TaskExecutionDecorator executor;
 
+    /** . */
+    private final RepositoryService repositoryService;
+
     public POMSessionManager(RepositoryService repositoryService, ChromatticManager manager, CacheService cacheService) {
         //
+        this.repositoryService = repositoryService;
         this.manager = manager;
         this.cache = cacheService.getCacheInstance(CACHE_NAME);
-        futureCache = new FutureExoCache<>(new Loader<ScopedKey<?>, Object, DataCacheContext>() {
-          @Override
-          public Object retrieve(DataCacheContext dataCacheContext, ScopedKey<?> key) throws Exception {
-            Object result = dataCacheContext.execute();
-            return result == null ? NullObject.get() : result;
-          }
-        }, cache);
         this.pomService = null;
         this.executor = new PortalNamesCache(new DataCache(new ExecutorDispatcher()));
     }
@@ -93,11 +82,23 @@ public class POMSessionManager implements Startable {
         return configurator;
     }
 
-    public Object cacheGet(Serializable key, DataCacheContext cacheContext) {
+    public void cachePut(Serializable key, Object value) {
         ScopedKey<?> globalKey = ScopedKey.create(key);
 
         //
-        Object value = futureCache.get(cacheContext, globalKey);
+        if (log.isTraceEnabled()) {
+            log.trace("Updating cache key=" + globalKey + " with value=" + value);
+        }
+
+        //
+        cache.put(globalKey, value);
+    }
+
+    public Object cacheGet(Serializable key) {
+        ScopedKey globalKey = ScopedKey.create(key);
+
+        //
+        Object value = cache.get(globalKey);
 
         //
         if (log.isTraceEnabled()) {
@@ -105,7 +106,7 @@ public class POMSessionManager implements Startable {
         }
 
         //
-        return value instanceof NullObject ? null : value;
+        return value;
     }
 
     public void cacheRemove(Serializable key) {

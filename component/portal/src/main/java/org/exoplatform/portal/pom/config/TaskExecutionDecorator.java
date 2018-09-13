@@ -32,11 +32,7 @@ public class TaskExecutionDecorator implements TaskExecutor {
     }
 
     public <V> V execute(POMSession session, POMTask<V> task) throws Exception {
-        return executeWithoutCache(session, task);
-    }
-
-    public <V> V executeWithoutCache(POMSession session, POMTask<V> task) throws Exception {
-      return next.execute(session, task);
+        return next.execute(session, task);
     }
 
     public <E extends TaskExecutor> E getDecorator(Class<E> decoratorClass) {
