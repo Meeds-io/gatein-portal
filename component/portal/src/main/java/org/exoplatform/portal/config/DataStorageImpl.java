@@ -25,8 +25,6 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.exoplatform.commons.cache.future.FutureExoCache;
-import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PropertyManager;
@@ -68,20 +66,10 @@ public class DataStorageImpl implements DataStorage {
 
     private final static String CACHE_NAME = "portal.PortalConfig";
 
-    protected FutureExoCache<PortalKey, PortalData, Object> futurePortalConfigCache;
-
     public DataStorageImpl(CacheService cacheService, ModelDataStorage delegate, ListenerService listenerServ) {
         this.delegate = delegate;
         this.listenerServ_ = listenerServ;
-
         this.portalConfigCache = cacheService.getCacheInstance(CACHE_NAME);
-        this.futurePortalConfigCache = new FutureExoCache<>(new Loader<PortalKey, PortalData, Object>() {
-          @Override
-          public PortalData retrieve(Object context, PortalKey key) throws Exception {
-            PortalData portalConfig = delegate.getPortalConfig(key);
-            return portalConfig == null ? PortalData.NULL_OBJECT : portalConfig;
-          }
-        }, portalConfigCache);
     }
 
     /**
@@ -97,15 +85,15 @@ public class DataStorageImpl implements DataStorage {
         // Clear cache entry since this method can be called even to update an existing
         // Portal Config
         PortalKey key = new PortalKey(config.getType(), config.getName());
-        delegate.create(config.build());
         portalConfigCache.remove(key);
+        delegate.create(config.build());
         listenerServ_.broadcast(PORTAL_CONFIG_CREATED, this, config);
     }
 
     public void save(PortalConfig config) throws Exception {
         PortalKey key = new PortalKey(config.getType(), config.getName());
-        delegate.save(config.build());
         portalConfigCache.remove(key);
+        delegate.save(config.build());
         listenerServ_.broadcast(PORTAL_CONFIG_UPDATED, this, config);
     }
 
@@ -292,9 +280,12 @@ public class DataStorageImpl implements DataStorage {
     }
 
     public PortalConfig getPortalConfig(String ownerType, String portalName) throws Exception {
-      PortalKey key = new PortalKey(ownerType, portalName);
-      PortalData data = futurePortalConfigCache.get(null, key);
-      return data != null && data.getKey() != null ? new PortalConfig(data) : null;
+        PortalKey key = new PortalKey(ownerType, portalName);
+        PortalData data = portalConfigCache.get(key);
+        if (data == null) {
+          data = delegate.getPortalConfig(key);
+        }
+        return data != null ? new PortalConfig(data) : null;
     }
 
     public Dashboard loadDashboard(String dashboardId) throws Exception {
