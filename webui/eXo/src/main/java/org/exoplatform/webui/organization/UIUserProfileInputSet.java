@@ -118,6 +118,7 @@ public class UIUserProfileInputSet extends UIFormInputSet {
         for (String key : keys) {
             if (key.equalsIgnoreCase("user.gender")) {
                 List<SelectItemOption<String>> ls = new ArrayList<SelectItemOption<String>>();
+                ls.add(new SelectItemOption<String>("", ""));
                 ls.add(new SelectItemOption<String>(MALE, MALE));
                 ls.add(new SelectItemOption<String>(FEMALE, FEMALE));
                 UIFormSelectBox genderSelectBox = new UIFormSelectBox(key, key, ls);
