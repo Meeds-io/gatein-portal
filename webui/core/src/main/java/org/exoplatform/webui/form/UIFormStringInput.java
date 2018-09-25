@@ -21,6 +21,7 @@ package org.exoplatform.webui.form;
 
 import java.io.Writer;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.serialization.api.annotations.Serialized;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.webui.application.WebuiRequestContext;
@@ -52,7 +53,18 @@ public class UIFormStringInput extends UIFormInputBase<String> {
      */
     private int maxLength = 0;
 
+    /**
+     * placeholder of the text field
+     */
+    private String placeholder = "";
+
     public UIFormStringInput() {
+    }
+
+    public UIFormStringInput(String name, String bindingExpression, String value, String placeholder) {
+        super(name, bindingExpression, String.class);
+        this.value_ = value;
+        this.placeholder = placeholder;
     }
 
     public UIFormStringInput(String name, String bindingExpression, String value) {
@@ -78,6 +90,15 @@ public class UIFormStringInput extends UIFormInputBase<String> {
         return maxLength;
     }
 
+    public String getPlaceholder() {
+        return placeholder;
+    }
+
+    public UIFormStringInput setPlaceholder(String placeholder) {
+        this.placeholder = placeholder;
+        return this;
+    }
+
     public void decode(Object input, WebuiRequestContext context) {
         String val = (String) input;
         if ((val == null || val.length() == 0) && type_ == PASSWORD_TYPE)
@@ -97,6 +118,11 @@ public class UIFormStringInput extends UIFormInputBase<String> {
             w.write(" type=\"password\"");
         else
             w.write(" type=\"text\"");
+        if(StringUtils.isNotEmpty(getPlaceholder())) {
+            w.write(" placeholder=\"");
+            w.write(getPlaceholder());
+            w.write("\"");
+        }
         w.write(" id=\"");
         w.write(getId());
         w.write("\"");
