@@ -109,6 +109,7 @@ public class TestPLIDMExternalStoreImportService extends AbstractKernelTest {
                                                                              }
                                                                            };
 
+  @Override
   public void setUp() throws Exception {
     setForceContainerReload(true);
 
@@ -131,23 +132,39 @@ public class TestPLIDMExternalStoreImportService extends AbstractKernelTest {
     begin();
 
     // Make sure data is valid after running previous tests classes
-    removeAllUsers();
-    removeGroupTree(null);
+    resetData();
 
-    externalStoreService.initializeGroupTree(externalStoreService.getReversedGroupTypeMappings());
+    // Make sure data processing (especially import to queue) is not done in the same second
+    // than the data creation (users and groups), otherwise users and groups could be imported twice
+    Thread.sleep(2000);
   }
 
   @Override
   public void tearDown() throws Exception {
-    removeAllUsers();
-    organizationService.getUserHandler().removeUserEventListener(errorOnUserEventListener);
+    deleteData();
 
+    end();
+    super.tearDown();
+  }
+
+  private void resetData() throws Exception {
+    deleteData();
+
+    openDSService.initLDAPServer();
+    openDSService.populateLDIFFile("ldap/ldap/initial-opends-external.ldif");
+
+    externalStoreService.initializeGroupTree(externalStoreService.getReversedGroupTypeMappings());
+  }
+
+  private void deleteData() throws Exception {
+    openDSService.cleanUpDN("dc=portal,dc=example,dc=com");
+    removeAllUsers();
     removeGroupTree(null);
 
     queueService.setLastCheckedTime(IDMEntityType.USER, null);
     queueService.setLastCheckedTime(IDMEntityType.GROUP, null);
-    end();
-    super.tearDown();
+
+    organizationService.getUserHandler().removeUserEventListener(errorOnUserEventListener);
   }
 
   private void removeAllUsers() throws Exception {
@@ -163,7 +180,6 @@ public class TestPLIDMExternalStoreImportService extends AbstractKernelTest {
     try {
       openDSService.start();
       openDSService.initLDAPServer();
-      openDSService.populateLDIFFile("ldap/ldap/initial-opends-external.ldif");
     } catch (Exception e) {
       log.error("Error in starting up OPENDS", e);
       e.printStackTrace();
@@ -207,7 +223,7 @@ public class TestPLIDMExternalStoreImportService extends AbstractKernelTest {
       int initialMembershipsSize = memberships.size();
 
       externalStoreImportService.importModifiedEntitiesOfTypeToQueue(IDMEntityType.GROUP);
-      assertTrue("A new Group should be detected on external store.", queueService.countAll() >= 1);
+      assertEquals("A new Group should be detected on external store.", 1, queueService.countAll());
       externalStoreImportService.processQueueEntries();
       assertEquals("The queue should be purged once the new group imported on internal store", 0, queueService.countAll());
 
@@ -233,7 +249,7 @@ public class TestPLIDMExternalStoreImportService extends AbstractKernelTest {
       Thread.sleep(1000);
 
       externalStoreImportService.importModifiedEntitiesOfTypeToQueue(IDMEntityType.GROUP);
-      assertTrue("Membership modification on Group should be detected", queueService.countAll() >= 1);
+      assertEquals("Membership modification on Group should be detected", 1, queueService.countAll());
       externalStoreImportService.processQueueEntries();
       assertEquals("Queue must be purged once the membership entity processing is successfully done", 0, queueService.countAll());
       allGroups = organizationService.getGroupHandler().getAllGroups();
@@ -249,7 +265,7 @@ public class TestPLIDMExternalStoreImportService extends AbstractKernelTest {
       // Delete '/role_hierarchy/Delta' group
       openDSService.cleanUpDN("cn=Delta,ou=Roles,o=test,dc=portal,dc=example,dc=com");
       externalStoreImportService.checkEntitiesToDeleteIntoQueue(IDMEntityType.GROUP);
-      assertTrue("The group deletion should be detected.", queueService.countAll() >= 1);
+      assertEquals("The group deletion should be detected.", 1, queueService.countAll());
       externalStoreImportService.processQueueEntries();
       assertEquals("The queue must be purged once the group deletion is processed on internal store.",
                    0,
@@ -277,7 +293,8 @@ public class TestPLIDMExternalStoreImportService extends AbstractKernelTest {
     createLDAPGroup("Admin");
 
     externalStoreImportService.importModifiedEntitiesOfTypeToQueue(IDMEntityType.USER);
-    assertTrue("Queue size should be greater than 0 to import all users", queueService.countAll() > 0);
+
+    assertEquals("Queue size should be greater than 0 to import all users", 11, queueService.countAll());
     externalStoreImportService.processQueueEntries();
     assertEquals("Queue should be purged once processed.", 0, queueService.countAll());
     int initialUsersSize = organizationService.getUserHandler().findAllUsers().getSize();

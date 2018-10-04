@@ -1,9 +1,9 @@
-#dn: dc=example,dc=com
-#objectclass: top
-#objectclass: dcObject
-#objectclass: organization
-#dc: example
-#o: example
+dn: dc=example,dc=com
+objectclass: top
+objectclass: dcObject
+objectclass: organization
+dc: example
+o: example
 
 dn: dc=portal,dc=example,dc=com
 objectclass: top
