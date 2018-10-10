@@ -18,10 +18,7 @@
  */
 package org.exoplatform.application.gadget.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 import org.apache.shindig.common.uri.Uri;
@@ -41,8 +38,16 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.container.xml.ValueParam;
+import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.access.PermissionType;
+import org.exoplatform.services.jcr.core.ExtendedNode;
+import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.security.IdentityConstants;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+
+import javax.jcr.Node;
+import javax.jcr.Session;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -71,7 +76,9 @@ public class GadgetRegistryServiceImpl implements GadgetRegistryService {
     /** . */
     private String hostName;
 
-    public GadgetRegistryServiceImpl(ChromatticManager chromatticManager, InitParams params) {
+    private RepositoryService repoService;
+
+    public GadgetRegistryServiceImpl(ChromatticManager chromatticManager, RepositoryService repoService, InitParams params) {
         ApplicationRegistryChromatticLifeCycle lifeCycle = (ApplicationRegistryChromatticLifeCycle) chromatticManager
                 .getLifeCycle("app");
 
@@ -105,6 +112,7 @@ public class GadgetRegistryServiceImpl implements GadgetRegistryService {
         this.moduleId = moduleId;
         this.hostName = hostName;
         this.chromatticLifeCycle = lifeCycle;
+        this.repoService = repoService;
     }
 
     public GadgetRegistry getRegistry() {
@@ -320,6 +328,19 @@ public class GadgetRegistryServiceImpl implements GadgetRegistryService {
                 done = false;
             } finally {
                 chromatticLifeCycle.closeContext(done);
+            }
+
+            if (done) {
+                SessionProvider sessionProvider = SessionProvider.createSystemProvider();
+                String workspace = chromatticLifeCycle.getWorkspaceName();
+                Session session = sessionProvider.getSession(workspace, repoService.getCurrentRepository());
+                ExtendedNode extendedNode = (ExtendedNode)session.getItem("/production/app:gadgets/app:" + importer.getGadgetName());
+                if (extendedNode.canAddMixin("exo:privilegeable")) {
+                    extendedNode.addMixin("exo:privilegeable");
+                }
+                Map<String, String[]> perms = new HashMap<String, String[]>();
+                extendedNode.setPermission(IdentityConstants.ANY, PermissionType.DEFAULT_AC);
+                extendedNode.save();
             }
             return done;
         }
