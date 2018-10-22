@@ -30,7 +30,7 @@
                 <div class="nothingEditable center">$noSitesLabel</div>  
       <%    } else {           
       %>
-         <div class="uiAction uiActionBorder">
+         <div id="top" class="uiAction uiActionBorder">
                   				<a href="javascript:void(0);" onclick="ajaxGet(eXo.env.server.createPortalURL('UIWorkingWorkspace', 'CreatePortal', true))" class="btn"><%=_ctx.appRes(uicomponent.getId() + ".action.addNewPortal")%></a>
          </div>
 		 <table class="managementBlock" summary="Sites edit">
