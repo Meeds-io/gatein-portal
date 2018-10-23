@@ -30,7 +30,7 @@
                 <div class="nothingEditable center">$noSitesLabel</div>  
       <%    } else {           
       %>
-         <div id="top" class="uiAction uiActionBorder">
+         <div id="createPortalTopAction" class="uiAction uiActionBorder">
                   				<a href="javascript:void(0);" onclick="ajaxGet(eXo.env.server.createPortalURL('UIWorkingWorkspace', 'CreatePortal', true))" class="btn"><%=_ctx.appRes(uicomponent.getId() + ".action.addNewPortal")%></a>
          </div>
 		 <table class="managementBlock" summary="Sites edit">
@@ -92,7 +92,7 @@
            }
 				if(uicomponent.getPortalConfigs() != null && uicomponent.getPortalConfigs().size() > 0){
 			%>
-			<div class="uiAction uiActionBorder">
+			<div id="createPortalBottomAction" class="uiAction uiActionBorder">
 				<a href="javascript:void(0);" onclick="ajaxGet(eXo.env.server.createPortalURL('UIWorkingWorkspace', 'CreatePortal', true))" class="btn"><%=_ctx.appRes(uicomponent.getId() + ".action.addNewPortal")%></a>
 			</div>
 			<%
