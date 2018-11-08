@@ -162,12 +162,32 @@
 	* calls
 	*/
 	eXo.core.Browser = {
-	  onLoadCallback : {},
-	  onResizeCallback : {},
-	  onScrollCallback : {},
-	  
-	  breakStream : null,
-	  
+      onLoadCallback : {},
+      onResizeCallback : {},
+      onScrollCallback : {},
+      title : null,
+      titlePrefix : null,
+      breakStream : null,
+      setTitle : function(title) {
+        this.title = title;
+        if (this.title == null || typeof this.title == "undefined"){
+          this.title = '';
+        }
+        if (this.titlePrefix == null || typeof this.titlePrefix == "undefined"){
+          this.titlePrefix = '';
+        }
+        document.title = this.titlePrefix + this.title;
+      },
+      setTitlePrefix : function(titlePrefix) {
+        this.titlePrefix = titlePrefix;
+        if (this.titlePrefix == null || typeof this.titlePrefix == "undefined"){
+          this.titlePrefix = '';
+        }
+        if (this.title == null || typeof this.title == "undefined"){
+          this.title = document.title;
+        }
+        document.title = this.titlePrefix + this.title;
+      },
 	  init : function() {
 		  $(window).on("resize", this.managerResize);
 		  $(window).on("scroll", this.onScroll);
