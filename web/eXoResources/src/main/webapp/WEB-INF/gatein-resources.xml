@@ -194,6 +194,13 @@
     </depends>
   </module>
 
+  <module>
+    <name>extensionRegistry</name>
+    <script>
+      <path>/javascript/eXo/core/extensionRegistry.js</path>
+    </script>
+  </module>
+
   <!-- GADGET Javascripts -->
   <module>
     <name>gadget</name>
