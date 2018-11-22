@@ -493,7 +493,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
    {
       try
       {
-         return new HibernateIdentityStoreSessionImpl(sessionFactory, lazyStartOfHibernateTransaction);
+         return new ExoHibernateIdentityStoreSessionImpl(sessionFactory, lazyStartOfHibernateTransaction);
       }
       catch (Exception e)
       {
@@ -2811,7 +2811,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
    {
       try
       {
-         HibernateIdentityStoreSessionImpl hbIdentityStoreSession = (HibernateIdentityStoreSessionImpl)ctx.getIdentityStoreSession();
+         ExoHibernateIdentityStoreSessionImpl hbIdentityStoreSession = (ExoHibernateIdentityStoreSessionImpl)ctx.getIdentityStoreSession();
 
          if (lazyStartOfHibernateTransaction)
          {
