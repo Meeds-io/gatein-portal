@@ -48,14 +48,13 @@ import org.exoplatform.services.organization.idm.cache.CacheableMembershipTypeHa
 import org.exoplatform.services.organization.idm.cache.CacheableUserHandlerImpl;
 import org.exoplatform.services.organization.idm.cache.CacheableUserProfileHandlerImpl;
 
-/*
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
+/**
+ * OrganizationService implementation using PicketLink
  */
 public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationService implements Startable,
         ComponentRequestLifecycle {
 
     // We may have several portal containers thus we need one PicketLinkIDMService per portal container
-    // private static PicketLinkIDMService jbidmService_;
     private PicketLinkIDMServiceImpl idmService_;
 
     public static final String CONFIGURATION_OPTION = "configuration";
@@ -145,25 +144,13 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
 
     @Override
     public void stop() {
-        // toto
+        // do nothing
     }
 
-    /*
-   */
-    /**
-     * Used to allow nested requests (as done by the authenticator during unit tests) and avoid to commit two times the same
-     * transaction.
-     */
-    /*
-     *
-     * private ThreadLocal<AtomicInteger> currentRequestCount = new ThreadLocal<AtomicInteger>() {
-     *
-     * @Override protected AtomicInteger initialValue() { return new AtomicInteger(); } };
-     */
-
     public void startRequest(ExoContainer container) {
-        if (!acceptComponentRequestCall)
+        if (!acceptComponentRequestCall) {
             return;
+        }
         try {
             if (configuration.isUseJTA()) {
                 if (traceLoggingEnabled) {
@@ -220,8 +207,9 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
     }
 
     public void endRequest(ExoContainer container) {
-        if (!acceptComponentRequestCall)
+        if (!acceptComponentRequestCall) {
             return;
+        }
         if (configuration.isUseJTA()) {
             if (traceLoggingEnabled) {
                 log.trace("Finishing UserTransaction in method endRequest");
@@ -245,6 +233,10 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
     }
 
     public boolean isStarted(ExoContainer container) {
+        if(!acceptComponentRequestCall) {
+            return false;
+        }
+
         try {
             if (configuration.isUseJTA()) {
                 return jtaTransactionLifecycleService.getUserTransaction() == null ? false :
@@ -259,7 +251,10 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
         return false;
     }
 
-    // Should be used only for non-JTA environment
+    /**
+     * Recover from an IDM error
+     * Should be used only for non-JTA environment.
+     */
     public void recoverFromIDMError(Exception e) {
         try {
             // We need to restart Hibernate transaction if it's available. First rollback old one and then start new one

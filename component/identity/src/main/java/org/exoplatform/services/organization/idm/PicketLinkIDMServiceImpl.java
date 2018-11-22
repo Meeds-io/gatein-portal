@@ -206,11 +206,15 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
     }
 
     public IdentitySessionFactory getIdentitySessionFactory() {
-        return identitySessionFactory; // To change body of implemented methods use File | Settings | File Templates.
+        return identitySessionFactory;
     }
 
     public IdentitySession getIdentitySession() throws Exception {
-        return getIdentitySessionFactory().getCurrentIdentitySession(realmName);
+        if(getIdentitySessionFactory() != null) {
+            return getIdentitySessionFactory().getCurrentIdentitySession(realmName);
+        } else {
+            return null;
+        }
     }
 
     public IdentitySession getIdentitySession(String realm) throws Exception {
