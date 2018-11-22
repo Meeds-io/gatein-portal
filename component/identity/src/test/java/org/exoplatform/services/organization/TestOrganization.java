@@ -19,8 +19,6 @@
 
 package org.exoplatform.services.organization;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -34,6 +32,7 @@ import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.organization.idm.Config;
 import org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl;
@@ -44,6 +43,7 @@ import org.exoplatform.services.organization.impl.UserProfileImpl;
 import org.exoplatform.services.security.ConversationRegistry;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
+import org.jboss.byteman.contrib.bmunit.BMUnit;
 
 
 /**
@@ -65,6 +65,9 @@ public class TestOrganization extends AbstractKernelTest {
     protected static final String DEFAULT_PASSWORD = "defaultpassword";
     protected static final String DESCRIPTION = " Description";
 
+    // variable used by Byteman to know if it must execute its rule
+    protected static boolean makeTransactionCommitFail = true;
+
 
     protected UpdateLoginTimeListener updateLoginTimeListener;
 
@@ -83,6 +86,11 @@ public class TestOrganization extends AbstractKernelTest {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+
+        if(getName().equals("testTransactionCommitFailsOnError")) {
+            BMUnit.loadScriptFile(getClass(), "idm", "src/test/resources/byteman");
+        }
+
         begin();
         PortalContainer container = getContainer();
         updateLoginTimeListener = new UpdateLoginTimeListener(container);
@@ -104,7 +112,6 @@ public class TestOrganization extends AbstractKernelTest {
 
     @Override
     protected void tearDown() throws Exception {
-        deleteGroup(GROUP_1);
         deleteGroup("/" + GROUP_1);
 
         deleteUser(USER_1);
@@ -112,6 +119,11 @@ public class TestOrganization extends AbstractKernelTest {
         deleteUser(USER_3);
 
         end();
+
+        if(getName().equals("testTransactionCommitFailsOnError")) {
+            BMUnit.unloadScriptFile(getClass(), "idm");
+        }
+
         super.tearDown();
     }
 
@@ -362,6 +374,39 @@ public class TestOrganization extends AbstractKernelTest {
         assertEquals("Expect mebershiptype is:", testType, mtHandler_.findMembershipType(testType).getName());
     }
 
+    /**
+     * Test if the transactions are well managed when a transaction commit operation fails (because of a
+     * connection loss for example).
+     * The test do a first user creation which fails (thanks to Byteman), then tries to do another user creation in
+     * a new transaction. This new transaction should succeed, meaning the transaction status is correct.
+     * Byteman is used to throw an exception during the commit only during the first user creation.
+     *
+     * @throws Exception
+     */
+    public void testTransactionCommitFailsOnError() throws Exception {
+        makeTransactionCommitFail = true;
+
+        try {
+            // An exception is throw during the transaction commit of this user creation, thanks to Byteman
+            createUser("userCommitFailed");
+        } finally {
+            RequestLifeCycle.end();
+        }
+
+        makeTransactionCommitFail = false;
+
+        try {
+            RequestLifeCycle.begin(getContainer());
+            // No exception is thrown during the transaction commit of this user creation
+            createUser("userCommitSucceeded");
+            RequestLifeCycle.end();
+            User userCommitSucceeded = organizationService.getUserHandler().findUserByName("userCommitSucceeded");
+            assertNotNull(userCommitSucceeded);
+        } finally {
+            RequestLifeCycle.begin(getContainer());
+        }
+    }
+
     public void testFindUserProfile() throws Exception {
         // Given
         UserProfileHandler userProfileHandler = organizationService.getUserProfileHandler();
@@ -429,7 +474,7 @@ public class TestOrganization extends AbstractKernelTest {
         }
     }
 
-    protected void createUser(String username, String... groups) {
+    protected void createUser(String username, String... groups) throws Exception {
         UserHandler userHandler = organizationService.getUserHandler();
         User user = userHandler.createUserInstance(username);
         user.setPassword(DEFAULT_PASSWORD);
@@ -439,15 +484,8 @@ public class TestOrganization extends AbstractKernelTest {
         if (groups.length > 0) {
             user.setOrganizationId(groups[0]);            
         }
-        try {
-            userHandler.createUser(user, true);
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter out = new PrintWriter(sw);
-            e.printStackTrace(out);
-            out.close();
-            fail("Error on create user: " + sw.toString());
-        }
+
+        userHandler.createUser(user, true);
     }
 
     protected void deleteUser(String username) {

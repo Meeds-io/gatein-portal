@@ -1,0 +1,7 @@
+RULE throw Exception on commit
+CLASS org.hibernate.engine.transaction.internal.jdbc.JdbcTransaction
+METHOD doCommit()
+AT ENTRY
+IF org.exoplatform.services.organization.TestOrganization.makeTransactionCommitFail
+DO throw new TransactionException("Fake TransactionException on commit")
+ENDRULE
