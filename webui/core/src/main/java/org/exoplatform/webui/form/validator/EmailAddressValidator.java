@@ -29,7 +29,7 @@ import org.exoplatform.webui.form.UIFormInput;
  * Validates whether an email is in the correct format Valid characters that can be used in a domain name are: a-z 0-9 - (dash)
  * or . (dot) but not as a starting or ending character . (dot) as a separator for the textual portions of a domain name
  *
- * Valid characters that can be used in a local part are: a-z 0-9 - (dash) or _ (underscore) or . (dot) but not as a starting or
+ * Valid characters that can be used in a local part are: a-z 0-9 - (dash) or _ (underscore) or . (dot) or  &amp; (ampersand) but not as a starting or
  * ending character and not appear two or more times consecutively
  */
 @Serialized
@@ -102,7 +102,7 @@ public class EmailAddressValidator extends MultipleConditionsValidator {
     }
 
     private static boolean isLocalPartSymbol(char c) {
-        return c == '-' || c == '_' || c == '.' || c == '+';
+        return c == '-' || c == '_' || c == '.' || c == '+' || c == '&';
     }
 
     private static boolean isDomainNameSymbol(char c) {
