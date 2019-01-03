@@ -30,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -56,6 +57,8 @@ public class UploadService {
      * For mor details about ascii-code please see at: http://www.ascii-code.com/
      */
     private static final int[] illegalChars = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 34, 42, 47, 58, 60, 62, 63, 92, 124};
+
+    private static final Pattern UPLOAD_ID_PATTERN = Pattern.compile("[0-9-]*");
 
     private List<MimeTypeUploadPlugin> plugins;
 
@@ -101,6 +104,10 @@ public class UploadService {
     }
 
     public void createUploadResource(String uploadId, HttpServletRequest request) throws FileUploadException {
+        if(uploadId == null || !UPLOAD_ID_PATTERN.matcher(uploadId).matches()) {
+            throw new FileUploadException("Upload id can contain only digits and hyphens");
+        }
+
         UploadResource upResource = new UploadResource(uploadId);
         upResource.setFileName("");// Avoid NPE in UploadHandler
         uploadResources.put(upResource.getUploadId(), upResource);
@@ -170,6 +177,10 @@ public class UploadService {
      */
     public void createUploadResource(String uploadId, String encoding, String contentType, double contentLength,
             InputStream inputStream) throws Exception {
+        if(uploadId == null || !UPLOAD_ID_PATTERN.matcher(uploadId).matches()) {
+            throw new FileUploadException("Upload id can contain only digits and hyphens");
+        }
+
         File uploadDir = new File(uploadLocation_);
         if (!uploadDir.exists())
             uploadDir.mkdirs();

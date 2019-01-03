@@ -21,16 +21,20 @@ package org.exoplatform.upload;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.fileupload.FileUploadException;
 import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.junit.Test;
+import org.mockito.Mockito;
+
+import javax.servlet.http.HttpServletRequest;
 
 @ConfiguredBy({
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/services/upload-service.xml")
 })
-public class TestCorrectFileName extends AbstractKernelTest {
+public class TestUploadService extends AbstractKernelTest {
     private static final String tmpDir = System.getProperty("java.io.tmpdir");
     UploadService uploadService;
 
@@ -103,6 +107,17 @@ public class TestCorrectFileName extends AbstractKernelTest {
         fileName = uploadService.correctFileName(fileName);
         assertEquals("test_Вьетнамские имена. расширение", fileName);
         assertFileCreation(fileName);
+    }
+
+    public void testShouldNotCreateUploadResourceWhenUploadIdIsNotAllowed() throws FileUploadException {
+        try {
+            HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+            String notAllowedUploadId = "/../../../webapps/ROOT/123456";
+            uploadService.createUploadResource(notAllowedUploadId, request);
+            fail("The upload resource creation must fail with the id " + notAllowedUploadId);
+        } catch(FileUploadException e) {
+            assertEquals("Upload id can contain only digits and hyphens", e.getMessage());
+        }
     }
 
     private void assertFileCreation(String fileName) {
