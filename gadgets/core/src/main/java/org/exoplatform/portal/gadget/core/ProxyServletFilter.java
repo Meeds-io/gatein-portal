@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 eXo Platform SAS.
+ * Copyright (C) 2018 eXo Platform SAS.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -20,6 +20,7 @@
 package org.exoplatform.portal.gadget.core;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URI;
 
 import javax.servlet.Filter;
@@ -33,9 +34,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.web.security.proxy.ProxyFilterService;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
 
 /**
  * The proxy servlet filter is a servlet filter placed in front of Shindig proxy servlet. It filters a request and allows only
@@ -60,7 +61,7 @@ public class ProxyServletFilter implements Filter {
     private ServletContext ctx;
 
     /** . */
-    private static final Logger logger = LoggerFactory.getLogger(ProxyServletFilter.class);
+    private static final Log logger = ExoLogger.getLogger(ProxyServletFilter.class);
 
     public void init(FilterConfig cfg) throws ServletException {
         this.ctx = cfg.getServletContext();
@@ -81,8 +82,7 @@ public class ProxyServletFilter implements Filter {
                 hresp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Could not access container for servlet context "
                         + ctx.getContextPath());
             } else {
-                ProxyFilterService service = (ProxyFilterService) container
-                        .getComponentInstanceOfType(ProxyFilterService.class);
+                ProxyFilterService service = container.getComponentInstanceOfType(ProxyFilterService.class);
                 if (service == null) {
                     hresp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Could not access proxy filter service "
                             + ctx.getContextPath());
@@ -92,13 +92,31 @@ public class ProxyServletFilter implements Filter {
                         if (!service.accept(hreq, container, uri)) {
                             hresp.sendError(HttpServletResponse.SC_FORBIDDEN, "Gadget " + url + " is blacklisted");
                         } else {
-                            chain.doFilter(req, resp);
+                            CharResponseWrapper responseWrapper = new CharResponseWrapper((HttpServletResponse) resp);
+
+                            chain.doFilter(req, responseWrapper);
+
+                            // Always return the same type of error if an error is sent by the proxy servlet to avoid
+                            // disclosing the reason of the failure (which can lead to know if the port used in the url
+                            // is opened or not)
+                            if(resp != null && hresp.getStatus() >= HttpServletResponse.SC_BAD_REQUEST) {
+                                logger.debug("The error response code sent by gadget proxy servlet is {}", hresp.getStatus());
+                                hresp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                                hresp.setContentLength(0);
+                                hresp.getOutputStream().write("".getBytes());
+                            } else {
+                                PrintWriter responseWrapperWriter = responseWrapper.getWriter();
+                                responseWrapperWriter.flush();
+                                byte[] bytes = responseWrapper.getByteArray();
+                                hresp.setContentLength(bytes.length);
+                                hresp.getWriter().write(new String(bytes));
+                            }
                         }
 
                     } catch (java.lang.IllegalArgumentException e) {
                         // It happens that some URLs can be wrong, I've seen this with "http://" as URL in one of the Google
                         // Gadgets
-                        logger.debug("Invalid URL: " + url);
+                        logger.debug("Invalid URL: {}", url);
                     }
                 }
             }
