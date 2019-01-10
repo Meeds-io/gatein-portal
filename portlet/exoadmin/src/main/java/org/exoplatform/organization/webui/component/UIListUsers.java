@@ -84,13 +84,13 @@ public class UIListUsers extends UISearch {
                 new SelectItemOption<String>("Any", UserStatus.ANY.name())
             ));
 
-    private Query lastQuery_;
+    private Query lastQuery_ = new Query();
     private UserStatus statusFilter = UserStatus.ENABLED;
 
     private String userSelected_;
 
     private UIGridUsers grid_;
-    
+
     boolean disableUserActived = true;
 
     public UIListUsers() throws Exception {
@@ -104,7 +104,7 @@ public class UIListUsers extends UISearch {
           disableUserActived = Boolean.parseBoolean(actived);
         }
         boolean showDisableUserFilterCheckbox = disableUserActived;
-        
+
         OrganizationService orgService = this.getApplicationComponent(OrganizationService.class);
         if(disableUserActived && orgService instanceof PicketLinkIDMOrganizationServiceImpl
                 && !((PicketLinkIDMOrganizationServiceImpl) orgService).getConfiguration().isFilterDisabledUsersInQueries()) {
@@ -131,8 +131,6 @@ public class UIListUsers extends UISearch {
     @Override
     public void processRender(WebuiRequestContext context) throws Exception {
         int curPage = grid_.getUIPageIterator().getCurrentPage();
-        if (lastQuery_ == null)
-            lastQuery_ = new Query();
         search(lastQuery_);
         grid_.getUIPageIterator().setCurrentPage(curPage);
         grid_.getUIPageIterator().getCurrentPageData();
@@ -271,17 +269,17 @@ public class UIListUsers extends UISearch {
                         ApplicationMessage.WARNING);
             } else {
                 User user = service.getUserHandler().findUserByName(userName, UserStatus.ANY);
-                
+
                 if(user == null) {
                     warning = new ApplicationMessage("UIListUsers.msg.user-is-deleted", null, ApplicationMessage.WARNING);
                 } else if (userACL.getSuperUser().equals(userName) && user.isEnabled()) {
                     warning = new ApplicationMessage("UIListUsers.msg.DisableSuperUser", new String[] { userName },
                             ApplicationMessage.WARNING);
                 } else {
-                    service.getUserHandler().setEnabled(userName, !user.isEnabled(), true);                    
+                    service.getUserHandler().setEnabled(userName, !user.isEnabled(), true);
                 }
             }
-            
+
             if (warning != null) {
                 UIApplication uiApp = event.getRequestContext().getUIApplication();
                 uiApp.addMessage(warning);

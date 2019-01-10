@@ -495,8 +495,6 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
       }
     }
 
-    orgService.flush();
-
     UserQueryBuilder qb = service_.getIdentitySession().createUserQueryBuilder();
 
     if (q.getUserName() != null) {
@@ -809,8 +807,6 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
   }
 
   public void populateUser(User user, IdentitySession session) throws Exception {
-    orgService.flush();
-
     AttributesManager am = session.getAttributesManager();
 
     Map<String, Attribute> attrs = null;
