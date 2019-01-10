@@ -21,7 +21,6 @@ package org.exoplatform.services.organization.idm;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -97,14 +96,10 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
         Collection<org.picketlink.idm.api.User> users = null;
 
         if (fullResults == null) {
-            getOrganizationService().flush();
-
-            userQueryBuilder.page(index, length);
-            UserQuery query = userQueryBuilder.sort(SortOrder.ASCENDING).createQuery();
-            users = getIDMService().getIdentitySession().list(query);
+            users = listQuery(index, length);
 
             if ((this.userStatus == UserStatus.ENABLED || this.userStatus == UserStatus.DISABLED) && !isDBOnly) {
-                users= filterUserByStatus(users, this.userStatus, index, length);
+                users = filterUserByStatus(users, this.userStatus, index, length);
             }
         } else {
             if ((this.userStatus == UserStatus.ENABLED || this.userStatus == UserStatus.DISABLED) && !isDBOnly) {
@@ -163,29 +158,26 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
             Tools.logMethodIn(log, LogLevel.TRACE, "getSize", null);
         }
 
-        getOrganizationService().flush();
-
         int result;
-
         if (size < 0) {
             if (fullResults != null) {
                 result = fullResults.size();
-            } else if (countAll) {
+            } else {
+              if (countAll) {
                 /*
                     wait for PersistenceManager.getUserCount(true)
                     see https://community.jboss.org/wiki/DisabledUser
                 */
 //             result = getIDMService().getIdentitySession().getPersistenceManager().getUserCount(enabledOnly);
                 result = getIDMService().getIdentitySession().getPersistenceManager().getUserCount();
-            } else {
-              userQueryBuilder.page(0, 0);
-              UserQuery query = userQueryBuilder.sort(SortOrder.ASCENDING).createQuery();
-              fullResults = getIDMService().getIdentitySession().list(query);
-
-              if ((this.userStatus == UserStatus.ENABLED || this.userStatus == UserStatus.DISABLED) && !isDBOnly) {
-                result = filterUserByStatus(fullResults, this.userStatus, 0, fullResults.size()).size();
               } else {
-                result = fullResults.size();
+                fullResults = listQuery(0, 0);
+
+                if ((this.userStatus == UserStatus.ENABLED || this.userStatus == UserStatus.DISABLED) && !isDBOnly) {
+                  result = filterUserByStatus(fullResults, this.userStatus, 0, fullResults.size()).size();
+                } else {
+                  result = fullResults.size();
+                }
               }
             }
 
@@ -237,5 +229,11 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
             }
         }
         return result;
+    }
+
+    private List<org.picketlink.idm.api.User> listQuery(int index, int length) throws Exception {
+      userQueryBuilder.page(index, length);
+      UserQuery query = userQueryBuilder.sort(SortOrder.ASCENDING).createQuery();
+      return getIDMService().getIdentitySession().list(query);
     }
 }
