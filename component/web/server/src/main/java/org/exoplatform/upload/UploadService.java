@@ -58,7 +58,7 @@ public class UploadService {
      */
     private static final int[] illegalChars = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 34, 42, 47, 58, 60, 62, 63, 92, 124};
 
-    private static final Pattern UPLOAD_ID_PATTERN = Pattern.compile("[0-9-]*");
+    private static final Pattern UPLOAD_ID_PATTERN = Pattern.compile("[^(\\./\\\\)]*");
 
     private List<MimeTypeUploadPlugin> plugins;
 
@@ -105,7 +105,7 @@ public class UploadService {
 
     public void createUploadResource(String uploadId, HttpServletRequest request) throws FileUploadException {
         if(uploadId == null || !UPLOAD_ID_PATTERN.matcher(uploadId).matches()) {
-            throw new FileUploadException("Upload id can contain only digits and hyphens");
+            throw new FileUploadException("Upload id " + uploadId + " is not valid, it cannot be null or contain '.' , '/' or '\\'");
         }
 
         UploadResource upResource = new UploadResource(uploadId);

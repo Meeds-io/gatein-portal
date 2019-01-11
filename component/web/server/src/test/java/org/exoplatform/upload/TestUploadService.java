@@ -109,14 +109,39 @@ public class TestUploadService extends AbstractKernelTest {
         assertFileCreation(fileName);
     }
 
-    public void testShouldNotCreateUploadResourceWhenUploadIdIsNotAllowed() throws FileUploadException {
+    public void testShouldNotCreateUploadResourceWhenUploadIdContainsDots() {
+        String notAllowedUploadId = ".webapps.ROOT.123456";
         try {
             HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-            String notAllowedUploadId = "/../../../webapps/ROOT/123456";
             uploadService.createUploadResource(notAllowedUploadId, request);
             fail("The upload resource creation must fail with the id " + notAllowedUploadId);
         } catch(FileUploadException e) {
-            assertEquals("Upload id can contain only digits and hyphens", e.getMessage());
+            assertEquals("Upload id " + notAllowedUploadId
+                    + " is not valid, it cannot be null or contain '.' , '/' or '\\'", e.getMessage());
+        }
+    }
+
+    public void testShouldNotCreateUploadResourceWhenUploadIdContainsSlashs() {
+        String notAllowedUploadId = "/webapps/ROOT/123456";
+        try {
+            HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+            uploadService.createUploadResource(notAllowedUploadId, request);
+            fail("The upload resource creation must fail with the id " + notAllowedUploadId);
+        } catch(FileUploadException e) {
+            assertEquals("Upload id " + notAllowedUploadId
+                    + " is not valid, it cannot be null or contain '.' , '/' or '\\'", e.getMessage());
+        }
+    }
+
+    public void testShouldNotCreateUploadResourceWhenUploadIdContainsAntiSlashs() {
+        String notAllowedUploadId = "\\webapps\\ROOT\\123456";
+        try {
+            HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+            uploadService.createUploadResource(notAllowedUploadId, request);
+            fail("The upload resource creation must fail with the id " + notAllowedUploadId);
+        } catch(FileUploadException e) {
+            assertEquals("Upload id " + notAllowedUploadId
+                    + " is not valid, it cannot be null or contain '.' , '/' or '\\'", e.getMessage());
         }
     }
 
