@@ -25,13 +25,11 @@
                xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-    <key>org.exoplatform.services.organization.search.UserSearchService</key>
-    <type>org.exoplatform.services.organization.search.UserSearchServiceImpl</type>
+    <type>org.exoplatform.portal.rest.UserRestResourcesV1</type>
   </component>
-  
+
   <component>
-    <key>org.exoplatform.services.organization.search.GroupSearchService</key>
-    <type>org.exoplatform.services.organization.search.GroupSearchServiceImpl</type>
+    <type>org.exoplatform.portal.rest.GroupRestResourcesV1</type>
   </component>
 
 </configuration>
