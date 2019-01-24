@@ -347,11 +347,6 @@
         <version>${org.exoplatform.gatein.wci.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.wci</groupId>
-        <artifactId>wci-wildfly11</artifactId>
-        <version>${org.exoplatform.gatein.wci.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.exoplatform.gatein.pc</groupId>
         <artifactId>pc-bridge</artifactId>
         <version>${org.exoplatform.gatein.pc.version}</version>
