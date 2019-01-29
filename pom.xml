@@ -40,14 +40,14 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
     
-    <org.exoplatform.kernel.version>5.1.x-SNAPSHOT</org.exoplatform.kernel.version>
-    <org.exoplatform.core.version>5.1.x-SNAPSHOT</org.exoplatform.core.version>
-    <org.exoplatform.ws.version>5.1.x-SNAPSHOT</org.exoplatform.ws.version>
-    <org.exoplatform.jcr.version>5.1.x-SNAPSHOT</org.exoplatform.jcr.version>
-    <org.exoplatform.gatein.sso.version>5.1.x-SNAPSHOT</org.exoplatform.gatein.sso.version>
-    <org.exoplatform.gatein.wci.version>5.1.x-SNAPSHOT</org.exoplatform.gatein.wci.version>
-    <org.exoplatform.gatein.pc.version>5.1.x-SNAPSHOT</org.exoplatform.gatein.pc.version>
-    <org.exoplatform.gatein.dep.version>1.6.x-SNAPSHOT</org.exoplatform.gatein.dep.version>
+    <org.exoplatform.kernel.version>5.1.2</org.exoplatform.kernel.version>
+    <org.exoplatform.core.version>5.1.2</org.exoplatform.core.version>
+    <org.exoplatform.ws.version>5.1.2</org.exoplatform.ws.version>
+    <org.exoplatform.jcr.version>5.1.2</org.exoplatform.jcr.version>
+    <org.exoplatform.gatein.sso.version>5.1.2</org.exoplatform.gatein.sso.version>
+    <org.exoplatform.gatein.wci.version>5.1.2</org.exoplatform.gatein.wci.version>
+    <org.exoplatform.gatein.pc.version>5.1.2</org.exoplatform.gatein.pc.version>
+    <org.exoplatform.gatein.dep.version>1.6.2</org.exoplatform.gatein.dep.version>
     <org.exoplatform.framework.junit.version>1.2.4-GA</org.exoplatform.framework.junit.version>
     <org.shindig.version>2.5.2</org.shindig.version>
     <nl.captcha.simplecaptcha.version>1.1.1.Final-gatein-4</nl.captcha.simplecaptcha.version>
