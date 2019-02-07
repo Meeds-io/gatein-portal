@@ -18,8 +18,6 @@
  */
 
 /* TODO: need to manage zIndex for all popup */
-//var zIndex = 2 ;
-//var popupArr = new Array() ;
 /**
  * Main class to manage popups
  */
@@ -27,7 +25,7 @@
 (function($, base) {
 	eXo.webui.UIPopup = {
 	
-	  zIndex : 3,
+	  zIndex : 2000,
 	
 	  /**
 	   * Inits the popup . calls changezIndex when the users presses the popup
