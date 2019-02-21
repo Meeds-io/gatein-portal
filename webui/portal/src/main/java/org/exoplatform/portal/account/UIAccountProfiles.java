@@ -52,7 +52,7 @@ import org.exoplatform.webui.form.validator.UserConfigurableValidator;
 
 @ComponentConfig(lifecycle = UIFormLifecycle.class, template = "system:/groovy/webui/form/UIForm.gtmpl",
 
-events = { @EventConfig(listeners = UIAccountProfiles.SaveActionListener.class, csrfCheck = true),
+events = { @EventConfig(listeners = UIAccountProfiles.SaveActionListener.class),
         @EventConfig(listeners = UIAccountProfiles.ResetActionListener.class, phase = Phase.DECODE) })
 public class UIAccountProfiles extends UIForm {
 

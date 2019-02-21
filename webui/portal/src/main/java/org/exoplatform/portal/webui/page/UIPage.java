@@ -59,7 +59,7 @@ import org.exoplatform.webui.event.EventListener;
  */
 @ComponentConfig(lifecycle = UIPageLifecycle.class, template = "system:/groovy/portal/webui/page/UIPage.gtmpl", events = {
         @EventConfig(listeners = MoveChildActionListener.class),
-        @EventConfig(name = "EditCurrentPage", listeners = UIPage.EditCurrentPageActionListener.class) })
+        @EventConfig(name = "EditCurrentPage", listeners = UIPage.EditCurrentPageActionListener.class, csrfCheck = false) })
 public class UIPage extends UIContainer {
 
     /**

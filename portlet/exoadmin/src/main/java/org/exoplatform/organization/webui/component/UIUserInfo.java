@@ -51,7 +51,7 @@ import java.util.ResourceBundle;
 
 /** Created by The eXo Platform SARL Author : chungnv nguyenchung136@yahoo.com Jun 23, 2006 10:07:15 AM */
 @ComponentConfig(lifecycle = UIFormLifecycle.class, template = "system:/groovy/webui/form/UIFormTabPane.gtmpl", events = {
-        @EventConfig(listeners = UIUserInfo.SaveActionListener.class, csrfCheck = true),
+        @EventConfig(listeners = UIUserInfo.SaveActionListener.class),
         @EventConfig(listeners = UIUserInfo.BackActionListener.class, phase = Phase.DECODE),
         @EventConfig(listeners = UIUserInfo.ToggleChangePasswordActionListener.class, phase = Phase.DECODE) })
 @Serialized

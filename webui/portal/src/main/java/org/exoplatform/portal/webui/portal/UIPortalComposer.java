@@ -83,8 +83,8 @@ import org.exoplatform.webui.event.EventListener;
                 @EventConfig(name = "Abort", listeners = UIPortalComposer.AbortSiteEditionActionListener.class),
                 @EventConfig(name = "Finish", listeners = UIPortalComposer.FinishSiteEditionActionListener.class),
                 @EventConfig(listeners = UIPortalComposer.SwitchModeActionListener.class),
-                @EventConfig(listeners = UIPortalComposer.ChangeEdittedStateActionListener.class),
-                @EventConfig(listeners = UIPortalComposer.ToggleActionListener.class) }),
+                @EventConfig(listeners = UIPortalComposer.ChangeEdittedStateActionListener.class, csrfCheck = false),
+                @EventConfig(listeners = UIPortalComposer.ToggleActionListener.class, csrfCheck = false) }),
         @ComponentConfig(id = UIPortalComposer.UIPAGE_EDITOR, template = "app:/groovy/portal/webui/portal/UIPortalComposer.gtmpl", events = {
                 @EventConfig(name = "ViewProperties", listeners = UIPortalComposer.ViewPagePropertiesActionListener.class),
                 @EventConfig(listeners = UIPortalComposer.CloseComposerActionListener.class),
@@ -92,8 +92,8 @@ import org.exoplatform.webui.event.EventListener;
                 @EventConfig(name = "Finish", listeners = UIPortalComposer.FinishPageEditionActionListener.class),
                 @EventConfig(name = "Back", listeners = UIPortalComposer.BackActionListener.class),
                 @EventConfig(listeners = UIPortalComposer.SwitchModeActionListener.class),
-                @EventConfig(listeners = UIPortalComposer.ChangeEdittedStateActionListener.class),
-                @EventConfig(listeners = UIPortalComposer.ToggleActionListener.class) }),
+                @EventConfig(listeners = UIPortalComposer.ChangeEdittedStateActionListener.class, csrfCheck = false),
+                @EventConfig(listeners = UIPortalComposer.ToggleActionListener.class, csrfCheck = false) }),
         @ComponentConfig(id = "UIPortalComposerTab", type = UITabPane.class, template = "app:/groovy/portal/webui/portal/UIPortalComposerContent.gtmpl", events = { @EventConfig(listeners = UIPortalComposer.SelectTabActionListener.class) }) })
 public class UIPortalComposer extends UIContainer {
     public static final String UIPORTAL_COMPOSER = "UIPortalComposer";

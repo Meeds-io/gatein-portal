@@ -125,12 +125,13 @@ import java.util.UUID;
  * @see UIPortletActionListener
  */
 @ComponentConfig(lifecycle = UIPortletLifecycle.class, template = "system:/groovy/portal/webui/application/UIPortlet.gtmpl", events = {
-        @EventConfig(listeners = RenderActionListener.class), @EventConfig(listeners = ChangePortletModeActionListener.class),
-        @EventConfig(listeners = ChangeWindowStateActionListener.class),
+        @EventConfig(listeners = RenderActionListener.class),
+        @EventConfig(listeners = ChangePortletModeActionListener.class, csrfCheck = false),
+        @EventConfig(listeners = ChangeWindowStateActionListener.class, csrfCheck = false),
         @EventConfig(listeners = DeleteComponentActionListener.class, confirm = "UIPortlet.deletePortlet"),
         @EventConfig(listeners = EditPortletActionListener.class),
         @EventConfig(phase = Phase.PROCESS, listeners = ProcessActionActionListener.class),
-        @EventConfig(phase = Phase.PROCESS, listeners = ServeResourceActionListener.class),
+        @EventConfig(phase = Phase.PROCESS, listeners = ServeResourceActionListener.class, csrfCheck = false),
         @EventConfig(phase = Phase.PROCESS, listeners = ProcessEventsActionListener.class) })
 public class UIPortlet<S, C extends Serializable> extends UIApplication {
 

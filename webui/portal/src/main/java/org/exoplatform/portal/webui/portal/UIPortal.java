@@ -67,14 +67,15 @@ import java.util.Map;
 
 @ComponentConfig(lifecycle = UIPortalLifecycle.class, template = "system:/groovy/portal/webui/portal/UIPortal.gtmpl", events = {
         @EventConfig(listeners = ChangeApplicationListActionListener.class),
-        @EventConfig(listeners = MoveChildActionListener.class), @EventConfig(listeners = UIPortal.LogoutActionListener.class),
-        @EventConfig(listeners = ShowLoginFormActionListener.class),
-        @EventConfig(listeners = ChangeLanguageActionListener.class),
-        @EventConfig(listeners = EditPortalPropertiesActionListener.class),
-        @EventConfig(listeners = ChangeSkinActionListener.class),
+        @EventConfig(listeners = MoveChildActionListener.class, csrfCheck = false),
+        @EventConfig(listeners = UIPortal.LogoutActionListener.class, csrfCheck = false),
+        @EventConfig(listeners = ShowLoginFormActionListener.class, csrfCheck = false),
+        @EventConfig(listeners = ChangeLanguageActionListener.class, csrfCheck = false),
+        @EventConfig(listeners = EditPortalPropertiesActionListener.class, csrfCheck = false),
+        @EventConfig(listeners = ChangeSkinActionListener.class, csrfCheck = false),
         @EventConfig(listeners = RecoveryPasswordAndUsernameActionListener.class),
-        @EventConfig(listeners = UIPortal.AccountSettingsActionListener.class),
-        @EventConfig(listeners = UIPortalActionListener.PingActionListener.class) })
+        @EventConfig(listeners = UIPortal.AccountSettingsActionListener.class, csrfCheck = false),
+        @EventConfig(listeners = UIPortalActionListener.PingActionListener.class, csrfCheck = false) })
 public class UIPortal extends UIContainer {
     private SiteKey siteKey;
 

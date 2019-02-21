@@ -41,7 +41,7 @@ public @interface EventConfig {
 
     Phase phase() default Phase.PROCESS;
 
-    boolean csrfCheck() default false;
+    boolean csrfCheck() default true;
 
     ParamConfig[] initParams() default {};
 }

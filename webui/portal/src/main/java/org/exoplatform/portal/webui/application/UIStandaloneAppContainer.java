@@ -41,7 +41,7 @@ import org.exoplatform.webui.core.UIContainer;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.EventListener;
 
-@ComponentConfig(template = "system:/groovy/portal/webui/application/UIStandaloneAppContainer.gtmpl", events = { @EventConfig(listeners = UIStandaloneAppContainer.LogoutActionListener.class) })
+@ComponentConfig(template = "system:/groovy/portal/webui/application/UIStandaloneAppContainer.gtmpl", events = { @EventConfig(listeners = UIStandaloneAppContainer.LogoutActionListener.class, csrfCheck = false) })
 public class UIStandaloneAppContainer extends UIContainer {
     private boolean lossData;
     private UIStandaloneGadget currApp;

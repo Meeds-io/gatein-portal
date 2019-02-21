@@ -37,10 +37,10 @@ import org.exoplatform.webui.core.UIContainer;
  */
 
 @ComponentConfig(id = "UIWorkingWorkspace", template = "system:/groovy/portal/webui/workspace/UIWorkingWorkspace.gtmpl", events = {
-        @EventConfig(listeners = UIMainActionListener.CreatePortalActionListener.class),
-        @EventConfig(listeners = UIMainActionListener.PageCreationWizardActionListener.class),
+        @EventConfig(listeners = UIMainActionListener.CreatePortalActionListener.class, csrfCheck = false),
+        @EventConfig(listeners = UIMainActionListener.PageCreationWizardActionListener.class, csrfCheck = false),
         @EventConfig(listeners = UIMainActionListener.EditBackgroundActionListener.class),
-        @EventConfig(listeners = UIMainActionListener.EditInlineActionListener.class),
+        @EventConfig(listeners = UIMainActionListener.EditInlineActionListener.class, csrfCheck = false),
         @EventConfig(listeners = UIMainActionListener.EditPageInFullPreviewActionListener.class)})
 public class UIWorkingWorkspace extends UIContainer {
 
