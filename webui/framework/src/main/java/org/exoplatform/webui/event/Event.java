@@ -23,8 +23,11 @@ import java.util.List;
 
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.webui.CSRFTokenUtil;
+import org.exoplatform.web.security.csrf.CSRFTokenUtil;
 import org.exoplatform.webui.application.WebuiRequestContext;
+
+import javax.portlet.PortletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 public class Event<T> {
 
@@ -40,7 +43,7 @@ public class Event<T> {
 
     private boolean csrfCheck;
 
-    private static final Log log = ExoLogger.getLogger(Event.class.getName());
+    private static final Log LOG = ExoLogger.getLogger(Event.class);
 
     public Event(T source, String name, WebuiRequestContext context) {
         name_ = name;
@@ -89,12 +92,27 @@ public class Event<T> {
     }
 
     public final void broadcast() throws Exception {
-        if (isCsrfCheck() && !CSRFTokenUtil.check()) {
+        if (isCsrfCheck() && !CSRFTokenUtil.check(getRequest())) {
             getRequestContext().setResponseComplete(true);
-            log.error("csrfToken is lost or this is an csrf attack");
+            LOG.warn("CSRF token is lost or this is an CSRF attack (event={})", this.getName());
         } else {
-            for (EventListener<T> listener : listeners_)
+            for (EventListener<T> listener : listeners_) {
                 listener.execute(this);
+            }
+        }
+    }
+
+    private static HttpServletRequest getRequest() {
+        WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
+        if (context != null && context.getRequest() instanceof PortletRequest) {
+            context = (WebuiRequestContext) context.getParentAppRequestContext();
+        }
+
+        if (context != null) {
+            return context.getRequest();
+        } else {
+            LOG.warn("Can't find portal context");
+            return null;
         }
     }
 

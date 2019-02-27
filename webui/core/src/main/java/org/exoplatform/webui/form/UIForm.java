@@ -26,7 +26,7 @@ import java.util.ResourceBundle;
 
 import org.exoplatform.commons.serialization.api.annotations.Serialized;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
-import org.exoplatform.webui.CSRFTokenUtil;
+import org.exoplatform.web.security.csrf.CSRFTokenUtil;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.application.portlet.PortletRequestContext;
 import org.exoplatform.webui.bean.BeanDataMapping;
@@ -151,6 +151,7 @@ public class UIForm extends UIContainer {
     @SuppressWarnings("unchecked")
     public void begin() throws Exception {
         WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
+
         String b = context.getURLBuilder().createURL(this, null, null);
 
         Writer writer = context.getWriter();

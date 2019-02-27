@@ -37,4 +37,19 @@
       <type>org.exoplatform.web.login.recovery.PasswordRecoveryHandler</type>
     </component-plugin>
   </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.rest.impl.RequestHandlerImpl</target-component>
+    <component-plugin>
+      <name>ws.rs.method.filter</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.rest.impl.method.MethodInvokerFilterComponentPlugin</type>
+      <init-params>
+        <value-param>
+          <name>csrf.access.filter</name>
+          <value>org.exoplatform.web.security.csrf.CSRFAccessFilter</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
 </configuration>

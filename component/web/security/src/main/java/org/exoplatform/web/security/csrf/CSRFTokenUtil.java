@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 eXo Platform SAS.
+ * Copyright (C) 2019 eXo Platform SAS.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -16,31 +16,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.webui;
+package org.exoplatform.web.security.csrf;
 
-import javax.portlet.PortletRequest;
+
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+
+import org.gatein.common.util.UUIDGenerator;
 
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.webui.application.WebuiRequestContext;
-import org.gatein.common.util.UUIDGenerator;
+import org.exoplatform.services.security.ConversationState;
 
 /**
- * @author <a href="mailto:phuong.vu@exoplatform.com">Vu Viet Phuong</a>
- * @version $Id$
+ * Util class to manage CSRF token
  *
  */
 public class CSRFTokenUtil {
     public static final String CSRF_TOKEN = "gtn:csrf";
 
-    private static Log log = ExoLogger.getExoLogger(CSRFTokenUtil.class);
+    protected static Log log = ExoLogger.getExoLogger(CSRFTokenUtil.class);
 
-    private static final UUIDGenerator generator = new UUIDGenerator();
+    protected static final UUIDGenerator generator = new UUIDGenerator();
 
-    public static boolean check() throws Exception {
-        HttpServletRequest request = getRequest();
+
+    public static boolean check(HttpServletRequest request) {
         if (request != null) {
             String sessionToken = getToken();
             String reqToken = request.getParameter(CSRF_TOKEN);
@@ -52,33 +51,18 @@ public class CSRFTokenUtil {
         }
     }
 
-    public static String getToken() throws Exception {
-        HttpServletRequest request = getRequest();
-        if (request != null) {
-            HttpSession session = request.getSession();
-            String token = (String) session.getAttribute(CSRF_TOKEN);
+    public static String getToken() {
+        ConversationState conversationState = ConversationState.getCurrent();
+        if (conversationState != null && conversationState.getIdentity() != null) {
+            String token = (String) conversationState.getAttribute(CSRF_TOKEN);
             if (token == null) {
                 token = generator.generateKey();
-                session.setAttribute(CSRF_TOKEN, token);
+                conversationState.setAttribute(CSRF_TOKEN, token);
             }
             return token;
         } else {
-            log.warn("No HttpServletRequest found, can't generate CSRF token");
             return null;
         }
     }
 
-    private static HttpServletRequest getRequest() throws Exception {
-        WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
-        if (context != null && context.getRequest() instanceof PortletRequest) {
-            context = (WebuiRequestContext) context.getParentAppRequestContext();
-        }
-
-        if (context != null) {
-            return context.getRequest();
-        } else {
-            log.warn("Can't find portal context");
-            return null;
-        }
-    }
 }

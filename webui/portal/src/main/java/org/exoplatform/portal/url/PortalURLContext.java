@@ -36,7 +36,7 @@ import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.controller.router.URIWriter;
 import org.exoplatform.web.url.PortalURL;
 import org.exoplatform.web.url.URLContext;
-import org.exoplatform.webui.CSRFTokenUtil;
+import org.exoplatform.web.security.csrf.CSRFTokenUtil;
 import org.gatein.common.io.UndeclaredIOException;
 
 /**
