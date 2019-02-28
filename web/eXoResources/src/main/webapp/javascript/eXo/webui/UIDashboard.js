@@ -105,6 +105,7 @@
       url += '?portal:componentId=' + componentId
           + '&portal:type=action&uicomponent=UIDashboard&op=' + action;
       url += '&ajaxRequest=true';
+      url += '&gtn:csrf=' + eXo.env.portal.csrfToken;
       if (params != null) {
         var len = params.length;
         for (var i = 0; i < len; i++) {

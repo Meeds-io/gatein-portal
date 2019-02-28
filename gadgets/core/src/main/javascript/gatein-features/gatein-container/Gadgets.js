@@ -257,6 +257,7 @@ gadgets.IfrGadgetService.prototype.requestNavigateTo = function(view, opt_params
   href += "&portal:type=action&uicomponent=" + compID;
   href += "&op=MaximizeGadget";
   href += "&maximize=" + maximize;
+  href += "&gtn:csrf=" + eXo.env.portal.csrfToken;
   href += "&objectId=" + ggWindow.attr("id") + "&ajaxRequest=true";
   ajaxGet(href, true);
 };

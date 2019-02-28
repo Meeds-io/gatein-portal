@@ -306,6 +306,7 @@
 		  href += "&portal:type=action&uicomponent=" + dashboardID;
 		  href += "&op=MinimizeGadget";
 		  href += "&minimized=" + minimized;
+		  href += "&gtn:csrf=" + eXo.env.portal.csrfToken;
 		  href += "&objectId=" + gadget.attr("id") + "&ajaxRequest=true";
 		  ajaxGet(href);
 
@@ -337,6 +338,7 @@
 		  href += "&portal:type=action&uicomponent=" + dashboardID;
 		  href += "&op=MaximizeGadget";
 		  href += "&maximize=" + maximizeParam;
+		  href += "&gtn:csrf=" + eXo.env.portal.csrfToken;
 		  href += "&objectId=" + gadget.attr("id") + "&ajaxRequest=true";
 		  ajaxGet(href, true);
 	  },
@@ -361,6 +363,7 @@
 				      + portletID;
 				  href += "&portal:type=action&uicomponent=" + dashboardID;
 				  href += "&op=DeleteGadget";
+				  href += "&gtn:csrf=" + eXo.env.portal.csrfToken;
 				  href += "&objectId=" + gadget.attr("id") + "&ajaxRequest=true";
 
 				  var dashboardCont = gadget.closest(".UIDashboardContainer");

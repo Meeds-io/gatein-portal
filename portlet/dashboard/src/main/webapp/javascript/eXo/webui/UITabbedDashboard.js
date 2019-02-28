@@ -48,6 +48,7 @@ function initTabbedDashboardPortlet(id)
         var href = eXo.env.server.portalBaseURL + "?portal:componentId=" + portletID;
         href += "&portal:type=action";
         href += "&portal:isSecure=false";
+        href += '&gtn:csrf=' + eXo.env.portal.csrfToken;
         href += "&uicomponent=UITabPaneDashboard";
         href += "&op=RenameTabLabel";
         href += "&objectId=" + input.attr("id");
@@ -100,6 +101,7 @@ function initTabbedDashboardPortlet(id)
           var href = eXo.env.server.portalBaseURL + "?portal:componentId=" + input.attr("id");
           href += "&portal:type=action";
           href += "&portal:isSecure=false";
+          href += '&gtn:csrf=' + eXo.env.portal.csrfToken;
           href += "&uicomponent=UITabPaneDashboard";
           href += "&op=AddDashboard";
           href += "&objectId=" + encodeURIComponent(label);
