@@ -130,9 +130,9 @@ import java.util.UUID;
         @EventConfig(listeners = ChangeWindowStateActionListener.class, csrfCheck = false),
         @EventConfig(listeners = DeleteComponentActionListener.class, confirm = "UIPortlet.deletePortlet"),
         @EventConfig(listeners = EditPortletActionListener.class),
-        @EventConfig(phase = Phase.PROCESS, listeners = ProcessActionActionListener.class),
+        @EventConfig(phase = Phase.PROCESS, listeners = ProcessActionActionListener.class, csrfCheck = false),
         @EventConfig(phase = Phase.PROCESS, listeners = ServeResourceActionListener.class, csrfCheck = false),
-        @EventConfig(phase = Phase.PROCESS, listeners = ProcessEventsActionListener.class) })
+        @EventConfig(phase = Phase.PROCESS, listeners = ProcessEventsActionListener.class, csrfCheck = false) })
 public class UIPortlet<S, C extends Serializable> extends UIApplication {
 
     protected static final Log log = ExoLogger.getLogger("portal:UIPortlet");
