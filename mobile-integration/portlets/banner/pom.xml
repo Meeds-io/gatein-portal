@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.exoplatform.gatein.portal</groupId>
     <artifactId>responsive-portlets</artifactId>
-    <version>5.1.2</version>
+    <version>5.1.x-acc210-SNAPSHOT</version>
   </parent>
 
 
