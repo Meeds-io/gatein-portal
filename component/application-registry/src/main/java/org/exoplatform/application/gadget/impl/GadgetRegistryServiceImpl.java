@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 eXo Platform SAS.
+ * Copyright (C) 2019 eXo Platform SAS.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -41,12 +41,11 @@ import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.access.PermissionType;
 import org.exoplatform.services.jcr.core.ExtendedNode;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.security.IdentityConstants;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 
-import javax.jcr.Node;
+import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
 /**
@@ -176,6 +175,7 @@ public class GadgetRegistryServiceImpl implements GadgetRegistryService {
         //
         if (def == null) {
             def = registry.addGadget(gadget.getName());
+
             if (gadget.isLocal()) {
                 def.setLocal(true);
                 LocalGadgetData data = (LocalGadgetData) def.getData();
@@ -199,6 +199,8 @@ public class GadgetRegistryServiceImpl implements GadgetRegistryService {
             def.setTitle(gadget.getTitle());
             def.setThumbnail(gadget.getThumbnail());
         }
+
+        updatePermissions(gadget.getName());
     }
 
     public void removeGadget(String name) {
@@ -321,6 +323,8 @@ public class GadgetRegistryServiceImpl implements GadgetRegistryService {
                 if (getRegistry().getGadget(importer.getGadgetName()) == null) {
                     GadgetDefinition def = getRegistry().addGadget(importer.getGadgetName());
                     importer.doImport(def);
+
+                    updatePermissions(importer.getGadgetName());
                 } else {
                     log.debug("Will not import existing gagdet " + importer.getGadgetName());
                 }
@@ -330,19 +334,20 @@ public class GadgetRegistryServiceImpl implements GadgetRegistryService {
                 chromatticLifeCycle.closeContext(done);
             }
 
-            if (done) {
-                SessionProvider sessionProvider = SessionProvider.createSystemProvider();
-                String workspace = chromatticLifeCycle.getWorkspaceName();
-                Session session = sessionProvider.getSession(workspace, repoService.getCurrentRepository());
-                ExtendedNode extendedNode = (ExtendedNode)session.getItem("/production/app:gadgets/app:" + importer.getGadgetName());
-                if (extendedNode.canAddMixin("exo:privilegeable")) {
-                    extendedNode.addMixin("exo:privilegeable");
-                }
-                Map<String, String[]> perms = new HashMap<String, String[]>();
-                extendedNode.setPermission(IdentityConstants.ANY, PermissionType.DEFAULT_AC);
-                extendedNode.save();
-            }
             return done;
         }
+    }
+
+    private void updatePermissions(String gadgetName) throws RepositoryException {
+        ChromatticSession chromatticSession = chromatticLifeCycle.getContext().getSession();
+        Session session = chromatticSession.getJCRSession();
+        session.save();
+
+        ExtendedNode extendedNode = (ExtendedNode)session.getItem("/production/app:gadgets/app:" + gadgetName);
+        if (extendedNode.canAddMixin("exo:privilegeable")) {
+            extendedNode.addMixin("exo:privilegeable");
+        }
+        extendedNode.setPermission(IdentityConstants.ANY, PermissionType.DEFAULT_AC);
+        extendedNode.save();
     }
 }

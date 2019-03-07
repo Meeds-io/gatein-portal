@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 eXo Platform SAS.
+ * Copyright (C) 2019 eXo Platform SAS.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -22,7 +22,11 @@ package org.exoplatform.application.gadget;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Calendar;
+import java.util.List;
 
 import org.apache.shindig.gadgets.spec.ModulePrefs;
 import org.chromattic.ext.ntdef.NTFolder;
@@ -35,10 +39,14 @@ import org.exoplatform.application.gadget.impl.RemoteGadgetData;
 import org.exoplatform.commons.chromattic.ChromatticManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.configuration.ConfigurationManager;
+import org.exoplatform.services.jcr.access.AccessControlEntry;
+import org.exoplatform.services.jcr.core.ExtendedNode;
+import org.exoplatform.services.security.IdentityConstants;
 import org.gatein.common.io.IOTools;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
-import org.gatein.common.net.URLTools;
+
+import javax.jcr.Session;
 
 /**
  * Created by The eXo Platform SAS Author : Pham Thanh Tung thanhtungty@gmail.com Jul 11, 2008
@@ -47,6 +55,8 @@ public class TestGadgetRegistryService extends AbstractApplicationRegistryTest {
 
     private GadgetRegistryServiceImpl service_;
 
+    private SourceStorage sourceStorage;
+
     private ChromatticManager chromatticManager;
 
     private ConfigurationManager configurationManager;
@@ -54,15 +64,55 @@ public class TestGadgetRegistryService extends AbstractApplicationRegistryTest {
     public void setUp() throws Exception {
         PortalContainer container = PortalContainer.getInstance();
         service_ = (GadgetRegistryServiceImpl) container.getComponentInstanceOfType(GadgetRegistryService.class);
-        chromatticManager = (ChromatticManager) container.getComponentInstanceOfType(ChromatticManager.class);
-        configurationManager = (ConfigurationManager) container.getComponentInstanceOfType(ConfigurationManager.class);
+        sourceStorage = container.getComponentInstanceOfType(SourceStorage.class);
+        chromatticManager = container.getComponentInstanceOfType(ChromatticManager.class);
+        configurationManager = container.getComponentInstanceOfType(ConfigurationManager.class);
         begin();
     }
 
     @Override
     protected void tearDown() throws Exception {
-        chromatticManager.getSynchronization().setSaveOnClose(false);
         end();
+    }
+
+    public void testShouldLocalGadgetSavedWithRightPermissionsWhenCreatingLocalGadget() throws Exception {
+        // Given
+        String gadgetName = "local_test_save";
+        Gadget gadget = new Gadget();
+        gadget.setName(gadgetName);
+        gadget.setLocal(true);
+
+        Source source = new Source(gadgetName, "application/xml");
+        URI gadgetURI = ClassLoader.getSystemResource("org/exoplatform/application/gadgets/weather.xml").toURI();
+        source.setTextContent(new String(Files.readAllBytes(Paths.get(gadgetURI))));
+        source.setLastModified(Calendar.getInstance());
+
+        // When
+        service_.saveGadget(gadget);
+        sourceStorage.saveSource(gadget, source);
+
+        // Then
+        GadgetDefinition def = service_.getRegistry().getGadget(gadgetName);
+        assertNotNull(def);
+        assertEquals("__MSG_description__", def.getDescription());
+        assertEquals("__MSG_gTitle__", def.getTitle());
+        assertEquals("http://www.labpixies.com/campaigns/weather/images/thumbnail.jpg", def.getThumbnail());
+        assertEquals("http://www.labpixies.com", def.getReferenceURL());
+
+        Session session = chromatticManager.getLifeCycle("app").getContext().getSession().getJCRSession();
+        ExtendedNode extendedNode = (ExtendedNode)session.getItem("/production/app:gadgets/app:" + gadget.getName());
+        assertNotNull(extendedNode);
+        List<AccessControlEntry> permissions = extendedNode.getACL().getPermissionEntries();
+        assertNotNull(permissions);
+        assertEquals(5, permissions.size());
+        assertTrue(permissions.contains(new AccessControlEntry("*:/platform/administrators", "read")));
+        assertTrue(permissions.contains(new AccessControlEntry("*:/platform/administrators", "add_node")));
+        assertTrue(permissions.contains(new AccessControlEntry("*:/platform/administrators", "set_property")));
+        assertTrue(permissions.contains(new AccessControlEntry("*:/platform/administrators", "remove")));
+        assertTrue(permissions.contains(new AccessControlEntry(IdentityConstants.ANY, "read")));
+
+        service_.removeGadget(gadgetName);
+        assertNull(service_.getGadget(gadgetName));
     }
 
     public void testLocalGadget() throws Exception {
