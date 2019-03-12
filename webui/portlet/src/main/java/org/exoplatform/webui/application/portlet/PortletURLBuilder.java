@@ -87,9 +87,7 @@ public class PortletURLBuilder extends URLBuilder<UIComponent> {
         }
 
         //
-        if (csrfCheck) {
-            url.setProperty(CSRF_PROP, Boolean.TRUE.toString());
-        }
+        url.setProperty(CSRF_PROP, Boolean.toString(csrfCheck));
 
         return url.toString();
 
