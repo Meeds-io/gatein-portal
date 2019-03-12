@@ -62,14 +62,10 @@ public class DataStorageImpl implements DataStorage {
 
     private Container sharedLayout = null;
 
-    protected ExoCache<PortalKey, PortalData> portalConfigCache;
-
-    private final static String CACHE_NAME = "portal.PortalConfig";
 
     public DataStorageImpl(CacheService cacheService, ModelDataStorage delegate, ListenerService listenerServ) {
         this.delegate = delegate;
         this.listenerServ_ = listenerServ;
-        this.portalConfigCache = cacheService.getCacheInstance(CACHE_NAME);
     }
 
     /**
@@ -82,24 +78,16 @@ public class DataStorageImpl implements DataStorage {
     }
 
     public void create(PortalConfig config) throws Exception {
-        // Clear cache entry since this method can be called even to update an existing
-        // Portal Config
-        PortalKey key = new PortalKey(config.getType(), config.getName());
-        portalConfigCache.remove(key);
         delegate.create(config.build());
         listenerServ_.broadcast(PORTAL_CONFIG_CREATED, this, config);
     }
 
     public void save(PortalConfig config) throws Exception {
-        PortalKey key = new PortalKey(config.getType(), config.getName());
-        portalConfigCache.remove(key);
         delegate.save(config.build());
         listenerServ_.broadcast(PORTAL_CONFIG_UPDATED, this, config);
     }
 
     public void remove(PortalConfig config) throws Exception {
-        PortalKey key = new PortalKey(config.getType(), config.getName());
-        portalConfigCache.remove(key);
         delegate.remove(config.build());
         listenerServ_.broadcast(PORTAL_CONFIG_REMOVED, this, config);
     }
@@ -281,10 +269,7 @@ public class DataStorageImpl implements DataStorage {
 
     public PortalConfig getPortalConfig(String ownerType, String portalName) throws Exception {
         PortalKey key = new PortalKey(ownerType, portalName);
-        PortalData data = portalConfigCache.get(key);
-        if (data == null) {
-          data = delegate.getPortalConfig(key);
-        }
+        PortalData data = delegate.getPortalConfig(key);
         return data != null ? new PortalConfig(data) : null;
     }
 

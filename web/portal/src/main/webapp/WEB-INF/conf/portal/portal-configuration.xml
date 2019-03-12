@@ -417,18 +417,6 @@
             <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.page.cacheMode:replication}</string></field>
           </object>
         </object-param>
-        <!-- DataStorage portal config configuration -->
-        <object-param>
-          <name>portal.PortalConfig</name>
-          <description>The Cache configuration for the DataStorage portal config</description>
-          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
-            <field name="name"><string>portal.PortalConfig</string></field>
-            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.portalconfig.strategy:LIRS}</string></field>
-            <field name="maxSize"><int>${exo.cache.portal.portalconfig.MaxNodes:1100}</int></field>
-            <field name="liveTime"><long>${exo.cache.portal.portalconfig.TimeToLive:86400}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.portalconfig.cacheMode:replication}</string></field>
-          </object>
-        </object-param>
         <!-- TemplateService configuration -->
         <object-param>
           <name>portal.TemplateService</name>

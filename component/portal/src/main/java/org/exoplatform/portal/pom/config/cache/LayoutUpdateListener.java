@@ -23,6 +23,7 @@ import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.pom.config.POMSessionManager;
+import org.exoplatform.portal.pom.data.PortalKey;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 
@@ -41,7 +42,10 @@ public class LayoutUpdateListener extends Listener<DataStorage, Object> {
     public void onEvent(Event<DataStorage, Object> event) throws Exception {
         Object config = event.getData();
 
-        if (config instanceof PortalConfig || config instanceof Container) {
+        if (config instanceof PortalConfig) {
+            PortalConfig portalConfig = (PortalConfig) config;
+            manager.cacheRemove(new PortalKey(portalConfig.getType(), portalConfig.getName()));
+        } else if (config instanceof Container) {
             //Update a layout, it should clear cache
             manager.clearCache();
         }
