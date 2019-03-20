@@ -31,7 +31,7 @@
   <msg name="action">Eylem</msg>
   <msg name="value">Değer</msg>
   <msg name="services_url">Hizmetlerin URL'si</msg>
-  <msg name="failManage">Temporary can't manage services from other host until we support OAuth</msg>
+  <msg name="failManage">OAuth'u destekleyene kadar geçici hizmetler diğer ana bilgisayardan yönetilemiyor</msg>
   <msg name="noServices">Hiçbir hizmet yok  ya da yeterli izne sahip değilsiniz</msg>
   <msg name="noMethod">Yöntem yok</msg>
   <msg name="noProperty">Özellik yok</msg>
