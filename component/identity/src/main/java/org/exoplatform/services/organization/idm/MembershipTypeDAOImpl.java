@@ -54,6 +54,8 @@ public class MembershipTypeDAOImpl extends AbstractDAOImpl implements Membership
 
     public static final DateFormat dateFormat = DateFormat.getInstance();
 
+    public static final int MEMBERSHIP_DESCRIPTION_LIMIT = 255;
+
     private List listeners_;
 
     public MembershipTypeDAOImpl(PicketLinkIDMOrganizationServiceImpl orgService, PicketLinkIDMService service) {
@@ -96,6 +98,11 @@ public class MembershipTypeDAOImpl extends AbstractDAOImpl implements Membership
 
         if (getIdentitySession().getRoleManager().getRoleType(mt.getName()) != null) {
             throw new Exception("Membership type '" + mt.getName() + "' is already exists.");
+        }
+        if(mt.getDescription() != null) {
+            if (mt.getDescription().length() > MEMBERSHIP_DESCRIPTION_LIMIT) {
+                throw new Exception("The membership type description field cannot exceed 255 characters");
+            }
         }
 
         try {

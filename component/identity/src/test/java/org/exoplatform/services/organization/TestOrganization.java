@@ -439,6 +439,26 @@ public class TestOrganization extends AbstractKernelTest {
         assertNull(userProfile);
     }
 
+    public void testCreateValidMembershiptype() throws Exception {
+      //Given
+      String testType = "testType";
+      String description ="this a long description!this a long description!this a long description!this a long description!this a long description!this a long description!this a long description!this a long description!this a long description!this a long description!this a long description!";
+      MembershipType mt = mtHandler_.createMembershipTypeInstance();
+      mt.setDescription(description);
+      mt.setName(testType);
+      MembershipType mt1 = null;
+      //When
+      try {
+        mt1 = mtHandler_.createMembershipType(mt, false);
+        fail("Exception should be thrown");
+      }
+      catch (Exception ex) {
+          assertEquals(ex.getMessage(),"The membership type description field cannot exceed 255 characters");
+      }
+      //Then
+      assertNull(mt1);
+    }
+
     protected void createGroup(String parent, String name) {
         GroupHandler groupHandler = organizationService.getGroupHandler();
         try {

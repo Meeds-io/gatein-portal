@@ -48,12 +48,14 @@ public class UIMembershipTypeForm extends UIForm {
 
     private String membershipTypeName;
 
+    public static final int MEMBERSHIP_DESCRIPTION_LIMIT = 255;
+
     public UIMembershipTypeForm() throws Exception {
         addUIFormInput(new UIFormStringInput(MEMBERSHIP_TYPE_NAME, MEMBERSHIP_TYPE_NAME, null).setReadOnly(false)
                 .addValidator(MandatoryValidator.class).addValidator(StringLengthValidator.class, 3, 30)
                 .addValidator(NameValidator.class).addValidator(SpecialCharacterValidator.class));
 
-        addUIFormInput(new UIFormTextAreaInput(DESCRIPTION, DESCRIPTION, null));
+        addUIFormInput(new UIFormTextAreaInput(DESCRIPTION, DESCRIPTION, null).addValidator(StringLengthValidator.class, MEMBERSHIP_DESCRIPTION_LIMIT));
     }
 
     public void setMembershipType(MembershipType membershipType) throws Exception {
