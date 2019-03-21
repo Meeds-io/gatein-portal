@@ -19,15 +19,20 @@
 
 package org.exoplatform.services.organization.idm;
 
+import java.io.Serializable;
 import java.util.*;
 
+import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.services.organization.Group;
 import org.gatein.common.logging.LogLevel;
-import org.picketlink.idm.api.Attribute;
-import org.picketlink.idm.api.Role;
+import org.picketlink.idm.api.*;
 import org.picketlink.idm.common.exception.IdentityException;
+import org.picketlink.idm.impl.api.IdentitySearchCriteriaImpl;
 import org.picketlink.idm.impl.api.SimpleAttribute;
 
 import org.exoplatform.services.organization.*;
+
+import static org.picketlink.idm.impl.store.hibernate.PatchedHibernateIdentityStoreImpl.ALL_GROUPS_TYPE;
 
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
@@ -129,7 +134,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         	    // Workaround due to issues in Picketlink if it has not support transaction for LDAP yet
                 if (parentGroup != null) {
                     if (getIdentitySession().getRelationshipManager().isAssociatedByKeys(parentGroup.getKey(),childGroup.getKey())) {
-                        getIdentitySession().getRelationshipManager().disassociateGroups(parentGroup, new ArrayList<org.picketlink.idm.api.Group> (Arrays.asList(childGroup)));    
+                        getIdentitySession().getRelationshipManager().disassociateGroups(parentGroup, new ArrayList<org.picketlink.idm.api.Group> (Arrays.asList(childGroup)));
                     }
                 } else {
                     org.picketlink.idm.api.Group rootGroup = getRootGroup();
@@ -581,6 +586,14 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
     }
 
+    public ListAccess<Group> findGroupsByKeyword(String keyword) throws Exception {
+        if (log.isTraceEnabled()) {
+            Tools.logMethodIn(log, LogLevel.TRACE, "findGroupsByKeyword", null);
+        }
+        IdentitySearchCriteria identitySearchCriteria = new IdentitySearchCriteriaImpl().nameFilter("*" + keyword + "*");
+        return new IDMGroupListAccess(identitySearchCriteria);
+    }
+
     private void preSave(Group group, boolean isNew) throws Exception {
         for (GroupEventListener listener : listeners_) {
             listener.preSave(group, isNew);
@@ -948,5 +961,57 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
     public String getGtnGroupName(String plidmGroupName) {
         return orgService.getConfiguration().getGtnGroupName(plidmGroupName);
+    }
+
+    public class IDMGroupListAccess implements ListAccess<Group>, Serializable {
+
+        private final IdentitySearchCriteria identitySearchCriteria;
+
+        public IDMGroupListAccess(IdentitySearchCriteria identitySearchCriteria) {
+            this.identitySearchCriteria = identitySearchCriteria;
+        }
+
+        public Group[] load(int index, int length) throws Exception {
+            if (log.isTraceEnabled()) {
+                Tools.logMethodIn(log, LogLevel.TRACE, "load", new Object[] { "index", index, "length", length });
+            }
+            if(length == 0) {
+                return new Group[0];
+            }
+            //As test suppose, we should throw exception when try to load more element than size
+            int totalSize = this.getSize();
+            if(index + length > totalSize) {
+                throw new IllegalArgumentException("Try to get more than groups can retrieve");
+            }
+            Collection<org.picketlink.idm.api.Group> groups = listQuery(index, length);
+            Group[] exoGroups = new Group[length];
+            int i = 0;
+            for (org.picketlink.idm.api.Group group : groups) {
+                exoGroups[i++] = convertGroup(group);
+            }
+            if (log.isTraceEnabled()) {
+                Tools.logMethodOut(log, LogLevel.TRACE, "load", exoGroups);
+            }
+            return exoGroups;
+        }
+
+        public int getSize() throws Exception {
+            if (log.isTraceEnabled()) {
+                Tools.logMethodIn(log, LogLevel.TRACE, "getSize", null);
+            }
+            int result = service_.getIdentitySession().getPersistenceManager().findGroup(ALL_GROUPS_TYPE, identitySearchCriteria).size();
+            // should check count
+            if (log.isTraceEnabled()) {
+                Tools.logMethodOut(log, LogLevel.TRACE, "getSize", result);
+            }
+
+            return result;
+
+        }
+
+        private List<org.picketlink.idm.api.Group> listQuery(int index, int length) throws Exception {
+            identitySearchCriteria.page(index, length);
+            return (List<org.picketlink.idm.api.Group>) service_.getIdentitySession().getPersistenceManager().findGroup(ALL_GROUPS_TYPE, identitySearchCriteria);
+        }
     }
 }

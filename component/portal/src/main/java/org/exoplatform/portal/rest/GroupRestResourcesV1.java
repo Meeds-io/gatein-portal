@@ -2,6 +2,7 @@ package org.exoplatform.portal.rest;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
@@ -16,9 +17,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.commons.utils.ListAccessImpl;
-import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.search.GroupSearchService;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -62,11 +60,10 @@ public class GroupRestResourcesV1 implements ResourceContainer {
     offset = offset > 0 ? offset : DEFAULT_OFFSET;
     limit = limit > 0 ? limit : DEFAULT_LIMIT;
 
-    ListAccess<Group> groups = groupSearchService.searchGroups(q);
-    limit = limit < groups.getSize() ? limit : groups.getSize();
-    Group [] allGroups = groups.load(offset, limit);
-    LinkedList<String> listAllGroups = new LinkedList(Arrays.asList(allGroups));
-    
+    int size = groupSearchService.searchGroups(q).getSize();
+    limit = limit < size ? limit : size;
+    Group[] groups = groupSearchService.searchGroups(q).load(offset, limit);
+    List<String> listAllGroups = new LinkedList(Arrays.asList(groups));
     return Response.ok(listAllGroups, MediaType.APPLICATION_JSON).build();
   }
 }

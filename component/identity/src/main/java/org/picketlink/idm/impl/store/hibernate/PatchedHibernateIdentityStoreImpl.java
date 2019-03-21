@@ -118,6 +118,8 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
 
    public static final String CREDENTIAL_TYPE_BINARY = "BINARY";
 
+   public static final String ALL_GROUPS_TYPE = "@@ALL_GROUPS@@";
+
    private String id;
 
    private FeaturesMetaData supportedFeatures;
@@ -746,10 +748,18 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
          StringBuilder hqlBuilderSelect = new StringBuilder("select distinct io from HibernateIdentityObject io");
          Map<String, Object> queryParams = new HashMap<String, Object>();
 
-         StringBuilder hqlBuilderConditions = new StringBuilder(" where io.realm=:realm and io.identityType=:identityType");
+         StringBuilder hqlBuilderConditions = new StringBuilder(" where io.realm=:realm");
          queryParams.put("realm", realm);
-         queryParams.put("identityType", hibernateType);
-
+         /* BEGIN SOC-6210: Search for all groups by keyword. If type name passed is equals to @@ALL_GROUPS@@, then
+         exclude USER type (search for all group types) */
+         String hibernateTypeName = hibernateType.getName();
+         if (ALL_GROUPS_TYPE.equals(hibernateTypeName)) {
+            hqlBuilderConditions.append(" and io.identityType.name <> 'USER'");
+         } else {
+            hqlBuilderConditions.append(" and io.identityType=:identityType");
+            queryParams.put("identityType", hibernateType);
+         }
+         /* END SOC-6210 */
          /* BEGIN CAL-1225: User picker in Participants tab is case sensitive */
          if (criteria != null && criteria.getFilter() != null) {
            String attrValue = criteria.getFilter().replaceAll("\\*", "%");
