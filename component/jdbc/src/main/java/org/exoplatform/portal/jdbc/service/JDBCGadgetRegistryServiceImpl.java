@@ -47,7 +47,7 @@ public class JDBCGadgetRegistryServiceImpl extends GadgetRegistryServiceImpl {
   private GadgetDAO           gadgetDAO;
 
   public JDBCGadgetRegistryServiceImpl(InitParams params, GadgetDAO gadgetDAO) throws Exception {
-    super(new ChromatticManager(null), params);
+    super(new ChromatticManager(null), null, params);
     this.gadgetDAO = gadgetDAO;
 
     //

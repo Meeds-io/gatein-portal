@@ -47,6 +47,7 @@
     <module>identity</module>
     <module>api</module>
     <module>file-storage</module>
+    <module>jdbc</module>
   </modules>
 
 </project>
