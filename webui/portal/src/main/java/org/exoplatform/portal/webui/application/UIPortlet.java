@@ -125,7 +125,7 @@ import java.util.UUID;
  * @see UIPortletActionListener
  */
 @ComponentConfig(lifecycle = UIPortletLifecycle.class, template = "system:/groovy/portal/webui/application/UIPortlet.gtmpl", events = {
-        @EventConfig(listeners = RenderActionListener.class),
+        @EventConfig(listeners = RenderActionListener.class, csrfCheck = false),
         @EventConfig(listeners = ChangePortletModeActionListener.class, csrfCheck = false),
         @EventConfig(listeners = ChangeWindowStateActionListener.class, csrfCheck = false),
         @EventConfig(listeners = DeleteComponentActionListener.class, confirm = "UIPortlet.deletePortlet"),
