@@ -37,7 +37,7 @@ import org.exoplatform.portal.mop.Described.State;
 import org.exoplatform.portal.mop.description.DescriptionService;
 
 @ConfiguredBy({
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/exo.portal.jdbc.test.configuration.xml") })
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
 public class TestDescriptionService extends AbstractKernelTest {
 
   private DescriptionService service;

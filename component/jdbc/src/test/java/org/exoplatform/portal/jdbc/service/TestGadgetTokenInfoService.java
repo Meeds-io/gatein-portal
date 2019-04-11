@@ -31,7 +31,7 @@ import org.exoplatform.portal.gadget.core.GadgetTokenInfoService;
 import org.exoplatform.portal.jdbc.dao.TokenDAO;
 
 @ConfiguredBy({
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/exo.portal.jdbc.test.configuration.xml") })
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
 public class TestGadgetTokenInfoService extends AbstractTokenServiceTest<GadgetTokenInfoService> {
 
     private TokenDAO tokenDAO;

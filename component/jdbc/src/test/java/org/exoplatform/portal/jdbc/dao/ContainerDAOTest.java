@@ -13,8 +13,7 @@ import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.portal.jdbc.entity.ContainerEntity;
 
 @ConfiguredBy({
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/exo.portal.jdbc.test.configuration.xml")  
-})
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
 public class ContainerDAOTest extends AbstractKernelTest {
   private ContainerDAO containerDAO;
   

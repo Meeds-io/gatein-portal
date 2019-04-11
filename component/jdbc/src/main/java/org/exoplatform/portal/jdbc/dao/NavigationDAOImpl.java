@@ -21,6 +21,7 @@ package org.exoplatform.portal.jdbc.dao;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
+import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
 import org.exoplatform.portal.jdbc.entity.NavigationEntity;
 import org.exoplatform.portal.mop.SiteType;
@@ -42,6 +43,7 @@ public class NavigationDAOImpl extends GenericDAOJPAImpl<NavigationEntity, Strin
     }
 
     @Override
+    @ExoTransactional
     public void deleteByOwner(SiteType siteType, String name) {
       NavigationEntity entity = findByOwner(siteType, name);
       if (entity != null) {

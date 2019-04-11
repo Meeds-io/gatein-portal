@@ -13,6 +13,7 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.gatein.api.common.Pagination;
 import org.gatein.api.page.PageQuery;
 import org.gatein.api.site.SiteType;
@@ -44,6 +45,7 @@ public class PageDAOImpl extends AbstractDAO<PageEntity> implements PageDAO {
   }
 
   @Override
+  @ExoTransactional
   public void deleteByOwner(org.exoplatform.portal.mop.SiteType siteType, String siteName) {
     Query query = getEntityManager().createNamedQuery("PageEntity.deleteByOwner");
 

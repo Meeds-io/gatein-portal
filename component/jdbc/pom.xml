@@ -279,31 +279,33 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
+        <groupId>com.jcabi</groupId>
+        <artifactId>jcabi-maven-plugin</artifactId>
+        <version>0.14</version>
         <executions>
           <execution>
-            <id>default-test</id>
-            <phase>test</phase>
+            <id>weave-classes</id>
+            <phase>process-classes</phase>
             <goals>
-              <goal>test</goal>
+              <goal>ajc</goal>
             </goals>
             <configuration>
-              <argLine>-Xms512m -Xmx512m</argLine>
-              <systemProperties>
-                <property>
-                  <name>exo.profiles</name>
-                  <value>${surefire.exo.profiles}</value>
-                </property>
-              </systemProperties>
+              <classesDirectory>${project.build.directory}/classes</classesDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>weave-test-classes</id>
+            <phase>process-test-classes</phase>
+            <goals>
+              <goal>ajc</goal>
+            </goals>
+            <configuration>
+              <classesDirectory>${project.build.directory}/test-classes</classesDirectory>
             </configuration>
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>com.jcabi</groupId>
-        <artifactId>jcabi-maven-plugin</artifactId>
-      </plugin>
+
     </plugins>
   </build>
   <profiles>

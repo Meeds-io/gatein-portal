@@ -14,7 +14,7 @@ import org.exoplatform.portal.jdbc.entity.PermissionEntity;
 import org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE;
 
 @ConfiguredBy({
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/exo.portal.jdbc.test.configuration.xml") })
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
 public class PermissionDAOTest extends AbstractKernelTest {
   private PermissionDAO     permissionDAO;
 

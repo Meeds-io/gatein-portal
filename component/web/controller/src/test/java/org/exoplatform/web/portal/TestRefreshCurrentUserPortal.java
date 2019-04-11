@@ -148,6 +148,12 @@ public class TestRefreshCurrentUserPortal extends AbstractPortalTest {
         ns.saveNode(root, null);
         navs = userPortal.getNavigations();
         assertEquals(3, navs.size());
+        ns.destroyNavigation(nav);
+        navs = userPortal.getNavigations();
+        assertEquals(2, navs.size());
+        //workaround: ns.saveNode this method already save data to db
+        //need to clear this test data, tearDown method not work correctly this case
+        sync(true);
         RequestContext.setCurrentInstance(null);
     }
 

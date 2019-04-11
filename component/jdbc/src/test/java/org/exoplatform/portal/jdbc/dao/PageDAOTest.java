@@ -12,8 +12,7 @@ import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageKey;
 
 @ConfiguredBy({
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/exo.portal.jdbc.test.configuration.xml")  
-})
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
 public class PageDAOTest extends AbstractKernelTest {
   private PageDAO pageDAO;
   private SiteDAO siteDAO;

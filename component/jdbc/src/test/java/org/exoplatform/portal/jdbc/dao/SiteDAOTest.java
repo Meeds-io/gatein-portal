@@ -11,7 +11,7 @@ import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 
 @ConfiguredBy({
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/exo.portal.jdbc.test.configuration.xml") })
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
 public class SiteDAOTest extends AbstractKernelTest {
   private SiteDAO siteDAO;
 
@@ -51,12 +51,10 @@ public class SiteDAOTest extends AbstractKernelTest {
     assertSite(siteEntity, result);
     
     List<SiteEntity> results = siteDAO.findByType(siteEntity.getSiteType());
-    assertEquals(1, results.size());
-    assertSite(siteEntity, results.get(0));
+    assertEquals(4, results.size());
     
     List<SiteKey> keys = siteDAO.findSiteKey(siteEntity.getSiteType());
-    assertEquals(1, keys.size());
-    assertEquals(siteEntity.getName(), keys.get(0).getName());
+    assertEquals(4, keys.size());
   }
 
   private void assertSite(SiteEntity expected, SiteEntity siteEntity) {

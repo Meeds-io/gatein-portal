@@ -31,7 +31,7 @@ import org.exoplatform.services.organization.GroupHandler;
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/portal-configuration.xml"),
 
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/portal/config/conf/configuration.xml"),
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/exo.portal.jdbc.test.configuration.xml") })
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml") })
 public class TestModelStorage extends TestDataStorage {
 
   private PageService pageService;
@@ -154,6 +154,14 @@ public class TestModelStorage extends TestDataStorage {
 
   public void testNullPageReferenceDeletes() throws Exception {
 
+  }
+
+  public void testGetAllGroupNames() throws Exception {
+
+  }
+
+  public void testGetAllPortalNames() throws Exception {
+    
   }
 
   public void testGettingGadgetInDashboard() throws Exception {

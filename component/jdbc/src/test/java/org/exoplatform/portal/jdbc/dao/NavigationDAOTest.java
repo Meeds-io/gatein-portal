@@ -18,7 +18,7 @@ import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
 
 @ConfiguredBy({
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/exo.portal.jdbc.test.configuration.xml") })
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
 public class NavigationDAOTest extends AbstractKernelTest {
 
   private SiteDAO           siteDAO;

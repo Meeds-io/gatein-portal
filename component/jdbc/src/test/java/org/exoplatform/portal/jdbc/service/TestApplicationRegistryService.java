@@ -37,8 +37,8 @@ import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 
-@ConfiguredBy({ 
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/exo.portal.jdbc.test.configuration.xml") })
+@ConfiguredBy({
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
 public class TestApplicationRegistryService extends AbstractKernelTest {
 
   protected static String              demo      = "demo";

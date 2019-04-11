@@ -14,8 +14,7 @@ import org.exoplatform.portal.jdbc.entity.WindowEntity;
 import org.exoplatform.portal.jdbc.entity.WindowEntity.AppType;
 
 @ConfiguredBy({
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/exo.portal.jdbc.test.configuration.xml")  
-})
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
 public class WindowDAOTest extends AbstractKernelTest {
   private WindowDAO windowDAO;
   

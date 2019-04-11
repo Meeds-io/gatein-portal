@@ -13,7 +13,7 @@ import org.exoplatform.portal.jdbc.entity.DescriptionEntity;
 import org.exoplatform.portal.jdbc.entity.DescriptionState;
 
 @ConfiguredBy({
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/exo.portal.jdbc.test.configuration.xml") })
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
 public class DescriptionDAOTest extends AbstractKernelTest {
   private DescriptionDAO descDAO;
 
