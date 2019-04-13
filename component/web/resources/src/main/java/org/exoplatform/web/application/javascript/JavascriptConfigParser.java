@@ -31,6 +31,7 @@ import java.util.Locale;
 import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.exoplatform.commons.utils.PropertyManager;
 
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.services.log.ExoLogger;
@@ -69,6 +70,9 @@ public class JavascriptConfigParser {
     /** . */
     public static final String SCRIPT_TAG = "script";
 
+    public static final String SCRIPT_DEV_TAG = "script-dev";
+
+    /** . */
     public static final String SCRIPTS_TAG = "scripts";
 
     /** . */
@@ -281,8 +285,43 @@ public class JavascriptConfigParser {
         return scripts.values();
     }
 
+    private void parseScript(Element element, ScriptResourceDescriptor desc, String scriptType) {
+        for (Element scriptElt : XMLTools.getChildren(element, scriptType)) {
+            String resourceBundle = parseOptString(scriptElt, "resource-bundle");
+
+            String minifyStr = parseOptString(scriptElt, "minify");
+            boolean minify = minifyStr == null || Boolean.parseBoolean(minifyStr);
+
+            List<Content> contents = new LinkedList<Content>();
+            Element adapter = XMLTools.getUniqueChild(scriptElt, ADAPTER_TAG, false);
+            String scriptPath = parseOptString(scriptElt, "path");
+            if (scriptPath != null) {
+                contents.add(new Content(scriptPath));
+            } else if (adapter != null) {
+                NodeList childs = adapter.getChildNodes();
+                for (int i = 0; i < childs.getLength(); i++) {
+                    Node item = childs.item(i);
+                    if (item instanceof Element) {
+                        Element include = (Element) item;
+                        if (INCLUDE_TAG.equals(include.getTagName())) {
+                            contents.add(new Content(XMLTools.asString(include, true)));
+                        }
+                    } else if (item.getNodeType() == Node.TEXT_NODE) {
+                        contents.add(new Content(item.getNodeValue().trim(), false));
+                    }
+                }
+            }
+            Content[] tmp = contents.toArray(new Content[contents.size()]);
+
+            //
+            Javascript script = new Javascript.Local(desc.id, contextPath, tmp, resourceBundle, 0, minify);
+            desc.modules.add(script);
+        }
+    }
+
     private void parseDesc(Element element, ScriptResourceDescriptor desc) {
         Element urlElement = XMLTools.getUniqueChild(element, URL_TAG, false);
+        Element scriptDev = XMLTools.getUniqueChild(element, SCRIPT_DEV_TAG, false);
         if (urlElement != null) {
             String remoteURL = XMLTools.asString(urlElement);
             desc.id.setFullId(false);
@@ -293,36 +332,11 @@ public class JavascriptConfigParser {
                 Locale locale = I18N.parseTagIdentifier(localeValue);
                 desc.supportedLocales.add(locale);
             }
-            for (Element scriptElt : XMLTools.getChildren(element, SCRIPT_TAG)) {
-                String resourceBundle = parseOptString(scriptElt, "resource-bundle");
-
-                String minifyStr = parseOptString(scriptElt, "minify");
-                boolean minify = minifyStr == null || Boolean.parseBoolean(minifyStr);
-
-                List<Content> contents = new LinkedList<Content>();
-                Element adapter = XMLTools.getUniqueChild(scriptElt, ADAPTER_TAG, false);
-                String scriptPath = parseOptString(scriptElt, "path");
-                if (scriptPath != null) {
-                    contents.add(new Content(scriptPath));
-                } else if (adapter != null) {
-                    NodeList childs = adapter.getChildNodes();
-                    for (int i = 0; i < childs.getLength(); i++) {
-                        Node item = childs.item(i);
-                        if (item instanceof Element) {
-                            Element include = (Element) item;
-                            if (INCLUDE_TAG.equals(include.getTagName())) {
-                                contents.add(new Content(XMLTools.asString(include, true)));
-                            }
-                        } else if (item.getNodeType() == Node.TEXT_NODE) {
-                            contents.add(new Content(item.getNodeValue().trim(), false));
-                        }
-                    }
-                }
-                Content[] tmp = contents.toArray(new Content[contents.size()]);
-
-                //
-                Javascript script = new Javascript.Local(desc.id, contextPath, tmp, resourceBundle, 0, minify);
-                desc.modules.add(script);
+            if(scriptDev != null && PropertyManager.isDevelopping()) {
+                parseScript(element, desc, SCRIPT_DEV_TAG);
+            }
+            else {
+                parseScript(element, desc, SCRIPT_TAG);
             }
         }
         for (Element moduleElt : XMLTools.getChildren(element, "depends")) {

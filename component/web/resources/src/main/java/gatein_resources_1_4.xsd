@@ -146,6 +146,7 @@
           <xs:element name="load-group" type="xs:string" minOccurs="0" maxOccurs="1"/>
           <xs:element name="supported-locale" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
           <xs:element name="script" type="script" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="script-dev" type="script-dev" minOccurs="0" maxOccurs="1"/>
         </xs:sequence>
         <xs:sequence>
           <xs:element name="url" type="url" minOccurs="0" maxOccurs="1"/>
@@ -162,6 +163,7 @@
         <xs:sequence>
           <xs:element name="supported-locale" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
           <xs:element name="script" type="script" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="script-dev" type="script-dev" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:sequence>
           <xs:element name="url" type="url" minOccurs="0" maxOccurs="1"/>
@@ -184,6 +186,7 @@
                   <xs:element name="load-group" type="xs:string" minOccurs="0" maxOccurs="1"/>
                   <xs:element name="supported-locale" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
                   <xs:element name="script" type="script" minOccurs="0" maxOccurs="1"/>
+                  <xs:element name="script-dev" type="script-dev" minOccurs="0" maxOccurs="1"/>
                 </xs:sequence>
                 <xs:sequence>
                   <xs:element name="url" type="url" minOccurs="0" maxOccurs="1"/>
@@ -200,6 +203,7 @@
                 <xs:sequence>
                   <xs:element name="supported-locale" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
                   <xs:element name="script" type="script" minOccurs="0" maxOccurs="unbounded"/>
+                  <xs:element name="script-dev" type="script-dev" minOccurs="0" maxOccurs="unbounded"/>
                 </xs:sequence>
                 <xs:sequence>
                   <xs:element name="url" type="url" minOccurs="0" maxOccurs="1"/>
@@ -240,6 +244,17 @@
   </xs:complexType>
 
   <xs:complexType name="script">
+    <xs:sequence>
+      <xs:element name="minify" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
+      <xs:choice>
+        <xs:element name="path" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="adapter" type="adapter" minOccurs="1" maxOccurs="1"/>
+      </xs:choice>
+      <xs:element name="resource-bundle" type="xs:string" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="script-dev">
     <xs:sequence>
       <xs:element name="minify" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
       <xs:choice>
