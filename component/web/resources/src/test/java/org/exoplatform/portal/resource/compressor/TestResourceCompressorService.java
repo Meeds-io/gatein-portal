@@ -28,6 +28,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
+import com.google.javascript.jscomp.SourceFile;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.portal.resource.AbstractWebResourceTest;
@@ -38,7 +39,8 @@ import org.exoplatform.portal.resource.compressor.impl.ResourceCompressorService
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.JSSourceFile;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author <a href="trong.tran@exoplatform.com">Trong Tran</a>
@@ -133,12 +135,14 @@ public class TestResourceCompressorService extends AbstractWebResourceTest {
     private String closureCompress(File input) throws Exception {
         Compiler compiler = new Compiler();
         CompilerOptions options = new CompilerOptions();
+        options.setLanguageIn(CompilerOptions.LanguageMode.ECMASCRIPT_2016);
+        options.setLanguageOut(CompilerOptions.LanguageMode.ECMASCRIPT5);
         CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
-        JSSourceFile extern = JSSourceFile.fromCode("extern", "");
+        SourceFile extern = SourceFile.fromCode("extern", "");
 
-        JSSourceFile jsInput;
+        SourceFile jsInput;
         try {
-            jsInput = JSSourceFile.fromFile(input);
+            jsInput = SourceFile.fromReader(input.getName(), new FileReader(input));
         } catch (Exception ex) {
             throw new ResourceCompressorException(ex);
         }

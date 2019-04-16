@@ -24,6 +24,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.javascript.jscomp.*;
@@ -102,17 +103,20 @@ class ScriptLoader implements Loader<ScriptKey, ScriptResult, ControllerContext>
         CompilationLevel level = CompilationLevel.SIMPLE_OPTIMIZATIONS;
         CompilerOptions options = new CompilerOptions();
         options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
-        options.setLanguageIn(CompilerOptions.LanguageMode.ECMASCRIPT5);
+        options.setStrictModeInput(false);
+        options.setLanguageIn(CompilerOptions.LanguageMode.ECMASCRIPT_2017);
+        options.setLanguageOut(CompilerOptions.LanguageMode.ECMASCRIPT5);
+        options.setExternExports(true);
         level.setOptionsForCompilationLevel(options);
 
         StringWriter code = new StringWriter();
         IOTools.copy(reader, code);
-        JSSourceFile[] inputs = new JSSourceFile[] { JSSourceFile.fromCode(sourceName, code.toString()) };
+        SourceFile[] inputs = new SourceFile[] { SourceFile.fromCode(sourceName, code.toString()) };
 
         com.google.javascript.jscomp.Compiler compiler = new Compiler();
         compiler.setErrorManager(new LoggerErrorManager(java.util.logging.Logger.getLogger(ResourceRequestHandler.class
             .getName())));
-        Result res = compiler.compile(new JSSourceFile[0], inputs, options);
+        Result res = compiler.compile(AbstractCommandLineRunner.getBuiltinExterns(CompilerOptions.Environment.BROWSER), Arrays.asList(inputs), options);
         if (res.success) {
             minifiedReaders.add(new StringReader(compiler.toSource()));
             return null;

@@ -50,10 +50,8 @@
 	   */
 	  create : function() {
 	    var popup = document.createElement("div");
-	    with (popup.style) {
-	      position = "relative";
-	      display = "none";
-	    }
+	    popup.style.position = "relative";
+	    popup.style.display = "none";
 	    return popup;
 	  },
 	  /**

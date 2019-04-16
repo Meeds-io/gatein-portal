@@ -111,16 +111,19 @@ public class ClosureCompressorPlugin extends BaseResourceCompressorPlugin {
         //
         Compiler compiler = new Compiler();
         CompilerOptions options = new CompilerOptions();
+        options.setLanguageIn(CompilerOptions.LanguageMode.ECMASCRIPT_2017);
+        options.setStrictModeInput(false);
+        options.setLanguageOut(CompilerOptions.LanguageMode.ECMASCRIPT5);
         options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
         level.setOptionsForCompilationLevel(options);
         WarningLevel.QUIET.setOptionsForWarningLevel(options);
-        JSSourceFile extern = JSSourceFile.fromCode("extern", "");
+        SourceFile extern = SourceFile.fromCode("extern", "");
 
         //
-        JSSourceFile jsInput;
+        SourceFile jsInput;
         try {
-            String code = JSSourceFile.fromReader("code", input).getCode();
-            jsInput = JSSourceFile.fromCode("jsInput", code);
+            String code = SourceFile.fromReader("code", input).getCode();
+            jsInput = SourceFile.fromCode("jsInput", code);
             compiler.compile(extern, jsInput, options);
             output.write(compiler.toSource());
         } catch (Exception ex) {
