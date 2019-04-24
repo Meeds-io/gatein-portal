@@ -24,7 +24,6 @@
 package org.gatein.portal.encoder;
 
 import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
 import javax.crypto.SecretKey;
@@ -44,9 +43,6 @@ import org.exoplatform.management.jmx.annotations.Property;
 import org.exoplatform.management.rest.annotations.RESTEndpoint;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
-import org.gatein.common.util.Base64;
-import org.gatein.portal.installer.PBEUtils;
-import org.picketlink.idm.impl.store.ldap.SimpleLDAPIdentityStoreConfiguration;
 import org.picocontainer.Startable;
 
 /**
