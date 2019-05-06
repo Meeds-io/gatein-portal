@@ -50,7 +50,8 @@ public interface ModelDataStorage {
      * Saves a page. If a page with the same id already exists then a merge operation will occur, otherwise it throws
      * {@link IllegalStateException}
      *
-     * The operation returns a list of the change object that describes the changes that occured during the save operation.
+     * From PLF 5.3.x (RDBMS implementation) we drop support return the change list as it's not used any where.
+     * So the method always return the empty list.
      *
      * @param page the page to save
      * @return the list of model changes that occured during the save operation
