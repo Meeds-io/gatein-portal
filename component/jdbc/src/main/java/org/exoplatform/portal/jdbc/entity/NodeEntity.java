@@ -42,7 +42,7 @@ import org.exoplatform.services.listener.ListenerService;
 
 @Entity
 @ExoEntity
-@Table(name = "PORTAL_NODES")
+@Table(name = "PORTAL_NAVIGATION_NODES")
 public class NodeEntity implements Serializable {
 
   private static final long serialVersionUID = 8630708630711337929L;

@@ -77,10 +77,10 @@
   </changeSet>
   
   <changeSet author="portal" id="1.0.0-4">
-    <createTable tableName="PORTAL_NODES">
+    <createTable tableName="PORTAL_NAVIGATION_NODES">
       <column name="NODE_ID" type="VARCHAR(200)">
         <constraints nullable="false" primaryKey="true"
-          primaryKeyName="PK_PORTAL_NODES" />
+          primaryKeyName="PK_PORTAL_NAVIGATION_NODES" />
       </column>
       <column name="NAME" type="NVARCHAR(200)"/>
       <column name="LABEL" type="NVARCHAR(200)"/>
@@ -95,7 +95,7 @@
       </column>
       
       <column name="PARENT_ID" type="VARCHAR(200)">
-        <constraints foreignKeyName="FK_PORTAL_NODE_PARENT" references="PORTAL_NODES(NODE_ID)"/>
+        <constraints foreignKeyName="FK_PORTAL_NODE_PARENT" references="PORTAL_NAVIGATION_NODES(NODE_ID)"/>
       </column>
     </createTable>
     <modifySql dbms="mysql">
@@ -112,7 +112,7 @@
       <column name="SITE_ID" type="VARCHAR(200)"/>
       <column name="PRIORITY" type="INT"/>
       <column name="NODE_ID" type="VARCHAR(200)">
-        <constraints foreignKeyName="FK_PORTAL_NAV_NODE" references="PORTAL_NODES(NODE_ID)" nullable="false"/>
+        <constraints foreignKeyName="FK_PORTAL_NAV_NODE" references="PORTAL_NAVIGATION_NODES(NODE_ID)" nullable="false"/>
       </column>
     </createTable>
     <modifySql dbms="mysql">
