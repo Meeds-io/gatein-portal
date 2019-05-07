@@ -418,7 +418,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
   @Override
   public String[] getSiteInfo(String workspaceObjectId) throws Exception {
-    return delegate.getSiteInfo(workspaceObjectId);
+    return null;
   }
 
   @Override

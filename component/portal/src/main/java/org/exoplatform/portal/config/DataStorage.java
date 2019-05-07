@@ -212,12 +212,16 @@ public interface DataStorage {
     List<String> getAllGroupNames() throws Exception;
 
     /**
+     * This method is deprecated ad it's for the standalone feature but we will drop this feature in PLF 5.3.x (portal RDBMS)
+     * so this method will always return NULL from PLF 5.3.x
+     *
      * Returns a String array that contains two elements. The first one is the site type and the second one is site name. <br>
      *
      * @param applicationStorageId
      * @return
      * @throws Exception
      */
+    @Deprecated
     String[] getSiteInfo(String applicationStorageId) throws Exception;
 
     <S> Application<S> getApplicationModel(String applicationStorageId) throws Exception;

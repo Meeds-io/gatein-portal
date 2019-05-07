@@ -73,6 +73,14 @@ public interface ModelDataStorage {
 
     void save() throws Exception;
 
+    /**
+     * This method is deprecated as it is for standalone mode but we drop support this feature in PLF 5.3.x (portal RDBMS)
+     * So this method will be dropped too. It will always return NULL
+     * @param workspaceObjectId
+     * @return
+     * @throws Exception
+     */
+    @Deprecated
     String[] getSiteInfo(String workspaceObjectId) throws Exception;
 
     <S> ApplicationData<S> getApplicationData(String applicationStorageId);
