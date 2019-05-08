@@ -21,20 +21,12 @@ package org.exoplatform.portal.mop.navigation;
 
 import java.util.List;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
-
 import org.exoplatform.portal.mop.EventType;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.navigation.NavigationContext;
-import org.exoplatform.portal.mop.navigation.NavigationService;
-import org.exoplatform.portal.mop.navigation.NavigationServiceException;
-import org.exoplatform.portal.mop.navigation.NodeChangeListener;
-import org.exoplatform.portal.mop.navigation.NodeContext;
-import org.exoplatform.portal.mop.navigation.NodeModel;
-import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.services.listener.ListenerService;
+import org.gatein.common.logging.Logger;
+import org.gatein.common.logging.LoggerFactory;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -42,14 +34,14 @@ import org.exoplatform.services.listener.ListenerService;
  */
 public class JDBCNavigationServiceWrapper implements NavigationService {
 
-  private static final Logger         log = LoggerFactory.getLogger(JDBCNavigationServiceWrapper.class);
+  private static final Logger log = LoggerFactory.getLogger(JDBCNavigationServiceWrapper.class);
 
   private final JDBCNavigationServiceImpl service;
 
-  private final ListenerService       listenerService;
+  private final ListenerService listenerService;
 
   public JDBCNavigationServiceWrapper(NavigationStore store,
-                                  ListenerService listenerService) {
+                                      ListenerService listenerService) {
     this.service = new JDBCNavigationServiceImpl(store);
     this.listenerService = listenerService;
   }
@@ -64,7 +56,7 @@ public class JDBCNavigationServiceWrapper implements NavigationService {
   }
 
   public void saveNavigation(NavigationContext navigation) throws NullPointerException, NavigationServiceException {
-    boolean created = service.loadNavigation(navigation.key) == null; 
+    boolean created = service.loadNavigation(navigation.key) == null;
     service.saveNavigation(navigation);
 
     //
@@ -76,6 +68,7 @@ public class JDBCNavigationServiceWrapper implements NavigationService {
   }
 
   public boolean destroyNavigation(NavigationContext navigation) throws NullPointerException, NavigationServiceException {
+    notify(EventType.NAVIGATION_DESTROY, navigation.getKey());
     boolean destroyed = service.destroyNavigation(navigation);
 
     //
@@ -88,30 +81,29 @@ public class JDBCNavigationServiceWrapper implements NavigationService {
   }
 
   public <N> NodeContext<N> loadNode(NodeModel<N> model,
-                                                NavigationContext navigation,
-                                                Scope scope,
-                                                NodeChangeListener<NodeContext<N>> listener) {
-    return service.loadNode(model, navigation, scope, listener);
+                                     NavigationContext navigation,
+                                     Scope scope,
+                                     NodeChangeListener<NodeContext<N>> listener) {
+    return service.loadNode(model, navigation, scope, new NodeChangeNotifier<>(listener, this, listenerService));
   }
 
   public <N> void saveNode(NodeContext<N> context,
                            NodeChangeListener<NodeContext<N>> listener) throws NavigationServiceException {
-    service.saveNode(context, listener);
-//    notify(EventType.NAVIGATION_UPDATED, siteKey);
+    service.saveNode(context, new NodeChangeNotifier<>(listener, this, listenerService));
   }
 
   public <N> void updateNode(NodeContext<N> context,
                              Scope scope,
                              NodeChangeListener<NodeContext<N>> listener) throws NullPointerException,
-                                                                                                NavigationServiceException {
-    service.updateNode(context, scope, listener);
+          NavigationServiceException {
+    service.updateNode(context, scope, new NodeChangeNotifier<>(listener, this, listenerService));
   }
 
   public <N> void rebaseNode(NodeContext<N> context,
                              Scope scope,
                              NodeChangeListener<NodeContext<N>> listener) throws NullPointerException,
-                                                                                                NavigationServiceException {
-    service.rebaseNode(context, scope, listener);
+          NavigationServiceException {
+    service.rebaseNode(context, scope, new NodeChangeNotifier<>(listener, this, listenerService));
   }
 
   private void notify(String name, SiteKey key) {
@@ -119,6 +111,87 @@ public class JDBCNavigationServiceWrapper implements NavigationService {
       listenerService.broadcast(name, this, key);
     } catch (Exception e) {
       log.error("Error when delivering notification " + name + " for navigation " + key, e);
+    }
+  }
+
+  public static class NodeChangeNotifier<N> implements NodeChangeListener<NodeContext<N>> {
+
+    private NodeChangeListener<NodeContext<N>> listener;
+
+    private ListenerService listenerService;
+
+    private NavigationService navigationService;
+
+    public NodeChangeNotifier(NodeChangeListener<NodeContext<N>> listener, NavigationService navigationService, ListenerService listenerService) {
+      this.listener = listener;
+      this.listenerService = listenerService;
+      this.navigationService = navigationService;
+    }
+
+    @Override
+    public void onAdd(NodeContext<N> target, NodeContext<N> parent, NodeContext<N> previous) {
+      notifyNodeChange(EventType.NAVIGATION_NODE_ADD, target);
+      if (listener != null) {
+        listener.onAdd(target, parent, previous);
+      }
+    }
+
+    @Override
+    public void onCreate(NodeContext<N> target, NodeContext<N> parent, NodeContext<N> previous, String name) {
+      notifyNodeChange(EventType.NAVIGATION_NODE_CREATE, target);
+      if (listener != null) {
+        listener.onCreate(target, parent, previous, name);
+      }
+    }
+
+    @Override
+    public void onRemove(NodeContext<N> target, NodeContext<N> parent) {
+      notifyNodeChange(EventType.NAVIGATION_NODE_REMOVE, target);
+      if (listener != null) {
+        listener.onRemove(target, parent);
+      }
+    }
+
+    @Override
+    public void onDestroy(NodeContext<N> target, NodeContext<N> parent) {
+      notifyNodeChange(EventType.NAVIGATION_NODE_DESTROY, target);
+      if (listener != null) {
+        listener.onDestroy(target, parent);
+      }
+    }
+
+    @Override
+    public void onRename(NodeContext<N> target, NodeContext<N> parent, String name) {
+      notifyNodeChange(EventType.NAVIGATION_NODE_RENAME, target);
+      if (listener != null) {
+        listener.onRename(target, parent, name);
+      }
+    }
+
+    @Override
+    public void onUpdate(NodeContext<N> target, NodeState state) {
+      notifyNodeChange(EventType.NAVIGATION_NODE_UPDATE, target);
+      if (listener != null) {
+        listener.onUpdate(target, state);
+      }
+    }
+
+    @Override
+    public void onMove(NodeContext<N> target, NodeContext<N> from, NodeContext<N> to, NodeContext<N> previous) {
+      notifyNodeChange(EventType.NAVIGATION_NODE_MOVE, target);
+      if (listener != null) {
+        listener.onMove(target, from, to, previous);
+      }
+    }
+
+    private void notifyNodeChange(String eventName, NodeContext<N> target) {
+      try {
+        log.debug("Broadcasting change type " + eventName + " notification for node " + target.getId()
+                + " name " + target.getName());
+        listenerService.broadcast(eventName, navigationService, target);
+      } catch (Exception e) {
+        log.error("Error when delivering notification " + eventName + " for node " + target.getId(), e);
+      }
     }
   }
 }

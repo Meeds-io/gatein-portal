@@ -33,11 +33,27 @@ public final class EventType {
     /** . */
     public static final String NAVIGATION_CREATED = "org.exoplatform.portal.mop.navigation.navigation_created";
 
+    public static final String NAVIGATION_DESTROY = "org.exoplatform.portal.mop.navigation.navigation_destroy";
+
     /** . */
     public static final String NAVIGATION_DESTROYED = "org.exoplatform.portal.mop.navigation.navigation_destroyed";
 
     /** . */
     public static final String NAVIGATION_UPDATED = "org.exoplatform.portal.mop.navigation.navigation_updated";
+
+    public static final String NAVIGATION_NODE_ADD = "org.exoplatform.portal.mop.navigation.node_add";
+
+    public static final String NAVIGATION_NODE_CREATE = "org.exoplatform.portal.mop.navigation.node_create";
+
+    public static final String NAVIGATION_NODE_REMOVE = "org.exoplatform.portal.mop.navigation.node_remove";
+
+    public static final String NAVIGATION_NODE_DESTROY = "org.exoplatform.portal.mop.navigation.node_destroy";
+
+    public static final String NAVIGATION_NODE_RENAME = "org.exoplatform.portal.mop.navigation.node_rename";
+
+    public static final String NAVIGATION_NODE_UPDATE = "org.exoplatform.portal.mop.navigation.node_update";
+
+    public static final String NAVIGATION_NODE_MOVE = "org.exoplatform.portal.mop.navigation.node_move";
 
     /** . */
     public static final String PAGE_CREATED = "org.exoplatform.portal.mop.page.page_created";
