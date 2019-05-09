@@ -76,6 +76,10 @@ public class NavigationData implements Serializable {
         }
     }
 
+    public String getRootId() {
+        return rootId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

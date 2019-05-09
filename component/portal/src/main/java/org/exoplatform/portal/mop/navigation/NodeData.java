@@ -41,7 +41,7 @@ import org.gatein.mop.api.workspace.link.PageLink;
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
-class NodeData implements Serializable {
+public class NodeData implements Serializable {
 
     /** . */
     final String parentId;
