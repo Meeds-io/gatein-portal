@@ -211,6 +211,10 @@ public class NodeData implements Serializable {
         return state;
     }
 
+    public String getParentId() {
+        return this.parentId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
