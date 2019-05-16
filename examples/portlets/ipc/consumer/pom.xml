@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.exoplatform.gatein.portal.examples.portlets</groupId>
     <artifactId>ipc</artifactId>
-    <version>5.2.1</version>
+    <version>5.2.x-acc222-SNAPSHOT</version>
   </parent>
 
   <artifactId>consumer</artifactId>
