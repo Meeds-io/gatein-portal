@@ -18,20 +18,18 @@
  */
 package org.exoplatform.portal.jdbc.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.commons.utils.IOUtil;
+import org.exoplatform.container.configuration.ConfigurationManager;
+import org.exoplatform.portal.config.model.*;
 import org.gatein.common.io.IOTools;
+import org.jibx.runtime.BindingDirectory;
+import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.impl.UnmarshallingContext;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -43,12 +41,6 @@ import org.exoplatform.portal.application.PortletPreferences;
 import org.exoplatform.portal.config.NoSuchDataException;
 import org.exoplatform.portal.config.Query;
 import org.exoplatform.portal.config.UserACL;
-import org.exoplatform.portal.config.model.ApplicationState;
-import org.exoplatform.portal.config.model.ApplicationType;
-import org.exoplatform.portal.config.model.CloneApplicationState;
-import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.config.model.PersistentApplicationState;
-import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.jdbc.dao.ContainerDAO;
 import org.exoplatform.portal.jdbc.dao.PageDAO;
 import org.exoplatform.portal.jdbc.dao.PermissionDAO;
@@ -105,7 +97,8 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
   private SettingDAO          settingDAO;
 
-  private POMDataStorage      delegate;
+  /** . */
+  private ConfigurationManager confManager;
 
   private static Log          log             = ExoLogger.getExoLogger(JDBCModelStorageImpl.class);
 
@@ -115,6 +108,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
                               ContainerDAO containerDAO,
                               PermissionDAO permissionDAO,
                               SettingDAO settingDAO,
+                              ConfigurationManager confManager,
                               POMDataStorage delegate) {
     this.siteDAO = siteDAO;
     this.pageDAO = pageDAO;
@@ -122,7 +116,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     this.containerDAO = containerDAO;
     this.permissionDAO = permissionDAO;
     this.settingDAO = settingDAO;
-    this.delegate = delegate;
+    this.confManager = confManager;
   }
 
   @Override
@@ -233,7 +227,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     if (window != null) {
       return window.getContentId();
     } else {
-      return delegate.getId(state);
+      return null;
     }
 
   }
@@ -261,7 +255,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
         return null;
       }
     } else {
-      return delegate.load(state, type);
+      return null;
     }
   }
 
@@ -285,9 +279,8 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
         window.setCustomization(null);
       }
       windowDAO.update(window);
-    } else {
-      delegate.save(state, preferences);
     }
+
     return state;
   }
 
@@ -354,7 +347,15 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
   @Override
   public Container getSharedLayout() throws Exception {
-    return delegate.getSharedLayout();
+    String path = "war:/conf/portal/portal/sharedlayout.xml";
+    String out = IOUtil.getStreamContentAsString(this.confManager.getInputStream(path));
+    ByteArrayInputStream is = new ByteArrayInputStream(out.getBytes("UTF-8"));
+    IBindingFactory bfact = BindingDirectory.getFactory(Container.class);
+    UnmarshallingContext uctx = (UnmarshallingContext) bfact.createUnmarshallingContext();
+    uctx.setDocument(is, null, "UTF-8", false);
+    Container container = (Container) uctx.unmarshalElement();
+    generateStorageName(container);
+    return container;
   }
 
   @Override
@@ -413,7 +414,6 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
   @Override
   public void save() throws Exception {
-    delegate.save();
   }
 
   @Override
@@ -1134,6 +1134,21 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       } else {
         throw new IllegalArgumentException("Can't delete child with type: " + t);
       }
+    }
+  }
+
+  /**
+   * This is a hack and should be removed, it is only used temporarily. This is because the objects are loaded from files and
+   * don't have name.
+   * (this is clone from POMDataStorage)
+   */
+  private void generateStorageName(ModelObject obj) {
+    if (obj instanceof Container) {
+      for (ModelObject child : ((Container) obj).getChildren()) {
+        generateStorageName(child);
+      }
+    } else if (obj instanceof Application) {
+      obj.setStorageName(UUID.randomUUID().toString());
     }
   }
 
