@@ -3,6 +3,8 @@ package org.exoplatform.portal.jdbc.migration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.exoplatform.commons.api.event.EventManager;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
@@ -13,8 +15,11 @@ import org.exoplatform.management.annotations.Managed;
 import org.exoplatform.management.annotations.ManagedDescription;
 import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
+import org.exoplatform.portal.mop.Described;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.description.DescriptionService;
+import org.exoplatform.portal.mop.description.DescriptionServiceImpl;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationService;
 import org.exoplatform.portal.mop.navigation.NavigationServiceImpl;
@@ -32,12 +37,17 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
 
   private NavigationService       navService;
 
+  private DescriptionService      descriptionService;
+
+  private DescriptionServiceImpl  jcrDescriptionService;
+
   private NavigationServiceImpl   jcrNavService;
 
   private List<NavigationContext> navigations;
 
   public NavigationMigrationService(InitParams initParams,
                                     NavigationService navService,
+                                    DescriptionService descriptionService,
                                     POMSessionManager manager,
                                     EventManager<NavigationContext, String> eventManager,
                                     EntityManagerService entityManagerService) {
@@ -47,6 +57,9 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
 
     SimpleDataCache cache = new SimpleDataCache();
     this.jcrNavService = new NavigationServiceImpl(manager, cache);
+
+    this.descriptionService = descriptionService;
+    this.jcrDescriptionService = new DescriptionServiceImpl(manager);
 
     this.LIMIT_THRESHOLD = getInteger(initParams, LIMIT_THRESHOLD_KEY, 1);
   }
@@ -88,6 +101,7 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
             for (int i = 0; i < jcrRoot.getNodeCount(); i++) {
               NodeContext child = jcrRoot.get(i);
               root.add(null, child);
+              migrateDescription(child);
             }
             navService.saveNode(root, null);
 
@@ -120,6 +134,15 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
       RequestLifeCycle.begin(PortalContainer.getInstance());
       LOG.info(String.format("| / END::nav migration for (%s) nav(s) consumed %s(ms)", offset, System.currentTimeMillis() - t));
     }
+  }
+
+  private void migrateDescription(NodeContext<?> nodeContext) {
+    for (int i = 0; i < nodeContext.getNodeCount(); i++) {
+      NodeContext child = nodeContext.get(i);
+      migrateDescription(child);
+    }
+    Map<Locale, Described.State> descriptions = jcrDescriptionService.getDescriptions(nodeContext.getId());
+    descriptionService.setDescriptions(nodeContext.getId(), descriptions);
   }
 
   private List<NavigationContext> getNavigations() {
