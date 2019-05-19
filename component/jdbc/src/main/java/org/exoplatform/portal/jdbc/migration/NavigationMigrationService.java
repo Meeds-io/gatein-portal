@@ -24,6 +24,7 @@ import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationService;
 import org.exoplatform.portal.mop.navigation.NavigationServiceImpl;
 import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.portal.mop.navigation.NodeModel;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.navigation.SimpleDataCache;
@@ -85,25 +86,23 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
         if (forkStop) {
           break;
         }
-        NavigationContext nav = navItr.next();
+        NavigationContext jcrNav = navItr.next();
 
-        LOG.info(String.format("|  \\ START::nav number: %s (%s nav)", offset, nav.getKey()));
+        LOG.info(String.format("|  \\ START::nav number: %s (%s nav)", offset, jcrNav.getKey()));
         long t1 = System.currentTimeMillis();
 
         try {
-          SiteKey key = nav.getKey();
+          SiteKey key = jcrNav.getKey();
           NavigationContext created = navService.loadNavigation(key);
           if (created == null) {
+            NavigationContext nav = new NavigationContext(key, jcrNav.getState());
             navService.saveNavigation(nav);
 
             NodeContext<?> root = navService.loadNode(NodeModel.SELF_MODEL, nav, Scope.ALL, null);
-            NodeContext<?> jcrRoot = jcrNavService.loadNode(NodeModel.SELF_MODEL, nav, Scope.ALL, null);
-            for (int i = 0; i < jcrRoot.getNodeCount(); i++) {
-              NodeContext child = jcrRoot.get(i);
-              root.add(null, child);
-              migrateDescription(child);
-            }
+            NodeContext<?> jcrRoot = jcrNavService.loadNode(NodeModel.SELF_MODEL, jcrNav, Scope.ALL, null);
+            migrateNode(root, jcrRoot);
             navService.saveNode(root, null);
+            migrateDescription(root, jcrRoot);
 
             created = navService.loadNavigation(key);
           } else {
@@ -121,10 +120,10 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
           broadcastListener(created, created.getKey().toString());
           LOG.info(String.format("|  / END::nav number %s (%s nav) consumed %s(ms)",
                                  offset - 1,
-                                 nav.getKey(),
+                                 jcrNav.getKey(),
                                  System.currentTimeMillis() - t1));
         } catch (Exception ex) {
-          LOG.error("exception during migration nav: " + nav.getKey(), ex);
+          LOG.error("exception during migration nav: " + jcrNav.getKey(), ex);
         }
       }
 
@@ -136,13 +135,24 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
     }
   }
 
-  private void migrateDescription(NodeContext<?> nodeContext) {
-    for (int i = 0; i < nodeContext.getNodeCount(); i++) {
-      NodeContext child = nodeContext.get(i);
-      migrateDescription(child);
+  private void migrateNode(NodeContext<?> parent, NodeContext<?> jcrParent) {
+    for (int i = 0; i < jcrParent.getNodeCount(); i++) {
+      NodeContext jcrChild = jcrParent.get(i);
+      NodeContext child = parent.add(null, jcrChild.getName());
+      child.setState(jcrChild.getState());
+      child.setHidden(jcrChild.isHidden());
+      migrateNode(child, jcrChild);
     }
-    Map<Locale, Described.State> descriptions = jcrDescriptionService.getDescriptions(nodeContext.getId());
-    descriptionService.setDescriptions(nodeContext.getId(), descriptions);
+  }
+
+  private void migrateDescription(NodeContext<?> parent, NodeContext<?> jcrParent) {
+    for (int i = 0; i < jcrParent.getNodeCount(); i++) {
+      NodeContext jcrChild = jcrParent.get(i);
+      NodeContext child = parent.get(i);
+      migrateDescription(child, jcrChild);
+    }
+    Map<Locale, Described.State> descriptions = jcrDescriptionService.getDescriptions(jcrParent.getId());
+    descriptionService.setDescriptions(parent.getId(), descriptions);
   }
 
   private List<NavigationContext> getNavigations() {
@@ -180,10 +190,11 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
         offset++;
 
         try {
+          SiteKey key = nav.getKey();
           jcrNavService.destroyNavigation(nav);
 
           LOG.info(String.format("|  / END::cleanup (%s nav) consumed time %s(ms)",
-                                 nav.getKey(),
+                                 key,
                                  System.currentTimeMillis() - timePernav));
 
           timePernav = System.currentTimeMillis();

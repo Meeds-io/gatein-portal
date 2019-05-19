@@ -70,7 +70,7 @@ public class JDBCNavigationServiceImpl implements NavigationService {
         //
         try {
             // Save
-            store.saveNavigation(navigation.key, navigation.state);
+            store.saveNavigation(navigation.key, navigation.getState());
 
             // Update state
             navigation.data = store.loadNavigationData(navigation.key);

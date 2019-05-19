@@ -227,6 +227,16 @@
   </component>
 
   <component>
+    <key>org.exoplatform.portal.jdbc.migration.NavigationMigrationService</key>
+    <type>org.exoplatform.portal.jdbc.migration.NavigationMigrationService</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.jdbc.migration.SiteMigrationService</key>
+    <type>org.exoplatform.portal.jdbc.migration.SiteMigrationService</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.portal.config.UserACL</key>
     <type>org.exoplatform.portal.config.UserACL</type>
     <init-params>

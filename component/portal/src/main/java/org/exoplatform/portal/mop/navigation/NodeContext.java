@@ -463,7 +463,7 @@ public final class NodeContext<N> extends ListTree<NodeContext<N>> {
             tree.addChange(new NodeChange.Moved<NodeContext<N>>(previousParent, this, previous, child));
         } else {
             // The name should never be null as it's a newly created node
-            tree.addChange(new NodeChange.Created<NodeContext<N>>(this, previous, child, child.name));
+            tree.addChange(new NodeChange.Created<NodeContext<N>>(this, previous, child, child.getName()));
         }
     }
 
