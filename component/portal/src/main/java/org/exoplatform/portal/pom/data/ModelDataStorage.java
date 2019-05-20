@@ -28,6 +28,7 @@ import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.mop.importer.Imported.Status;
+import org.jgroups.annotations.Unsupported;
 
 /**
  * Created by The eXo Platform SAS Apr 19, 2007
@@ -90,8 +91,9 @@ public interface ModelDataStorage {
      *
      * temporarily put here
      ***************************************************************/
+    @Deprecated
     <A> A adapt(ModelData modelData, Class<A> type);
-
+    @Deprecated
     <A> A adapt(ModelData modelData, Class<A> type, boolean create);
 
     Status getImportStatus();

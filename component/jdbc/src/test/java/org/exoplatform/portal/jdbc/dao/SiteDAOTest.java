@@ -38,6 +38,8 @@ public class SiteDAOTest extends AbstractKernelTest {
     SiteEntity result = siteDAO.find(siteEntity.getId());
     assertNotNull(result);
     assertSite(siteEntity, result);
+
+    siteDAO.delete(siteEntity);
   }
   
   public void testFind() {
@@ -51,10 +53,12 @@ public class SiteDAOTest extends AbstractKernelTest {
     assertSite(siteEntity, result);
     
     List<SiteEntity> results = siteDAO.findByType(siteEntity.getSiteType());
-    assertEquals(4, results.size());
+    assertEquals(1, results.size());
     
     List<SiteKey> keys = siteDAO.findSiteKey(siteEntity.getSiteType());
-    assertEquals(4, keys.size());
+    assertEquals(1, keys.size());
+
+    siteDAO.delete(siteEntity);
   }
 
   private void assertSite(SiteEntity expected, SiteEntity siteEntity) {

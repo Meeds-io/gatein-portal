@@ -6,7 +6,6 @@ import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.TestDataStorage;
 import org.exoplatform.portal.config.model.Application;
@@ -20,10 +19,13 @@ import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.portal.pom.data.ModelChange;
 import org.exoplatform.portal.pom.spi.gadget.Gadget;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
-import org.exoplatform.services.organization.Group;
-import org.exoplatform.services.organization.GroupHandler;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 @ConfiguredBy({
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.test.jcr-configuration.xml"),
@@ -76,8 +78,27 @@ public class TestModelStorage extends TestDataStorage {
     }
   }
 
-  public void testWindowMove1() {
+  public void testWindowMove1() throws Exception {
+    Page page = storage_.getPage("portal::test::test4");
+    Application<?> a1 = (Application<?>) page.getChildren().get(0);
+    Container a2 = (Container) page.getChildren().get(1);
+    Application<?> a3 = (Application<?>) a2.getChildren().get(0);
+    Application<?> a4 = (Application<?>) a2.getChildren().remove(1);
+    page.getChildren().add(1, a4);
+    List<ModelChange> changes = storage_.save(page);
 
+    //
+    page = storage_.getPage("portal::test::test4");
+    assertEquals(3, page.getChildren().size());
+    Application<?> c1 = (Application<?>) page.getChildren().get(0);
+    assertEquals(a1.getStorageId(), c1.getStorageId());
+    Application<?> c2 = (Application<?>) page.getChildren().get(1);
+    assertEquals(a4.getStorageId(), c2.getStorageId());
+    Container c3 = (Container) page.getChildren().get(2);
+    assertEquals(a2.getStorageId(), c3.getStorageId());
+    assertEquals(1, c3.getChildren().size());
+    Application<?> c4 = (Application<?>) c3.getChildren().get(0);
+    assertEquals(a3.getStorageId(), c4.getStorageId());
   }
 
   public void testPageMerge() throws Exception {
@@ -140,28 +161,60 @@ public class TestModelStorage extends TestDataStorage {
     assertEquals(app3Id, container.getChildren().get(1).getStorageId());
   }
 
+  /**
+   * As we drop support API to access/modify MOP mixin, so these test isn't need.
+   * @throws Exception
+   */
   public void testAccessMixin() throws Exception {
-
   }
-
   public void testModifyMixin() throws Exception {
-
-  }
-
-  public void testJTA() throws Exception {
-
-  }
-
-  public void testNullPageReferenceDeletes() throws Exception {
-
-  }
-
-  public void testGetAllGroupNames() throws Exception {
-
   }
 
   public void testGetAllPortalNames() throws Exception {
-    
+    testGetAllSiteNames("portal", "getAllPortalNames");
+  }
+
+  public void testGetAllGroupNames() throws Exception {
+    testGetAllSiteNames("group", "getAllGroupNames");
+  }
+
+  private void testGetAllSiteNames(String siteType, final String methodName) throws Exception {
+    final List<String> names = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
+
+    // Create new portal
+    storage_.create(new PortalConfig(siteType, "testGetAllSiteNames"));
+
+    // Test during tx we see the good names
+    List<String> transientNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
+    assertTrue("Was expecting " + transientNames + " to contain " + names, transientNames.containsAll(names));
+    transientNames.removeAll(names);
+    assertEquals(Collections.singletonList("testGetAllSiteNames"), transientNames);
+
+    // Now commit tx
+    end(true);
+
+    // We test we observe the change
+    begin();
+    List<String> afterNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
+    assertTrue(afterNames.containsAll(names));
+    afterNames.removeAll(names);
+    assertEquals(Collections.singletonList("testGetAllSiteNames"), afterNames);
+
+    // Then we remove the newly created portal
+    storage_.remove(new PortalConfig(siteType, "testGetAllSiteNames"));
+
+    // Test we are syeing the transient change
+    transientNames.clear();
+    transientNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
+    assertEquals(names, transientNames);
+
+    //
+    end(true);
+
+    // Now test it is still removed
+    begin();
+    afterNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
+    assertEquals(new HashSet<String>(names), new HashSet<String>(afterNames));
   }
 
   public void testGettingGadgetInDashboard() throws Exception {
@@ -220,15 +273,6 @@ public class TestModelStorage extends TestDataStorage {
                   pConfig.getPortalLayout());
     assertTrue(pConfig.getPortalLayout().getChildren() != null
         && pConfig.getPortalLayout().getChildren().size() == 0);
-  }
-
-  public void testGroupLayout() throws Exception {
-  }
-  
-  public void testUserLayout() throws Exception {
-  }
-  
-  public void testGroupNavigation() throws Exception {    
   }
   
   // We need to investigate why when the pref is null we need to replace it with

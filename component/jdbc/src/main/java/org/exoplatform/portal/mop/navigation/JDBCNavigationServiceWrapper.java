@@ -73,7 +73,7 @@ public class JDBCNavigationServiceWrapper implements NavigationService {
 
     //
     if (destroyed) {
-      notify(EventType.NAVIGATION_DESTROYED, navigation.getKey());
+      notify(EventType.NAVIGATION_DESTROYED, navigation.key);
     }
 
     //

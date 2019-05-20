@@ -301,6 +301,8 @@ public class NavigationStoreImpl implements NavigationStore {
       if (page != null) {
         entity.setPageRef(page.getId());
       }
+    } else {
+      entity.setPageRef(null);
     }
     entity.setStartTime(state.getStartPublicationTime());
     entity.setVisibility(state.getVisibility());

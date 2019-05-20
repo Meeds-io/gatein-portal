@@ -230,8 +230,10 @@ public interface DataStorage {
      * Public API to access/modify MOP mixin, temporarily put here
      **************************************************************/
 
+    @Deprecated
     <A> A adapt(ModelObject modelObject, Class<A> type);
 
+    @Deprecated
     <A> A adapt(ModelObject modelObject, Class<A> type, boolean create);
 
     Status getImportStatus();
