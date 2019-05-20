@@ -875,29 +875,6 @@ public class TestDataStorage extends AbstractConfigTest {
         assertNotNull("the User's PortalConfig is not null", pConfig);
     }
 
-    public void testWSRP() throws Exception {
-        WSRP wsrp = new WSRP();
-        String id = "portlet id";
-        wsrp.setPortletId(id);
-        TransientApplicationState<WSRP> state = new TransientApplicationState<WSRP>("test", wsrp);
-        Application<WSRP> wsrpApplication = Application.createWSRPApplication();
-        wsrpApplication.setState(state);
-
-        Page container = new Page();
-        String pageId = "portal::test::wsrp_page";
-        container.setPageId(pageId);
-        container.getChildren().add(wsrpApplication);
-        pageService.savePage(new PageContext(container.getPageKey(), null));
-        storage_.save(container);
-
-        container = storage_.getPage(pageId);
-        wsrpApplication = (Application<WSRP>) container.getChildren().get(0);
-
-        wsrp = storage_.load(wsrpApplication.getState(), ApplicationType.WSRP_PORTLET);
-        assertNotNull(wsrp);
-        assertEquals(id, wsrp.getPortletId());
-    }
-
     public void testJTA() throws Exception {
         jtaUserTransactionLifecycleService.beginJTATransaction();
 

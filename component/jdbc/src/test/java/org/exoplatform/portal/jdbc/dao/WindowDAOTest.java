@@ -41,7 +41,7 @@ public class WindowDAOTest extends AbstractKernelTest {
   }
   
   public void testCreateContainer() {
-    WindowEntity entity = createInstance("content1", AppType.WSRP);
+    WindowEntity entity = createInstance("content1", AppType.PORTLET);
     windowDAO.create(entity);
     end();
     begin();

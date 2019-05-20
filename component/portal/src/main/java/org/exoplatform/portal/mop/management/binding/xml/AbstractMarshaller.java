@@ -76,7 +76,8 @@ public abstract class AbstractMarshaller<T> implements Marshaller<T> {
             if (ApplicationType.PORTLET == type) {
                 marshalPortletApplication(writer, safeCast(application, Portlet.class));
             } else if (ApplicationType.WSRP_PORTLET == type) {
-                marshalWsrpApplication(writer, safeCast(application, WSRP.class));
+                throw new UnsupportedOperationException("We dont support WSRP any more");
+//                marshalWsrpApplication(writer, safeCast(application, WSRP.class));
             }
         } else if (modelObject instanceof Page) {
             // marshalPageData(writer, (PageData) componentData);
@@ -272,11 +273,7 @@ public abstract class AbstractMarshaller<T> implements Marshaller<T> {
                 application = portlet;
                 break;
             case WSRP:
-                ApplicationState<WSRP> wsrpState = unmarshalWsrpApplicationState(navigator.fork());
-                Application<WSRP> wsrp = new Application<WSRP>(ApplicationType.WSRP_PORTLET);
-                wsrp.setState(wsrpState);
-                application = wsrp;
-                break;
+                throw new UnsupportedOperationException("We dont support wsrp portlet any more");
             case UNKNOWN:
                 throw unexpectedElement(navigator);
             default:
@@ -341,48 +338,6 @@ public abstract class AbstractMarshaller<T> implements Marshaller<T> {
         }
 
         return state;
-    }
-
-    protected void marshalWsrpApplication(StaxWriter<Element> writer, Application<WSRP> wsrpApplication)
-            throws XMLStreamException {
-        writer.writeStartElement(Element.PORTLET_APPLICATION);
-
-        // Marshal application state
-        String contentId;
-        ApplicationState<WSRP> state = wsrpApplication.getState();
-        if (state instanceof TransientApplicationState) {
-            TransientApplicationState<WSRP> tas = (TransientApplicationState<WSRP>) state;
-            contentId = tas.getContentId();
-        } else {
-            // The only way to retrieve the information if the state is not transient is if we're within the portal context
-            ExoContainer container = ExoContainerContext.getCurrentContainer();
-            if (container instanceof PortalContainer) {
-                DataStorage dataStorage = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
-                try {
-                    contentId = dataStorage.getId(state);
-                } catch (Exception e) {
-                    throw new XMLStreamException("Could not obtain contentId.", e);
-                }
-            } else {
-                throw new XMLStreamException("Cannot marshal application state " + state
-                        + " outside the context of the portal.");
-            }
-        }
-
-        writer.writeElement(Element.WSRP, contentId);
-
-        marshalApplication(writer, wsrpApplication);
-
-        writer.writeEndElement(); // end portlet-application
-    }
-
-    private ApplicationState<WSRP> unmarshalWsrpApplicationState(StaxNavigator<Element> navigator) throws XMLStreamException {
-        String portletId = getRequiredContent(navigator, true);
-        if (navigator.next() != null) {
-            throw unexpectedElement(navigator);
-        }
-
-        return new TransientApplicationState<WSRP>(portletId, null);
     }
 
     protected void marshalApplication(StaxWriter<Element> writer, Application<?> application) throws XMLStreamException {

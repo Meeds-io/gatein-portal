@@ -275,6 +275,9 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
 
     //
     portlet: for (org.gatein.pc.api.Portlet portlet : portlets) {
+      if (portlet.isRemote()) {
+        continue;
+      }
       PortletInfo info = portlet.getInfo();
       String portletApplicationName = info.getApplicationName();
       String portletName = portlet.getContext().getId();

@@ -190,6 +190,6 @@ public class WindowEntity extends ComponentEntity implements Serializable {
   }
 
   public static enum AppType {
-    PORTLET, GADGET, WSRP
+    PORTLET, GADGET
   }
 }

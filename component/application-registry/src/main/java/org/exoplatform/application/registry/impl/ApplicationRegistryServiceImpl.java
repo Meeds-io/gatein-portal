@@ -381,6 +381,10 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
 
         //
         portlet: for (org.gatein.pc.api.Portlet portlet : portlets) {
+            if (portlet.isRemote()) {
+                //we dont support WSRP portlet any more
+                continue;
+            }
             PortletInfo info = portlet.getInfo();
             String portletApplicationName = info.getApplicationName();
             String portletName = info.getName();

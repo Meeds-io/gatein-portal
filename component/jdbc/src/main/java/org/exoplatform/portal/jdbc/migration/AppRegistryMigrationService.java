@@ -16,6 +16,7 @@ import org.exoplatform.management.annotations.Managed;
 import org.exoplatform.management.annotations.ManagedDescription;
 import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
+import org.exoplatform.portal.config.model.ApplicationType;
 
 @Managed
 @ManagedDescription("Portal migration applications from JCR to RDBMS.")
@@ -75,6 +76,9 @@ public class AppRegistryMigrationService extends AbstractMigrationService<Applic
           ApplicationCategory created = appService.getApplicationCategory(category.getName());
           if (created == null) {
             for (Application app : category.getApplications()) {
+              if (ApplicationType.WSRP_PORTLET.equals(app.getType())) {
+                continue;
+              }
               appService.save(category, app);
             }
             

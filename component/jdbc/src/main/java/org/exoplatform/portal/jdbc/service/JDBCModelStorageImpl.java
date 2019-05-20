@@ -845,8 +845,6 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       return ApplicationType.PORTLET;
     case GADGET:
       return ApplicationType.GADGET;
-    case WSRP:
-      return ApplicationType.WSRP_PORTLET;
     }
     return null;
   }
@@ -934,7 +932,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       } else if (ApplicationType.GADGET.getName().equals(type.getName())) {
         dst.setAppType(AppType.GADGET);
       } else if (ApplicationType.WSRP_PORTLET.getName().equals(type.getName())) {
-        dst.setAppType(AppType.WSRP);
+        throw new IllegalStateException("We do not support WSRP any more");
       }
 
       ApplicationState state = srcChild.getState();
