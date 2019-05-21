@@ -236,13 +236,13 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
     private static final String LOCALE_SESSION_ATTR = "org.gatein.LOCALE";
     private Locale calculateLocale(ControllerContext context) {
         LocalePolicy localePolicy = getService(LocalePolicy.class);
-
+    
         HttpServletRequest request = HttpServletRequest.class.cast(context.getRequest());
-
+    
         LocaleContextInfo localeCtx = LocaleContextInfoUtils.buildLocaleContextInfo(request);
 
         Set<Locale> supportedLocales = LocaleContextInfoUtils.getSupportedLocales();
-
+        
         Locale locale = localePolicy.determineLocale(localeCtx);
         boolean supported = supportedLocales.contains(locale);
 
@@ -258,36 +258,36 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
 
         return locale;
     }
-
+    
     private User findUser(OrganizationService orgService, String usernameOrEmail) throws Exception {
-        if (usernameOrEmail == null || usernameOrEmail.isEmpty()) {
-            return null;
-        }
+      if (usernameOrEmail == null || usernameOrEmail.isEmpty()) {
+          return null;
+      }
 
-        User user = null;
-        UserHandler uHandler = orgService.getUserHandler();
-        user = uHandler.findUserByName(usernameOrEmail, UserStatus.ANY);
-        if (user == null && usernameOrEmail.contains("@")) {
-            Query query = new Query();
-            query.setEmail(usernameOrEmail);
-            ListAccess<User> list = uHandler.findUsersByQuery(query, UserStatus.ANY);
-            if (list != null && list.getSize() > 0) {
-                user = list.load(0, 1)[0];
-            }
-        }
+      User user = null;
+      UserHandler uHandler = orgService.getUserHandler();
+      user = uHandler.findUserByName(usernameOrEmail, UserStatus.ANY);
+      if (user == null && usernameOrEmail.contains("@")) {
+          Query query = new Query();
+          query.setEmail(usernameOrEmail);
+          ListAccess<User> list = uHandler.findUsersByQuery(query, UserStatus.ANY);
+          if (list != null && list.getSize() > 0) {
+              user = list.load(0, 1)[0];
+          }
+      }
 
-        if (user != null && !user.isEnabled()) {
-            throw new DisabledUserException(user.getUserName());
-        }
+      if (user != null && !user.isEnabled()) {
+          throw new DisabledUserException(user.getUserName());
+      }
 
-        return user;
-    }
+      return user;
+  }
 
     public String escapeXssCharacters(String message){
         message = (message == null) ? null : message.replace("&", "&amp").replace("<","&lt;").replace(">","&gt;")
-                .replace("\"","&quot;")
-                .replace("'","&#x27;")
-                .replace("/","&#x2F;");
+                                    .replace("\"","&quot;")
+                                    .replace("'","&#x27;")
+                                    .replace("/","&#x2F;");
         return message;
     }
 }
