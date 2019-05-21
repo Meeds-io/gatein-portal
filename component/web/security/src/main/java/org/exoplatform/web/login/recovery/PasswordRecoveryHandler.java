@@ -103,7 +103,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
         ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
 
         String token = context.getParameter(TOKEN);
-        String initURL = context.getParameter(INIT_URL);
+        String initURL = escapeXssCharacters(context.getParameter(INIT_URL));
 
         String requestAction = req.getParameter(REQ_PARAM_ACTION);
 
