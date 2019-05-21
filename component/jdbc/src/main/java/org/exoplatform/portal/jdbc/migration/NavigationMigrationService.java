@@ -156,7 +156,7 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
   }
 
   private List<NavigationContext> getNavigations() {
-    if (navigations == null) {
+    if (navigations == null || navigations.isEmpty()) {
       navigations = new ArrayList<NavigationContext>();
       navigations.addAll(jcrNavService.loadNavigations(SiteType.PORTAL));
       navigations.addAll(jcrNavService.loadNavigations(SiteType.GROUP));
