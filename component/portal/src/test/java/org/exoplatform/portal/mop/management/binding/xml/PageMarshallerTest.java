@@ -273,7 +273,7 @@ public class PageMarshallerTest extends AbstractMarshallerTest {
             {
                 // Verify site map & wsrp application
                 assertNotNull(container3.getChildren());
-                assertEquals(2, container3.getChildren().size());
+                assertEquals(1, container3.getChildren().size());
                 {
                     ModelObject sitemapcomponent = container3.getChildren().get(0);
                     assertTrue(sitemapcomponent instanceof Application);
@@ -294,29 +294,6 @@ public class PageMarshallerTest extends AbstractMarshallerTest {
                     assertTrue(application.getShowApplicationState());
                     assertFalse(application.getShowApplicationMode());
                     assertEquals("SiteMap", application.getDescription());
-                    assertNull(application.getIcon());
-                    assertNull(application.getWidth());
-                    assertNull(application.getHeight());
-                }
-                {
-                    ModelObject wsrpcomponent = container3.getChildren().get(1);
-                    assertTrue(wsrpcomponent instanceof Application);
-                    @SuppressWarnings("unchecked")
-                    Application<WSRP> application = (Application<WSRP>) wsrpcomponent;
-                    assertTrue(application.getType() == ApplicationType.WSRP_PORTLET);
-                    ApplicationState<WSRP> state = application.getState();
-                    assertNotNull(state);
-                    assertTrue(state instanceof TransientApplicationState);
-                    TransientApplicationState<WSRP> tas = (TransientApplicationState<WSRP>) state;
-                    assertEquals("selfv2./portletApplicationName.portletName", tas.getContentId());
-                    assertNull(tas.getContentState());
-
-                    assertEquals("WSRP", application.getTitle());
-                    assertEquals("Someone", Utils.join(";", application.getAccessPermissions()));
-                    assertFalse(application.getShowInfoBar());
-                    assertTrue(application.getShowApplicationState());
-                    assertTrue(application.getShowApplicationMode());
-                    assertNull(application.getDescription());
                     assertNull(application.getIcon());
                     assertNull(application.getWidth());
                     assertNull(application.getHeight());
