@@ -83,12 +83,16 @@ public abstract class AbstractTestNavigationService extends AbstractMOPTest {
         return new NavigationServiceImpl(mgr);
     }
 
-    protected void createNavigation(SiteType siteType, String siteName) throws Exception {
+    protected void createSite(SiteType siteType, String siteName) throws Exception {
         ContainerData container = new ContainerData(null, "test", "", "", "", "", "",
                 "", "", "", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
         modelDataStorage.create(new PortalData(null,
                 siteName, siteType.getName(), null, null,
                 null, new ArrayList<>(), null, null, null, container, null));
+    }
+
+    protected void createNavigation(SiteType siteType, String siteName) throws Exception {
+        createSite(siteType, siteName);
         service.saveNavigation(new NavigationContext(new SiteKey(siteType, siteName), new NavigationState(1)));
     }
 }

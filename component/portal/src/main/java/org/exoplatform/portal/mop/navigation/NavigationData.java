@@ -76,6 +76,10 @@ public class NavigationData implements Serializable {
         }
     }
 
+    public NavigationState getState() {
+        return this.state;
+    }
+
     public String getRootId() {
         return rootId;
     }
