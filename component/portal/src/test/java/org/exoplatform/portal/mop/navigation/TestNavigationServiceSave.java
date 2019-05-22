@@ -94,7 +94,9 @@ public class TestNavigationServiceSave extends AbstractTestNavigationService {
 
         //
         sync(true);
-        service.clearCache();
+        if (service instanceof NavigationServiceImpl) {
+            ((NavigationServiceImpl)service).clearCache();
+        }
 
         //
         nav = service.loadNavigation(SiteKey.portal("destroy_navigation"));

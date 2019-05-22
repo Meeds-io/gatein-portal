@@ -43,7 +43,7 @@ public abstract class AbstractTestNavigationService extends AbstractMOPTest {
     protected POMSessionManager mgr;
 
     /** . */
-    protected NavigationServiceImpl service;
+    protected NavigationService service;
 
     /** . */
     protected DataStorage dataStorage;
@@ -60,7 +60,7 @@ public abstract class AbstractTestNavigationService extends AbstractMOPTest {
         dataStorage = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
 
         // Clear the cache for each test
-        service.clearCache();
+        ((NavigationServiceImpl)service).clearCache();
 
         //
         super.setUp();
