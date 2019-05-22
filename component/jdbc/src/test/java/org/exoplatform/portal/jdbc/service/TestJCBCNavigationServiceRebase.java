@@ -19,29 +19,33 @@
 
 package org.exoplatform.portal.jdbc.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.navigation.AbstractTestNavigationService;
+import org.exoplatform.portal.mop.navigation.HierarchyError;
+import org.exoplatform.portal.mop.navigation.HierarchyException;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationError;
+import org.exoplatform.portal.mop.navigation.NavigationService;
 import org.exoplatform.portal.mop.navigation.NavigationServiceException;
-import org.exoplatform.portal.mop.navigation.NavigationState;
 import org.exoplatform.portal.mop.navigation.Node;
 import org.exoplatform.portal.mop.navigation.NodeChange;
 import org.exoplatform.portal.mop.navigation.NodeContext;
 import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.portal.mop.navigation.Scope;
-import org.exoplatform.portal.pom.data.ContainerData;
-import org.exoplatform.portal.pom.data.PortalData;
-import org.gatein.mop.api.workspace.Navigation;
-import org.gatein.mop.api.workspace.ObjectType;
-import org.gatein.mop.api.workspace.Site;
-import org.gatein.mop.core.api.MOPService;
 
+@ConfiguredBy({
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.test.jcr-configuration.xml"),
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/portal/mop/navigation/configuration.xml")})
 public class TestJCBCNavigationServiceRebase extends AbstractTestNavigationService {
 
   public void testRebase1() throws Exception {
@@ -71,7 +75,7 @@ public class TestJCBCNavigationServiceRebase extends AbstractTestNavigationServi
     assertEquals(4, root1.getNodeCount());
     assertSame(a.getNode(), root1.getNode(0));
     assertSame(b.getNode(), root1.getNode(1));
-    Node c1 = (Node)root1.getNode(2);
+    Node c1 = (Node) root1.getNode(2);
     assertEquals("c", c1.getName());
     assertEquals(c2.getId(), c1.getId());
     assertSame(d.getNode(), root1.getNode(3));
@@ -321,8 +325,8 @@ public class TestJCBCNavigationServiceRebase extends AbstractTestNavigationServi
     //
     try {
       service.rebaseNode(root.getContext(), null, null);
-    } catch (NavigationServiceException e) {
-      assertSame(NavigationError.UPDATE_CONCURRENTLY_REMOVED_NODE, e.getError());
+    } catch (HierarchyException e) {
+      assertSame(HierarchyError.UPDATE_CONCURRENTLY_REMOVED_NODE, e.getError());
     }
   }
 
@@ -374,5 +378,11 @@ public class TestJCBCNavigationServiceRebase extends AbstractTestNavigationServi
     Iterator<NodeChange<Node>> changes = root.rebase(service, null);
     assertFalse(changes.hasNext());
     assertSame("b", a.getName());
+  }
+
+  @Override
+  protected NavigationService getNavigationService() {
+    PortalContainer container = PortalContainer.getInstance();
+    return (NavigationService) container.getComponentInstanceOfType(NavigationService.class);
   }
 }
