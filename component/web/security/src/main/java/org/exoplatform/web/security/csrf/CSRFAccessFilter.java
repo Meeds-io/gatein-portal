@@ -45,8 +45,7 @@ public class CSRFAccessFilter implements MethodInvokerFilter
     * @see ExoCSRFCheck
     *
     */
-   public void accept(GenericMethodResource method) throws WebApplicationException
-   {
+   public void accept(GenericMethodResource method) {
       for (Annotation a : method.getMethod().getAnnotations())
       {
          Class<?> ac = a.annotationType();
@@ -55,12 +54,19 @@ public class CSRFAccessFilter implements MethodInvokerFilter
          {
             //get token in context
             ServletContainerRequest request = (ServletContainerRequest) ApplicationContextImpl.getCurrent().getContainerRequest();
-
-            if (request == null || !CSRFTokenUtil.check(request.getServletRequest())) {
-               LOG.warn("CSRF token is lost or this is an CSRF attack (method={})", method.getMethod().getName());
-               throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN).entity(
-                       "You do not have the permissions to perform this operation").type(
-                       MediaType.TEXT_PLAIN).build());
+            if (request == null) {
+              LOG.warn("HTTP Request not found. Can't check CSRF token on method (method={})", method.getMethod().getName());
+              throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN)
+                                                        .entity("You do not have the permissions to perform this operation")
+                                                        .type(MediaType.TEXT_PLAIN)
+                                                        .build());
+            }
+            if (!CSRFTokenUtil.check(request.getServletRequest())) {
+              LOG.warn("CSRF token is lost or this is an CSRF attack (method={})", method.getMethod().getName());
+              throw new WebApplicationException(Response.status(Response.Status.FORBIDDEN)
+                                                        .entity("You do not have the permissions to perform this operation")
+                                                        .type(MediaType.TEXT_PLAIN)
+                                                        .build());
             }
          }
       }

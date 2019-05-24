@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.junit.After;
 import org.junit.Test;
@@ -16,6 +17,8 @@ import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 
 public class CSRFTokenUtilTest {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpSession session = (HttpSession)mock(HttpSession.class);
 
     @After
     public void tearDown() {
@@ -23,27 +26,32 @@ public class CSRFTokenUtilTest {
     }
 
     @Test
-    public void shouldNotGenerateTokenWhenNoConversationState() {
-        String token = CSRFTokenUtil.getToken();
-
-        assertNull(token);
-    }
-
-    @Test
-    public void shouldGenerateTokenWhenConversationState() {
+    public void shouldGenerateTokenWhenAuthenticated() {
         startSessionAs("root");
-
-        String token = CSRFTokenUtil.getToken();
+        when(request.getRemoteUser()).thenReturn("root");
+        String token = CSRFTokenUtil.getToken(request);
 
         assertNotNull(token);
     }
 
     @Test
-    public void shouldGetSameTokenWhenFetchingTokenTwice() {
+    public void shouldGenerateTokenWhenNonAuthenticated() {
         startSessionAs("root");
+        when(request.getRemoteUser()).thenReturn(null);
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute(CSRF_TOKEN)).thenReturn("B56F1F537F0001012F46539853E23BCD");
+        String token = CSRFTokenUtil.getToken(request);
 
-        String token1 = CSRFTokenUtil.getToken();
-        String token2 = CSRFTokenUtil.getToken();
+        assertNotNull(token);
+    }
+
+    @Test
+    public void shouldGetSameTokenWhenFetchingTokenTwiceWhenAuthenticated() {
+
+        startSessionAs("root");
+        when(request.getRemoteUser()).thenReturn("root");
+        String token1 = CSRFTokenUtil.getToken(request);
+        String token2 = CSRFTokenUtil.getToken(request);
 
         assertNotNull(token1);
         assertNotNull(token2);
@@ -51,12 +59,26 @@ public class CSRFTokenUtilTest {
     }
 
     @Test
-    public void shouldSucceedCheckWhenSameTokenInRequest() {
+    public void shouldGetSameTokenWhenFetchingTokenTwiceWhenNonAuthenticated() {
+
         startSessionAs("root");
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute(CSRF_TOKEN)).thenReturn("B56F1F537F0001012F46539853E23BCD");
+        String token1 = CSRFTokenUtil.getToken(request);
+        String token2 = CSRFTokenUtil.getToken(request);
 
-        String token = CSRFTokenUtil.getToken();
+        assertNotNull(token1);
+        assertNotNull(token2);
+        assertEquals(token1, token2);
+        assertEquals(token1,"B56F1F537F0001012F46539853E23BCD");
+    }
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
+    @Test
+    public void shouldSucceedCheckWhenSameTokenInRequestWhenAuthenticated() {
+        startSessionAs("root");
+        when(request.getRemoteUser()).thenReturn("root");
+        String token = CSRFTokenUtil.getToken(request);
+
         when(request.getParameter(CSRF_TOKEN)).thenReturn(token);
 
         boolean check = CSRFTokenUtil.check(request);
@@ -65,11 +87,25 @@ public class CSRFTokenUtilTest {
     }
 
     @Test
-    public void shouldFailCheckWhenNoTokenInRequest() {
+    public void shouldSucceedCheckWhenSameTokenInRequestWhenNonAuthenticated() {
+        startSessionAs("root");
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute(CSRF_TOKEN)).thenReturn("B56F1F537F0001012F46539853E23BCD");
+        String token = CSRFTokenUtil.getToken(request);
+
+        when(request.getParameter(CSRF_TOKEN)).thenReturn(token);
+
+        boolean check = CSRFTokenUtil.check(request);
+
+        assertTrue(check);
+    }
+
+    @Test
+    public void shouldFailCheckWhenNoTokenInRequestWhenAuthenticated() {
         startSessionAs("root");
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getParameter(CSRF_TOKEN)).thenReturn(null);
+        when(request.getRemoteUser()).thenReturn("root");
 
         boolean check = CSRFTokenUtil.check(request);
 
@@ -77,11 +113,35 @@ public class CSRFTokenUtilTest {
     }
 
     @Test
-    public void shouldFailCheckWhenWrongTokenInRequest() {
+    public void shouldFailCheckWhenNoTokenInRequestWhenNonAuthenticated() {
         startSessionAs("root");
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getSession()).thenReturn(session);
+        when(request.getParameter(CSRF_TOKEN)).thenReturn(null);
+        when(request.getRemoteUser()).thenReturn(null);
+
+        boolean check = CSRFTokenUtil.check(request);
+
+        assertFalse(check);
+    }
+
+    @Test
+    public void shouldFailCheckWhenWrongTokenInRequestInAuthenticatedMode() {
+        startSessionAs("root");
         when(request.getParameter(CSRF_TOKEN)).thenReturn("WrongToken");
+        when(request.getRemoteUser()).thenReturn("root");
+
+        boolean check = CSRFTokenUtil.check(request);
+
+        assertFalse(check);
+    }
+
+    @Test
+    public void shouldFailCheckWhenWrongTokenInRequestInNonAuthenticatedMode() {
+        startSessionAs("root");
+        when(request.getSession()).thenReturn(session);
+        when(request.getParameter(CSRF_TOKEN)).thenReturn("WrongToken");
+        when(request.getRemoteUser()).thenReturn(null);
 
         boolean check = CSRFTokenUtil.check(request);
 

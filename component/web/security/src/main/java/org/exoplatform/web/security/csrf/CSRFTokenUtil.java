@@ -20,12 +20,13 @@ package org.exoplatform.web.security.csrf;
 
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
+import org.exoplatform.services.security.ConversationState;
 import org.gatein.common.util.UUIDGenerator;
 
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.security.ConversationState;
 
 /**
  * Util class to manage CSRF token
@@ -41,7 +42,7 @@ public class CSRFTokenUtil {
 
     public static boolean check(HttpServletRequest request) {
         if (request != null) {
-            String sessionToken = getToken();
+            String sessionToken = getToken(request);
             String reqToken = request.getParameter(CSRF_TOKEN);
 
             return reqToken != null && reqToken.equals(sessionToken);
@@ -51,18 +52,36 @@ public class CSRFTokenUtil {
         }
     }
 
-    public static String getToken() {
-        ConversationState conversationState = ConversationState.getCurrent();
-        if (conversationState != null && conversationState.getIdentity() != null) {
-            String token = (String) conversationState.getAttribute(CSRF_TOKEN);
-            if (token == null) {
-                token = generator.generateKey();
-                conversationState.setAttribute(CSRF_TOKEN, token);
+    public static String getToken(HttpServletRequest request) {
+
+        if (request != null) {
+            if (request.getRemoteUser() == null) {
+                HttpSession session = request.getSession();
+                String token = (String) session.getAttribute(CSRF_TOKEN);
+                if (token == null) {
+                    token = generator.generateKey();
+                    session.setAttribute(CSRF_TOKEN, token);
+                }
+                return token;
+            } else {
+                ConversationState conversationState = ConversationState.getCurrent();
+                if (conversationState != null && conversationState.getIdentity() != null) {
+                    String token = (String) conversationState.getAttribute(CSRF_TOKEN);
+                    if (token == null) {
+                        token = generator.generateKey();
+                        conversationState.setAttribute(CSRF_TOKEN, token);
+                    }
+                    return token;
+                } else {
+                    return null;
+                }
             }
-            return token;
+
         } else {
+            log.warn("No HttpServletRequest found, can't generate CSRF token");
             return null;
         }
+
     }
 
 }

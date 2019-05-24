@@ -29,7 +29,7 @@ import org.exoplatform.webui.event.Event.Phase;
 import org.exoplatform.webui.event.EventListener;
 
 /** Created by The eXo Platform SAS Mar 13, 2007 */
-@ComponentConfig(id = "UIMaskWorkspace", template = "system:/groovy/portal/webui/workspace/UIMaskWorkspace.gtmpl", events = @EventConfig(phase = Phase.DECODE, listeners = UIMaskWorkspace.CloseActionListener.class))
+@ComponentConfig(id = "UIMaskWorkspace", template = "system:/groovy/portal/webui/workspace/UIMaskWorkspace.gtmpl", events = @EventConfig(phase = Phase.DECODE, listeners = UIMaskWorkspace.CloseActionListener.class, csrfCheck = false))
 public class UIMaskWorkspace extends UIComponentDecorator {
 
     private int width_ = -1;
@@ -88,7 +88,7 @@ public class UIMaskWorkspace extends UIComponentDecorator {
         setWindowSize(-1, -1);
     }
 
-  public <T extends UIComponent> T createUIComponent(Class<T> clazz, String configId, String id) throws Exception {
+    public <T extends UIComponent> T createUIComponent(Class<T> clazz, String configId, String id) throws Exception {
         T uicomponent = super.createUIComponent(clazz, configId, id);
         setUIComponent(uicomponent);
         return uicomponent;

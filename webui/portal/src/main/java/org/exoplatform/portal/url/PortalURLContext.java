@@ -43,6 +43,7 @@ import org.gatein.common.io.UndeclaredIOException;
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
 public class PortalURLContext implements URLContext {
+
     private static final char REPLACEMENT_CHAR = '\ufffd';
 
     /** . */
@@ -176,8 +177,11 @@ public class PortalURLContext implements URLContext {
         if (url.isCSRFCheck()) {
             String token;
             try {
-                token = CSRFTokenUtil.getToken();
-                writer.appendQueryParameter(CSRFTokenUtil.CSRF_TOKEN, token);
+                token = CSRFTokenUtil.getToken(req);
+                if(token != null){
+                    writer.appendQueryParameter(CSRFTokenUtil.CSRF_TOKEN, token);
+                }
+
             } catch (Exception e) {
                 throw new IllegalStateException("Can't add csrf token to url", e);
             }
@@ -205,4 +209,6 @@ public class PortalURLContext implements URLContext {
             }
         }
     }
+
+
 }

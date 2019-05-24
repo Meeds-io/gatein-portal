@@ -27,6 +27,7 @@ import java.util.ResourceBundle;
 import org.exoplatform.commons.serialization.api.annotations.Serialized;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.web.security.csrf.CSRFTokenUtil;
+import org.exoplatform.webui.Util;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.application.portlet.PortletRequestContext;
 import org.exoplatform.webui.bean.BeanDataMapping;
@@ -35,11 +36,9 @@ import org.exoplatform.webui.config.Event;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.core.UIContainer;
 import org.exoplatform.webui.form.input.UICheckBoxInput;
-
 /** Created by The eXo Platform SARL Author : Dang Van Minh minhdv81@yahoo.com Jun 6, 2006 */
 @Serialized
 public class UIForm extends UIContainer {
-
     public static final String ACTION = "formOp";
 
     public static final String SUBCOMPONENT_ID = "subComponentId";
@@ -151,7 +150,6 @@ public class UIForm extends UIContainer {
     @SuppressWarnings("unchecked")
     public void begin() throws Exception {
         WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
-
         String b = context.getURLBuilder().createURL(this, null, null);
 
         Writer writer = context.getWriter();
@@ -164,9 +162,16 @@ public class UIForm extends UIContainer {
         }
         writer.append(" method=\"post\">");
         writer.append("<div><input type=\"hidden\" name=\"").append(ACTION).append("\" value=\"\"/>");
-        writer.append("<input type=\"hidden\" name=\"").append(CSRFTokenUtil.CSRF_TOKEN).append("\" value=\"");
-        writer.append(CSRFTokenUtil.getToken());
-        writer.append("\"/></div>");
+        String token = CSRFTokenUtil.getToken(Util.getRequest());
+        if(token != null){
+            writer.append("<input type=\"hidden\" name=\"")
+                  .append(CSRFTokenUtil.CSRF_TOKEN)
+                  .append("\" value=\"")
+                  .append(CSRFTokenUtil.getToken(Util.getRequest()))
+                  .append("\"/>");
+        }
+        writer.append("</div>");
+
     }
 
     @Override
@@ -296,4 +301,6 @@ public class UIForm extends UIContainer {
     public String getUIComponentName() {
         return "uiform";
     }
+
+
 }

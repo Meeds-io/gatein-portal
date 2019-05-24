@@ -19,7 +19,11 @@
 
 package org.exoplatform.webui;
 
+import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.InitParams;
+
+import javax.portlet.PortletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by The eXo Platform SAS May 10, 2006
@@ -59,5 +63,17 @@ public class Util {
         }
         Object[] args = { params };
         return type.getConstructor(CONSTRUCTOR_PARAMS).newInstance(args);
+    }
+
+
+    public static HttpServletRequest getRequest() throws Exception {
+        WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
+        if (context == null) {
+            return null;
+        }
+        if (context.getRequest() instanceof PortletRequest) {
+            context = (WebuiRequestContext) context.getParentAppRequestContext();
+        }
+        return context.getRequest();
     }
 }
