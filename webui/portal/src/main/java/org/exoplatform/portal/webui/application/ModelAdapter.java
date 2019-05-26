@@ -20,12 +20,9 @@
 package org.exoplatform.portal.webui.application;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.exoplatform.application.gadget.GadgetRegistryService;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.model.ApplicationState;
@@ -33,7 +30,6 @@ import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.pc.ExoPortletState;
 import org.exoplatform.portal.pc.ExoPortletStateType;
-import org.exoplatform.portal.pom.spi.gadget.Gadget;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
 import org.exoplatform.portal.pom.spi.portlet.Preference;
@@ -54,10 +50,6 @@ public abstract class ModelAdapter<S, C extends Serializable> {
         if (type == ApplicationType.PORTLET) {
             @SuppressWarnings("unchecked")
             ModelAdapter<S, C> adapter = (ModelAdapter<S, C>) PORTLET;
-            return adapter;
-        } else if (type == ApplicationType.GADGET) {
-            @SuppressWarnings("unchecked")
-            ModelAdapter<S, C> adapter = (ModelAdapter<S, C>) GADGET;
             return adapter;
         } else if (type == ApplicationType.WSRP_PORTLET) {
             @SuppressWarnings("unchecked")
@@ -131,91 +123,6 @@ public abstract class ModelAdapter<S, C extends Serializable> {
                 }
                 return pref;
             }
-        }
-
-        @Override
-        public ExoPortletState getStateFromModifiedContext(PortletContext originalPortletContext,
-                PortletContext modifiedPortletContext) {
-            if (modifiedPortletContext != null && modifiedPortletContext instanceof StatefulPortletContext) {
-                StatefulPortletContext statefulContext = (StatefulPortletContext) modifiedPortletContext;
-                if (statefulContext.getState() instanceof ExoPortletState) {
-                    return (ExoPortletState) statefulContext.getState();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        public ExoPortletState getstateFromClonedContext(PortletContext originalPortletContext,
-                PortletContext clonedPortletContext) {
-            if (clonedPortletContext != null && clonedPortletContext instanceof StatefulPortletContext) {
-                StatefulPortletContext statefulContext = (StatefulPortletContext) clonedPortletContext;
-                if (statefulContext.getState() instanceof ExoPortletState) {
-                    return (ExoPortletState) statefulContext.getState();
-                }
-            }
-            return null;
-        }
-    };
-
-    private static final String DASHBOARD = "dashboard";
-    private static final String GADGET_PORTLET = "GadgetPortlet";
-    private static final PortletContext WRAPPER_CONTEXT = PortletContext.reference(PortletInvoker.LOCAL_PORTLET_INVOKER_ID,
-            PortletContext.createPortletContext(DASHBOARD, GADGET_PORTLET));
-    private static final String WRAPPER_ID = WRAPPER_CONTEXT.getId();
-    private static final ModelAdapter<Gadget, ExoPortletState> GADGET = new ModelAdapter<Gadget, ExoPortletState>() {
-        @Override
-        public StatefulPortletContext<ExoPortletState> getPortletContext(ExoContainer container, String applicationId,
-                ApplicationState<Gadget> applicationState) throws Exception {
-            GadgetRegistryService gadgetService = (GadgetRegistryService) container
-                    .getComponentInstanceOfType(GadgetRegistryService.class);
-            org.exoplatform.application.gadget.Gadget model = gadgetService.getGadget(applicationId);
-            String url = GadgetUtil.reproduceUrl(model.getUrl(), model.isLocal());
-            ExoPortletState prefs = new ExoPortletState(WRAPPER_ID);
-            prefs.getState().put("url", Arrays.asList(url));
-            DataStorage dataStorage = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
-            Gadget gadget = dataStorage.load(applicationState, ApplicationType.GADGET);
-            if (gadget != null && gadget.getUserPref() != null) {
-                prefs.getState().put("userPref", Collections.singletonList(gadget.getUserPref()));
-            }
-            return StatefulPortletContext.create(LOCAL_STATE_ID, ExoPortletStateType.getInstance(), prefs);
-        }
-
-        @Override
-        public ApplicationState<Gadget> update(ExoContainer container, ExoPortletState updateState,
-                ApplicationState<Gadget> gadgetApplicationState) throws Exception {
-            // Compute new preferences
-            String userPref = null;
-            for (Map.Entry<String, List<String>> entry : updateState.getState().entrySet()) {
-                if (entry.getKey().equals("userPref") && entry.getValue().size() > 0) {
-                    userPref = entry.getValue().get(0);
-                }
-            }
-
-            if (gadgetApplicationState instanceof TransientApplicationState<?>) {
-                throw new UnsupportedOperationException("todo");
-            } else {
-                if (userPref != null) {
-                    Gadget gadget = new Gadget();
-                    gadget.addUserPref(userPref);
-                    DataStorage dataStorage = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
-                    dataStorage.save(gadgetApplicationState, gadget);
-                }
-            }
-
-            //
-            return gadgetApplicationState;
-        }
-
-        @Override
-        public PortletContext getProducerOfferedPortletContext(String applicationState) {
-            return WRAPPER_CONTEXT;
-        }
-
-        @Override
-        public Portlet getState(ExoContainer container, ApplicationState<Gadget> applicationState) throws Exception {
-            // For now we return null as it does not make sense to edit the gadget preferences
-            return null;
         }
 
         @Override

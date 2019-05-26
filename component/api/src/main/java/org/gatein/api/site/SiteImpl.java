@@ -201,9 +201,6 @@ public class SiteImpl implements Site {
                         case SPACE:
                             service.createGroupSite(portalConfig.getName());
                             break;
-                        case DASHBOARD:
-                            service.createUserSite(portalConfig.getName());
-                            break;
                     }
                 } catch (Exception e) {
                     throw new ApiException("Could not create site " + id, e);

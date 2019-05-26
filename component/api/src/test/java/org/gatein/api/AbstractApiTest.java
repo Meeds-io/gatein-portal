@@ -119,8 +119,8 @@ public class AbstractApiTest {
 
     protected void createSite(SiteId siteId, boolean createNav, String... pages) {
         try {
-            DataStorage dataStorage = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
-            NavigationService navService = (NavigationService) container.getComponentInstanceOfType(NavigationService.class);
+            DataStorage dataStorage = container.getComponentInstanceOfType(DataStorage.class);
+            NavigationService navService = container.getComponentInstanceOfType(NavigationService.class);
 
             SiteKey siteKey = Util.from(siteId);
 
@@ -144,7 +144,7 @@ public class AbstractApiTest {
     }
 
     protected void createPage(SiteId siteId, String... pages) {
-        PageService pageService = (PageService) container.getComponentInstanceOfType(PageService.class);
+        PageService pageService = container.getComponentInstanceOfType(PageService.class);
 
         SiteKey siteKey = Util.from(siteId);
         for (String page : pages) {
@@ -155,14 +155,14 @@ public class AbstractApiTest {
 
     protected void setPermission(PageId pageId, String editPermission, String... accessPermissions) {
         PageKey pageKey = Util.from(pageId);
-        PageService pageService = (PageService) container.getComponentInstanceOfType(PageService.class);
+        PageService pageService = container.getComponentInstanceOfType(PageService.class);
         PageContext p = pageService.loadPage(pageKey);
         p.setState(p.getState().builder().editPermission(editPermission).accessPermissions(accessPermissions).build());
         pageService.savePage(p);
     }
 
     private void cleanup() throws Exception {
-        DataStorage dataStorage = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
+        DataStorage dataStorage = container.getComponentInstanceOfType(DataStorage.class);
         SiteType[] types = new SiteType[] { SiteType.PORTAL, SiteType.GROUP, SiteType.USER };
 
         for (SiteType type : types) {

@@ -160,6 +160,7 @@ public class PortalImplTest extends AbstractApiTest {
 
         PageQuery query = new PageQuery.Builder().withSiteName("find-pages").build();
         List<Page> pages = portal.findPages(query);
+        System.out.println(">>>> findPages_BySiteName=" + pages.size());
         assertEquals(6, pages.size());
     }
 
@@ -171,26 +172,13 @@ public class PortalImplTest extends AbstractApiTest {
 
         PageQuery query = new PageQuery.Builder().withSiteType(SiteType.SITE).build();
         List<Page> pages = portal.findPages(query);
+        System.out.println(">>>> findPages_BySiteType 1=" + pages.size());
         assertEquals(2, pages.size());
 
         query = new PageQuery.Builder().withSiteType(SiteType.SPACE).build();
         pages = portal.findPages(query);
+        System.out.println(">>>> findPages_BySiteName 2=" + pages.size());
         assertEquals(1, pages.size());
-
-        query = new PageQuery.Builder().withSiteType(SiteType.DASHBOARD).build();
-        pages = portal.findPages(query);
-        assertEquals(3, pages.size());
-    }
-
-    @Test
-    public void findPages_BySiteType_And_SiteName() {
-        createSite(new SiteId("find-pages"), "page1", "page2");
-        createSite(new SiteId(new Group("find-pages")), "find-pages", "page3");
-        createSite(new SiteId(new User("find-pages")), "page4", "page5", "page6");
-
-        PageQuery query = new PageQuery.Builder().withSiteType(SiteType.DASHBOARD).withSiteName("find-pages").build();
-        List<Page> pages = portal.findPages(query);
-        assertEquals(3, pages.size());
     }
 
     @Test
@@ -418,9 +406,6 @@ public class PortalImplTest extends AbstractApiTest {
                 .size());
         assertEquals(3, portal.findSites(new SiteQuery.Builder().includeEmptySites(true).withSiteTypes(SiteType.SPACE).build())
                 .size());
-        assertEquals(3,
-                portal.findSites(new SiteQuery.Builder().includeEmptySites(true).withSiteTypes(SiteType.DASHBOARD).build())
-                        .size());
 
         // By type and range
         assertEquals(
@@ -433,11 +418,6 @@ public class PortalImplTest extends AbstractApiTest {
                 portal.findSites(
                         new SiteQuery.Builder().includeEmptySites(true).withSiteTypes(SiteType.SPACE).withPagination(0, 2)
                                 .build()).size());
-        assertEquals(
-                2,
-                portal.findSites(
-                        new SiteQuery.Builder().includeEmptySites(true).withSiteTypes(SiteType.DASHBOARD).withPagination(0, 2)
-                                .build()).size());
 
         assertEquals(
                 2,
@@ -448,11 +428,6 @@ public class PortalImplTest extends AbstractApiTest {
                 1,
                 portal.findSites(
                         new SiteQuery.Builder().includeEmptySites(true).withSiteTypes(SiteType.SPACE).withPagination(0, 2)
-                                .withNextPage().build()).size());
-        assertEquals(
-                1,
-                portal.findSites(
-                        new SiteQuery.Builder().includeEmptySites(true).withSiteTypes(SiteType.DASHBOARD).withPagination(0, 2)
                                 .withNextPage().build()).size());
     }
 
@@ -539,8 +514,8 @@ public class PortalImplTest extends AbstractApiTest {
     @Test
     public void getSite_User() {
         createSite(new SiteId(new User("user10")));
-        Site dashboard = portal.getSite(new SiteId(new User("user10")));
-        assertNotNull(dashboard);
+        Site site = portal.getSite(new SiteId(new User("user10")));
+        assertNotNull(site);
     }
 
     @Test

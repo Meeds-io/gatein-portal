@@ -114,10 +114,6 @@
 	position: relative;
 }
 
-.UserToolBarDashboardPortletTDContainer {
-	position: relative;
-}
-
 .AdminToolBarPortletTDContainer {
 	position: relative;
 }
@@ -182,11 +178,6 @@
 }
 
 /**********************************/
-
-.UIToolbarContainer .DashboardIcon {
-	background: url('background/ToolbarContainer.gif') no-repeat 5px -64px; /* orientation=lt */
-	background: url('background/ToolbarContainer.gif') no-repeat 100% -64px; /* orientation=rt */
-}
 
 .UIToolbarContainer .SiteIcon {
 	background: url('background/ToolbarContainer.gif') no-repeat 5px -98px; /* orientation=lt */

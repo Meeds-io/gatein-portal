@@ -574,11 +574,6 @@
       </dependency>
       <dependency>
         <groupId>org.exoplatform.gatein.portal</groupId>
-        <artifactId>exo.portal.webui.dashboard</artifactId>
-        <version>5.3.x-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
         <artifactId>exo.portal.gadgets-core</artifactId>
         <version>5.3.x-SNAPSHOT</version>
       </dependency>
@@ -666,12 +661,6 @@
       <dependency>
         <groupId>org.exoplatform.gatein.portal.examples.skins</groupId>
         <artifactId>gatein-sample-skin</artifactId>
-        <version>5.3.x-SNAPSHOT</version>
-        <type>war</type>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
-        <artifactId>exo.portal.portlet.dashboard</artifactId>
         <version>5.3.x-SNAPSHOT</version>
         <type>war</type>
       </dependency>

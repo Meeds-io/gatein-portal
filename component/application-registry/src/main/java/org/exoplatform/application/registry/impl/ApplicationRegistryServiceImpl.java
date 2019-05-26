@@ -27,8 +27,6 @@ import java.util.Set;
 
 import org.chromattic.api.ChromatticSession;
 
-import org.exoplatform.application.gadget.Gadget;
-import org.exoplatform.application.gadget.GadgetRegistryService;
 import org.exoplatform.application.registry.Application;
 import org.exoplatform.application.registry.ApplicationCategoriesPlugins;
 import org.exoplatform.application.registry.ApplicationCategory;
@@ -370,47 +368,6 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
         return null;
     }
 
-    public void importExoGadgets() throws Exception {
-        ContentRegistry registry = getContentRegistry();
-
-        //
-        ExoContainer container = ExoContainerContext.getCurrentContainer();
-        GadgetRegistryService gadgetService = (GadgetRegistryService) container
-                .getComponentInstanceOfType(GadgetRegistryService.class);
-        List<Gadget> eXoGadgets = gadgetService.getAllGadgets();
-
-        //
-        if (eXoGadgets != null) {
-            ArrayList<String> permissions = new ArrayList<String>();
-            permissions.add(anyOfAdminGroup);
-            String categoryName = "Gadgets";
-
-            //
-            CategoryDefinition category = registry.getCategory(categoryName);
-            if (category == null) {
-                category = registry.createCategory(categoryName);
-                category.setDisplayName(categoryName);
-                category.setDescription(categoryName);
-                category.setAccessPermissions(permissions);
-            }
-
-            //
-            for (Gadget ele : eXoGadgets) {
-                Application app = new Application();
-                app.setApplicationName(ele.getName());
-                app.setType(ApplicationType.GADGET);
-                ContentDefinition contentDef = findApp(category, ApplicationType.GADGET, ele.getName());
-                if (contentDef == null) {
-                    contentDef = category.createContent(ele.getName(), org.exoplatform.portal.pom.spi.gadget.Gadget.CONTENT_TYPE,
-                            ele.getName());
-                    contentDef.setDisplayName(ele.getTitle());
-                    contentDef.setDescription(ele.getDescription());
-                    contentDef.setAccessPermissions(permissions);
-                }
-            }
-        }
-    }
-
     public void importAllPortlets() throws Exception {
         ContentRegistry registry = getContentRegistry();
 
@@ -624,8 +581,6 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
                 }
             } else if (type == WSRP.CONTENT_TYPE) {
                 return "/eXoResources/skin/sharedImages/Icon80x80/DefaultPortlet.png";
-            } else if (type == org.exoplatform.portal.pom.spi.gadget.Gadget.CONTENT_TYPE) {
-                return "/" + "eXoGadgets" + "/skin/DefaultSkin/portletIcons/" + contentId + ".png";
             }
         }
 

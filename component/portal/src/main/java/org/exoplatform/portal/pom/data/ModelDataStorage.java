@@ -69,10 +69,6 @@ public interface ModelDataStorage {
 
     Container getSharedLayout() throws Exception;
 
-    DashboardData loadDashboard(String dashboardId) throws Exception;
-
-    void saveDashboard(DashboardData dashboard) throws Exception;
-
     void save() throws Exception;
 
     String[] getSiteInfo(String workspaceObjectId) throws Exception;

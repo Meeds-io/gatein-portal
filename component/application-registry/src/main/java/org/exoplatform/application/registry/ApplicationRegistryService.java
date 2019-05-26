@@ -157,13 +157,4 @@ public interface ApplicationRegistryService {
      * If Application've already existed, it'll be ignored
      */
     void importAllPortlets() throws Exception;
-
-    // TODO: dang.tung
-    /**
-     * Get all Gadget, add to eXoGadgets application category <br>
-     * When first added, it's access permission will be Everyone <br>
-     * If ApplicationCategory currently doesn't exist, it'll be created <br>
-     * Gadget that has been imported will be ignored
-     */
-    void importExoGadgets() throws Exception;
 }

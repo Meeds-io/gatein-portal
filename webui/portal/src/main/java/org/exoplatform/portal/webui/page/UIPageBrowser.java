@@ -303,7 +303,6 @@ public class UIPageBrowser extends UIContainer {
                         uiPortal.clearUIPage(pageRef);
                     }
 
-                    // Update UserToolbarDashboardPortlet
                     ActionResponse actResponse = event.getRequestContext().getResponse();
                     actResponse.setEvent(new QName("NavigationChange"), userNode.getName());
                     return;

@@ -344,44 +344,6 @@
   </portlet>
 
   <portlet>
-    <description xml:lang="EN">User Toolbar Dashboard Portlet</description>
-    <portlet-name>UserToolbarDashboardPortlet</portlet-name>
-    <display-name xml:lang="EN">User Toolbar Dashboard Portlet</display-name>
-    <portlet-class>org.exoplatform.webui.application.portlet.PortletApplicationController</portlet-class>
-
-    <init-param>
-      <name>webui.configuration</name>
-      <value>/WEB-INF/conf/portlet/exoadmin/UserToolbarDashboardPortlet/webui/configuration.xml</value>
-    </init-param>
-
-    <expiration-cache>0</expiration-cache>
-    <supports>
-      <mime-type>text/html</mime-type>
-      <portlet-mode>help</portlet-mode>
-    </supports>
-    <supported-locale>en</supported-locale>
-    <resource-bundle>locale.portlet.exoadmin.UserToolbarPortlet</resource-bundle>
-    <portlet-info>
-      <title>User Toolbar Dashboard Portlet</title>
-      <short-title>UserToolbarDashboard</short-title>
-      <keywords>gatein_internal</keywords>
-    </portlet-info>
-    <portlet-preferences>
-      <preference>
-        <name>level</name>
-        <value>2</value>
-      </preference>
-    </portlet-preferences>
-    <security-role-ref>
-      <role-name>admin</role-name>
-      <role-link>admin</role-link>
-    </security-role-ref>
-    <supported-publishing-event>
-      <name>NavigationChange</name>
-    </supported-publishing-event>
-  </portlet>
-
-  <portlet>
     <description xml:lang="EN">User Toolbar Group Portlet</description>
     <portlet-name>UserToolbarGroupPortlet</portlet-name>
     <display-name xml:lang="EN">User Toolbar Group Portlet</display-name>

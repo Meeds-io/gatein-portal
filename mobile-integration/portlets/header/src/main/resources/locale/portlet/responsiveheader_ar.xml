@@ -5,7 +5,6 @@
         <Register>تسجيل</Register>
         <SignOut>تسجيل الخروج</SignOut>
         <UserProfile>ﺎﻠﻤﻠﻓ ﺎﻠﺸﺨﺼﻳ</UserProfile>
-        <Dashboard>ﻝﻮﺣﺓ ﺎﻠﻘﻳﺍﺩﺓ</Dashboard>
         <GroupPages>صفحات المجموعة</GroupPages>
         <GroupPageTitleFormat>{groupName} صفحة</GroupPageTitleFormat>
     </label>

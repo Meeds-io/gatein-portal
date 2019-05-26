@@ -41,7 +41,6 @@ import org.exoplatform.portal.webui.application.UIPortletActionListener.ServeRes
 import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.portal.webui.portal.UIPortalComponentActionListener.DeleteComponentActionListener;
 import org.exoplatform.portal.webui.util.Util;
-import org.exoplatform.portal.webui.workspace.UIPortalApplication;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.UserProfile;
@@ -230,8 +229,6 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
         ApplicationType<S> type = state.getApplicationType();
         if (type == ApplicationType.PORTLET) {
             return applicationId;
-        } else if (type == ApplicationType.GADGET) {
-            return "dashboard/GadgetPortlet";
         } else {
             return null;
         }

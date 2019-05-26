@@ -20,7 +20,6 @@
 package org.exoplatform.portal.webui.page;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.config.DataStorage;
@@ -41,14 +40,12 @@ import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserNode;
 import org.exoplatform.portal.mop.user.UserNodeFilterConfig;
 import org.exoplatform.portal.mop.user.UserPortal;
-import org.exoplatform.portal.webui.application.UIGadget;
 import org.exoplatform.portal.webui.portal.PageNodeEvent;
 import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
 import org.exoplatform.portal.webui.workspace.UIPortalApplication;
 import org.exoplatform.portal.webui.workspace.UIWorkingWorkspace;
 import org.exoplatform.web.application.ApplicationMessage;
-import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.EventListener;
@@ -181,51 +178,6 @@ public class UIPageActionListener {
             // Reset selected navigation on userPortalConfig
             PortalDataMapper.toUIPortal(uiPortal, userPortalConfig.getPortalConfig());
             return uiPortal;
-        }
-    }
-
-    public static class DeleteGadgetActionListener extends EventListener<UIPage> {
-        public void execute(Event<UIPage> event) throws Exception {
-            WebuiRequestContext pContext = event.getRequestContext();
-            String id = pContext.getRequestParameter(UIComponent.OBJECTID);
-            UIPage uiPage = event.getSource();
-            List<UIGadget> uiWidgets = new ArrayList<UIGadget>();
-            uiPage.findComponentOfType(uiWidgets, UIGadget.class);
-            for (UIGadget uiWidget : uiWidgets) {
-                if (uiWidget.getId().equals(id)) {
-                    uiPage.getChildren().remove(uiWidget);
-                    String userName = pContext.getRemoteUser();
-                    if (userName != null && userName.trim().length() > 0) {
-                        // Julien : commented as normally removing the gadget should
-                        // remove the state associated with it
-                        // in the MOP
-                        // UserGadgetStorage widgetDataService =
-                        // uiPage.getApplicationComponent(UserGadgetStorage.class) ;
-                        // widgetDataService.delete(userName,
-                        // uiWidget.getApplicationName(), uiWidget.getId()) ;
-                    }
-                    if (uiPage.isModifiable()) {
-                        Page page = (Page) PortalDataMapper.buildModelObject(uiPage);
-                        if (page.getChildren() == null) {
-                            page.setChildren(new ArrayList<ModelObject>());
-                        }
-
-                        //
-                        PageService pageService = uiPage.getApplicationComponent(PageService.class);
-                        PageState pageState = PageUtils.toPageState(page);
-                        pageService.savePage(new PageContext(page.getPageKey(), pageState));
-
-                        //
-                        DataStorage dataService = uiPage.getApplicationComponent(DataStorage.class);
-                        dataService.save(page);
-                    }
-                    break;
-                }
-            }
-            PortalRequestContext pcontext = (PortalRequestContext) event.getRequestContext();
-            pcontext.ignoreAJAXUpdateOnPortlets(false);
-            pcontext.setResponseComplete(true);
-            pcontext.getWriter().write(EventListener.RESULT_OK);
         }
     }
 

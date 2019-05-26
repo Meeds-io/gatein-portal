@@ -497,8 +497,8 @@ public class PageMarshallerTest extends AbstractMarshallerTest {
             assertEquals(1, pages.getPages().size());
             Page page = pages.getPages().get(0);
 
-            assertEquals("Tab_Default", page.getName());
-            assertEquals("Tab_Default", page.getTitle());
+            assertEquals("SiteMap", page.getName());
+            assertEquals("SiteMap", page.getTitle());
             assertNotNull(page.getChildren());
             assertEquals(1, page.getChildren().size());
             ModelObject child = page.getChildren().get(0);

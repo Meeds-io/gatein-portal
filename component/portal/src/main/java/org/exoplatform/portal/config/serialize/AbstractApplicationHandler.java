@@ -23,7 +23,6 @@ import org.exoplatform.portal.application.Preference;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Properties;
 import org.exoplatform.portal.config.model.TransientApplicationState;
-import org.exoplatform.portal.pom.spi.gadget.Gadget;
 import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
 import org.jibx.runtime.IAliasable;
 import org.jibx.runtime.IMarshaller;
@@ -90,53 +89,39 @@ public class AbstractApplicationHandler implements IMarshaller, IUnmarshaller, I
         //
         Application<?> app;
         TransientApplicationState state;
-        // Since we don't support dashboard's here, this only works for gadgets using the gadget wrapper portlet.
-        if ("gadget-application".equals(m_name)) {
-            ctx.parsePastStartTag(m_uri, "gadget");
-            String gadgetName = ctx.parseElementText(m_uri, "gadget-ref");
-            Gadget gadget = null;
-            // Once the gadget portlet wrapper is able to use gadget userPref's, include parsing logic here.
-            // Gadget gadget = new Gadget();
-            // gadget.setUserPref();
-            state = new TransientApplicationState<Gadget>(gadgetName, gadget);
-            app = Application.createGadgetApplication();
-            app.setState(state);
-            ctx.parsePastEndTag(m_uri, "gadget");
+        String contentId;
+        boolean isWSRP = false;
+        if (ctx.isAt(m_uri, "wsrp")) {
+            contentId = ctx.parseElementText(m_uri, "wsrp");
+            app = Application.createWSRPApplication();
+            isWSRP = true;
         } else {
-            String contentId;
-            boolean isWSRP = false;
-            if (ctx.isAt(m_uri, "wsrp")) {
-                contentId = ctx.parseElementText(m_uri, "wsrp");
-                app = Application.createWSRPApplication();
-                isWSRP = true;
-            } else {
 
-                ctx.parsePastStartTag(m_uri, "portlet");
-                String applicationName = ctx.parseElementText(m_uri, "application-ref");
-                String portletName = ctx.parseElementText(m_uri, "portlet-ref");
-                contentId = applicationName + "/" + portletName;
-                app = Application.createPortletApplication();
-            }
-
-            if (ctx.isAt(m_uri, "preferences")) {
-                PortletBuilder builder = new PortletBuilder();
-                ctx.parsePastStartTag(m_uri, "preferences");
-                while (ctx.isAt(m_uri, "preference")) {
-                    Preference value = (Preference) ctx.unmarshalElement();
-                    builder.add(value.getName(), value.getValues(), value.isReadOnly());
-                }
-                ctx.parsePastEndTag(m_uri, "preferences");
-                state = new TransientApplicationState(contentId, builder.build());
-            } else {
-                state = new TransientApplicationState(contentId, null);
-            }
-
-            if (!isWSRP) {
-                ctx.parsePastEndTag(m_uri, "portlet");
-            }
-
-            app.setState(state);
+            ctx.parsePastStartTag(m_uri, "portlet");
+            String applicationName = ctx.parseElementText(m_uri, "application-ref");
+            String portletName = ctx.parseElementText(m_uri, "portlet-ref");
+            contentId = applicationName + "/" + portletName;
+            app = Application.createPortletApplication();
         }
+
+        if (ctx.isAt(m_uri, "preferences")) {
+            PortletBuilder builder = new PortletBuilder();
+            ctx.parsePastStartTag(m_uri, "preferences");
+            while (ctx.isAt(m_uri, "preference")) {
+                Preference value = (Preference) ctx.unmarshalElement();
+                builder.add(value.getName(), value.getValues(), value.isReadOnly());
+            }
+            ctx.parsePastEndTag(m_uri, "preferences");
+            state = new TransientApplicationState(contentId, builder.build());
+        } else {
+            state = new TransientApplicationState(contentId, null);
+        }
+
+        if (!isWSRP) {
+            ctx.parsePastEndTag(m_uri, "portlet");
+        }
+
+        app.setState(state);
 
         //
         nextOptionalTag(ctx, "application-type");

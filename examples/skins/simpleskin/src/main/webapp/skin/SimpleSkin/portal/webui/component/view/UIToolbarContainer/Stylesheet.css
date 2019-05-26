@@ -83,11 +83,6 @@
 
 /**********************************/
 
-.UIToolbarContainer .DashboardIcon {
-	background: url('background/ToolbarContainer.gif') no-repeat 5px -65px; /* orientation=lt */
-	background: url('background/ToolbarContainer.gif') no-repeat 100% -65px; /* orientation=rt */
-}
-
 .UIToolbarContainer .SiteIcon {
 	background: url('background/ToolbarContainer.gif') no-repeat 0px -97px; /* orientation=lt */
 	background: url('background/ToolbarContainer.gif') no-repeat 100% -97px; /* orientation=rt */

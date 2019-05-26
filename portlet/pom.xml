@@ -35,7 +35,6 @@
   <name>GateIn Portal Portlet</name>
 
   <modules>
-    <module>dashboard</module>
     <module>exoadmin</module>
     <module>web</module>
     <module>redirect</module>

@@ -1026,7 +1026,6 @@
       <normalPage>
         <EmptyLayout>空布局</EmptyLayout>
         <CurrentLayout>当前布局</CurrentLayout>
-        <DashboardLayout>控制面板布局</DashboardLayout>
       </normalPage>
       <columnPage>
         <TwoColumnsLayout>两列布局</TwoColumnsLayout>
@@ -1710,40 +1709,6 @@
       <RoundConer>圆角样式</RoundConer>
     </item>
   </ThemeDropDown>
-  <UIAddGadgetPopup>
-    <title>
-      <UIDashboardSelectContainer>控制面板工作区</UIDashboardSelectContainer>
-    </title>
-  </UIAddGadgetPopup>
-  <UIDashboardSelectContainer>
-    <action>
-      <addGadget>增加小工具</addGadget>
-    </action>
-  </UIDashboardSelectContainer>
-  <UIDashboardContainer>
-    <label>
-      <openWorkspace>增加小工具</openWorkspace>
-      <SaveTitle>保存</SaveTitle>
-      <CancelTitle>取消</CancelTitle>
-      <Debug>调试</Debug>
-      <Cache>没有缓存</Cache>
-    </label>
-  </UIDashboardContainer>
-  <UIDashboardEditForm>
-    <label>
-      <totalColumns>烈数：</totalColumns>
-      <isPrivate>是私有的：</isPrivate>
-      <owner>所有者：</owner>
-    </label>
-  </UIDashboardEditForm>
-  <UIDashboard>
-    <msg>
-      <required>该文本字段是必需的</required>
-      <addGadget>将小工具拖动到此</addGadget>
-      <notUrl>url是无效的。请输入一个小工具xml或RSS提要的正确url。</notUrl>
-      <ApplicationNotExisted>此应用不存在或已被删除。</ApplicationNotExisted>
-    </msg>
-  </UIDashboard>
   <UIUserSelector>
     <label>
       <option>

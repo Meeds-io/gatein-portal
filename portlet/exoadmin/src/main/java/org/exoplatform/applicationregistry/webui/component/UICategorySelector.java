@@ -147,12 +147,8 @@ public class UICategorySelector extends UIForm {
             appInfo.getChild(UICategorySelector.class).setRendered(false);
             UIApplicationRegistryPortlet uiPortlet = appInfo.getAncestorOfType(UIApplicationRegistryPortlet.class);
             UIApplicationOrganizer uiOrganizer = uiPortlet.getChild(UIApplicationOrganizer.class);
-            UIGadgetManagement uiGadgetManagement = uiPortlet.getChild(UIGadgetManagement.class);
 
             uiOrganizer.reload();
-            if (uiGadgetManagement != null) {
-                uiGadgetManagement.setSelectedGadget(selector.getApplication().getApplicationName());
-            }
 
             event.getRequestContext().addUIComponentToUpdateByAjax(appInfo);
         }

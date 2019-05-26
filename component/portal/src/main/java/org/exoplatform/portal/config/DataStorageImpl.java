@@ -32,13 +32,11 @@ import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.config.model.Dashboard;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.pom.data.ApplicationData;
-import org.exoplatform.portal.pom.data.DashboardData;
 import org.exoplatform.portal.pom.data.ModelChange;
 import org.exoplatform.portal.pom.data.ModelData;
 import org.exoplatform.portal.pom.data.ModelDataStorage;
@@ -47,7 +45,6 @@ import org.exoplatform.portal.pom.data.PageKey;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
 import org.exoplatform.services.cache.CacheService;
-import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.listener.ListenerService;
 
 /**
@@ -271,15 +268,6 @@ public class DataStorageImpl implements DataStorage {
         PortalKey key = new PortalKey(ownerType, portalName);
         PortalData data = delegate.getPortalConfig(key);
         return data != null ? new PortalConfig(data) : null;
-    }
-
-    public Dashboard loadDashboard(String dashboardId) throws Exception {
-        DashboardData data = delegate.loadDashboard(dashboardId);
-        return data != null ? new Dashboard(data) : null;
-    }
-
-    public void saveDashboard(Dashboard dashboard) throws Exception {
-        delegate.saveDashboard(dashboard.build());
     }
 
     public <A> A adapt(ModelObject modelObject, Class<A> type) {

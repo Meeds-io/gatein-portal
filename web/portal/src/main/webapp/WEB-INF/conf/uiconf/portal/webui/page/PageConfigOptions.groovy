@@ -27,7 +27,6 @@ WebuiRequestContext contextres = WebuiRequestContext.getCurrentInstance();
 SelectItemCategory normalPageConfigs = new SelectItemCategory("normalPageConfigs") ;
 categories.add(normalPageConfigs);
 normalPageConfigs.addSelectItemOption(new SelectItemOption("normalPage.EmptyLayout", "empty", "EmptyLayout"));
-normalPageConfigs.addSelectItemOption(new SelectItemOption("normalPage.DashboardLayout", "dashboard", "DashboardLayout"));
 
 SelectItemCategory columnPageConfigs = new SelectItemCategory("columnPageConfigs") ;
 categories.add(columnPageConfigs);  

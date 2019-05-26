@@ -26,16 +26,13 @@ import java.util.Set;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.config.model.Dashboard;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PageBody;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.SiteBody;
 import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.pom.spi.gadget.Gadget;
 import org.exoplatform.portal.webui.application.PortletState;
-import org.exoplatform.portal.webui.application.UIGadget;
 import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.container.UIComponentFactory;
 import org.exoplatform.portal.webui.container.UIContainer;
@@ -75,19 +72,9 @@ public class PortalDataMapper {
                 model = toPortletModel((UIPortlet<Object, ?>) uiComponent);
             } else if (uiComponent instanceof UIContainer) {
                 model = toContainer((UIContainer) uiComponent);
-            } else if (uiComponent instanceof UIGadget) {
-                model = toGadget((UIGadget) uiComponent);
             }
         }
         return model;
-    }
-
-    private static Application<Gadget> toGadget(UIGadget uiGadget) {
-        Application<Gadget> app = Application.createGadgetApplication(uiGadget.getStorageId());
-        app.setState(uiGadget.getState());
-        app.setProperties(uiGadget.getProperties());
-        app.setStorageName(uiGadget.getStorageName());
-        return app;
     }
 
     public static void toContainer(Container model, UIContainer uiContainer) {
@@ -200,11 +187,6 @@ public class PortalDataMapper {
         return model;
     }
 
-    public static void toUIGadget(UIGadget uiGadget, Application<Gadget> model) {
-        uiGadget.setProperties(model.getProperties());
-        uiGadget.setState(model.getState());
-    }
-
     /**
      * Fill the UI component with both information from the persistent model and some coming from the portlet.xml defined by the
      * JSR 286 specification
@@ -258,10 +240,6 @@ public class PortalDataMapper {
     }
 
     public static void toUIContainer(UIContainer uiContainer, Container model) throws Exception {
-        toUIContainer(uiContainer, model, model instanceof Dashboard);
-    }
-
-    private static void toUIContainer(UIContainer uiContainer, Container model, boolean dashboard) throws Exception {
         uiContainer.setStorageId(model.getStorageId());
         uiContainer.setId(model.getId());
         uiContainer.setWidth(model.getWidth());
@@ -282,7 +260,7 @@ public class PortalDataMapper {
         if (children == null)
             return;
         for (Object child : children) {
-            buildUIContainer(uiContainer, child, dashboard);
+            buildUIContainer(uiContainer, child);
         }
     }
 
@@ -329,12 +307,12 @@ public class PortalDataMapper {
         List<ModelObject> children = layout .getChildren();
         if (children != null) {
             for (Object child : children) {
-                buildUIContainer(uiPortal, child, false);
+                buildUIContainer(uiPortal, child);
             }
         }
     }
 
-    private static void buildUIContainer(UIContainer uiContainer, Object model, boolean dashboard) throws Exception {
+    private static void buildUIContainer(UIContainer uiContainer, Object model) throws Exception {
         UIComponent uiComponent = null;
         WebuiRequestContext context = Util.getPortalRequestContext();
 
@@ -349,21 +327,13 @@ public class PortalDataMapper {
         } else if (model instanceof Application) {
             Application application = (Application) model;
 
-            if (dashboard && application.getType() == ApplicationType.GADGET) {
-                Application<Gadget> ga = (Application<Gadget>) application;
-                UIGadget uiGadget = uiContainer.createUIComponent(context, UIGadget.class, null, null);
-                uiGadget.setStorageId(application.getStorageId());
-                toUIGadget(uiGadget, ga);
-                uiComponent = uiGadget;
-            } else {
-                UIPortlet uiPortlet = uiContainer.createUIComponent(context, UIPortlet.class, null, null);
-                uiPortlet.setStorageId(application.getStorageId());
-                if (application.getStorageName() != null) {
-                    uiPortlet.setStorageName(application.getStorageName());
-                }
-                toUIPortlet(uiPortlet, application);
-                uiComponent = uiPortlet;
+            UIPortlet uiPortlet = uiContainer.createUIComponent(context, UIPortlet.class, null, null);
+            uiPortlet.setStorageId(application.getStorageId());
+            if (application.getStorageName() != null) {
+                uiPortlet.setStorageName(application.getStorageName());
             }
+            toUIPortlet(uiPortlet, application);
+            uiComponent = uiPortlet;
         } else if (model instanceof Container) {
             Container container = (Container) model;
 
@@ -375,7 +345,7 @@ public class PortalDataMapper {
                 uiTempContainer = uiContainer.createUIComponent(context, UIContainer.class, null, null);
             }
 
-            toUIContainer(uiTempContainer, (Container) model, dashboard);
+            toUIContainer(uiTempContainer, (Container) model);
             uiComponent = uiTempContainer;
         }
         uiContainer.addChild(uiComponent);
