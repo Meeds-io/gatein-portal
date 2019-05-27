@@ -166,7 +166,7 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
   }
   
   private List<PortalData> getPortalData() {
-    if (data == null) {
+    if (data == null || data.isEmpty()) {
       data = new ArrayList<PortalData>();
       try {
         data.addAll(getPortalData(PortalConfig.PORTAL_TYPE));
