@@ -217,6 +217,11 @@
   </component>
 
   <component>
+    <key>org.exoplatform.portal.mop.page.PageServiceImpl</key>
+    <type>org.exoplatform.portal.mop.page.PageServiceImpl</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.portal.mop.description.DescriptionService</key>
     <type>org.exoplatform.portal.jdbc.service.DescriptionServiceImpl</type>
   </component>
@@ -229,6 +234,11 @@
   <component>
     <key>org.exoplatform.portal.jdbc.migration.SiteMigrationService</key>
     <type>org.exoplatform.portal.jdbc.migration.SiteMigrationService</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.jdbc.migration.PageMigrationService</key>
+    <type>org.exoplatform.portal.jdbc.migration.PageMigrationService</type>
   </component>
 
   <component>

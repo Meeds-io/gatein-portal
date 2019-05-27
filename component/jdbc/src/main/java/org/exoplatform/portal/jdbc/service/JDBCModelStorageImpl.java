@@ -581,7 +581,12 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
             JDBCDashboardData data;
             if (app.getStorageId() != null) {
               ContainerEntity dstDashboard = containerDAO.find(app.getStorageId());
-              data = buildDashBoard(dstDashboard);
+              if (dstDashboard != null) {
+                data = buildDashBoard(dstDashboard);
+              } else {
+                data = JDBCDashboardData.INITIAL_DASHBOARD;
+                dashboardChilds = saveChildren(data.getChildren());
+              }
             } else {
               data = JDBCDashboardData.INITIAL_DASHBOARD;
               dashboardChilds = saveChildren(data.getChildren());
@@ -628,19 +633,25 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       if (srcChildId != null) { // update
         if (srcChild instanceof ContainerData) {
           dstChild = containerDAO.find(srcChildId);
-          buildContainerEntity((ContainerEntity) dstChild, (ContainerData) srcChild);
-          containerDAO.update((ContainerEntity) dstChild);
+          if (dstChild != null) {
+            buildContainerEntity((ContainerEntity) dstChild, (ContainerData) srcChild);
+            containerDAO.update((ContainerEntity) dstChild);
+          }
         } else if (srcChild instanceof ApplicationData) {
           dstChild = windowDAO.find(srcChildId);
-          buildWindowEntity((WindowEntity) dstChild, (ApplicationData) srcChild);
-          windowDAO.update((WindowEntity) dstChild);
+          if (dstChild != null) {
+            buildWindowEntity((WindowEntity) dstChild, (ApplicationData) srcChild);
+            windowDAO.update((WindowEntity) dstChild);
+          }
         } else if (srcChild instanceof BodyData) {
           // nothing to update on body data
           dstChild = containerDAO.find(srcChildId);
         } else {
           log.warn("this layout component type is not supported: {}", srcChild);
         }
-      } else { // create new
+      }
+
+      if (dstChild == null) { // create new
         if (srcChild instanceof ContainerData) {
           dstChild = buildContainerEntity(null, (ContainerData) srcChild);
           containerDAO.create((ContainerEntity) dstChild);
