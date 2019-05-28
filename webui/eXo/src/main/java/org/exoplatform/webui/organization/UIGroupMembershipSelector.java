@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 eXo Platform SAS.
+ * Copyright (C) 2019 eXo Platform SAS.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -19,17 +19,15 @@
 
 package org.exoplatform.webui.organization;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.exoplatform.commons.serialization.api.annotations.Serialized;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
@@ -58,11 +56,18 @@ import org.exoplatform.webui.form.UIForm;
 @Serialized
 public class UIGroupMembershipSelector extends UIContainer {
 
+    private OrganizationService organizationService;
+
+    private UserACL userACL;
+
     private Group selectGroup_;
 
     private List<String> listMemberhip;
 
     public UIGroupMembershipSelector() throws Exception {
+        organizationService = getApplicationComponent(OrganizationService.class);
+        userACL = getApplicationComponent(UserACL.class);
+
         UIBreadcumbs uiBreadcumbs = addChild(UIBreadcumbs.class, "BreadcumbGroupSelector", "BreadcumbGroupSelector");
         UITree tree = addChild(UITree.class, "UITreeGroupSelector", "TreeGroupSelector");
         tree.setIcon("GroupAdminIcon");
@@ -78,21 +83,14 @@ public class UIGroupMembershipSelector extends UIContainer {
      */
     @Override
     public void processRender(WebuiRequestContext context) throws Exception {
-        OrganizationService service = getApplicationComponent(OrganizationService.class);
         UITree tree = getChild(UITree.class);
         if (tree != null && tree.getSibbling() == null) {
-            Collection<?> sibblingsGroup = service.getGroupHandler().findGroups(null);
-            tree.setSibbling((List) sibblingsGroup);
+            tree.setSibbling(getChildrenGroups(null));
         }
 
-        List<MembershipType> memberships = (List<MembershipType>) service.getMembershipTypeHandler().findMembershipTypes();
-        Collections.sort(memberships, new Comparator<MembershipType>() {
-            @Override
-            public int compare(MembershipType o1, MembershipType o2) {
-                return o1.getName().compareTo(o2.getName());
-            }
-        });
-        listMemberhip = new LinkedList<String>();
+        List<MembershipType> memberships = (List<MembershipType>) organizationService.getMembershipTypeHandler().findMembershipTypes();
+        memberships.sort(Comparator.comparing(MembershipType::getName));
+        listMemberhip = new LinkedList<>();
         boolean containWildcard = false;
         for (MembershipType mt : memberships) {
             listMemberhip.add(mt.getName());
@@ -112,44 +110,50 @@ public class UIGroupMembershipSelector extends UIContainer {
     }
 
     public void changeGroup(String groupId) throws Exception {
-        OrganizationService service = getApplicationComponent(OrganizationService.class);
         UIBreadcumbs uiBreadcumb = getChild(UIBreadcumbs.class);
         uiBreadcumb.setPath(getPath(null, groupId));
 
         UITree tree = getChild(UITree.class);
-        Collection<?> sibblingGroup;
 
         if (groupId == null) {
-            sibblingGroup = service.getGroupHandler().findGroups(null);
-            tree.setSibbling((List) sibblingGroup);
+            tree.setSibbling(getChildrenGroups(null));
             tree.setChildren(null);
             tree.setSelected(null);
             selectGroup_ = null;
             return;
         }
 
-        selectGroup_ = service.getGroupHandler().findGroupById(groupId);
+        selectGroup_ = organizationService.getGroupHandler().findGroupById(groupId);
         String parentGroupId = null;
         if (selectGroup_ != null) {
             parentGroupId = selectGroup_.getParentId();
         }
         Group parentGroup = null;
         if (parentGroupId != null) {
-            parentGroup = service.getGroupHandler().findGroupById(parentGroupId);
+            parentGroup = organizationService.getGroupHandler().findGroupById(parentGroupId);
         }
 
-        Collection childrenGroup = service.getGroupHandler().findGroups(selectGroup_);
-        sibblingGroup = service.getGroupHandler().findGroups(parentGroup);
-
-        tree.setSibbling((List) sibblingGroup);
-        tree.setChildren((List) childrenGroup);
+        tree.setSibbling(getChildrenGroups(parentGroup));
+        tree.setChildren(getChildrenGroups(selectGroup_));
         tree.setSelected(selectGroup_);
         tree.setParentSelected(parentGroup);
     }
 
+    protected List<Group> getChildrenGroups(Group parentGroup) throws Exception {
+        ConversationState conversationState = ConversationState.getCurrent();
+        if(conversationState != null && conversationState.getIdentity() != null) {
+            return organizationService.getGroupHandler().findGroups(parentGroup)
+                    .stream()
+                    .filter(group -> userACL.hasPermission(conversationState.getIdentity(), group, "default"))
+                    .collect(Collectors.toList());
+        } else {
+            return Collections.EMPTY_LIST;
+        }
+    }
+
     private List<LocalPath> getPath(List<LocalPath> list, String id) throws Exception {
         if (list == null) {
-            list = new ArrayList<LocalPath>(5);
+            list = new ArrayList<>(5);
         }
         if (id == null) {
             return list;
@@ -182,7 +186,7 @@ public class UIGroupMembershipSelector extends UIContainer {
             UIComponent uiComp = event.getSource();
             UIGroupMembershipSelector uiSelector = uiComp.getParent();
             uiSelector.changeGroup(groupId);
-            UIComponent uiPermission = uiSelector.<UIComponent> getParent().getParent();
+            UIComponent uiPermission = uiSelector.getParent().getParent();
             uiPermission.setRenderSibling(uiPermission.getClass());
             uiPermission.broadcast(event, Event.Phase.PROCESS);
             UIPopupWindow uiPopup = uiSelector.getParent();
@@ -194,7 +198,7 @@ public class UIGroupMembershipSelector extends UIContainer {
     public static class SelectMembershipActionListener extends EventListener<UIGroupMembershipSelector> {
         public void execute(Event<UIGroupMembershipSelector> event) throws Exception {
             UIGroupMembershipSelector uiSelector = event.getSource();
-            UIComponent uiPermission = uiSelector.<UIComponent> getParent().getParent();
+            UIComponent uiPermission = uiSelector.getParent().getParent();
             uiPermission.setRenderSibling(uiPermission.getClass());
             WebuiRequestContext pcontext = event.getRequestContext();
 

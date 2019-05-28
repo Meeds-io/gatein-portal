@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 eXo Platform SAS.
+ * Copyright (C) 2019 eXo Platform SAS.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -19,13 +19,14 @@
 
 package org.exoplatform.webui.organization.account;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.exoplatform.commons.serialization.api.annotations.Serialized;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
@@ -56,20 +57,24 @@ import org.exoplatform.webui.form.UIForm;
 @Serialized
 public class UIGroupSelector extends UIContainer {
 
+    private OrganizationService organizationService;
+
+    private UserACL userACL;
+
     private Group selectGroup_;
 
     @SuppressWarnings("unchecked")
     public UIGroupSelector() throws Exception {
+        organizationService = getApplicationComponent(OrganizationService.class);
+        userACL = getApplicationComponent(UserACL.class);
+
         UIBreadcumbs uiBreadcumbs = addChild(UIBreadcumbs.class, "BreadcumbGroupSelector", "BreadcumbGroupSelector");
         UITree tree = addChild(UITree.class, "UITreeGroupSelector", "TreeGroupSelector");
-        OrganizationService service = getApplicationComponent(OrganizationService.class);
-        Collection<?> sibblingsGroup = service.getGroupHandler().findGroups(null);
 
-        tree.setSibbling((List) sibblingsGroup);
+        tree.setSibbling(getGroups(null));
         tree.setIcon("GroupAdminIcon");
         tree.setSelectedIcon("PortalIcon");
         tree.setBeanIdField("id");
-        // tree.setBeanLabelField("groupName");
         tree.setBeanLabelField("label");
         tree.setEscapeHTML(true);
         uiBreadcumbs.setBreadcumbsStyle("UIExplorerHistoryPath");
@@ -81,46 +86,43 @@ public class UIGroupSelector extends UIContainer {
 
     @SuppressWarnings("unchecked")
     public void changeGroup(String groupId) throws Exception {
-        OrganizationService service = getApplicationComponent(OrganizationService.class);
         UIBreadcumbs uiBreadcumb = getChild(UIBreadcumbs.class);
         uiBreadcumb.setPath(getPath(null, groupId));
 
         UITree tree = getChild(UITree.class);
-        Collection<?> sibblingGroup;
 
         if (groupId == null) {
-            sibblingGroup = service.getGroupHandler().findGroups(null);
-            tree.setSibbling((List) sibblingGroup);
+            tree.setSibbling(getGroups(null));
             tree.setChildren(null);
             tree.setSelected(null);
             selectGroup_ = null;
             return;
         }
 
-        selectGroup_ = service.getGroupHandler().findGroupById(groupId);
+        selectGroup_ = organizationService.getGroupHandler().findGroupById(groupId);
         String parentGroupId = null;
-        if (selectGroup_ != null)
+        if (selectGroup_ != null) {
             parentGroupId = selectGroup_.getParentId();
+        }
         Group parentGroup = null;
-        if (parentGroupId != null)
-            parentGroup = service.getGroupHandler().findGroupById(parentGroupId);
+        if (parentGroupId != null) {
+            parentGroup = organizationService.getGroupHandler().findGroupById(parentGroupId);
+        }
 
-        Collection childrenGroup = service.getGroupHandler().findGroups(selectGroup_);
-        sibblingGroup = service.getGroupHandler().findGroups(parentGroup);
-
-        tree.setSibbling((List) sibblingGroup);
-        tree.setChildren((List) childrenGroup);
+        tree.setSibbling(getGroups(selectGroup_));
+        if(parentGroup != null) {
+            tree.setChildren(getGroups(parentGroup));
+        }
         tree.setSelected(selectGroup_);
         tree.setParentSelected(parentGroup);
     }
 
     private List<LocalPath> getPath(List<LocalPath> list, String id) throws Exception {
         if (list == null)
-            list = new ArrayList<LocalPath>(5);
+            list = new ArrayList<>(5);
         if (id == null)
             return list;
-        OrganizationService service = getApplicationComponent(OrganizationService.class);
-        Group group = service.getGroupHandler().findGroupById(id);
+        Group group = organizationService.getGroupHandler().findGroupById(id);
         if (group == null)
             return list;
         list.add(0, new LocalPath(group.getId(), group.getGroupName()));
@@ -130,19 +132,23 @@ public class UIGroupSelector extends UIContainer {
 
     @SuppressWarnings("unchecked")
     public List<String> getListGroup() throws Exception {
-        OrganizationService service = getApplicationComponent(OrganizationService.class);
-        List<String> listGroup = new ArrayList<String>();
-        if (getCurrentGroup() == null)
+        if (getCurrentGroup() == null) {
             return null;
-        Collection<Group> groups = service.getGroupHandler().findGroups(getCurrentGroup());
-        if (groups.size() > 0) {
-            for (Object child : groups) {
-                Group childGroup = (Group) child;
-                listGroup.add(childGroup.getId());
-            }
         }
-        return listGroup;
 
+        return getGroups(getCurrentGroup()).stream().map(Group::getId).collect(Collectors.toList());
+    }
+
+    protected List<Group> getGroups(Group parentGroup) throws Exception {
+        ConversationState conversationState = ConversationState.getCurrent();
+        if(conversationState != null && conversationState.getIdentity() != null) {
+            return organizationService.getGroupHandler().findGroups(parentGroup)
+                    .stream()
+                    .filter(group -> userACL.hasPermission(conversationState.getIdentity(), group, "default"))
+                    .collect(Collectors.toList());
+        } else {
+            return Collections.EMPTY_LIST;
+        }
     }
 
     public String event(String name, String beanId) throws Exception {
