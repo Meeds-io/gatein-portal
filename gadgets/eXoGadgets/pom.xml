@@ -48,17 +48,5 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.apache.shindig</groupId>
-      <artifactId>shindig-common</artifactId>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.code.guice</groupId>
-          <artifactId>guice-jmx</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
   </dependencies>
 </project>

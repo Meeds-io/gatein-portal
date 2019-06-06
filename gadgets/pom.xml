@@ -32,8 +32,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>core</module>
-    <module>server</module>
     <module>eXoGadgets</module>
   </modules>
 </project>
