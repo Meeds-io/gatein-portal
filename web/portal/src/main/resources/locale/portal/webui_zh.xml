@@ -1618,53 +1618,6 @@
       <tabsPageConfigs>标签页面配置</tabsPageConfigs>
     </item>
   </UIDropDownPageTemp>
-
-  <UIGadgetContainerManagement>
-    <action>
-      <close>取消</close>
-      <save>#{word.save}</save>
-    </action>
-    <confirm>
-      <DeleteContainer>您确定要删除这个容器吗？</DeleteContainer>
-      <DeleteGadget>您确定要删除这个小工具吗？</DeleteGadget>
-    </confirm>
-    <title>
-      <manager>小工具容器管理</manager>
-      <containers>容器</containers>
-      <selectedContainer>选中的小工具容器信息：</selectedContainer>
-    </title>
-    <msg>
-      <emptyList>此分类中不存在容器。</emptyList>
-      <noSelected>没选中容器</noSelected>
-    </msg>
-    <label>
-      <label>容器标签：</label>
-      <description>容器描述：</description>
-    </label>
-    <tooltip>
-      <remove>删除选中的小工具容器</remove>
-      <edit>编辑选中的小工具容器</edit>
-      <addnew>增加新的小工具容器</addnew>
-    </tooltip>
-  </UIGadgetContainerManagement>
-  <GadgetContainerPopup>
-    <title>
-      <UIGadgetContainerForm>小工具容器表</UIGadgetContainerForm>
-    </title>
-  </GadgetContainerPopup>
-  <UIGadgetContainerForm>
-    <label>
-      <name>标签：</name>
-      <description>描述：</description>
-    </label>
-    <action>
-      <Save>#{word.save}</Save>
-      <Close>取消</Close>
-    </action>
-    <msg>
-      <exist>这个容器已经存在，请输入另外一个。</exist>
-    </msg>
-  </UIGadgetContainerForm>
   <UIWidgetContainer>
     <tooltip>
       <addWidget>增加小工具</addWidget>
@@ -1812,16 +1765,6 @@
       <Group>组</Group>
     </header>
   </UIAddGroupNavigation>
-  <UIGadget>
-    <tooltip>
-      <Minimize>最小化</Minimize>
-      <Unminimize>还原</Unminimize>
-      <Maximize>最大化</Maximize>
-      <Unmaximize>向下还原</Unmaximize>
-      <editGadget>编辑小工具</editGadget>
-      <deleteGadget>删除小工具</deleteGadget>
-    </tooltip>
-  </UIGadget>
   <Locale>
     <zh_CN>简体中文</zh_CN>
     <zh_TW>簡體中文</zh_TW>

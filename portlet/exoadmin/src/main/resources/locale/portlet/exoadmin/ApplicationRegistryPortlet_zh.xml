@@ -18,16 +18,10 @@
     </msg>
     <label></label>
   </application>
-  <gadget>
-    <msg>
-      <changeNotExist>不能将修改保存到小工具中，数据库中该小工具已不存在。</changeNotExist>
-    </msg>
-  </gadget>
   <UIToolbar>
     <label>
       <organize>分类</organize>
       <portlet>Portlet</portlet>
-      <gadget>小工具</gadget>
     </label>
   </UIToolbar>
   <UIOrganizer>
@@ -92,7 +86,6 @@
     <label>
       <option>
         <portlet>portlet</portlet>
-        <gadget>小工具</gadget>
       </option>
       <displayName>#{label.displayName}</displayName>
       <type>应用类型</type>
@@ -148,43 +141,6 @@
       <noPortletPreferences>没有portlet选项</noPortletPreferences>
     </msg>
   </UIPortletInfo>
-  <UIGadgetManagement>
-    <label>
-      <addRemote>增加一个远程小工具</addRemote>
-      <createNew>创建一个新小工具</createNew>
-    </label>
-    <title>
-      <deleteGadget>删除小工具</deleteGadget>
-    </title>
-    <msg>
-      <noGadget>没有可用的小工具。</noGadget>
-      <deleteGadgetInUse>不能删除此小工具，正在使用中。</deleteGadgetInUse>
-      <deleteGadget>您确定要删除此小工具吗？</deleteGadget>
-    </msg>
-  </UIGadgetManagement>
-  <UIGadgetInfo>
-    <label>
-      <gadgetDetails>小工具详细信息</gadgetDetails>
-      <name>小工具名称：</name>
-      <displayName>#{label.displayName}</displayName>
-      <description>#{label.description}</description>
-      <viewUrl>查看网址：</viewUrl>
-      <editUrl>编辑网址：</editUrl>
-      <reference>选项：</reference>
-      <categories>分类：</categories>
-      <categories>
-        <guide>为了能在控制面板中使用，您必须将此小工具添加到分类中。</guide>
-        <clickHere>点击此处添加到分类中</clickHere>
-      </categories>
-    </label>
-    <title>
-      <refresh>刷新信息</refresh>
-      <editGadget>编辑小工具</editGadget>
-    </title>
-    <msg>
-      <gadgetNotExist>此小工具在数据库中不存在，不能在此小工具上执行操作。</gadgetNotExist>
-    </msg>
-  </UIGadgetInfo>
   <UICategorySelector>
     <header>
       <choose>选择</choose>
@@ -198,29 +154,6 @@
       <NoCategory>没有分类</NoCategory>
     </msg>
   </UICategorySelector>
-  <UIAddGadget>
-    <action>
-      <Add>增加</Add>
-      <Cancel>#{word.cancel}</Cancel>
-    </action>
-    <label>
-      <url>网址</url>
-      <urlExist>此网址已经存在，请选择另外一个！</urlExist>
-      <urlError>网址：'{0}'中的数据无效</urlError>
-    </label>
-  </UIAddGadget>
-  <UIGadgetEditor>
-    <label>
-      <source>源:</source>
-    </label>
-    <action>
-      <Save>#{word.save}</Save>
-      <Cancel>#{word.cancel}</Cancel>
-    </action>
-    <msg>
-      <invalidSpec>这个来源是无效的小工具规范。</invalidSpec>
-    </msg>
-  </UIGadgetEditor>
   <UIListPermissionSelector>
     <header>
       <groupId>组</groupId>
