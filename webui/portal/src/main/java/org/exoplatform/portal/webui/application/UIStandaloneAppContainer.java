@@ -23,12 +23,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.exoplatform.portal.application.StandaloneAppRequestContext;
-import org.exoplatform.portal.config.DataStorage;
-import org.exoplatform.portal.config.model.Application;
-import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.pom.spi.gadget.Gadget;
-import org.exoplatform.portal.webui.util.PortalDataMapper;
-import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.web.login.LoginServlet;
 import org.exoplatform.web.login.LogoutControl;
 import org.exoplatform.web.security.security.AbstractTokenService;

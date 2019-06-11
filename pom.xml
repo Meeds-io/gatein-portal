@@ -128,7 +128,6 @@
   <modules>
     <module>build-config</module>
     <module>component</module>
-    <module>gadgets</module>
     <module>webui</module>
     <module>portlet</module>
     <module>web</module>

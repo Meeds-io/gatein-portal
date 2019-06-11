@@ -312,10 +312,6 @@ public class UIPortalComponentActionListener {
                 //
                 @SuppressWarnings("unchecked")
                 UIPortlet<Object, ?> uiPortlet = uiTarget.createUIComponent(UIPortlet.class, null, null);
-                // Only setting title for Gadgets as it's using Portlet wrapper for displaying
-                if (app.getType().equals(ApplicationType.GADGET)) {
-                    uiPortlet.setTitle(app.getDisplayName());
-                }
                 uiPortlet.setDescription(app.getDescription());
                 List<String> accessPersList = app.getAccessPermissions();
                 String[] accessPers = accessPersList.toArray(new String[accessPersList.size()]);

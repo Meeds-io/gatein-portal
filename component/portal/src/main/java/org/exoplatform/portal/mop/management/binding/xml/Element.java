@@ -90,7 +90,6 @@ public enum Element implements EnumElement<Element> {
     MOVE_CONTAINERS_PERMISSIONS("move-containers-permissions"),
     EDIT_PERMISSION("edit-permission"),
     PORTLET_APPLICATION("portlet-application"),
-    GADGET_APPLICATION("gadget-application"),
     CONTAINER("container"),
     PAGE_BODY("page-body"),
     APPLICATION_REF("application-ref"),

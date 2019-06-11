@@ -22,7 +22,6 @@ package org.exoplatform.portal.config.model;
 import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.ApplicationData;
 import org.exoplatform.portal.pom.data.ModelData;
-import org.exoplatform.portal.pom.spi.gadget.Gadget;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.wsrp.WSRP;
 
@@ -227,18 +226,6 @@ public class Application<S> extends ModelObject {
         return new ApplicationData<S>(storageId, storageName, getType(), state, id, title, icon, description, showInfoBar,
                 showApplicationState, showApplicationMode, theme, width, height, Utils.safeImmutableMap(properties),
                 Utils.safeImmutableList(accessPermissions));
-    }
-
-    public static Application<Gadget> createGadgetApplication(ApplicationData<Gadget> data) {
-        return new Application<Gadget>(data);
-    }
-
-    public static Application<Gadget> createGadgetApplication(String storageId) {
-        return new Application<Gadget>(ApplicationType.GADGET, storageId);
-    }
-
-    public static Application<Gadget> createGadgetApplication() {
-        return new Application<Gadget>(ApplicationType.GADGET);
     }
 
     public static Application<Portlet> createPortletApplication(ApplicationData<Portlet> data) {

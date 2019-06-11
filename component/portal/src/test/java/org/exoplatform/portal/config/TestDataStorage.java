@@ -20,7 +20,6 @@
 package org.exoplatform.portal.config;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -55,7 +54,6 @@ import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.pom.config.POMSessionManager;
 import org.exoplatform.portal.pom.data.ModelChange;
-import org.exoplatform.portal.pom.spi.gadget.Gadget;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
 import org.exoplatform.portal.pom.spi.wsrp.WSRP;
@@ -697,28 +695,6 @@ public class TestDataStorage extends AbstractConfigTest {
         begin();
         afterNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
         assertEquals(new HashSet<String>(names), new HashSet<String>(afterNames));
-    }
-
-    public void testGadget() throws Exception {
-        Gadget gadget = new Gadget();
-        gadget.setUserPref("user_pref");
-        TransientApplicationState<Gadget> state = new TransientApplicationState<Gadget>("bar", gadget);
-        Application<Gadget> gadgetApplication = Application.createGadgetApplication();
-        gadgetApplication.setState(state);
-
-        Page container = new Page();
-        container.setPageId("portal::test::gadget_page");
-        container.getChildren().add(gadgetApplication);
-
-        pageService.savePage(new PageContext(container.getPageKey(), null));
-        storage_.save(container);
-
-        container = storage_.getPage("portal::test::gadget_page");
-        gadgetApplication = (Application<Gadget>) container.getChildren().get(0);
-
-        gadget = storage_.load(gadgetApplication.getState(), ApplicationType.GADGET);
-        assertNotNull(gadget);
-        assertEquals("user_pref", gadget.getUserPref());
     }
 
     public void testSiteScopedPreferences() throws Exception {

@@ -24,9 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.exoplatform.component.test.AbstractGateInTest;
-import org.exoplatform.portal.config.model.ApplicationType;
-import org.exoplatform.portal.config.model.PersistentApplicationState;
-import org.exoplatform.portal.pom.data.ApplicationData;
 import org.exoplatform.portal.pom.data.BodyData;
 import org.exoplatform.portal.pom.data.BodyType;
 import org.exoplatform.portal.pom.data.ComponentData;
@@ -36,7 +33,6 @@ import org.exoplatform.portal.pom.data.PageData;
 import org.exoplatform.portal.pom.data.PageKey;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
-import org.exoplatform.portal.pom.spi.gadget.Gadget;
 import org.gatein.common.io.IOTools;
 
 /**
@@ -137,28 +133,5 @@ public class TestSerialization extends AbstractGateInTest {
         assertEquals(obj.getEditPermission(), clone.getEditPermission());
         assertEquals(obj.getProperties(), clone.getProperties());
         assertEquals(obj.getSkin(), clone.getSkin());
-    }
-
-    public void testApplicationData() throws Exception {
-        ApplicationData<?> obj = new ApplicationData<Gadget>("foo01", "foo02", ApplicationType.GADGET,
-                new PersistentApplicationState<Gadget>("bar"), "foo03", "foo04", "foo05", "foo06", true, true, true, "foo07",
-                "foo08", "foo09", Collections.singletonMap("foo10", "foo11"), Arrays.asList("foo12"));
-        ApplicationData<?> clone = IOTools.clone(obj);
-        assertEquals(obj.getStorageId(), clone.getStorageId());
-        assertEquals(obj.getType(), clone.getType());
-        assertEquals(((PersistentApplicationState<?>) obj.getState()).getStorageId(),
-                ((PersistentApplicationState<?>) clone.getState()).getStorageId());
-        assertEquals(obj.getId(), clone.getId());
-        assertEquals(obj.getTitle(), clone.getTitle());
-        assertEquals(obj.getIcon(), clone.getIcon());
-        assertEquals(obj.getDescription(), clone.getDescription());
-        assertEquals(obj.isShowInfoBar(), clone.isShowInfoBar());
-        assertEquals(obj.isShowApplicationState(), clone.isShowApplicationState());
-        assertEquals(obj.isShowApplicationMode(), clone.isShowApplicationMode());
-        assertEquals(obj.getTheme(), clone.getTheme());
-        assertEquals(obj.getWidth(), clone.getWidth());
-        assertEquals(obj.getHeight(), clone.getHeight());
-        assertEquals(obj.getProperties(), clone.getProperties());
-        assertEquals(obj.getAccessPermissions(), clone.getAccessPermissions());
     }
 }

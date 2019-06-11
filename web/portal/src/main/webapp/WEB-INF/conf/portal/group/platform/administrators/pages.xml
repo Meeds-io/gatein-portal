@@ -90,21 +90,6 @@
   </page>
 
   <page>
-    <name>servicesManagement</name>
-    <title>Services Management</title>
-    <access-permissions>manager:/platform/administrators</access-permissions>
-    <edit-permission>manager:/platform/administrators</edit-permission>
-    <gadget-application>
-      <gadget>
-        <gadget-ref>ServicesManagement</gadget-ref>
-      </gadget>
-      <title>Services Management</title>
-      <access-permissions>manager:/platform/administrators</access-permissions>
-      <show-info-bar>false</show-info-bar>
-    </gadget-application>
-  </page>
-
-  <page>
     <name>siteRedirects</name>
     <title>Site Redirects and Import/Export</title>
     <access-permissions>manager:/platform/administrators</access-permissions>

@@ -88,10 +88,6 @@ public class UIWorkingWorkspace extends UIContainer {
                 if (chunks[1].equals(portletName)) {
                     Util.getPortalRequestContext().addUIComponentToUpdateByAjax(portlet);
                 }
-            } else if (type == ApplicationType.GADGET) {
-                if (applicationId.equals(portletName)) {
-                    Util.getPortalRequestContext().addUIComponentToUpdateByAjax(portlet);
-                }
             } else {
                 throw new AssertionError("Need to handle wsrp case later");
             }

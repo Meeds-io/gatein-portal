@@ -41,9 +41,6 @@ import javax.xml.stream.XMLStreamException;
 
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.config.serialize.JibxArraySerialize;
-import org.gatein.common.xml.stax.navigator.Exceptions;
-import org.gatein.common.xml.stax.navigator.StaxNavUtils;
 import org.gatein.common.xml.stax.writer.StaxWriter;
 import org.gatein.common.xml.stax.writer.WritableValueTypes;
 import org.gatein.common.xml.stax.writer.builder.StaxWriterBuilder;
@@ -193,13 +190,6 @@ public class PageMarshaller extends AbstractMarshaller<Page.PageSet> {
                         page.setChildren(new ArrayList<ModelObject>());
                     }
                     page.getChildren().add(unmarshalPortletApplication(navigator.fork()));
-                    current = navigator.sibling();
-                    break;
-                case GADGET_APPLICATION:
-                    if (page.getChildren() == null) {
-                        page.setChildren(new ArrayList<ModelObject>());
-                    }
-                    page.getChildren().add(unmarshalGadgetApplication(navigator.fork()));
                     current = navigator.sibling();
                     break;
                 case UNKNOWN:

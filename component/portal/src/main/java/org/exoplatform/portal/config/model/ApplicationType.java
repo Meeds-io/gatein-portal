@@ -22,7 +22,6 @@ package org.exoplatform.portal.config.model;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 
-import org.exoplatform.portal.pom.spi.gadget.Gadget;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.wsrp.WSRP;
 import org.gatein.mop.api.content.ContentType;
@@ -39,8 +38,6 @@ public class ApplicationType<S> implements Serializable {
     public static ApplicationType<?> getType(String name) {
         if (PORTLET.getName().equals(name)) {
             return ApplicationType.PORTLET;
-        } else if (GADGET.getName().equals(name)) {
-            return ApplicationType.GADGET;
         } else if (WSRP_PORTLET.getName().equals(name)) {
             return ApplicationType.WSRP_PORTLET;
         } else {
@@ -51,8 +48,6 @@ public class ApplicationType<S> implements Serializable {
     public static <S> ApplicationType<S> getType(ContentType<S> name) {
         if (PORTLET.getContentType().equals(name)) {
             return (ApplicationType<S>) ApplicationType.PORTLET;
-        } else if (GADGET.getContentType().equals(name)) {
-            return (ApplicationType<S>) ApplicationType.GADGET;
         } else if (WSRP_PORTLET.getContentType().equals(name)) {
             return (ApplicationType<S>) ApplicationType.WSRP_PORTLET;
         } else {
@@ -62,9 +57,6 @@ public class ApplicationType<S> implements Serializable {
 
     /** . */
     public static final ApplicationType<Portlet> PORTLET = new ApplicationType<Portlet>(Portlet.CONTENT_TYPE, "portlet");
-
-    /** . */
-    public static final ApplicationType<Gadget> GADGET = new ApplicationType<Gadget>(Gadget.CONTENT_TYPE, "gadget");
 
     /** . */
     public static final ApplicationType<WSRP> WSRP_PORTLET = new ApplicationType<WSRP>(WSRP.CONTENT_TYPE, "wsrp");
