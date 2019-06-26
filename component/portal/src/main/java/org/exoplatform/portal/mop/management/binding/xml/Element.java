@@ -95,8 +95,6 @@ public enum Element implements EnumElement<Element> {
     APPLICATION_REF("application-ref"),
     PORTLET_REF("portlet-ref"),
     PORTLET("portlet"),
-    GADGET_REF("gadget-ref"),
-    GADGET("gadget"),
     WSRP("wsrp"),
     THEME("theme"),
     SHOW_INFO_BAR("show-info-bar"),
