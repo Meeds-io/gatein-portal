@@ -147,10 +147,7 @@ public class UIAccountEditInputSet extends UIFormInputSet {
         Query query = new Query();
         String email = getUIStringInput("email").getValue();
         query.setEmail(email);
-        if (!oldEmail.equals(email) && service.getUserHandler().findUsersByQuery(query, UserStatus.ANY).getSize() > 0) {
-            // Be sure it keep old value
-            user.setEmail(oldEmail);
-            query.setEmail(oldEmail);
+        if ((oldEmail == null || !oldEmail.equals(email)) && service.getUserHandler().findUsersByQuery(query, UserStatus.ANY).getSize() > 0) {
             Object[] args = { username };
             uiApp.addMessage(new ApplicationMessage("UIAccountInputSet.msg.email-exist", args, ApplicationMessage.WARNING));
             return false;
