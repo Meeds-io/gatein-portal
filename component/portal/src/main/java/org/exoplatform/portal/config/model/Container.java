@@ -81,7 +81,10 @@ public class Container extends ModelObject {
         //
         ArrayList<ModelObject> children = new ArrayList<ModelObject>();
         for (ComponentData child : data.getChildren()) {
-            children.add(ModelObject.build(child));
+            ModelObject m = ModelObject.build(child);
+            if (m != null) {
+                children.add(ModelObject.build(child));
+            }
         }
 
         //

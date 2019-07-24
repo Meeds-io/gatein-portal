@@ -469,6 +469,11 @@ public class Mapper {
             if (component instanceof UIContainer) {
                 UIContainer srcContainer = (UIContainer) component;
                 Attributes attrs = srcContainer.getAttributes();
+                String type = attrs.getValue(MappedAttributes.TYPE);
+                if ("dashboard".equals(type)) {
+                    // Gadget is dropped so we just ignore the dashboard
+                    continue;
+                }
                 List<ComponentData> dstChildren = loadChildren(srcContainer);
                 mo = load(srcContainer, dstChildren);
             } else if (component instanceof UIWindow) {

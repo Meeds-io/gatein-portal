@@ -24,6 +24,7 @@ import org.exoplatform.portal.pom.data.BodyData;
 import org.exoplatform.portal.pom.data.ContainerData;
 import org.exoplatform.portal.pom.data.ModelData;
 import org.exoplatform.portal.pom.data.PageData;
+import org.exoplatform.portal.pom.spi.gadget.Gadget;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.wsrp.WSRP;
 
@@ -88,6 +89,11 @@ public abstract class ModelObject {
                 return Application.createPortletApplication((ApplicationData<Portlet>) applicationData);
             } else if (ApplicationType.WSRP_PORTLET == type) {
                 return Application.createWSRPApplication((ApplicationData<WSRP>) applicationData);
+            } else if (ApplicationType.GADGET == type) {
+                /**
+                 * Gadget support is dropped so no need to convert model object into the application
+                 */
+                return null;
             } else {
                 throw new AssertionError();
             }

@@ -160,7 +160,6 @@ public class PortalImplTest extends AbstractApiTest {
 
         PageQuery query = new PageQuery.Builder().withSiteName("find-pages").build();
         List<Page> pages = portal.findPages(query);
-        System.out.println(">>>> findPages_BySiteName=" + pages.size());
         assertEquals(6, pages.size());
     }
 
@@ -172,12 +171,10 @@ public class PortalImplTest extends AbstractApiTest {
 
         PageQuery query = new PageQuery.Builder().withSiteType(SiteType.SITE).build();
         List<Page> pages = portal.findPages(query);
-        System.out.println(">>>> findPages_BySiteType 1=" + pages.size());
         assertEquals(2, pages.size());
 
         query = new PageQuery.Builder().withSiteType(SiteType.SPACE).build();
         pages = portal.findPages(query);
-        System.out.println(">>>> findPages_BySiteName 2=" + pages.size());
         assertEquals(1, pages.size());
     }
 

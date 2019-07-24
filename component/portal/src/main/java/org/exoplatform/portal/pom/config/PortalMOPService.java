@@ -19,6 +19,8 @@
 package org.exoplatform.portal.pom.config;
 
 import org.chromattic.api.Chromattic;
+import org.exoplatform.portal.pom.spi.gadget.Gadget;
+import org.exoplatform.portal.pom.spi.gadget.GadgetContentProvider;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.portlet.PortletContentProvider;
 import org.exoplatform.portal.pom.spi.wsrp.WSRP;
@@ -48,5 +50,6 @@ public class PortalMOPService extends MOPService {
     protected void configure(ContentManagerRegistry registry) {
         registry.register(Portlet.CONTENT_TYPE, new PortletContentProvider());
         registry.register(WSRP.CONTENT_TYPE, new WSRPContentProvider());
+        registry.register(Gadget.CONTENT_TYPE, new GadgetContentProvider());
     }
 }

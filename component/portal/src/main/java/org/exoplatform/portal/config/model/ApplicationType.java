@@ -22,6 +22,7 @@ package org.exoplatform.portal.config.model;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 
+import org.exoplatform.portal.pom.spi.gadget.Gadget;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.wsrp.WSRP;
 import org.gatein.mop.api.content.ContentType;
@@ -40,6 +41,8 @@ public class ApplicationType<S> implements Serializable {
             return ApplicationType.PORTLET;
         } else if (WSRP_PORTLET.getName().equals(name)) {
             return ApplicationType.WSRP_PORTLET;
+        } else if (GADGET.getName().equals(name)) {
+            return ApplicationType.GADGET;
         } else {
             return null;
         }
@@ -50,6 +53,8 @@ public class ApplicationType<S> implements Serializable {
             return (ApplicationType<S>) ApplicationType.PORTLET;
         } else if (WSRP_PORTLET.getContentType().equals(name)) {
             return (ApplicationType<S>) ApplicationType.WSRP_PORTLET;
+        } else if (GADGET.getContentType().equals(name)) {
+            return (ApplicationType<S>) ApplicationType.GADGET;
         } else {
             return null;
         }
@@ -60,6 +65,12 @@ public class ApplicationType<S> implements Serializable {
 
     /** . */
     public static final ApplicationType<WSRP> WSRP_PORTLET = new ApplicationType<WSRP>(WSRP.CONTENT_TYPE, "wsrp");
+
+    /**
+     * Gadget is dropped since PLF 5.3.x and this constant will be removed in next version.
+     */
+    @Deprecated
+    public static final ApplicationType<Gadget> GADGET = new ApplicationType<Gadget>(Gadget.CONTENT_TYPE, "gadget");
 
     /** . */
     private final transient ContentType<S> contentType;
