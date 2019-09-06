@@ -116,6 +116,7 @@
     <version.yuicompressor-maven-plugin>0.7.1</version.yuicompressor-maven-plugin>
     <version.plugin.japex>1.2.3</version.plugin.japex>
     <version.plugin.jibx>1.3.1</version.plugin.jibx>
+    <version.jcabi.plugin>0.14</version.jcabi.plugin>
   </properties>
 
   <scm>
@@ -1256,6 +1257,33 @@ memory option properties. This should be removed when we can just set the compil
             <meminitial>256m</meminitial>
             <maxmem>1024m</maxmem>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.jcabi</groupId>
+          <artifactId>jcabi-maven-plugin</artifactId>
+          <version>${version.jcabi.plugin}</version>
+          <executions>
+            <execution>
+              <id>weave-classes</id>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>ajc</goal>
+              </goals>
+              <configuration>
+                <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+              </configuration>
+            </execution>
+            <execution>
+              <id>weave-test-classes</id>
+              <phase>process-test-classes</phase>
+              <goals>
+                <goal>ajc</goal>
+              </goals>
+              <configuration>
+                <classesDirectory>${project.build.testOutputDirectory}</classesDirectory>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <groupId>org.jibx</groupId>
