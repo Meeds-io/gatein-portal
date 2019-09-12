@@ -40,11 +40,11 @@ import javax.persistence.Table;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
-@Entity
+@Entity(name = "GateInDescription")
 @ExoEntity
 @Table(name = "PORTAL_DESCRIPTIONS")
 @NamedQueries({
-  @NamedQuery(name = "DescriptionEntity.getByRefId", query = "SELECT d FROM DescriptionEntity d WHERE d.referenceId = :refId") })
+  @NamedQuery(name = "DescriptionEntity.getByRefId", query = "SELECT d FROM GateInDescription d WHERE d.referenceId = :refId") })
 public class DescriptionEntity implements Serializable {
 
   private static final long serialVersionUID = 1173817577220348267L;

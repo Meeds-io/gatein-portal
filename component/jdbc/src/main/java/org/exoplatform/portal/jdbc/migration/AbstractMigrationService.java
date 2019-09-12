@@ -7,9 +7,8 @@ import javax.jcr.Node;
 import javax.jcr.Value;
 import javax.persistence.EntityManager;
 
+import org.exoplatform.services.listener.ListenerService;
 import org.picocontainer.Startable;
-
-import org.exoplatform.commons.api.event.EventManager;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -24,7 +23,7 @@ public abstract class AbstractMigrationService<T> implements Startable {
 
   protected final static String           LIMIT_THRESHOLD_KEY = "LIMIT_THRESHOLD";
 
-  protected final EventManager<T, String> eventManager;
+  protected final ListenerService listenerService;
 
   protected final EntityManagerService    entityManagerService;
 
@@ -33,30 +32,22 @@ public abstract class AbstractMigrationService<T> implements Startable {
   protected int                           LIMIT_THRESHOLD     = 100;
 
   public AbstractMigrationService(InitParams initParams,
-                                  EventManager<T, String> eventManager,
+                                  ListenerService listenerService,
                                   EntityManagerService entityManagerService) {
-    this.eventManager = eventManager;
+    this.listenerService = listenerService;
     this.entityManagerService = entityManagerService;
     LOG = ExoLogger.getLogger(this.getClass().getName());
   }
 
   public void addMigrationListener(Listener<T, String> listener) {
-    eventManager.addEventListener(getListenerKey(), listener);
-  }
-
-  public void removeMigrationListener(Listener<T, String> listener) {
-    eventManager.removeEventListener(getListenerKey(), listener);
+    this.listenerService.addListener(getListenerKey(), listener);
   }
 
   protected void broadcastListener(T t, String newId) {
-    List<Listener<T, String>> listeners = eventManager.getEventListeners(getListenerKey());
-    for (Listener<T, String> listener : listeners) {
-      try {
-        Event<T, String> event = new Event<T, String>(getListenerKey(), t, newId);
-        listener.onEvent(event);
-      } catch (Exception e) {
-        LOG.error("Failed to broadcastListener for listener: " + listener.getName(), e);
-      }
+    try {
+      this.listenerService.broadcast(new Event(getListenerKey(), t, newId));
+    } catch (Exception e) {
+      LOG.error("Failed to broadcast event", e);
     }
   }
 

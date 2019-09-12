@@ -91,7 +91,7 @@
       <column name="NODE_INDEX" type="INT"/>
       
       <column name="PAGE_ID" type="VARCHAR(200)">
-        <constraints foreignKeyName="FK_PORTAL_NODE_PAGE" references="PORTAL_PAGES(ID)"/>
+        <constraints nullable="true" />
       </column>
       
       <column name="PARENT_ID" type="VARCHAR(200)">
@@ -101,6 +101,12 @@
     <modifySql dbms="mysql">
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
     </modifySql>
+  </changeSet>
+  <changeSet id="portal" author="1.0.0-4.1">
+    <addForeignKeyConstraint constraintName="FK_PORTAL_NODE_PAGE"
+                             baseTableName="PORTAL_NAVIGATION_NODES" baseColumnNames="PAGE_ID"
+                             referencedTableName="PORTAL_PAGES" referencedColumnNames="ID"
+                             onDelete="SET NULL" onUpdate="NO ACTION" />
   </changeSet>
   
   <changeSet author="portal" id="1.0.0-5">

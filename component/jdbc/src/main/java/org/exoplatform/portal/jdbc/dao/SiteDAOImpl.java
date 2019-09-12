@@ -25,8 +25,8 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
   @Override
   @ExoTransactional
   public void delete(SiteEntity entity) {
-    pageDAO.deleteByOwner(entity.getSiteType(), entity.getName());
     navDAO.deleteByOwner(entity.getSiteType(), entity.getName());
+    pageDAO.deleteByOwner(entity.getSiteType(), entity.getName());
     super.delete(entity);
   }
 

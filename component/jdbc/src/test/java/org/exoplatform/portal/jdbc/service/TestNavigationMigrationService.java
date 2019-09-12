@@ -28,10 +28,12 @@ import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.portal.mop.navigation.NodeModel;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.navigation.SimpleDataCache;
+import org.exoplatform.portal.pom.config.POMDataStorage;
 import org.exoplatform.portal.pom.config.POMSessionManager;
 import org.exoplatform.portal.pom.data.ContainerData;
 import org.exoplatform.portal.pom.data.ModelDataStorage;
 import org.exoplatform.portal.pom.data.PortalData;
+import org.exoplatform.services.listener.ListenerService;
 import org.gatein.mop.api.workspace.Navigation;
 import org.gatein.mop.api.workspace.ObjectType;
 import org.gatein.mop.api.workspace.Site;
@@ -62,6 +64,8 @@ public class TestNavigationMigrationService extends AbstractPortalTest {
 
   private ModelDataStorage modelStorage;
 
+  private POMDataStorage pomStorage;
+
   public TestNavigationMigrationService(String name) {
     super(name);
   }
@@ -70,6 +74,7 @@ public class TestNavigationMigrationService extends AbstractPortalTest {
   public void setUp() throws Exception {
     super.setUp();
 
+    this.pomStorage = getContainer().getComponentInstanceOfType(POMDataStorage .class);
     this.navService = getContainer().getComponentInstanceOfType(NavigationService.class);
     this.manager = getContainer().getComponentInstanceOfType(POMSessionManager.class);
     this.modelStorage = getContainer().getComponentInstanceOfType(ModelDataStorage.class);
@@ -80,7 +85,7 @@ public class TestNavigationMigrationService extends AbstractPortalTest {
     this.descriptionService = getContainer().getComponentInstanceOfType(DescriptionService.class);
     this.jcrDescriptionService = new DescriptionServiceImpl(manager);
 
-    this.migrationService = getContainer().getComponentInstanceOfType(NavigationMigrationService.class);
+    this.migrationService = new NavigationMigrationService(null, navService, descriptionService, getService(POMSessionManager.class), getService(ListenerService.class), getService(EntityManagerService.class));
 
     super.begin();
 
@@ -94,6 +99,10 @@ public class TestNavigationMigrationService extends AbstractPortalTest {
 
   protected void tearDown() throws Exception {
     end(false);
+  }
+
+  public <T> T getService(Class<T> clazz) {
+    return getContainer().getComponentInstanceOfType(clazz);
   }
 
   @Override
@@ -136,6 +145,8 @@ public class TestNavigationMigrationService extends AbstractPortalTest {
             "testMigrate", SiteType.PORTAL.getName(), null, null,
             null, new ArrayList<>(), null, null, null, container, null));
 
+    sync(true);
+
     migrationService.doMigration();
     migrationService.doRemove();
 
@@ -151,5 +162,11 @@ public class TestNavigationMigrationService extends AbstractPortalTest {
 
     nav = jcrNavService.loadNavigation(SiteKey.portal("testMigrate"));
     assertNull(nav);
+
+    // Remove site
+    PortalData portalData = new PortalData(null, "testMigrate", "portal",
+            "en", "", "", Collections.emptyList(), "", null, "", container, Collections.emptyList());
+    this.pomStorage.remove(portalData);
+    sync(true);
   }
 }

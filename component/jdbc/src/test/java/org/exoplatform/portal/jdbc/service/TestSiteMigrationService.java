@@ -1,5 +1,6 @@
 package org.exoplatform.portal.jdbc.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import javax.persistence.EntityTransaction;
@@ -12,6 +13,7 @@ import org.exoplatform.portal.AbstractPortalTest;
 import org.exoplatform.portal.jdbc.migration.PageMigrationService;
 import org.exoplatform.portal.jdbc.migration.SiteMigrationService;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageService;
@@ -24,6 +26,7 @@ import org.exoplatform.portal.pom.data.ModelDataStorage;
 import org.exoplatform.portal.pom.data.PageData;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
+import org.exoplatform.services.listener.ListenerService;
 import org.gatein.mop.api.workspace.ObjectType;
 import org.gatein.mop.api.workspace.Site;
 import org.gatein.mop.core.api.MOPService;
@@ -62,9 +65,10 @@ public class TestSiteMigrationService extends AbstractPortalTest {
     this.pageService = getContainer().getComponentInstanceOfType(PageService.class);
     this.manager = getContainer().getComponentInstanceOfType(POMSessionManager.class);
     this.jcrPageService = new PageServiceImpl(manager);
-    this.siteMigrationService = getContainer().getComponentInstanceOfType(SiteMigrationService.class);
+    this.siteMigrationService = new SiteMigrationService(null, pomStorage, modelStorage,
+            getContainer().getComponentInstanceOfType(ListenerService.class), getContainer().getComponentInstanceOfType(EntityManagerService.class));
 
-    super.begin();
+    begin();
 
     EntityManagerService managerService =
             getContainer().getComponentInstanceOfType(EntityManagerService.class);

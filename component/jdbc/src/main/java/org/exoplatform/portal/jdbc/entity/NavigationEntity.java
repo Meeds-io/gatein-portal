@@ -35,11 +35,11 @@ import java.io.Serializable;
 import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.portal.mop.SiteType;
 
-@Entity
+@Entity(name = "GateInNavigation")
 @ExoEntity
 @Table(name = "PORTAL_NAVIGATIONS")
 @NamedQueries({
-  @NamedQuery(name = "NavigationEntity.findByOwner", query = "SELECT nav FROM NavigationEntity nav INNER JOIN nav.owner s WHERE s.siteType = :ownerType AND s.name = :ownerId") })
+  @NamedQuery(name = "NavigationEntity.findByOwner", query = "SELECT nav FROM GateInNavigation nav INNER JOIN nav.owner s WHERE s.siteType = :ownerType AND s.name = :ownerId") })
 public class NavigationEntity implements Serializable {
 
   private static final long serialVersionUID = 3811683620903785319L;

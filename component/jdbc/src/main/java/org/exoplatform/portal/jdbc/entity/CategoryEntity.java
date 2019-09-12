@@ -16,11 +16,11 @@ import javax.persistence.Table;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
-@Entity
+@Entity(name = "GateInApplicationCategory")
 @ExoEntity
 @Table(name = "PORTAL_APP_CATEGORIES")
 @NamedQueries({
-  @NamedQuery(name = "CategoryEntity.findByName", query = "SELECT cat FROM CategoryEntity cat WHERE cat.name = :name")})
+  @NamedQuery(name = "CategoryEntity.findByName", query = "SELECT cat FROM GateInApplicationCategory cat WHERE cat.name = :name")})
 public class CategoryEntity implements Serializable {
 
   private static final long      serialVersionUID = 8772040309317091459L;

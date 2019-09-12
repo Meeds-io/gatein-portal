@@ -14,12 +14,12 @@ import javax.persistence.Table;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
-@Entity
+@Entity(name = "GateInGadgetToken")
 @ExoEntity
 @Table(name = "PORTAL_TOKENS")
 @NamedQueries({
-  @NamedQuery(name = "GadgetTokenEntity.deleteByKey", query = "DELETE FROM GadgetTokenEntity g WHERE g.userId = :userId AND g.gadgetUri = :gadgetUri AND g.moduleId = :moduleId AND g.tokenName = :tokenName AND g.serviceName = :serviceName"),
-  @NamedQuery(name = "GadgetTokenEntity.findByKey", query = "SELECT g FROM GadgetTokenEntity g WHERE g.userId = :userId AND g.gadgetUri = :gadgetUri AND g.moduleId = :moduleId AND g.tokenName = :tokenName AND g.serviceName = :serviceName") })
+  @NamedQuery(name = "GadgetTokenEntity.deleteByKey", query = "DELETE FROM GateInGadgetToken g WHERE g.userId = :userId AND g.gadgetUri = :gadgetUri AND g.moduleId = :moduleId AND g.tokenName = :tokenName AND g.serviceName = :serviceName"),
+  @NamedQuery(name = "GadgetTokenEntity.findByKey", query = "SELECT g FROM GateInGadgetToken g WHERE g.userId = :userId AND g.gadgetUri = :gadgetUri AND g.moduleId = :moduleId AND g.tokenName = :tokenName AND g.serviceName = :serviceName") })
 public class GadgetTokenEntity implements Serializable {
 
   private static final long serialVersionUID = -7178403295319561214L;

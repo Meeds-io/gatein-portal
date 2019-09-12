@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import org.exoplatform.commons.api.event.EventManager;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -24,11 +22,11 @@ import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationService;
 import org.exoplatform.portal.mop.navigation.NavigationServiceImpl;
 import org.exoplatform.portal.mop.navigation.NodeContext;
-import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.portal.mop.navigation.NodeModel;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.navigation.SimpleDataCache;
 import org.exoplatform.portal.pom.config.POMSessionManager;
+import org.exoplatform.services.listener.ListenerService;
 
 @Managed
 @ManagedDescription("Portal migration navigations from JCR to RDBMS.")
@@ -50,10 +48,10 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
                                     NavigationService navService,
                                     DescriptionService descriptionService,
                                     POMSessionManager manager,
-                                    EventManager<NavigationContext, String> eventManager,
+                                    ListenerService listenerService,
                                     EntityManagerService entityManagerService) {
 
-    super(initParams, eventManager, entityManagerService);
+    super(initParams, listenerService, entityManagerService);
     this.navService = navService;
 
     SimpleDataCache cache = new SimpleDataCache();

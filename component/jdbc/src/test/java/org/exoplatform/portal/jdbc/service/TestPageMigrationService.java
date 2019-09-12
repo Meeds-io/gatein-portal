@@ -11,6 +11,7 @@ import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.portal.AbstractPortalTest;
 import org.exoplatform.portal.jdbc.migration.PageMigrationService;
+import org.exoplatform.portal.jdbc.migration.SiteMigrationService;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageContext;
@@ -20,10 +21,8 @@ import org.exoplatform.portal.mop.page.PageServiceImpl;
 import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.pom.config.POMDataStorage;
 import org.exoplatform.portal.pom.config.POMSessionManager;
-import org.exoplatform.portal.pom.data.ContainerData;
-import org.exoplatform.portal.pom.data.ModelDataStorage;
-import org.exoplatform.portal.pom.data.PageData;
-import org.exoplatform.portal.pom.data.PortalData;
+import org.exoplatform.portal.pom.data.*;
+import org.exoplatform.services.listener.ListenerService;
 import org.gatein.mop.api.workspace.ObjectType;
 import org.gatein.mop.api.workspace.Site;
 import org.gatein.mop.core.api.MOPService;
@@ -50,6 +49,8 @@ public class TestPageMigrationService extends AbstractPortalTest {
 
   private PageMigrationService pageMigrationService;
 
+  private SiteMigrationService siteMigrationService;
+
   public TestPageMigrationService(String name) {
     super(name);
   }
@@ -63,7 +64,10 @@ public class TestPageMigrationService extends AbstractPortalTest {
     this.pageService = getContainer().getComponentInstanceOfType(PageService.class);
     this.manager = getContainer().getComponentInstanceOfType(POMSessionManager.class);
     this.jcrPageService = new PageServiceImpl(manager);
-    this.pageMigrationService = getContainer().getComponentInstanceOfType(PageMigrationService.class);
+    this.pageMigrationService = new PageMigrationService(null, pomStorage, modelStorage, pageService, jcrPageService,
+            getContainer().getComponentInstanceOfType(ListenerService.class), getContainer().getComponentInstanceOfType(EntityManagerService.class));
+    this.siteMigrationService = new SiteMigrationService(null, pomStorage, modelStorage,
+            getContainer().getComponentInstanceOfType(ListenerService.class), getContainer().getComponentInstanceOfType(EntityManagerService.class));
 
     super.begin();
 
@@ -81,10 +85,10 @@ public class TestPageMigrationService extends AbstractPortalTest {
 
   public void testMigrate() throws Exception {
     MOPService mop = manager.getPOMService();
-    Site portal = mop.getModel().getWorkspace().addSite(ObjectType.PORTAL_SITE, "classic");
+    Site portal = mop.getModel().getWorkspace().addSite(ObjectType.PORTAL_SITE, "testPageMigrationSite");
     portal.getRootPage().addChild("pages");
 
-    PageKey pageKey = new PageKey(SiteKey.portal("classic"), "testPageMigration");
+    PageKey pageKey = new PageKey(SiteKey.portal("testPageMigrationSite"), "testPageMigration");
     PageState state = new PageState("", "", false, "",
             Collections.emptyList(), "", Collections.emptyList(), Collections.emptyList());
     PageContext pageContext = new PageContext(pageKey, state);
@@ -94,8 +98,16 @@ public class TestPageMigrationService extends AbstractPortalTest {
             "", "", "", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
     pomStorage.save(new PageData(null, null,
             "testPageMigration", null, null, null, "testPageMigration", "", "", "",
-            Collections.emptyList(), Arrays.asList(container), "portal", "classic", "", false,
+            Collections.emptyList(), Arrays.asList(container), "portal", "testPageMigrationSite", "", false,
             Collections.emptyList(), Collections.emptyList()));
+
+    sync(true);
+
+    container = new ContainerData(null, "test", "", "", "", "", "",
+            "", "", "", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+    modelStorage.create(new PortalData(null,
+            "testPageMigrationSite", SiteType.PORTAL.getName(), null, null,
+            null, new ArrayList<>(), null, null, null, container, null));
 
     pageMigrationService.doMigration();
     pageMigrationService.doRemove();
@@ -104,5 +116,11 @@ public class TestPageMigrationService extends AbstractPortalTest {
 
     assertNull(jcrPageService.loadPage(pageKey));
     assertNotNull(pageService.loadPage(pageKey));
+
+    // Clean up portal
+    PortalData portalData = new PortalData(null, "testPageMigrationSite", "portal",
+            "en", "", "", Collections.emptyList(), "", null, "", container, Collections.emptyList());
+    this.pomStorage.remove(portalData);
+    sync(true);
   }
 }

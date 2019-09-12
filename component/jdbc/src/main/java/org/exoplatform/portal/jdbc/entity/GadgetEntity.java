@@ -14,11 +14,11 @@ import javax.persistence.Table;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
-@Entity
+@Entity(name = "GateInGadget")
 @ExoEntity
 @Table(name = "PORTAL_GADGETS")
 @NamedQueries({
-    @NamedQuery(name = "GadgetEntity.find", query = "SELECT g FROM GadgetEntity g WHERE g.name = :name") })
+    @NamedQuery(name = "GadgetEntity.find", query = "SELECT g FROM GateInGadget g WHERE g.name = :name") })
 public class GadgetEntity implements Serializable {
 
   private static final long serialVersionUID = -7234685756984011687L;

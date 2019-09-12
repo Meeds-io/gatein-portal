@@ -14,10 +14,10 @@ import javax.persistence.Table;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
-@Entity
+@Entity(name = "GateInSetting")
 @ExoEntity
 @Table(name = "PORTAL_SETTINGS")
-@NamedQueries({ @NamedQuery(name = "SettingEntity.findByName", query = "SELECT s FROM SettingEntity s WHERE s.name = :name") })
+@NamedQueries({ @NamedQuery(name = "SettingEntity.findByName", query = "SELECT s FROM GateInSetting s WHERE s.name = :name") })
 public class SettingEntity implements Serializable {
 
   private static final long serialVersionUID = -44730129666361277L;

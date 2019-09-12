@@ -31,11 +31,11 @@ import org.json.simple.JSONObject;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
-@Entity
+@Entity(name = "GateInWindow")
 @ExoEntity
 @Table(name = "PORTAL_WINDOWS")
 @NamedQueries({
-  @NamedQuery(name = "WindowEntity.findByIds", query = "SELECT w FROM WindowEntity w WHERE w.id in (:ids)") })
+  @NamedQuery(name = "WindowEntity.findByIds", query = "SELECT w FROM GateInWindow w WHERE w.id in (:ids)") })
 public class WindowEntity extends ComponentEntity implements Serializable {
 
   private static final long serialVersionUID = 6633792468705838255L;

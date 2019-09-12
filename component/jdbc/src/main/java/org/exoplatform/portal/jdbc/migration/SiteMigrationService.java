@@ -3,8 +3,6 @@ package org.exoplatform.portal.jdbc.migration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.exoplatform.commons.api.event.EventManager;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -18,6 +16,7 @@ import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.pom.config.POMDataStorage;
 import org.exoplatform.portal.pom.data.ModelDataStorage;
 import org.exoplatform.portal.pom.data.PortalData;
+import org.exoplatform.services.listener.ListenerService;
 
 @Managed
 @ManagedDescription("Portal migration sites from JCR to RDBMS.")
@@ -34,10 +33,10 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
   public SiteMigrationService(InitParams initParams,
                               POMDataStorage pomStorage,
                               ModelDataStorage modelStorage,
-                              EventManager<PortalData, String> eventManager,
+                              ListenerService listenerService,
                               EntityManagerService entityManagerService) {
 
-    super(initParams, eventManager, entityManagerService);
+    super(initParams, listenerService, entityManagerService);
     this.pomStorage = pomStorage;
     this.modelStorage = modelStorage;
     this.LIMIT_THRESHOLD = getInteger(initParams, LIMIT_THRESHOLD_KEY, 1);

@@ -7,7 +7,6 @@ import org.exoplatform.application.registry.Application;
 import org.exoplatform.application.registry.ApplicationCategory;
 import org.exoplatform.application.registry.ApplicationRegistryService;
 import org.exoplatform.application.registry.impl.ApplicationRegistryServiceImpl;
-import org.exoplatform.commons.api.event.EventManager;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -17,6 +16,7 @@ import org.exoplatform.management.annotations.ManagedDescription;
 import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
 import org.exoplatform.portal.config.model.ApplicationType;
+import org.exoplatform.services.listener.ListenerService;
 
 @Managed
 @ManagedDescription("Portal migration applications from JCR to RDBMS.")
@@ -33,10 +33,10 @@ public class AppRegistryMigrationService extends AbstractMigrationService<Applic
   public AppRegistryMigrationService(InitParams initParams,
                               ApplicationRegistryService appService,
                               ApplicationRegistryServiceImpl jcrAppService,
-                              EventManager<ApplicationCategory, String> eventManager,
+                              ListenerService listenerService,
                               EntityManagerService entityManagerService) {
 
-    super(initParams, eventManager, entityManagerService);
+    super(initParams, listenerService, entityManagerService);
     this.appService = appService;
     this.jcrAppService = jcrAppService;
     this.LIMIT_THRESHOLD = getInteger(initParams, LIMIT_THRESHOLD_KEY, 1);

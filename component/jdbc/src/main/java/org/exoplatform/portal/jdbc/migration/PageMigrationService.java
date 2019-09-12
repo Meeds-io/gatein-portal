@@ -1,8 +1,6 @@
 package org.exoplatform.portal.jdbc.migration;
 
 import java.util.Iterator;
-
-import org.exoplatform.commons.api.event.EventManager;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -20,6 +18,7 @@ import org.exoplatform.portal.mop.page.PageServiceImpl;
 import org.exoplatform.portal.pom.config.POMDataStorage;
 import org.exoplatform.portal.pom.data.ModelDataStorage;
 import org.exoplatform.portal.pom.data.PageData;
+import org.exoplatform.services.listener.ListenerService;
 
 @Managed
 @ManagedDescription("Portal migration pages from JCR to RDBMS.")
@@ -40,10 +39,10 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
                               ModelDataStorage modelStorage,
                               PageService pageService,
                               PageServiceImpl jcrPageService,
-                              EventManager<PageContext, String> eventManager,
+                              ListenerService listenerService,
                               EntityManagerService entityManagerService) {
 
-    super(initParams, eventManager, entityManagerService);
+    super(initParams, listenerService, entityManagerService);
     this.pomStorage = pomStorage;
     this.modelStorage = modelStorage;
     this.pageService = pageService;

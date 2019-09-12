@@ -34,13 +34,13 @@ import org.json.simple.JSONObject;
 import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.portal.mop.SiteType;
 
-@Entity
+@Entity(name = "GateInSite")
 @ExoEntity
 @Table(name = "PORTAL_SITES")
 @NamedQueries({
-    @NamedQuery(name = "SiteEntity.findByKey", query = "SELECT s FROM SiteEntity s WHERE s.siteType = :siteType AND s.name = :name"),
-    @NamedQuery(name = "SiteEntity.findByType", query = "SELECT s FROM SiteEntity s WHERE s.siteType = :siteType"),
-    @NamedQuery(name = "SiteEntity.findSiteKey", query = "SELECT s.name FROM SiteEntity s WHERE s.siteType = :siteType")
+    @NamedQuery(name = "SiteEntity.findByKey", query = "SELECT s FROM GateInSite s WHERE s.siteType = :siteType AND s.name = :name"),
+    @NamedQuery(name = "SiteEntity.findByType", query = "SELECT s FROM GateInSite s WHERE s.siteType = :siteType"),
+    @NamedQuery(name = "SiteEntity.findSiteKey", query = "SELECT s.name FROM GateInSite s WHERE s.siteType = :siteType")
 })
 public class SiteEntity extends ComponentEntity {
 

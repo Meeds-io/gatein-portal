@@ -53,7 +53,7 @@ import org.gatein.mop.core.api.MOPService;
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/portal/mop/navigation/configuration.xml") })
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/test.navigation.configuration.xml") })
 public class TestJDBCNavigationService extends TestNavigationService {
 
     protected void setUp() throws Exception {

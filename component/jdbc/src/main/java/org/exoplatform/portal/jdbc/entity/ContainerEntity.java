@@ -34,10 +34,10 @@ import org.json.simple.JSONObject;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
-@Entity
+@Entity(name = "GateInContainer")
 @ExoEntity
 @Table(name = "PORTAL_CONTAINERS")
-@NamedQueries({ @NamedQuery(name = "ContainerEntity.findByIds", query = "SELECT c FROM ContainerEntity c WHERE c.id in (:ids)") })
+@NamedQueries({ @NamedQuery(name = "ContainerEntity.findByIds", query = "SELECT c FROM GateInContainer c WHERE c.id in (:ids)") })
 public class ContainerEntity extends ComponentEntity implements Serializable {
 
   private static final long     serialVersionUID = -8045606258160322858L;

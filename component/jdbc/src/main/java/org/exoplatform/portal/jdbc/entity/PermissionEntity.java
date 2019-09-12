@@ -32,12 +32,12 @@ import javax.persistence.Table;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
-@Entity
+@Entity(name = "GateInPermission")
 @ExoEntity
 @Table(name = "PORTAL_PERMISSIONS")
 @NamedQueries({
-  @NamedQuery(name = "PermissionEntity.deleteByRefId", query = "DELETE PermissionEntity p WHERE p.referenceId = :refId"),
-  @NamedQuery(name = "PermissionEntity.getPermissions", query = "SELECT p FROM PermissionEntity p WHERE p.referenceId = :refId AND type = :type") })
+  @NamedQuery(name = "PermissionEntity.deleteByRefId", query = "DELETE GateInPermission p WHERE p.referenceId = :refId"),
+  @NamedQuery(name = "PermissionEntity.getPermissions", query = "SELECT p FROM GateInPermission p WHERE p.referenceId = :refId AND type = :type") })
 public class PermissionEntity implements Serializable {
 
   private static final long serialVersionUID = 1173817577220348267L;

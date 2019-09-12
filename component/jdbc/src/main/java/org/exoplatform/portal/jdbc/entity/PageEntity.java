@@ -38,12 +38,12 @@ import org.json.simple.JSONObject;
 import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.portal.mop.SiteType;
 
-@Entity
+@Entity(name = "GateInPage")
 @ExoEntity
 @Table(name = "PORTAL_PAGES")
 @NamedQueries({
-    @NamedQuery(name = "PageEntity.deleteByOwner", query = "DELETE PageEntity p WHERE p.id IN (select page.id FROM PageEntity page JOIN page.owner s WHERE s.siteType = :ownerType AND s.name = :ownerId)"),
-    @NamedQuery(name = "PageEntity.findByKey", query = "SELECT p FROM PageEntity p JOIN p.owner s WHERE s.siteType = :ownerType AND s.name = :ownerId AND p.name = :name") })
+    @NamedQuery(name = "PageEntity.deleteByOwner", query = "DELETE GateInPage p WHERE p.id IN (select page.id FROM GateInPage page JOIN page.owner s WHERE s.siteType = :ownerType AND s.name = :ownerId)"),
+    @NamedQuery(name = "PageEntity.findByKey", query = "SELECT p FROM GateInPage p JOIN p.owner s WHERE s.siteType = :ownerType AND s.name = :ownerId AND p.name = :name") })
 public class PageEntity extends ComponentEntity implements Serializable {
 
   private static final long     serialVersionUID = -6195451978995765259L;

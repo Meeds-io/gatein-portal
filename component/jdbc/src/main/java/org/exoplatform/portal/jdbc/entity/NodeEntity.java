@@ -40,7 +40,7 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.services.listener.ListenerService;
 
-@Entity
+@Entity(name = "GateInNavigationNode")
 @ExoEntity
 @Table(name = "PORTAL_NAVIGATION_NODES")
 public class NodeEntity implements Serializable {

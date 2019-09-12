@@ -2,19 +2,13 @@ package org.exoplatform.portal.jdbc.migration;
 
 import java.lang.reflect.Field;
 
+import org.exoplatform.portal.jdbc.dao.SettingDAO;
+import org.exoplatform.portal.jdbc.entity.SettingEntity;
 import org.picocontainer.Startable;
-
 import org.exoplatform.commons.api.persistence.DataInitializer;
-import org.exoplatform.commons.api.settings.SettingService;
-import org.exoplatform.commons.api.settings.SettingValue;
-import org.exoplatform.commons.api.settings.data.Context;
-import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.commons.chromattic.ChromatticManager;
-import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.jcr.impl.core.SessionImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.settings.impl.SettingServiceImpl;
 
 public class RDBMSMigrationManager implements Startable {
   private static final Log     LOG                          = ExoLogger.getLogger(RDBMSMigrationManager.class);
@@ -31,19 +25,20 @@ public class RDBMSMigrationManager implements Startable {
   
   private AppRegistryMigrationService appMigrationService;
 
-  private SettingService       settingService;
+  // TODO: need move setting service from common into gatein
+  private SettingDAO           settingDAO;
 
   public RDBMSMigrationManager(SiteMigrationService siteMigrationService,
                                PageMigrationService pageMigrationService,
                                NavigationMigrationService navMigrationService,
                                AppRegistryMigrationService appMigrationService,
-                               SettingService settingService,
+                               SettingDAO settingDAO,
                                DataInitializer initializer) {
     this.siteMigrationService = siteMigrationService;
     this.pageMigrationService = pageMigrationService;
     this.navMigrationService = navMigrationService;
     this.appMigrationService = appMigrationService;
-    this.settingService = settingService;
+    this.settingDAO = settingDAO;
   }
 
   @Override
@@ -150,32 +145,25 @@ public class RDBMSMigrationManager implements Startable {
   }
 
   private boolean getOrCreateSettingValue(String key) {
-    try {
-      SettingValue<?> migrationValue = settingService.get(Context.GLOBAL, Scope.GLOBAL.id(MIGRATION_SETTING_GLOBAL_KEY), key);
-      if (migrationValue != null) {
-        return Boolean.parseBoolean(migrationValue.getValue().toString());
-      } else {
-        updateSettingValue(key, Boolean.FALSE);
-        return false;
-      }
-    } finally {
-      Scope.GLOBAL.id(null);
+    SettingEntity setting = this.settingDAO.findByName(key);
+    if (setting != null) {
+      return Boolean.parseBoolean(setting.getValue());
+    } else {
+      updateSettingValue(key, Boolean.FALSE);
+      return false;
     }
   }
 
   private void updateSettingValue(String key, Boolean status) {
-    SettingServiceImpl settingServiceImpl = CommonsUtils.getService(SettingServiceImpl.class);
-    boolean created = settingServiceImpl.startSynchronization();
-    try {
-      settingService.set(Context.GLOBAL, Scope.GLOBAL.id(MIGRATION_SETTING_GLOBAL_KEY), key, SettingValue.create(status));
-      try {
-        CommonsUtils.getService(ChromatticManager.class).getLifeCycle("setting").getContext().getSession().save();
-      } catch (Exception e) {
-        LOG.warn(e);
-      }
-    } finally {
-      Scope.GLOBAL.id(null);
-      settingServiceImpl.stopSynchronization(created);
+    SettingEntity setting = this.settingDAO.findByName(key);
+    if (setting == null) {
+      setting = new SettingEntity();
+      setting.setName(key);
+      setting.setValue(Boolean.toString(status));
+      this.settingDAO.create(setting);
+    } else {
+      setting.setValue(Boolean.toString(status));
+      settingDAO.update(setting);
     }
   }
 

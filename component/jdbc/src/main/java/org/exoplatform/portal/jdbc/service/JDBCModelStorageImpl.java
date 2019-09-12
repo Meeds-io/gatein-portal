@@ -108,8 +108,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
                               ContainerDAO containerDAO,
                               PermissionDAO permissionDAO,
                               SettingDAO settingDAO,
-                              ConfigurationManager confManager,
-                              POMDataStorage delegate) {
+                              ConfigurationManager confManager) {
     this.siteDAO = siteDAO;
     this.pageDAO = pageDAO;
     this.windowDAO = windowDAO;
@@ -960,7 +959,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     dst.setDescription(srcChild.getDescription());
     dst.setHeight(srcChild.getHeight());
     dst.setIcon(srcChild.getIcon());
-    dst.setProperties(new JSONObject(srcChild.getProperties()).toJSONString());
+    dst.setProperties(this.toJSON(srcChild.getProperties()).toJSONString());
     dst.setShowApplicationMode(srcChild.isShowApplicationMode());
     dst.setShowApplicationState(srcChild.isShowApplicationState());
     dst.setShowInfoBar(srcChild.isShowInfoBar());
@@ -1112,6 +1111,15 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       log.error(e);
       throw new IllegalStateException("Can't parse body: " + body);
     }
+  }
+
+  private JSONObject toJSON(Map map) {
+    JSONObject json = new JSONObject();
+    Set<Map.Entry> entries = map.entrySet();
+    for (Map.Entry entry : entries) {
+      json.put(entry.getKey(), entry.getValue());
+    }
+    return json;
   }
 
   private void deleteChildren(JSONArray children) {
