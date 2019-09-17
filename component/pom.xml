@@ -46,6 +46,7 @@
     <module>management</module>
     <module>identity</module>
     <module>api</module>
+    <module>file-storage</module>
   </modules>
 
 </project>
