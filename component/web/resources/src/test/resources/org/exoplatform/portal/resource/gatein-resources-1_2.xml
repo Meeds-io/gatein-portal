@@ -261,14 +261,6 @@
       <js-path>/javascript/eXo/webui/UIPermissionSelectorTab.js</js-path>
     </param>
     <param>
-      <js-module>eXo.webui.UIDashboard</js-module>
-      <js-path>/javascript/eXo/webui/UIDashboard.js</js-path>
-    </param>
-    <param>
-      <js-module>eXo.webui.UIDashboardUtil</js-module>
-      <js-path>/javascript/eXo/webui/UIDashboardUtil.js</js-path>
-    </param>
-    <param>
       <js-module>eXo.webui.UINotification</js-module>
       <js-path>/javascript/eXo/webui/UINotification.js</js-path>
     </param>

@@ -40,7 +40,6 @@
     <module>core</module>
     <module>eXo</module>
     <module>portal</module>
-    <module>dashboard</module>
   </modules>
 
 </project>

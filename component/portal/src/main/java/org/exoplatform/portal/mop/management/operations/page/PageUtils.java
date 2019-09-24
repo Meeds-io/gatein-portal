@@ -12,7 +12,6 @@ import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.config.model.Dashboard;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PageBody;
@@ -131,13 +130,6 @@ public class PageUtils {
         return container;
     }
 
-    public static Dashboard copy(Dashboard existing) {
-        Dashboard dashboard = new Dashboard();
-        copyFields(existing, dashboard);
-
-        return dashboard;
-    }
-
     public static Page copy(Page existing) {
         Page page = new Page();
 
@@ -212,9 +204,6 @@ public class PageUtils {
                 Application<?> app = copy((Application<?>) object);
 
                 children.add(app);
-            }
-            if (object instanceof Dashboard) {
-                children.add(copy((Dashboard) object));
             }
             if (object instanceof Container) {
                 children.add(copy((Container) object));

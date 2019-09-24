@@ -24,9 +24,13 @@ import org.chromattic.api.annotations.Property;
 import org.gatein.mop.core.api.workspace.content.AbstractCustomizationState;
 
 /**
+ * Gadget is dropped since PLF 5.3.x and this class will be removed in next version.
+ * It's kept to support migrate data only.
+ *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@Deprecated
 @PrimaryType(name = "mop:gadget")
 public abstract class GadgetState extends AbstractCustomizationState {
     @Property(name = "mop:prefs")

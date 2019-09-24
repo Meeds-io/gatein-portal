@@ -26,22 +26,6 @@
     xmlns="http://www.gatein.org/xml/ns/gatein_objects_1_6">
 
   <page>
-    <name>dashboard</name>
-    <title>Dashboard</title>
-    <access-permissions>*:/platform/users</access-permissions>
-    <edit-permission>*:/platform/administrators</edit-permission>
-    <portlet-application>
-      <portlet>
-        <application-ref>dashboard</application-ref>
-        <portlet-ref>DashboardPortlet</portlet-ref>
-      </portlet>
-      <title>Dashboard</title>
-      <access-permissions>Everyone</access-permissions>
-      <show-info-bar>false</show-info-bar>
-    </portlet-application>
-  </page>
-
-  <page>
     <name>webexplorer</name>
     <title>Web Explorer</title>
     <access-permissions>*:/platform/users</access-permissions>

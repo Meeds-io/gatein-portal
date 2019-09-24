@@ -67,10 +67,6 @@ public class TestSiteDataImportInsert extends AbstractSiteDataImportTest {
         assertNotNull(page2);
         assertEquals("site 2", page2.getState().getDisplayName());
 
-        PageContext dashboard1 = pageService.loadPage(PageKey.parse("user::root::dashboard1"));
-        assertNotNull(dashboard1);
-        assertEquals("site 2", dashboard1.getState().getDisplayName());
-
         RequestLifeCycle.end();
     }
 }

@@ -85,26 +85,6 @@
             <height>350px</height>
           </portlet-application>
         </container>
-        <container id="c2-2" template="system:/groovy/portal/webui/container/UIContainer.gtmpl" width="200px"
-                   height="300px">
-          <access-permissions>/platform/users</access-permissions>
-          <gadget-application>
-            <gadget>
-              <gadget-ref>Calendar</gadget-ref>
-            </gadget>
-            <theme>Vista:VistaTheme::Mac:MacTheme::Default:DefaultTheme</theme>
-            <title>Calendar Title</title>
-            <access-permissions>*:/platform/administrators;*:/organization/management/executive-board
-            </access-permissions>
-            <show-info-bar>true</show-info-bar>
-            <show-application-state>false</show-application-state>
-            <show-application-mode>false</show-application-mode>
-            <description>Calendar Description</description>
-            <icon>StarAwardIcon</icon>
-            <width>100px</width>
-            <height>200px</height>
-          </gadget-application>
-        </container>
       </container>
       <container id="c3" template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
         <access-permissions>Everyone</access-permissions>

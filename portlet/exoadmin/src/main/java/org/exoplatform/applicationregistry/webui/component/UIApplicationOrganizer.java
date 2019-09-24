@@ -24,8 +24,6 @@ import java.util.List;
 
 import javax.portlet.PortletPreferences;
 
-import org.exoplatform.application.gadget.Gadget;
-import org.exoplatform.application.gadget.GadgetRegistryService;
 import org.exoplatform.application.registry.Application;
 import org.exoplatform.application.registry.ApplicationCategory;
 import org.exoplatform.application.registry.ApplicationRegistryService;
@@ -83,12 +81,6 @@ public class UIApplicationOrganizer extends UIContainer {
             setSelectedCategory(categories.get(0));
         }
 
-        if (getParent() != null) {
-            UIGadgetManagement gadgetManager = getParent().findFirstComponentOfType(UIGadgetManagement.class);
-            if (gadgetManager != null)
-                gadgetManager.reload();
-        }
-
         PortalRequestContext portalContext = org.exoplatform.portal.webui.util.Util.getPortalRequestContext();
         UIPortal uiPortal = org.exoplatform.portal.webui.util.Util.getUIPortal();
         // TODO why use MonitorEvent that not just Event
@@ -128,16 +120,6 @@ public class UIApplicationOrganizer extends UIContainer {
             return;
         }
         Collections.sort(applications, new Util.ApplicationComparator());
-
-        // Correct IconUrl of gadget
-        GadgetRegistryService gadgetService = getApplicationComponent(GadgetRegistryService.class);
-        for (Application app : applications) {
-            if (ApplicationType.GADGET.equals(app.getType())) {
-                Gadget gadget = gadgetService.getGadget(app.getApplicationName());
-                if (gadget != null)
-                    app.setIconURL(gadget.getThumbnail());
-            }
-        }
 
         setSelectedApplication(applications.get(0));
     }
@@ -231,7 +213,6 @@ public class UIApplicationOrganizer extends UIContainer {
             ApplicationRegistryService service = uiOrganizer.getApplicationComponent(ApplicationRegistryService.class);
 
             service.importAllPortlets();
-            service.importExoGadgets();
             uiOrganizer.reload();
             event.getRequestContext().addUIComponentToUpdateByAjax(uiOrganizer);
         }

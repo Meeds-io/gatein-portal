@@ -85,12 +85,6 @@ public class UIStandaloneApplication extends UIApplication {
 
     @Override
     public void processDecode(WebuiRequestContext context) throws Exception {
-        String storageId = ((StandaloneAppRequestContext) context).getStorageId();
-
-        UIStandaloneAppContainer staContaner = getChild(UIStandaloneAppContainer.class);
-        if (!storageId.equals(staContaner.getCurrStorageId())) {
-            staContaner.setCurrStorageId(storageId);
-        }
         super.processDecode(context);
     }
 

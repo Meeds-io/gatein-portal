@@ -21,7 +21,6 @@ package org.exoplatform.applicationregistry.webui;
 
 import java.util.Comparator;
 
-import org.exoplatform.application.gadget.Gadget;
 import org.exoplatform.application.registry.Application;
 import org.exoplatform.application.registry.ApplicationCategory;
 import org.gatein.common.i18n.LocalizedString;
@@ -60,21 +59,4 @@ public class Util {
         }
 
     }
-
-    public static class GadgetComparator implements Comparator<Gadget> {
-
-        public int compare(Gadget gadget1, Gadget gadget2) {
-            String firstTitle = gadget1.getTitle();
-            if (firstTitle == null) {
-                firstTitle = "";
-            }
-            String secondTitle = gadget2.getTitle();
-            if (secondTitle == null) {
-                secondTitle = "";
-            }
-            return firstTitle.compareToIgnoreCase(secondTitle);
-        }
-
-    }
-
 }

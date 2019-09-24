@@ -71,11 +71,6 @@ public abstract class AbstractSiteDataImportTest extends AbstractDataImportTest 
         assertNotNull(page);
         assertEquals("site 2", page.getState().getDisplayName());
 
-        // Test user
-        PageContext dashboard1 = pageService.loadPage(PageKey.parse("user::root::dashboard1"));
-        assertNotNull(dashboard1);
-        assertEquals("site 2", dashboard1.getState().getDisplayName());
-
         RequestLifeCycle.end();
     }
 
@@ -116,10 +111,6 @@ public abstract class AbstractSiteDataImportTest extends AbstractDataImportTest 
 
         page = pageService.loadPage(PageKey.parse("group::/platform/administrators::page1"));
         assertNull(page);
-
-        // Test user
-        Page dashboard1 = dataStorage.getPage("user::root::dashboard1");
-        assertNull(dashboard1);
 
         RequestLifeCycle.end();
     }

@@ -28,13 +28,6 @@
 
   <page-nodes>
     <node>
-      <uri>dashboard</uri>
-      <name>dashboard</name>
-      <label>#{platform.users.dashboard}</label>
-      <page-reference>group::/platform/users::dashboard</page-reference>
-    </node>
-
-    <node>
       <uri>mylink</uri>
       <name>mylink</name>
       <label>#{platform.users.mylink}</label>

@@ -43,13 +43,11 @@ import org.exoplatform.portal.config.model.PersistentApplicationState;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.EventType;
-import org.exoplatform.portal.pom.config.tasks.DashboardTask;
 import org.exoplatform.portal.pom.config.tasks.PageTask;
 import org.exoplatform.portal.pom.config.tasks.PortalConfigTask;
 import org.exoplatform.portal.pom.config.tasks.PreferencesTask;
 import org.exoplatform.portal.pom.config.tasks.SearchTask;
 import org.exoplatform.portal.pom.data.ApplicationData;
-import org.exoplatform.portal.pom.data.DashboardData;
 import org.exoplatform.portal.pom.data.Mapper;
 import org.exoplatform.portal.pom.data.ModelChange;
 import org.exoplatform.portal.pom.data.ModelData;
@@ -226,14 +224,6 @@ public class POMDataStorage implements ModelDataStorage {
         } else if (obj instanceof Application) {
             obj.setStorageName(UUID.randomUUID().toString());
         }
-    }
-
-    public DashboardData loadDashboard(String dashboardId) throws Exception {
-        return pomMgr.execute(new DashboardTask.Load(dashboardId));
-    }
-
-    public void saveDashboard(DashboardData dashboard) throws Exception {
-        pomMgr.execute(new DashboardTask.Save(dashboard));
     }
 
     public Container getSharedLayout() throws Exception {

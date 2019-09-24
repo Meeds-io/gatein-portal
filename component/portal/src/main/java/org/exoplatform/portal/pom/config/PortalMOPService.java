@@ -49,7 +49,7 @@ public class PortalMOPService extends MOPService {
     @Override
     protected void configure(ContentManagerRegistry registry) {
         registry.register(Portlet.CONTENT_TYPE, new PortletContentProvider());
-        registry.register(Gadget.CONTENT_TYPE, new GadgetContentProvider());
         registry.register(WSRP.CONTENT_TYPE, new WSRPContentProvider());
+        registry.register(Gadget.CONTENT_TYPE, new GadgetContentProvider());
     }
 }

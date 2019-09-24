@@ -24,13 +24,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.exoplatform.application.gadget.Gadget;
-import org.exoplatform.application.gadget.GadgetRegistryService;
 import org.exoplatform.application.registry.Application;
 import org.exoplatform.application.registry.ApplicationCategory;
 import org.exoplatform.application.registry.ApplicationRegistryService;
 import org.exoplatform.portal.config.UserACL;
-import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
@@ -93,18 +90,8 @@ public class UIApplicationList extends UIContainer {
                 continue;
             }
 
-            GadgetRegistryService gadgetService = getApplicationComponent(GadgetRegistryService.class);
             for (String p : accessPermission) {
                 if (userACL.hasPermission(p)) {
-                    if (ApplicationType.GADGET.equals(app.getType())) {
-                        try {
-                            Gadget gadget;
-                            gadget = gadgetService.getGadget(app.getApplicationName());
-                            if (gadget != null)
-                                app.setIconURL(gadget.getThumbnail());
-                        } catch (Exception e) {
-                        }
-                    }
                     apps.add(app);
                     break;
                 }

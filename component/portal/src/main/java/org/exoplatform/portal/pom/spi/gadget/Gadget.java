@@ -27,9 +27,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
+ * Gadget is dropped and this class will be removed in next version.
+ * We just keep it in current version to support the migration data only.
+ *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@Deprecated
 public class Gadget implements Serializable {
 
     /** . */

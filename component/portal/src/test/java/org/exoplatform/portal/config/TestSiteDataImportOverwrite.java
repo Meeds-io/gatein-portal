@@ -78,11 +78,6 @@ public class TestSiteDataImportOverwrite extends AbstractSiteDataImportTest {
         assertNotNull(page);
         assertEquals("site 2",  page.getState().getDisplayName());
 
-        // Test user
-        PageContext dashboard1 = pageService.loadPage(PageKey.parse("user::root::dashboard1"));
-        assertNotNull(dashboard1);
-        assertEquals("site 2", dashboard1.getState().getDisplayName());
-
         RequestLifeCycle.end();
     }
     @Override
@@ -108,10 +103,6 @@ public class TestSiteDataImportOverwrite extends AbstractSiteDataImportTest {
         PageContext page2 = pageService.loadPage(PageKey.parse("portal::classic::page2"));
         assertNotNull(page2);
         assertEquals("site 2", page2.getState().getDisplayName());
-
-        PageContext dashboard1 = pageService.loadPage(PageKey.parse("user::root::dashboard1"));
-        assertNotNull(dashboard1);
-        assertEquals("site 2", dashboard1.getState().getDisplayName());
 
         RequestLifeCycle.end();
     }

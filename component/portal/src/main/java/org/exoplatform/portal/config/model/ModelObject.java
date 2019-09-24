@@ -87,10 +87,13 @@ public abstract class ModelObject {
             ApplicationType type = applicationData.getType();
             if (ApplicationType.PORTLET == type) {
                 return Application.createPortletApplication((ApplicationData<Portlet>) applicationData);
-            } else if (ApplicationType.GADGET == type) {
-                return Application.createGadgetApplication((ApplicationData<Gadget>) applicationData);
             } else if (ApplicationType.WSRP_PORTLET == type) {
                 return Application.createWSRPApplication((ApplicationData<WSRP>) applicationData);
+            } else if (ApplicationType.GADGET == type) {
+                /**
+                 * Gadget support is dropped so no need to convert model object into the application
+                 */
+                return null;
             } else {
                 throw new AssertionError();
             }

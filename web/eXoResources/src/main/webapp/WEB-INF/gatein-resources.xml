@@ -813,41 +813,6 @@
     </depends>
   </module>
 
-  <module>
-    <name>dashboard</name>
-    <script>
-      <path>/javascript/eXo/webui/UIDashboard.js</path>
-    </script>
-    <depends>
-      <module>common</module>
-    </depends>
-    <depends>
-      <module>portalRequest</module>
-    </depends>
-    <depends>
-      <module>base</module>
-    </depends>
-    <depends>
-      <module>portalControl</module>
-    </depends>
-    <depends>
-      <module>jquery</module>
-    </depends>
-    <depends>
-      <module>portalDragDrop</module>
-    </depends>
-  </module>
-  
-  <scripts>
-    <name>tabbedDashboard</name>
-    <script>
-      <path>/javascript/eXo/webui/UITabbedDashboard.js</path>
-    </script>
-    <depends>
-      <scripts>bootstrap</scripts>
-    </depends>
-  </scripts>
-
   <!-- Container Javascript -->
   <module>
     <name>toggleContainer</name>

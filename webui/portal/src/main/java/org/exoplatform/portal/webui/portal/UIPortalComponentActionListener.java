@@ -312,10 +312,6 @@ public class UIPortalComponentActionListener {
                 //
                 @SuppressWarnings("unchecked")
                 UIPortlet<Object, ?> uiPortlet = uiTarget.createUIComponent(UIPortlet.class, null, null);
-                // Only setting title for Gadgets as it's using Portlet wrapper for displaying
-                if (app.getType().equals(ApplicationType.GADGET)) {
-                    uiPortlet.setTitle(app.getDisplayName());
-                }
                 uiPortlet.setDescription(app.getDescription());
                 List<String> accessPersList = app.getAccessPermissions();
                 String[] accessPers = accessPersList.toArray(new String[accessPersList.size()]);
@@ -327,23 +323,17 @@ public class UIPortalComponentActionListener {
                     accessPers = new String[] { UserACL.EVERYONE };
                 uiPortlet.setAccessPermissions(accessPers);
 
-                // Hardcode on state to fix error while drag/drop Dashboard
-                if ("dashboard/DashboardPortlet".equals(app.getContentId())) {
-                    TransientApplicationState<Object> state = new TransientApplicationState<Object>(app.getContentId());
-                    uiPortlet.setState(new PortletState<Object>(state, applicationType));
-                } else {
-                    ApplicationState<Object> state;
-                    // if we have a new portlet added to the page we need for it to have its own state.
-                    // otherwise all new portlets added to a page will have the same state.
-                    if (newComponent) {
-                        state = new TransientApplicationState<Object>(app.getContentId());
+                ApplicationState<Object> state;
+                // if we have a new portlet added to the page we need for it to have its own state.
+                // otherwise all new portlets added to a page will have the same state.
+                if (newComponent) {
+                    state = new TransientApplicationState<Object>(app.getContentId());
 
-                        // if the portlet is not new, then we should clone it from the original portlet
-                    } else {
-                        state = new CloneApplicationState<Object>(app.getStorageId());
-                    }
-                    uiPortlet.setState(new PortletState<Object>(state, applicationType));
+                    // if the portlet is not new, then we should clone it from the original portlet
+                } else {
+                    state = new CloneApplicationState<Object>(app.getStorageId());
                 }
+                uiPortlet.setState(new PortletState<Object>(state, applicationType));
                 uiPortlet.setPortletInPortal(uiTarget instanceof UIPortal);
 
                 // TODO Wait to fix issue EXOGTN-213 and then

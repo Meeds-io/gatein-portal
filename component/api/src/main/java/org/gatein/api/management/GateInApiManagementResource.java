@@ -83,7 +83,6 @@ public class GateInApiManagementResource {
 
     private static final SiteQuery SITE_QUERY = new SiteQuery.Builder().withSiteTypes(SiteType.SITE).build();
     private static final SiteQuery SPACE_QUERY = new SiteQuery.Builder().withSiteTypes(SiteType.SPACE).build();
-    private static final SiteQuery DASHBOARD_QUERY = new SiteQuery.Builder().withSiteTypes(SiteType.DASHBOARD).build();
 
     private final Portal portal;
 
@@ -210,55 +209,6 @@ public class GateInApiManagementResource {
     @Managed("/spaces/{group-name: .*}/navigation")
     public NavigationManagementResource getSpaceNavigation(@MappedPath("group-name") String groupName, @ManagedContext OperationContext context) {
         SiteId id = new SiteId(new Group(groupName));
-        return navigationResource(id, context);
-    }
-
-    // -------------------------------------------- User Sites (Dashboard) ---------------------------------------------//
-    @Managed("/dashboards")
-    public ModelList getDashboards(@ManagedContext PathAddress address, @MappedAttribute("emptySites") String emptySites,
-                                   @MappedAttribute("offset") String offset, @MappedAttribute("limit") String limit) {
-        return _getSites(DASHBOARD_QUERY, address, emptySites, offset, limit);
-    }
-
-    @Managed("/dashboards/{user-name}")
-    public ModelObject getDashboard(@MappedPath("user-name") String userName, @ManagedContext OperationContext context) {
-        SiteId id = new SiteId(new User(userName));
-        return _getSite(id, context);
-    }
-
-    @Managed("/dashboards/{user-name}")
-    @ManagedRole("administrators")
-    @ManagedOperation(name = OperationNames.ADD_RESOURCE, description = "Adds a given site")
-    public ModelObject addDashboard(@MappedPath("user-name") String userName, @MappedAttribute("template") String template, @ManagedContext PathAddress address) {
-        SiteId siteId = new SiteId(new User(userName));
-        return _addSite(address, siteId, template);
-    }
-
-    @Managed("/dashboards/{user-name}")
-    @ManagedRole("administrators")
-    @ManagedOperation(name = OperationNames.REMOVE_RESOURCE, description = "Removes the given dashboard")
-    public void removeDashboard(@MappedPath("user-name") String userName, @ManagedContext OperationContext context) {
-        SiteId id = new SiteId(new User(userName));
-        _removeSite(id, context);
-    }
-
-    @Managed("/dashboards/{user-name}")
-    @ManagedRole("administrators")
-    @ManagedOperation(name = OperationNames.UPDATE_RESOURCE, description = "Updates a given space")
-    public ModelObject updateDashboard(@MappedPath("user-name") String userName, @ManagedContext ModelObject siteModel, @ManagedContext OperationContext context) {
-        SiteId id = new SiteId(new User(userName));
-        return _updateSite(id, siteModel, context);
-    }
-
-    @Managed("/dashboards/{user-name}/pages")
-    public PageManagementResource getDashboardPages(@MappedPath("user-name") String userName, @ManagedContext OperationContext context) {
-        SiteId id = new SiteId(new User(userName));
-        return pagesResource(id, context);
-    }
-
-    @Managed("/dashboards/{user-name}/navigation")
-    public NavigationManagementResource getDashboardNavigation(@MappedPath("user-name") String userName, @ManagedContext OperationContext context) {
-        SiteId id = new SiteId(new User(userName));
         return navigationResource(id, context);
     }
 
@@ -503,9 +453,6 @@ public class GateInApiManagementResource {
                 break;
             case SPACE:
                 address = address.append("spaces");
-                break;
-            case DASHBOARD:
-                address = address.append("dashboards");
                 break;
             default:
                 throw new AssertionError();

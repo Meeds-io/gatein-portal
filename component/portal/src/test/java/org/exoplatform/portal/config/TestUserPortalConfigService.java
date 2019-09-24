@@ -465,30 +465,6 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
         }.execute(null);
     }
 
-    public void testCreateFromTemplate() {
-        new UnitTest() {
-            public void execute() throws Exception {
-                Page clone = userPortalConfigSer_.createPageTemplate("dashboard", "portal", "test");
-                assertNotNull(clone);
-                assertEquals("portal", clone.getOwnerType());
-                assertEquals("test", clone.getOwnerId());
-
-                //
-                assertEquals(1, clone.getChildren().size());
-
-                //
-                Application<Portlet> app = (Application<Portlet>) clone.getChildren().get(0);
-                assertEquals("Dashboard", app.getTitle());
-                assertNotNull(app.getState());
-                assertEquals("dashboard/DashboardPortlet", storage_.getId(app.getState()));
-                // assertEquals("portal", app.getInstanceState().getOwnerType());
-                // assertEquals("test", app.getInstanceState().getOwnerId());
-                Portlet prefs2 = storage_.load(app.getState(), ApplicationType.PORTLET);
-                assertNull(prefs2);
-            }
-        }.execute(null);
-    }
-
     public void testOverwriteUserLayout() {
         new UnitTest() {
             public void execute() throws Exception {

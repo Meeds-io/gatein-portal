@@ -53,8 +53,6 @@ import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PageBody;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.config.serialize.JibxArraySerialize;
-import org.exoplatform.portal.pom.data.ModelDataStorage;
-import org.exoplatform.portal.pom.spi.gadget.Gadget;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
 import org.exoplatform.portal.pom.spi.portlet.Preference;
@@ -77,8 +75,6 @@ public abstract class AbstractMarshaller<T> implements Marshaller<T> {
             ApplicationType<?> type = application.getType();
             if (ApplicationType.PORTLET == type) {
                 marshalPortletApplication(writer, safeCast(application, Portlet.class));
-            } else if (ApplicationType.GADGET == type) {
-                marshalGadgetApplication(writer, safeCast(application, Gadget.class));
             } else if (ApplicationType.WSRP_PORTLET == type) {
                 marshalWsrpApplication(writer, safeCast(application, WSRP.class));
             }
@@ -176,13 +172,6 @@ public abstract class AbstractMarshaller<T> implements Marshaller<T> {
                         container.setChildren(new ArrayList<ModelObject>());
                     }
                     container.getChildren().add(unmarshalPortletApplication(navigator.fork()));
-                    current = navigator.sibling();
-                    break;
-                case GADGET_APPLICATION:
-                    if (container.getChildren() == null) {
-                        container.setChildren(new ArrayList<ModelObject>());
-                    }
-                    container.getChildren().add(unmarshalGadgetApplication(navigator.fork()));
                     current = navigator.sibling();
                     break;
                 case PAGE_BODY:
@@ -352,85 +341,6 @@ public abstract class AbstractMarshaller<T> implements Marshaller<T> {
         }
 
         return state;
-    }
-
-    protected void marshalGadgetApplication(StaxWriter<Element> writer, Application<Gadget> gadgetApplication)
-            throws XMLStreamException {
-        writer.writeStartElement(Element.GADGET_APPLICATION).writeStartElement(Element.GADGET);
-
-        // Marshal ApplicationState
-        ApplicationState<Gadget> state = gadgetApplication.getState();
-
-        // Marshal application state
-        String contentId;
-        Gadget gadget;
-        // If transient we have all the information we need
-        if (state instanceof TransientApplicationState) {
-            TransientApplicationState<Gadget> transientApplicationState = (TransientApplicationState<Gadget>) state;
-            contentId = transientApplicationState.getContentId();
-            gadget = transientApplicationState.getContentState();
-        } else {
-            // The only way to retrieve the information if the state is not transient is if we're within a portal context
-            ExoContainer container = ExoContainerContext.getCurrentContainer();
-            if (container instanceof PortalContainer) {
-                ModelDataStorage dataStorage = (ModelDataStorage) container.getComponentInstanceOfType(ModelDataStorage.class);
-                try {
-                    gadget = dataStorage.load(state, ApplicationType.GADGET);
-                } catch (Exception e) {
-                    throw new XMLStreamException("Could not obtain gadget state from custom context.");
-                }
-
-                try {
-                    contentId = dataStorage.getId(state);
-                } catch (Exception e) {
-                    throw new XMLStreamException("Could not obtain contentId from custom context.", e);
-                }
-            } else {
-                throw new XMLStreamException("Cannot marshal application state " + state
-                        + " outside the context of the portal.");
-            }
-        }
-
-        // Marshal portlet application id
-        if (contentId == null)
-            throw new XMLStreamException("Gadget content ID was null.");
-        writer.writeElement(Element.GADGET_REF, contentId);
-
-        // Marshal preferences
-        if (gadget != null) {
-            // TODO: When user-prefs are supported, uncomment
-            // writer.writeOptionalElement(Element.PREFERENCES, gadget.getUserPref());
-        }
-        writer.writeEndElement(); // End of portlet
-
-        marshalApplication(writer, gadgetApplication);
-
-        writer.writeEndElement(); // End of gadget-application
-    }
-
-    protected Application<Gadget> unmarshalGadgetApplication(StaxNavigator<Element> navigator) throws XMLStreamException {
-        requiresChild(navigator, Element.GADGET);
-        ApplicationState<Gadget> state = unmarshalGadgetApplicationState(navigator.fork());
-
-        Application<Gadget> gadget = new Application<Gadget>(ApplicationType.GADGET);
-        gadget.setState(state);
-
-        return unmarshalApplication(navigator, gadget);
-    }
-
-    private ApplicationState<Gadget> unmarshalGadgetApplicationState(StaxNavigator<Element> navigator)
-            throws XMLStreamException {
-        requiresChild(navigator, Element.GADGET_REF);
-        String gadgetRef = getRequiredContent(navigator, true);
-
-        // TODO: Implement userPref unmarshalling when gatein_objects support it
-        Gadget gadget = null;
-
-        if (navigator.next() != null) {
-            throw unexpectedElement(navigator);
-        }
-
-        return new TransientApplicationState<Gadget>(gadgetRef, gadget);
     }
 
     protected void marshalWsrpApplication(StaxWriter<Element> writer, Application<WSRP> wsrpApplication)

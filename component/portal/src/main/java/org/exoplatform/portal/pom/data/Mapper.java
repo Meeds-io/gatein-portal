@@ -35,11 +35,9 @@ import java.util.regex.Pattern;
 
 import org.exoplatform.portal.config.NoSuchDataException;
 import org.exoplatform.portal.config.StaleModelException;
-import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.CloneApplicationState;
-import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.PersistentApplicationState;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.TransientApplicationState;
@@ -54,7 +52,6 @@ import org.exoplatform.portal.mop.redirects.Redirect;
 import org.exoplatform.portal.mop.redirects.Redirectable;
 import org.exoplatform.portal.pom.config.POMSession;
 import org.exoplatform.portal.pom.config.Utils;
-import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.services.jcr.util.Text;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -474,38 +471,11 @@ public class Mapper {
                 Attributes attrs = srcContainer.getAttributes();
                 String type = attrs.getValue(MappedAttributes.TYPE);
                 if ("dashboard".equals(type)) {
-                    Site owner = src.getPage().getSite();
-                    TransientApplicationState<Portlet> state = new TransientApplicationState<Portlet>(
-                            "dashboard/DashboardPortlet", null, getOwnerType(owner.getObjectType()), owner.getName());
-
-                    //
-                    boolean showInfoBar = attrs.getValue(MappedAttributes.SHOW_INFO_BAR, false);
-                    boolean showMode = attrs.getValue(MappedAttributes.SHOW_MODE, false);
-                    boolean showWindowState = attrs.getValue(MappedAttributes.SHOW_WINDOW_STATE, false);
-                    String theme = attrs.getValue(MappedAttributes.THEME, null);
-
-                    Described described = srcContainer.adapt(Described.class);
-
-                    String id = attrs.getValue(MappedAttributes.ID, null);
-                    String icon = attrs.getValue(MappedAttributes.ICON, null);
-                    String width = attrs.getValue(MappedAttributes.WIDTH, null);
-                    String height = attrs.getValue(MappedAttributes.HEIGHT, null);
-
-                    //
-                    List<String> a = Collections.singletonList(UserACL.EVERYONE);
-                    if (srcContainer.isAdapted(ProtectedResource.class)) {
-                        ProtectedResource pr = srcContainer.adapt(ProtectedResource.class);
-                        a = pr.getAccessPermissions();
-                    }
-
-                    //
-                    mo = new ApplicationData<Portlet>(srcContainer.getObjectId(), component.getName(), ApplicationType.PORTLET,
-                            state, id, described.getName(), icon, described.getDescription(), showInfoBar, showWindowState,
-                            showMode, theme, width, height, Collections.<String, String> emptyMap(), a);
-                } else {
-                    List<ComponentData> dstChildren = loadChildren(srcContainer);
-                    mo = load(srcContainer, dstChildren);
+                    // Gadget is dropped so we just ignore the dashboard
+                    continue;
                 }
+                List<ComponentData> dstChildren = loadChildren(srcContainer);
+                mo = load(srcContainer, dstChildren);
             } else if (component instanceof UIWindow) {
                 UIWindow window = (UIWindow) component;
                 ApplicationData<?> application = load(window);
@@ -573,7 +543,7 @@ public class Mapper {
 
         Attributes dstAttrs = dst.getAttributes();
         dstAttrs.setValue(MappedAttributes.ID, src.getId());
-        dstAttrs.setValue(MappedAttributes.TYPE, src instanceof DashboardData ? "dashboard" : null);
+        dstAttrs.setValue(MappedAttributes.TYPE, null);
         dstAttrs.setValue(MappedAttributes.ICON, src.getIcon());
         dstAttrs.setValue(MappedAttributes.TEMPLATE, src.getTemplate());
         dstAttrs.setValue(MappedAttributes.FACTORY_ID, src.getFactoryId());
@@ -645,64 +615,6 @@ public class Mapper {
             String srcChildId = srcChild.getStorageId();
             // Flag variable, become non null if and only if we are saving a transient dashboard
             ApplicationData<?> transientDashboardData = null;
-
-            // Replace dashboard application by container if needed
-            // this should be removed once we make the dashboard as first class
-            // citizen of the portal
-            if (srcChild instanceof ApplicationData) {
-                ApplicationData<?> app = (ApplicationData<?>) srcChild;
-                // todo julien: shouldn't we be checking for WSRP as well here?
-                if (app.getType() == ApplicationType.PORTLET && app.getState() instanceof TransientApplicationState) {
-                    TransientApplicationState<?> state = (TransientApplicationState<?>) app.getState();
-                    String contentId = state.getContentId();
-                    if ("dashboard/DashboardPortlet".equals(contentId)) {
-                        DashboardData data;
-                        if (app.getStorageId() != null) {
-                            UIContainer dstDashboard = session.findObjectById(ObjectType.CONTAINER, app.getStorageId());
-                            data = loadDashboard(dstDashboard);
-
-                            // Update those attributes as we have to do it now, they don't exist in a container
-                            // but do exist in a dashboard container
-                            Attributes attrs = dstDashboard.getAttributes();
-                            attrs.setValue(MappedAttributes.SHOW_INFO_BAR, app.isShowInfoBar());
-                            attrs.setValue(MappedAttributes.SHOW_MODE, app.isShowApplicationMode());
-                            attrs.setValue(MappedAttributes.SHOW_WINDOW_STATE, app.isShowApplicationState());
-                            attrs.setValue(MappedAttributes.THEME, app.getTheme());
-                        } else {
-                            data = DashboardData.INITIAL_DASHBOARD;
-                            transientDashboardData = (ApplicationData<?>) srcChild;
-                        }
-
-                        //
-                        String icon = data.getIcon();
-                        if (icon == null)
-                            icon = app.getIcon();
-
-                        String title = data.getTitle();
-                        if (title == null)
-                            title = app.getTitle();
-
-                        String description = data.getDescription();
-                        if (description == null)
-                            description = app.getDescription();
-
-                        String width = data.getWidth();
-                        if (width == null)
-                            width = app.getWidth();
-
-                        String height = data.getHeight();
-                        if (height == null)
-                            height = app.getHeight();
-
-                        data = new DashboardData(data.getStorageId(), data.getId(), data.getName(), icon, data.getTemplate(),
-                                data.getFactoryId(), title, description, width, height, app.getAccessPermissions(),
-                                data.getMoveAppsPermissions(), data.getMoveContainersPermissions(), data.getChildren());
-
-                        //
-                        srcChild = data;
-                    }
-                }
-            }
 
             //
             UIComponent dstChild;
@@ -976,43 +888,6 @@ public class Mapper {
         } else {
             throw new IllegalArgumentException("Cannot save application with state " + instanceState);
         }
-    }
-
-    public DashboardData loadDashboard(UIContainer container) {
-
-        List<String> accessPermissions = Collections.emptyList();
-        if (container.isAdapted(ProtectedResource.class)) {
-            ProtectedResource pr = container.adapt(ProtectedResource.class);
-            accessPermissions = pr.getAccessPermissions();
-        }
-
-        List<String> moveAppsPermissions = null;
-        List<String> moveContainersPermissions = null;
-        if (container.isAdapted(ProtectedContainer.class)) {
-            ProtectedContainer pc = container.adapt(ProtectedContainer.class);
-            moveAppsPermissions = pc.getMoveAppsPermissions();
-            moveContainersPermissions = pc.getMoveContainersPermissions();
-        } else {
-            moveAppsPermissions = Collections.emptyList();
-            moveContainersPermissions = Collections.emptyList();
-        }
-
-        //
-        Described described = container.adapt(Described.class);
-
-        //
-        Attributes attrs = container.getAttributes();
-        List<ComponentData> children = loadChildren(container);
-        return new DashboardData(container.getObjectId(), attrs.getValue(MappedAttributes.ID),
-                attrs.getValue(MappedAttributes.NAME), attrs.getValue(MappedAttributes.ICON),
-                attrs.getValue(MappedAttributes.TEMPLATE), attrs.getValue(MappedAttributes.FACTORY_ID), described.getName(),
-                described.getDescription(), attrs.getValue(MappedAttributes.WIDTH), attrs.getValue(MappedAttributes.HEIGHT),
-                Utils.safeImmutableList(accessPermissions), moveAppsPermissions, moveContainersPermissions, children);
-    }
-
-    public void saveDashboard(DashboardData dashboard, UIContainer dst) {
-        save(dashboard, dst);
-        saveChildren(dashboard, dst);
     }
 
     private static void load(Attributes src, Map<String, String> dst, Set<String> blackList) {

@@ -53,10 +53,6 @@ jsMan.require("SHARED/org_gatein_responsive_menu", "menu").addScripts("menu.init
                         <li class="menulink"><a class="link" href="${registerLink}">${resourceBundle.getString("label.Register")}</a></li>
                     </c:when>
                     <c:otherwise>
-                        <c:set var="useDashboardLink" value="${renderRequest.getPreferences().getValue('enable.dashboard.link', false)}" />
-                        <c:if test="${useDashboardLink.equals('true')}">
-                            <li class="menulink"><a class="link" href="${headerbean.generateDashboardLink()}">${resourceBundle.getString("label.Dashboard")}</a></li>
-                        </c:if>
                         <c:set var="useGroupPagesLink" value="${renderRequest.getPreferences().getValue('enable.grouppages.link', false)}" />
                         <c:if test="${useGroupPagesLink.equals('true')}">
                             <li class="menucategory"><a href="#" class="menutoggle"><span>${resourceBundle.getString("label.GroupPages")}</span><i class="caret">${resourceBundle.getString("label.ShowGroupPages")}</i></a><ol class="menu">

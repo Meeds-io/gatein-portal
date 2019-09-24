@@ -28,7 +28,6 @@ import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.config.model.Dashboard;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
@@ -198,20 +197,6 @@ public interface DataStorage {
      * /conf/portal/portal/sharedlayout.xml
      */
     Container getSharedLayout() throws Exception;
-
-    /**
-     * Return Dashboard object from database according to dashboard id If can't find out, return null
-     *
-     * @param dashboardId
-     */
-    Dashboard loadDashboard(String dashboardId) throws Exception;
-
-    /**
-     * Save Dashboard (its data : DashboadData) to database
-     *
-     * @param dashboard - Dashboard object to be saved
-     */
-    void saveDashboard(Dashboard dashboard) throws Exception;
 
     void save() throws Exception;
 

@@ -49,7 +49,6 @@
     <org.exoplatform.gatein.pc.version>5.3.x-SNAPSHOT</org.exoplatform.gatein.pc.version>
     <org.exoplatform.gatein.dep.version>1.8.x-SNAPSHOT</org.exoplatform.gatein.dep.version>
     <org.exoplatform.framework.junit.version>1.2.4-GA</org.exoplatform.framework.junit.version>
-    <org.shindig.version>2.5.2</org.shindig.version>
     <nl.captcha.simplecaptcha.version>1.1.1.Final-gatein-4</nl.captcha.simplecaptcha.version>
     <org.gatein.api.version>1.0.1.Final</org.gatein.api.version>
     <org.gatein.common.version>2.2.2.Final</org.gatein.common.version>
@@ -129,7 +128,6 @@
   <modules>
     <module>build-config</module>
     <module>component</module>
-    <module>gadgets</module>
     <module>webui</module>
     <module>portlet</module>
     <module>web</module>
@@ -574,16 +572,6 @@
       </dependency>
       <dependency>
         <groupId>org.exoplatform.gatein.portal</groupId>
-        <artifactId>exo.portal.webui.dashboard</artifactId>
-        <version>5.3.x-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
-        <artifactId>exo.portal.gadgets-core</artifactId>
-        <version>5.3.x-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
         <artifactId>exo.portal.component.test.core</artifactId>
         <version>5.3.x-SNAPSHOT</version>
       </dependency>
@@ -623,20 +611,8 @@
       </dependency>
       <dependency>
         <groupId>org.exoplatform.gatein.portal</groupId>
-        <artifactId>exo.portal.gadgets-server</artifactId>
-        <version>5.3.x-SNAPSHOT</version>
-        <type>war</type>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
         <artifactId>exo.portal.eXoGadgets</artifactId>
         <version>5.3.x-SNAPSHOT</version>
-        <type>war</type>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
-        <artifactId>exo.portal.gwtGadgets</artifactId>
-        <version>4.4.x-PLF-SNAPSHOT</version>
         <type>war</type>
       </dependency>
       <dependency>
@@ -666,12 +642,6 @@
       <dependency>
         <groupId>org.exoplatform.gatein.portal.examples.skins</groupId>
         <artifactId>gatein-sample-skin</artifactId>
-        <version>5.3.x-SNAPSHOT</version>
-        <type>war</type>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
-        <artifactId>exo.portal.portlet.dashboard</artifactId>
         <version>5.3.x-SNAPSHOT</version>
         <type>war</type>
       </dependency>
@@ -899,33 +869,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.apache.shindig</groupId>
-        <artifactId>shindig-gadgets</artifactId>
-        <version>${org.shindig.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.shindig</groupId>
-        <artifactId>shindig-features</artifactId>
-        <version>${org.shindig.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.shindig</groupId>
-        <artifactId>shindig-common</artifactId>
-        <version>${org.shindig.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.shindig</groupId>
-        <artifactId>shindig-common</artifactId>
-        <classifier>tests</classifier>
-        <version>${org.shindig.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.shindig</groupId>
-        <artifactId>shindig-social-api</artifactId>
-        <version>${org.shindig.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.gatein.captcha</groupId>
         <artifactId>simplecaptcha</artifactId>
         <version>${nl.captcha.simplecaptcha.version}</version>
@@ -980,14 +923,6 @@
         <groupId>net.jcip</groupId>
         <artifactId>jcip-annotations</artifactId>
         <version>${jcip.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.shindig</groupId>
-        <artifactId>shindig-common</artifactId>
-        <version>${org.shindig.version}</version>
-        <type>test-jar</type>
-        <scope>test</scope>
       </dependency>
 
       <!-- SSO -->

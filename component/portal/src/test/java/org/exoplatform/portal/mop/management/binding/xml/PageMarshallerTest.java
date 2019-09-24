@@ -48,7 +48,6 @@ import org.exoplatform.portal.pom.data.ApplicationData;
 import org.exoplatform.portal.pom.data.ComponentData;
 import org.exoplatform.portal.pom.data.ContainerData;
 import org.exoplatform.portal.pom.data.PageData;
-import org.exoplatform.portal.pom.spi.gadget.Gadget;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.portlet.Preference;
 import org.exoplatform.portal.pom.spi.wsrp.WSRP;
@@ -219,7 +218,7 @@ public class PageMarshallerTest extends AbstractMarshallerTest {
             assertEquals("*:/platform/guests", Utils.join(";", container2.getAccessPermissions()));
             assertEquals("TableColumnContainer", container2.getFactoryId());
             assertNotNull(container2.getChildren());
-            assertEquals(2, container2.getChildren().size());
+            assertEquals(1, container2.getChildren().size());
 
             {
                 // Verify column 1 of container 2
@@ -258,44 +257,6 @@ public class PageMarshallerTest extends AbstractMarshallerTest {
                     assertEquals("PortletIcon", application.getIcon());
                     assertEquals("250px", application.getWidth());
                     assertEquals("350px", application.getHeight());
-                }
-
-                // Verify column 2 of container 2
-                ModelObject orgComp = container2.getChildren().get(1);
-                assertTrue(orgComp instanceof Container);
-                Container orgContainer = (Container) orgComp;
-                assertEquals("c2-2", orgContainer.getId());
-                assertEquals("system:/groovy/portal/webui/container/UIContainer.gtmpl", orgContainer.getTemplate());
-                assertEquals("200px", orgContainer.getWidth());
-                assertEquals("300px", orgContainer.getHeight());
-                assertEquals("/platform/users", Utils.join(";", orgContainer.getAccessPermissions()));
-                {
-                    // Verify calendar gadget application
-                    assertNotNull(orgContainer.getChildren());
-                    assertEquals(1, orgContainer.getChildren().size());
-                    ModelObject gadgetComponent = orgContainer.getChildren().get(0);
-                    assertTrue(gadgetComponent instanceof Application);
-                    @SuppressWarnings("unchecked")
-                    Application<Gadget> application = (Application<Gadget>) gadgetComponent;
-                    assertTrue(application.getType() == ApplicationType.GADGET);
-                    ApplicationState<Gadget> state = application.getState();
-                    assertNotNull(state);
-                    assertTrue(state instanceof TransientApplicationState);
-                    TransientApplicationState<Gadget> tas = (TransientApplicationState<Gadget>) state;
-                    assertEquals("Calendar", tas.getContentId());
-                    assertNull(tas.getContentState());
-
-                    assertEquals("Vista:VistaTheme::Mac:MacTheme::Default:DefaultTheme", application.getTheme());
-                    assertEquals("Calendar Title", application.getTitle());
-                    assertEquals("*:/platform/administrators;*:/organization/management/executive-board",
-                            Utils.join(";", application.getAccessPermissions()));
-                    assertTrue(application.getShowInfoBar());
-                    assertFalse(application.getShowApplicationState());
-                    assertFalse(application.getShowApplicationMode());
-                    assertEquals("Calendar Description", application.getDescription());
-                    assertEquals("StarAwardIcon", application.getIcon());
-                    assertEquals("100px", application.getWidth());
-                    assertEquals("200px", application.getHeight());
                 }
             }
 
@@ -447,45 +408,6 @@ public class PageMarshallerTest extends AbstractMarshallerTest {
         comparePages(expected, actualPages.getPages().get(0));
     }
 
-    public void testPageMarshallingWithGadget() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        Gadget gadget = null;
-        // TODO: Uncomment when gadget user-prefs are supported in gatein_objects
-        // Gadget gadget = new Gadget();
-        // gadget.setUserPref("user-pref");
-
-        ApplicationState<Gadget> state = new TransientApplicationState<Gadget>("gadget-ref", gadget);
-        ApplicationData<Gadget> applicationData = new ApplicationData<Gadget>(null, null, ApplicationType.GADGET, state, null,
-                "app-title", "app-icon", "app-description", false, true, false, "app-theme", "app-wdith", "app-height",
-                new HashMap<String, String>(), Collections.singletonList("app-edit-permissions"));
-
-        List<ComponentData> children = Collections.singletonList((ComponentData) applicationData);
-        PageData expectedData = new PageData(null, null, "page-name", null, null, null, "Page Title", null, null, null,
-                Collections.singletonList("access-permissions"), children, "", "", "edit-permission", true,
-                Collections.singletonList("move-apps-permissions"),
-                Collections.singletonList("move-containers-permissions"));
-
-        Page expected = new Page(expectedData);
-
-        Page.PageSet expectedPages = new Page.PageSet();
-        expectedPages.setPages(new ArrayList<Page>(1));
-        expectedPages.getPages().add(expected);
-
-        PageMarshaller marshaller = new PageMarshaller();
-        marshaller.marshal(expectedPages, baos, false);
-
-        // System.out.println(baos.toString());
-
-        Page.PageSet actualPages = marshaller.unmarshal(new ByteArrayInputStream(baos.toByteArray()));
-
-        assertNotNull(actualPages);
-        assertNotNull(actualPages.getPages());
-        assertEquals(1, actualPages.getPages().size());
-
-        comparePages(expected, actualPages.getPages().get(0));
-    }
-
     public void testTemplatePagesUnMarshalling() {
         PageMarshaller marshaller = new PageMarshaller();
         InputStream in = null;
@@ -497,8 +419,8 @@ public class PageMarshallerTest extends AbstractMarshallerTest {
             assertEquals(1, pages.getPages().size());
             Page page = pages.getPages().get(0);
 
-            assertEquals("Tab_Default", page.getName());
-            assertEquals("Tab_Default", page.getTitle());
+            assertEquals("SiteMap", page.getName());
+            assertEquals("SiteMap", page.getTitle());
             assertNotNull(page.getChildren());
             assertEquals(1, page.getChildren().size());
             ModelObject child = page.getChildren().get(0);

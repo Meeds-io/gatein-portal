@@ -426,15 +426,6 @@ public class CommonHelper extends AbstractContextual {
         waitForPageToLoad(timeout);
     }
 
-    public static void goToDashboard() throws Exception {
-        setUp();
-
-        System.out.println("--Go to Dashboard--");
-        waitForElementPresent("link=Dashboard");
-        click("link=Dashboard");
-        waitForPageToLoad(timeout);
-    }
-
     public static void goToClassicPortal() throws Exception {
         setUp();
 

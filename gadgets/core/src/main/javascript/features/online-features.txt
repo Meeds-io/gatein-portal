@@ -1,3 +1,0 @@
-#
-#  THe list of features that require running in ONLINE mode
-#

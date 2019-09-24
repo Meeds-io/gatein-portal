@@ -19,31 +19,12 @@
 
 /***************************************  UIGadget   **************************************/
 
-.UIWindow .UIGadgetPortlet {
-	padding: 10px;
-}
-
-.UIWindow .UIGadgetPortlet .gadgets-gadget-content {
-	padding: 0;
-}
-
 .UIGadget {
 	margin: 3px 0px;
 }
 
 .UIGadget .GadgetMenuBar {
 	height: 20px;
-}
-
-.UIGadget .GadgetControl {
-	background: url('/eXoResources/skin/DefaultSkin/portal/webui/component/view/UIDashboard/background/BgTitleGadget.gif') repeat-x left top;
-	height: 23px;
-	line-height: 23px;
-	padding: 0 9px;
-	border: 1px solid #dbdbdb;
-	border-top: none;
-	cursor: move;
-	text-align: left;
 }
 
 .UIGadget .GadgetTitle {

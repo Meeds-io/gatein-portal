@@ -131,10 +131,6 @@ public class TestApplicationRegistryService extends AbstractApplicationRegistryT
                 ApplicationType.PORTLET, null);
         assertFalse(categories.isEmpty());
 
-        categories = service_.getApplicationCategories("MSOffice",
-                ApplicationType.GADGET, null);
-        assertTrue(categories.isEmpty());
-
         categories = service_.getApplicationCategories(null,
                 ApplicationType.PORTLET, null);
         assertEquals(2, categories.size());

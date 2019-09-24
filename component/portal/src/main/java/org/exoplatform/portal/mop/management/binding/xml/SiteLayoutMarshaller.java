@@ -25,7 +25,6 @@ package org.exoplatform.portal.mop.management.binding.xml;
 import static org.gatein.common.xml.stax.navigator.Exceptions.expectedElement;
 import static org.gatein.common.xml.stax.navigator.Exceptions.unexpectedElement;
 import static org.gatein.common.xml.stax.navigator.Exceptions.unknownElement;
-import static org.gatein.common.xml.stax.navigator.StaxNavUtils.getContent;
 import static org.gatein.common.xml.stax.navigator.StaxNavUtils.getRequiredAttribute;
 import static org.gatein.common.xml.stax.navigator.StaxNavUtils.getRequiredContent;
 import static org.gatein.common.xml.stax.writer.StaxWriterUtils.buildDefaultWriter;
@@ -45,7 +44,6 @@ import org.exoplatform.portal.config.model.PageBody;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.PortalRedirect;
 import org.exoplatform.portal.config.model.Properties;
-import org.exoplatform.portal.config.serialize.JibxArraySerialize;
 import org.exoplatform.portal.mop.management.binding.xml.portal.redirects.PortalRedirectXmlHandler;
 import org.gatein.common.xml.stax.navigator.StaxNavUtils;
 import org.gatein.common.xml.stax.writer.StaxWriter;
@@ -241,13 +239,6 @@ public class SiteLayoutMarshaller extends AbstractMarshaller<PortalConfig> {
                         throw expectedElement(navigator, Element.PORTAL_LAYOUT);
                     }
                     portalLayout.getChildren().add(unmarshalPortletApplication(navigator.fork()));
-                    current = navigator.sibling();
-                    break;
-                case GADGET_APPLICATION:
-                    if (portalLayout == null) {
-                        throw expectedElement(navigator, Element.PORTAL_LAYOUT);
-                    }
-                    portalLayout.getChildren().add(unmarshalGadgetApplication(navigator.fork()));
                     current = navigator.sibling();
                     break;
                 case CONTAINER:

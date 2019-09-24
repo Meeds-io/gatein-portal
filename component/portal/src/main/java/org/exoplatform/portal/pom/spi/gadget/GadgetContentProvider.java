@@ -25,9 +25,13 @@ import org.gatein.mop.spi.content.ContentProvider;
 import org.gatein.mop.spi.content.StateContainer;
 
 /**
+ * Gadget is dropped since PLF version 5.3.x, so this class is deprecated and will be removed in next version.
+ * We just keep the class to support migration only.
+ *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@Deprecated
 public class GadgetContentProvider implements ContentProvider<Gadget, GadgetState> {
 
     public Gadget combine(List<Gadget> states) {

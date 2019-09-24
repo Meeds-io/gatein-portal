@@ -24,8 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.exoplatform.application.gadget.Gadget;
-import org.exoplatform.application.gadget.GadgetRegistryService;
 import org.exoplatform.application.registry.Application;
 import org.exoplatform.application.registry.ApplicationCategory;
 import org.exoplatform.application.registry.ApplicationRegistryService;
@@ -81,10 +79,9 @@ public class UIAddApplicationForm extends UIForm {
 
     public UIAddApplicationForm() throws Exception {
         addUIFormInput(new UIFormStringInput(FIELD_NAME, null, null).addValidator(StringLengthValidator.class, 3, 30));
-        List<SelectItemOption<String>> types = new ArrayList<SelectItemOption<String>>(3);
-        types.add(new SelectItemOption<String>(ApplicationType.PORTLET.getName()));
-        types.add(new SelectItemOption<String>(ApplicationType.GADGET.getName()));
-        types.add(new SelectItemOption<String>(ApplicationType.WSRP_PORTLET.getName()));
+        List<SelectItemOption<String>> types = new ArrayList<>(2);
+        types.add(new SelectItemOption<>(ApplicationType.PORTLET.getName()));
+        types.add(new SelectItemOption<>(ApplicationType.WSRP_PORTLET.getName()));
         UIFormSelectBox uiSelectBox = new UIFormSelectBox(FIELD_TYPE, null, types);
         uiSelectBox.setOnChange("ChangeType");
         addUIFormInput(uiSelectBox);
@@ -144,23 +141,6 @@ public class UIAddApplicationForm extends UIForm {
             return createApplicationsFromPortlets(false);
         } else if (ApplicationType.WSRP_PORTLET == type) {
             return createApplicationsFromPortlets(true);
-        } else if (ApplicationType.GADGET == type) {
-            GadgetRegistryService gadgetService = getApplicationComponent(GadgetRegistryService.class);
-            List<Gadget> gadgets = gadgetService.getAllGadgets();
-            List<Application> applications = new ArrayList<Application>(gadgets.size());
-            for (Gadget gadget : gadgets) {
-                Application app = new Application();
-                app.setApplicationName(gadget.getName());
-                app.setType(ApplicationType.GADGET);
-                app.setDisplayName(gadget.getTitle());
-                app.setContentId(gadget.getName());
-                String description = (gadget.getDescription() == null || gadget.getDescription().length() < 1) ? gadget
-                        .getName() : gadget.getDescription();
-                app.setDescription(description);
-                app.setAccessPermissions(new ArrayList<String>());
-                applications.add(app);
-            }
-            return applications;
         }
 
         return Collections.emptyList();

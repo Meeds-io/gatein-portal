@@ -121,15 +121,6 @@
   </portlet>
 
   <portlet>
-    <name>UserToolbarDashboardPortlet</name>
-    <module>
-      <depends>
-        <module>navigation</module>
-      </depends>
-    </module>
-  </portlet>
-
-  <portlet>
     <name>AdminToolbarPortlet</name>
     <module>
       <depends>

@@ -66,12 +66,6 @@ public class NavigationPortlet extends GenericPortlet {
         for (Site space : spaces) {
             outputSite(space, writer);
         }
-
-        writer.println("<h1>Dashboard</h1>");
-        List<Site> dashboards = portal.findSites(new SiteQuery.Builder().withSiteTypes(SiteType.DASHBOARD).build());
-        for (Site dashboard : dashboards) {
-            outputSite(dashboard, writer);
-        }
     }
 
     private void outputSite(Site site, PrintWriter writer) throws IOException {

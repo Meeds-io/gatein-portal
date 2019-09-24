@@ -23,7 +23,6 @@ import java.util.Locale;
 
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.url.StandaloneAppURLContext;
-import org.exoplatform.portal.webui.application.UIStandaloneAppContainer;
 import org.exoplatform.portal.webui.workspace.UIStandaloneApplication;
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.web.ControllerContext;
@@ -55,9 +54,8 @@ public class StandaloneAppRequestContext extends PortalRequestContext {
     public String getTitle() throws Exception {
         String title = null;
         UIApplication uiApp = getUIApplication();
-        UIStandaloneAppContainer container = uiApp.getChild(UIStandaloneAppContainer.class);
-        if (container != null) {
-            title = container.getCurrAppName();
+        if (uiApp != null) {
+            title = uiApp.getName();
         }
 
         if (title == null) {

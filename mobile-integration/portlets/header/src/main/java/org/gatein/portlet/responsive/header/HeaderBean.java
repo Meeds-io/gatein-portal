@@ -36,7 +36,6 @@ import org.gatein.api.navigation.Navigation;
 import org.gatein.api.navigation.Node;
 import org.gatein.api.navigation.Nodes;
 import org.gatein.api.site.Site;
-import org.gatein.api.site.SiteId;
 import org.gatein.api.site.SiteQuery;
 import org.gatein.api.site.SiteType;
 
@@ -93,11 +92,6 @@ public class HeaderBean {
         PortalRequest portalRequest = PortalRequest.getInstance();
         String portalURL = portalRequest.getURIResolver().resolveURI(portalRequest.getSiteId());
         return portalURL;
-    }
-
-    public String generateDashboardLink() throws Exception {
-        PortalRequest portalRequest = PortalRequest.getInstance();
-        return portalRequest.getURIResolver().resolveURI(new SiteId(portalRequest.getUser()));
     }
 
     public String generateGroupPagesLink() {

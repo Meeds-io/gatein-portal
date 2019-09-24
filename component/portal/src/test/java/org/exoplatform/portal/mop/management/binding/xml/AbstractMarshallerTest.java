@@ -33,7 +33,6 @@ import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.PageBody;
 import org.exoplatform.portal.config.model.TransientApplicationState;
-import org.exoplatform.portal.pom.spi.gadget.Gadget;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.portlet.Preference;
 
@@ -117,8 +116,6 @@ public abstract class AbstractMarshallerTest extends TestCase {
                 assertEquals(expectedTas.getContentState().getClass(), actualTas.getContentState().getClass());
                 if (expectedTas.getContentState() instanceof Portlet) {
                     comparePortlet((Portlet) expectedTas.getContentState(), (Portlet) actualTas.getContentState());
-                } else if (expectedTas.getContentState() instanceof Gadget) {
-                    compareGadget((Gadget) expectedTas.getContentState(), (Gadget) actualTas.getContentState());
                 }
             }
         }
@@ -132,12 +129,5 @@ public abstract class AbstractMarshallerTest extends TestCase {
             assertEquals(expectedPref.getValues(), actualPref.getValues());
             assertEquals(expectedPref.isReadOnly(), actualPref.isReadOnly());
         }
-    }
-
-    private void compareGadget(Gadget expected, Gadget actual) {
-        assertNotNull(expected);
-        assertNotNull(actual);
-        // When gadget user prefs are supported in gatein_objects, uncomment.
-        // assertEquals(expected.getUserPref(), actual.getUserPref());
     }
 }
