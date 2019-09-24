@@ -132,4 +132,10 @@
     </createIndex>
   </changeSet>
 
+  <changeSet author="file" id="1.0.0-13">
+    <modifyDataType columnName="UPDATER"
+                    newDataType="NVARCHAR(200)"
+                    tableName="FILES_FILES"/>
+  </changeSet>
+
 </databaseChangeLog>
