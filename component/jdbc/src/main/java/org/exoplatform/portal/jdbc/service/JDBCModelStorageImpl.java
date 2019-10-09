@@ -59,7 +59,6 @@ import org.exoplatform.portal.jdbc.entity.WindowEntity.AppType;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.Imported.Status;
-import org.exoplatform.portal.pom.config.POMDataStorage;
 import org.exoplatform.portal.pom.config.tasks.SearchTask;
 import org.exoplatform.portal.pom.config.tasks.SearchTask.FindPortletPreferences;
 import org.exoplatform.portal.pom.data.ApplicationData;
@@ -67,7 +66,6 @@ import org.exoplatform.portal.pom.data.BodyData;
 import org.exoplatform.portal.pom.data.BodyType;
 import org.exoplatform.portal.pom.data.ComponentData;
 import org.exoplatform.portal.pom.data.ContainerData;
-import org.exoplatform.portal.pom.data.DashboardData;
 import org.exoplatform.portal.pom.data.MappedAttributes;
 import org.exoplatform.portal.pom.data.ModelChange;
 import org.exoplatform.portal.pom.data.ModelData;
@@ -358,60 +356,6 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
   }
 
   @Override
-  public void saveDashboard(DashboardData dashboard) throws Exception {
-    String id = dashboard.getStorageId();
-    ContainerEntity dst = containerDAO.find(id);
-    if (dst == null) {
-      throw new IllegalStateException("Not found dashboard to update: " + id);
-    }
-
-    JSONParser parser = new JSONParser();
-    JSONArray containerBody = (JSONArray) parser.parse(dst.getContainerBody());
-    cleanDeletedComponents(containerBody, dashboard.getChildren());
-
-    dst.setChildren(saveChildren(dashboard.getChildren()));
-    buildContainerEntity(dst, dashboard);
-    dst.setContainerBody(((JSONArray) dst.toJSON().get("children")).toJSONString());
-    containerDAO.update(dst);
-    savePermissions(dst.getId(), dashboard);
-  }
-
-  @Override
-  public DashboardData loadDashboard(String dashboardId) throws Exception {
-    ContainerEntity dashboard = containerDAO.find(dashboardId);
-
-    List<PermissionEntity> access = permissionDAO.getPermissions(dashboardId,
-                                                                 org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.ACCESS);
-
-    List<PermissionEntity> moveApps =
-                                    permissionDAO.getPermissions(dashboardId,
-                                                                 org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.MOVE_APP);
-    List<PermissionEntity> moveContainers =
-                                          permissionDAO.getPermissions(dashboardId,
-                                                                       org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.MOVE_CONTAINER);
-
-    //
-    JSONParser parser = new JSONParser();
-    JSONArray body = (JSONArray) parser.parse(dashboard.getContainerBody());
-    List<ComponentData> children = buildChildren(body);
-
-    return new DashboardData(dashboard.getId(),
-                             dashboard.getId(),
-                             dashboard.getName(),
-                             dashboard.getId(),
-                             dashboard.getTemplate(),
-                             dashboard.getFactoryId(),
-                             dashboard.getTitle(),
-                             dashboard.getDescription(),
-                             dashboard.getWidth(),
-                             dashboard.getHeight(),
-                             buildPermission(access),
-                             buildPermission(moveApps),
-                             buildPermission(moveContainers),
-                             children);
-  }
-
-  @Override
   public void save() throws Exception {
   }
 
@@ -567,67 +511,6 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     for (ComponentData srcChild : children) {
       String srcChildId = srcChild.getStorageId();
 
-      // Replace dashboard application by container if needed
-      // this should be removed once we make the dashboard as first class
-      // citizen of the portal
-      List<ComponentEntity> dashboardChilds = null;
-      if (srcChild instanceof ApplicationData) {
-        ApplicationData<?> app = (ApplicationData<?>) srcChild;
-        if (app.getType() == ApplicationType.PORTLET && app.getState() instanceof TransientApplicationState) {
-          TransientApplicationState<?> state = (TransientApplicationState<?>) app.getState();
-          String contentId = state.getContentId();
-          if ("dashboard/DashboardPortlet".equals(contentId)) {
-            JDBCDashboardData data;
-            if (app.getStorageId() != null) {
-              ContainerEntity dstDashboard = containerDAO.find(app.getStorageId());
-              if (dstDashboard != null) {
-                data = buildDashBoard(dstDashboard);
-              } else {
-                data = JDBCDashboardData.INITIAL_DASHBOARD;
-                dashboardChilds = saveChildren(data.getChildren());
-              }
-            } else {
-              data = JDBCDashboardData.INITIAL_DASHBOARD;
-              dashboardChilds = saveChildren(data.getChildren());
-            }
-
-            //
-            String icon = app.getIcon();
-            String title = app.getTitle();
-            String description = app.getDescription();
-            String width = app.getWidth();
-            String height = app.getHeight();
-            // Update those attributes as we have to do it now, they don't
-            // exist in a container
-            // but do exist in a dashboard container
-            JSONObject properties = new JSONObject();
-            properties.put(MappedAttributes.SHOW_INFO_BAR.getName(), app.isShowInfoBar());
-            properties.put(MappedAttributes.SHOW_MODE.getName(), app.isShowApplicationMode());
-            properties.put(MappedAttributes.SHOW_WINDOW_STATE.getName(), app.isShowApplicationState());
-            properties.put(MappedAttributes.THEME.getName(), app.getTheme());
-
-            data = new JDBCDashboardData(data.getStorageId(),
-                                         data.getId(),
-                                         data.getName(),
-                                         icon,
-                                         data.getTemplate(),
-                                         data.getFactoryId(),
-                                         title,
-                                         description,
-                                         width,
-                                         height,
-                                         app.getAccessPermissions(),
-                                         data.getMoveAppsPermissions(),
-                                         data.getMoveContainersPermissions(),
-                                         properties,
-                                         data.getChildren());
-
-            //
-            srcChild = data;
-          }
-        }
-      }
-
       ComponentEntity dstChild = null;
       if (srcChildId != null) { // update
         if (srcChild instanceof ContainerData) {
@@ -670,19 +553,8 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       savePermissions(dstChild.getId(), srcChild);
 
       if (srcChild instanceof ContainerData) {
-        if (srcChild instanceof JDBCDashboardData) {
-          ContainerEntity dashboard = (ContainerEntity) dstChild;
-          // create dashboard children first time
-          if (dashboardChilds != null) {
-            dashboard.setChildren(dashboardChilds);
-            dashboard.setContainerBody(((JSONArray) dashboard.toJSON().get("children")).toJSONString());
-            dashboard.setChildren(Collections.<ComponentEntity> emptyList());
-            containerDAO.update(dashboard);
-          }
-        } else {
-          List<ComponentEntity> descendants = saveChildren(((ContainerData) srcChild).getChildren());
-          ((ContainerEntity) dstChild).setChildren(descendants);
-        }
+        List<ComponentEntity> descendants = saveChildren(((ContainerData) srcChild).getChildren());
+        ((ContainerEntity) dstChild).setChildren(descendants);
       }
 
       results.add(dstChild);
@@ -696,37 +568,6 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     properties.put(MappedAttributes.TYPE.getName(), bodyData.getType().name());
     dst.setProperties(properties.toJSONString());
     return dst;
-  }
-
-  private JDBCDashboardData buildDashBoard(ContainerEntity dstDashboard) {
-    ContainerData container = buildContainer(dstDashboard,
-                                             new JSONObject(),
-                                             Collections.<String, ContainerEntity> emptyMap(),
-                                             Collections.<String, WindowEntity> emptyMap());
-    JSONObject properties = new JSONObject();
-    if (dstDashboard.getProperties() != null) {
-      JSONParser parser = new JSONParser();
-      try {
-        properties = (JSONObject) parser.parse(dstDashboard.getProperties());
-      } catch (ParseException e) {
-        log.error(e);
-      }
-    }
-    return new JDBCDashboardData(container.getId(),
-                                 container.getId(),
-                                 container.getName(),
-                                 container.getIcon(),
-                                 container.getTemplate(),
-                                 container.getFactoryId(),
-                                 container.getTitle(),
-                                 container.getDescription(),
-                                 container.getWidth(),
-                                 container.getHeight(),
-                                 container.getAccessPermissions(),
-                                 container.getMoveAppsPermissions(),
-                                 container.getMoveContainersPermissions(),
-                                 properties,
-                                 container.getChildren());
   }
 
   private List<ComponentData> buildChildren(JSONArray jsonBody) {
@@ -918,14 +759,6 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     dst.setHeight(src.getHeight());
     dst.setIcon(src.getIcon());
     dst.setName(src.getName());
-    if (src instanceof DashboardData) {
-      JSONObject properties = new JSONObject();
-      if (src instanceof JDBCDashboardData) {
-        properties = ((JDBCDashboardData) src).getProperties();
-      }
-      properties.put(MappedAttributes.TYPE.getName(), "dashboard");
-      dst.setProperties(properties.toJSONString());
-    }
     dst.setTemplate(src.getTemplate());
     dst.setTitle(src.getTitle());
     dst.setWidth(src.getWidth());

@@ -34,8 +34,6 @@ import org.gatein.pc.api.info.MetaInfo;
 import org.gatein.pc.api.info.PortletInfo;
 import org.picocontainer.Startable;
 
-import org.exoplatform.application.gadget.Gadget;
-import org.exoplatform.application.gadget.GadgetRegistryService;
 import org.exoplatform.application.registry.Application;
 import org.exoplatform.application.registry.ApplicationCategoriesPlugins;
 import org.exoplatform.application.registry.ApplicationCategory;
@@ -70,8 +68,6 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
 
   private PermissionDAO                      permissionDAO;
 
-  private GadgetRegistryService              gadgetService;
-
   private String                             anyOfAdminGroup;
 
   private List<ApplicationCategoriesPlugins> plugins;
@@ -87,12 +83,10 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
   public JDBCApplicationRegistryService(CategoryDAO catDAO,
                                         ApplicationDAO appDAO,
                                         PermissionDAO permissionDAO,
-                                        GadgetRegistryService gadgetService,
                                         UserACL userACL) {
     this.catDAO = catDAO;
     this.appDAO = appDAO;
     this.permissionDAO = permissionDAO;
-    this.gadgetService = gadgetService;
     this.anyOfAdminGroup = new MembershipEntry(userACL.getAdminGroups()).toString();
   }
 
@@ -224,44 +218,6 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     if (appEntity != null) {
       permissionDAO.deletePermissions(appEntity.getId());
       appDAO.delete(appEntity);
-    }
-  }
-
-  public void importExoGadgets() throws Exception {
-    //
-    List<Gadget> eXoGadgets = gadgetService.getAllGadgets();
-
-    //
-    if (eXoGadgets != null) {
-      ArrayList<String> permissions = new ArrayList<String>();
-      permissions.add(anyOfAdminGroup);
-      String categoryName = "Gadgets";
-
-      //
-      CategoryEntity category = catDAO.findByName(categoryName);
-      if (category == null) {
-        category = new CategoryEntity();
-        category.setDisplayName(categoryName);
-        category.setDescription(categoryName);
-        catDAO.create(category);
-        permissionDAO.savePermissions(category.getId(), TYPE.ACCESS, permissions);
-      }
-
-      //
-      for (Gadget ele : eXoGadgets) {
-        ApplicationEntity app = appDAO.find(category.getName(), ele.getName());
-        if (app == null) {
-          app = new ApplicationEntity();
-          app.setApplicationName(ele.getName());
-          app.setCategory(category);
-          app.setContentId(ele.getName());
-          app.setType(ApplicationType.GADGET.getName());
-          app.setDisplayName(ele.getTitle());
-          app.setDescription(ele.getDescription());
-          appDAO.create(app);
-          permissionDAO.savePermissions(app.getId(), TYPE.ACCESS, permissions);
-        }
-      }
     }
   }
 

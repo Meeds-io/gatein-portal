@@ -195,14 +195,6 @@
     <type>org.exoplatform.portal.jdbc.dao.CategoryDAOImpl</type>
   </component>
   <component>
-    <key>org.exoplatform.portal.jdbc.dao.GadgetDAO</key>
-    <type>org.exoplatform.portal.jdbc.dao.GadgetDAOImpl</type>
-  </component>
-  <component>
-    <key>org.exoplatform.portal.jdbc.dao.TokenDAO</key>
-    <type>org.exoplatform.portal.jdbc.dao.TokenDAOImpl</type>
-  </component>
-  <component>
     <key>org.exoplatform.portal.jdbc.dao.SettingDAO</key>
     <type>org.exoplatform.portal.jdbc.dao.SettingDAOImpl</type>
   </component>
@@ -262,28 +254,6 @@
   <component>
     <key>org.exoplatform.application.registry.ApplicationRegistryService</key>
     <type>org.exoplatform.portal.jdbc.service.JDBCApplicationRegistryService</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.application.gadget.GadgetRegistryService</key>
-    <type>org.exoplatform.portal.jdbc.service.JDBCGadgetRegistryServiceImpl</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.portal.gadget.core.GadgetTokenInfoService</key>
-    <type>org.exoplatform.portal.jdbc.service.GadgetTokenInfoService</type>
-    <init-params>
-      <value-param>
-        <name>cleanup.period.time</name>
-        <value>0</value>
-      </value-param>
-      <values-param>
-        <name>service.configuration</name>
-        <value>gadget-token</value>
-        <value>2</value>
-        <value>SECOND</value>
-      </values-param>
-    </init-params>
   </component>
 
   <component>

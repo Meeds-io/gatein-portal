@@ -12,7 +12,6 @@ import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.config.model.Dashboard;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PersistentApplicationState;
 import org.exoplatform.portal.config.model.PortalConfig;
@@ -215,41 +214,6 @@ public class TestModelStorage extends TestDataStorage {
     begin();
     afterNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
     assertEquals(new HashSet<String>(names), new HashSet<String>(afterNames));
-  }
-
-  public void testGettingGadgetInDashboard() throws Exception {
-    Page page = new Page();
-    page.setPageId("portal::test::foo");
-    Application<Portlet> app = Application.createPortletApplication();
-    app.setState(new TransientApplicationState<Portlet>("dashboard/DashboardPortlet"));
-    page.getChildren().add(app);
-    pageService.savePage(new PageContext(page.getPageKey(), null));
-    storage_.save(page);
-    page = storage_.getPage("portal::test::foo");
-    String id = page.getChildren().get(0).getStorageId();
-
-    // Load the dashboard itself
-    Dashboard dashboard = storage_.loadDashboard(id);
-
-    // Put a gadget in one container
-    Container row0 = (Container) dashboard.getChildren().get(0);
-    Application<Gadget> gadgetApp = Application.createGadgetApplication();
-    gadgetApp.setState(new TransientApplicationState<Gadget>("foo"));
-    row0.getChildren().add(gadgetApp);
-
-    // Save the dashboard
-    storage_.saveDashboard(dashboard);
-
-    // Load again the persisted version
-    dashboard = storage_.loadDashboard(id);
-
-    row0 = (Container) dashboard.getChildren().get(0);
-    Application<Gadget> gadget = (Application<Gadget>) row0.getChildren().get(0);
-    String storageId = gadget.getStorageId();
-
-    // Now get the gadget by StorageId
-    Application<Object> applicationModel = storage_.getApplicationModel(storageId);
-    assertEquals(gadget.getId(), applicationModel.getId());
   }
 
   public void testSiteLayout() throws Exception {
