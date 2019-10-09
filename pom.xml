@@ -519,7 +519,7 @@
       <dependency>
         <groupId>org.exoplatform.gatein.portal</groupId>
         <artifactId>exo.portal.component.jdbc</artifactId>
-        <version>5.3.x-portal-rdbms-SNAPSHOT</version>
+        <version>6.0.x-portal-rdbms-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.gatein.portal</groupId>

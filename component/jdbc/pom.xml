@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.exoplatform.gatein.portal</groupId>
     <artifactId>exo.portal.component</artifactId>
-    <version>5.3.x-portal-rdbms-SNAPSHOT</version>
+    <version>6.0.x-portal-rdbms-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
