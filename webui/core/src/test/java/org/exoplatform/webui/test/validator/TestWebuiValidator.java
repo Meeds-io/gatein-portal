@@ -144,6 +144,9 @@ public class TestWebuiValidator extends TestCase {
         assertFalse(expected(validator, "root--gtn"));
         assertFalse(expected(validator, "root*gtn"));
         assertFalse(expected(validator, "Root"));
+        assertFalse(expected(validator, " root "));
+        assertFalse(expected(validator, " root"));
+        assertFalse(expected(validator, "root "));
     }
 
     public void validateUsernamesInGroupMembership() {
