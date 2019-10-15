@@ -29,7 +29,6 @@ import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.management.operations.page.PageUtils;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageService;
-import org.exoplatform.portal.mop.page.PageServiceWrapper;
 import org.exoplatform.portal.mop.page.PageState;
 
 /**
@@ -67,7 +66,7 @@ public class PageImporter {
         //We temporary don't support to delete user site's pages, it's risk because user site page, navigation is controlled by 
         //UserSiteLifecycle which is difference with portal site and group site
         if (mode == ImportMode.OVERWRITE && !siteKey.getType().equals(SiteType.USER)) {
-            List<PageContext> allPages = ((PageServiceWrapper)pageService).loadPages(siteKey);
+            List<PageContext> allPages = pageService.loadPages(siteKey);
             for (PageContext currentPage : allPages) {
                 String currentPageId = currentPage.getKey().format();
                 if (!hashPageList.containsKey(currentPageId)) {

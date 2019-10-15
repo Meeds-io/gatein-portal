@@ -1,7 +1,11 @@
 package org.exoplatform.portal.mop.page;
 
 import org.exoplatform.portal.mop.QueryResult;
+import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -22,6 +26,8 @@ public interface PageService {
      * @throws PageServiceException anything that would prevent the operation to succeed
      */
     PageContext loadPage(PageKey key) throws NullPointerException, PageServiceException;
+
+    List<PageContext> loadPages(SiteKey siteKey) throws NullPointerException, PageServiceException;
 
     /**
      * Create, update a page. When the page state is not null, the page will be created or updated depending on whether or not
