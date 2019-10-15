@@ -232,6 +232,28 @@ public class NavigationStoreImpl implements NavigationStore {
   }
 
   @Override
+  public NavigationData loadNavigationData(String nodeId) {
+    NodeData root = this.buildNodeData(this.getRootNode(nodeId));
+    NavigationEntity navEntity = navigationDAO.findByRootNode(root.getId());
+    if (navEntity != null) {
+      SiteEntity siteEntity = navEntity.getOwner();
+      SiteKey key = siteEntity.getSiteType().key(siteEntity.getName());
+      NavigationState navigationState = new NavigationState(navEntity.getPriority());
+      return new NavigationData(key, navigationState, String.valueOf(navEntity.getRootNode().getId()));
+    }
+
+    return NavigationData.EMPTY;
+  }
+
+  private NodeEntity getRootNode(String nodeId) {
+    NodeEntity entity = this.nodeDAO.find(nodeId);
+    if (entity.getParent() != null) {
+      return this.getRootNode(entity.getParent().getId());
+    }
+    return entity;
+  }
+
+  @Override
   public void saveNavigation(SiteKey key, NavigationState state) {
     SiteEntity owner = siteDAO.findByKey(key);
     if (owner == null) {

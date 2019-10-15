@@ -26,6 +26,8 @@ public interface NavigationDAO extends GenericDAO<NavigationEntity, String> {
 
   NavigationEntity findByOwner(SiteType type, String name);
 
+  NavigationEntity findByRootNode(String nodeId);
+
   void deleteByOwner(SiteType siteType, String name);
 
 }

@@ -84,6 +84,10 @@ public class NavigationData implements Serializable {
         return rootId;
     }
 
+    public SiteKey getSiteKey() {
+        return this.key;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

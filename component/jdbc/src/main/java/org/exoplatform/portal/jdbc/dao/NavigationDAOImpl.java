@@ -43,6 +43,19 @@ public class NavigationDAOImpl extends GenericDAOJPAImpl<NavigationEntity, Strin
     }
 
     @Override
+    public NavigationEntity findByRootNode(String nodeId) {
+        TypedQuery<NavigationEntity> query = getEntityManager().createNamedQuery("NavigationEntity.findByRootNode",
+                NavigationEntity.class);
+        query.setParameter("rootNodeId", nodeId);
+
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    @Override
     @ExoTransactional
     public void deleteByOwner(SiteType siteType, String name) {
       NavigationEntity entity = findByOwner(siteType, name);

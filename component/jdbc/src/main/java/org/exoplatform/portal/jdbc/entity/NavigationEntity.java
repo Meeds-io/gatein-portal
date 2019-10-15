@@ -39,7 +39,9 @@ import org.exoplatform.portal.mop.SiteType;
 @ExoEntity
 @Table(name = "PORTAL_NAVIGATIONS")
 @NamedQueries({
-  @NamedQuery(name = "NavigationEntity.findByOwner", query = "SELECT nav FROM GateInNavigation nav INNER JOIN nav.owner s WHERE s.siteType = :ownerType AND s.name = :ownerId") })
+  @NamedQuery(name = "NavigationEntity.findByOwner", query = "SELECT nav FROM GateInNavigation nav INNER JOIN nav.owner s WHERE s.siteType = :ownerType AND s.name = :ownerId"),
+  @NamedQuery(name = "NavigationEntity.findByRootNode", query = "SELECT nav FROM GateInNavigation nav INNER JOIN nav.rootNode r WHERE r.id = :rootNodeId")
+})
 public class NavigationEntity implements Serializable {
 
   private static final long serialVersionUID = 3811683620903785319L;
