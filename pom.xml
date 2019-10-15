@@ -115,7 +115,9 @@
     <version.yuicompressor-maven-plugin>0.7.1</version.yuicompressor-maven-plugin>
     <version.plugin.japex>1.2.3</version.plugin.japex>
     <version.plugin.jibx>1.3.1</version.plugin.jibx>
+    <version.plugin.javadoc>2.10.3</version.plugin.javadoc>
     <version.jcabi.plugin>0.14</version.jcabi.plugin>
+    <parsedVersion.majorVersion>N/A</parsedVersion.majorVersion>
   </properties>
 
   <scm>
@@ -1338,6 +1340,68 @@ memory option properties. This should be removed when we can just set the compil
           <groupId>net.sf.alchim</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>${version.yuicompressor-maven-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${version.plugin.javadoc}</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+              <manifestEntries>
+                <Date>${maven.build.timestamp}</Date>
+                <Implementation-URL>${project.url}</Implementation-URL>
+                <SCM-URL>${project.scm.connection}</SCM-URL>
+                <SCM-Revision>${buildNumber}</SCM-Revision>
+                <Specification-Title>${project.name}</Specification-Title>
+                <Specification-Version>${parsedVersion.majorVersion}.0</Specification-Version>
+                <Specification-Vendor>${project.organization.name}</Specification-Vendor>
+                <Implementation-Title>${project.name}</Implementation-Title>
+                <Implementation-Version>${project.version}</Implementation-Version>
+                <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+              </manifestEntries>
+            </archive>
+            <tags>
+              <tag>
+                <name>LevelAPI</name>
+                <placement>a</placement>
+                <head>eXo level API</head>
+              </tag>
+              <tag>
+                <name>anchor</name>
+                <placement>a</placement>
+                <head>eXo anchor for generated doc on REST API</head>
+              </tag>
+              <tag>
+                <name>request</name>
+                <placement>a</placement>
+                <head>eXo anchor for generated doc on REST API</head>
+              </tag>
+              <tag>
+                <name>response</name>
+                <placement>a</placement>
+                <head>eXo response for generated doc on REST API</head>
+              </tag>
+              <tag>
+                <name>format</name>
+                <placement>a</placement>
+                <head>eXo format for generated doc on REST API</head>
+              </tag>
+              <tag>
+                <name>authentication</name>
+                <placement>a</placement>
+                <head>eXo authentication for generated doc on REST API</head>
+              </tag>
+              <tag>
+                <name>notificationId</name>
+                <placement>a</placement>
+                <head>eXo notificationId for generated doc on REST API</head>
+              </tag>
+            </tags>
+          </configuration>
         </plugin>
 
       </plugins>
