@@ -240,5 +240,17 @@
     <modifySql dbms="mysql">
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
     </modifySql>
-  </changeSet>  
+  </changeSet>
+
+  <changeSet author="portal" id="1.0.0-16" dbms="oracle,postgresql">
+    <createSequence sequenceName="SEQ_PORTAL_PERMISSIONS_ID" startValue="1"/>
+  </changeSet>
+
+  <changeSet author="portal" id="1.0.0-17" dbms="oracle,postgresql">
+    <createSequence sequenceName="SEQ_PORTAL_DESCRIPTIONS_ID" startValue="1"/>
+  </changeSet>
+
+  <changeSet author="portal" id="1.0.0-18" dbms="oracle,postgresql">
+    <createSequence sequenceName="SEQ_PORTAL_SETTINGS_ID" startValue="1"/>
+  </changeSet>
 </databaseChangeLog>

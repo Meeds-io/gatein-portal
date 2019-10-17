@@ -20,13 +20,9 @@ package org.exoplatform.portal.jdbc.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import javax.persistence.*;
 
+import org.hibernate.annotations.Type;
 import org.json.simple.JSONObject;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
@@ -77,7 +73,9 @@ public class WindowEntity extends ComponentEntity implements Serializable {
   private String            contentId;
 
   @Lob
+  @Type(type = "org.hibernate.type.BinaryType")
   @Column(name = "CUSTOMIZATION", length = 10000)
+  @Basic(fetch = FetchType.LAZY)
   private byte[]            customization;
 
   public String getTitle() {
