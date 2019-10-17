@@ -138,7 +138,7 @@ public class UserConfigurableValidator extends MultipleConditionsValidator {
     public UserConfigurableValidator(String configurationName, String messageLocalizationKey,
             Boolean exceptionOnMissingMandatory) {
         this.exceptionOnMissingMandatory = exceptionOnMissingMandatory;
-        this.trimValue = true;
+        this.trimValue = configurationName == null || !USERNAME.equals(configurationName);
         localizationKey = messageLocalizationKey != null ? messageLocalizationKey : DEFAULT_LOCALIZATION_KEY;
         this.validatorName = configurationName != null ? configurationName : USERNAME;
     }
