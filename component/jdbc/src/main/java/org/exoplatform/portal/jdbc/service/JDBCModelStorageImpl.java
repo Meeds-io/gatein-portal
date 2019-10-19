@@ -432,7 +432,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
     PageData pageData =
                       new PageData(entity.getId(),
-                                   entity.getId(),
+                                   null,
                                    entity.getName(),
                                    null,
                                    null,
