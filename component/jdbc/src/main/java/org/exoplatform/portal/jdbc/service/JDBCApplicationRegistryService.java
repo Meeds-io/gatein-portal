@@ -186,8 +186,8 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     save(category);
     CategoryEntity catEntity = catDAO.findByName(category.getName());
 
-    ApplicationEntity appEntity = null;
-    if (application.getStorageId() != null) {
+    ApplicationEntity appEntity = appDAO.find(category.getName(), application.getApplicationName());
+    if (appEntity == null && application.getStorageId() != null) {
       appEntity = appDAO.find(application.getStorageId());
     }
     appEntity = buildAppEntity(appEntity, application);
