@@ -253,4 +253,39 @@
   <changeSet author="portal" id="1.0.0-18" dbms="oracle,postgresql">
     <createSequence sequenceName="SEQ_PORTAL_SETTINGS_ID" startValue="1"/>
   </changeSet>
+
+  <changeSet author="portal" id="1.0.0-19">
+    <addForeignKeyConstraint constraintName="FK_PORTAL_DESCRIPTION_LOCALIZED_DESCRIPTION_ID"
+                             baseTableName="PORTAL_DESCRIPTION_LOCALIZED"
+                             baseColumnNames="DESCRIPTION_ID"
+                             referencedTableName="PORTAL_DESCRIPTIONS"
+                             referencedColumnNames="DESCRIPTION_ID"
+                             onDelete="CASCADE"
+                             onUpdate="NO ACTION"
+    />
+    <addForeignKeyConstraint constraintName="FK_PORTAL_NAVIGATION_SITE_ID"
+                             baseTableName="PORTAL_NAVIGATIONS"
+                             baseColumnNames="SITE_ID"
+                             referencedTableName="PORTAL_SITES"
+                             referencedColumnNames="ID"
+                             onDelete="CASCADE"
+                             onUpdate="NO ACTION"
+    />
+    <addForeignKeyConstraint constraintName="FK_PORTAL_PAGE_SITE_ID"
+                             baseTableName="PORTAL_PAGES"
+                             baseColumnNames="SITE_ID"
+                             referencedTableName="PORTAL_SITES"
+                             referencedColumnNames="ID"
+                             onDelete="CASCADE"
+                             onUpdate="NO ACTION"
+    />
+    <addForeignKeyConstraint constraintName="FK_PORTAL_APPLICATION_CATEGORY_ID"
+                             baseTableName="PORTAL_APPLICATIONS"
+                             baseColumnNames="CATEGORY_ID"
+                             referencedTableName="PORTAL_APP_CATEGORIES"
+                             referencedColumnNames="ID"
+                             onDelete="SET NULL"
+                             onUpdate="NO ACTION"
+    />
+  </changeSet>
 </databaseChangeLog>
