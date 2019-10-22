@@ -226,21 +226,6 @@
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
     </modifySql>
   </changeSet>
-  
-  <changeSet author="portal" id="1.0.0-15">
-    <createTable tableName="PORTAL_SETTINGS">
-      <column name="SETTING_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
-        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_PORTAL_SETTINGS"/>
-      </column>
-      <column name="NAME" type="NVARCHAR(200)"/>
-      <column name="VALUE" type="LONGTEXT"/>
-      <column name="CREATED_DATE" type="BIGINT"/>
-      <column name="MODIFIED_DATE" type="BIGINT"/>
-    </createTable>
-    <modifySql dbms="mysql">
-      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
-    </modifySql>
-  </changeSet>
 
   <changeSet author="portal" id="1.0.0-16" dbms="oracle,postgresql">
     <createSequence sequenceName="SEQ_PORTAL_PERMISSIONS_ID" startValue="1"/>
@@ -248,10 +233,6 @@
 
   <changeSet author="portal" id="1.0.0-17" dbms="oracle,postgresql">
     <createSequence sequenceName="SEQ_PORTAL_DESCRIPTIONS_ID" startValue="1"/>
-  </changeSet>
-
-  <changeSet author="portal" id="1.0.0-18" dbms="oracle,postgresql">
-    <createSequence sequenceName="SEQ_PORTAL_SETTINGS_ID" startValue="1"/>
   </changeSet>
 
   <changeSet author="portal" id="1.0.0-19">

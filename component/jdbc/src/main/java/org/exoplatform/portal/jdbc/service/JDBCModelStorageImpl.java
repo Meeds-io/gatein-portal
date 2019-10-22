@@ -23,6 +23,10 @@ import java.io.Serializable;
 import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.portal.config.model.*;
@@ -44,7 +48,6 @@ import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.jdbc.dao.ContainerDAO;
 import org.exoplatform.portal.jdbc.dao.PageDAO;
 import org.exoplatform.portal.jdbc.dao.PermissionDAO;
-import org.exoplatform.portal.jdbc.dao.SettingDAO;
 import org.exoplatform.portal.jdbc.dao.SiteDAO;
 import org.exoplatform.portal.jdbc.dao.WindowDAO;
 import org.exoplatform.portal.jdbc.entity.ComponentEntity;
@@ -52,7 +55,6 @@ import org.exoplatform.portal.jdbc.entity.ComponentEntity.TYPE;
 import org.exoplatform.portal.jdbc.entity.ContainerEntity;
 import org.exoplatform.portal.jdbc.entity.PageEntity;
 import org.exoplatform.portal.jdbc.entity.PermissionEntity;
-import org.exoplatform.portal.jdbc.entity.SettingEntity;
 import org.exoplatform.portal.jdbc.entity.SiteEntity;
 import org.exoplatform.portal.jdbc.entity.WindowEntity;
 import org.exoplatform.portal.jdbc.entity.WindowEntity.AppType;
@@ -93,7 +95,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
   private PermissionDAO       permissionDAO;
 
-  private SettingDAO          settingDAO;
+  private SettingService      settingService;
 
   /** . */
   private ConfigurationManager confManager;
@@ -105,14 +107,14 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
                               WindowDAO windowDAO,
                               ContainerDAO containerDAO,
                               PermissionDAO permissionDAO,
-                              SettingDAO settingDAO,
+                              SettingService settingService,
                               ConfigurationManager confManager) {
     this.siteDAO = siteDAO;
     this.pageDAO = pageDAO;
     this.windowDAO = windowDAO;
     this.containerDAO = containerDAO;
     this.permissionDAO = permissionDAO;
-    this.settingDAO = settingDAO;
+    this.settingService = settingService;
     this.confManager = confManager;
   }
 
@@ -386,11 +388,11 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
 //  @Override
   public Status getImportStatus() {
-    SettingEntity setting = settingDAO.findByName(IMPORTED_STATUS);
+    SettingValue<Long> setting = (SettingValue<Long>)settingService.get(Context.GLOBAL, Scope.GLOBAL.id(null), IMPORTED_STATUS);
     if (setting != null) {
-      String value = setting.getValue();
+      Long value = setting.getValue();
       try {
-        return Status.getStatus(Integer.parseInt(value));
+        return Status.getStatus(value.intValue());
       } catch (Exception ex) {
         log.error("Can't parse setting value of import status", ex);
       }
@@ -400,19 +402,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
 //  @Override
   public void saveImportStatus(Status status) {
-    SettingEntity setting = settingDAO.findByName(IMPORTED_STATUS);
-    if (setting == null) {
-      setting = new SettingEntity();
-      setting.setName(IMPORTED_STATUS);
-    }
-    setting.setModifiedDate(System.currentTimeMillis());
-    setting.setValue(String.valueOf(status.status()));
-
-    if (setting.getId() == null) {
-      settingDAO.create(setting);
-    } else {
-      settingDAO.update(setting);
-    }
+    settingService.set(Context.GLOBAL, Scope.GLOBAL.id(null), IMPORTED_STATUS, SettingValue.create(Long.valueOf(status.status())));
   }
 
   private PageData buildPageData(PageEntity entity) throws Exception {

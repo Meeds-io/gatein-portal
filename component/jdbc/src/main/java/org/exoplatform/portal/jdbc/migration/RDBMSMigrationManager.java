@@ -2,8 +2,10 @@ package org.exoplatform.portal.jdbc.migration;
 
 import java.lang.reflect.Field;
 
-import org.exoplatform.portal.jdbc.dao.SettingDAO;
-import org.exoplatform.portal.jdbc.entity.SettingEntity;
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
 import org.picocontainer.Startable;
 import org.exoplatform.commons.api.persistence.DataInitializer;
 import org.exoplatform.services.jcr.impl.core.SessionImpl;
@@ -26,19 +28,19 @@ public class RDBMSMigrationManager implements Startable {
   private AppRegistryMigrationService appMigrationService;
 
   // TODO: need move setting service from common into gatein
-  private SettingDAO           settingDAO;
+  private SettingService settingService;
 
   public RDBMSMigrationManager(SiteMigrationService siteMigrationService,
                                PageMigrationService pageMigrationService,
                                NavigationMigrationService navMigrationService,
                                AppRegistryMigrationService appMigrationService,
-                               SettingDAO settingDAO,
+                               SettingService settingService,
                                DataInitializer initializer) {
     this.siteMigrationService = siteMigrationService;
     this.pageMigrationService = pageMigrationService;
     this.navMigrationService = navMigrationService;
     this.appMigrationService = appMigrationService;
-    this.settingDAO = settingDAO;
+    this.settingService = settingService;
   }
 
   @Override
@@ -145,9 +147,9 @@ public class RDBMSMigrationManager implements Startable {
   }
 
   private boolean getOrCreateSettingValue(String key) {
-    SettingEntity setting = this.settingDAO.findByName(key);
+    SettingValue<Boolean> setting = (SettingValue<Boolean>)this.settingService.get(Context.GLOBAL, Scope.GLOBAL.id(null), key);
     if (setting != null) {
-      return Boolean.parseBoolean(setting.getValue());
+      return setting.getValue();
     } else {
       updateSettingValue(key, Boolean.FALSE);
       return false;
@@ -155,16 +157,7 @@ public class RDBMSMigrationManager implements Startable {
   }
 
   private void updateSettingValue(String key, Boolean status) {
-    SettingEntity setting = this.settingDAO.findByName(key);
-    if (setting == null) {
-      setting = new SettingEntity();
-      setting.setName(key);
-      setting.setValue(Boolean.toString(status));
-      this.settingDAO.create(setting);
-    } else {
-      setting.setValue(Boolean.toString(status));
-      settingDAO.update(setting);
-    }
+    settingService.set(Context.GLOBAL, Scope.GLOBAL.id(null), key, SettingValue.create(status));
   }
 
   @Override
