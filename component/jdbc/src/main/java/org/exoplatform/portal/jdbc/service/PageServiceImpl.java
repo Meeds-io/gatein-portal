@@ -241,14 +241,14 @@ public class PageServiceImpl implements PageService {
 
   @Override
   public QueryResult<PageContext> findPages(int from,
-                                            int to,
+                                            int limit,
                                             SiteType siteType,
                                             String siteName,
                                             String pageName,
                                             String pageTitle) {
     PageQuery.Builder builder = new PageQuery.Builder();
     builder.withDisplayName(pageTitle).withSiteType(convert(siteType)).withSiteName(siteName);
-    builder.withPagination(from, to - from);
+    builder.withPagination(from, limit);
     ListAccess<PageEntity> dataSet = pageDAO.findByQuery(builder.build());
     try {
       ArrayList<PageContext> pages = new ArrayList<PageContext>(dataSet.getSize());
