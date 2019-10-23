@@ -1049,7 +1049,11 @@ public class TestJDBCNavigationServiceSave extends AbstractTestNavigationService
     Node temp = root.addChild("temp");
     temp.setName("bar");
     Iterator<NodeChange<Node>> changes = root.save(service);
-    assertFalse(changes.hasNext());
+    assertTrue(changes.hasNext());
+    NodeChange.Created<Node> created = (NodeChange.Created<Node>)changes.next();
+    Node n = created.getTarget();
+    assertEquals("bar", n.getName());
+    assertSame("bar", root.getChild(0).getName());
   }
 
   public void testConcurrentAddToRemoved() throws Exception {
@@ -1499,7 +1503,10 @@ public class TestJDBCNavigationServiceSave extends AbstractTestNavigationService
 
     //
     Iterator<NodeChange<Node>> changes = root1.save(service);
-    assertFalse(changes.hasNext());
+    assertTrue(changes.hasNext());
+    NodeChange.Renamed<Node> renamed = (NodeChange.Renamed<Node>)changes.next();
+    Node n = renamed.getTarget();
+    assertEquals("b", n.getName());
   }
 
   public void testRemovedNavigation() throws Exception {
@@ -1580,7 +1587,7 @@ public class TestJDBCNavigationServiceSave extends AbstractTestNavigationService
     assertFalse(mgr.getSession().isModified());
   }
 
-  public void testRebase() throws Exception {
+  public void testSaveRebase() throws Exception {
     createNavigation(SiteType.PORTAL, "save_rebase");
     NavigationContext navigation = service.loadNavigation(SiteKey.portal("save_rebase"));
     NodeContext rootContext1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null);
@@ -1596,18 +1603,18 @@ public class TestJDBCNavigationServiceSave extends AbstractTestNavigationService
 
     //
     Node root2 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
-    root2.addChild("c");
+    Node c = root2.addChild("c");
     service.saveNode(root2.getContext(), null);
 
     //
     Iterator<NodeChange<Node>> changes = root1.save(service);
-    NodeChange.Added<Node> added = (NodeChange.Added<Node>) changes.next();
-    Node c = added.getTarget();
-    assertEquals("c", c.getName());
+    NodeChange.Created<Node> added = (NodeChange.Created<Node>) changes.next();
+    Node n = added.getTarget();
+    assertEquals("b", n.getName());
     assertFalse(changes.hasNext());
-    assertSame(a, root1.getChild(0));
-    assertSame(b, root1.getChild(1));
-    assertSame(c, root1.getChild(2));
+    assertSame(a.getName(), root1.getChild(0).getName());
+    assertSame(b.getName(), root1.getChild(1).getName());
+    assertSame(c.getName(), root1.getChild(2).getName());
   }
 
   @Override

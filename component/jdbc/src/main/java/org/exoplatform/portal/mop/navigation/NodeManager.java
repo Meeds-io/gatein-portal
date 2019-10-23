@@ -200,6 +200,7 @@ public class NodeManager {
             NodeChangeQueue<NodeContext<N>> changes = rebased.getChanges();
             if (changes != null) {
                 changes.broadcast(persister);
+                changes.broadcast(listener);
 
                 // Update the tree handles to the persistent values
                 for (Map.Entry<String, String> entry : persister.toPersist.entrySet()) {
@@ -222,7 +223,7 @@ public class NodeManager {
 
             // Update
             TreeUpdate.perform(tree, NodeContextUpdateAdapter.<N> create(), rebased.root, NodeContextUpdateAdapter.<N> create(),
-                    listener, rebased);
+                    null, rebased);
         } finally {
             store.flush();
         }

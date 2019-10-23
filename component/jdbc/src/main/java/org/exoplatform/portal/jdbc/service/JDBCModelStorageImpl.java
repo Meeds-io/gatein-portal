@@ -388,11 +388,11 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
 //  @Override
   public Status getImportStatus() {
-    SettingValue<Long> setting = (SettingValue<Long>)settingService.get(Context.GLOBAL, Scope.GLOBAL.id(null), IMPORTED_STATUS);
+    SettingValue<String> setting = (SettingValue<String>)settingService.get(Context.GLOBAL, Scope.GLOBAL.id(null), IMPORTED_STATUS);
     if (setting != null) {
-      Long value = setting.getValue();
+      String value = setting.getValue();
       try {
-        return Status.getStatus(value.intValue());
+        return Status.getStatus(Integer.parseInt(value));
       } catch (Exception ex) {
         log.error("Can't parse setting value of import status", ex);
       }
@@ -402,7 +402,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
 //  @Override
   public void saveImportStatus(Status status) {
-    settingService.set(Context.GLOBAL, Scope.GLOBAL.id(null), IMPORTED_STATUS, SettingValue.create(Long.valueOf(status.status())));
+    settingService.set(Context.GLOBAL, Scope.GLOBAL.id(null), IMPORTED_STATUS, SettingValue.create(String.valueOf(status.status())));
   }
 
   private PageData buildPageData(PageEntity entity) throws Exception {

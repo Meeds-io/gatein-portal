@@ -84,7 +84,7 @@ public class JDBCNavigationServiceWrapper implements NavigationService {
                                      NavigationContext navigation,
                                      Scope scope,
                                      NodeChangeListener<NodeContext<N>> listener) {
-    return service.loadNode(model, navigation, scope, new NodeChangeNotifier<>(listener, this, listenerService));
+    return service.loadNode(model, navigation, scope, listener);
   }
 
   public <N> void saveNode(NodeContext<N> context,
@@ -96,14 +96,14 @@ public class JDBCNavigationServiceWrapper implements NavigationService {
                              Scope scope,
                              NodeChangeListener<NodeContext<N>> listener) throws NullPointerException,
           NavigationServiceException {
-    service.updateNode(context, scope, new NodeChangeNotifier<>(listener, this, listenerService));
+    service.updateNode(context, scope, listener);
   }
 
   public <N> void rebaseNode(NodeContext<N> context,
                              Scope scope,
                              NodeChangeListener<NodeContext<N>> listener) throws NullPointerException,
           NavigationServiceException {
-    service.rebaseNode(context, scope, new NodeChangeNotifier<>(listener, this, listenerService));
+    service.rebaseNode(context, scope, listener);
   }
 
   private void notify(String name, SiteKey key) {
