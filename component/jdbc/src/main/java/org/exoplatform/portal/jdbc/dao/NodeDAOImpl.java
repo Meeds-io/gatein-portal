@@ -21,6 +21,10 @@ package org.exoplatform.portal.jdbc.dao;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
 import org.exoplatform.portal.jdbc.entity.NodeEntity;
 
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
+import java.util.List;
+
 public class NodeDAOImpl extends GenericDAOJPAImpl<NodeEntity, String> implements NodeDAO {
 
     @Override
@@ -29,4 +33,12 @@ public class NodeDAOImpl extends GenericDAOJPAImpl<NodeEntity, String> implement
         return super.create(entity);
     }
 
+    @Override
+    public List<NodeEntity> findAllByPage(String pageId) {
+        TypedQuery<NodeEntity> query = getEntityManager().createNamedQuery("NodeEntity.findByPage",
+                NodeEntity.class);
+        query.setParameter("pageId", pageId);
+
+        return query.getResultList();
+    }
 }

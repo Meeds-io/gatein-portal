@@ -22,17 +22,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.PreRemove;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.container.ExoContainer;
@@ -43,6 +33,9 @@ import org.exoplatform.services.listener.ListenerService;
 @Entity(name = "GateInNavigationNode")
 @ExoEntity
 @Table(name = "PORTAL_NAVIGATION_NODES")
+@NamedQueries({
+        @NamedQuery(name = "NodeEntity.findByPage", query = "SELECT n FROM GateInNavigationNode n INNER JOIN n.page p WHERE p.id = :pageId")
+})
 public class NodeEntity implements Serializable {
 
   private static final long serialVersionUID = 8630708630711337929L;
@@ -69,8 +62,9 @@ public class NodeEntity implements Serializable {
   @Column(name = "VISIBILITY")
   private Visibility        visibility       = Visibility.DISPLAYED;
 
-  @Column(name = "PAGE_ID")
-  private String        pageRef;
+  @ManyToOne(fetch = FetchType.LAZY, optional = true)
+  @JoinColumn(name = "PAGE_ID", nullable = true)
+  private PageEntity    page;
 
   @Column(name = "NODE_INDEX")
   private int               index;
@@ -139,12 +133,12 @@ public class NodeEntity implements Serializable {
     this.visibility = visibility;
   }
 
-  public String getPageRef() {
-    return pageRef;
+  public PageEntity getPage() {
+    return page;
   }
 
-  public void setPageRef(String pageRef) {
-    this.pageRef = pageRef;
+  public void setPage(PageEntity page) {
+    this.page = page;
   }
 
   public int getIndex() {

@@ -26,6 +26,13 @@ public interface NodeStore {
 
     NodeData loadNode(String nodeId);
 
+    /**
+     * Load all Navigation node which refer to a page
+     * @param pageRef
+     * @return
+     */
+    NodeData[] loadNodes(String pageRef);
+
     NodeData[] createNode(String parentId, String previousId, String name, NodeState state);
 
     NodeData destroyNode(String targetId);

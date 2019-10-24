@@ -72,6 +72,20 @@ public class NavigationStoreImpl implements NavigationStore {
   }
 
   @Override
+  public NodeData[] loadNodes(String pageRef) {
+    PageEntity page = this.pageDAO.findByKey(PageKey.parse(pageRef));
+    if (page == null) {
+      return new NodeData[0];
+    }
+    List<NodeEntity> nodes = nodeDAO.findAllByPage(page.getId());
+    NodeData[] result = new NodeData[nodes.size()];
+    for (int i = 0; i < nodes.size(); i++) {
+      result[i] = buildNodeData(nodes.get(i));
+    }
+    return result;
+  }
+
+  @Override
   public NodeData[] createNode(String parentId, String previousId, String name, NodeState state) {
     NodeEntity parent = null;
     if (parentId != null) {
@@ -321,10 +335,10 @@ public class NavigationStoreImpl implements NavigationStore {
     if (state.getPageRef() != null) {
       PageEntity page = pageDAO.findByKey(state.getPageRef());
       if (page != null) {
-        entity.setPageRef(page.getId());
+        entity.setPage(page);
       }
     } else {
-      entity.setPageRef(null);
+      entity.setPage(null);
     }
     entity.setStartTime(state.getStartPublicationTime());
     entity.setVisibility(state.getVisibility());
@@ -354,14 +368,11 @@ public class NavigationStoreImpl implements NavigationStore {
            .label(node.getLabel())
            .startPublicationTime(node.getStartTime())
            .visibility(node.getVisibility());
-    String pageId = node.getPageRef();
-    if (pageId != null) {
-      PageEntity page = pageDAO.find(pageId);
-      if (page != null) {
-        SiteKey siteKey = new SiteKey(page.getOwnerType(), page.getOwnerId());
-        PageKey pageKey = new PageKey(siteKey, page.getName());
-        builder.pageRef(pageKey);        
-      }
+    PageEntity page = node.getPage();
+    if (page != null) {
+      SiteKey siteKey = new SiteKey(page.getOwnerType(), page.getOwnerId());
+      PageKey pageKey = new PageKey(siteKey, page.getName());
+      builder.pageRef(pageKey);
     }
 
     NodeState state = builder.build();
