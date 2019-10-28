@@ -64,9 +64,15 @@ public class DownloadService {
     }
 
     public DownloadResource getDownloadResource(String id) {
+        return getDownloadResource(id, true);
+    }
+
+    public DownloadResource getDownloadResource(String id, boolean remove) {
         DownloadResource resource = downloadResources_.get(id);
         if (resource != null) {
-            downloadResources_.remove(id);
+            if(remove) {
+                downloadResources_.remove(id);
+            }
             return resource;
         }
         String[] temp = id.split(":");
