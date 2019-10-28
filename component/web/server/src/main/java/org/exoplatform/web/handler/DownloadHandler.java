@@ -55,10 +55,11 @@ public class DownloadHandler extends WebRequestHandler {
 
     public void execute(WebAppController controller, HttpServletRequest req, HttpServletResponse res) throws Exception {
         String resourceId = req.getParameter("resourceId");
+        boolean remove = !"false".equals(req.getParameter("remove"));
         res.setHeader("Cache-Control", "private max-age=600, s-maxage=120");
         ExoContainer container = ExoContainerContext.getCurrentContainer();
-        DownloadService dservice = (DownloadService) container.getComponentInstanceOfType(DownloadService.class);
-        DownloadResource dresource = dservice.getDownloadResource(resourceId);
+        DownloadService dservice = container.getComponentInstanceOfType(DownloadService.class);
+        DownloadResource dresource = dservice.getDownloadResource(resourceId, remove);
         if (dresource == null) {
             res.setContentType("text/plain");
             res.getWriter().write("NO DOWNDLOAD RESOURCE CONTENT  OR YOU DO NOT HAVE THE RIGHT TO ACCESS THE CONTENT");
