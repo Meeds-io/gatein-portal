@@ -87,6 +87,18 @@
           <value>/*</value>
         </value-param>
         <value-param>
+          <name>CONFIG_FILE</name>
+          <value>${exo.conf.dir}/saml2/picketlink-sp.xml</value>
+        </value-param>
+        <value-param>
+          <name>IGNORE_SIGNATURES</name>
+          <value>${gatein.sso.saml.signature.ignore:true}</value>
+        </value-param>
+        <value-param>
+          <name>ROLES</name>
+          <value>users</value>
+        </value-param>
+        <value-param>
           <name>LOGOUT_URL</name>
           <value>${gatein.sso.filter.logout.url}</value>
         </value-param>
