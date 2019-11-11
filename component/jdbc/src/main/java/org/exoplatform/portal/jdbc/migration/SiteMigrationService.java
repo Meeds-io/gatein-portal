@@ -1,8 +1,7 @@
 package org.exoplatform.portal.jdbc.migration;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -16,6 +15,7 @@ import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.pom.config.POMDataStorage;
 import org.exoplatform.portal.pom.data.ModelDataStorage;
 import org.exoplatform.portal.pom.data.PortalData;
+import org.exoplatform.portal.pom.data.PortalKey;
 import org.exoplatform.services.listener.ListenerService;
 
 @Managed
@@ -43,32 +43,35 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
   }
 
   @Override
-  protected void beforeMigration() throws Exception {
-    MigrationContext.setSiteDone(false);
-  }
-
-  @Override
   @Managed
   @ManagedDescription("Manual to start run migration data of sites from JCR to RDBMS.")
-  public void doMigration() {
+  public void doMigration() throws Exception {
     boolean begunTx = startTx();
-    int offset = 0;
 
     long t = System.currentTimeMillis();
+
+    int total = 0;
+    int offset = 0;
+    Set<PortalKey> sitesFailed = new HashSet<>();
     try {
       LOG.info("| \\ START::Sites migration ---------------------------------");
       List<PortalData> sites = getPortalData();
 
       if (sites == null || sites.size() == 0) {
+        LOG.info("|  \\ NO SITE: There is no site to migrate");
         return;
       }
 
-      LIMIT_THRESHOLD = LIMIT_THRESHOLD > sites.size() ? sites.size() : LIMIT_THRESHOLD;
+      total = sites.size();
+      LOG.info("|  \\ There are " + total + " site(s)");
+
+      final int limitThreshold = LIMIT_THRESHOLD > sites.size() ? sites.size() : LIMIT_THRESHOLD;
       for (PortalData site : sites) {
         if (forkStop) {
+          LOG.info("|  \\ Force stop");
           break;
         }
-
+        offset++;
         LOG.info(String.format("|  \\ START::site number: %s (%s site)", offset, site.getKey()));
         long t1 = System.currentTimeMillis();
 
@@ -80,9 +83,9 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
           } else {
             LOG.info("Ignoring, this site: {} already in JPA", created.getKey());
           }
+
           //
-          offset++;
-          if (offset % LIMIT_THRESHOLD == 0) {
+          if (offset % limitThreshold == 0) {
             endTx(begunTx);
             RequestLifeCycle.end();
             RequestLifeCycle.begin(PortalContainer.getInstance());
@@ -90,16 +93,18 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
           }
 
           broadcastListener(created, created.getKey().toString());
+
           LOG.info(String.format("|  / END::site number %s (%s site) consumed %s(ms)",
-                                 offset - 1,
+                                 offset,
                                  site.getKey(),
                                  System.currentTimeMillis() - t1));
         } catch (Exception ex) {
           LOG.error("exception during migration site: ", site.getKey());
+          sitesFailed.add(site.getKey());
         }
       }
-
     } finally {
+      MigrationContext.setSitesMigrateFailed(sitesFailed);
       endTx(begunTx);
       RequestLifeCycle.end();
       RequestLifeCycle.begin(PortalContainer.getInstance());
@@ -108,11 +113,18 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
   }
 
   @Override
+  protected void beforeMigration() throws Exception {
+    MigrationContext.setSiteDone(false);
+  }
+
+  @Override
   protected void afterMigration() throws Exception {
     if (forkStop) {
       return;
     }
-    MigrationContext.setSiteDone(true);
+    if (MigrationContext.getSitesMigrateFailed().isEmpty()) {
+      MigrationContext.setSiteDone(true);
+    }
   }
 
   public void doRemove() throws Exception {
@@ -164,15 +176,16 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
     super.stop();
   }
   
-  private List<PortalData> getPortalData() {
+  private List<PortalData> getPortalData() throws Exception {
     if (data == null || data.isEmpty()) {
-      data = new ArrayList<PortalData>();
+      data = new ArrayList<>();
       try {
         data.addAll(getPortalData(PortalConfig.PORTAL_TYPE));
         data.addAll(getPortalData(PortalConfig.GROUP_TYPE));
         data.addAll(getPortalData(PortalConfig.USER_TYPE));
       } catch (Exception ex) {
         LOG.error("Can't load sites in JCR for migration", ex);
+        throw ex;
       }
     }
     return data;

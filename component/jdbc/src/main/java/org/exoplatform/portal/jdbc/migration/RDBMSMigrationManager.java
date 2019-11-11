@@ -7,7 +7,6 @@ import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 import org.picocontainer.Startable;
-import org.exoplatform.commons.api.persistence.DataInitializer;
 import org.exoplatform.services.jcr.impl.core.SessionImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -34,8 +33,7 @@ public class RDBMSMigrationManager implements Startable {
                                PageMigrationService pageMigrationService,
                                NavigationMigrationService navMigrationService,
                                AppRegistryMigrationService appMigrationService,
-                               SettingService settingService,
-                               DataInitializer initializer) {
+                               SettingService settingService) {
     this.siteMigrationService = siteMigrationService;
     this.pageMigrationService = pageMigrationService;
     this.navMigrationService = navMigrationService;
@@ -65,50 +63,60 @@ public class RDBMSMigrationManager implements Startable {
             if (!MigrationContext.isDone()) {
               if (!MigrationContext.isSiteDone()) {
                 siteMigrationService.start();
-                updateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_MIGRATION_KEY, Boolean.TRUE);
+                updateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_MIGRATION_KEY, MigrationContext.isSiteDone());
               }
-              // cleanup
-              if (MigrationContext.isSiteDone() && !MigrationContext.isSiteCleanupDone()) {
-                siteMigrationService.doRemove();
-                updateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_CLEANUP_KEY, Boolean.TRUE);
-              }
-              
+
               if (MigrationContext.isSiteDone() && !MigrationContext.isPageDone()) {
                 pageMigrationService.start();
-                updateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_MIGRATION_KEY, Boolean.TRUE);
-              }
-              // cleanup
-              if (MigrationContext.isPageDone() && !MigrationContext.isPageCleanupDone()) {
-                pageMigrationService.doRemove();
-                updateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_CLEANUP_KEY, Boolean.TRUE);
+                updateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_MIGRATION_KEY, MigrationContext.isPageDone());
               }
               
               if (MigrationContext.isPageDone() && !MigrationContext.isNavDone()) {
                 navMigrationService.start();
-                updateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_MIGRATION_KEY, Boolean.TRUE);
+                updateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_MIGRATION_KEY, MigrationContext.isNavDone());
               }
+
+              
+              if (MigrationContext.isNavDone() && !MigrationContext.isAppDone()) {
+                appMigrationService.start();
+                updateSettingValue(MigrationContext.PORTAL_RDBMS_APP_MIGRATION_KEY, MigrationContext.isAppDone());
+              }
+            }
+            //
+            LOG.info("END ASYNC MIGRATION-----------------------------------------------------");
+
+            if (MigrationContext.isDone()) {
+              LOG.info("START CLEANUP PORTAL DATA ---------------------------------------------------");
+
+              // Site
+              if (MigrationContext.isSiteDone() && !MigrationContext.isSiteCleanupDone()) {
+                siteMigrationService.doRemove();
+                updateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_CLEANUP_KEY, Boolean.TRUE);
+              }
+
+              // Page
+              if (MigrationContext.isPageDone() && !MigrationContext.isPageCleanupDone()) {
+                pageMigrationService.doRemove();
+                updateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_CLEANUP_KEY, Boolean.TRUE);
+              }
+
               // cleanup
               if (MigrationContext.isNavDone() && MigrationContext.isNavCleanupDone()) {
                 navMigrationService.doRemove();
                 updateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_CLEANUP_KEY, Boolean.TRUE);
               }
-              
-              if (MigrationContext.isNavDone() && !MigrationContext.isAppDone()) {
-                appMigrationService.start();
-                updateSettingValue(MigrationContext.PORTAL_RDBMS_APP_MIGRATION_KEY, Boolean.TRUE);
-              }
+
               // cleanup
               if (MigrationContext.isAppDone() && !MigrationContext.isAppCleanupDone()) {
                 appMigrationService.doRemove();
                 updateSettingValue(MigrationContext.PORTAL_RDBMS_APP_CLEANUP_KEY, Boolean.TRUE);
-                
+
                 updateSettingValue(MigrationContext.PORTAL_RDBMS_MIGRATION_STATUS_KEY, Boolean.TRUE);
                 MigrationContext.setDone(true);
-              }         
+              }
+
+              LOG.info("END CLEANUP PORTAL DATA -----------------------------------------------------");
             }
-            
-            //
-            LOG.info("END ASYNC MIGRATION-----------------------------------------------------");
           }
 
         } catch (Exception e) {

@@ -16,6 +16,11 @@
  */
 package org.exoplatform.portal.jdbc.migration;
 
+import org.exoplatform.portal.pom.data.PortalKey;
+
+import java.util.HashSet;
+import java.util.Set;
+
 public final class MigrationContext {
   public static final String PORTAL_RDBMS_MIGRATION_STATUS_KEY = "PORTAL_RDBMS_MIGRATION_DONE";
   public static final String PORTAL_RDBMS_SITE_MIGRATION_KEY = "PORTAL_RDBMS_SITE_MIGRATION_DONE";  
@@ -40,6 +45,9 @@ public final class MigrationContext {
   
   private static boolean isAppDone = false;
   private static boolean isAppCleanupDone = false;
+
+  private static Set<PortalKey> sitesMigrateFailed = new HashSet<>();
+  private static Set<String> pagesMigrateFailed = new HashSet<>();
 
   public static boolean isDone() {
     return isDone;
@@ -115,5 +123,21 @@ public final class MigrationContext {
 
   public static boolean isAppDone() {
     return isAppDone;
+  }
+
+  public static Set<PortalKey> getSitesMigrateFailed() {
+    return sitesMigrateFailed;
+  }
+
+  public static void setSitesMigrateFailed(Set<PortalKey> sitesMigrateFailed) {
+    MigrationContext.sitesMigrateFailed = sitesMigrateFailed;
+  }
+
+  public static Set<String> getPagesMigrateFailed() {
+    return pagesMigrateFailed;
+  }
+
+  public static void setPagesMigrateFailed(Set<String> pagesMigrateFailed) {
+    MigrationContext.pagesMigrateFailed = pagesMigrateFailed;
   }
 }

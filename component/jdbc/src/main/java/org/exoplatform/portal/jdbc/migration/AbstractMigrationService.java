@@ -2,13 +2,10 @@ package org.exoplatform.portal.jdbc.migration;
 
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.jcr.Node;
 import javax.jcr.Value;
 import javax.persistence.EntityManager;
-
 import org.exoplatform.services.listener.ListenerService;
-import org.picocontainer.Startable;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -18,7 +15,7 @@ import org.exoplatform.services.listener.Listener;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-public abstract class AbstractMigrationService<T> implements Startable {
+public abstract class AbstractMigrationService<T> {
   protected Log                           LOG;
 
   protected final static String           LIMIT_THRESHOLD_KEY = "LIMIT_THRESHOLD";

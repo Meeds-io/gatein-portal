@@ -84,6 +84,7 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
         if (forkStop) {
           break;
         }
+        offset++;
         NavigationContext jcrNav = navItr.next();
 
         LOG.info(String.format("|  \\ START::nav number: %s (%s nav)", offset, jcrNav.getKey()));

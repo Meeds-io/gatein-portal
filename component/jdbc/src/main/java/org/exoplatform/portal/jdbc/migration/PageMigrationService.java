@@ -1,6 +1,7 @@
 package org.exoplatform.portal.jdbc.migration;
 
-import java.util.Iterator;
+import java.util.*;
+
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -47,7 +48,7 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
     this.modelStorage = modelStorage;
     this.pageService = pageService;
     this.jcrPageService = jcrPageService;
-    this.LIMIT_THRESHOLD = getInteger(initParams, LIMIT_THRESHOLD_KEY, 1);
+    this.LIMIT_THRESHOLD = getInteger(initParams, LIMIT_THRESHOLD_KEY, 100);
   }
 
   @Override
@@ -60,9 +61,11 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
   @ManagedDescription("Manual to start run migration data of pages from JCR to RDBMS.")
   public void doMigration() {
     boolean begunTx = startTx();
-    int offset = 0;
 
     long t = System.currentTimeMillis();
+    Set<String> failedPages = new HashSet<>();
+    int offset = 0;
+
     try {
       LOG.info("| \\ START::pages migration ---------------------------------");
       QueryResult<PageContext> pages;
@@ -74,9 +77,10 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
           if (forkStop) {
             break;
           }
+          offset++;
           PageContext page = pageItr.next();
 
-          LOG.info(String.format("|  \\ START::page number: %s (%s page)", offset, page.getKey()));
+          LOG.info(String.format("|  \\ START::page number: %s (%s page)", offset, page.getKey().format()));
           long t1 = System.currentTimeMillis();
 
           try {
@@ -96,8 +100,8 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
             } else {
               LOG.info("Ignoring, this page: {} already in JPA", created.getKey());
             }
+
             //
-            offset++;
             if (offset % LIMIT_THRESHOLD == 0) {
               endTx(begunTx);
               RequestLifeCycle.end();
@@ -106,12 +110,14 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
             }
 
             broadcastListener(created, created.getKey().toString());
+
             LOG.info(String.format("|  / END::page number %s (%s page) consumed %s(ms)",
-                                   offset - 1,
+                                   offset,
                                    page.getKey(),
                                    System.currentTimeMillis() - t1));
           } catch (Exception ex) {
-            LOG.error("exception during migration page: ", page.getKey());
+            LOG.error("Exception during migration page: ", page.getKey());
+            failedPages.add(page.getKey().format());
           }
         }
       } while (pages.getSize() > 0);
@@ -119,6 +125,7 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
     } finally {
       endTx(begunTx);
       RequestLifeCycle.end();
+      MigrationContext.setPagesMigrateFailed(failedPages);
       RequestLifeCycle.begin(PortalContainer.getInstance());
       LOG.info(String.format("| / END::page migration for (%s) page(s) consumed %s(ms)", offset, System.currentTimeMillis() - t));
     }
@@ -126,7 +133,7 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
 
   @Override
   protected void afterMigration() throws Exception {
-    if (forkStop) {
+    if (forkStop || MigrationContext.getPagesMigrateFailed().isEmpty()) {
       return;
     }
     MigrationContext.setPageDone(true);
