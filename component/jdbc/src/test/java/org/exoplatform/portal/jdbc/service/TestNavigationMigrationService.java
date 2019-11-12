@@ -85,7 +85,7 @@ public class TestNavigationMigrationService extends AbstractPortalTest {
     this.descriptionService = getContainer().getComponentInstanceOfType(DescriptionService.class);
     this.jcrDescriptionService = new DescriptionServiceImpl(manager);
 
-    this.migrationService = new NavigationMigrationService(null, navService, descriptionService, getService(POMSessionManager.class), getService(ListenerService.class), getService(EntityManagerService.class));
+    this.migrationService = new NavigationMigrationService(null, pomStorage, navService, descriptionService, getService(POMSessionManager.class), getService(ListenerService.class), getService(EntityManagerService.class));
 
     super.begin();
 

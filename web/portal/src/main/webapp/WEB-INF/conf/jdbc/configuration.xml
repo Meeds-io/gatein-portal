@@ -941,7 +941,30 @@
       </component-plugin> 
     </component-plugins>
   </component>
-  
+
+  <component>
+    <key>org.exoplatform.portal.mop.page.PageServiceImpl</key>
+    <type>org.exoplatform.portal.mop.page.PageServiceImpl</type>
+  </component>
+  <component>
+    <type>org.exoplatform.application.registry.impl.ApplicationRegistryServiceImpl</type>
+  </component>
+  <component>
+    <type>org.exoplatform.portal.jdbc.migration.SiteMigrationService</type>
+  </component>
+  <component>
+    <type>org.exoplatform.portal.jdbc.migration.PageMigrationService</type>
+  </component>
+  <component>
+    <type>org.exoplatform.portal.jdbc.migration.NavigationMigrationService</type>
+  </component>
+  <component>
+    <type>org.exoplatform.portal.jdbc.migration.AppRegistryMigrationService</type>
+  </component>
+  <component>
+    <type>org.exoplatform.portal.jdbc.migration.RDBMSMigrationManager</type>
+  </component>
+
   <external-component-plugins>
     <!-- The full qualified name of the ListenerService -->
     <target-component>org.exoplatform.services.listener.ListenerService</target-component>

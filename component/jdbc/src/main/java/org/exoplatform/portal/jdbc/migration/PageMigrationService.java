@@ -27,8 +27,6 @@ import org.exoplatform.services.listener.ListenerService;
 public class PageMigrationService extends AbstractMigrationService<PageContext> {
   public static final String EVENT_LISTENER_KEY = "PORTAL_PAGES_MIGRATION";
 
-  private POMDataStorage     pomStorage;
-
   private ModelDataStorage   modelStorage;
 
   private PageService        pageService;
@@ -43,8 +41,7 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
                               ListenerService listenerService,
                               EntityManagerService entityManagerService) {
 
-    super(initParams, listenerService, entityManagerService);
-    this.pomStorage = pomStorage;
+    super(initParams, pomStorage, listenerService, entityManagerService);
     this.modelStorage = modelStorage;
     this.pageService = pageService;
     this.jcrPageService = jcrPageService;
@@ -94,7 +91,28 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
                                                                                                              siteKey.getName(),
                                                                                                              key.getName());
               PageData pageData = pomStorage.getPage(pomPageKey);
-              modelStorage.save(pageData);
+              PageData migrate = new PageData(
+                      null,
+                      pageData.getId(),
+                      pageData.getName(),
+                      pageData.getIcon(),
+                      pageData.getTemplate(),
+                      pageData.getFactoryId(),
+                      pageData.getTitle(),
+                      pageData.getDescription(),
+                      pageData.getWidth(),
+                      pageData.getHeight(),
+                      pageData.getAccessPermissions(),
+                      this.migrateComponents(pageData.getChildren()),
+                      pageData.getOwnerType(),
+                      pageData.getOwnerId(),
+                      pageData.getEditPermission(),
+                      pageData.isShowMaxWindow(),
+                      pageData.getMoveAppsPermissions(),
+                      pageData.getMoveContainersPermissions()
+              );
+
+              modelStorage.save(migrate);
 
               created = pageService.loadPage(page.getKey());
             } else {
@@ -116,7 +134,7 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
                                    page.getKey(),
                                    System.currentTimeMillis() - t1));
           } catch (Exception ex) {
-            LOG.error("Exception during migration page: ", page.getKey());
+            LOG.error("Exception during migration page: " + page.getKey(), ex);
             failedPages.add(page.getKey().format());
           }
         }
@@ -133,7 +151,7 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
 
   @Override
   protected void afterMigration() throws Exception {
-    if (forkStop || MigrationContext.getPagesMigrateFailed().isEmpty()) {
+    if (forkStop || !MigrationContext.getPagesMigrateFailed().isEmpty()) {
       return;
     }
     MigrationContext.setPageDone(true);
@@ -144,11 +162,11 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
     long t = System.currentTimeMillis();
     long timePerpage = System.currentTimeMillis();
 
-    RequestLifeCycle.begin(PortalContainer.getInstance());
     int offset = 0;
-
     QueryResult<PageContext> pages;
+
     do {
+      RequestLifeCycle.begin(PortalContainer.getInstance());
       pages = jcrPageService.findPages(offset, LIMIT_THRESHOLD, null, null, null, null);
 
       try {
@@ -166,10 +184,6 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
                                    System.currentTimeMillis() - timePerpage));
 
             timePerpage = System.currentTimeMillis();
-            if (offset % LIMIT_THRESHOLD == 0) {
-              RequestLifeCycle.end();
-              RequestLifeCycle.begin(PortalContainer.getInstance());
-            }
           } catch (Exception ex) {
             LOG.error("Can't remove page", ex);
           }

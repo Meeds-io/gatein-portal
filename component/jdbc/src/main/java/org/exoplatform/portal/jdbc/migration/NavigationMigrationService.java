@@ -25,6 +25,7 @@ import org.exoplatform.portal.mop.navigation.NodeContext;
 import org.exoplatform.portal.mop.navigation.NodeModel;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.navigation.SimpleDataCache;
+import org.exoplatform.portal.pom.config.POMDataStorage;
 import org.exoplatform.portal.pom.config.POMSessionManager;
 import org.exoplatform.services.listener.ListenerService;
 
@@ -45,13 +46,14 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
   private List<NavigationContext> navigations;
 
   public NavigationMigrationService(InitParams initParams,
+                                    POMDataStorage pomStorage,
                                     NavigationService navService,
                                     DescriptionService descriptionService,
                                     POMSessionManager manager,
                                     ListenerService listenerService,
                                     EntityManagerService entityManagerService) {
 
-    super(initParams, listenerService, entityManagerService);
+    super(initParams, pomStorage, listenerService, entityManagerService);
     this.navService = navService;
 
     SimpleDataCache cache = new SimpleDataCache();
@@ -96,17 +98,16 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
           if (created == null) {
             NavigationContext nav = new NavigationContext(key, jcrNav.getState());
             navService.saveNavigation(nav);
-
-            NodeContext<?> root = navService.loadNode(NodeModel.SELF_MODEL, nav, Scope.ALL, null);
-            NodeContext<?> jcrRoot = jcrNavService.loadNode(NodeModel.SELF_MODEL, jcrNav, Scope.ALL, null);
-            migrateNode(root, jcrRoot);
-            navService.saveNode(root, null);
-            migrateDescription(root, jcrRoot);
-
             created = navService.loadNavigation(key);
-          } else {
-            LOG.info("Ignoring, this nav: {} already in JPA", created.getKey());
           }
+
+          //
+          NodeContext<?> root = navService.loadNode(NodeModel.SELF_MODEL, created, Scope.ALL, null);
+          NodeContext<?> jcrRoot = jcrNavService.loadNode(NodeModel.SELF_MODEL, jcrNav, Scope.ALL, null);
+          migrateNode(root, jcrRoot);
+          navService.saveNode(root, null);
+          migrateDescription(root, jcrRoot);
+
           //
           offset++;
           if (offset % LIMIT_THRESHOLD == 0) {
@@ -137,7 +138,10 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
   private void migrateNode(NodeContext<?> parent, NodeContext<?> jcrParent) {
     for (int i = 0; i < jcrParent.getNodeCount(); i++) {
       NodeContext jcrChild = jcrParent.get(i);
-      NodeContext child = parent.add(null, jcrChild.getName());
+      NodeContext child = parent.get(jcrChild.getName());
+      if (child == null) {
+        child = parent.add(null, jcrChild.getName());
+      }
       child.setState(jcrChild.getState());
       child.setHidden(jcrChild.isHidden());
       migrateNode(child, jcrChild);

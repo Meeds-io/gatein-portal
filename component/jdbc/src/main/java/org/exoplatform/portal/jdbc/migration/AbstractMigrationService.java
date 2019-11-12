@@ -1,10 +1,16 @@
 package org.exoplatform.portal.jdbc.migration;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import javax.jcr.Node;
 import javax.jcr.Value;
 import javax.persistence.EntityManager;
+
+import org.exoplatform.portal.config.model.ApplicationState;
+import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.pom.config.POMDataStorage;
+import org.exoplatform.portal.pom.data.*;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.PortalContainer;
@@ -20,17 +26,21 @@ public abstract class AbstractMigrationService<T> {
 
   protected final static String           LIMIT_THRESHOLD_KEY = "LIMIT_THRESHOLD";
 
+  protected POMDataStorage     pomStorage;
+
   protected final ListenerService listenerService;
 
   protected final EntityManagerService    entityManagerService;
 
   protected boolean                       forkStop            = false;
 
-  protected int                           LIMIT_THRESHOLD     = 100;
+  protected int                           LIMIT_THRESHOLD     = 10;
 
   public AbstractMigrationService(InitParams initParams,
+                                  POMDataStorage pomDataStorage,
                                   ListenerService listenerService,
                                   EntityManagerService entityManagerService) {
+    this.pomStorage = pomDataStorage;
     this.listenerService = listenerService;
     this.entityManagerService = entityManagerService;
     LOG = ExoLogger.getLogger(this.getClass().getName());
@@ -135,6 +145,95 @@ public abstract class AbstractMigrationService<T> {
     } catch (Exception ex) {
       return null;
     }
+  }
+
+  protected ContainerData migrateContainer(ContainerData containerData) throws Exception {
+    //
+    List<ComponentData> children = this.migrateComponents(containerData.getChildren());
+    ContainerData layout = new ContainerData(null,
+            containerData.getId(),
+            containerData.getName(),
+            containerData.getIcon(),
+            containerData.getTemplate(),
+            containerData.getFactoryId(),
+            containerData.getTitle(),
+            containerData.getDescription(),
+            containerData.getWidth(),
+            containerData.getHeight(),
+            containerData.getAccessPermissions(),
+            containerData.getMoveAppsPermissions(),
+            containerData.getMoveContainersPermissions(),
+            children);
+    return layout;
+  }
+
+  protected <S> ApplicationData<S> migrateApplication(ApplicationData<S> app) throws Exception {
+    S s = pomStorage.load(app.getState(), app.getType());
+    String contentId = pomStorage.getId(app.getState());
+    ApplicationState<S> migrated = new TransientApplicationState<>(contentId, s);
+
+    return new ApplicationData<>(null,
+            app.getStorageName(),
+            app.getType(),
+            migrated,
+            app.getId(),
+            app.getTitle(),
+            app.getIcon(),
+            app.getDescription(),
+            app.isShowInfoBar(),
+            app.isShowApplicationState(),
+            app.isShowApplicationMode(),
+            app.getTheme(),
+            app.getWidth(),
+            app.getHeight(),
+            app.getProperties(),
+            app.getAccessPermissions()
+    );
+  }
+
+  protected BodyData migrateBodyData(BodyData body) {
+    return new BodyData(null, body.getType());
+  }
+
+  protected PageData migratePageData(PageData page) throws Exception {
+    List<ComponentData> children = this.migrateComponents(page.getChildren());
+    return new PageData(null,
+            page.getId(),
+            page.getName(),
+            page.getIcon(),
+            page.getTemplate(),
+            page.getFactoryId(),
+            page.getTitle(),
+            page.getDescription(),
+            page.getWidth(),
+            page.getHeight(),
+            page.getAccessPermissions(),
+            children,
+            page.getOwnerType(),
+            page.getOwnerId(),
+            page.getEditPermission(),
+            page.isShowMaxWindow(),
+            page.getMoveAppsPermissions(),
+            page.getMoveContainersPermissions());
+  }
+
+
+  protected List<ComponentData> migrateComponents(List<ComponentData> list) throws Exception {
+    List<ComponentData> result = new ArrayList<>();
+
+    for (ComponentData comp : list) {
+      if (comp instanceof ContainerData) {
+        result.add(migrateContainer((ContainerData)comp));
+      } else if (comp instanceof PageData) {
+        result.add(this.migratePageData((PageData)comp));
+      } else if (comp instanceof BodyData) {
+        result.add(migrateBodyData((BodyData)comp));
+      } else if (comp instanceof ApplicationData) {
+        result.add(migrateApplication((ApplicationData)comp));
+      }
+    }
+
+    return result;
   }
 
   protected abstract void beforeMigration() throws Exception;

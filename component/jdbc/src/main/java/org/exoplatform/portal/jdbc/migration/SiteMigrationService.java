@@ -13,6 +13,7 @@ import org.exoplatform.management.jmx.annotations.Property;
 import org.exoplatform.portal.config.Query;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.pom.config.POMDataStorage;
+import org.exoplatform.portal.pom.data.ContainerData;
 import org.exoplatform.portal.pom.data.ModelDataStorage;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
@@ -24,8 +25,6 @@ import org.exoplatform.services.listener.ListenerService;
 public class SiteMigrationService extends AbstractMigrationService<PortalData> {
   public static final String EVENT_LISTENER_KEY = "PORTAL_SITES_MIGRATION";
 
-  private POMDataStorage     pomStorage;
-
   private ModelDataStorage   modelStorage;
 
   private List<PortalData>   data;
@@ -36,10 +35,9 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
                               ListenerService listenerService,
                               EntityManagerService entityManagerService) {
 
-    super(initParams, listenerService, entityManagerService);
-    this.pomStorage = pomStorage;
+    super(initParams, pomStorage, listenerService, entityManagerService);
     this.modelStorage = modelStorage;
-    this.LIMIT_THRESHOLD = getInteger(initParams, LIMIT_THRESHOLD_KEY, 1);
+    this.LIMIT_THRESHOLD = getInteger(initParams, LIMIT_THRESHOLD_KEY, 100);
   }
 
   @Override
@@ -78,7 +76,21 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
         try {
           PortalData created = modelStorage.getPortalConfig(site.getKey());
           if (created == null) {
-            modelStorage.create(site);
+            PortalData migrate = new PortalData(null,
+                    site.getName(),
+                    site.getType(),
+                    site.getLocale(),
+                    site.getLabel(),
+                    site.getDescription(),
+                    site.getAccessPermissions(),
+                    site.getEditPermission(),
+                    site.getProperties(),
+                    site.getSkin(),
+                    this.migrateContainer(site.getPortalLayout()),
+                    site.getRedirects());
+
+
+            modelStorage.create(migrate);
             created = modelStorage.getPortalConfig(site.getKey());
           } else {
             LOG.info("Ignoring, this site: {} already in JPA", created.getKey());
@@ -99,7 +111,7 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
                                  site.getKey(),
                                  System.currentTimeMillis() - t1));
         } catch (Exception ex) {
-          LOG.error("exception during migration site: ", site.getKey());
+          LOG.error("exception during migration site: " + site.getKey(), ex);
           sitesFailed.add(site.getKey());
         }
       }

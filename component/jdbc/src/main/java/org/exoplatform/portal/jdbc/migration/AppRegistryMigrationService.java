@@ -16,6 +16,7 @@ import org.exoplatform.management.annotations.ManagedDescription;
 import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
 import org.exoplatform.portal.config.model.ApplicationType;
+import org.exoplatform.portal.pom.config.POMDataStorage;
 import org.exoplatform.services.listener.ListenerService;
 
 @Managed
@@ -31,12 +32,13 @@ public class AppRegistryMigrationService extends AbstractMigrationService<Applic
   private List<ApplicationCategory>   data;
 
   public AppRegistryMigrationService(InitParams initParams,
+                              POMDataStorage pomStorage,
                               ApplicationRegistryService appService,
                               ApplicationRegistryServiceImpl jcrAppService,
                               ListenerService listenerService,
                               EntityManagerService entityManagerService) {
 
-    super(initParams, listenerService, entityManagerService);
+    super(initParams, pomStorage, listenerService, entityManagerService);
     this.appService = appService;
     this.jcrAppService = jcrAppService;
     this.LIMIT_THRESHOLD = getInteger(initParams, LIMIT_THRESHOLD_KEY, 1);
