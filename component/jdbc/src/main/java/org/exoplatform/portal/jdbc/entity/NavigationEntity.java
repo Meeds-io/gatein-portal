@@ -18,17 +18,7 @@
  */
 package org.exoplatform.portal.jdbc.entity;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import java.io.Serializable;
 
@@ -47,8 +37,10 @@ public class NavigationEntity implements Serializable {
   private static final long serialVersionUID = 3811683620903785319L;
 
   @Id
-  @Column(name = "NAVIGATION_ID", length = 200)
-  private String             id;
+  @SequenceGenerator(name="SEQ_GTN_NAVIGATION_ID", sequenceName="SEQ_GTN_NAVIGATION_ID")
+  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_GTN_NAVIGATION_ID")
+  @Column(name = "NAVIGATION_ID")
+  private Long             id;
 
   @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "SITE_ID")
@@ -61,11 +53,11 @@ public class NavigationEntity implements Serializable {
   @JoinColumn(name = "NODE_ID")
   private NodeEntity        rootNode;
 
-  public String getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

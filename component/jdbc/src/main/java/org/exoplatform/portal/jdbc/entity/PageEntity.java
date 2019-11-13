@@ -22,15 +22,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -39,6 +31,7 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.portal.mop.SiteType;
 
 @Entity(name = "GateInPage")
+@SequenceGenerator(name="SEQ_GTN_ID_GENERATOR", sequenceName="SEQ_GTN_PAGE_ID")
 @ExoEntity
 @Table(name = "PORTAL_PAGES")
 @NamedQueries({
@@ -47,6 +40,12 @@ import org.exoplatform.portal.mop.SiteType;
 public class PageEntity extends ComponentEntity implements Serializable {
 
   private static final long     serialVersionUID = -6195451978995765259L;
+
+  @Id
+  @SequenceGenerator(name="SEQ_PAGE_ID_GENERATOR", sequenceName="SEQ_PAGE_ID_GENERATOR")
+  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_PAGE_ID_GENERATOR")
+  @Column(name = "ID")
+  protected Long            id;
 
   @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "SITE_ID")
@@ -72,6 +71,14 @@ public class PageEntity extends ComponentEntity implements Serializable {
 
   @Transient
   private List<ComponentEntity> children         = new LinkedList<ComponentEntity>();
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public SiteEntity getOwner() {
     return owner;

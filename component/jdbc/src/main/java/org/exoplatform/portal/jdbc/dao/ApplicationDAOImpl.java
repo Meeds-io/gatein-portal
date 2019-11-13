@@ -8,12 +8,7 @@ import javax.persistence.TypedQuery;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
 import org.exoplatform.portal.jdbc.entity.ApplicationEntity;
 
-public class ApplicationDAOImpl extends GenericDAOJPAImpl<ApplicationEntity, String> implements ApplicationDAO {
-  @Override
-  public ApplicationEntity create(ApplicationEntity entity) {
-    entity.setId(UUID.randomUUID().toString());
-    return super.create(entity);
-  }
+public class ApplicationDAOImpl extends GenericDAOJPAImpl<ApplicationEntity, Long> implements ApplicationDAO {
 
   @Override
   public ApplicationEntity find(String categoryName, String name) {

@@ -33,7 +33,7 @@ public interface NavigationStore extends NodeStore {
 
     NavigationData loadNavigationData(SiteKey key);
 
-    NavigationData loadNavigationData(String nodeId);
+    NavigationData loadNavigationData(Long nodeId);
 
     void saveNavigation(SiteKey key, NavigationState state);
 

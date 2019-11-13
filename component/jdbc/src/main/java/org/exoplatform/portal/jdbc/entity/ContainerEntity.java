@@ -22,12 +22,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -41,6 +36,12 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
 public class ContainerEntity extends ComponentEntity implements Serializable {
 
   private static final long     serialVersionUID = -8045606258160322858L;
+
+  @Id
+  @SequenceGenerator(name="SEQ_CONTAINER_ID_GENERATOR", sequenceName="SEQ_CONTAINER_ID_GENERATOR")
+  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_CONTAINER_ID_GENERATOR")
+  @Column(name = "ID")
+  protected Long            id;
 
   @Column(name = "WEBUI_ID", length = 200)
   private String                webuiId;
@@ -77,6 +78,14 @@ public class ContainerEntity extends ComponentEntity implements Serializable {
 
   @Column(name = "CONTAINER_BODY", length = 5000)
   private String                containerBody    = new JSONArray().toJSONString();
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public String getWebuiId() {
     return webuiId;

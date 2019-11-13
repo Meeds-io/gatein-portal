@@ -164,7 +164,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       JSONArray children = parse(siteBody);
       deleteChildren(children);
 
-      permissionDAO.deletePermissions(entity.getId());
+      permissionDAO.deletePermissions(SiteEntity.class.getName(), entity.getId());
       siteDAO.delete(entity);
     } else {
       throw new NoSuchDataException("Could not remove non existing portal " + siteKey);
@@ -211,13 +211,13 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       return tstate.getContentId();
     }
 
-    String id;
+    Long id;
     if (state instanceof PersistentApplicationState) {
       PersistentApplicationState pstate = (PersistentApplicationState) state;
-      id = pstate.getStorageId();
+      id = Util.parseLong(pstate.getStorageId());
     } else if (state instanceof CloneApplicationState) {
       CloneApplicationState cstate = (CloneApplicationState) state;
-      id = cstate.getStorageId();
+      id = Util.parseLong(cstate.getStorageId());
     } else {
       throw new AssertionError();
     }
@@ -239,11 +239,11 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       return prefs != null ? prefs : null;
     }
 
-    String id;
+    Long id;
     if (state instanceof CloneApplicationState) {
-      id = ((CloneApplicationState<S>) state).getStorageId();
+      id = Util.parseLong(((CloneApplicationState<S>) state).getStorageId());
     } else {
-      id = ((PersistentApplicationState<S>) state).getStorageId();
+      id = Util.parseLong(((PersistentApplicationState<S>) state).getStorageId());
     }
     WindowEntity window = windowDAO.find(id);
     if (window != null) {
@@ -264,11 +264,11 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       throw new AssertionError("Does not make sense");
     }
 
-    String id;
+    Long id;
     if (state instanceof CloneApplicationState) {
-      id = ((CloneApplicationState<S>) state).getStorageId();
+      id = Util.parseLong(((CloneApplicationState<S>) state).getStorageId());
     } else {
-      id = ((PersistentApplicationState<S>) state).getStorageId();
+      id = Util.parseLong(((PersistentApplicationState<S>) state).getStorageId());
     }
     WindowEntity window = windowDAO.find(id);
     if (window != null) {
@@ -368,7 +368,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
   @Override
   public <S> ApplicationData<S> getApplicationData(String applicationStorageId) {
-    WindowEntity window = windowDAO.find(applicationStorageId);
+    WindowEntity window = windowDAO.find(Util.parseLong(applicationStorageId));
     if (window != null) {
       return buildWindow(window);
     } else {
@@ -414,14 +414,14 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     JSONArray pageBody = (JSONArray) parser.parse(entity.getPageBody());
 
     List<PermissionEntity> moveApps =
-                                    permissionDAO.getPermissions(entity.getId(),
+                                    permissionDAO.getPermissions(PageEntity.class.getName(), entity.getId(),
                                                                  org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.MOVE_APP);
     List<PermissionEntity> moveContainers =
-                                          permissionDAO.getPermissions(entity.getId(),
+                                          permissionDAO.getPermissions(PageEntity.class.getName(), entity.getId(),
                                                                        org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.MOVE_CONTAINER);
 
     PageData pageData =
-                      new PageData(entity.getId(),
+                      new PageData("page_" + entity.getId(),
                                    null,
                                    entity.getName(),
                                    null,
@@ -442,12 +442,12 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     return pageData;
   }
 
-  private Map<String, WindowEntity> queryWindow(JSONArray jsonBody) {
-    Set<String> ids = new HashSet<String>();
+  private Map<Long, WindowEntity> queryWindow(JSONArray jsonBody) {
+    Set<Long> ids = new HashSet<>();
     filterId(jsonBody, TYPE.WINDOW, ids);
-    List<WindowEntity> entities = windowDAO.findByIds(new LinkedList<String>(ids));
+    List<WindowEntity> entities = windowDAO.findByIds(new LinkedList<>(ids));
 
-    Map<String, WindowEntity> results = new HashMap<String, WindowEntity>();
+    Map<Long, WindowEntity> results = new HashMap<>();
     for (WindowEntity entity : entities) {
       results.put(entity.getId(), entity);
     }
@@ -460,14 +460,14 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     return results;
   }
 
-  private Set<String> filterId(JSONArray jsonBody, TYPE type, Set<String> ids) {
+  private Set<Long> filterId(JSONArray jsonBody, TYPE type, Set<Long> ids) {
     if (jsonBody != null) {
       for (Object obj : jsonBody) {
         JSONObject component = (JSONObject) obj;
         TYPE t = TYPE.valueOf(component.get("type").toString());
 
         if (t.equals(type)) {
-          ids.add(component.get("id").toString());
+          ids.add(Util.parseLong(component.get("id").toString()));
         }
         if (TYPE.CONTAINER.equals(t)) {
           filterId((JSONArray) component.get("children"), type, ids);
@@ -477,12 +477,12 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     return ids;
   }
 
-  private Map<String, ContainerEntity> queryContainer(JSONArray jsonBody) {
-    Set<String> ids = new HashSet<String>();
+  private Map<Long, ContainerEntity> queryContainer(JSONArray jsonBody) {
+    Set<Long> ids = new HashSet<>();
     filterId(jsonBody, TYPE.CONTAINER, ids);
-    List<ContainerEntity> entities = containerDAO.findByIds(new LinkedList<String>(ids));
+    List<ContainerEntity> entities = containerDAO.findByIds(new LinkedList<>(ids));
 
-    Map<String, ContainerEntity> results = new HashMap<String, ContainerEntity>();
+    Map<Long, ContainerEntity> results = new HashMap<>();
     for (ContainerEntity entity : entities) {
       results.put(entity.getId(), entity);
     }
@@ -499,10 +499,10 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     List<ComponentEntity> results = new LinkedList<ComponentEntity>();
 
     for (ComponentData srcChild : children) {
-      String srcChildId = srcChild.getStorageId();
+      Long srcChildId = Util.parseLong(srcChild.getStorageId());
 
       ComponentEntity dstChild = null;
-      if (srcChildId != null) { // update
+      if (srcChildId != null && srcChildId > 0) { // update
         if (srcChild instanceof ContainerData) {
           dstChild = containerDAO.find(srcChildId);
           if (dstChild != null) {
@@ -561,21 +561,21 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
   }
 
   private List<ComponentData> buildChildren(JSONArray jsonBody) {
-    Map<String, ContainerEntity> containers = queryContainer(jsonBody);
-    Map<String, WindowEntity> windows = queryWindow(jsonBody);
+    Map<Long, ContainerEntity> containers = queryContainer(jsonBody);
+    Map<Long, WindowEntity> windows = queryWindow(jsonBody);
 
     return buildChildren(jsonBody, containers, windows);
   }
 
   private List<ComponentData> buildChildren(JSONArray jsonBody,
-                                            Map<String, ContainerEntity> containers,
-                                            Map<String, WindowEntity> windows) {
+                                            Map<Long, ContainerEntity> containers,
+                                            Map<Long, WindowEntity> windows) {
     List<ComponentData> results = new LinkedList<ComponentData>();
 
     if (jsonBody != null) {
       for (Object component : jsonBody) {
         JSONObject jsonComponent = (JSONObject) component;
-        String id = jsonComponent.get("id").toString();
+        Long id = Util.parseLong(jsonComponent.get("id").toString());
         TYPE type = TYPE.valueOf(jsonComponent.get("type").toString());
 
         switch (type) {
@@ -604,18 +604,18 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
             //
             List<String> accessPermissions =
-                                           buildPermission(permissionDAO.getPermissions(srcContainer.getId(),
+                                           buildPermission(permissionDAO.getPermissions(ContainerEntity.class.getName(), srcContainer.getId(),
                                                                                         org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.ACCESS));
             if (accessPermissions.isEmpty()) {
               accessPermissions = Collections.singletonList(UserACL.EVERYONE);
             }
 
             //
-            results.add(new ApplicationData<Portlet>(srcContainer.getId(),
-                                                     srcContainer.getId(),
+            results.add(new ApplicationData<Portlet>(String.valueOf(srcContainer.getId()),
+                                                     String.valueOf(srcContainer.getId()),
                                                      ApplicationType.PORTLET,
                                                      state,
-                                                     srcContainer.getId(),
+                                                     String.valueOf(srcContainer.getId()),
                                                      srcContainer.getTitle(),
                                                      srcContainer.getIcon(),
                                                      srcContainer.getDescription(),
@@ -628,7 +628,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
                                                      Collections.<String, String> emptyMap(),
                                                      accessPermissions));
           } else if (BodyType.PAGE.name().equals(ctype)) {
-            BodyData body = new BodyData(id, BodyType.PAGE);
+            BodyData body = new BodyData(String.valueOf(id), BodyType.PAGE);
             results.add(body);
           } else {
             results.add(buildContainer(containers.get(id), jsonComponent, containers, windows));
@@ -646,7 +646,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
   @SuppressWarnings("unchecked")
   private ApplicationData buildWindow(WindowEntity windowEntity) {
     ApplicationType<?> appType = convert(windowEntity.getAppType());
-    PersistentApplicationState<?> state = new PersistentApplicationState(windowEntity.getId());
+    PersistentApplicationState<?> state = new PersistentApplicationState(String.valueOf(windowEntity.getId()));
 
     Map<String, String> properties = new HashMap<String, String>();
     try {
@@ -659,14 +659,14 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       log.error(ex);
     }
 
-    List<PermissionEntity> access = permissionDAO.getPermissions(windowEntity.getId(),
+    List<PermissionEntity> access = permissionDAO.getPermissions(WindowEntity.class.getName(), windowEntity.getId(),
                                                                  org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.ACCESS);
 
-    return new ApplicationData(windowEntity.getId(),
+    return new ApplicationData(String.valueOf(windowEntity.getId()),
                                null,
                                appType,
                                state,
-                               windowEntity.getId(),
+                               String.valueOf(windowEntity.getId()),
                                windowEntity.getTitle(),
                                windowEntity.getIcon(),
                                windowEntity.getDescription(),
@@ -692,20 +692,20 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
   private ContainerData buildContainer(ContainerEntity entity,
                                        JSONObject jsonComponent,
-                                       Map<String, ContainerEntity> containers,
-                                       Map<String, WindowEntity> windows) {
+                                       Map<Long, ContainerEntity> containers,
+                                       Map<Long, WindowEntity> windows) {
     List<ComponentData> children = buildChildren((JSONArray) jsonComponent.get("children"), containers, windows);
 
-    List<PermissionEntity> access = permissionDAO.getPermissions(entity.getId(),
+    List<PermissionEntity> access = permissionDAO.getPermissions(ContainerEntity.class.getName(), entity.getId(),
                                                                  org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.ACCESS);
     List<PermissionEntity> moveApps =
-                                    permissionDAO.getPermissions(entity.getId(),
+                                    permissionDAO.getPermissions(ContainerEntity.class.getName(), entity.getId(),
                                                                  org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.MOVE_APP);
     List<PermissionEntity> moveConts =
-                                     permissionDAO.getPermissions(entity.getId(),
+                                     permissionDAO.getPermissions(ContainerEntity.class.getName(), entity.getId(),
                                                                   org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.MOVE_CONTAINER);
 
-    return new ContainerData(entity.getId(),
+    return new ContainerData(String.valueOf(entity.getId()),
                              entity.getWebuiId(),
                              entity.getName(),
                              entity.getIcon(),
@@ -722,18 +722,18 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
   }
 
   private void cleanDeletedComponents(JSONArray body, List<ComponentData> children) {
-    Set<String> windowIds = new HashSet<String>();
+    Set<Long> windowIds = new HashSet<>();
     filterId(body, TYPE.WINDOW, windowIds);
-    for (String id : windowIds) {
-      if (findById(id, children) == null) {
+    for (Long id : windowIds) {
+      if (findById(id, TYPE.WINDOW, children) == null) {
         windowDAO.deleteById(id);
       }
     }
 
-    Set<String> containerIds = new HashSet<String>();
+    Set<Long> containerIds = new HashSet<>();
     filterId(body, TYPE.CONTAINER, containerIds);
-    for (String id : containerIds) {
-      if (findById(id, children) == null) {
+    for (Long id : containerIds) {
+      if (findById(id, TYPE.CONTAINER, children) == null) {
         containerDAO.deleteById(id);
       }
     }
@@ -793,13 +793,16 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     return dst;
   }
 
-  private ComponentData findById(String id, List<ComponentData> children) {
+  private ComponentData findById(Long id, ComponentEntity.TYPE type, List<ComponentData> children) {
     if (children != null) {
       for (ComponentData child : children) {
-        if (id.equals(child.getStorageId())) {
+        if (id.equals(Util.parseLong(child.getStorageId()))
+          && ((type == TYPE.WINDOW && child instanceof ApplicationData)
+                || (type == TYPE.CONTAINER && child instanceof ContainerData))) {
+
           return child;
         } else if (child instanceof ContainerData) {
-          ComponentData result = findById(id, ((ContainerData) child).getChildren());
+          ComponentData result = findById(id, type, ((ContainerData) child).getChildren());
           if (result != null) {
             return result;
           }
@@ -821,32 +824,35 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     return results;
   }
 
-  private void savePermissions(String id, PortalData config) {
-    permissionDAO.savePermissions(id,
+  private void savePermissions(long id, PortalData config) {
+    permissionDAO.savePermissions(SiteEntity.class.getName(), id,
                                   org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.ACCESS,
                                   config.getAccessPermissions());
-    permissionDAO.savePermissions(id,
+    permissionDAO.savePermissions(SiteEntity.class.getName(), id,
                                   org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.EDIT,
                                   Arrays.asList(config.getEditPermission()));
   }
 
-  private void savePermissions(String id, ComponentData srcChild) {
+  private void savePermissions(long id, ComponentData srcChild) {
     List<String> access = null;
+    String typeName = srcChild.getClass().getName();
     if (srcChild instanceof ContainerData) {
       ContainerData srcData = (ContainerData) srcChild;
+      typeName = ContainerEntity.class.getName();
       access = srcData.getAccessPermissions();
-      permissionDAO.savePermissions(id,
+      permissionDAO.savePermissions(typeName, id,
                                     org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.MOVE_APP,
                                     srcData.getMoveAppsPermissions());
-      permissionDAO.savePermissions(id,
+      permissionDAO.savePermissions(typeName, id,
                                     org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.MOVE_CONTAINER,
                                     srcData.getMoveContainersPermissions());
     } else if (srcChild instanceof ApplicationData) {
       ApplicationData srcData = (ApplicationData) srcChild;
+      typeName = WindowEntity.class.getName();
       access = srcData.getAccessPermissions();
     }
 
-    permissionDAO.savePermissions(id, org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.ACCESS, access);
+    permissionDAO.savePermissions(typeName, id, org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.ACCESS, access);
   }
 
   private SiteEntity buildSiteEntity(SiteEntity entity, PortalData config) throws Exception {
@@ -890,9 +896,9 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       throw new IllegalStateException("site doens't has root container layout");
     }
 
-    List<PermissionEntity> access = permissionDAO.getPermissions(entity.getId(),
+    List<PermissionEntity> access = permissionDAO.getPermissions(SiteEntity.class.getName(), entity.getId(),
                                                                  org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.ACCESS);
-    List<PermissionEntity> edit = permissionDAO.getPermissions(entity.getId(),
+    List<PermissionEntity> edit = permissionDAO.getPermissions(SiteEntity.class.getName(), entity.getId(),
                                                                org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE.EDIT);
     String editPer = edit.size() > 0 ? edit.get(0).getPermission() : null;
 
@@ -910,7 +916,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       log.error(ex);
     }
 
-    return new PortalData(entity.getId(),
+    return new PortalData("site_" + entity.getId(),
                           entity.getName(),
                           entity.getSiteType().getName(),
                           entity.getLocale(),
@@ -948,7 +954,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
   private void deleteChildren(JSONArray children) {
     for (Object child : children) {
       JSONObject c = (JSONObject) child;
-      String id = c.get("id").toString();
+      Long id = Util.parseLong(c.get("id").toString());
       TYPE t = TYPE.valueOf(c.get("type").toString());
 
       if (TYPE.CONTAINER.equals(t)) {
@@ -962,13 +968,13 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
           JSONArray dashboardChilds = parse(container.getContainerBody());
           deleteChildren(dashboardChilds);
 
-          permissionDAO.deletePermissions(container.getId());
+          permissionDAO.deletePermissions(ContainerEntity.class.getName(), container.getId());
           containerDAO.delete(container);
         }
       } else if (TYPE.WINDOW.equals(t)) {
         WindowEntity window = windowDAO.find(id);
         if (window != null) {
-          permissionDAO.deletePermissions(window.getId());
+          permissionDAO.deletePermissions(WindowEntity.class.getName(), window.getId());
           windowDAO.delete(window);
         }
       } else {

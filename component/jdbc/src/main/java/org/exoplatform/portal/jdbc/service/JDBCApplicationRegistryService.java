@@ -128,11 +128,11 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     } else {
       catDAO.update(catEntity);
     }
-    permissionDAO.savePermissions(catEntity.getId(), TYPE.ACCESS, category.getAccessPermissions());
+    permissionDAO.savePermissions(CategoryEntity.class.getName(), catEntity.getId(), TYPE.ACCESS, category.getAccessPermissions());
   }
 
   public void remove(ApplicationCategory category) {
-    List<String> ids = new LinkedList<String>();
+    List<Long> ids = new LinkedList<>();
 
     CategoryEntity catEntity = catDAO.findByName(category.getName());
     if (catEntity != null) {
@@ -143,8 +143,8 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
       catDAO.delete(catEntity);
     }
 
-    for (String id : ids) {
-      permissionDAO.deletePermissions(id);
+    for (Long id : ids) {
+      permissionDAO.deletePermissions(ApplicationEntity.class.getName(), id);
     }
   }
 
@@ -188,7 +188,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
 
     ApplicationEntity appEntity = appDAO.find(category.getName(), application.getApplicationName());
     if (appEntity == null && application.getStorageId() != null) {
-      appEntity = appDAO.find(application.getStorageId());
+      appEntity = appDAO.find(Util.parseLong(application.getStorageId()));
     }
     appEntity = buildAppEntity(appEntity, application);
 
@@ -200,11 +200,11 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     } else {
       appDAO.update(appEntity);
     }
-    permissionDAO.savePermissions(appEntity.getId(), TYPE.ACCESS, application.getAccessPermissions());
+    permissionDAO.savePermissions(ApplicationEntity.class.getName(), appEntity.getId(), TYPE.ACCESS, application.getAccessPermissions());
   }
 
   public void update(Application application) {
-    ApplicationEntity appEntity = appDAO.find(application.getStorageId());
+    ApplicationEntity appEntity = appDAO.find(Util.parseLong(application.getStorageId()));
     if (appEntity != null) {
       appEntity = buildAppEntity(appEntity, application);
       appDAO.update(appEntity);
@@ -214,9 +214,9 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
   }
 
   public void remove(Application app) {
-    ApplicationEntity appEntity = appDAO.find(app.getStorageId());
+    ApplicationEntity appEntity = appDAO.find(Util.parseLong(app.getStorageId()));
     if (appEntity != null) {
-      permissionDAO.deletePermissions(appEntity.getId());
+      permissionDAO.deletePermissions(ApplicationEntity.class.getName(), appEntity.getId());
       appDAO.delete(appEntity);
     }
   }
@@ -300,7 +300,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
           category.setName(categoryName);
           category.setDisplayName(categoryName);
           catDAO.create(category);
-          permissionDAO.savePermissions(category.getId(), TYPE.ACCESS, permissions);
+          permissionDAO.savePermissions(CategoryEntity.class.getName(), category.getId(), TYPE.ACCESS, permissions);
         }
 
         //
@@ -343,7 +343,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
             app.setDisplayName(displayName);
             app.setDescription(getLocalizedStringValue(descriptionLS, portletName));
             appDAO.create(app);
-            permissionDAO.savePermissions(app.getId(), TYPE.ACCESS, permissions);
+            permissionDAO.savePermissions(ApplicationEntity.class.getName(), app.getId(), TYPE.ACCESS, permissions);
           }
         }
       }
@@ -358,7 +358,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     category.setDisplayName(catEntity.getDisplayName());
     category.setDescription(catEntity.getDescription());
 
-    List<String> access = buildPermission(permissionDAO.getPermissions(catEntity.getId(), TYPE.ACCESS));
+    List<String> access = buildPermission(permissionDAO.getPermissions(CategoryEntity.class.getName(), catEntity.getId(), TYPE.ACCESS));
     category.setAccessPermissions(access);
 
     category.setCreatedDate(new Date(catEntity.getCreatedDate()));
@@ -412,12 +412,12 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     application.setDisplayName(appEntity.getDisplayName());
     application.setDescription(appEntity.getDescription());
 
-    List<String> access = buildPermission(permissionDAO.getPermissions(appEntity.getId(), TYPE.ACCESS));
+    List<String> access = buildPermission(permissionDAO.getPermissions(ApplicationEntity.class.getName(), appEntity.getId(), TYPE.ACCESS));
     application.setAccessPermissions(new ArrayList<String>(access));
 
     application.setCreatedDate(new Date(appEntity.getCreatedDate()));
     application.setModifiedDate(new Date(appEntity.getModifiedDate()));
-    application.setStorageId(appEntity.getId());
+    application.setStorageId(String.valueOf(appEntity.getId()));
     application.setContentId(appEntity.getContentId());
     return application;
   }

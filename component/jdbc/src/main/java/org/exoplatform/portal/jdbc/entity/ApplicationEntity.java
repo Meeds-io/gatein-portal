@@ -20,15 +20,7 @@ package org.exoplatform.portal.jdbc.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
@@ -42,8 +34,10 @@ public class ApplicationEntity implements Serializable {
   private static final long serialVersionUID = 4955770436068594917L;
 
   @Id
-  @Column(name = "ID", length = 200)
-  private String            id;
+  @SequenceGenerator(name="SEQ_GTN_APPLICATION_ID", sequenceName="SEQ_GTN_APPLICATION_ID")
+  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_GTN_APPLICATION_ID")
+  @Column(name = "ID")
+  private Long            id;
 
   @Column(name = "DISPLAY_NAME", length = 200)
   private String            displayName;
@@ -70,11 +64,11 @@ public class ApplicationEntity implements Serializable {
   @JoinColumn(name = "CATEGORY_ID")
   private CategoryEntity    category;
 
-  public String getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

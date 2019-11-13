@@ -108,7 +108,7 @@ public class NavigationDAOTest extends AbstractKernelTest {
     NavigationEntity nav = new NavigationEntity();
     nav.setOwner(getOrCreateSite("classic"));
     nav.setPriority(1);
-    nav.setId(UUID.randomUUID().toString());
+//    nav.setId(UUID.randomUUID().toString());
     return nav;
   }
 
@@ -136,7 +136,7 @@ public class NavigationDAOTest extends AbstractKernelTest {
 
   private NodeEntity createNode(String name) {
     NodeEntity node = new NodeEntity();
-    node.setId(UUID.randomUUID().toString());
+    //node.setId(UUID.randomUUID().toString());
     node.setName(name);
     node.setEndTime(1);
     node.setIcon("icon");

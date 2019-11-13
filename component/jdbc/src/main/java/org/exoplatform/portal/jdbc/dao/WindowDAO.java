@@ -24,10 +24,10 @@ import java.util.List;
 import org.exoplatform.commons.api.persistence.GenericDAO;
 import org.exoplatform.portal.jdbc.entity.WindowEntity;
 
-public interface WindowDAO extends GenericDAO<WindowEntity, String> {
+public interface WindowDAO extends GenericDAO<WindowEntity, Long> {
 
-  List<WindowEntity> findByIds(List<String> ids);
+  List<WindowEntity> findByIds(List<Long> ids);
 
-  void deleteById(String id);
+  void deleteById(Long id);
 
 }

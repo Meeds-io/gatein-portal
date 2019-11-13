@@ -26,7 +26,7 @@ import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
 import org.exoplatform.portal.jdbc.entity.NavigationEntity;
 import org.exoplatform.portal.mop.SiteType;
 
-public class NavigationDAOImpl extends GenericDAOJPAImpl<NavigationEntity, String>implements NavigationDAO {
+public class NavigationDAOImpl extends GenericDAOJPAImpl<NavigationEntity, Long>implements NavigationDAO {
 
     @Override
     public NavigationEntity findByOwner(SiteType type, String name) {
@@ -43,7 +43,7 @@ public class NavigationDAOImpl extends GenericDAOJPAImpl<NavigationEntity, Strin
     }
 
     @Override
-    public NavigationEntity findByRootNode(String nodeId) {
+    public NavigationEntity findByRootNode(Long nodeId) {
         TypedQuery<NavigationEntity> query = getEntityManager().createNamedQuery("NavigationEntity.findByRootNode",
                 NavigationEntity.class);
         query.setParameter("rootNodeId", nodeId);

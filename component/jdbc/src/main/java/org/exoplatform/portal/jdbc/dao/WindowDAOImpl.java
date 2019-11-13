@@ -10,7 +10,7 @@ import org.exoplatform.portal.jdbc.entity.WindowEntity;
 public class WindowDAOImpl extends AbstractDAO<WindowEntity> implements WindowDAO {
 
   @Override
-  public List<WindowEntity> findByIds(List<String> ids) {
+  public List<WindowEntity> findByIds(List<Long> ids) {
     if (ids == null || ids.isEmpty()) {
       return Collections.emptyList();
     }
@@ -20,7 +20,7 @@ public class WindowDAOImpl extends AbstractDAO<WindowEntity> implements WindowDA
   }
 
   @Override
-  public void deleteById(String id) {
+  public void deleteById(Long id) {
     WindowEntity window = find(id);
     if (window != null) {
       delete(window);

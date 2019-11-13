@@ -36,6 +36,12 @@ public class WindowEntity extends ComponentEntity implements Serializable {
 
   private static final long serialVersionUID = 6633792468705838255L;
 
+  @Id
+  @SequenceGenerator(name="SEQ_WINDOW_ID_GENERATOR", sequenceName="SEQ_WINDOW_ID_GENERATOR")
+  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_WINDOW_ID_GENERATOR")
+  @Column(name = "ID")
+  protected Long            id;
+
   @Column(name = "TITLE", length = 200)
   private String            title;
 
@@ -77,6 +83,14 @@ public class WindowEntity extends ComponentEntity implements Serializable {
   @Column(name = "CUSTOMIZATION", length = 10000)
   @Basic(fetch = FetchType.LAZY)
   private byte[]            customization;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public String getTitle() {
     return title;

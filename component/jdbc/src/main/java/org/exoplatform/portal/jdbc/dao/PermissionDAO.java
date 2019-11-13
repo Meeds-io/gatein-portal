@@ -25,9 +25,9 @@ import org.exoplatform.portal.jdbc.entity.PermissionEntity;
 import org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE;
 
 public interface PermissionDAO extends GenericDAO<PermissionEntity, Long> {
-  public List<PermissionEntity> getPermissions(String refId, TYPE type);
+  public List<PermissionEntity> getPermissions(String refType, Long refId, TYPE type);
 
-  public int deletePermissions(String refId);
+  public int deletePermissions(String refType, Long refId);
 
-  public List<PermissionEntity> savePermissions(String refId, TYPE type, List<String> permissions);
+  public List<PermissionEntity> savePermissions(String refType, Long refId, TYPE type, List<String> permissions);
 }

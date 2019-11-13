@@ -4,15 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
@@ -26,8 +18,10 @@ public class CategoryEntity implements Serializable {
   private static final long      serialVersionUID = 8772040309317091459L;
 
   @Id
-  @Column(name = "ID", length = 200)
-  private String                 id;
+  @SequenceGenerator(name="SEQ_GTN_APPLICATION_CAT_ID", sequenceName="SEQ_GTN_APPLICATION_CAT_ID")
+  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_GTN_APPLICATION_CAT_ID")
+  @Column(name = "ID")
+  private Long                 id;
 
   @Column(name = "NAME", length = 200)
   private String                 name;
@@ -47,11 +41,11 @@ public class CategoryEntity implements Serializable {
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<ApplicationEntity> applications     = new HashSet<ApplicationEntity>();
 
-  public String getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

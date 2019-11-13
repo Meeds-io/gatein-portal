@@ -23,10 +23,10 @@ import java.util.List;
 import org.exoplatform.commons.api.persistence.GenericDAO;
 import org.exoplatform.portal.jdbc.entity.ContainerEntity;
 
-public interface ContainerDAO extends GenericDAO<ContainerEntity, String> {
+public interface ContainerDAO extends GenericDAO<ContainerEntity, Long> {
 
-  List<ContainerEntity> findByIds(List<String> ids);
+  List<ContainerEntity> findByIds(List<Long> ids);
 
-  void deleteById(String id);
+  void deleteById(Long id);
 
 }

@@ -25,7 +25,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
-public class NodeDAOImpl extends GenericDAOJPAImpl<NodeEntity, String> implements NodeDAO {
+public class NodeDAOImpl extends GenericDAOJPAImpl<NodeEntity, Long> implements NodeDAO {
 
     @Override
     public NodeEntity create(NodeEntity entity) {
@@ -34,7 +34,7 @@ public class NodeDAOImpl extends GenericDAOJPAImpl<NodeEntity, String> implement
     }
 
     @Override
-    public List<NodeEntity> findAllByPage(String pageId) {
+    public List<NodeEntity> findAllByPage(Long pageId) {
         TypedQuery<NodeEntity> query = getEntityManager().createNamedQuery("NodeEntity.findByPage",
                 NodeEntity.class);
         query.setParameter("pageId", pageId);

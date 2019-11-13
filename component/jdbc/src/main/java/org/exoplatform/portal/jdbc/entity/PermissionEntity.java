@@ -36,8 +36,8 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
 @ExoEntity
 @Table(name = "PORTAL_PERMISSIONS")
 @NamedQueries({
-  @NamedQuery(name = "PermissionEntity.deleteByRefId", query = "DELETE GateInPermission p WHERE p.referenceId = :refId"),
-  @NamedQuery(name = "PermissionEntity.getPermissions", query = "SELECT p FROM GateInPermission p WHERE p.referenceId = :refId AND type = :type") })
+  @NamedQuery(name = "PermissionEntity.deleteByRefId", query = "DELETE GateInPermission p WHERE p.referenceType = :refType AND p.referenceId = :refId"),
+  @NamedQuery(name = "PermissionEntity.getPermissions", query = "SELECT p FROM GateInPermission p WHERE p.referenceType = :refType AND p.referenceId = :refId AND p.type = :type") })
 public class PermissionEntity implements Serializable {
 
   private static final long serialVersionUID = 1173817577220348267L;
@@ -48,8 +48,11 @@ public class PermissionEntity implements Serializable {
   @Column(name = "PERMISSION_ID")
   private Long              id;
 
-  @Column(name = "REF_ID", length = 200)
-  private String            referenceId;
+  @Column(name = "REF_TYPE", length = 200)
+  private String            referenceType;
+
+  @Column(name = "REF_ID")
+  private Long            referenceId;
 
   @Column(name = "PERMISSION", length = 200)
   private String            permission;
@@ -60,7 +63,8 @@ public class PermissionEntity implements Serializable {
   public PermissionEntity() {
   }
 
-  public PermissionEntity(String referenceId, String permission, TYPE type) {
+  public PermissionEntity(String referenceType, long referenceId, String permission, TYPE type) {
+    this.referenceType = referenceType;
     this.referenceId = referenceId;
     this.permission = permission;
     this.type = type;
@@ -74,11 +78,19 @@ public class PermissionEntity implements Serializable {
     this.id = id;
   }
 
-  public String getReferenceId() {
+  public String getReferenceType() {
+    return referenceType;
+  }
+
+  public void setReferenceType(String referenceType) {
+    this.referenceType = referenceType;
+  }
+
+  public Long getReferenceId() {
     return referenceId;
   }
 
-  public void setReferenceId(String referenceId) {
+  public void setReferenceId(Long referenceId) {
     this.referenceId = referenceId;
   }
 
@@ -102,9 +114,10 @@ public class PermissionEntity implements Serializable {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((permission == null) ? 0 : permission.hashCode());
+    result = prime * result + (referenceType == null ? 0 : referenceType.hashCode());
     result = prime * result + ((referenceId == null) ? 0 : referenceId.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
+    result = prime * result + ((permission == null) ? 0 : permission.hashCode());
     return result;
   }
 
@@ -114,21 +127,38 @@ public class PermissionEntity implements Serializable {
       return true;
     if (obj == null)
       return false;
-    if (getClass() != obj.getClass())
+    if (getClass() != obj.getClass()) {
       return false;
+    }
+
     PermissionEntity other = (PermissionEntity) obj;
-    if (permission == null) {
-      if (other.permission != null)
-        return false;
-    } else if (!permission.equals(other.permission))
+
+    if (type != other.type) {
       return false;
+    }
+
+    if (referenceType == null) {
+      if (other.referenceType != null) {
+        return false;
+      }
+    } else if (!referenceType.equals(other.referenceType)) {
+      return false;
+    }
+
     if (referenceId == null) {
       if (other.referenceId != null)
         return false;
-    } else if (!referenceId.equals(other.referenceId))
+    } else if (!referenceId.equals(other.referenceId)) {
       return false;
-    if (type != other.type)
+    }
+
+    if (permission == null) {
+      if (other.permission != null)
+        return false;
+    } else if (!permission.equals(other.permission)) {
       return false;
+    }
+
     return true;
   }
 

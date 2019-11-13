@@ -26,7 +26,7 @@ import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.gatein.api.page.PageQuery;
 
-public interface PageDAO extends GenericDAO<PageEntity, String> {
+public interface PageDAO extends GenericDAO<PageEntity, Long> {
 
     PageEntity findByKey(PageKey pageKey);    
 

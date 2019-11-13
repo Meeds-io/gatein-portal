@@ -19,6 +19,8 @@
 
 package org.exoplatform.portal.mop.navigation;
 
+import org.exoplatform.portal.jdbc.service.Util;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -49,7 +51,7 @@ class NodePersister<N> extends NodeChangeListener.Base<NodeContext<N>> {
             throws HierarchyException {
 
         //
-        NodeData[] result = persistence.createNode(parent.data.id, previous != null ? previous.data.id : null, name, target.state);
+        NodeData[] result = persistence.createNode(Util.parseLong(parent.data.id), previous != null ? Util.parseLong(previous.data.id) : null, name, target.state);
 
         //
         parent.data = result[0];
@@ -79,7 +81,7 @@ class NodePersister<N> extends NodeChangeListener.Base<NodeContext<N>> {
         }
 
         //
-        parent.data = persistence.destroyNode(target.data.id);
+        parent.data = persistence.destroyNode(Util.parseLong(target.data.id));
 
         //
         toUpdate.add(parent.handle);
@@ -91,7 +93,7 @@ class NodePersister<N> extends NodeChangeListener.Base<NodeContext<N>> {
     public void onUpdate(NodeContext<N> source, NodeState state) throws HierarchyException {
 
         //
-        source.data = persistence.updateNode(source.data.id, state);
+        source.data = persistence.updateNode(Util.parseLong(source.data.id), state);
         source.state = null;
 
 
@@ -103,7 +105,7 @@ class NodePersister<N> extends NodeChangeListener.Base<NodeContext<N>> {
     public void onMove(NodeContext<N> target, NodeContext<N> from, NodeContext<N> to, NodeContext<N> previous)
             throws HierarchyException {
 
-        NodeData[] result = persistence.moveNode(target.data.id, from.data.id, to.data.id, previous != null ? previous.data.id : null);
+        NodeData[] result = persistence.moveNode(Util.parseLong(target.data.id), Util.parseLong(from.data.id), Util.parseLong(to.data.id), previous != null ? Util.parseLong(previous.data.id) : null);
 
 
         //
@@ -119,7 +121,7 @@ class NodePersister<N> extends NodeChangeListener.Base<NodeContext<N>> {
 
     public void onRename(NodeContext<N> target, NodeContext<N> parent, String name) throws HierarchyException {
 
-        NodeData[] result = persistence.renameNode(target.data.id, parent.data.id, name);
+        NodeData[] result = persistence.renameNode(Util.parseLong(target.data.id), Util.parseLong(parent.data.id), name);
 
         //
         target.data = result[0];

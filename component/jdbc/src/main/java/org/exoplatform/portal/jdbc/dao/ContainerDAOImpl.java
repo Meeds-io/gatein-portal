@@ -10,7 +10,7 @@ import org.exoplatform.portal.jdbc.entity.ContainerEntity;
 public class ContainerDAOImpl extends AbstractDAO<ContainerEntity> implements ContainerDAO {
 
   @Override
-  public List<ContainerEntity> findByIds(List<String> ids) {
+  public List<ContainerEntity> findByIds(List<Long> ids) {
     if (ids == null || ids.isEmpty()) {
       return Collections.emptyList();
     }
@@ -20,7 +20,7 @@ public class ContainerDAOImpl extends AbstractDAO<ContainerEntity> implements Co
   }
 
   @Override
-  public void deleteById(String id) {
+  public void deleteById(Long id) {
     ContainerEntity containerEntity = find(id);
     if (containerEntity != null) {
       delete(containerEntity);

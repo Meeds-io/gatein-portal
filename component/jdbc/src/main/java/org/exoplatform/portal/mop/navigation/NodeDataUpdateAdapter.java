@@ -19,6 +19,8 @@
 
 package org.exoplatform.portal.mop.navigation;
 
+import org.exoplatform.portal.jdbc.service.Util;
+
 /**
 * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
 */
@@ -44,14 +46,14 @@ class NodeDataUpdateAdapter implements TreeUpdateAdapter<NodeData> {
     }
 
     public NodeData getDescendant(NodeData node, String handle) {
-        NodeData data = persistence.loadNode(handle);
+        NodeData data = persistence.loadNode(Util.parseLong(handle));
         NodeData current = data;
         while (current != null) {
             if (node.id.equals(current.id)) {
                 return data;
             } else {
                 if (current.parentId != null) {
-                    current = persistence.loadNode(current.parentId);
+                    current = persistence.loadNode(Util.parseLong(current.parentId));
                 } else {
                     current = null;
                 }

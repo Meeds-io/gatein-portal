@@ -23,6 +23,6 @@ import org.exoplatform.portal.jdbc.entity.NodeEntity;
 
 import java.util.List;
 
-public interface NodeDAO extends GenericDAO<NodeEntity, String> {
-    List<NodeEntity> findAllByPage(String pageId);
+public interface NodeDAO extends GenericDAO<NodeEntity, Long> {
+    List<NodeEntity> findAllByPage(Long pageId);
 }

@@ -21,7 +21,7 @@ package org.exoplatform.portal.jdbc.dao;
 import org.exoplatform.commons.api.persistence.GenericDAO;
 import org.exoplatform.portal.jdbc.entity.CategoryEntity;
 
-public interface CategoryDAO extends GenericDAO<CategoryEntity, String> {
+public interface CategoryDAO extends GenericDAO<CategoryEntity, Long> {
 
   CategoryEntity findByName(String name);
 

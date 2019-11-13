@@ -22,6 +22,7 @@ package org.exoplatform.portal.mop.navigation;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.exoplatform.portal.jdbc.service.Util;
 import org.exoplatform.portal.mop.navigation.NodeContext;
 import org.exoplatform.portal.mop.navigation.NodeModel;
 
@@ -47,7 +48,7 @@ public class NodeManager {
             Scope scope,
             NodeChangeListener<NodeContext<N>> listener) {
         try {
-            NodeData data = store.loadNode(nodeId);
+            NodeData data = store.loadNode(Util.parseLong(nodeId));
             if (data != null) {
                 NodeContext<N> context = new NodeContext<N>(model, data);
                 updateNode(context, scope, listener);
@@ -111,7 +112,7 @@ public class NodeManager {
             throw new IllegalArgumentException("For now we don't accept to update a context that has pending changes");
         }
         try {
-            NodeData data = store.loadNode(tree.root.data.id);
+            NodeData data = store.loadNode(Util.parseLong(tree.root.data.id));
             if (data == null) {
                 throw new HierarchyException(HierarchyError.UPDATE_CONCURRENTLY_REMOVED_NODE);
             }
@@ -151,7 +152,7 @@ public class NodeManager {
             TreeContext<N> tree,
             Scope.Visitor visitor) throws HierarchyException {
         try {
-            NodeData data = store.loadNode(tree.root.getId());
+            NodeData data = store.loadNode(Util.parseLong(tree.root.getId()));
             if (data == null) {
                 throw new HierarchyException(HierarchyError.UPDATE_CONCURRENTLY_REMOVED_NODE);
             }
@@ -185,7 +186,7 @@ public class NodeManager {
             HierarchyException {
 
         try {
-            NodeData data = store.loadNode(tree.root.data.id);
+            NodeData data = store.loadNode(Util.parseLong(tree.root.data.id));
             if (data == null) {
                 throw new HierarchyException(HierarchyError.UPDATE_CONCURRENTLY_REMOVED_NODE);
             }

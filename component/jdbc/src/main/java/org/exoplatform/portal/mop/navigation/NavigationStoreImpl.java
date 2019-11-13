@@ -37,6 +37,7 @@ import org.exoplatform.portal.jdbc.entity.NavigationEntity;
 import org.exoplatform.portal.jdbc.entity.NodeEntity;
 import org.exoplatform.portal.jdbc.entity.PageEntity;
 import org.exoplatform.portal.jdbc.entity.SiteEntity;
+import org.exoplatform.portal.jdbc.service.Util;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageKey;
@@ -66,7 +67,7 @@ public class NavigationStoreImpl implements NavigationStore {
   }
 
   @Override
-  public NodeData loadNode(String nodeId) {
+  public NodeData loadNode(Long nodeId) {
     NodeEntity node = nodeDAO.find(nodeId);
     return buildNodeData(node);
   }
@@ -86,12 +87,12 @@ public class NavigationStoreImpl implements NavigationStore {
   }
 
   @Override
-  public NodeData[] createNode(String parentId, String previousId, String name, NodeState state) {
+  public NodeData[] createNode(Long parentId, Long previousId, String name, NodeState state) {
     NodeEntity parent = null;
     if (parentId != null) {
       parent = nodeDAO.find(parentId);
     }
-    String prev = "";
+    Long prev = null;
     if (previousId != null) {
       prev = previousId;
     }
@@ -120,7 +121,7 @@ public class NavigationStoreImpl implements NavigationStore {
   }
 
   @Override
-  public NodeData destroyNode(String targetId) {
+  public NodeData destroyNode(Long targetId) {
     NodeEntity node = nodeDAO.find(targetId);
     if (node != null) {
       NodeEntity parent = node.getParent();
@@ -141,7 +142,7 @@ public class NavigationStoreImpl implements NavigationStore {
   }
 
   @Override
-  public NodeData updateNode(String targetId, NodeState state) {
+  public NodeData updateNode(Long targetId, NodeState state) {
     NodeEntity node = nodeDAO.find(targetId);
     if (node != null) {
       node = buildNodeEntity(node, state);
@@ -153,7 +154,7 @@ public class NavigationStoreImpl implements NavigationStore {
   }
 
   @Override
-  public NodeData[] moveNode(String targetId, String fromId, String toId, String previousId) {
+  public NodeData[] moveNode(Long targetId, Long fromId, Long toId, Long previousId) {
     NodeEntity target = nodeDAO.find(targetId);
     if (target == null) {
       return null;
@@ -166,7 +167,7 @@ public class NavigationStoreImpl implements NavigationStore {
 
       List<NodeEntity> children = to.getChildren();
       if (children != null && previousId != null) {
-        String prev = previousId;
+        Long prev = previousId;
         for (index = 0; index < children.size(); index++) {
           if (children.get(index).getId().equals(prev)) {
             break;
@@ -192,7 +193,7 @@ public class NavigationStoreImpl implements NavigationStore {
   }
 
   @Override
-  public NodeData[] renameNode(String targetId, String parentId, String name) {
+  public NodeData[] renameNode(Long targetId, Long parentId, String name) {
     NodeEntity target = nodeDAO.find(targetId);
     if (target == null) {
       return null;
@@ -246,9 +247,9 @@ public class NavigationStoreImpl implements NavigationStore {
   }
 
   @Override
-  public NavigationData loadNavigationData(String nodeId) {
+  public NavigationData loadNavigationData(Long nodeId) {
     NodeData root = this.buildNodeData(this.getRootNode(nodeId));
-    NavigationEntity navEntity = navigationDAO.findByRootNode(root.getId());
+    NavigationEntity navEntity = navigationDAO.findByRootNode(Util.parseLong(root.getId()));
     if (navEntity != null) {
       SiteEntity siteEntity = navEntity.getOwner();
       SiteKey key = siteEntity.getSiteType().key(siteEntity.getName());
@@ -259,7 +260,7 @@ public class NavigationStoreImpl implements NavigationStore {
     return NavigationData.EMPTY;
   }
 
-  private NodeEntity getRootNode(String nodeId) {
+  private NodeEntity getRootNode(Long nodeId) {
     NodeEntity entity = this.nodeDAO.find(nodeId);
     if (entity.getParent() != null) {
       return this.getRootNode(entity.getParent().getId());
@@ -277,7 +278,6 @@ public class NavigationStoreImpl implements NavigationStore {
     NavigationEntity navEntity = navigationDAO.findByOwner(key.getType(), key.getName());
     navEntity = buildNavEntity(navEntity, key, state.getPriority());
     if (navEntity.getId() == null) {
-      navEntity.setId(UUID.randomUUID().toString());
       nodeDAO.create(navEntity.getRootNode());
       navigationDAO.create(navEntity);
     } else {
@@ -311,7 +311,7 @@ public class NavigationStoreImpl implements NavigationStore {
     if (entity == null) {
       entity = new NavigationEntity();
       NodeEntity rootNode = new NodeEntity();
-      rootNode.setId(UUID.randomUUID().toString());
+      //rootNode.setId(UUID.randomUUID().toString());
       rootNode.setName("default");
       entity.setRootNode(rootNode);
 
@@ -324,7 +324,7 @@ public class NavigationStoreImpl implements NavigationStore {
   private NodeEntity buildNodeEntity(NodeEntity entity, NodeState state) {
     if (entity == null) {
       entity = new NodeEntity();
-      entity.setId(UUID.randomUUID().toString());
+      //entity.setId(UUID.randomUUID().toString());
     }
     if (state == null) {
       return entity;
@@ -355,7 +355,7 @@ public class NavigationStoreImpl implements NavigationStore {
       parentId = node.getParent().getId().toString();
     }
 
-    List<String> children = new ArrayList<String>();
+    List<String> children = new ArrayList<>();
     if (node.getChildren() != null) {
       for (NodeEntity child : node.getChildren()) {
         children.add(child.getId().toString());

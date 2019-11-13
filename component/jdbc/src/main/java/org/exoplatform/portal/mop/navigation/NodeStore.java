@@ -24,7 +24,7 @@ package org.exoplatform.portal.mop.navigation;
  */
 public interface NodeStore {
 
-    NodeData loadNode(String nodeId);
+    NodeData loadNode(Long nodeId);
 
     /**
      * Load all Navigation node which refer to a page
@@ -33,15 +33,15 @@ public interface NodeStore {
      */
     NodeData[] loadNodes(String pageRef);
 
-    NodeData[] createNode(String parentId, String previousId, String name, NodeState state);
+    NodeData[] createNode(Long parentId, Long previousId, String name, NodeState state);
 
-    NodeData destroyNode(String targetId);
+    NodeData destroyNode(Long targetId);
 
-    NodeData updateNode(String targetId, NodeState state);
+    NodeData updateNode(Long targetId, NodeState state);
 
-    NodeData[] moveNode(String targetId, String fromId, String toId, String previousId);
+    NodeData[] moveNode(Long targetId, Long fromId, Long toId, Long previousId);
 
-    NodeData[] renameNode(String targetId, String parentId, String name);
+    NodeData[] renameNode(Long targetId, Long parentId, String name);
 
     void flush();
 }

@@ -33,7 +33,7 @@ public class PermissionDAOTest extends AbstractKernelTest {
   }
 
   public void testCreate() {
-    PermissionEntity per1 = new PermissionEntity("ref1", "per1", TYPE.ACCESS);
+    PermissionEntity per1 = new PermissionEntity("type1", 1l, "per1", TYPE.ACCESS);
     permissionDAO.create(per1);
     end();
     begin();
@@ -44,48 +44,48 @@ public class PermissionDAOTest extends AbstractKernelTest {
   }
   
   public void testGet() {
-    PermissionEntity per1 = new PermissionEntity("ref1", "per1", TYPE.ACCESS);
+    PermissionEntity per1 = new PermissionEntity("type1", 1l, "per1", TYPE.ACCESS);
     permissionDAO.create(per1);
-    PermissionEntity per2 = new PermissionEntity("ref2", "per2", TYPE.EDIT);
+    PermissionEntity per2 = new PermissionEntity("type2", 2L, "per2", TYPE.EDIT);
     permissionDAO.create(per2);
     end();
     begin();
     
-    List<PermissionEntity> result1 = permissionDAO.getPermissions("ref1", TYPE.ACCESS);
+    List<PermissionEntity> result1 = permissionDAO.getPermissions("type1", 1L, TYPE.ACCESS);
     assertEquals(1, result1.size());
     assertPermission(per1, result1.get(0));
     
-    List<PermissionEntity> result2 = permissionDAO.getPermissions("ref2", TYPE.EDIT);
+    List<PermissionEntity> result2 = permissionDAO.getPermissions("type2", 2L, TYPE.EDIT);
     assertEquals(1, result2.size());
     assertPermission(per2, result2.get(0));
   }
   
   public void testDelete() {
-    PermissionEntity per1 = new PermissionEntity("ref1", "per1", TYPE.ACCESS);
+    PermissionEntity per1 = new PermissionEntity("type1", 1L, "per1", TYPE.ACCESS);
     permissionDAO.create(per1);
-    PermissionEntity per2 = new PermissionEntity("ref1", "per2", TYPE.EDIT);
+    PermissionEntity per2 = new PermissionEntity("type1", 1L, "per2", TYPE.EDIT);
     permissionDAO.create(per2);
-    PermissionEntity per3 = new PermissionEntity("ref3", "per3", TYPE.EDIT);
+    PermissionEntity per3 = new PermissionEntity("type3", 3L, "per3", TYPE.EDIT);
     permissionDAO.create(per3);
     end();
     begin();
     
-    int deleted = permissionDAO.deletePermissions("ref1");
+    int deleted = permissionDAO.deletePermissions("type1", 1L);
     assertEquals(2, deleted);
     assertEquals(1, permissionDAO.findAll().size());    
   }
   
   public void testSave() {
-    PermissionEntity per1 = new PermissionEntity("ref1", "per1", TYPE.ACCESS);
+    PermissionEntity per1 = new PermissionEntity("type1", 1L, "per1", TYPE.ACCESS);
     permissionDAO.create(per1);
-    PermissionEntity per2 = new PermissionEntity("ref1", "per2", TYPE.ACCESS);
+    PermissionEntity per2 = new PermissionEntity("type1", 1L, "per2", TYPE.ACCESS);
     permissionDAO.create(per2);
-    PermissionEntity per3 = new PermissionEntity("ref1", "per3", TYPE.ACCESS);
+    PermissionEntity per3 = new PermissionEntity("type1", 1L, "per3", TYPE.ACCESS);
     permissionDAO.create(per3);
     end();
     begin();
     
-    List<PermissionEntity> results = permissionDAO.savePermissions("ref1", TYPE.ACCESS, Arrays.asList("per1", "per4"));
+    List<PermissionEntity> results = permissionDAO.savePermissions("type1", 1L, TYPE.ACCESS, Arrays.asList("per1", "per4"));
     assertEquals(2, results.size());
     assertTrue(results.remove(per1));
     assertEquals("per4", results.get(0).getPermission());

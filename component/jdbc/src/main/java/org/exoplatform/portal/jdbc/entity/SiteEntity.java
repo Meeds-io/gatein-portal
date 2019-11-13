@@ -21,12 +21,7 @@ package org.exoplatform.portal.jdbc.entity;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -45,6 +40,12 @@ import org.exoplatform.portal.mop.SiteType;
 public class SiteEntity extends ComponentEntity {
 
   private static final long     serialVersionUID = 3036823700771832314L;
+
+  @Id
+  @SequenceGenerator(name="SEQ_SITE_ID_GENERATOR", sequenceName="SEQ_SITE_ID_GENERATOR")
+  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_SITE_ID_GENERATOR")
+  @Column(name = "ID")
+  protected Long            id;
 
   @Column(name = "TYPE")
   private SiteType              siteType;
@@ -72,6 +73,14 @@ public class SiteEntity extends ComponentEntity {
 
   @Transient
   private List<ComponentEntity> children         = new LinkedList<ComponentEntity>();
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public String getName() {
     return name;

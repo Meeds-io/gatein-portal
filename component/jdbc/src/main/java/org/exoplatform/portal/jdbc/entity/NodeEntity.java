@@ -41,8 +41,10 @@ public class NodeEntity implements Serializable {
   private static final long serialVersionUID = 8630708630711337929L;
 
   @Id
-  @Column(name = "NODE_ID", length = 200)
-  private String             id;
+  @SequenceGenerator(name="SEQ_GTN_NAVIGATION_NODE_ID", sequenceName="SEQ_GTN_NAVIGATION_NODE_ID")
+  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_GTN_NAVIGATION_NODE_ID")
+  @Column(name = "NODE_ID")
+  private Long             id;
 
   @Column(name = "NAME", length = 200)
   private String            name;
@@ -77,11 +79,11 @@ public class NodeEntity implements Serializable {
   @JoinColumn(name = "PARENT_ID")
   private NodeEntity        parent;
 
-  public String getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

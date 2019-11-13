@@ -26,7 +26,7 @@ import org.exoplatform.portal.jdbc.entity.SiteEntity;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 
-public interface SiteDAO extends GenericDAO<SiteEntity, String> {
+public interface SiteDAO extends GenericDAO<SiteEntity, Long> {
 
   SiteEntity findByKey(SiteKey siteKey);
 

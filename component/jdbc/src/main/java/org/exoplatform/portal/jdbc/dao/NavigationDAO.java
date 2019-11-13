@@ -22,11 +22,11 @@ import org.exoplatform.commons.api.persistence.GenericDAO;
 import org.exoplatform.portal.jdbc.entity.NavigationEntity;
 import org.exoplatform.portal.mop.SiteType;
 
-public interface NavigationDAO extends GenericDAO<NavigationEntity, String> {
+public interface NavigationDAO extends GenericDAO<NavigationEntity, Long> {
 
   NavigationEntity findByOwner(SiteType type, String name);
 
-  NavigationEntity findByRootNode(String nodeId);
+  NavigationEntity findByRootNode(Long nodeId);
 
   void deleteByOwner(SiteType siteType, String name);
 
