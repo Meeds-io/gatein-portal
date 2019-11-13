@@ -33,7 +33,7 @@ import org.exoplatform.services.log.Log;
  *
  */
 public class CSRFTokenUtil {
-    public static final String CSRF_TOKEN = "gtn:csrf";
+    public static final String CSRF_TOKEN = "portal:csrf";
 
     protected static Log log = ExoLogger.getExoLogger(CSRFTokenUtil.class);
 
