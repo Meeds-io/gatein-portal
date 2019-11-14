@@ -121,6 +121,7 @@ public class TestPageMigrationService extends AbstractPortalTest {
     PortalData portalData = new PortalData(null, "testPageMigrationSite", "portal",
             "en", "", "", Collections.emptyList(), "", null, "", container, Collections.emptyList());
     this.pomStorage.remove(portalData);
+    this.pomStorage.save();
     sync(true);
   }
 }

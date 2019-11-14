@@ -27,6 +27,7 @@ import org.exoplatform.portal.pom.data.PageData;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
 import org.exoplatform.services.listener.ListenerService;
+import org.gatein.mop.api.workspace.Navigation;
 import org.gatein.mop.api.workspace.ObjectType;
 import org.gatein.mop.api.workspace.Site;
 import org.gatein.mop.core.api.MOPService;
@@ -85,6 +86,9 @@ public class TestSiteMigrationService extends AbstractPortalTest {
   public void testMigrate() throws Exception {
     MOPService mop = manager.getPOMService();
     Site portal = mop.getModel().getWorkspace().addSite(ObjectType.PORTAL_SITE, "testSiteMigration");
+    Navigation defaultNav = portal.getRootNavigation().addChild("default");
+    defaultNav.addChild("a");
+
     portal.getRootPage().addChild("pages");
     portal.getRootPage().addChild("templates");
 
