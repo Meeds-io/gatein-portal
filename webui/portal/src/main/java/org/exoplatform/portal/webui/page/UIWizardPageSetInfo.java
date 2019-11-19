@@ -68,11 +68,11 @@ import org.exoplatform.webui.form.validator.UserConfigurableValidator;
  * Created by The eXo Platform SARL Author : Nguyen Thi Hoa hoa.nguyen@exoplatform.com Oct 31, 2006
  */
 @ComponentConfig(lifecycle = UIFormLifecycle.class, template = "system:/groovy/portal/webui/page/UIWizardPageSetInfo.gtmpl", events = {
-        @EventConfig(listeners = UIWizardPageSetInfo.ChangeNodeActionListener.class, phase = Phase.DECODE),
-        @EventConfig(listeners = UIWizardPageSetInfo.SwitchVisibleActionListener.class, phase = Phase.DECODE),
-        @EventConfig(listeners = UIWizardPageSetInfo.SwitchPublicationDateActionListener.class, phase = Phase.DECODE),
-        @EventConfig(listeners = UIWizardPageSetInfo.ChangeLanguageActionListener.class, phase = Phase.DECODE),
-        @EventConfig(listeners = UIWizardPageSetInfo.SwitchLabelModeActionListener.class, phase = Phase.DECODE) })
+        @EventConfig(listeners = UIWizardPageSetInfo.ChangeNodeActionListener.class, phase = Phase.DECODE, csrfCheck = false),
+        @EventConfig(listeners = UIWizardPageSetInfo.SwitchVisibleActionListener.class, phase = Phase.DECODE, csrfCheck = false),
+        @EventConfig(listeners = UIWizardPageSetInfo.SwitchPublicationDateActionListener.class, phase = Phase.DECODE, csrfCheck = false),
+        @EventConfig(listeners = UIWizardPageSetInfo.ChangeLanguageActionListener.class, phase = Phase.DECODE, csrfCheck = false),
+        @EventConfig(listeners = UIWizardPageSetInfo.SwitchLabelModeActionListener.class, phase = Phase.DECODE, csrfCheck = false) })
 public class UIWizardPageSetInfo extends UIForm {
 
     public static final String PAGE_NAME = "pageName";

@@ -72,7 +72,7 @@ import org.gatein.common.util.ParameterValidation;
 /** Copied by The eXo Platform SARL Author May 28, 2009 3:07:15 PM */
 @ComponentConfigs({
         @ComponentConfig(template = "system:/groovy/portal/webui/navigation/UINavigationNodeSelector.gtmpl", events = {
-                @EventConfig(listeners = UINavigationNodeSelector.ChangeNodeActionListener.class),
+                @EventConfig(listeners = UINavigationNodeSelector.ChangeNodeActionListener.class, csrfCheck = false),
                 @EventConfig(listeners = UINavigationNodeSelector.NodeModifiedActionListener.class) }),
         @ComponentConfig(id = "NavigationNodePopupMenu", type = UIRightClickPopupMenu.class, template = "system:/groovy/webui/core/UIRightClickPopupMenu.gtmpl", events = {
                 @EventConfig(listeners = UINavigationNodeSelector.AddNodeActionListener.class),

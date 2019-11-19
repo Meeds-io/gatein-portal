@@ -40,7 +40,7 @@ import org.exoplatform.webui.organization.UIGroup;
 /**
  * Created by The eXo Platform SARL Author : chungnv nguyenchung136@yahoo.com Jun 23, 2006 10:07:15 AM
  */
-@ComponentConfig(events = @EventConfig(listeners = UIGroupExplorer.ChangeNodeActionListener.class))
+@ComponentConfig(events = @EventConfig(listeners = UIGroupExplorer.ChangeNodeActionListener.class, csrfCheck = false))
 @Serialized
 public class UIGroupExplorer extends UIContainer {
 

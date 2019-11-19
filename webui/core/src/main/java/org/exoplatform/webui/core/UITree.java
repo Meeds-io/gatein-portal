@@ -40,7 +40,7 @@ import org.exoplatform.webui.form.UIForm;
  *
  * @see UIRightClickPopupMenu
  */
-@ComponentConfig(template = "system:/groovy/webui/core/UITree.gtmpl", events = @EventConfig(listeners = UITree.ChangeNodeActionListener.class))
+@ComponentConfig(template = "system:/groovy/webui/core/UITree.gtmpl", events = @EventConfig(listeners = UITree.ChangeNodeActionListener.class, csrfCheck = false))
 @Serialized
 public class UITree extends UIComponent {
     /**

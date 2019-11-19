@@ -81,7 +81,7 @@ import java.util.*;
  * configuration parameters. If all components are displayed it is composed of 2 UI components: -UIWorkingWorkSpace: the right
  * part that can display the normal or webos portal layouts - UIPopupWindow: a popup window that display or not
  */
-@ComponentConfig(lifecycle = UIPortalApplicationLifecycle.class, template = "system:/groovy/portal/webui/workspace/UIPortalApplication.gtmpl", events = { @EventConfig(listeners = ChangeNodeActionListener.class) })
+@ComponentConfig(lifecycle = UIPortalApplicationLifecycle.class, template = "system:/groovy/portal/webui/workspace/UIPortalApplication.gtmpl", events = { @EventConfig(listeners = ChangeNodeActionListener.class, csrfCheck = false) })
 public class UIPortalApplication extends UIApplication {
 
     /**

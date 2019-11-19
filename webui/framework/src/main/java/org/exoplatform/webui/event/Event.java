@@ -94,7 +94,11 @@ public class Event<T> {
     public final void broadcast() throws Exception {
         if (isCsrfCheck() && !CSRFTokenUtil.check(getRequest())) {
             getRequestContext().setResponseComplete(true);
-            LOG.warn("CSRF token is lost or this is an CSRF attack (event={})", this.getName());
+            for (EventListener<T> listener : listeners_) {
+              LOG.warn("CSRF token is lost or this is an CSRF attack (event={}, listener={})",
+                       this.getName(),
+                       listener.getClass().getName());
+            }
         } else {
             for (EventListener<T> listener : listeners_) {
                 listener.execute(this);

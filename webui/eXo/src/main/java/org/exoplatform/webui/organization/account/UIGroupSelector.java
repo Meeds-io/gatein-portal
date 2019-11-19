@@ -49,10 +49,10 @@ import org.exoplatform.webui.form.UIForm;
  */
 @ComponentConfigs({
         @ComponentConfig(template = "system:/groovy/webui/organization/account/UIGroupSelector.gtmpl", events = {
-                @EventConfig(phase = Phase.DECODE, listeners = UIGroupSelector.ChangeNodeActionListener.class),
-                @EventConfig(phase = Phase.DECODE, listeners = UIGroupSelector.SelectGroupActionListener.class),
-                @EventConfig(phase = Phase.DECODE, listeners = UIGroupSelector.SelectPathActionListener.class) }),
-        @ComponentConfig(type = UITree.class, id = "UITreeGroupSelector", template = "system:/groovy/webui/core/UITree.gtmpl", events = @EventConfig(phase = Phase.DECODE, listeners = UITree.ChangeNodeActionListener.class)),
+                @EventConfig(phase = Phase.DECODE, listeners = UIGroupSelector.ChangeNodeActionListener.class, csrfCheck = false),
+                @EventConfig(phase = Phase.DECODE, listeners = UIGroupSelector.SelectGroupActionListener.class, csrfCheck = false),
+                @EventConfig(phase = Phase.DECODE, listeners = UIGroupSelector.SelectPathActionListener.class, csrfCheck = false) }),
+        @ComponentConfig(type = UITree.class, id = "UITreeGroupSelector", template = "system:/groovy/webui/core/UITree.gtmpl", events = @EventConfig(phase = Phase.DECODE, listeners = UITree.ChangeNodeActionListener.class, csrfCheck = false)),
         @ComponentConfig(type = UIBreadcumbs.class, id = "BreadcumbGroupSelector", template = "system:/groovy/webui/core/UIBreadcumbs.gtmpl", events = @EventConfig(phase = Phase.DECODE, listeners = UIBreadcumbs.SelectPathActionListener.class)) })
 @Serialized
 public class UIGroupSelector extends UIContainer {
