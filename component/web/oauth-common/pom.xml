@@ -55,6 +55,12 @@
     <dependency>
       <groupId>org.picketlink.idm</groupId>
       <artifactId>picketlink-idm-api</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

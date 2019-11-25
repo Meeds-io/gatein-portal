@@ -110,6 +110,18 @@
     </init-params>
   </component>
 
+  <component>
+    <key>org.exoplatform.services.naming.InitialContextInitializer</key>
+    <type>org.exoplatform.commons.InitialContextInitializer2</type>
+    <init-params>
+      <properties-param>
+        <name>default-properties</name>
+        <description>Default initial context properties</description>
+        <property name="java.naming.factory.initial" value="org.exoplatform.services.naming.SimpleContextFactory"/>
+      </properties-param>
+    </init-params>
+  </component>
+
   <!-- Init data -->
   <external-component-plugins>
     <target-component>org.exoplatform.services.database.HibernateService</target-component>
