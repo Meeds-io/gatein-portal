@@ -21,6 +21,10 @@ package org.exoplatform.commons.file.storage.dao.impl;
 import org.exoplatform.commons.file.storage.dao.NameSpaceDAO;
 import org.exoplatform.commons.file.storage.entity.NameSpaceEntity;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+
+import java.util.List;
 
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
@@ -29,13 +33,18 @@ import javax.persistence.TypedQuery;
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
 public class NameSpaceDAOImpl extends GenericDAOJPAImpl<NameSpaceEntity, Long> implements NameSpaceDAO {
+
+  private static final Log LOG = ExoLogger.getLogger(NameSpaceDAOImpl.class);
+
   public NameSpaceEntity getNameSpaceByName(String name) {
     TypedQuery<NameSpaceEntity> query = getEntityManager().createNamedQuery("nameSpace.getNameSpaceByName", NameSpaceEntity.class)
                                                           .setParameter("name", name);
-    try {
-      return query.getSingleResult();
-    } catch (NoResultException e) {
+    List<NameSpaceEntity> list = query.getResultList();
+    if (list == null || list.isEmpty()) {
       return null;
+    } else if (list.size() > 1) {
+      LOG.warn("More than one namespace with name '{}' was found, return first one.", name);
     }
+    return list.get(0);
   }
 }
