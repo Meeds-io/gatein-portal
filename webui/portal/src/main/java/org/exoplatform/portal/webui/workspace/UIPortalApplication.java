@@ -173,6 +173,8 @@ public class UIPortalApplication extends UIApplication {
 
     private SkinService skinService;
 
+    private SkinVisitor skinVisitor;
+
     private String skin_;
 
     private boolean isSessionOpen = false;
@@ -242,6 +244,8 @@ public class UIPortalApplication extends UIApplication {
     public UIPortalApplication() throws Exception {
         log = ExoLogger.getLogger("portal:UIPortalApplication");
         PortalRequestContext context = PortalRequestContext.getCurrentInstance();
+        skinService = getApplicationComponent(SkinService.class);
+        skinVisitor = getApplicationComponent(SkinVisitor.class);
 
         // userPortalConfig_ = (UserPortalConfig)context.getAttribute(UserPortalConfig.class);
         // if (userPortalConfig_ == null)
@@ -531,9 +535,9 @@ public class UIPortalApplication extends UIApplication {
     }
 
     public Collection<SkinConfig> getPortalSkins(SkinVisitor visitor) {
-        SkinService skinService = getApplicationComponent(SkinService.class);
         if (visitor != null) {
-            return skinService.findSkins(visitor);
+            Collection<SkinConfig> skins = skinService.findSkins(visitor);
+            return skins;
         } else {
             return Collections.emptyList();
         }
@@ -547,18 +551,19 @@ public class UIPortalApplication extends UIApplication {
      * - portal skin modules <br>
      * - skin for specific site<br>
      */
-    public Collection<Skin> getPortalSkins() {
-        SkinService skinService = getApplicationComponent(SkinService.class);
-
-        //
-        Collection<Skin> skins = new ArrayList<Skin>(skinService.getPortalSkins(skin_));
+    public Collection<SkinConfig> getPortalSkins() {
+        Collection<SkinConfig> skins = null;
+        if (skinVisitor != null) {
+          skins = new ArrayList<>(skinService.getPortalSkins(skin_));
+        } else {
+          skins = getPortalSkins(skinVisitor);
+        }
 
         //
         SkinConfig skinConfig = skinService.getSkin(Util.getUIPortal().getName(), skin_);
         if (skinConfig != null) {
             skins.add(skinConfig);
         }
-
         return skins;
     }
 
@@ -571,7 +576,6 @@ public class UIPortalApplication extends UIApplication {
     }
 
     private Collection<SkinConfig> getCustomSkins() {
-        SkinService skinService = getApplicationComponent(SkinService.class);
         return skinService.getCustomPortalSkins(skin_);
     }
 
@@ -617,7 +621,6 @@ public class UIPortalApplication extends UIApplication {
         Set<SkinConfig> portalPortletSkins = getPortalPortletSkins();
         // don't merge portlet if portlet not available
         if (!portalPortletSkins.isEmpty()) {
-            SkinService skinService = getApplicationComponent(SkinService.class);
             portletSkins.add(skinService.merge(portalPortletSkins, PORTAL_PORTLETS_SKIN_ID));
         }
 
@@ -656,7 +659,6 @@ public class UIPortalApplication extends UIApplication {
     private SkinConfig getPortletSkinConfig(UIPortlet portlet) {
         String portletId = portlet.getSkinId();
         if (portletId != null) {
-            SkinService skinService = getApplicationComponent(SkinService.class);
             return skinService.getSkin(portletId, skin_);
         } else {
             return null;
@@ -677,7 +679,6 @@ public class UIPortalApplication extends UIApplication {
 
         DataStorage dataStorage = getApplicationComponent(DataStorage.class);
         Container container = dataStorage.getSharedLayout();
-
         if (container != null) {
             org.exoplatform.portal.webui.container.UIContainer uiContainer = createUIComponent(
                     org.exoplatform.portal.webui.container.UIContainer.class, null, null);
@@ -894,8 +895,6 @@ public class UIPortalApplication extends UIApplication {
             }
         }
 
-        SkinService skinService = getApplicationComponent(SkinService.class);
-
         List<SkinConfig> skins = new ArrayList<SkinConfig>();
         Set<SkinConfig> portalPortletSkins = getPortalPortletSkins();
         boolean reloadPortalPortletSkins = false;
@@ -978,7 +977,6 @@ public class UIPortalApplication extends UIApplication {
             if (userPortalConfigSkin != null && userPortalConfigSkin.trim().length() > 0) {
                 skin_ = userPortalConfigSkin;
             } else {
-                SkinService skinService = getApplicationComponent(SkinService.class);
                 skin_ = skinService.getDefaultSkin();
             }
         }
