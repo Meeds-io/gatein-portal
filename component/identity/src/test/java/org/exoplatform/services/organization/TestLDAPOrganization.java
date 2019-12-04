@@ -11,7 +11,6 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.idm.Config;
-import org.exoplatform.services.organization.idm.PicketLinkIDMCacheService;
 import org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl;
 import org.exoplatform.services.organization.idm.UserDAOImpl;
 import org.exoplatform.services.organization.idm.cache.CacheableUserHandlerImpl;
@@ -40,9 +39,6 @@ public class TestLDAPOrganization extends TestOrganization {
 
   OrganizationService organization;
 
-  PicketLinkIDMCacheService picketLinkIDMCacheService;
-
-
   @Override
   protected void beforeRunBare() {
     try {
@@ -60,7 +56,6 @@ public class TestLDAPOrganization extends TestOrganization {
     container = PortalContainer.getInstance();
     organization = (OrganizationService) container.getComponentInstanceOfType(OrganizationService.class);
     uHandler = organization.getUserHandler();
-    picketLinkIDMCacheService = (PicketLinkIDMCacheService) container.getComponentInstanceOfType(PicketLinkIDMCacheService.class);
     super.setUp();
     synchronizeUsers();
   }
@@ -135,7 +130,6 @@ public class TestLDAPOrganization extends TestOrganization {
     User test2 = organization.getUserHandler().findUserByName("admin");
     assertNotNull(test2);
     openDSService.cleanUpDN("uid=admin,ou=People,o=test,dc=portal,dc=example,dc=com");
-    picketLinkIDMCacheService.invalidateAll();
     if (organization.getUserHandler() instanceof CacheableUserHandlerImpl) {
       ((CacheableUserHandlerImpl) organization.getUserHandler()).clearCache();
     }

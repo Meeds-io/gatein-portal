@@ -81,14 +81,10 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
 
     private IdentityConfigurationMetaData configMD;
 
-    private IntegrationCache integrationCache;
-
     private HibernateService hibernateService;
 
-    private InfinispanCacheFactory infinispanCacheFactory = InfinispanCacheFactory.getInstance();
-
     public PicketLinkIDMServiceImpl(ExoContainerContext exoContainerContext, InitParams initParams,
-            HibernateService hibernateService, ConfigurationManager confManager, PicketLinkIDMCacheService picketLinkIDMCache,
+            HibernateService hibernateService, ConfigurationManager confManager,
             InitialContextInitializer dependency) throws Exception {
         ValueParam config = initParams.getValueParam(PARAM_CONFIG_OPTION);
         ValueParam jndiName = initParams.getValueParam(PARAM_JNDI_NAME_OPTION);
@@ -116,9 +112,6 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
 
         boolean skipExpirationOfStructureCacheEntries = canExpireStructureCacheEntriesParam != null
                 && "true".equals(canExpireStructureCacheEntriesParam.getValue());
-        // Not ideal, as we are changing field of singleton (could be changed more time with different values for different
-        // portal containers)
-        infinispanCacheFactory.setSkipExpirationOfStructureCacheEntries(skipExpirationOfStructureCacheEntries);
 
         if (config != null) {
             this.config = config.getValue();
@@ -145,21 +138,7 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
                     throw new IllegalArgumentException("Infinispan configuration InputStream is null");
                 }
 
-                Cache cache = infinispanCacheFactory.createInfinispanCache(configStream,
-                        exoContainerContext.getPortalContainerName(), "api");
-
                 configStream.close();
-
-                // PLIDM API cache
-                APICacheProvider apiCacheProvider = infinispanCacheFactory.createAPICacheProvider(
-                        staleCacheNodesLinksCleanerDelay, cache);
-                picketLinkIDMCache.register(apiCacheProvider);
-                identityConfiguration.getIdentityConfigurationRegistry().register(apiCacheProvider, "apiCacheProvider");
-
-                // Integration cache
-                integrationCache = infinispanCacheFactory.createIntegrationCache(cache);
-                picketLinkIDMCache.register(integrationCache);
-
             }
 
             if (storeCacheConfig != null) {
@@ -170,16 +149,6 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
                 if (configStream == null) {
                     throw new IllegalArgumentException("Infinispan configuration InputStream is null");
                 }
-
-                Cache cache = infinispanCacheFactory.createInfinispanCache(configStream,
-                        exoContainerContext.getPortalContainerName(), "store");
-
-                configStream.close();
-
-                IdentityStoreCacheProvider storeCacheProvider = infinispanCacheFactory.createStoreCacheProvider(
-                        staleCacheNodesLinksCleanerDelay, cache);
-                picketLinkIDMCache.register(storeCacheProvider);
-                identityConfiguration.getIdentityConfigurationRegistry().register(storeCacheProvider, "storeCacheProvider");
             }
 
             if (useSecureRandomService != null && "true".equals(useSecureRandomService.getValue())) {
@@ -222,10 +191,6 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
             throw new IllegalArgumentException("Realm name cannot be null");
         }
         return getIdentitySessionFactory().getCurrentIdentitySession(realm);
-    }
-
-    public IntegrationCache getIntegrationCache() {
-        return integrationCache;
     }
 
     public String getRealmName() {

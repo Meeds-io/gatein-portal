@@ -134,10 +134,6 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
       handleException("Identity operation error: ", e);
     }
 
-    if (getIntegrationCache() != null) {
-      getIntegrationCache().invalidateAll();
-    }
-
     try {
       persistUserInfo(user, plIDMUser, session, true);
     } catch (Exception e) {
@@ -223,10 +219,6 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
       }
     }
 
-    if (getIntegrationCache() != null) {
-      getIntegrationCache().invalidateAll();
-    }
-
     if (broadcast)
       postSetEnabled(foundUser);
 
@@ -278,10 +270,6 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
     } catch (Exception e) {
       handleException("Cannot remove user: " + userName + "; ", e);
 
-    }
-
-    if (getIntegrationCache() != null) {
-      getIntegrationCache().invalidateAll();
     }
 
     if (broadcast) {
@@ -484,17 +472,6 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
     // otherwise use PLIDM queries
 
-    IDMUserListAccess list;
-
-    IntegrationCache cache = getIntegrationCache();
-
-    if (cache != null) {
-      list = cache.getGtnUserLazyPageList(getCacheNS(), q, userStatus);
-      if (list != null) {
-        return list;
-      }
-    }
-
     UserQueryBuilder qb = service_.getIdentitySession().createUserQueryBuilder();
 
     if (q.getUserName() != null) {
@@ -538,14 +515,11 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
       }
     }
 
+    IDMUserListAccess list;
     if (q.getUserName() == null && q.getEmail() == null && q.getFirstName() == null && q.getLastName() == null) {
       list = new IDMUserListAccess(qb, 20, !countPaginatedUsers(), countPaginatedUsers(), userStatus);
     } else {
       list = new IDMUserListAccess(qb, 20, false, countPaginatedUsers(), userStatus);
-    }
-
-    if (cache != null) {
-      cache.putGtnUserLazyPageList(getCacheNS(), q, list, userStatus);
     }
 
     return list;
@@ -833,13 +807,6 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
   public PicketLinkIDMOrganizationServiceImpl getOrgService() {
     return orgService;
-  }
-
-  private IntegrationCache getIntegrationCache() {
-    // TODO: refactor to remove cast. For now to avoid adding new config option
-    // and share existing cache instannce
-    // TODO: it should be there.
-    return ((PicketLinkIDMServiceImpl) service_).getIntegrationCache();
   }
 
   /**
