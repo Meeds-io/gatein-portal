@@ -38,6 +38,7 @@
       <listener>org.exoplatform.portal.application.UserProfileLifecycle</listener>
       <listener>org.exoplatform.portal.application.localization.LocalizationLifecycle</listener>
       <listener>org.exoplatform.portal.application.oauth.OAuthLifecycle</listener>
+      <listener>org.exoplatform.web.application.ExtensiblePortalApplicationLifecycle</listener>
     </application-lifecycle-listeners>
 
     <events>
