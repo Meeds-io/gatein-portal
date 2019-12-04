@@ -1,57 +1,42 @@
 <%
 	import org.exoplatform.web.application.JavascriptManager;
 	import org.exoplatform.portal.webui.workspace.UIPortalApplication;
-	import org.exoplatform.portal.webui.portal.UIPortal;
-	import org.exoplatform.container.ExoContainer;
-	import org.exoplatform.container.ExoContainerContext
-	import org.exoplatform.portal.config.UserACL;
-	import org.exoplatform.portal.webui.workspace.UIPortalApplication.EditMode;
 
 	def rcontext = _ctx.getRequestContext();
-
+	/* ADDED PART BY ECMS */
+	if (rcontext.getRequestParameter("noadminbar")!=null) return;
+	/* END ADDED PART BY ECMS */
+	
 	UIPortalApplication uiPortalApp = rcontext.getUIApplication();
-	UIPortal uiPortal = uiPortalApp.getCurrentSite();
-	String sharedLayout = uiPortal.getProperty("sharedLayout");
-	boolean hasPermission = false;
-	if (sharedLayout != null && sharedLayout.equals("adminsOnly")) {
-		ExoContainer exoContainer = ExoContainerContext.getCurrentContainer();
-		UserACL acl = (UserACL) exoContainer.getComponentInstanceOfType(UserACL.class);
-
-		if (acl.hasPermission("*:/platform/administrators")){
-			 hasPermission = true;
-		}
-
-	} else {
-		hasPermission = uicomponent.hasPermission();
-	}
-
+	boolean hasPermission = uicomponent.hasPermission();
+	
 	if(!uiPortalApp.isEditing() && !hasPermission) return;
-	EditMode editMode = uiPortalApp.getEditMode();
+	
+	/* ADDED PART BY PLF */
+  String theme = uicomponent.getApplicationComponent(org.exoplatform.portal.branding.BrandingService.class).getTopBarTheme();
+  String barNavigationStyle = "UIToolbarContainer" + theme;
+	/* END ADDED PART BY PLF */
 
-	if (uiPortalApp.isEditing()) {
-		def reqJS = rcontext.getJavascriptManager().require("SHARED/portal", "portal");
-		reqJS.addScripts("portal.UIPortal.initMouseHover('" + uicomponent.id + "');");
+	JavascriptManager jsmanager = rcontext.getJavascriptManager();
+//	jsmanager.loadScriptResource('portal');
+	jsmanager.require("SHARED/portal", "portal").
+	addScripts("portal.UIPortal.initMouseHover('" + uicomponent.id + "');");
+
 %>
-<div class="UIContainer UIToolbarContainer EdittingContainer <%=hasPermission?"": "ProtectedContainer"%>"
+<div class="UIContainer UIToolbarContainer $barNavigationStyle <%=uiPortalApp.isEditing()?"EdittingContainer":""%> <%=hasPermission?"": "ProtectedContainer"%>"
 				id="${uicomponent.id}">
-<%
-	} else {
-%>
-<div class="UIContainer UIToolbarContainer <%=hasPermission?"": "ProtectedContainer"%>" id="${uicomponent.id}">
-<%
-	}
-%>
 	<div class="NormalContainerBlock">
 		<div class="LeftContainerBlock">
 			<div class="RightContainerBlock UIComponentBlock">
 
 			<%
+				int portalMode = uiPortalApp.getModeState();
 				String style = "";
-				String width = uicomponent.getWidth();
-				String height = uicomponent.getHeight();
-				if (width != null) style += "width:"+width+";";
-				if (height != null) style += "height:"+height+";";
-				if (editMode == EditMode.BLOCK) {
+				String width	= uicomponent.getWidth();
+				String height	= uicomponent.getHeight();
+				if(width != null) style += "width:"+width+";";
+				if(height != null) style += "height:"+height+";";
+				if(portalMode == uiPortalApp.CONTAINER_BLOCK_EDIT_MODE || portalMode == uiPortalApp.APP_BLOCK_EDIT_MODE){
 			%>
 				<div class="LAYOUT-CONTAINER LAYOUT-BLOCK">
 			<%} else {%>
@@ -60,10 +45,11 @@
 					<div>
 						<%if(hasPermission) {%>
 						<div class="UITableColumnContainer" style="margin: 0px auto; $style">
-							<div class="TRContainer ClearFix" style="zoom: 100%;">
+							<div class="TRContainer clearfix" style="zoom: 100%;">
 								<% for(uiChild in uicomponent.getChildren()) {%>
-									<div class="${uiChild.id}TDContainer FL"><% uicomponent.renderUIComponent(uiChild) %></div>
+									<div class="${uiChild.id}TDContainer pull-left"><% uicomponent.renderUIComponent(uiChild) %></div>
 								<% } %>
+								
 						 </div>
 						</div>
 						<%}%>
@@ -71,14 +57,16 @@
 				</div>
 				<%/*Debug On IE	-----For DND */%>
 
-			<%if (editMode != EditMode.NO_EDIT) {%>
+			<%if(portalMode != UIPortalApplication.NORMAL_MODE){%>
 				<div class="EDITION-BLOCK EDITION-CONTAINER" style="display: none;position: relative;">
 					<div style="position: absolute; top: -86px;">
 						<div class="NewLayer" style="display: none; visibility: hidden;"><span></span></div>
 						<div class="CONTROL-CONTAINER CONTROL-BLOCK UIInfoBar">
 							<%/*Begin InfoBar*/%>
 							<div class="BlueRoundedStyle">
-								<div class="DragControlArea" title="<%=_ctx.appRes("UIContainer.tooltip.drag")%>"><span></span></div>
+								<div class="DragControlArea" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIContainer.tooltip.drag")%>" 
+								     onmousedown="eXo.portal.PortalDragDrop.init.call(this,event);" 
+								     onkeydown="eXo.portal.PortalDragDrop.init.call(this,event);"><span></span></div>
 								<%
 									String strTitle = uicomponent.getTitle() != null ?
 												ExpressionUtil.getExpressionValue(res, uicomponent.getTitle()) :
@@ -86,8 +74,8 @@
 								%>
 								<div class="ContainerIcon DefaultContainer16x16Icon"><%=hasPermission ? strTitle : _ctx.appRes("UIPortlet.label.protectedContent")%></div>
 								<%if(hasPermission) {%>
-									<a href="javascript:void(0);" onclick="<%=uicomponent.event("EditContainer","$uicomponent.id")%>" class="EditIcon" title="<%=_ctx.appRes("UIContainer.tooltip.editContainer")%>"><span></span></a>
-									<a href="javascript:void(0);" onclick="<%=uicomponent.event("DeleteComponent","$uicomponent.id")%>" class="DeleteIcon" title="<%=_ctx.appRes("UIContainer.tooltip.closeContainer")%>"><span></span></a>
+									<a href="<%=uicomponent.event("EditContainer","$uicomponent.id")%>;eXo.portal.UIPortal.changeComposerSaveButton()" class="EditContainerIcon" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIContainer.tooltip.editContainer")%>"><span></span></a>
+									<a href="<%=uicomponent.event("DeleteComponent","$uicomponent.id")%>" class="DeleteContainerIcon" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIContainer.tooltip.closeContainer")%>"><span></span></a>
 								<%}%>
 							</div>
 							<%/*End InfoBar*/ %>
@@ -101,4 +89,3 @@
 	</div>
 
 </div>
-

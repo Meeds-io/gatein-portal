@@ -37,6 +37,7 @@
   <modules>
     <module>test</module>
     <module>common</module>
+    <module>file-storage</module>
     <module>pc</module>
     <module>resources</module>
     <module>application-registry</module>
@@ -46,7 +47,6 @@
     <module>management</module>
     <module>identity</module>
     <module>api</module>
-    <module>file-storage</module>
     <module>jdbc</module>
   </modules>
 

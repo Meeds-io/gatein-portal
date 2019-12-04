@@ -1,10 +1,14 @@
 package org.exoplatform.portal.localization;
 
+import java.util.*;
+
+import javax.servlet.http.*;
+
 import org.apache.commons.lang3.LocaleUtils;
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.RootContainer;
+import org.gatein.common.logging.Logger;
+import org.gatein.common.logging.LoggerFactory;
+
+import org.exoplatform.container.*;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.portal.Constants;
@@ -12,16 +16,7 @@ import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.UserProfile;
-import org.exoplatform.services.resources.LocaleConfig;
-import org.exoplatform.services.resources.LocaleConfigService;
-import org.exoplatform.services.resources.LocaleContextInfo;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.*;
+import org.exoplatform.services.resources.*;
 
 /**
  * This class is used to ease {@link LocaleContextInfo} object build

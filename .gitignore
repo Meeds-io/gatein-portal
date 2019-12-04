@@ -16,3 +16,4 @@ release.properties
 .metadata
 .directory
 rebel.xml
+node_modules
