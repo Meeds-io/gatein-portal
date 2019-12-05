@@ -194,10 +194,13 @@ public interface DataStorage {
     <T> ListAccess<T> find2(Query<T> q, Comparator<T> sortComparator) throws Exception;
 
     /**
-     * Return Container object - info that be used to build this Container is retrieved from
-     * /conf/portal/portal/sharedlayout.xml
+     * Return shared layout containing common layout of all sites (user, group and sites).
+     * This will retrieve the layout from /conf/portal/portal/sharedlayout-{siteName}.xml
+     * else if not found, retrieve it from /conf/portal/portal/sharedlayout.xml
+     * 
+     * @param siteName 
      */
-    Container getSharedLayout() throws Exception;
+    Container getSharedLayout(String siteName) throws Exception;
 
     void save() throws Exception;
 

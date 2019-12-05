@@ -175,6 +175,8 @@ public class UIPortalApplication extends UIApplication {
 
     private SkinVisitor skinVisitor;
 
+    private DataStorage dataStorage;
+
     private String skin_;
 
     private boolean isSessionOpen = false;
@@ -185,11 +187,17 @@ public class UIPortalApplication extends UIApplication {
 
     private boolean isAjaxInLastRequest;
 
-    private RequestNavigationData lastNonAjaxRequestNavData;
+    private RequestNavigationData   lastNonAjaxRequestNavData;
+  
+    private RequestNavigationData   lastRequestNavData;
+  
+    private UIWorkingWorkspace      uiWorkingWorkspace;
 
-    private RequestNavigationData lastRequestNavData;
+    private UIComponentDecorator    uiViewWorkingWorkspace;
 
     private String lastPortal;
+
+    private String lastPortalOwner;
 
     /**
      * Returns a locally cached value of {@value #DEFAULT_MODE_PROPERTY} property from configuration.properties.
@@ -246,6 +254,7 @@ public class UIPortalApplication extends UIApplication {
         PortalRequestContext context = PortalRequestContext.getCurrentInstance();
         skinService = getApplicationComponent(SkinService.class);
         skinVisitor = getApplicationComponent(SkinVisitor.class);
+        dataStorage = getApplicationComponent(DataStorage.class);
 
         // userPortalConfig_ = (UserPortalConfig)context.getAttribute(UserPortalConfig.class);
         // if (userPortalConfig_ == null)
@@ -277,6 +286,10 @@ public class UIPortalApplication extends UIApplication {
 
         this.all_UIPortals = new HashMap<SiteKey, UIPortal>(5);
 
+        JavascriptManager jsMan = context.getJavascriptManager();
+        // Add JS resource of current portal
+
+        this.lastPortalOwner = context.getPortalOwner();
         initWorkspaces();
     }
 
@@ -363,7 +376,6 @@ public class UIPortalApplication extends UIApplication {
     }
 
     public void refreshCachedUI() throws Exception {
-        DataStorage storage = this.getApplicationComponent(DataStorage.class);
         all_UIPortals.clear();
 
         UIPortal uiPortal = getCurrentSite();
@@ -371,7 +383,7 @@ public class UIPortalApplication extends UIApplication {
             SiteKey siteKey = uiPortal.getSiteKey();
 
             UIPortal tmp = null;
-            PortalConfig portalConfig = storage.getPortalConfig(siteKey.getTypeName(), siteKey.getName());
+            PortalConfig portalConfig = dataStorage.getPortalConfig(siteKey.getTypeName(), siteKey.getName());
             if (portalConfig != null) {
                 tmp = this.createUIComponent(UIPortal.class, null, null);
                 PortalDataMapper.toUIPortal(tmp, portalConfig);
@@ -571,7 +583,7 @@ public class UIPortalApplication extends UIApplication {
 
     private Set<SkinConfig> getPortalPortletSkins() {
         Set<SkinConfig> portletConfigs = new HashSet<SkinConfig>();
-        for (UIComponent child : findFirstComponentOfType(UIPortal.class).getChildren()) {
+        for (UIComponent child : Util.getUIPortal().getChildren()) {
             getPortalPortletSkinConfig(portletConfigs, child);
         }
         return portletConfigs;
@@ -611,9 +623,8 @@ public class UIPortalApplication extends UIApplication {
     public Set<Skin> getPortletSkins() {
         // Determine portlets visible on the page
         List<UIPortlet> uiportlets = new ArrayList<UIPortlet>();
-        UIWorkingWorkspace uiWorkingWS = getChildById(UI_WORKING_WS_ID);
-        uiWorkingWS.findComponentOfType(uiportlets, UIPortlet.class);
-        UIPortalToolPanel toolPanel = uiWorkingWS.findFirstComponentOfType(UIPortalToolPanel.class);
+        uiWorkingWorkspace.findComponentOfType(uiportlets, UIPortlet.class);
+        UIPortalToolPanel toolPanel = uiWorkingWorkspace.findFirstComponentOfType(UIPortalToolPanel.class);
         if (toolPanel != null && toolPanel.isRendered()) {
             toolPanel.findComponentOfType(uiportlets, UIPortlet.class);
         }
@@ -675,21 +686,30 @@ public class UIPortalApplication extends UIApplication {
      * @throws Exception
      */
     private void initWorkspaces() throws Exception {
-        UIWorkingWorkspace uiWorkingWorkspace = addChild(UIWorkingWorkspace.class, UIPortalApplication.UI_WORKING_WS_ID, null);
-        uiWorkingWorkspace.addChild(UIEditInlineWorkspace.class, null, UI_EDITTING_WS_ID).setRendered(false);
-        UIComponentDecorator uiViewWS = uiWorkingWorkspace.addChild(UIComponentDecorator.class, null, UI_VIEWING_WS_ID);
-
-        DataStorage dataStorage = getApplicationComponent(DataStorage.class);
-        Container container = dataStorage.getSharedLayout();
-        if (container != null) {
-            org.exoplatform.portal.webui.container.UIContainer uiContainer = createUIComponent(
-                    org.exoplatform.portal.webui.container.UIContainer.class, null, null);
-            uiContainer.setStorageId(container.getStorageId());
-            PortalDataMapper.toUIContainer(uiContainer, container);
-            uiContainer.setRendered(true);
-            uiViewWS.setUIComponent(uiContainer);
+        if (this.getChildById(UIPortalApplication.UI_WORKING_WS_ID) != null) {
+          this.removeChildById(UIPortalApplication.UI_WORKING_WS_ID);
         }
-        addChild(UIMaskWorkspace.class, UIPortalApplication.UI_MASK_WS_ID, null);
+        this.uiWorkingWorkspace = this.addChild(UIWorkingWorkspace.class, UIPortalApplication.UI_WORKING_WS_ID, null);
+        this.uiWorkingWorkspace.addChild(UIEditInlineWorkspace.class, null, UI_EDITTING_WS_ID).setRendered(false);
+        this.uiViewWorkingWorkspace = this.uiWorkingWorkspace.addChild(UIComponentDecorator.class, null, UI_VIEWING_WS_ID);
+
+        if (this.getChildById(UIPortalApplication.UI_MASK_WS_ID) == null) {
+          this.addChild(UIMaskWorkspace.class, UIPortalApplication.UI_MASK_WS_ID, null);
+        }
+        initSharedLayout();
+    }
+
+    private void initSharedLayout() throws Exception {
+      Container container = dataStorage.getSharedLayout(this.lastPortalOwner);
+      if (container != null) {
+          org.exoplatform.portal.webui.container.UIContainer uiContainer = createUIComponent(
+                  org.exoplatform.portal.webui.container.UIContainer.class, null, null);
+          uiContainer.setStorageId(container.getStorageId());
+          PortalDataMapper.toUIContainer(uiContainer, container);
+          uiContainer.setRendered(true);
+          this.uiViewWorkingWorkspace.setUIComponent(uiContainer);
+      }
+      refreshCachedUI();
     }
 
     /**
@@ -786,6 +806,12 @@ public class UIPortalApplication extends UIApplication {
      */
     public void processRender(WebuiRequestContext context) throws Exception {
         PortalRequestContext pcontext = (PortalRequestContext) context;
+
+        // Reload shared layout if site has changed
+        if (!StringUtils.equals(this.lastPortalOwner, pcontext.getPortalOwner())) {
+          this.lastPortalOwner = pcontext.getPortalOwner();
+          initWorkspaces();
+        }
 
         JavascriptManager jsMan = context.getJavascriptManager();
         // Add JS resource of current portal
@@ -982,6 +1008,8 @@ public class UIPortalApplication extends UIApplication {
                 skin_ = skinService.getDefaultSkin();
             }
         }
+
+        
     }
 
     /**

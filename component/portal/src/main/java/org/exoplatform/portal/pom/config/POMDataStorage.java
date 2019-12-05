@@ -19,7 +19,7 @@
 
 package org.exoplatform.portal.pom.config;
 
-import java.io.ByteArrayInputStream;
+import java.io.*;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +27,7 @@ import java.util.UUID;
 
 import javax.transaction.Status;
 
+import org.apache.commons.lang3.StringUtils;
 import org.chromattic.api.ChromatticSession;
 import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.commons.utils.LazyPageList;
@@ -232,9 +233,21 @@ public class POMDataStorage implements ModelDataStorage {
         }
     }
 
-    public Container getSharedLayout() throws Exception {
-        String path = "war:/conf/portal/portal/sharedlayout.xml";
-        String out = IOUtil.getStreamContentAsString(confManager_.getInputStream(path));
+    public Container getSharedLayout(String siteName) throws Exception {
+        String path = null;
+        if (StringUtils.isBlank(siteName)) {
+          path = DEFAULT_SHAREDLAYOUT_PATH;
+        } else {
+          path = "war:/conf/portal/portal/sharedlayout-" + siteName + ".xml";
+        }
+        InputStream inputStream = null;
+        try {
+          inputStream = confManager_.getInputStream(path);
+        } catch (IOException e) {
+          log.debug("Unable to find file '" + path + "'", e);
+          return getSharedLayout(null);
+        }
+        String out = IOUtil.getStreamContentAsString(inputStream);
         ByteArrayInputStream is = new ByteArrayInputStream(out.getBytes("UTF-8"));
         IBindingFactory bfact = BindingDirectory.getFactory(Container.class);
         UnmarshallingContext uctx = (UnmarshallingContext) bfact.createUnmarshallingContext();

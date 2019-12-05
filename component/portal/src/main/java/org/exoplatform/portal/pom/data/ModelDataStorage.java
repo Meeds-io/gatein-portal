@@ -37,6 +37,8 @@ import org.jgroups.annotations.Unsupported;
  */
 public interface ModelDataStorage {
 
+    String DEFAULT_SHAREDLAYOUT_PATH = "war:/conf/portal/portal/sharedlayout.xml";
+
     void create(PortalData config) throws Exception;
 
     void save(PortalData config) throws Exception;
@@ -70,7 +72,7 @@ public interface ModelDataStorage {
 
     <T> LazyPageList<T> find(Query<T> q, Comparator<T> sortComparator) throws Exception;
 
-    Container getSharedLayout() throws Exception;
+    Container getSharedLayout(String siteName) throws Exception;
 
     void save() throws Exception;
 

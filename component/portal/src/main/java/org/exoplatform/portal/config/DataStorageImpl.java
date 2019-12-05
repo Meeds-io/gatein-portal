@@ -19,11 +19,9 @@
 package org.exoplatform.portal.config;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+
+import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
@@ -58,7 +56,7 @@ public class DataStorageImpl implements DataStorage {
 
     private ListenerService listenerServ_;
 
-    private Container sharedLayout = null;
+    private Map<String, Container> sharedLayouts = new HashMap<>();
 
 
     public DataStorageImpl(CacheService cacheService, ModelDataStorage delegate, ListenerService listenerServ) {
@@ -116,11 +114,21 @@ public class DataStorageImpl implements DataStorage {
         return delegate.save(state, preferences);
     }
 
-    public Container getSharedLayout() throws Exception {
-        if (PropertyManager.isDevelopping() || sharedLayout == null) {
-          sharedLayout = delegate.getSharedLayout();
+    public Container getSharedLayout(String siteName) throws Exception {
+        String cacheKey = siteName;
+        if (StringUtils.isBlank(cacheKey)) {
+          cacheKey = "DEFAULT-SITE";
         }
-        return sharedLayout;
+        if (PropertyManager.isDevelopping() || !sharedLayouts.containsKey(cacheKey)) {
+          Container sharedLayout = delegate.getSharedLayout(siteName);
+          if (sharedLayout == null && StringUtils.isNotBlank(siteName)) {
+            // Return default shared layout if dedicated shared layout wasn't found
+            return getSharedLayout(null);
+          } else {
+            sharedLayouts.put(cacheKey, sharedLayout);
+          }
+        }
+        return sharedLayouts.get(cacheKey);
     }
 
     public PortalConfig getPortalConfig(String portalName) throws Exception {

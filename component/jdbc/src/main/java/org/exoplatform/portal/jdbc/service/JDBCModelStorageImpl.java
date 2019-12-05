@@ -18,8 +18,7 @@
  */
 package org.exoplatform.portal.jdbc.service;
 
-import java.io.ByteArrayInputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
@@ -345,16 +344,28 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
   }
 
   @Override
-  public Container getSharedLayout() throws Exception {
-    String path = "war:/conf/portal/portal/sharedlayout.xml";
-    String out = IOUtil.getStreamContentAsString(this.confManager.getInputStream(path));
-    ByteArrayInputStream is = new ByteArrayInputStream(out.getBytes("UTF-8"));
-    IBindingFactory bfact = BindingDirectory.getFactory(Container.class);
-    UnmarshallingContext uctx = (UnmarshallingContext) bfact.createUnmarshallingContext();
-    uctx.setDocument(is, null, "UTF-8", false);
-    Container container = (Container) uctx.unmarshalElement();
-    generateStorageName(container);
-    return container;
+  public Container getSharedLayout(String siteName) throws Exception {
+      String path = null;
+      if (StringUtils.isBlank(siteName)) {
+        path = DEFAULT_SHAREDLAYOUT_PATH;
+      } else {
+        path = "war:/conf/portal/portal/sharedlayout-" + siteName + ".xml";
+      }
+      InputStream inputStream = null;
+      try {
+        inputStream = confManager.getInputStream(path);
+      } catch (IOException e) {
+        log.debug("Unable to find file '" + path + "'", e);
+        return getSharedLayout(null);
+      }
+      String out = IOUtil.getStreamContentAsString(inputStream);
+      ByteArrayInputStream is = new ByteArrayInputStream(out.getBytes("UTF-8"));
+      IBindingFactory bfact = BindingDirectory.getFactory(Container.class);
+      UnmarshallingContext uctx = (UnmarshallingContext) bfact.createUnmarshallingContext();
+      uctx.setDocument(is, null, "UTF-8", false);
+      Container container = (Container) uctx.unmarshalElement();
+      generateStorageName(container);
+      return container;
   }
 
   @Override

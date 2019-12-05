@@ -158,9 +158,9 @@ public class WebuiBindingContext extends BindingContext {
      * @param parentAppName parent template name
      */
     public void includeTemplates(String parentAppName) {
-      TemplateService templateExtensionService = PortalContainer.getInstance()
-                                                                .getComponentInstanceOfType(TemplateService.class);
-      Set<String> templateExtensions = templateExtensionService.getTemplateExtensions(parentAppName);
+      TemplateService templateService = PortalContainer.getInstance()
+                                                       .getComponentInstanceOfType(TemplateService.class);
+      Set<String> templateExtensions = templateService.getTemplateExtensions(parentAppName);
       if (templateExtensions == null || templateExtensions.isEmpty()) {
         return;
       }
