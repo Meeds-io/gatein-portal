@@ -553,10 +553,12 @@ public class UIPortalApplication extends UIApplication {
      */
     public Collection<SkinConfig> getPortalSkins() {
         Collection<SkinConfig> skins = null;
+        skins = new ArrayList<>(skinService.getPortalSkins(skin_));
         if (skinVisitor != null) {
-          skins = new ArrayList<>(skinService.getPortalSkins(skin_));
-        } else {
-          skins = getPortalSkins(skinVisitor);
+          Collection<SkinConfig> skins_ = getPortalSkins(skinVisitor);
+          if (skins_ != null && !skins_.isEmpty()) {
+            skins.addAll(skins_);
+          }
         }
 
         //

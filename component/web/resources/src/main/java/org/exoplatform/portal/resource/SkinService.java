@@ -571,17 +571,7 @@ public class SkinService extends AbstractResourceService implements Startable {
    * @return
    */
   public Collection<SkinConfig> findSkins(SkinVisitor visitor) {
-    Set<Entry<SkinKey, SkinConfig>> entrySet = portalSkins_.entrySet();
-    for (Entry<SkinKey, SkinConfig> entry : entrySet) {
-      visitor.visitPortalSkin(entry);
-    }
-
-    entrySet = skinConfigs_.entrySet();
-    for (Entry<SkinKey, SkinConfig> entry : entrySet) {
-      visitor.visitSkin(entry);
-    }
-
-    return visitor.getSkins();
+    return visitor.getSkins(portalSkins_.entrySet(), skinConfigs_.entrySet());
   }
 
   /**
@@ -644,7 +634,7 @@ public class SkinService extends AbstractResourceService implements Startable {
    *         SkinKey(module, defaultSkin)
    */
   public SkinConfig getSkin(String module, String skinName) {
-    if (StringUtils.isEmpty(skinName)) {
+    if (StringUtils.isBlank(skinName)) {
       skinName = getDefaultSkin();
     }
 

@@ -161,7 +161,7 @@
     <init-params>
       <value-param>
         <name>skin.default</name>
-        <value>${exo.skin.default:Default}</value>
+        <value>${exo.skin.default:Enterprise}</value>
       </value-param>
     </init-params>
   </component>

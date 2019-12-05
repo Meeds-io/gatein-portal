@@ -174,23 +174,16 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
     public void testPortalSkinVisitor() {
         String contextPath = mockServletContext.getContextPath();
         Collection<SkinConfig> portalSkinConfigs = skinService.findSkins(new SkinVisitor() {
-
-            Collection<SkinConfig> list = new HashSet<SkinConfig>();
-
             @Override
-            public void visitPortalSkin(Entry<SkinKey, SkinConfig> entry) {
+            public Collection<SkinConfig> getSkins(Set<Entry<SkinKey, SkinConfig>> portalSkins,
+                                                 Set<Entry<SkinKey, SkinConfig>> skinConfigs) {
+              Collection<SkinConfig> list = new HashSet<>();
+              for (Entry<SkinKey, SkinConfig> entry : portalSkins) {
                 if (entry.getKey().getModule().equals("CoreSkin")) {
-                    list.add(entry.getValue());
+                  list.add(entry.getValue());
                 }
-            }
-
-            @Override
-            public void visitSkin(Entry<SkinKey, SkinConfig> entry) {
-            }
-
-            @Override
-            public Collection<SkinConfig> getSkins() {
-                return list;
+              }
+              return list;
             }
         });
 
@@ -324,26 +317,21 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
         assertEquals("/path/to/customkey.css", skin.getCSSPath());
 
         Collection<SkinConfig> list = skinService.findSkins(new SkinVisitor() {
-
-            Collection<SkinConfig> list = new HashSet<SkinConfig>();
-
             @Override
-            public void visitPortalSkin(Entry<SkinKey, SkinConfig> entry) {
+            public Collection<SkinConfig> getSkins(Set<Entry<SkinKey, SkinConfig>> portalSkins,
+                                                   Set<Entry<SkinKey, SkinConfig>> skinConfigs) {
+              Collection<SkinConfig> list = new HashSet<SkinConfig>();
+              for (Entry<SkinKey, SkinConfig> entry : portalSkins) {
                 if (entry.getKey().getModule().startsWith("jcr/")) {
-                    list.add(entry.getValue());
+                  list.add(entry.getValue());
                 }
-            }
-
-            @Override
-            public void visitSkin(Entry<SkinKey, SkinConfig> entry) {
+              }
+              for (Entry<SkinKey, SkinConfig> entry : skinConfigs) {
                 if (entry.getKey().getModule().startsWith("jcr/")) {
-                    list.add(entry.getValue());
+                  list.add(entry.getValue());
                 }
-            }
-
-            @Override
-            public Collection<SkinConfig> getSkins() {
-                return list;
+              }
+              return list;
             }
         });
 
