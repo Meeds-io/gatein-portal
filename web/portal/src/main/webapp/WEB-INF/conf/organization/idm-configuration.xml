@@ -21,8 +21,9 @@
 -->
 
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xsi:schemaLocation="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd http://www.exoplaform.org/xml/ns/kernel_1_2.xsd"
-               xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
+  xsi:schemaLocation="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd http://www.exoplaform.org/xml/ns/kernel_1_2.xsd"
+  xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
+
   <component>
     <type>org.exoplatform.services.organization.cache.OrganizationCacheHandler</type>
   </component>
@@ -31,7 +32,6 @@
     <key>org.gatein.common.transaction.JTAUserTransactionLifecycleService</key>
     <type>org.gatein.common.transaction.JTAUserTransactionLifecycleServiceImpl</type>
   </component>
-
   <component>
     <key>org.exoplatform.services.database.HibernateService</key>
     <jmx-name>database:type=HibernateService</jmx-name>
@@ -41,17 +41,17 @@
         <name>hibernate.properties</name>
         <description>Default Hibernate Service</description>
         <property name="hibernate.hbm2ddl.auto" value="update"/>
-        <property name="hibernate.show_sql" value="false"/>
-        <property name="hibernate.connection.datasource" value="${gatein.idm.datasource.name}${container.name.suffix}"/>
-        <property name="hibernate.connection.autocommit" value="false"/>
+        <property name="hibernate.show_sql" value="false" />
+        <property name="hibernate.connection.datasource" value="${gatein.idm.datasource.name}${container.name.suffix}" />
+        <property name="hibernate.connection.autocommit" value="false" />
 
         <!-- Non-JTA setup -->
         <property name="hibernate.current_session_context_class" value="thread"/>
 
         <!-- JTA setup -->
         <!--<property name="hibernate.current_session_context_class" value="jta"/>
-     <property name="hibernate.transaction.factory_class" value="org.hibernate.transaction.JTATransactionFactory" />
-     <property name="hibernate.transaction.jta.platform" value="org.exoplatform.services.organization.idm.UserTransactionJtaPlatform" />-->
+        <property name="hibernate.transaction.factory_class" value="org.hibernate.transaction.JTATransactionFactory" />
+        <property name="hibernate.transaction.jta.platform" value="org.exoplatform.services.organization.idm.UserTransactionJtaPlatform" />-->
 
         <property name="hibernate.cache.use_second_level_cache" value="false"/>
         <property name="hibernate.cache.use_query_cache" value="false"/>
@@ -64,9 +64,11 @@
 
         <!--
           Should be automatically detected. Force otherwise
-           <property name="hibernate.dialect" value="org.hibernate.dialect.XXXDialect"/>
+          <property name="hibernate.dialect" value="org.hibernate.dialect.XXXDialect"/>
         -->
+
         <property name="hibernate.listeners.envers.autoRegister" value="false"/>
+
       </properties-param>
     </init-params>
   </component>
@@ -96,7 +98,6 @@
 
         <!--MSAD Read Only "ACME" LDAP Example-->
         <!--<value>war:/conf/organization/picketlink-idm/examples/picketlink-idm-msad-readonly-config.xml</value>-->
-
       </value-param>
 
       <!-- In default PicketLink IDM configuration hibernate store will namespace identity objects using this realm name
@@ -106,19 +107,18 @@
         <value>idm_realm${container.name.suffix}</value>
       </value-param>
 
-      <value-param>
-        <name>skipExpirationOfStructureCacheEntries</name>
-        <value>true</value>
-      </value-param>
+        <value-param>
+            <name>skipExpirationOfStructureCacheEntries</name>
+            <value>true</value>
+        </value-param>
 
-      <value-param>
-        <name>useSecureRandomService</name>
-        <value>true</value>
-      </value-param>
+        <value-param>
+            <name>useSecureRandomService</name>
+            <value>true</value>
+        </value-param>
 
     </init-params>
   </component>
-
 
   <component>
     <key>org.exoplatform.services.organization.OrganizationService</key>
@@ -227,7 +227,6 @@
               </value>-->
             </collection>
           </field>
-
           <!-- If 'true' will use JTA UserTransaction. If 'false' will use IDM transaction API -->
           <field name="useJTA">
             <boolean>false</boolean>
@@ -249,7 +248,7 @@
             <boolean>true</boolean>
           </field>
 
-          <!--
+            <!--
             When this option is set to true:
               If use fresh user-database or existed user-database of GateIn 3.7 or above, it will work fine with disable-user feature.
               If use existed user-database of GateIn 3.6 or below, Some method introduced by disable-user feature will not
@@ -263,63 +262,30 @@
             it's recommended to switch this option to true to use disable-user feature
             If you has existed user-database of Gatein 3.6 or below, it's recommended to migrate data and set this option to true to use disable-user
             feature or set this option to false.
-          -->
-          <field name="filterDisabledUsersInQueries">
-            <boolean>true</boolean>
-          </field>
+            -->
+            <field name="filterDisabledUsersInQueries">
+              <boolean>true</boolean>
+            </field>
           
-          <!-- 
+            <!-- 
             This option is used to toogle disable-user feature
             By default, this option is set to TRUE
             When this option is set to FALSE,
               the disable-user feature is deactivated, and 'filterDisabledUsersInQueries' option is ignored
-           -->
-          <field name="disableUserActived">
-            <boolean>${exo.disable.user.activated:true}</boolean>
-          </field>
+            -->
+            <field name="disableUserActived">
+              <boolean>${exo.disable.user.activated:true}</boolean>
+            </field>
 
-          <!-- If true, the property lastLoginTime of user will be updated after successful authentication of this user to portal.
-               If false, the property won't be updated, which could have performance improvement in systems with many concurrent user logins -->
-          <field name="updateLastLoginTimeAfterAuthentication">
-            <boolean>${exo.idm.user.updateLastLoginTime:true}</boolean>
-          </field>
-
+            <!-- If true, the property lastLoginTime of user will be updated after successful authentication of this user to portal.
+                 If false, the property won't be updated, which could have performance improvement in systems with many concurrent user logins -->
+            <field name="updateLastLoginTimeAfterAuthentication">
+              <boolean>${exo.idm.user.updateLastLoginTime:true}</boolean>
+            </field>
         </object>
       </object-param>
     </init-params>
   </component>
-
-  <external-component-plugins>
-    <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
-    <component-plugin>
-      <name>bind.datasource</name>
-      <set-method>addPlugin</set-method>
-      <type>org.exoplatform.services.naming.BindReferencePlugin</type>
-      <init-params>
-        <value-param>
-          <name>bind-name</name>
-          <value>${gatein.idm.datasource.name}${container.name.suffix}</value>
-        </value-param>
-        <value-param>
-          <name>class-name</name>
-          <value>javax.sql.DataSource</value>
-        </value-param>
-        <value-param>
-          <name>factory</name>
-          <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
-        </value-param>
-        <properties-param>
-          <name>ref-addresses</name>
-          <description>ref-addresses</description>
-          <property name="driverClassName" value="${portal.container.gatein.idm.datasource.driver}"/>
-          <property name="url" value="${portal.container.gatein.idm.datasource.url}"/>
-          <property name="username" value="${portal.container.gatein.idm.datasource.username}"/>
-          <property name="password" value="${portal.container.gatein.idm.datasource.password}"/>
-
-        </properties-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
 
   <external-component-plugins>
     <target-component>org.exoplatform.services.database.HibernateService</target-component>
@@ -366,9 +332,9 @@
       <name>exo.core.security.ConversationRegistry.register</name>
       <set-method>addListener</set-method>
       <type>org.exoplatform.services.organization.idm.UpdateLoginTimeListener</type>
-      <description>update last login time for user asynchronously</description>
+      <description>update last login time for user</description>      
     </component-plugin>
-  </external-component-plugins>
+  </external-component-plugins>    
 
   <external-component-plugins>
     <target-component>org.exoplatform.services.cache.CacheService</target-component>
@@ -383,10 +349,10 @@
           <description>Exo Cache cluster configuration for IDM User entity</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>portal.User</string></field>
-            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.idm.user.strategy:LIRS}</string></field>
-            <field name="maxSize"><int>${exo.cache.portal.idm.user.MaxNodes:1000}</int></field>
-            <field name="liveTime"><long>${exo.cache.portal.idm.user.TimeToLive:86400}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.idm.user.cacheMode:replication}</string></field>
+            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.user.strategy:LIRS}</string></field>
+            <field name="maxSize"><int>${exo.cache.portal.user.MaxNodes:5000}</int></field>
+            <field name="liveTime"><long>${exo.cache.portal.user.TimeToLive:3600}</long></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.user.cacheMode:replication}</string></field>
           </object>
         </object-param>
         
@@ -395,10 +361,10 @@
           <description>Exo Cache cluster configuration for IDM User Profile entity</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>portal.Profile</string></field>
-            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.idm.profile.strategy:LIRS}</string></field>
-            <field name="maxSize"><int>${exo.cache.portal.idm.profile.MaxNodes:1000}</int></field>
-            <field name="liveTime"><long>${exo.cache.portal.idm.profile.TimeToLive:86400}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.idm.profile.cacheMode:replication}</string></field>
+            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.profile.strategy:LIRS}</string></field>
+            <field name="maxSize"><int>${exo.cache.portal.profile.MaxNodes:5000}</int></field>
+            <field name="liveTime"><long>${exo.cache.portal.profile.TimeToLive:3600}</long></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.profile.cacheMode:replication}</string></field>
           </object>
         </object-param>
         
@@ -407,10 +373,10 @@
           <description>Exo Cache cluster configuration for IDM Membership entity</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>portal.Membership</string></field>
-            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.idm.membership:LIRS}</string></field>
-            <field name="maxSize"><int>${exo.cache.portal.idm.membership.MaxNodes:20000}</int></field>
-            <field name="liveTime"><long>${exo.cache.portal.idm.membership.TimeToLive:86400}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.idm.membership.cacheMode:replication}</string></field>
+            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.membership:LIRS}</string></field>
+            <field name="maxSize"><int>${exo.cache.portal.membership.MaxNodes:5000}</int></field>
+            <field name="liveTime"><long>${exo.cache.portal.membership.TimeToLive:86400}</long></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.membership.cacheMode:replication}</string></field>
           </object>
         </object-param>
         
@@ -419,10 +385,10 @@
           <description>Exo Cache cluster configuration for IDM Membership Type entity</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>portal.Role</string></field>
-            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.idm.role.strategy:LIRS}</string></field>
-            <field name="maxSize"><int>${exo.cache.portal.idm.role.MaxNodes:50}</int></field>
-            <field name="liveTime"><long>${exo.cache.portal.idm.role.TimeToLive:86400}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.idm.role.cacheMode:replication}</string></field>
+            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.role.strategy:LIRS}</string></field>
+            <field name="maxSize"><int>${exo.cache.portal.role.MaxNodes:5000}</int></field>
+            <field name="liveTime"><long>${exo.cache.portal.role.TimeToLive:3600}</long></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.role.cacheMode:replication}</string></field>
           </object>
         </object-param>
         
@@ -431,10 +397,10 @@
           <description>Exo Cache cluster configuration for IDM Group entity</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>portal.Group</string></field>
-            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.idm.group.strategy:LIRS}</string></field>
-            <field name="maxSize"><int>${exo.cache.portal.idm.group.MaxNodes:100}</int></field>
-            <field name="liveTime"><long>${exo.cache.portal.idm.group.TimeToLive:-1}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.idm.group.cacheMode:replication}</string></field>
+            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.group.strategy:LIRS}</string></field>
+            <field name="maxSize"><int>${exo.cache.portal.group.MaxNodes:100}</int></field>
+            <field name="liveTime"><long>${exo.cache.portal.group.TimeToLive:-1}</long></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.group.cacheMode:replication}</string></field>
           </object>
         </object-param>
       </init-params>

@@ -95,6 +95,11 @@
   </component>
 
   <component>
+    <key>org.exoplatform.web.login.recovery.PasswordRecoveryService</key>
+    <type>org.exoplatform.web.login.recovery.PasswordRecoveryServiceImpl</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.portal.mop.navigation.NavigationService</key>
     <type>org.exoplatform.portal.mop.navigation.NavigationServiceWrapper</type>
   </component>
@@ -149,9 +154,6 @@
                   <value>
                     <string>basic</string>
                   </value>
-                  <value>
-                    <string>classic</string>
-                  </value>
                 </collection>
               </field>
               <field name="groupTemplates">
@@ -171,25 +173,6 @@
             </object>
           </object-param>
           <object-param>
-            <name>portal.configuration</name>
-            <description>description</description>
-            <object type="org.exoplatform.portal.config.NewPortalConfig">
-              <field name="predefinedOwner">
-                <collection type="java.util.HashSet">
-                  <value>
-                    <string>classic</string>
-                  </value>
-                </collection>
-              </field>
-              <field name="ownerType">
-                <string>portal</string>
-              </field>
-              <field name="templateLocation">
-                <string>war:/conf/portal/</string>
-              </field>
-            </object>
-          </object-param>
-          <object-param>
             <name>group.configuration</name>
             <description>description</description>
             <object type="org.exoplatform.portal.config.NewPortalConfig">
@@ -199,13 +182,7 @@
                     <string>/platform/administrators</string>
                   </value>
                   <value>
-                    <string>/platform/users</string>
-                  </value>
-                  <value>
                     <string>/platform/guests</string>
-                  </value>
-                  <value>
-                    <string>/organization/management/executive-board</string>
                   </value>
                 </collection>
               </field>
@@ -415,6 +392,15 @@
             <field name="maxSize"><int>${exo.cache.portal.template.MaxNodes:1000}</int></field>
             <field name="liveTime"><long>${exo.cache.portal.template.TimeToLive:-1}</long></field>
             <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.template.cacheMode:replication}</string></field>
+          </object>
+        </object-param>
+        <object-param>
+          <name>portal.ResourceBundleData</name>
+          <description></description>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>portal.ResourceBundleData</string></field>
+            <field name="maxSize"><int>${exo.cache.portal.ResourceBundleData.MaxNodes:1000}</int></field>
+            <field name="liveTime"><long>${exo.cache.portal.ResourceBundleData.TimeToLive:-1}</long></field>
           </object>
         </object-param>
       </init-params>
