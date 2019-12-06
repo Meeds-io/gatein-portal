@@ -308,6 +308,14 @@
         <version>${jboss-dmr.version}</version>
       </dependency>
 
+      <!-- GateIn Sources -->
+      <dependency>
+        <groupId>org.exoplatform.gatein.portal</groupId>
+        <artifactId>exo.portal.parent</artifactId>
+        <version>${project.version}</version>
+        <classifier>source-release</classifier>
+        <type>zip</type>
+      </dependency>
       <!-- GateIn -->
       <dependency>
         <groupId>org.exoplatform.gatein.portal</groupId>
