@@ -22,12 +22,14 @@ package org.exoplatform.portal.webui.application;
 import org.exoplatform.Constants;
 import org.exoplatform.commons.utils.Text;
 import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.application.UserProfileLifecycle;
 import org.exoplatform.portal.application.state.ContextualPropertyManager;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.NoSuchDataException;
 import org.exoplatform.portal.config.model.ApplicationType;
+import org.exoplatform.portal.module.ModuleRegistry;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.wsrp.WSRP;
 import org.exoplatform.portal.portlet.PortletExceptionHandleService;
@@ -485,9 +487,9 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
 
             if (portlet == null) {
                 if (producerOfferedPortletContext != null) {
-                    log.info("Could not find portlet with ID : " + producerOfferedPortletContext.getId());
+                    log.debug("Could not find portlet with ID : " + producerOfferedPortletContext.getId());
                 } else {
-                    log.info("Could not find portlet. The producerOfferedPortletContext is null");
+                    log.debug("Could not find portlet. The producerOfferedPortletContext is null");
                 }
                 return false;
             }
@@ -559,7 +561,9 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
 
             //
             if (producedOfferedPortlet == null) {
-                log.info("Could not find portlet with ID : " + producerOfferedPortletContext.getId());
+                if (producerOfferedPortletContext != null) {
+                  log.debug("Could not find portlet with ID : " + producerOfferedPortletContext.getId());
+                }
                 return null;
             }
 
@@ -903,20 +907,22 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
                 String applicationId = dataStorage.getId(state.getApplicationState());
                 ModelAdapter<S, C> adapter = ModelAdapter.getAdapter(state.getApplicationType());
                 PortletContext producerOfferedPortletContext = adapter.getProducerOfferedPortletContext(applicationId);
-                org.gatein.pc.api.Portlet producedOfferedPortlet;
 
-                try {
-                    producedOfferedPortlet = portletInvoker.getPortlet(producerOfferedPortletContext);
-                } catch (Exception e) {
-                    // Whenever couldn't invoke the portlet object, set the request portlet to null for the error tobe
+                ModuleRegistry moduleRegistry = getApplicationComponent(ModuleRegistry.class);
+                if (moduleRegistry.isPortletActive(applicationId)) {
+                  try {
+                    this.producedOfferedPortlet = portletInvoker.getPortlet(producerOfferedPortletContext);
+                  } catch (Exception e) {
+                    // Whenever couldn't invoke the portlet object, set the request
+                    // portlet to null for the error tobe
                     // properly handled and displayed when the portlet is rendered
-                    producedOfferedPortlet = null;
+                    this.producedOfferedPortlet = null;
                     log.error(e.getMessage(), e);
+                  }
                 }
 
                 this.adapter = adapter;
                 this.producerOfferedPortletContext = producerOfferedPortletContext;
-                this.producedOfferedPortlet = producedOfferedPortlet;
                 this.applicationId = applicationId;
             } catch (NoSuchDataException e) {
                 log.error(e.getMessage());

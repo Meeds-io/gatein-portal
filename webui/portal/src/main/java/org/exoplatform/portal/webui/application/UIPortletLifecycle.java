@@ -213,7 +213,7 @@ public class UIPortletLifecycle<S, C extends Serializable, I> extends Lifecycle<
                 uiApp.refreshCachedUI();
                 markup = Text.create(context.getApplicationResourceBundle().getString("UIPortlet.message.staleData"));
             } else if (e instanceof NoSuchPortletException) {
-                markup = Text.create(context.getApplicationResourceBundle().getString("UIPortlet.message.unavailable"));
+                markup = Text.create("");
             } else {
                 // Log the error
                 log.error("Portlet render threw an exception", pcException);
