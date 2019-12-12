@@ -1,14 +1,21 @@
 package org.exoplatform.settings.jpa.dao;
 
-import org.apache.commons.lang3.StringUtils;
-import org.exoplatform.commons.api.persistence.ExoTransactional;
-import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
-import org.exoplatform.settings.jpa.entity.ScopeEntity;
+import java.util.List;
 
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
+import org.apache.commons.lang3.StringUtils;
+
+import org.exoplatform.commons.api.persistence.ExoTransactional;
+import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.settings.jpa.entity.ScopeEntity;
+
 public class SettingScopeDAO extends GenericDAOJPAImpl<ScopeEntity, Long> {
+  private static final Log LOG = ExoLogger.getLogger(SettingScopeDAO.class);
+
   @ExoTransactional
   public ScopeEntity getScopeByTypeAndName(String scopeType, String scopeName) {
     TypedQuery<ScopeEntity> query;
@@ -21,7 +28,15 @@ public class SettingScopeDAO extends GenericDAOJPAImpl<ScopeEntity, Long> {
                                 .setParameter("scopeType", scopeType);
     }
     try {
-      return query.getSingleResult();
+      List<ScopeEntity> scopes = query.getResultList();
+      if (scopes == null || scopes.isEmpty()) {
+        return null;
+      } else {
+        if (scopes.size() > 1) {
+          LOG.warn("More than one scope element was found for tyme '{}' and name ''", scopeType, scopeName);
+        }
+        return scopes.get(0);
+      }
     } catch (NoResultException e) {
       return null;
     }
