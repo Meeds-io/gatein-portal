@@ -3,43 +3,28 @@
 	def jsManager = rcontext.getJavascriptManager();	
 
 	String quickSearchlink = uicomponent.event("QuickSearch");							 	
-	String clearSearchlink = uicomponent.event("ClearSearch");
-	def keyPressAct = "portalControl.UIPortalControl.onEnterPress(event, executeScript);";
+	def keyPressAct = "portalControl.UIPortalControl.onEnterPress(event, executeScript);event.cancelBubble = true;";
 	
 	jsManager.require("SHARED/jquery", "\$").require("SHARED/portalControl", "portalControl")
-				.addScripts("var executeScript = \$('#$uiform.id a.SearchIcon').attr('href');")
-				.addScripts("\$('#$uiform.id .QuickSet').on('keypress', function(event) {$keyPressAct});");
+				.addScripts("var executeScript = \$('#$uiform.id .quickSearch').attr('href');")
+				.addScripts("\$('#$uiform.id').on('keypress', function(event) {$keyPressAct});")
+        .addScripts("\$('#$uiform.id').addClass('form-inline');");
 %>
-<div class="UIPageSearchForm">	
-	<div class="UIBarStyle">
-		<div class="BarStyle2">
-			<div class="LeftBar">
-				<div class="RightBar">
-					<div class="MiddleBar">
-						<div class="UISearchContainer">
-							<%uiform.begin()%>							 
-						      	<div class="QuickSet">								
-								<% 
-									QuickSearchInputSet = uiform.getQuickSearchInputSet();
-									for(field in QuickSearchInputSet.getChildren()) {
-								%>
-										<div class="SearchLabel"><label for="<%= field.getId() %>"><%=uiform.getLabel(field.getId())%> </label></div>
-								<%
-										uiform.renderField(field)
-									}
-								%>
-								<a class="SearchIcon" href="javascript:void(0);" onclick="$quickSearchlink" title="<%= _ctx.appRes("UIPageSearchForm.label.QuickSearch") %>">
-									<span class="skipHidden"><%= _ctx.appRes("UIPageSearchForm.label.QuickSearch") %></span>
-								</a>
-								<a class="ClearSearchIcon" href="javascript:void(0);" onclick="$clearSearchlink" title="<%= _ctx.appRes("UIPageSearchForm.label.ClearSearch") %>">
-									<span class="skipHidden"><%= _ctx.appRes("UIPageSearchForm.label.ClearSearch") %></span>
-								</a>
-							  </div>
-							<%uiform.end()%>	 
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>				
+<div class="uiGrayLightBox uiPageSearch">
+	<%uiform.begin()%>							 
+		<% 
+			QuickSearchInputSet = uiform.getQuickSearchInputSet();
+			for(field in QuickSearchInputSet.getChildren()) {
+		%>
+				<label for="<%= field.getId() %>"><%=uiform.getLabel(field.getId())%>:</label>
+				<span class="inputLarge selectboxMedium">
+		<%
+				uiform.renderField(field)%>
+				</span>
+		<%	}
+		%>
+		&nbsp;<a class="actionIcon quickSearch" href="javascript:void(0);" onclick="$quickSearchlink" rel="tooltip" data-placement="bottom" title="<%= _ctx.appRes("UIPageSearchForm.label.QuickSearch") %>">
+		  <i class="uiIconSearch uiIconLightGray"><span class="skipHidden"><%= _ctx.appRes("UIPageSearchForm.label.QuickSearch") %></span></i>
+		</a>
+	<%uiform.end()%>	 
 </div>

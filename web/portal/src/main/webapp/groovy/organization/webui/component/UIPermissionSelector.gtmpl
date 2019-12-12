@@ -9,63 +9,54 @@
 	def rcontext = _ctx.getRequestContext();
 
 	def popupId = uicomponent.getChild(UIPopupWindow.class).getId();
-	def btn = "#UIPermissionSelector .ActionButton";
+	def btn = "#UIPermissionSelector .uiAction .btn";
 	rcontext.getJavascriptManager().require("SHARED/jquery", "\$").require("SHARED/uiPopupWindow", "uiPopupWindow")
 			  .addScripts("\$('$btn').eq(1).click(function() {uiPopupWindow.show('$popupId', true)});");
 %>
-<div class="UIPermissionSelector" id="UIPermissionSelector">
-	<div class="PermissionInfoContainer">
+<div class="uiPermissionSelector" id="UIPermissionSelector">
+	
 		<%uicomponent.renderChildren();%>
 	 
 		<%/*Begin UIToolbarContentContainer*/%>
-		<div class="InfoContentContainer"	>
-			
-			<div class="SelectedPermissionInfo" style="display:block;">
-				<div class="OverflowContainer">
-				<div class="Icon BlueInfoBox16x16Icon"><span></span></div>
-				<div class="PermissionInfoTitle"><%=_ctx.appRes(uicomponent.getId() + ".label.currentSelectedPermissionInfo")%></div>
+		
+			<div class="form-horizontal" style="display:block;">
+				<div class="control-group">
+					<strong class="control-label"><i class="uiIconInformation uiIconBlue"> </i> <%=_ctx.appRes(uicomponent.getId() + ".label.currentSelectedPermissionInfo")%></strong>
 				</div>
-				<div class="OverflowContainer">
-					<div class="Label"><%=_ctx.appRes(uicomponent.getId() + ".label.groupId")%> :</div>
+				<div class="control-group">
+					<label class="control-label"><%=_ctx.appRes(uicomponent.getId() + ".label.groupId")%> :</label>
 					<% 
 					def groupId = permission.getGroupId();
 					if(groupId.length() < 60) {
 					%>
-							<div class="Info"><%=permission.getGroupId() %></div>
+							<div class="controls"><%=permission.getGroupId() %></div>
 					<% } else { %>
-							<div class="Info" title="$groupId"><%=groupId.substring(0,57) + "..." %></div>
+							<div class="controls" title="$groupId"><%=groupId.substring(0,57) + "..." %></div>
 					<% } %>
 				</div>				 
-				<div class="OverflowContainer">
-					<div class="Label"><%=_ctx.appRes(uicomponent.getId() + ".label.membershipMember")%> :</div>
-					<div class="Info"><%=permission.getMembership()%></div>
+				<div class="control-group">
+					<label class="control-label"><%=_ctx.appRes(uicomponent.getId() + ".label.membershipMember")%> :</label>
+					<div class="controls"><%=permission.getMembership()%></div>
 				</div>
-				
-			</div>		
+			
+			</div>	
 			
 			<% if(uicomponent.isEditable()) { %>	
-				<div class="UIAction">
+				<div class="uiAction uiActionBorder">
 					
 					<%/*Click on this action button will pop up the permission selector*/%>
 					<%
 					String deletePermissionEvent = "javascript:void(0)";
-					String css = "FloatBlockHidden ActionButton SimpleStyle";
 					if(permission.getExpression() != null && permission.getExpression().length() > 0) {
 						deletePermissionEvent = uiForm.event("DeletePermission", uicomponent.getId(), "");
-						css = "ActionButton SimpleStyle";
 					} 
 					%>
 				 	
-					<span onclick="<%=deletePermissionEvent%>" class="<%=css%>">
-						<a href="javascript:void(0);" class="DeletePermissionIcon"><%=_ctx.appRes(uicomponent.getId() + ".action.DeletePermission")%></a>
-					</span>
-					<span class="ActionButton SimpleStyle">
-						<a href="javascript:void(0);" class="SelectPermissionIcon"><%=_ctx.appRes(uicomponent.getId() + ".action.SelectPermission")%></a>
-					</span>
-												
+						<a class="btn" onclick="<%=deletePermissionEvent%>" class="DeletePermissionIcon"><%=_ctx.appRes(uicomponent.getId() + ".action.DeletePermission")%></a>
+						<a class="btn" href="javascript:void(0);" class="SelectPermissionIcon"><%=_ctx.appRes(uicomponent.getId() + ".action.SelectPermission")%></a>
 				</div>
 			<% } %>
-		</div>
+		
 		<%/*End UIToolbarContentContainer*/%>
-	</div>
+	
 </div>

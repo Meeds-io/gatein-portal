@@ -5,6 +5,8 @@
    import java.text.SimpleDateFormat;
    import org.gatein.common.text.EntityEncoder;
    import org.exoplatform.commons.utils.HTMLEntityEncoder;
+   import org.exoplatform.portal.webui.workspace.UIPortalApplication;
+   import org.exoplatform.web.application.JavascriptManager;
 
    String[] beanFields = uicomponent.getBeanFields();
    String[] beanActions = uicomponent.getBeanActions();
@@ -15,11 +17,41 @@
       colnum = beanFields.length;
 
    UIComponent uiParent = uicomponent.getParent();
+   def disableUserActived = uiParent.disableUserActived;
    String name = uicomponent.getLabel();
    UIForm uiForm = uicomponent.getAncestorOfType(UIForm.class);
+
+   String yeslabel;
+   String noLabel;
+   String enableTooltip;
+   String disableTooltip;
+   if(name != null) {
+        yesLabel = _ctx.appRes(name + ".label.yes");
+        noLabel = _ctx.appRes(name + ".label.no");
+
+        enableTooltip = _ctx.appRes(name + ".action.title.enableUser");
+        disableTooltip = _ctx.appRes(name + ".action.title.disableUser");
+   } else {
+        yesLabel = _ctx.appRes(uiParent.getName() + ".label.yes");
+        noLabel = _ctx.appRes(uiParent.getName() + ".label.no");
+
+        enableTooltip = _ctx.appRes(uiParent.getName() + ".action.title.enableUser");
+        disableTooltip = _ctx.appRes(uiParent.getName() + ".action.title.disableUser");
+   }
+   def rcontext = _ctx.getRequestContext();
+   JavascriptManager jsManager = rcontext.getJavascriptManager();
+   jsManager.require("SHARED/jquery", "jq")
+        .require("SHARED/iphoneStyleCheckbox", "iphoneStyle")
+        .require("SHARED/bts_tooltip", "tooltip")
+        .addScripts("jq('input.yesno').each(function(){jq(this).iphoneStyle(" +
+        "{disabledClass: 'switchBtnDisabled', containerClass: 'uiSwitchBtn', labelOnClass: 'switchBtnLabelOn', labelOffClass: 'switchBtnLabelOff', handleClass: 'switchBtnHandle', checkedLabel:'$yesLabel',uncheckedLabel:'$noLabel', onChange: function(el, val){jq(el).trigger('click');}});" +
+        "var checked = jq(this).is(':checked'); " +
+        "jq(this).closest('.uiSwitchBtn').attr('rel', 'tooltip').attr('title', checked ? '$disableTooltip' : '$enableTooltip');" +
+        "jq(this).change(function(){jq(this).trigger('click');});});" + 
+        "jq(document).find('*[rel=\"tooltip\"]').tooltip();");
 %>
 <div id="$uicomponent.id">
-   <table class="UIGrid" cellspacing="0" summary="Component $uicomponent.id">
+   <table class="uiGrid table table-hover table-striped" cellspacing="0" summary="Component $uicomponent.id">
       <thead>
       <tr>
          <% if (name != null) {
@@ -38,11 +70,11 @@
             for (field in beanFields) { %>
                 <th class="portlet-table-header" id="<%= field%>" scope="col"><%=_ctx.appRes(uiParent.getName() + ".header." + field)%></th>
             <%}%>
-
-                <th class="portlet-table-header" id="DisableEnableUser" scope="col"><%=_ctx.appRes(uiParent.getName() + ".header.DisableEnableUser")%></th>
-
+			<%if (disableUserActived) { %>
+                <th class="portlet-table-header center" id="DisableEnableUser" scope="col"><%=_ctx.appRes(uiParent.getName() + ".header.DisableEnableUser")%></th>
+			<%} %>
             <% if (beanActions != null && beanActions.length > 0) { %>
-                <th class="portlet-table-header" id="actions" scope="col"><%=_ctx.appRes(uiParent.getName() + ".header.action")%></th>
+                <th class="portlet-table-header center" id="actions" scope="col"><%=_ctx.appRes(uiParent.getName() + ".header.action")%></th>
             <%}
          } %>
       </tr>
@@ -50,36 +82,30 @@
       <tbody class="portlet-table-body">
       <% if (uicomponent.getUIPageIterator().getAvailable() < 1) {%>
           <tr>
-             <td style="font-style:italic; color: #FF5604; text-align: center;" colspan="<%=colnum%>">
+             <td class="empty" colspan="<%=colnum%>">
                 <%=_ctx.appRes("UIGrid.msg.empty")%>
              </td>
           </tr>
       <% } else {
-         def rowClass = "";
-         boolean even = true;
-         def rowStyle = null;
+         def rowStyle = "";
          for (bean in uicomponent.getBeans()) {
-            if (even) {
-                rowClass = "EvenRow";
-            } else {
-                rowClass = "OddRow portlet-table-alternate";
-            }
-            even = !even;
-
+           if(bean == null){
+              continue;
+           }
             def beanIdField = uicomponent.getBeanIdField();
             def beanId = uicomponent.getBeanIdFor(bean);
             if (bean instanceof org.exoplatform.services.organization.User) {
                 if(!uicomponent.getFieldValue(bean, "enabled")) {
-                    rowStyle = "font-style: italic; background: darkgray";
+                    rowStyle = "disabled";
                 } else {
-                    rowStyle = null;
+                    rowStyle = "enabled";
                 }
             } %>
-            <tr class="$rowClass" style="$rowStyle">
+            <tr class="$rowStyle">
             <%
                EntityEncoder encoder = HTMLEntityEncoder.getInstance();
                for (field in beanFields) {
-			      def fieldValue = uicomponent.getFieldValue(bean, field);
+            def fieldValue = uicomponent.getFieldValue(bean, field);
                   def cssClass = "";
                   if(fieldValue != null) {
                      def fieldClass = fieldValue.getClass();
@@ -99,39 +125,36 @@
                   println "<td headers=\"$field\"><div class=\""+cssClass+"\" title='$value'>"+value+"</div></td>";
                }%>
 
+					<%if (disableUserActived) { %>
                <!-- EnableDisableUser action -->
                <% if (bean instanceof org.exoplatform.services.organization.User) {%>
                    <td headers="DisableEnableUser">
-                    <div class="ActionContainer">
+                    <div class="center">
                         <%
                         String enableDisableAction = "DisableEnableUser";
-                        String enableDisableTitle = _ctx.appRes(uiParent.getName() + ".action.title." + enableDisableAction);
-                        String enableDisableActionLink = "";
+                        String enableDisableActionLink;
                         if (uiForm != null) {
                             enableDisableActionLink = uiForm.event(enableDisableAction, uiParent.getId(), beanId);
                         } else {
                             enableDisableActionLink = uiParent.event(enableDisableAction, beanId);
                         }
 
-                        String classIcon = "";
+                        String checked = "";
                         if (uicomponent.getFieldValue(bean, "enabled")) {
-                            enableDisableTitle = "Disabled User";
-                            classIcon = "CheckDisable";
+                            checked = "checked=\"checked\"";
                         } else {
-                            enableDisableTitle = "Enabled User";
-                            classIcon = "Check";
                         }
-                        %>
-                        <a href="javascript:;" onclick="$enableDisableActionLink">
-                            <img alt="$enableDisableTitle" title="$enableDisableTitle" src="/eXoResources/skin/sharedImages/Blank.gif" class="${classIcon}"/>
-                        </a>
+                        %>                                               
+                        <input type="checkbox" class="yesno" data-yes="yes" data-no="no" onclick="$enableDisableActionLink" $checked autocomplete="off"/>
                     </div>
                    </td>
-               <%}%>
+               <%}
+					}
+               %>
 
                <% if (beanActions != null && beanActions.length > 0) {%>
                  <td headers="actions">
-                    <div class="ActionContainer">
+                    <div class="center">
                        <%
                          def classIcon = "";
                          for (action in beanActions) {
@@ -143,20 +166,18 @@
                             } else {
                                actionLink = uiParent.event(action, beanId);
                             }
-                            classIcon = action + "Icon";
+                            classIcon = "uiIcon" + action;
                             if (action == "DisableEnableUser") {
                                 if (bean instanceof org.exoplatform.services.organization.User) {
                                     if (uicomponent.getFieldValue(bean, "enabled")) {
-                                        title = "Disabled User";
-                                        classIcon = "CheckDisable";
+                                        classIcon = "uiIconSelectPage uiIconLightGray";
                                     } else {
-                                        title = "Enabled User";
-                                        classIcon = "Check";
+                                        classIcon = "uiIconSelectPage uiIconBlue";
                                     }
                                 }
                             }%>
-                            <a href="javascript:;" onclick="$actionLink">
-                            <img alt="$title" title="$title" src="/eXoResources/skin/sharedImages/Blank.gif" class="${classIcon}"/>
+                            <a class="actionIcon" title="$title" rel="tooltip" href="javascript:;" onclick="$actionLink">
+                <i class="${classIcon} uiIconLightGray"> </i>
                             </a>
                        <%} %>
                     </div>

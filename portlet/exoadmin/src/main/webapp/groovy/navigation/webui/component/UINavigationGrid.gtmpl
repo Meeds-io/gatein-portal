@@ -9,8 +9,7 @@
     def parent = uicomponent.getParent();
     def navigations = uicomponent.getBeans();
 %>
-
-<div id="$uicomponent.id" class="FeedBox">
+<div id="$uicomponent.id" class="FeedBox uiManagementSite">
     <% 
     boolean isEvenRow = true;
     SiteKey siteKey;
@@ -22,10 +21,14 @@
     String noNavigationsLabel = _ctx.appRes("UIGroupNavigationManagement.Label.NoNavigations");
     if (navigations == null || navigations.size() == 0) { 
       %>
-      <div class="NothingEditable">$noNavigationsLabel</div>
+      <div class="nothingEditable center">$noNavigationsLabel</div>
       <%
     } 
     else {
+    %>
+    <table class="managementBlock" summary="Groups navigation edit">
+      <tbody>
+    <%
     for(navigation in navigations) {
        siteKey = navigation.getKey();
        String groupDescription = OrganizationUtils.getGroupDescription(siteKey.getName());
@@ -41,24 +44,26 @@
        String deleteLink = parent.event("DeleteNavigation",String.valueOf(siteKey.getName()));
        String editProperties = parent.event("EditProperties",String.valueOf(siteKey.getName()));
        String editLink = parent.event("EditNavigation",String.valueOf(siteKey.getName()));%>
-  <table class="ManagementBlock <%=isEvenRow ? "EvenRow":"OddRow"%>" style="table-layout: fixed" summary="Groups navigation edit">
-      <tr style="display: none;">
-        <th scope="col">Image</th>
-        <th scope="col">Site</th>
-        <th scope="col">Actions</th>                      
-      </tr>  
       <tr>
-        <td class="Image"><img src="/exoadmin/skin/navigation/webui/component/background/GroupImage.png" alt="" /></td>
-        <td class="Content">
-            <div class="Label" title="$siteKey.name">$groupLabel</div>
+        <td class="content">
+            <div class="siteName" title="$siteKey.name">$groupLabel</div>
             <div>$descriptionLabel: $groupDescription</div>
         </td>   
-        <td class="ActionBlock">
-            <a href="javascript:void(0);" onclick="<%=editLink%>" class="EditNavIcon">$editNavigationLabel</a> 
-            <a href="javascript:void(0);" onclick="<%=editProperties%>" class="EditProIcon">$editPropertiesLabel</a> 
-            <a href="javascript:void(0);" onclick="<%=deleteLink%>" class="DeleteIcon">$deleteNavigationLabel</a>
+        <td width="140">
+            <a class='actionIcon' href="javascript:void(0);" onclick="<%=editLink%>" class="actionIcon">
+            	<i class="uiIconNavigation uiIconLightGray"></i>$editNavigationLabel</a> 
+        </td> 
+        <td width="140">     
+            <a class='actionIcon' href="javascript:void(0);" onclick="<%=editProperties%>" class="actionIcon">
+            	<i class="uiIconEditPortalConfig uiIconLightGray"></i>$editPropertiesLabel</a>
+        </td>      
+        <td width="140">       
+            <a class='actionIcon' href="javascript:void(0);" onclick="<%=deleteLink%>" class="actionIcon">
+            	<i class="uiIconTrash uiIconLightGray"></i>$deleteNavigationLabel</a>
         </td>   
-    </tr>                               
-  </table>  
-    <% isEvenRow = !isEvenRow;}} %>    
+      </tr>
+    <% } %>    
+    </tbody>                           
+  </table>    
+   <% } %>   
 </div>

@@ -51,7 +51,7 @@ import java.util.ResourceBundle;
  * Created by The eXo Platform SARL Author : tung.dang tungcnw@gmail.com
  */
 
-@ComponentConfig(lifecycle = UIFormLifecycle.class, template = "system:/groovy/portal/webui/portal/UIAccountChangePass.gtmpl", events = {
+@ComponentConfig(lifecycle = UIFormLifecycle.class, template = "war:/groovy/portal/webui/portal/UIAccountChangePass.gtmpl", events = {
         @EventConfig(listeners = UIAccountChangePass.SaveActionListener.class),
         @EventConfig(listeners = UIAccountChangePass.ResetActionListener.class, phase = Phase.DECODE),
         @EventConfig(listeners = UIAccountChangePass.ResetPassActionListener.class, phase = Phase.DECODE)})

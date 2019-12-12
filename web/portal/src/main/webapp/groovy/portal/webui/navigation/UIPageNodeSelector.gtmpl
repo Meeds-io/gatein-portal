@@ -6,7 +6,7 @@
 	UIRightClickPopupMenu uiPopupMenu = uicomponent.getChild(UIRightClickPopupMenu.class);
 	String popupMenu = "";
 %>
-<div id="UIPageNodeSelector">
+<div id="UIPageNodeSelector" class="uiPageNodeSelector" $popupMenu>
 <%
 	if(uiPopupMenu != null && uiPopupMenu.isRendered()) {
 		String id = uicomponent.getParent().getId();
@@ -18,31 +18,12 @@
 	 
 	}
 %>
-	<div class="TopLeftContainerOptions">
-		<div class="TopRightContainerOptions">
-			<div class="TopCenterContainerOptions"><span></span></div>
-		</div>
-	</div>
-	<div class="MiddleLeftContainerOptions" $popupMenu>
-		<div class="MiddleRightContainerOptions">
-			<div class="UIPageNodeSelector" id="UIPageNodeSelector">
-				<%/*Begin PageNodeSelectorContainer*/%>
-				<div class="UIContainerConfigOptions ItemSelectorAncestor"> 
-					<div class="ContainerConfigOptions">
-						<a class="AddNavigationIcon" href="javascript:void(0);" onclick ="<%=uicomponent.event("CreateNavigation"); %>" title="<%=_ctx.appRes("UIPageNodeSelector.tooltip.newPageNavigation")%>"><span></span></a>
-						<div class="UIVerticalSlideTabs ItemList CategoryContainer" style="padding: 1px;">
-							<% uicomponent.renderChild(UITree.class);%>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="BottomLeftContainerOptions">
-		<div class="BottomRightContainerOptions">
-			<div class="BottomCenterContainerOptions"><span></span></div>
-		</div>
-	</div> 
+		<%/*Begin PageNodeSelectorContainer*/%>
+		 
+			<a class="AddNavigationIcon" href="javascript:void(0);" onclick ="<%=uicomponent.event("CreateNavigation"); %>" title="<%=_ctx.appRes("UIPageNodeSelector.tooltip.newPageNavigation")%>"><span></span></a>
+			<% uicomponent.renderChild(UITree.class);%>
+		
+	
 </div>
 
 
