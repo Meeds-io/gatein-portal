@@ -25,6 +25,11 @@
     xsi:schemaLocation="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd http://www.exoplaform.org/xml/ns/kernel_1_2.xsd"
     xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
 
+   <component>
+      <key>org.exoplatform.services.listener.ListenerService</key>
+      <type>org.exoplatform.services.listener.ListenerService</type>
+   </component>
+
   <component>
     <key>org.infinispan.transaction.lookup.TransactionManagerLookup</key>
     <type>org.exoplatform.services.transaction.infinispan.JBossStandaloneJTAManagerLookup</type>
