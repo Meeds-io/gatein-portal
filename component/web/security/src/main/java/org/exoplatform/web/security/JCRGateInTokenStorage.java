@@ -14,6 +14,9 @@ import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.wci.security.Credentials;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class JCRGateInTokenStorage implements GateInTokenStore {
     private static final String LIFECYCLE_NAME = "chromatic-lifecycle";
 
@@ -122,7 +125,10 @@ public class JCRGateInTokenStorage implements GateInTokenStore {
         new TokenTask<Void>() {
             @Override
             protected Void execute(SessionContext context) {
-                getTokenContainer().removeAll();
+                TokenContainer container = getTokenContainer();
+                if (container != null && container.size() > 0) {
+                    container.removeAll();
+                }
                 return null;
             }
 
@@ -146,6 +152,28 @@ public class JCRGateInTokenStorage implements GateInTokenStore {
             @Override
             protected Long execute(SessionContext context) {
                 return (long) getTokenContainer().size();
+            }
+        }.executeWith(chromatticLifeCycle);
+    }
+
+    public List<TokenData> getAll(long offset, long limit) {
+        return new TokenTask<List<TokenData>>() {
+            @Override
+            protected List<TokenData> execute(SessionContext context) {
+                List<TokenData> result = new ArrayList<>();
+                QueryResult<TokenEntry> entries = this.findAll(offset, limit);
+                if (entries != null && entries.size() > 0) {
+                    while (entries.hasNext()) {
+                        TokenEntry en = entries.next();
+                        HashedToken hashedToken = getMixin(en, HashedToken.class);
+                        if (hashedToken != null && hashedToken.getHashedToken() != null) {
+                            result.add(new TokenData(en.getId(), hashedToken.getHashedToken(),
+                                    new Credentials(en.getUserName(), en.getPassword()), en.getExpirationTime()));
+                        }
+                    }
+                }
+
+                return result;
             }
         }.executeWith(chromatticLifeCycle);
     }
@@ -177,6 +205,19 @@ public class JCRGateInTokenStorage implements GateInTokenStore {
             String statement = new StringBuilder(128).append("jcr:path LIKE '").append(session.getPath(tokenContainer))
                     .append("/%'").append(" AND username='").append(Utils.queryEscape(user)).append("'").toString();
             return session.createQueryBuilder(TokenEntry.class).where(statement).get().objects();
+        }
+
+        protected final QueryResult<TokenEntry> findAll(long offset, long limit) {
+            SessionContext ctx = chromatticLifeCycle.getContext();
+            ChromatticSession session = ctx.getSession();
+            TokenContainer tokenContainer = getTokenContainer();
+
+            if (tokenContainer == null) {
+                return null;
+            }
+            String statement = new StringBuilder(128).append("jcr:path LIKE '").append(session.getPath(tokenContainer))
+                    .append("/%'").toString();
+            return session.createQueryBuilder(TokenEntry.class).where(statement).get().objects(offset, limit);
         }
     }
 }
