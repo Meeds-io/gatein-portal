@@ -18,8 +18,11 @@
  */
 package org.exoplatform.web.security;
 
+import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.web.security.security.AbstractTokenService;
+
+import javax.persistence.EntityTransaction;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Hai Thanh Nguyen</a>
@@ -29,6 +32,18 @@ import org.exoplatform.web.security.security.AbstractTokenService;
 
 public abstract class AbstractTokenServiceTest<S extends AbstractTokenService<?, ?>> extends AbstractKernelTest {
     protected S service;
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        begin();
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        end();
+        super.tearDown();
+    }
 
     public abstract void testGetToken() throws Exception;
 

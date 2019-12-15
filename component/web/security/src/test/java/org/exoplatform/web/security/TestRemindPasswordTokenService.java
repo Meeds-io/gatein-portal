@@ -35,7 +35,7 @@ import org.exoplatform.web.security.security.RemindPasswordTokenService;
   @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/jcr-configuration.xml") })
 public class TestRemindPasswordTokenService extends AbstractCookieTokenServiceTest {
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         PortalContainer container = getContainer();
         RequestLifeCycle.begin(container);
         service = (CookieTokenService) container.getComponentInstanceOfType(RemindPasswordTokenService.class);

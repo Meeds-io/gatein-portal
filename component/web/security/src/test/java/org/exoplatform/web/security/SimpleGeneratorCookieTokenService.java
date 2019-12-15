@@ -41,9 +41,9 @@ public class SimpleGeneratorCookieTokenService extends CookieTokenService {
     private int counter = 0;
     private int noRandom = 0;
 
-    public SimpleGeneratorCookieTokenService(InitParams initParams, ChromatticManager chromatticManager, CodecInitializer codecInitializer)
+    public SimpleGeneratorCookieTokenService(InitParams initParams, GateInTokenStore tokenStore, CodecInitializer codecInitializer)
             throws TokenServiceInitializationException {
-        super(replaceHashService(initParams), chromatticManager, codecInitializer);
+        super(replaceHashService(initParams), tokenStore, codecInitializer);
     }
 
     /**
