@@ -9,6 +9,8 @@ import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.portal.AbstractPortalTest;
 import org.exoplatform.portal.jdbc.migration.PageMigrationService;
 import org.exoplatform.portal.jdbc.migration.SiteMigrationService;
@@ -26,6 +28,7 @@ import org.exoplatform.portal.pom.data.ModelDataStorage;
 import org.exoplatform.portal.pom.data.PageData;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
+import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.listener.ListenerService;
 import org.gatein.mop.api.workspace.Navigation;
 import org.gatein.mop.api.workspace.ObjectType;
@@ -66,8 +69,17 @@ public class TestSiteMigrationService extends AbstractPortalTest {
     this.pageService = getContainer().getComponentInstanceOfType(PageService.class);
     this.manager = getContainer().getComponentInstanceOfType(POMSessionManager.class);
     this.jcrPageService = new PageServiceImpl(manager);
-    this.siteMigrationService = new SiteMigrationService(null, pomStorage, modelStorage,
-            getContainer().getComponentInstanceOfType(ListenerService.class), getContainer().getComponentInstanceOfType(EntityManagerService.class));
+
+    InitParams params = new InitParams();
+    ValueParam v = new ValueParam();
+    v.setName("workspace");
+    v.setValue("portal-test");
+    params.addParameter(v);
+
+    this.siteMigrationService = new SiteMigrationService(params, pomStorage, modelStorage,
+            getContainer().getComponentInstanceOfType(ListenerService.class),
+            getContainer().getComponentInstanceOfType(RepositoryService.class),
+            getContainer().getComponentInstanceOfType(EntityManagerService.class));
 
     begin();
 

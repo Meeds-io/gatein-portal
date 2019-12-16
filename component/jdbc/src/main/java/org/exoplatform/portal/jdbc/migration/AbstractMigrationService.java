@@ -1,16 +1,21 @@
 package org.exoplatform.portal.jdbc.migration;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import javax.jcr.Node;
-import javax.jcr.Value;
+import java.util.*;
+import javax.jcr.*;
+import javax.jcr.query.QueryManager;
 import javax.persistence.EntityManager;
 
+import org.chromattic.ext.format.BaseEncodingObjectFormatter;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.pom.config.POMDataStorage;
 import org.exoplatform.portal.pom.data.*;
+import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.core.ManageableRepository;
+import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.PortalContainer;
@@ -25,6 +30,9 @@ public abstract class AbstractMigrationService<T> {
   protected Log                           LOG;
 
   protected final static String           LIMIT_THRESHOLD_KEY = "LIMIT_THRESHOLD";
+  protected static final String DEFAULT_WORKSPACE_NAME = "portal-system";
+
+  protected static final BaseEncodingObjectFormatter formatter = new BaseEncodingObjectFormatter();
 
   protected POMDataStorage     pomStorage;
 
@@ -32,17 +40,31 @@ public abstract class AbstractMigrationService<T> {
 
   protected final EntityManagerService    entityManagerService;
 
+  protected final RepositoryService repoService;
+
   protected boolean                       forkStop            = false;
 
   protected int                           LIMIT_THRESHOLD     = 10;
 
+  protected String workspaceName;
+
   public AbstractMigrationService(InitParams initParams,
                                   POMDataStorage pomDataStorage,
                                   ListenerService listenerService,
+                                  RepositoryService repoService,
                                   EntityManagerService entityManagerService) {
     this.pomStorage = pomDataStorage;
     this.listenerService = listenerService;
     this.entityManagerService = entityManagerService;
+    this.repoService = repoService;
+
+    ValueParam workspaceParam = initParams == null ? null : initParams.getValueParam("workspace");
+    if (workspaceParam != null) {
+      this.workspaceName = workspaceParam.getValue();
+    } else {
+      this.workspaceName = DEFAULT_WORKSPACE_NAME;
+    }
+
     LOG = ExoLogger.getLogger(this.getClass().getName());
   }
 
@@ -231,6 +253,41 @@ public abstract class AbstractMigrationService<T> {
       } else if (comp instanceof ApplicationData) {
         result.add(migrateApplication((ApplicationData)comp));
       }
+    }
+
+    return result;
+  }
+
+  protected Set<PortalKey> findSites(SiteType type, long offset, long limit) {
+    Set<PortalKey> result = new HashSet<>();
+    String mopType = "mop:" + type.getName().toLowerCase() + "site";
+
+    try {
+      String query = "select * from " + mopType;
+      ManageableRepository currentRepository = this.repoService.getCurrentRepository();
+      Session session = SessionProvider.createSystemProvider().getSession(workspaceName, currentRepository);
+      QueryManager queryManager = session.getWorkspace().getQueryManager();
+
+      javax.jcr.query.Query q = queryManager.createQuery(query, javax.jcr.query.Query.SQL);
+      if (q instanceof QueryImpl) {
+        ((QueryImpl)q).setOffset(offset);
+        ((QueryImpl)q).setLimit(limit);
+      }
+      javax.jcr.query.QueryResult rs = q.execute();
+
+      NodeIterator iterator = rs.getNodes();
+      while (iterator.hasNext()) {
+        Node node = iterator.nextNode();
+        String path = node.getPath();
+        String siteName = path.substring(path.lastIndexOf(":") + 1);
+        siteName = formatter.decodeNodeName(null, siteName);
+
+        result.add(new PortalKey(type.getName().toLowerCase(), siteName));
+      }
+
+
+    } catch (RepositoryException ex) {
+      LOG.error("Error while retrieve user portal", ex);
     }
 
     return result;

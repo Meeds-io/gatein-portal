@@ -12,12 +12,23 @@ import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
 import org.exoplatform.portal.config.Query;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.pom.config.POMDataStorage;
 import org.exoplatform.portal.pom.data.ContainerData;
 import org.exoplatform.portal.pom.data.ModelDataStorage;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
+import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.core.ManageableRepository;
+import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.listener.ListenerService;
+
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.query.QueryManager;
 
 @Managed
 @ManagedDescription("Portal migration sites from JCR to RDBMS.")
@@ -26,16 +37,14 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
   public static final String EVENT_LISTENER_KEY = "PORTAL_SITES_MIGRATION";
 
   private ModelDataStorage   modelStorage;
-
-  private List<PortalData>   data;
-
   public SiteMigrationService(InitParams initParams,
                               POMDataStorage pomStorage,
                               ModelDataStorage modelStorage,
                               ListenerService listenerService,
+                              RepositoryService repoService,
                               EntityManagerService entityManagerService) {
 
-    super(initParams, pomStorage, listenerService, entityManagerService);
+    super(initParams, pomStorage, listenerService, repoService, entityManagerService);
     this.modelStorage = modelStorage;
     this.LIMIT_THRESHOLD = getInteger(initParams, LIMIT_THRESHOLD_KEY, 100);
   }
@@ -44,84 +53,105 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
   @Managed
   @ManagedDescription("Manual to start run migration data of sites from JCR to RDBMS.")
   public void doMigration() throws Exception {
-    boolean begunTx = startTx();
-
     long t = System.currentTimeMillis();
 
-    int total = 0;
-    int offset = 0;
+    long total = 0;
+    long count = 0;
     Set<PortalKey> sitesFailed = new HashSet<>();
-    try {
-      LOG.info("| \\ START::Sites migration ---------------------------------");
-      List<PortalData> sites = getPortalData();
 
-      if (sites == null || sites.size() == 0) {
-        LOG.info("|  \\ NO SITE: There is no site to migrate");
-        return;
+    LOG.info("|\\ START::migrate sites");
+
+    LOG.info("|  \\ START::migrate site of type " + SiteType.PORTAL.getName());
+    count = doMigrate(SiteType.PORTAL, sitesFailed);
+    LOG.info("|  // END::migrate site of type " + SiteType.PORTAL.getName() + ", migrated for " + count + " site(s)");
+    total += count;
+
+    LOG.info("|  \\ START::migrate site of type " + SiteType.GROUP.getName());
+    count = doMigrate(SiteType.GROUP, sitesFailed);
+    LOG.info("|  // END::migrate site of type " + SiteType.GROUP.getName() + ", migrated for " + count + " site(s)");
+    total += count;
+
+    LOG.info("|  \\ START::migrate site of type " + SiteType.USER.getName());
+    count = doMigrate(SiteType.USER, sitesFailed);
+    LOG.info("|  // END::migrate site of type " + SiteType.USER.getName() + ", migrated for " + count + " site(s)");
+    total += count;
+
+    LOG.info("|// END::migrated for "+ total + " site(s) in " + (System.currentTimeMillis() - t) + "ms");
+
+    MigrationContext.setSitesMigrateFailed(sitesFailed);
+    RequestLifeCycle.end();
+    RequestLifeCycle.begin(PortalContainer.getInstance());
+  }
+
+  private long doMigrate(SiteType type, Set<PortalKey> failed) {
+    long offset = 0;
+    long limit = LIMIT_THRESHOLD;
+    long count = 0;
+
+    boolean hasNext = true;
+    while (hasNext) {
+      if (forkStop) {
+        LOG.info("|  \\ Stop requested!!!");
+        break;
       }
 
-      total = sites.size();
-      LOG.info("|  \\ There are " + total + " site(s)");
+      Set<PortalKey> keys = findSites(type, offset, limit);
+      hasNext = keys != null && !keys.isEmpty();
+      if (hasNext) {
 
-      final int limitThreshold = LIMIT_THRESHOLD > sites.size() ? sites.size() : LIMIT_THRESHOLD;
-      for (PortalData site : sites) {
-        if (forkStop) {
-          LOG.info("|  \\ Force stop");
-          break;
-        }
-        offset++;
-        LOG.info(String.format("|  \\ START::site number: %s (%s site)", offset, site.getKey()));
-        long t1 = System.currentTimeMillis();
+        boolean begunTx = startTx();
 
-        try {
-          PortalData created = modelStorage.getPortalConfig(site.getKey());
-          if (created == null) {
-            PortalData migrate = new PortalData(null,
-                    site.getName(),
-                    site.getType(),
-                    site.getLocale(),
-                    site.getLabel(),
-                    site.getDescription(),
-                    site.getAccessPermissions(),
-                    site.getEditPermission(),
-                    site.getProperties(),
-                    site.getSkin(),
-                    this.migrateContainer(site.getPortalLayout()),
-                    site.getRedirects());
+        for (PortalKey key : keys) {
+          offset++;
+          count ++;
 
+          long t1 = System.currentTimeMillis();
+          LOG.info(String.format("|  \\ START::migrate site number: %s (%s site) (type: %s)", offset, key.toString(), type.getName()));
 
-            modelStorage.create(migrate);
-            created = modelStorage.getPortalConfig(site.getKey());
-          } else {
-            LOG.info("Ignoring, this site: {} already in JPA", created.getKey());
+          try {
+            PortalData created = modelStorage.getPortalConfig(key);
+            if (created == null) {
+              PortalData site = pomStorage.getPortalConfig(key);
+              PortalData migrate = new PortalData(null,
+                      site.getName(),
+                      site.getType(),
+                      site.getLocale(),
+                      site.getLabel(),
+                      site.getDescription(),
+                      site.getAccessPermissions(),
+                      site.getEditPermission(),
+                      site.getProperties(),
+                      site.getSkin(),
+                      this.migrateContainer(site.getPortalLayout()),
+                      site.getRedirects());
+
+              modelStorage.create(migrate);
+              created = modelStorage.getPortalConfig(site.getKey());
+            } else {
+              LOG.info("Ignoring, this site: {} already in JPA", created.getKey());
+            }
+
+            broadcastListener(created, created.getKey().toString());
+
+          } catch (Exception ex) {
+            LOG.error("Error during migration site: " + key.toString(), ex);
+            failed.add(key);
+            count --;
+          } finally {
+            LOG.info(String.format("|  / END::migrate site number: %s (%s site) (type: %s) consumed %s(ms)",
+                    offset,
+                    key.toString(),
+                    type.getName(),
+                    System.currentTimeMillis() - t1));
           }
-
-          //
-          if (offset % limitThreshold == 0) {
-            endTx(begunTx);
-            RequestLifeCycle.end();
-            RequestLifeCycle.begin(PortalContainer.getInstance());
-            begunTx = startTx();
-          }
-
-          broadcastListener(created, created.getKey().toString());
-
-          LOG.info(String.format("|  / END::site number %s (%s site) consumed %s(ms)",
-                                 offset,
-                                 site.getKey(),
-                                 System.currentTimeMillis() - t1));
-        } catch (Exception ex) {
-          LOG.error("exception during migration site: " + site.getKey(), ex);
-          sitesFailed.add(site.getKey());
         }
+
+        endTx(begunTx);
+        RequestLifeCycle.end();
+        RequestLifeCycle.begin(PortalContainer.getInstance());
       }
-    } finally {
-      MigrationContext.setSitesMigrateFailed(sitesFailed);
-      endTx(begunTx);
-      RequestLifeCycle.end();
-      RequestLifeCycle.begin(PortalContainer.getInstance());
-      LOG.info(String.format("| / END::Site migration for (%s) site(s) consumed %s(ms)", offset, System.currentTimeMillis() - t));
     }
+    return count;
   }
 
   @Override
@@ -140,45 +170,79 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
   }
 
   public void doRemove() throws Exception {
-    LOG.info("| \\ START::cleanup Sites ---------------------------------");
+    LOG.info("|\\ START::cleanup Sites ---------------------------------");
     long t = System.currentTimeMillis();
-    long timePerSite = System.currentTimeMillis();
-
+    long total = 0;
     RequestLifeCycle.begin(PortalContainer.getInstance());
-    int offset = 0;
-
     try {
-      List<PortalData> sites = getPortalData();
-      if (sites == null || sites.size() == 0) {
-        return;
-      }
-
-      for (PortalData site : sites) {
-        LOG.info(String.format("|  \\ START::cleanup Site number: %s (%s site)", offset, site.getKey()));
-        offset++;
-
-        try {
-          pomStorage.remove(site);
-
-          LOG.info(String.format("|  / END::cleanup (%s site) consumed time %s(ms)",
-                                 site.getKey(),
-                                 System.currentTimeMillis() - timePerSite));
-
-          timePerSite = System.currentTimeMillis();
-          if (offset % LIMIT_THRESHOLD == 0) {
-            RequestLifeCycle.end();
-            RequestLifeCycle.begin(PortalContainer.getInstance());
-          }
-        } catch (Exception ex) {
-          LOG.error("Can't remove site", ex);
-        }
-      }
-      LOG.info(String.format("| / END::cleanup Sites migration for (%s) site consumed %s(ms)",
-                             offset,
-                             System.currentTimeMillis() - t));
+      total += doRemove(SiteType.PORTAL);
+      total += doRemove(SiteType.GROUP);
+      total += doRemove(SiteType.USER);
     } finally {
+      LOG.info(String.format("|// END::Cleanup sites for (%s) site(s) consumed %s(ms)",
+              total,
+              System.currentTimeMillis() - t));
       RequestLifeCycle.end();
+
+      // Clean up success
+      Set<PortalKey> portals = findSites(SiteType.PORTAL, 0, 1);
+      Set<PortalKey> groups = findSites(SiteType.GROUP, 0, 1);
+      Set<PortalKey> users = findSites(SiteType.USER, 0, 1);
+      boolean isDone = (portals == null || portals.isEmpty())
+              && (groups == null || groups.isEmpty())
+              && (users == null || users.isEmpty());
+
+      MigrationContext.setSiteCleanupDone(isDone);
     }
+  }
+
+  private long doRemove(SiteType type) {
+    long offset = 0;
+    long limit = LIMIT_THRESHOLD;
+    long count = 0;
+
+    boolean hasNext = true;
+    while (hasNext) {
+      if (forkStop) {
+        LOG.info("|  \\ Stop requested!!!");
+        break;
+      }
+
+      Set<PortalKey> keys = findSites(type, offset, limit);
+      hasNext = keys != null && !keys.isEmpty();
+      if (hasNext) {
+        boolean begunTx = startTx();
+
+        for (PortalKey key : keys) {
+          count ++;
+
+          long t1 = System.currentTimeMillis();
+          LOG.info(String.format("|  \\ START::Clean up site number: %s (%s site) (type: %s)", count, key.toString(), type.getName()));
+
+          try {
+            PortalData data = pomStorage.getPortalConfig(key);
+            if (data != null) {
+              pomStorage.remove(data);
+            }
+            pomStorage.save();
+          } catch (Exception ex) {
+            LOG.error("Error during clean up site: " + key.toString(), ex);
+            count --;
+          } finally {
+            LOG.info(String.format("|  // END::Clean up site number: %s (%s site) (type: %s) consumed %s(ms)",
+                    offset,
+                    key.toString(),
+                    type.getName(),
+                    System.currentTimeMillis() - t1));
+          }
+        }
+
+        endTx(begunTx);
+        RequestLifeCycle.end();
+        RequestLifeCycle.begin(PortalContainer.getInstance());
+      }
+    }
+    return count;
   }
 
   @Override
@@ -186,26 +250,6 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
   @ManagedDescription("Manual to stop run miguration data of sites from JCR to RDBMS.")
   public void stop() {
     super.stop();
-  }
-  
-  private List<PortalData> getPortalData() throws Exception {
-    if (data == null || data.isEmpty()) {
-      data = new ArrayList<>();
-      try {
-        data.addAll(getPortalData(PortalConfig.PORTAL_TYPE));
-        data.addAll(getPortalData(PortalConfig.GROUP_TYPE));
-        data.addAll(getPortalData(PortalConfig.USER_TYPE));
-      } catch (Exception ex) {
-        LOG.error("Can't load sites in JCR for migration", ex);
-        throw ex;
-      }
-    }
-    return data;
-  }
-
-  private Collection<? extends PortalData> getPortalData(String portalType) throws Exception {
-    Query<PortalData> q = new Query<PortalData>(portalType, null, PortalData.class);
-    return pomStorage.find(q).getAll();
   }
 
   protected String getListenerKey() {

@@ -19,6 +19,7 @@ import org.exoplatform.portal.mop.page.PageServiceImpl;
 import org.exoplatform.portal.pom.config.POMDataStorage;
 import org.exoplatform.portal.pom.data.ModelDataStorage;
 import org.exoplatform.portal.pom.data.PageData;
+import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.listener.ListenerService;
 
 @Managed
@@ -39,9 +40,10 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
                               PageService pageService,
                               PageServiceImpl jcrPageService,
                               ListenerService listenerService,
+                              RepositoryService repoService,
                               EntityManagerService entityManagerService) {
 
-    super(initParams, pomStorage, listenerService, entityManagerService);
+    super(initParams, pomStorage, listenerService, repoService, entityManagerService);
     this.modelStorage = modelStorage;
     this.pageService = pageService;
     this.jcrPageService = jcrPageService;

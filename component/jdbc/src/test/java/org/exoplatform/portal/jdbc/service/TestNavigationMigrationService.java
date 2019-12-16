@@ -10,6 +10,8 @@ import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.portal.AbstractPortalTest;
 import org.exoplatform.portal.config.TestDataStorage;
 import org.exoplatform.portal.jdbc.migration.NavigationMigrationService;
@@ -33,6 +35,7 @@ import org.exoplatform.portal.pom.config.POMSessionManager;
 import org.exoplatform.portal.pom.data.ContainerData;
 import org.exoplatform.portal.pom.data.ModelDataStorage;
 import org.exoplatform.portal.pom.data.PortalData;
+import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.listener.ListenerService;
 import org.gatein.mop.api.workspace.Navigation;
 import org.gatein.mop.api.workspace.ObjectType;
@@ -85,7 +88,16 @@ public class TestNavigationMigrationService extends AbstractPortalTest {
     this.descriptionService = getContainer().getComponentInstanceOfType(DescriptionService.class);
     this.jcrDescriptionService = new DescriptionServiceImpl(manager);
 
-    this.migrationService = new NavigationMigrationService(null, pomStorage, navService, descriptionService, getService(POMSessionManager.class), getService(ListenerService.class), getService(EntityManagerService.class));
+    InitParams params = new InitParams();
+    ValueParam v = new ValueParam();
+    v.setName("workspace");
+    v.setValue("portal-test");
+    params.addParameter(v);
+    this.migrationService = new NavigationMigrationService(params, pomStorage, navService, descriptionService,
+            getService(POMSessionManager.class),
+            getService(ListenerService.class),
+            getService(RepositoryService.class),
+            getService(EntityManagerService.class));
 
     super.begin();
 
@@ -160,6 +172,7 @@ public class TestNavigationMigrationService extends AbstractPortalTest {
     assertNotNull(descriptionService.getDescription(child.getId(), Locale.ENGLISH));
 
 
+    jcrNavService.clearCache();
     nav = jcrNavService.loadNavigation(SiteKey.portal("testMigrate"));
     assertNull(nav);
 

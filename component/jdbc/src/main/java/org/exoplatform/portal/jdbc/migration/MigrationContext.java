@@ -47,6 +47,7 @@ public final class MigrationContext {
   private static boolean isAppCleanupDone = false;
 
   private static Set<PortalKey> sitesMigrateFailed = new HashSet<>();
+  private static Set<PortalKey> navigationFailed = new HashSet<>();
   private static Set<String> pagesMigrateFailed = new HashSet<>();
 
   public static boolean isDone() {
@@ -131,6 +132,14 @@ public final class MigrationContext {
 
   public static void setSitesMigrateFailed(Set<PortalKey> sitesMigrateFailed) {
     MigrationContext.sitesMigrateFailed = sitesMigrateFailed;
+  }
+
+  public static Set<PortalKey> getNavigationFailed() {
+    return navigationFailed;
+  }
+
+  public static void setNavigationFailed(Set<PortalKey> navigationFailed) {
+    MigrationContext.navigationFailed = navigationFailed;
   }
 
   public static Set<String> getPagesMigrateFailed() {
