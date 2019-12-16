@@ -25,7 +25,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.management.annotations.Impact;
@@ -43,6 +45,7 @@ import org.gatein.common.util.Base64;
 import org.gatein.common.util.Base64.EncodingOption;
 import org.gatein.wci.security.Credentials;
 import org.picocontainer.Startable;
+import sun.misc.Request;
 
 /**
  * Created by The eXo Platform SAS Author : liem.nguyen ncliam@gmail.com Jun 5, 2009
@@ -105,7 +108,14 @@ public abstract class AbstractTokenService<T extends Token, K> implements Starta
             executor.scheduleWithFixedDelay(new Runnable() {
                 public void run() {
                     try {
-                        AbstractTokenService.this.cleanExpiredTokens();
+                        PortalContainer container = PortalContainer.getInstance();
+                        ExoContainerContext.setCurrentContainer(container);
+                        RequestLifeCycle.begin(container);
+                        try {
+                            AbstractTokenService.this.cleanExpiredTokens();
+                        } finally {
+                            RequestLifeCycle.end();
+                        }
                     } catch (Throwable t) {
                         log.warn("Failed to clean expired tokens", t);
                     }
