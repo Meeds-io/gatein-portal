@@ -110,8 +110,9 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
 
           try {
             PortalData created = modelStorage.getPortalConfig(key);
+            PortalData site = pomStorage.getPortalConfig(key);
             if (created == null) {
-              PortalData site = pomStorage.getPortalConfig(key);
+              LOG.info("Creating site {} in JPA", site.getKey());
               PortalData migrate = new PortalData(null,
                       site.getName(),
                       site.getType(),
@@ -126,11 +127,25 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
                       site.getRedirects());
 
               modelStorage.create(migrate);
-              created = modelStorage.getPortalConfig(site.getKey());
+
             } else {
-              LOG.info("Ignoring, this site: {} already in JPA", created.getKey());
+              LOG.info("Updating layout for site {} in JPA", created.getKey());
+              PortalData migrate = new PortalData(created.getStorageId(),
+                      created.getName(),
+                      created.getType(),
+                      created.getLocale(),
+                      created.getLabel(),
+                      created.getDescription(),
+                      created.getAccessPermissions(),
+                      created.getEditPermission(),
+                      created.getProperties(),
+                      created.getSkin(),
+                      this.migrateContainer(site.getPortalLayout()),
+                      created.getRedirects());
+              modelStorage.save(migrate);
             }
 
+            created = modelStorage.getPortalConfig(key);
             broadcastListener(created, created.getKey().toString());
 
           } catch (Exception ex) {

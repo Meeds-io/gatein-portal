@@ -86,13 +86,16 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
             PageKey key = page.getKey();
             SiteKey siteKey = key.getSite();
             PageContext created = pageService.loadPage(key);
+
+            org.exoplatform.portal.pom.data.PageKey pomPageKey =
+                    new org.exoplatform.portal.pom.data.PageKey(siteKey.getTypeName(),
+                            siteKey.getName(),
+                            key.getName());
+            PageData pageData = pomStorage.getPage(pomPageKey);
+
             if (created == null) {
+              LOG.info("Creating page: {} already in JPA", created.getKey());
               pageService.savePage(page);
-              org.exoplatform.portal.pom.data.PageKey pomPageKey =
-                                                                 new org.exoplatform.portal.pom.data.PageKey(siteKey.getTypeName(),
-                                                                                                             siteKey.getName(),
-                                                                                                             key.getName());
-              PageData pageData = pomStorage.getPage(pomPageKey);
               PageData migrate = new PageData(
                       null,
                       pageData.getId(),
@@ -115,10 +118,30 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
               );
 
               modelStorage.save(migrate);
-
-              created = pageService.loadPage(page.getKey());
             } else {
-              LOG.info("Ignoring, this page: {} already in JPA", created.getKey());
+              LOG.info("Updating layout for page: {} already in JPA", created.getKey());
+              PageData data = modelStorage.getPage(pomPageKey);
+              PageData migrate = new PageData(
+                      data.getStorageId(),
+                      data.getId(),
+                      data.getName(),
+                      data.getIcon(),
+                      data.getTemplate(),
+                      data.getFactoryId(),
+                      data.getTitle(),
+                      data.getDescription(),
+                      data.getWidth(),
+                      data.getHeight(),
+                      data.getAccessPermissions(),
+                      this.migrateComponents(pageData.getChildren()),
+                      data.getOwnerType(),
+                      data.getOwnerId(),
+                      data.getEditPermission(),
+                      data.isShowMaxWindow(),
+                      data.getMoveAppsPermissions(),
+                      data.getMoveContainersPermissions()
+              );
+              modelStorage.save(migrate);
             }
 
             //
@@ -129,6 +152,7 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
               begunTx = startTx();
             }
 
+            created = pageService.loadPage(page.getKey());
             broadcastListener(created, created.getKey().toString());
 
             LOG.info(String.format("|  / END::page number %s (%s page) consumed %s(ms)",

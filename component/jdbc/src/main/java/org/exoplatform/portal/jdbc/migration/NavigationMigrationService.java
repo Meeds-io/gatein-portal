@@ -203,21 +203,21 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
           try {
             SiteKey siteKey = type.key(key.getId());
             NavigationContext jcrNav = jcrNavService.loadNavigation(siteKey);
+            if (jcrNav != null) {
+              NavigationContext created = navService.loadNavigation(siteKey);
+              if (created == null) {
+                NavigationContext nav = new NavigationContext(siteKey, jcrNav.getState());
+                navService.saveNavigation(nav);
+                created = navService.loadNavigation(siteKey);
+              }
 
-            NavigationContext created = navService.loadNavigation(siteKey);
-            if (created == null) {
-              NavigationContext nav = new NavigationContext(siteKey, jcrNav.getState());
-              navService.saveNavigation(nav);
-              created = navService.loadNavigation(siteKey);
+              //
+              NodeContext<?> root = navService.loadNode(NodeModel.SELF_MODEL, created, Scope.ALL, null);
+              NodeContext<?> jcrRoot = jcrNavService.loadNode(NodeModel.SELF_MODEL, jcrNav, Scope.ALL, null);
+              migrateNode(root, jcrRoot);
+              navService.saveNode(root, null);
+              migrateDescription(root, jcrRoot);
             }
-
-            //
-            NodeContext<?> root = navService.loadNode(NodeModel.SELF_MODEL, created, Scope.ALL, null);
-            NodeContext<?> jcrRoot = jcrNavService.loadNode(NodeModel.SELF_MODEL, jcrNav, Scope.ALL, null);
-            migrateNode(root, jcrRoot);
-            navService.saveNode(root, null);
-            migrateDescription(root, jcrRoot);
-
           } catch (Exception ex) {
             LOG.error("Error during migrate navigation of site: " + key.toString(), ex);
             failed.add(key);
@@ -255,8 +255,11 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
   private void migrateDescription(NodeContext<?> parent, NodeContext<?> jcrParent) {
     for (int i = 0; i < jcrParent.getNodeCount(); i++) {
       NodeContext jcrChild = jcrParent.get(i);
-      NodeContext child = parent.get(i);
-      migrateDescription(child, jcrChild);
+      NodeContext child = null;
+      if ((child = parent.get(jcrChild.getName())) != null) {
+        migrateDescription(child, jcrChild);
+      }
+
     }
     Map<Locale, Described.State> descriptions = jcrDescriptionService.getDescriptions(jcrParent.getId());
     descriptionService.setDescriptions(parent.getId(), descriptions);
