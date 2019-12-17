@@ -94,7 +94,7 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
             PageData pageData = pomStorage.getPage(pomPageKey);
 
             if (created == null) {
-              LOG.info("Creating page: {} already in JPA", created.getKey());
+              LOG.info("Creating page: {} already in JPA", key);
               pageService.savePage(page);
               PageData migrate = new PageData(
                       null,
