@@ -21,6 +21,7 @@ public class JPAGateInTokenStorage implements GateInTokenStore {
     }
 
     @Override
+    @ExoTransactional
     public void saveToken(TokenData data) throws TokenExistsException {
         TokenEntity existing = this.tokenDAO.findByTokenId(data.tokenId);
         if (existing != null) {
@@ -47,6 +48,7 @@ public class JPAGateInTokenStorage implements GateInTokenStore {
     }
 
     @Override
+    @ExoTransactional
     public void deleteToken(String tokenId) {
         TokenEntity entity = this.tokenDAO.findByTokenId(tokenId);
         if (entity != null) {
@@ -55,6 +57,7 @@ public class JPAGateInTokenStorage implements GateInTokenStore {
     }
 
     @Override
+    @ExoTransactional
     public void deleteTokenOfUser(String user) {
         List<TokenEntity> entities = this.tokenDAO.findByUsername(user);
         if (entities != null && !entities.isEmpty()) {
@@ -63,11 +66,13 @@ public class JPAGateInTokenStorage implements GateInTokenStore {
     }
 
     @Override
+    @ExoTransactional
     public void deleteAll() {
         this.tokenDAO.deleteAll();
     }
 
     @Override
+    @ExoTransactional
     public void cleanExpired() {
         this.tokenDAO.cleanExpired();;
     }
