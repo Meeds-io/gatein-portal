@@ -193,7 +193,6 @@
         <value>locale.portal.webui</value>
         <value>locale.portal.custom</value>
         <value>locale.portal.login</value>
-        <value>locale.navigation.portal.classic</value>
         <value>locale.navigation.group.platform.administrators</value>
         <value>locale.navigation.group.platform.users</value>
         <value>locale.navigation.group.platform.guests</value>

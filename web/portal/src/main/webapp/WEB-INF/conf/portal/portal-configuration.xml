@@ -123,11 +123,6 @@
         <description>this listener init the portal configuration</description>
         <init-params>
           <value-param>
-            <name>default.portal</name>
-            <description>The default portal for checking db is empty or not</description>
-            <value>classic</value>
-          </value-param>
-          <value-param>
             <name>page.templates.location</name>
             <description>the path to the location that contains Page templates</description>
             <value>war:/conf/portal/template/pages</value>
