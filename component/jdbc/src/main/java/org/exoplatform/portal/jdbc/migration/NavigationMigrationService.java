@@ -198,7 +198,7 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
           count ++;
 
           long t1 = System.currentTimeMillis();
-          LOG.info(String.format("|  \\ START::Clean navigation for site number: %s (%s site) (type: %s)", offset, key.toString(), type.getName()));
+          LOG.info(String.format("|  \\ START::Migrate navigation for site number: %s (%s site) (type: %s)", offset, key.toString(), type.getName()));
 
           try {
             SiteKey siteKey = type.key(key.getId());
