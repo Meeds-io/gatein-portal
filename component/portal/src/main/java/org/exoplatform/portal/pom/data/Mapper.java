@@ -756,7 +756,6 @@ public class Mapper {
         ApplicationType<S> type = null;
         PersistentApplicationState<S> instanceState = null;
         if (customization == null) {
-          LOG.warn("Can't find customization info of {} '{}'", src.getContextType(), src.getContextId());
           return null;
         } else {
           ContentType<?> contentType = customization.getType();

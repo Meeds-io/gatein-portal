@@ -1,6 +1,7 @@
 package org.exoplatform.portal.jdbc.migration;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.PortalContainer;
@@ -10,25 +11,12 @@ import org.exoplatform.management.annotations.Managed;
 import org.exoplatform.management.annotations.ManagedDescription;
 import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
-import org.exoplatform.portal.config.Query;
-import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.pom.config.POMDataStorage;
-import org.exoplatform.portal.pom.data.ContainerData;
-import org.exoplatform.portal.pom.data.ModelDataStorage;
-import org.exoplatform.portal.pom.data.PortalData;
-import org.exoplatform.portal.pom.data.PortalKey;
+import org.exoplatform.portal.pom.data.*;
 import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.core.ManageableRepository;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
-import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.listener.ListenerService;
-
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.jcr.query.QueryManager;
 
 @Managed
 @ManagedDescription("Portal migration sites from JCR to RDBMS.")
@@ -37,6 +25,7 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
   public static final String EVENT_LISTENER_KEY = "PORTAL_SITES_MIGRATION";
 
   private ModelDataStorage   modelStorage;
+
   public SiteMigrationService(InitParams initParams,
                               POMDataStorage pomStorage,
                               ModelDataStorage modelStorage,
@@ -79,8 +68,7 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
     LOG.info("|// END::migrated for "+ total + " site(s) in " + (System.currentTimeMillis() - t) + "ms");
 
     MigrationContext.setSitesMigrateFailed(sitesFailed);
-    RequestLifeCycle.end();
-    RequestLifeCycle.begin(PortalContainer.getInstance());
+    restartTransaction();
   }
 
   private long doMigrate(SiteType type, Set<PortalKey> failed) {
@@ -98,36 +86,32 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
       Set<PortalKey> keys = findSites(type, offset, limit);
       hasNext = keys != null && !keys.isEmpty();
       if (hasNext) {
-
-        boolean begunTx = startTx();
-
         for (PortalKey key : keys) {
           offset++;
           count ++;
 
           long t1 = System.currentTimeMillis();
           LOG.info(String.format("|  \\ START::migrate site number: %s (%s site) (type: %s)", offset, key.toString(), type.getName()));
-
           try {
+            PortalData toMigrateSite = pomStorage.getPortalConfig(key);
+            ContainerData portalLayoutContainer = this.migrateContainer(toMigrateSite.getPortalLayout());
+
             PortalData created = modelStorage.getPortalConfig(key);
-            PortalData site = pomStorage.getPortalConfig(key);
             if (created == null) {
-              LOG.info("Creating site {} in JPA", site.getKey());
+              LOG.info("Creating site {} in JPA", toMigrateSite.getKey());
               PortalData migrate = new PortalData(null,
-                      site.getName(),
-                      site.getType(),
-                      site.getLocale(),
-                      site.getLabel(),
-                      site.getDescription(),
-                      site.getAccessPermissions(),
-                      site.getEditPermission(),
-                      site.getProperties(),
-                      site.getSkin(),
-                      this.migrateContainer(site.getPortalLayout()),
-                      site.getRedirects());
-
+                      toMigrateSite.getName(),
+                      toMigrateSite.getType(),
+                      toMigrateSite.getLocale(),
+                      toMigrateSite.getLabel(),
+                      toMigrateSite.getDescription(),
+                      toMigrateSite.getAccessPermissions(),
+                      toMigrateSite.getEditPermission(),
+                      toMigrateSite.getProperties(),
+                      toMigrateSite.getSkin(),
+                      portalLayoutContainer,
+                      toMigrateSite.getRedirects());
               modelStorage.create(migrate);
-
             } else {
               LOG.info("Updating layout for site {} in JPA", created.getKey());
               PortalData migrate = new PortalData(created.getStorageId(),
@@ -140,10 +124,12 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
                       created.getEditPermission(),
                       created.getProperties(),
                       created.getSkin(),
-                      this.migrateContainer(site.getPortalLayout()),
+                      portalLayoutContainer,
                       created.getRedirects());
               modelStorage.save(migrate);
             }
+
+            restartTransaction();
 
             created = modelStorage.getPortalConfig(key);
             broadcastListener(created, created.getKey().toString());
@@ -153,6 +139,7 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
             failed.add(key);
             count --;
           } finally {
+            restartTransaction();
             LOG.info(String.format("|  / END::migrate site number: %s (%s site) (type: %s) consumed %s(ms)",
                     offset,
                     key.toString(),
@@ -160,10 +147,6 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
                     System.currentTimeMillis() - t1));
           }
         }
-
-        endTx(begunTx);
-        RequestLifeCycle.end();
-        RequestLifeCycle.begin(PortalContainer.getInstance());
       }
     }
     return count;
@@ -226,11 +209,8 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
       Set<PortalKey> keys = findSites(type, offset, limit);
       hasNext = keys != null && !keys.isEmpty();
       if (hasNext) {
-        boolean begunTx = startTx();
-
         for (PortalKey key : keys) {
           count ++;
-
           long t1 = System.currentTimeMillis();
           LOG.info(String.format("|  \\ START::Clean up site number: %s (%s site) (type: %s)", count, key.toString(), type.getName()));
 
@@ -244,6 +224,7 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
             LOG.error("Error during clean up site: " + key.toString(), ex);
             count --;
           } finally {
+            restartTransaction();
             LOG.info(String.format("|  // END::Clean up site number: %s (%s site) (type: %s) consumed %s(ms)",
                     offset,
                     key.toString(),
@@ -251,10 +232,6 @@ public class SiteMigrationService extends AbstractMigrationService<PortalData> {
                     System.currentTimeMillis() - t1));
           }
         }
-
-        endTx(begunTx);
-        RequestLifeCycle.end();
-        RequestLifeCycle.begin(PortalContainer.getInstance());
       }
     }
     return count;

@@ -77,7 +77,7 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
 
   @Override
   protected void beforeMigration() throws Exception {
-    MigrationContext.setNavigationDone(false);
+    MigrationContext.setNavDone(false);
   }
 
   @Override
@@ -111,8 +111,7 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
     LOG.info("|// END::migrated navigation for "+ total + " site(s) in " + (System.currentTimeMillis() - t) + "ms");
 
     MigrationContext.setNavigationFailed(sitesFailed);
-    RequestLifeCycle.end();
-    RequestLifeCycle.begin(PortalContainer.getInstance());
+    restartTransaction();
 
 //    boolean begunTx = startTx();
 //    int offset = 0;
@@ -190,9 +189,6 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
       Set<PortalKey> keys = findSites(type, offset, limit);
       hasNext = keys != null && !keys.isEmpty();
       if (hasNext) {
-
-        boolean begunTx = startTx();
-
         for (PortalKey key : keys) {
           offset++;
           count ++;
@@ -230,10 +226,7 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
                     System.currentTimeMillis() - t1));
           }
         }
-
-        endTx(begunTx);
-        RequestLifeCycle.end();
-        RequestLifeCycle.begin(PortalContainer.getInstance());
+        restartTransaction();
       }
     }
     return count;
@@ -281,7 +274,7 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
       return;
     }
     if (MigrationContext.getNavigationFailed().isEmpty()) {
-      MigrationContext.setNavigationDone(true);
+      MigrationContext.setNavDone(true);
     }
   }
 
@@ -321,15 +314,12 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
       Set<PortalKey> keys = findSites(type, offset, limit);
       hasNext = keys != null && !keys.isEmpty();
       if (hasNext) {
-        boolean begunTx = startTx();
-
         for (PortalKey key : keys) {
           count ++;
           offset ++;
 
           long t1 = System.currentTimeMillis();
           LOG.info(String.format("|  \\ START::Clean up site number: %s (%s site) (type: %s)", count, key.toString(), type.getName()));
-
           try {
             SiteKey siteKey = type.key(key.getId());
             NavigationContext nav = jcrNavService.loadNavigation(siteKey);
@@ -337,12 +327,12 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
               jcrNavService.destroyNavigation(nav);
             }
             pomStorage.save();
-
           } catch (Exception ex) {
             ex.printStackTrace();
             LOG.error("Error during clean up site: " + key.toString(), ex);
             count --;
           } finally {
+            restartTransaction();
             LOG.info(String.format("|  // END::Clean up site number: %s (%s site) (type: %s) consumed %s(ms)",
                     offset,
                     key.toString(),
@@ -350,10 +340,6 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
                     System.currentTimeMillis() - t1));
           }
         }
-
-        endTx(begunTx);
-        RequestLifeCycle.end();
-        RequestLifeCycle.begin(PortalContainer.getInstance());
       }
     }
     return count;
@@ -379,15 +365,7 @@ public class NavigationMigrationService extends AbstractMigrationService<Navigat
         ((QueryImpl)q).setLimit(1);
       }
       javax.jcr.query.QueryResult rs = q.execute();
-
-      NodeIterator iterator = rs.getNodes();
-      if (iterator.hasNext()) {
-        Node node = iterator.nextNode();
-        System.out.println("Path: " + node.getPath());
-        System.out.println("Name: " + node.getName());
-        return true;
-      }
-
+      return rs.getNodes().hasNext();
     } catch (RepositoryException ex) {
       LOG.error("Error while retrieve user portal", ex);
     }

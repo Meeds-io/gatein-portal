@@ -55,7 +55,6 @@ public class AppRegistryMigrationService extends AbstractMigrationService<Applic
   @Managed
   @ManagedDescription("Manual to start run migration data of applications from JCR to RDBMS.")
   public void doMigration() {
-    boolean begunTx = startTx();
     int offset = 0;
 
     long t = System.currentTimeMillis();
@@ -63,7 +62,7 @@ public class AppRegistryMigrationService extends AbstractMigrationService<Applic
       LOG.info("| \\ START::Application Categories migration ---------------------------------");
       List<ApplicationCategory> categories = getAppCategory();
 
-      if (categories == null || categories.size() == 0) {
+      if (categories == null || categories.isEmpty()) {
         return;
       }
 
@@ -93,10 +92,7 @@ public class AppRegistryMigrationService extends AbstractMigrationService<Applic
           //
           offset++;
           if (offset % LIMIT_THRESHOLD == 0) {
-            endTx(begunTx);
-            RequestLifeCycle.end();
-            RequestLifeCycle.begin(PortalContainer.getInstance());
-            begunTx = startTx();
+            restartTransaction();
           }
 
           broadcastListener(created, created.getName());
@@ -108,11 +104,8 @@ public class AppRegistryMigrationService extends AbstractMigrationService<Applic
           LOG.error("exception during migration category: " + category.getName(), ex);
         }
       }
-
     } finally {
-      endTx(begunTx);
-      RequestLifeCycle.end();
-      RequestLifeCycle.begin(PortalContainer.getInstance());
+      restartTransaction();
       LOG.info(String.format("| / END::Category migration for (%s) categories consumed %s(ms)", offset, System.currentTimeMillis() - t));
     }
   }
@@ -136,7 +129,7 @@ public class AppRegistryMigrationService extends AbstractMigrationService<Applic
     try {
       List<ApplicationCategory> categories = getAppCategory();
 
-      if (categories == null || categories.size() == 0) {
+      if (categories == null || categories.isEmpty()) {
         return;
       }
 
@@ -154,8 +147,7 @@ public class AppRegistryMigrationService extends AbstractMigrationService<Applic
 
           timePerSite = System.currentTimeMillis();
           if (offset % LIMIT_THRESHOLD == 0) {
-            RequestLifeCycle.end();
-            RequestLifeCycle.begin(PortalContainer.getInstance());
+            restartTransaction();
           }
         } catch (Exception ex) {
           LOG.error("Can't remove category: " + category.getName(), ex);
@@ -182,7 +174,7 @@ public class AppRegistryMigrationService extends AbstractMigrationService<Applic
   
   private List<ApplicationCategory> getAppCategory() {
     if (data == null) {
-      data = new ArrayList<ApplicationCategory>();
+      data = new ArrayList<>();
       try {
         data.addAll(jcrAppService.getApplicationCategories());
       } catch (Exception e) {

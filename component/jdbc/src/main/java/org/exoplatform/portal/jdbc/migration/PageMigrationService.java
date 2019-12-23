@@ -59,8 +59,6 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
   @Managed
   @ManagedDescription("Manual to start run migration data of pages from JCR to RDBMS.")
   public void doMigration() {
-    boolean begunTx = startTx();
-
     long t = System.currentTimeMillis();
     Set<String> failedPages = new HashSet<>();
     int offset = 0;
@@ -146,10 +144,7 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
 
             //
             if (offset % LIMIT_THRESHOLD == 0) {
-              endTx(begunTx);
-              RequestLifeCycle.end();
-              RequestLifeCycle.begin(PortalContainer.getInstance());
-              begunTx = startTx();
+              restartTransaction();
             }
 
             created = pageService.loadPage(page.getKey());
@@ -167,10 +162,8 @@ public class PageMigrationService extends AbstractMigrationService<PageContext> 
       } while (pages.getSize() > 0);
 
     } finally {
-      endTx(begunTx);
-      RequestLifeCycle.end();
       MigrationContext.setPagesMigrateFailed(failedPages);
-      RequestLifeCycle.begin(PortalContainer.getInstance());
+      restartTransaction();
       LOG.info(String.format("| / END::page migration for (%s) page(s) consumed %s(ms)", offset, System.currentTimeMillis() - t));
     }
   }

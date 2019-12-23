@@ -22,33 +22,48 @@ import java.util.HashSet;
 import java.util.Set;
 
 public final class MigrationContext {
-  public static final String PORTAL_RDBMS_MIGRATION_STATUS_KEY = "PORTAL_RDBMS_MIGRATION_DONE";
-  public static final String PORTAL_RDBMS_SITE_MIGRATION_KEY = "PORTAL_RDBMS_SITE_MIGRATION_DONE";  
-  public static final String PORTAL_RDBMS_SITE_CLEANUP_KEY = "PORTAL_RDBMS_SITE_CLEANUP_DONE";
-  public static final String PORTAL_RDBMS_PAGE_MIGRATION_KEY = "PORTAL_RDBMS_PAGE_MIGRATION_DONE";;
-  public static final String PORTAL_RDBMS_PAGE_CLEANUP_KEY = "PORTAL_RDBMS_PAGE_CLEANUP_DONE";
-  public static final String PORTAL_RDBMS_NAV_MIGRATION_KEY = "PORTAL_RDBMS_NAV_MIGRATION_DONE";;
-  public static final String PORTAL_RDBMS_NAV_CLEANUP_KEY = "PORTAL_RDBMS_NAV_CLEANUP_DONE";
-  public static final String PORTAL_RDBMS_APP_MIGRATION_KEY = "PORTAL_RDBMS_APP_MIGRATION_DONE";;
-  public static final String PORTAL_RDBMS_APP_CLEANUP_KEY = "PORTAL_RDBMS_APP_CLEANUP_DONE";
-    
-  //
-  private static boolean isDone = false;
-  private static boolean isSiteDone = false;
-  private static boolean isSiteCleanupDone = false;
-  
-  private static boolean isPageDone = false;
-  private static boolean isPageCleanupDone = false;
-  
-  private static boolean isNavDone = false;
-  private static boolean isNavCleanupDone = false;
-  
-  private static boolean isAppDone = false;
-  private static boolean isAppCleanupDone = false;
+  public static final String    PORTAL_RDBMS_MIGRATION_STATUS_KEY = "PORTAL_RDBMS_MIGRATION_DONE";
 
-  private static Set<PortalKey> sitesMigrateFailed = new HashSet<>();
-  private static Set<PortalKey> navigationFailed = new HashSet<>();
-  private static Set<String> pagesMigrateFailed = new HashSet<>();
+  public static final String    PORTAL_RDBMS_SITE_MIGRATION_KEY   = "PORTAL_RDBMS_SITE_MIGRATION_DONE";
+
+  public static final String    PORTAL_RDBMS_SITE_CLEANUP_KEY     = "PORTAL_RDBMS_SITE_CLEANUP_DONE";
+
+  public static final String    PORTAL_RDBMS_PAGE_MIGRATION_KEY   = "PORTAL_RDBMS_PAGE_MIGRATION_DONE";;
+
+  public static final String    PORTAL_RDBMS_PAGE_CLEANUP_KEY     = "PORTAL_RDBMS_PAGE_CLEANUP_DONE";
+
+  public static final String    PORTAL_RDBMS_NAV_MIGRATION_KEY    = "PORTAL_RDBMS_NAV_MIGRATION_DONE";;
+
+  public static final String    PORTAL_RDBMS_NAV_CLEANUP_KEY      = "PORTAL_RDBMS_NAV_CLEANUP_DONE";
+
+  public static final String    PORTAL_RDBMS_APP_MIGRATION_KEY    = "PORTAL_RDBMS_APP_MIGRATION_DONE";;
+
+  public static final String    PORTAL_RDBMS_APP_CLEANUP_KEY      = "PORTAL_RDBMS_APP_CLEANUP_DONE";
+
+  //
+  private static boolean        isDone                            = false;
+
+  private static boolean        isSiteDone                        = false;
+
+  private static boolean        isSiteCleanupDone                 = false;
+
+  private static boolean        isPageDone                        = false;
+
+  private static boolean        isPageCleanupDone                 = false;
+
+  private static boolean        isNavDone                         = false;
+
+  private static boolean        isNavCleanupDone                  = false;
+
+  private static boolean        isAppDone                         = false;
+
+  private static boolean        isAppCleanupDone                  = false;
+
+  private static Set<PortalKey> sitesMigrateFailed                = new HashSet<>();
+
+  private static Set<PortalKey> navigationFailed                  = new HashSet<>();
+
+  private static Set<String>    pagesMigrateFailed                = new HashSet<>();
 
   public static boolean isDone() {
     return isDone;
@@ -76,10 +91,6 @@ public final class MigrationContext {
 
   public static void setPageDone(boolean isPageDone) {
     MigrationContext.isPageDone = isPageDone;
-  }
-
-  public static void setNavigationDone(boolean isNavDone) {
-    MigrationContext.isNavDone = isNavDone;
   }
 
   public static void setAppDone(boolean isAppDone) {
