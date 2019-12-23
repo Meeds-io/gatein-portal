@@ -21,12 +21,18 @@ package org.exoplatform.portal.mop.importer;
 
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.pom.data.Mapper;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * @author <a href="trongtt@gmail.com">Trong Tran</a>
  * @version $Revision$
  */
 public class PortalConfigImporter {
+    /** . */
+    private static final Log LOG = ExoLogger.getLogger(PortalConfigImporter.class);
+
     /** . */
     private final PortalConfig src;
 
@@ -47,12 +53,13 @@ public class PortalConfigImporter {
         PortalConfig dst = null;
 
         //
+        boolean portalExists = existingPortalConfig == null;
         switch (mode) {
             case CONSERVE:
                 dst = null;
                 break;
             case INSERT:
-                if (existingPortalConfig == null) {
+                if (portalExists) {
                     dst = src;
                 } else {
                     dst = null;
@@ -67,7 +74,12 @@ public class PortalConfigImporter {
         }
 
         if (dst != null) {
-            if (existingPortalConfig == null) {
+            LOG.info("Importing Portal config of site of type '{}' with name '{}', import mode '{}', already exists = {}",
+                     src.getType(),
+                     src.getName(),
+                     mode,
+                     portalExists);
+            if (portalExists) {
                 service.create(dst);
             } else {
                 service.save(dst);

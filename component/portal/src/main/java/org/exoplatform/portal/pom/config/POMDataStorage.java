@@ -162,6 +162,9 @@ public class POMDataStorage implements ModelDataStorage {
     }
 
     public <S> S load(ApplicationState<S> state, ApplicationType<S> type) throws Exception {
+        if (type == null || type.getContentType() == null || state == null) {
+          return null;
+        }
         Class<S> clazz = type.getContentType().getStateClass();
         if (state instanceof TransientApplicationState) {
             TransientApplicationState<S> transientState = (TransientApplicationState<S>) state;

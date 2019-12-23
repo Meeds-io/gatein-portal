@@ -191,6 +191,10 @@ public abstract class AbstractMigrationService<T> {
 
   protected <S> ApplicationData<S> migrateApplication(ApplicationData<S> app) throws Exception {
     S s = pomStorage.load(app.getState(), app.getType());
+    if (s == null) {
+      LOG.warn("Can't migrate application {}", app.getId());
+      return null;
+    }
     String contentId = pomStorage.getId(app.getState());
     ApplicationState<S> migrated = new TransientApplicationState<>(contentId, s);
 
@@ -251,7 +255,11 @@ public abstract class AbstractMigrationService<T> {
       } else if (comp instanceof BodyData) {
         result.add(migrateBodyData((BodyData)comp));
       } else if (comp instanceof ApplicationData) {
-        result.add(migrateApplication((ApplicationData)comp));
+        ApplicationData application = migrateApplication((ApplicationData)comp);
+        if (application == null) {
+          continue;
+        }
+        result.add(application);
       }
     }
 
