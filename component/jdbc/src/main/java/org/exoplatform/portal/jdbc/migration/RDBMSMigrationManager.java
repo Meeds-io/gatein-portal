@@ -12,22 +12,21 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 public class RDBMSMigrationManager implements Startable {
-  private static final Log     LOG                          = ExoLogger.getLogger(RDBMSMigrationManager.class);
+  private static final Log            LOG                          = ExoLogger.getLogger(RDBMSMigrationManager.class);
 
-  public static final String   MIGRATION_SETTING_GLOBAL_KEY = "MIGRATION_SETTING_GLOBAL";
+  public static final String          MIGRATION_SETTING_GLOBAL_KEY = "MIGRATION_SETTING_GLOBAL";
 
-  private Thread               migrationThread;
+  private Thread                      migrationThread;
 
-  private SiteMigrationService siteMigrationService;
-  
-  private PageMigrationService pageMigrationService;
-  
-  private NavigationMigrationService navMigrationService;
-  
+  private SiteMigrationService        siteMigrationService;
+
+  private PageMigrationService        pageMigrationService;
+
+  private NavigationMigrationService  navMigrationService;
+
   private AppRegistryMigrationService appMigrationService;
 
-  // TODO: need move setting service from common into gatein
-  private SettingService settingService;
+  private SettingService              settingService;
 
   public RDBMSMigrationManager(SiteMigrationService siteMigrationService,
                                PageMigrationService pageMigrationService,
@@ -60,26 +59,51 @@ public class RDBMSMigrationManager implements Startable {
             //
             LOG.info("START ASYNC MIGRATION---------------------------------------------------");
             //
-            if (!MigrationContext.isDone()) {
-              if (!MigrationContext.isSiteDone()) {
-                siteMigrationService.start();
-                updateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_MIGRATION_KEY, MigrationContext.isSiteDone());
+            if (MigrationContext.isDone()) {
+              LOG.info("Overall Portal JCR to RDBMS migration already finished, ignore it.");
+            } else {
+              if (MigrationContext.isAppDone()) {
+                LOG.info("APPLICATION REGISTRY migration already finished, ignore it.");
+              } else {
+                try {
+                  appMigrationService.start();
+                  updateSettingValue(MigrationContext.PORTAL_RDBMS_APP_MIGRATION_KEY, MigrationContext.isAppDone());
+                } catch (Throwable e) {
+                  LOG.error("Error migrating APPLICATION REGISTRY from JCR to RDBMS", e);
+                }
               }
 
-              if (MigrationContext.isSiteDone() && !MigrationContext.isPageDone()) {
-                pageMigrationService.start();
-                updateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_MIGRATION_KEY, MigrationContext.isPageDone());
-              }
-              
-              if (MigrationContext.isPageDone() && !MigrationContext.isNavDone()) {
-                navMigrationService.start();
-                updateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_MIGRATION_KEY, MigrationContext.isNavDone());
+              if (MigrationContext.isSiteDone()) {
+                LOG.info("SITES migration already finished, ignore it.");
+              } else {
+                try {
+                  siteMigrationService.start();
+                  updateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_MIGRATION_KEY, MigrationContext.isSiteDone());
+                } catch (Throwable e) {
+                  LOG.error("Error migrating SITES from JCR to RDBMS", e);
+                }
               }
 
-              
-              if (MigrationContext.isNavDone() && !MigrationContext.isAppDone()) {
-                appMigrationService.start();
-                updateSettingValue(MigrationContext.PORTAL_RDBMS_APP_MIGRATION_KEY, MigrationContext.isAppDone());
+              if (MigrationContext.isPageDone()) {
+                LOG.info("PAGES migration already finished, ignore it.");
+              } else if (MigrationContext.isSiteDone()) {
+                try {
+                  pageMigrationService.start();
+                  updateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_MIGRATION_KEY, MigrationContext.isPageDone());
+                } catch (Throwable e) {
+                  LOG.error("Error migrating PAGES from JCR to RDBMS", e);
+                }
+              }
+
+              if (MigrationContext.isNavDone()) {
+                LOG.info("Sites NAVIGATIONS migration already finished, ignore it.");
+              } else if (MigrationContext.isPageDone()) {
+                try {
+                  navMigrationService.start();
+                  updateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_MIGRATION_KEY, MigrationContext.isNavDone());
+                } catch (Throwable e) {
+                  LOG.error("Error migrating sites NAVIGATIONS from JCR to RDBMS", e);
+                }
               }
             }
             //
@@ -90,8 +114,11 @@ public class RDBMSMigrationManager implements Startable {
 
               // cleanup
               if (MigrationContext.isAppDone() && !MigrationContext.isAppCleanupDone()) {
-                appMigrationService.doRemove();
-                updateSettingValue(MigrationContext.PORTAL_RDBMS_APP_CLEANUP_KEY, Boolean.TRUE);
+                try {
+                  appMigrationService.doRemove();
+                  updateSettingValue(MigrationContext.PORTAL_RDBMS_APP_CLEANUP_KEY, Boolean.TRUE);
+                } catch (Exception e) {
+                }
               }
 
               // cleanup
@@ -116,7 +143,8 @@ public class RDBMSMigrationManager implements Startable {
             }
           }
 
-          if (MigrationContext.isSiteCleanupDone() && MigrationContext.isPageCleanupDone() && MigrationContext.isNavCleanupDone() && MigrationContext.isAppCleanupDone()) {
+          if (MigrationContext.isSiteCleanupDone() && MigrationContext.isPageCleanupDone() && MigrationContext.isNavCleanupDone()
+              && MigrationContext.isAppCleanupDone()) {
             updateSettingValue(MigrationContext.PORTAL_RDBMS_MIGRATION_STATUS_KEY, Boolean.TRUE);
             MigrationContext.setDone(true);
           }
@@ -145,19 +173,19 @@ public class RDBMSMigrationManager implements Startable {
     //
     MigrationContext.setSiteDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_MIGRATION_KEY));
     MigrationContext.setSiteCleanupDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_CLEANUP_KEY));
-    
-    MigrationContext.setSiteDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_MIGRATION_KEY));
-    MigrationContext.setSiteCleanupDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_CLEANUP_KEY));
-    
-    MigrationContext.setSiteDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_MIGRATION_KEY));
-    MigrationContext.setSiteCleanupDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_CLEANUP_KEY));
-    
-    MigrationContext.setSiteDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_APP_MIGRATION_KEY));
-    MigrationContext.setSiteCleanupDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_APP_CLEANUP_KEY));
+
+    MigrationContext.setPageDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_MIGRATION_KEY));
+    MigrationContext.setPageCleanupDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_CLEANUP_KEY));
+
+    MigrationContext.setNavDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_MIGRATION_KEY));
+    MigrationContext.setNavCleanupDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_CLEANUP_KEY));
+
+    MigrationContext.setAppDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_APP_MIGRATION_KEY));
+    MigrationContext.setAppCleanupDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_APP_CLEANUP_KEY));
   }
 
   private boolean getOrCreateSettingValue(String key) {
-    SettingValue<String> setting = (SettingValue<String>)this.settingService.get(Context.GLOBAL, Scope.GLOBAL.id(null), key);
+    SettingValue<String> setting = (SettingValue<String>) this.settingService.get(Context.GLOBAL, Scope.GLOBAL.id(null), key);
     if (setting != null) {
       return Boolean.parseBoolean(setting.getValue());
     } else {
