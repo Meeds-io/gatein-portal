@@ -2,11 +2,12 @@ package org.exoplatform.portal.jdbc.migration;
 
 import java.lang.reflect.Field;
 
+import org.picocontainer.Startable;
+
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
-import org.picocontainer.Startable;
 import org.exoplatform.services.jcr.impl.core.SessionImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -50,103 +51,86 @@ public class RDBMSMigrationManager implements Startable {
         //
         Field field = null;
         try {
-          if (!MigrationContext.isDone()) {
+          if (MigrationContext.isDone()) {
+            LOG.info("Overall Portal JCR to RDBMS migration already finished, ignore it.");
+          } else {
             field = SessionImpl.class.getDeclaredField("FORCE_USE_GET_NODES_LAZILY");
             if (field != null) {
               field.setAccessible(true);
               field.set(null, true);
             }
+
+            //
+            long startTime = System.currentTimeMillis();
             //
             LOG.info("START ASYNC MIGRATION---------------------------------------------------");
-            //
-            if (MigrationContext.isDone()) {
-              LOG.info("Overall Portal JCR to RDBMS migration already finished, ignore it.");
-            } else {
-              if (MigrationContext.isAppDone()) {
-                LOG.info("APPLICATION REGISTRY migration already finished, ignore it.");
-              } else {
-                try {
-                  appMigrationService.start();
-                  updateSettingValue(MigrationContext.PORTAL_RDBMS_APP_MIGRATION_KEY, MigrationContext.isAppDone());
-                } catch (Throwable e) {
-                  LOG.error("Error migrating APPLICATION REGISTRY from JCR to RDBMS", e);
-                }
-              }
-
-              if (MigrationContext.isSiteDone()) {
-                LOG.info("SITES migration already finished, ignore it.");
-              } else {
-                try {
-                  siteMigrationService.start();
-                  updateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_MIGRATION_KEY, MigrationContext.isSiteDone());
-                } catch (Throwable e) {
-                  LOG.error("Error migrating SITES from JCR to RDBMS", e);
-                }
-              }
-
-              if (MigrationContext.isPageDone()) {
-                LOG.info("PAGES migration already finished, ignore it.");
-              } else if (MigrationContext.isSiteDone()) {
-                try {
-                  pageMigrationService.start();
-                  updateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_MIGRATION_KEY, MigrationContext.isPageDone());
-                } catch (Throwable e) {
-                  LOG.error("Error migrating PAGES from JCR to RDBMS", e);
-                }
-              }
-
-              if (MigrationContext.isNavDone()) {
-                LOG.info("Sites NAVIGATIONS migration already finished, ignore it.");
-              } else if (MigrationContext.isPageDone()) {
-                try {
-                  navMigrationService.start();
-                  updateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_MIGRATION_KEY, MigrationContext.isNavDone());
-                } catch (Throwable e) {
-                  LOG.error("Error migrating sites NAVIGATIONS from JCR to RDBMS", e);
-                }
-              }
-            }
-            //
-            LOG.info("END ASYNC MIGRATION-----------------------------------------------------");
 
             if (MigrationContext.isAppDone()) {
-              LOG.info("START CLEANUP PORTAL DATA ---------------------------------------------------");
-
-              // cleanup
-              if (MigrationContext.isAppDone() && !MigrationContext.isAppCleanupDone()) {
-                try {
-                  appMigrationService.doRemove();
-                  updateSettingValue(MigrationContext.PORTAL_RDBMS_APP_CLEANUP_KEY, Boolean.TRUE);
-                } catch (Exception e) {
-                }
-              }
-
-              // cleanup
-              if (MigrationContext.isNavDone() && !MigrationContext.isNavCleanupDone()) {
-                navMigrationService.doRemove();
-                updateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_CLEANUP_KEY, Boolean.TRUE);
-              }
-
-              // Page
-              if (MigrationContext.isPageDone() && !MigrationContext.isPageCleanupDone()) {
-                pageMigrationService.doRemove();
-                updateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_CLEANUP_KEY, Boolean.TRUE);
-              }
-
-              // Site
-              if (MigrationContext.isSiteDone() && !MigrationContext.isSiteCleanupDone()) {
-                siteMigrationService.doRemove();
-                updateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_CLEANUP_KEY, Boolean.TRUE);
-              }
-
-              LOG.info("END CLEANUP PORTAL DATA -----------------------------------------------------");
+              LOG.info("APPLICATION REGISTRY migration already finished, ignore it.");
+            } else {
+              appMigrationService.start();
+              updateSettingValue(MigrationContext.PORTAL_RDBMS_APP_MIGRATION_KEY, MigrationContext.isAppDone());
             }
+
+            if (MigrationContext.isSiteDone()) {
+              LOG.info("SITES migration already finished, ignore it.");
+            } else {
+              siteMigrationService.start();
+              updateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_MIGRATION_KEY, MigrationContext.isSiteDone());
+            }
+
+            if (MigrationContext.isPageDone()) {
+              LOG.info("PAGES migration already finished, ignore it.");
+            } else {
+              pageMigrationService.start();
+              updateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_MIGRATION_KEY, MigrationContext.isPageDone());
+            }
+
+            if (MigrationContext.isNavDone()) {
+              LOG.info("Sites NAVIGATIONS migration already finished, ignore it.");
+            } else {
+              navMigrationService.start();
+              updateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_MIGRATION_KEY, MigrationContext.isNavDone());
+            }
+            //
+            LOG.info("END ASYNC MIGRATION in {}ms-----------------------------------------------------",
+                     System.currentTimeMillis() - startTime);
+
+            startTime = System.currentTimeMillis();
+            LOG.info("START CLEANUP PORTAL DATA ---------------------------------------------------");
+            // cleanup
+            if (MigrationContext.isAppDone() && !MigrationContext.isAppCleanupDone()) {
+              appMigrationService.doRemove();
+              updateSettingValue(MigrationContext.PORTAL_RDBMS_APP_CLEANUP_KEY, Boolean.TRUE);
+            }
+
+            // cleanup
+            if (MigrationContext.isNavDone() && !MigrationContext.isNavCleanupDone()) {
+              navMigrationService.doRemove();
+              updateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_CLEANUP_KEY, Boolean.TRUE);
+            }
+
+            // Page
+            if (MigrationContext.isPageDone() && !MigrationContext.isPageCleanupDone()) {
+              pageMigrationService.doRemove();
+              updateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_CLEANUP_KEY, Boolean.TRUE);
+            }
+
+            // Site
+            if (MigrationContext.isSiteDone() && !MigrationContext.isSiteCleanupDone()) {
+              siteMigrationService.doRemove();
+              updateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_CLEANUP_KEY, Boolean.TRUE);
+            }
+
+            LOG.info("END CLEANUP PORTAL DATA in {}ms -----------------------------------------------------",
+                     System.currentTimeMillis() - startTime);
           }
 
           if (MigrationContext.isSiteCleanupDone() && MigrationContext.isPageCleanupDone() && MigrationContext.isNavCleanupDone()
               && MigrationContext.isAppCleanupDone()) {
             updateSettingValue(MigrationContext.PORTAL_RDBMS_MIGRATION_STATUS_KEY, Boolean.TRUE);
             MigrationContext.setDone(true);
+            settingService.remove(AbstractMigrationService.CONTEXT);
           }
 
         } catch (Exception e) {
@@ -185,9 +169,9 @@ public class RDBMSMigrationManager implements Startable {
   }
 
   private boolean getOrCreateSettingValue(String key) {
-    SettingValue<String> setting = (SettingValue<String>) this.settingService.get(Context.GLOBAL, Scope.GLOBAL.id(null), key);
+    SettingValue<?> setting = this.settingService.get(Context.GLOBAL, Scope.GLOBAL.id(null), key);
     if (setting != null) {
-      return Boolean.parseBoolean(setting.getValue());
+      return Boolean.parseBoolean(setting.getValue().toString());
     } else {
       updateSettingValue(key, Boolean.FALSE);
       return false;
@@ -200,12 +184,7 @@ public class RDBMSMigrationManager implements Startable {
 
   @Override
   public void stop() {
-    siteMigrationService.stop();
-    try {
-      this.migrationThread.join();
-    } catch (InterruptedException e) {
-      LOG.error(e);
-    }
+    AbstractMigrationService.forceStop = true; // NOSONAR
+    this.migrationThread.interrupt();
   }
-
 }

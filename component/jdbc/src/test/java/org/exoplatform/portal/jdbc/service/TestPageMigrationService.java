@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import javax.persistence.EntityTransaction;
 
+import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
@@ -77,10 +78,12 @@ public class TestPageMigrationService extends AbstractPortalTest {
     this.pageMigrationService = new PageMigrationService(params, pomStorage, modelStorage, pageService, jcrPageService,
             getContainer().getComponentInstanceOfType(ListenerService.class),
             getContainer().getComponentInstanceOfType(RepositoryService.class),
+            getContainer().getComponentInstanceOfType(SettingService.class),
             getContainer().getComponentInstanceOfType(EntityManagerService.class));
     this.siteMigrationService = new SiteMigrationService(params, pomStorage, modelStorage,
             getContainer().getComponentInstanceOfType(ListenerService.class),
             getContainer().getComponentInstanceOfType(RepositoryService.class),
+            getContainer().getComponentInstanceOfType(SettingService.class),
             getContainer().getComponentInstanceOfType(EntityManagerService.class));
 
     super.begin();
@@ -123,6 +126,7 @@ public class TestPageMigrationService extends AbstractPortalTest {
             "testPageMigrationSite", SiteType.PORTAL.getName(), null, null,
             null, new ArrayList<>(), null, null, null, container, null));
 
+    pageMigrationService.setSiteMigrated(SiteType.PORTAL.key("testPageMigrationSite"));
     pageMigrationService.doMigration();
     pageMigrationService.doRemove();
 

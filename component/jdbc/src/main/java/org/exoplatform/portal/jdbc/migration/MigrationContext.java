@@ -16,27 +16,30 @@
  */
 package org.exoplatform.portal.jdbc.migration;
 
-import org.exoplatform.portal.pom.data.PortalKey;
-
 import java.util.HashSet;
 import java.util.Set;
 
+import org.exoplatform.portal.pom.data.PortalKey;
+
 public final class MigrationContext {
+  private MigrationContext() {
+  }
+
   public static final String    PORTAL_RDBMS_MIGRATION_STATUS_KEY = "PORTAL_RDBMS_MIGRATION_DONE";
 
   public static final String    PORTAL_RDBMS_SITE_MIGRATION_KEY   = "PORTAL_RDBMS_SITE_MIGRATION_DONE";
 
   public static final String    PORTAL_RDBMS_SITE_CLEANUP_KEY     = "PORTAL_RDBMS_SITE_CLEANUP_DONE";
 
-  public static final String    PORTAL_RDBMS_PAGE_MIGRATION_KEY   = "PORTAL_RDBMS_PAGE_MIGRATION_DONE";;
+  public static final String    PORTAL_RDBMS_PAGE_MIGRATION_KEY   = "PORTAL_RDBMS_PAGE_MIGRATION_DONE";
 
   public static final String    PORTAL_RDBMS_PAGE_CLEANUP_KEY     = "PORTAL_RDBMS_PAGE_CLEANUP_DONE";
 
-  public static final String    PORTAL_RDBMS_NAV_MIGRATION_KEY    = "PORTAL_RDBMS_NAV_MIGRATION_DONE";;
+  public static final String    PORTAL_RDBMS_NAV_MIGRATION_KEY    = "PORTAL_RDBMS_NAV_MIGRATION_DONE";
 
   public static final String    PORTAL_RDBMS_NAV_CLEANUP_KEY      = "PORTAL_RDBMS_NAV_CLEANUP_DONE";
 
-  public static final String    PORTAL_RDBMS_APP_MIGRATION_KEY    = "PORTAL_RDBMS_APP_MIGRATION_DONE";;
+  public static final String    PORTAL_RDBMS_APP_MIGRATION_KEY    = "PORTAL_RDBMS_APP_MIGRATION_DONE";
 
   public static final String    PORTAL_RDBMS_APP_CLEANUP_KEY      = "PORTAL_RDBMS_APP_CLEANUP_DONE";
 

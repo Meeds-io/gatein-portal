@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import javax.persistence.EntityTransaction;
 
+import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
@@ -79,6 +80,7 @@ public class TestSiteMigrationService extends AbstractPortalTest {
     this.siteMigrationService = new SiteMigrationService(params, pomStorage, modelStorage,
             getContainer().getComponentInstanceOfType(ListenerService.class),
             getContainer().getComponentInstanceOfType(RepositoryService.class),
+            getContainer().getComponentInstanceOfType(SettingService.class),
             getContainer().getComponentInstanceOfType(EntityManagerService.class));
 
     begin();

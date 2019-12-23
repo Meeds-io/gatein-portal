@@ -1,15 +1,24 @@
 package org.exoplatform.portal.jdbc.migration;
 
 import java.util.*;
+
 import javax.jcr.*;
 import javax.jcr.query.QueryManager;
-import javax.persistence.EntityManager;
 
 import org.apache.commons.lang3.StringUtils;
 import org.chromattic.ext.format.BaseEncodingObjectFormatter;
-import org.exoplatform.container.xml.ValueParam;
+
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.commons.persistence.impl.EntityManagerService;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.pom.config.POMDataStorage;
 import org.exoplatform.portal.pom.data.*;
@@ -17,26 +26,29 @@ import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
-import org.exoplatform.services.listener.ListenerService;
-import org.exoplatform.commons.persistence.impl.EntityManagerService;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.component.RequestLifeCycle;
-import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.services.listener.Event;
-import org.exoplatform.services.listener.Listener;
+import org.exoplatform.services.listener.*;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 public abstract class AbstractMigrationService<T> {
-  protected Log                                      LOG;
 
-  protected final static String                      LIMIT_THRESHOLD_KEY    = "LIMIT_THRESHOLD";
+  protected static final String                      CONTEXT_KEY            = "PORTAL_MIGRATION_ENTITIES";
+
+  protected static final Context                     CONTEXT                = Context.GLOBAL.id("PORTAL_MIGRATION_ENTITIES");
+
+  protected static final String                      LIMIT_THRESHOLD_KEY    = "LIMIT_THRESHOLD";
 
   protected static final String                      DEFAULT_WORKSPACE_NAME = "portal-system";
 
   protected static final BaseEncodingObjectFormatter formatter              = new BaseEncodingObjectFormatter();
 
-  protected POMDataStorage                           pomStorage;
+  protected static boolean                           forceStop              = false;
+
+  protected final Log                                log;
+
+  protected int                                      limitThreshold         = 10;
+
+  protected final POMDataStorage                     pomStorage;
 
   protected final ListenerService                    listenerService;
 
@@ -44,9 +56,7 @@ public abstract class AbstractMigrationService<T> {
 
   protected final RepositoryService                  repoService;
 
-  protected boolean                                  forkStop               = false;
-
-  protected int                                      LIMIT_THRESHOLD        = 10;
+  protected final SettingService                     settingService;
 
   protected String                                   workspaceName;
 
@@ -54,20 +64,18 @@ public abstract class AbstractMigrationService<T> {
                                   POMDataStorage pomDataStorage,
                                   ListenerService listenerService,
                                   RepositoryService repoService,
+                                  SettingService settingService,
                                   EntityManagerService entityManagerService) {
     this.pomStorage = pomDataStorage;
     this.listenerService = listenerService;
     this.entityManagerService = entityManagerService;
+    this.settingService = settingService;
     this.repoService = repoService;
 
-    ValueParam workspaceParam = initParams == null ? null : initParams.getValueParam("workspace");
-    if (workspaceParam != null) {
-      this.workspaceName = workspaceParam.getValue();
-    } else {
-      this.workspaceName = DEFAULT_WORKSPACE_NAME;
-    }
+    this.log = ExoLogger.getLogger(this.getClass().getName());
 
-    LOG = ExoLogger.getLogger(this.getClass().getName());
+    this.workspaceName = getString(initParams, "workspace", DEFAULT_WORKSPACE_NAME);
+    this.limitThreshold = getInteger(initParams, LIMIT_THRESHOLD_KEY, 1);
   }
 
   public void addMigrationListener(Listener<T, String> listener) {
@@ -76,14 +84,13 @@ public abstract class AbstractMigrationService<T> {
 
   protected void broadcastListener(T t, String newId) {
     try {
-      this.listenerService.broadcast(new Event(getListenerKey(), t, newId));
+      this.listenerService.broadcast(new Event<>(getListenerKey(), t, newId));
     } catch (Exception e) {
-      LOG.error("Failed to broadcast event", e);
+      log.error("Failed to broadcast event", e);
     }
   }
 
-  public void start() throws Exception {
-    forkStop = false;
+  public void start() {
     RequestLifeCycle.begin(PortalContainer.getInstance());
     try {
       beforeMigration();
@@ -93,10 +100,6 @@ public abstract class AbstractMigrationService<T> {
       RequestLifeCycle.end();
       restartTransaction();
     }
-  }
-
-  public void stop() {
-    forkStop = true;
   }
 
   protected int getInteger(InitParams params, String key, int defaultValue) {
@@ -115,7 +118,7 @@ public abstract class AbstractMigrationService<T> {
     }
   }
 
-  protected String getProperty(Node node, String propName) throws Exception {
+  protected String getProperty(Node node, String propName) {
     try {
       return node.getProperty(propName).getString();
     } catch (Exception ex) {
@@ -123,7 +126,7 @@ public abstract class AbstractMigrationService<T> {
     }
   }
 
-  protected String[] getProperties(Node node, String propName) throws Exception {
+  protected String[] getProperties(Node node, String propName) {
     List<String> values = new LinkedList<>();
     try {
       for (Value val : node.getProperty(propName).getValues()) {
@@ -131,62 +134,66 @@ public abstract class AbstractMigrationService<T> {
       }
       return values.toArray(new String[values.size()]);
     } catch (Exception ex) {
-      return null;
+      log.warn("Error reading property '{}' of node {}", propName, node, ex);
+      return new String[0];
     }
   }
 
-  protected ContainerData migrateContainer(ContainerData containerData) throws Exception {
+  protected ContainerData migrateContainer(ContainerData containerData) {
     //
     List<ComponentData> children = this.migrateComponents(containerData.getChildren());
-    ContainerData layout = new ContainerData(null,
-                                             containerData.getId(),
-                                             containerData.getName(),
-                                             containerData.getIcon(),
-                                             containerData.getTemplate(),
-                                             containerData.getFactoryId(),
-                                             containerData.getTitle(),
-                                             containerData.getDescription(),
-                                             containerData.getWidth(),
-                                             containerData.getHeight(),
-                                             containerData.getAccessPermissions(),
-                                             containerData.getMoveAppsPermissions(),
-                                             containerData.getMoveContainersPermissions(),
-                                             children);
-    return layout;
+    return new ContainerData(null,
+                             containerData.getId(),
+                             containerData.getName(),
+                             containerData.getIcon(),
+                             containerData.getTemplate(),
+                             containerData.getFactoryId(),
+                             containerData.getTitle(),
+                             containerData.getDescription(),
+                             containerData.getWidth(),
+                             containerData.getHeight(),
+                             containerData.getAccessPermissions(),
+                             containerData.getMoveAppsPermissions(),
+                             containerData.getMoveContainersPermissions(),
+                             children);
   }
 
-  protected <S> ApplicationData<S> migrateApplication(ApplicationData<S> app) throws Exception {
+  protected <S> ApplicationData<S> migrateApplication(ApplicationData<S> app) {
     if (StringUtils.isBlank(app.getStorageId())) {
       throw new IllegalStateException("Unexpected empty application storage id");
     }
     ApplicationData<S> applicationData = pomStorage.getApplicationData(app.getStorageId());
-    S s = pomStorage.load(applicationData.getState(), applicationData.getType());
-    String contentId = pomStorage.getId(app.getState());
-    ApplicationState<S> migrated = new TransientApplicationState<>(contentId, s);
+    try {
+      S s = pomStorage.load(applicationData.getState(), applicationData.getType());
+      String contentId = pomStorage.getId(app.getState());
+      ApplicationState<S> migrated = new TransientApplicationState<>(contentId, s);
 
-    return new ApplicationData<>(null,
-                                 app.getStorageName(),
-                                 app.getType(),
-                                 migrated,
-                                 app.getId(),
-                                 app.getTitle(),
-                                 app.getIcon(),
-                                 app.getDescription(),
-                                 app.isShowInfoBar(),
-                                 app.isShowApplicationState(),
-                                 app.isShowApplicationMode(),
-                                 app.getTheme(),
-                                 app.getWidth(),
-                                 app.getHeight(),
-                                 app.getProperties(),
-                                 app.getAccessPermissions());
+      return new ApplicationData<>(null,
+                                   app.getStorageName(),
+                                   app.getType(),
+                                   migrated,
+                                   app.getId(),
+                                   app.getTitle(),
+                                   app.getIcon(),
+                                   app.getDescription(),
+                                   app.isShowInfoBar(),
+                                   app.isShowApplicationState(),
+                                   app.isShowApplicationMode(),
+                                   app.getTheme(),
+                                   app.getWidth(),
+                                   app.getHeight(),
+                                   app.getProperties(),
+                                   app.getAccessPermissions());
+    } catch (Exception e) {
+      throw new IllegalStateException("Unable to retrieve data of application with storage id " + app.getStorageId(), e);
+    }
   }
 
   protected BodyData migrateBodyData(BodyData body) {
     return new BodyData(null, body.getType());
   }
 
-  protected PageData migratePageData(PageData page) throws Exception {
+  protected PageData migratePageData(PageData page) {
     List<ComponentData> children = this.migrateComponents(page.getChildren());
     return new PageData(null,
                         page.getId(),
@@ -208,7 +215,7 @@ public abstract class AbstractMigrationService<T> {
                         page.getMoveContainersPermissions());
   }
 
-  protected List<ComponentData> migrateComponents(List<ComponentData> list) throws Exception {
+  protected List<ComponentData> migrateComponents(List<ComponentData> list) {
     List<ComponentData> result = new ArrayList<>();
 
     for (ComponentData comp : list) {
@@ -219,7 +226,7 @@ public abstract class AbstractMigrationService<T> {
       } else if (comp instanceof BodyData) {
         result.add(migrateBodyData((BodyData) comp));
       } else if (comp instanceof ApplicationData) {
-        ApplicationData application = migrateApplication((ApplicationData) comp);
+        ApplicationData<?> application = migrateApplication((ApplicationData<?>) comp);
         if (application == null) {
           continue;
         }
@@ -251,20 +258,71 @@ public abstract class AbstractMigrationService<T> {
       while (iterator.hasNext()) {
         Node node = iterator.nextNode();
         String path = node.getPath();
-        String siteName = path.substring(path.lastIndexOf(":") + 1);
+        String siteName = path.substring(path.lastIndexOf(':') + 1);
         siteName = formatter.decodeNodeName(null, siteName);
 
         result.add(new PortalKey(type.getName().toLowerCase(), siteName));
       }
 
     } catch (RepositoryException ex) {
-      LOG.error("Error while retrieve user portal", ex);
+      log.error("Error while retrieve user portal", ex);
     }
 
     return result;
   }
 
+  public void setSiteMigrated(SiteKey key) {
+    settingService.set(CONTEXT, Scope.PORTAL.id(key.getTypeName()), key.getName(), SettingValue.create(true));
+  }
+  
+  public void setSiteMigrated(PortalKey key) {
+    settingService.set(CONTEXT, Scope.PORTAL.id(key.getType()), key.getId(), SettingValue.create(true));
+  }
+
+  public boolean isSiteMigrated(PortalKey key) {
+    SettingValue<?> settingValue =
+                                 settingService.get(CONTEXT, Scope.PORTAL.id(key.getType()), key.getId());
+    return settingValue != null && Boolean.parseBoolean(settingValue.getValue().toString());
+  }
+
+  public boolean isSiteMigrated(SiteKey key) {
+    SettingValue<?> settingValue =
+                                 settingService.get(CONTEXT, Scope.PORTAL.id(key.getTypeName()), key.getName());
+    return settingValue != null && Boolean.parseBoolean(settingValue.getValue().toString());
+  }
+
+  public void setPageMigrated(org.exoplatform.portal.mop.page.PageKey key) {
+    settingService.set(CONTEXT,
+                       Scope.PAGE.id(key.getSite().getTypeName() + "::" + key.getSite().getName()),
+                       key.getName(),
+                       SettingValue.create(true));
+  }
+
+  public boolean isPageMigrated(org.exoplatform.portal.mop.page.PageKey key) {
+    SettingValue<?> settingValue = settingService.get(CONTEXT,
+                                                      Scope.PAGE.id(key.getSite().getTypeName() + "::" + key.getSite().getName()),
+                                                      key.getName());
+    return settingValue != null && Boolean.parseBoolean(settingValue.getValue().toString());
+  }
+
+  public void setNavigationMigrated(PortalKey key) {
+    settingService.set(CONTEXT,
+                       new Scope("Navigation", key.getType()),
+                       key.getId(),
+                       SettingValue.create(true));
+  }
+
+  public boolean isNavigationMigrated(PortalKey key) {
+    SettingValue<?> settingValue = settingService.get(CONTEXT,
+                                                      new Scope("Navigation", key.getType()),
+                                                      key.getId());
+    return settingValue != null && Boolean.parseBoolean(settingValue.getValue().toString());
+  }
+
   protected void restartTransaction() {
+    if (forceStop) {
+      return;
+    }
     int i = 0;
     // Close transactions until no encapsulated transaction
     boolean success = true;
@@ -283,13 +341,13 @@ public abstract class AbstractMigrationService<T> {
     }
   }
 
-  protected abstract void beforeMigration() throws Exception;
+  protected abstract void beforeMigration();
 
-  public abstract void doMigration() throws Exception;
+  public abstract void doMigration();
 
-  protected abstract void afterMigration() throws Exception;
+  protected abstract void afterMigration();
 
-  public abstract void doRemove() throws Exception;
+  public abstract void doRemove();
 
   protected abstract String getListenerKey();
 }

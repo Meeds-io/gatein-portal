@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.UUID;
 import javax.persistence.EntityTransaction;
 
+import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
@@ -97,6 +98,7 @@ public class TestNavigationMigrationService extends AbstractPortalTest {
             getService(POMSessionManager.class),
             getService(ListenerService.class),
             getService(RepositoryService.class),
+            getService(SettingService.class),
             getService(EntityManagerService.class));
 
     super.begin();
@@ -159,6 +161,7 @@ public class TestNavigationMigrationService extends AbstractPortalTest {
 
     sync(true);
 
+    migrationService.setSiteMigrated(SiteType.PORTAL.key("testMigrate"));
     migrationService.doMigration();
     migrationService.doRemove();
 
