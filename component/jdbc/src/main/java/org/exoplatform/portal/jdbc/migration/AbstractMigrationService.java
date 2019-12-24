@@ -9,16 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.chromattic.ext.format.BaseEncodingObjectFormatter;
 
 import org.exoplatform.commons.api.settings.SettingService;
-import org.exoplatform.commons.api.settings.SettingValue;
-import org.exoplatform.commons.api.settings.data.Context;
-import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.commons.persistence.impl.EntityManagerService;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.TransientApplicationState;
-import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.pom.config.POMDataStorage;
 import org.exoplatform.portal.pom.data.*;
@@ -30,11 +23,7 @@ import org.exoplatform.services.listener.*;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-public abstract class AbstractMigrationService<T> {
-
-  protected static final String                      CONTEXT_KEY            = "PORTAL_MIGRATION_ENTITIES";
-
-  protected static final Context                     CONTEXT                = Context.GLOBAL.id("PORTAL_MIGRATION_ENTITIES");
+public abstract class AbstractMigrationService {
 
   protected static final String                      LIMIT_THRESHOLD_KEY    = "LIMIT_THRESHOLD";
 
@@ -42,17 +31,15 @@ public abstract class AbstractMigrationService<T> {
 
   protected static final BaseEncodingObjectFormatter formatter              = new BaseEncodingObjectFormatter();
 
-  protected static boolean                           forceStop              = false;
-
   protected final Log                                log;
 
   protected int                                      limitThreshold         = 10;
 
   protected final POMDataStorage                     pomStorage;
 
-  protected final ListenerService                    listenerService;
+  protected final ModelDataStorage                   modelStorage;
 
-  protected final EntityManagerService               entityManagerService;
+  protected final ListenerService                    listenerService;
 
   protected final RepositoryService                  repoService;
 
@@ -62,15 +49,15 @@ public abstract class AbstractMigrationService<T> {
 
   public AbstractMigrationService(InitParams initParams,
                                   POMDataStorage pomDataStorage,
+                                  ModelDataStorage modelStorage,
                                   ListenerService listenerService,
                                   RepositoryService repoService,
-                                  SettingService settingService,
-                                  EntityManagerService entityManagerService) {
+                                  SettingService settingService) {
     this.pomStorage = pomDataStorage;
+    this.modelStorage = modelStorage;
     this.listenerService = listenerService;
-    this.entityManagerService = entityManagerService;
-    this.settingService = settingService;
     this.repoService = repoService;
+    this.settingService = settingService;
 
     this.log = ExoLogger.getLogger(this.getClass().getName());
 
@@ -78,27 +65,15 @@ public abstract class AbstractMigrationService<T> {
     this.limitThreshold = getInteger(initParams, LIMIT_THRESHOLD_KEY, 1);
   }
 
-  public void addMigrationListener(Listener<T, String> listener) {
+  public void addMigrationListener(Listener<Object, String> listener) {
     this.listenerService.addListener(getListenerKey(), listener);
   }
 
-  protected void broadcastListener(T t, String newId) {
+  protected void broadcastListener(Object t, String newId) {
     try {
       this.listenerService.broadcast(new Event<>(getListenerKey(), t, newId));
     } catch (Exception e) {
       log.error("Failed to broadcast event", e);
-    }
-  }
-
-  public void start() {
-    RequestLifeCycle.begin(PortalContainer.getInstance());
-    try {
-      beforeMigration();
-      doMigration();
-      afterMigration();
-    } finally {
-      RequestLifeCycle.end();
-      restartTransaction();
     }
   }
 
@@ -237,7 +212,54 @@ public abstract class AbstractMigrationService<T> {
     return result;
   }
 
-  protected Set<PortalKey> findSites(SiteType type, long offset, long limit) {
+  protected List<PortalKey> getSitesToMigrate() {
+    return getSitesToMigrate(false);
+  }
+
+  protected List<PortalKey> getSitesToMigrate(boolean forceRefresh) {
+    List<PortalKey> portalKeys = MigrationContext.getSitesToMigrate();
+    if (!forceRefresh && portalKeys != null) {
+      return portalKeys;
+    }
+    portalKeys = new ArrayList<>(); // NOSONAR
+
+    long t1 = System.currentTimeMillis();
+    log.info("  \\ START::COMPUTE site keys to migrate");
+
+    findSites(portalKeys, SiteType.PORTAL);
+    int portalSitesCount = portalKeys.size();
+    log.info("--- {} PORTAL sites to migrate", portalSitesCount);
+
+    findSites(portalKeys, SiteType.GROUP);
+    int groupSitesCount = portalKeys.size() - portalSitesCount;
+    log.info("--- {} GROUP sites to migrate", groupSitesCount);
+
+    findSites(portalKeys, SiteType.USER);
+    int userSitesCount = portalKeys.size() - portalSitesCount - groupSitesCount;
+    log.info("--- {} USER sites to migrate", userSitesCount);
+
+    MigrationContext.setSitesToMigrate(portalKeys);
+
+    log.info("  / END::COMPUTE site keys to migrate in {}ms", System.currentTimeMillis() - t1);
+    return portalKeys;
+  }
+
+  protected void findSites(List<PortalKey> portalKeys, SiteType type) {
+    long offset = 0;
+    long limit = limitThreshold;
+
+    boolean hasNext = false;
+    do {
+      if (MigrationContext.isForceStop()) {
+        log.info("|  \\ STOPPING migration (server terminated)");
+        break;
+      }
+      hasNext = findSites(portalKeys, type, offset, limit);
+      offset += limit;
+    } while (hasNext);
+  }
+
+  protected boolean findSites(List<PortalKey> portalKeys, SiteType type, long offset, long limit) {
     Set<PortalKey> result = new HashSet<>();
     String mopType = "mop:" + type.getName().toLowerCase() + "site";
 
@@ -267,87 +289,15 @@ public abstract class AbstractMigrationService<T> {
     } catch (RepositoryException ex) {
       log.error("Error while retrieve user portal", ex);
     }
-
-    return result;
-  }
-
-  public void setSiteMigrated(SiteKey key) {
-    settingService.set(CONTEXT, Scope.PORTAL.id(key.getTypeName()), key.getName(), SettingValue.create(true));
-  }
-  
-  public void setSiteMigrated(PortalKey key) {
-    settingService.set(CONTEXT, Scope.PORTAL.id(key.getType()), key.getId(), SettingValue.create(true));
-  }
-
-  public boolean isSiteMigrated(PortalKey key) {
-    SettingValue<?> settingValue =
-                                 settingService.get(CONTEXT, Scope.PORTAL.id(key.getType()), key.getId());
-    return settingValue != null && Boolean.parseBoolean(settingValue.getValue().toString());
-  }
-
-  public boolean isSiteMigrated(SiteKey key) {
-    SettingValue<?> settingValue =
-                                 settingService.get(CONTEXT, Scope.PORTAL.id(key.getTypeName()), key.getName());
-    return settingValue != null && Boolean.parseBoolean(settingValue.getValue().toString());
-  }
-
-  public void setPageMigrated(org.exoplatform.portal.mop.page.PageKey key) {
-    settingService.set(CONTEXT,
-                       Scope.PAGE.id(key.getSite().getTypeName() + "::" + key.getSite().getName()),
-                       key.getName(),
-                       SettingValue.create(true));
-  }
-
-  public boolean isPageMigrated(org.exoplatform.portal.mop.page.PageKey key) {
-    SettingValue<?> settingValue = settingService.get(CONTEXT,
-                                                      Scope.PAGE.id(key.getSite().getTypeName() + "::" + key.getSite().getName()),
-                                                      key.getName());
-    return settingValue != null && Boolean.parseBoolean(settingValue.getValue().toString());
-  }
-
-  public void setNavigationMigrated(PortalKey key) {
-    settingService.set(CONTEXT,
-                       new Scope("Navigation", key.getType()),
-                       key.getId(),
-                       SettingValue.create(true));
-  }
-
-  public boolean isNavigationMigrated(PortalKey key) {
-    SettingValue<?> settingValue = settingService.get(CONTEXT,
-                                                      new Scope("Navigation", key.getType()),
-                                                      key.getId());
-    return settingValue != null && Boolean.parseBoolean(settingValue.getValue().toString());
-  }
-
-  protected void restartTransaction() {
-    if (forceStop) {
-      return;
+    if (!result.isEmpty()) {
+      portalKeys.addAll(result);
     }
-    int i = 0;
-    // Close transactions until no encapsulated transaction
-    boolean success = true;
-    do {
-      try {
-        RequestLifeCycle.end();
-        i++;
-      } catch (IllegalStateException e) {
-        success = false;
-      }
-    } while (success);
-
-    // Restart transactions with the same number of encapsulations
-    for (int j = 0; j < i; j++) {
-      RequestLifeCycle.begin(PortalContainer.getInstance());
-    }
+    return !result.isEmpty();
   }
 
-  protected abstract void beforeMigration();
+  public abstract void doMigrate(PortalKey siteToMigrateKey) throws Exception; // NOSONAR
 
-  public abstract void doMigration();
-
-  protected abstract void afterMigration();
-
-  public abstract void doRemove();
+  public abstract void doRemove(PortalKey siteToRemoveKey) throws Exception; // NOSONAR
 
   protected abstract String getListenerKey();
 }

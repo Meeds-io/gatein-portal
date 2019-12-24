@@ -1,13 +1,16 @@
 package org.exoplatform.portal.jdbc.migration;
 
 import java.lang.reflect.Field;
+import java.util.*;
 
 import org.picocontainer.Startable;
 
 import org.exoplatform.commons.api.settings.SettingService;
-import org.exoplatform.commons.api.settings.SettingValue;
-import org.exoplatform.commons.api.settings.data.Context;
-import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.portal.jdbc.migration.MigrationContext.PortalEntityType;
+import org.exoplatform.portal.pom.data.PortalKey;
 import org.exoplatform.services.jcr.impl.core.SessionImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -17,7 +20,7 @@ public class RDBMSMigrationManager implements Startable {
 
   public static final String          MIGRATION_SETTING_GLOBAL_KEY = "MIGRATION_SETTING_GLOBAL";
 
-  private Thread                      migrationThread;
+  private PortalContainer             container;
 
   private SiteMigrationService        siteMigrationService;
 
@@ -29,11 +32,13 @@ public class RDBMSMigrationManager implements Startable {
 
   private SettingService              settingService;
 
-  public RDBMSMigrationManager(SiteMigrationService siteMigrationService,
+  public RDBMSMigrationManager(PortalContainer container,
+                               SiteMigrationService siteMigrationService,
                                PageMigrationService pageMigrationService,
                                NavigationMigrationService navMigrationService,
                                AppRegistryMigrationService appMigrationService,
                                SettingService settingService) {
+    this.container = container;
     this.siteMigrationService = siteMigrationService;
     this.pageMigrationService = pageMigrationService;
     this.navMigrationService = navMigrationService;
@@ -43,99 +48,44 @@ public class RDBMSMigrationManager implements Startable {
 
   @Override
   public void start() {
-    initMigrationSetting();
+    if (MigrationContext.isDone()) {
+      LOG.info("Overall Portal JCR to RDBMS migration already finished, ignore it.");
+      return;
+    }
 
     Runnable migrateTask = new Runnable() {
       @Override
       public void run() {
         //
         Field field = null;
+        ExoContainerContext.setCurrentContainer(container);
+        RequestLifeCycle.begin(container);
         try {
-          if (MigrationContext.isDone()) {
-            LOG.info("Overall Portal JCR to RDBMS migration already finished, ignore it.");
-          } else {
-            field = SessionImpl.class.getDeclaredField("FORCE_USE_GET_NODES_LAZILY");
-            if (field != null) {
-              field.setAccessible(true);
-              field.set(null, true);
-            }
-
-            //
-            long startTime = System.currentTimeMillis();
-            //
-            LOG.info("START ASYNC MIGRATION---------------------------------------------------");
-
-            if (MigrationContext.isAppDone()) {
-              LOG.info("APPLICATION REGISTRY migration already finished, ignore it.");
-            } else {
-              appMigrationService.start();
-              updateSettingValue(MigrationContext.PORTAL_RDBMS_APP_MIGRATION_KEY, MigrationContext.isAppDone());
-            }
-
-            if (MigrationContext.isSiteDone()) {
-              LOG.info("SITES migration already finished, ignore it.");
-            } else {
-              siteMigrationService.start();
-              updateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_MIGRATION_KEY, MigrationContext.isSiteDone());
-            }
-
-            if (MigrationContext.isPageDone()) {
-              LOG.info("PAGES migration already finished, ignore it.");
-            } else {
-              pageMigrationService.start();
-              updateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_MIGRATION_KEY, MigrationContext.isPageDone());
-            }
-
-            if (MigrationContext.isNavDone()) {
-              LOG.info("Sites NAVIGATIONS migration already finished, ignore it.");
-            } else {
-              navMigrationService.start();
-              updateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_MIGRATION_KEY, MigrationContext.isNavDone());
-            }
-            //
-            LOG.info("END ASYNC MIGRATION in {}ms-----------------------------------------------------",
-                     System.currentTimeMillis() - startTime);
-
-            startTime = System.currentTimeMillis();
-            LOG.info("START CLEANUP PORTAL DATA ---------------------------------------------------");
-            // cleanup
-            if (MigrationContext.isAppDone() && !MigrationContext.isAppCleanupDone()) {
-              appMigrationService.doRemove();
-              updateSettingValue(MigrationContext.PORTAL_RDBMS_APP_CLEANUP_KEY, Boolean.TRUE);
-            }
-
-            // cleanup
-            if (MigrationContext.isNavDone() && !MigrationContext.isNavCleanupDone()) {
-              navMigrationService.doRemove();
-              updateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_CLEANUP_KEY, Boolean.TRUE);
-            }
-
-            // Page
-            if (MigrationContext.isPageDone() && !MigrationContext.isPageCleanupDone()) {
-              pageMigrationService.doRemove();
-              updateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_CLEANUP_KEY, Boolean.TRUE);
-            }
-
-            // Site
-            if (MigrationContext.isSiteDone() && !MigrationContext.isSiteCleanupDone()) {
-              siteMigrationService.doRemove();
-              updateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_CLEANUP_KEY, Boolean.TRUE);
-            }
-
-            LOG.info("END CLEANUP PORTAL DATA in {}ms -----------------------------------------------------",
-                     System.currentTimeMillis() - startTime);
+          field = SessionImpl.class.getDeclaredField("FORCE_USE_GET_NODES_LAZILY");
+          if (field != null) {
+            field.setAccessible(true);
+            field.set(null, true);
           }
 
-          if (MigrationContext.isSiteCleanupDone() && MigrationContext.isPageCleanupDone() && MigrationContext.isNavCleanupDone()
-              && MigrationContext.isAppCleanupDone()) {
-            updateSettingValue(MigrationContext.PORTAL_RDBMS_MIGRATION_STATUS_KEY, Boolean.TRUE);
-            MigrationContext.setDone(true);
-            settingService.remove(AbstractMigrationService.CONTEXT);
-          }
+          List<PortalKey> sitesToMigrate = siteMigrationService.getSitesToMigrate();
 
+          migrateAppRegistry();
+          Set<PortalKey> failedSitesToMigrate = migratePortals(sitesToMigrate);
+          removeAppRegistry();
+          Set<PortalKey> failedSitesToRemove = removePortals(sitesToMigrate);
+          setMigrationAsDone(failedSitesToMigrate, failedSitesToRemove);
+
+          LOG.info("END PORTAL Migration for {} sites, failed sites to migrate = {}, failed sites to cleanup = {}, app registry : migrated = {}, cleaned up = {}. Overall migration finished successfully= {}",
+                   sitesToMigrate.size(),
+                   failedSitesToMigrate.isEmpty() ? "'0 sites'" : failedSitesToMigrate,
+                   failedSitesToRemove.isEmpty() ? "'0 sites'" : failedSitesToRemove,
+                   MigrationContext.isAppDone(),
+                   MigrationContext.isAppCleanupDone(),
+                   MigrationContext.isDone());
         } catch (Exception e) {
-          LOG.error("Failed to running Migration data from JCR to RDBMS", e);
+          LOG.error("Failed to run Portal Migration data from JCR to RDBMS", e);
         } finally {
+          RequestLifeCycle.end();
           if (field != null) {
             try {
               field.set(null, false);
@@ -146,45 +96,246 @@ public class RDBMSMigrationManager implements Startable {
         }
       }
     };
-    this.migrationThread = new Thread(migrateTask);
-    this.migrationThread.setPriority(Thread.NORM_PRIORITY);
-    this.migrationThread.setName("PORTAL-MIGRATION-RDBMS");
-    this.migrationThread.start();
-  }
-
-  private void initMigrationSetting() {
-    MigrationContext.setDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_MIGRATION_STATUS_KEY));
-    //
-    MigrationContext.setSiteDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_MIGRATION_KEY));
-    MigrationContext.setSiteCleanupDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_SITE_CLEANUP_KEY));
-
-    MigrationContext.setPageDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_MIGRATION_KEY));
-    MigrationContext.setPageCleanupDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_PAGE_CLEANUP_KEY));
-
-    MigrationContext.setNavDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_MIGRATION_KEY));
-    MigrationContext.setNavCleanupDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_NAV_CLEANUP_KEY));
-
-    MigrationContext.setAppDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_APP_MIGRATION_KEY));
-    MigrationContext.setAppCleanupDone(getOrCreateSettingValue(MigrationContext.PORTAL_RDBMS_APP_CLEANUP_KEY));
-  }
-
-  private boolean getOrCreateSettingValue(String key) {
-    SettingValue<?> setting = this.settingService.get(Context.GLOBAL, Scope.GLOBAL.id(null), key);
-    if (setting != null) {
-      return Boolean.parseBoolean(setting.getValue().toString());
-    } else {
-      updateSettingValue(key, Boolean.FALSE);
-      return false;
-    }
-  }
-
-  private void updateSettingValue(String key, Boolean status) {
-    settingService.set(Context.GLOBAL, Scope.GLOBAL.id(null), key, SettingValue.create(status));
+    Thread migrationThread = new Thread(migrateTask);
+    migrationThread.setPriority(Thread.NORM_PRIORITY);
+    migrationThread.setName("PORTAL-MIGRATION-RDBMS");
+    migrationThread.start();
   }
 
   @Override
   public void stop() {
-    AbstractMigrationService.forceStop = true; // NOSONAR
-    this.migrationThread.interrupt();
+    MigrationContext.setForceStop();
   }
+
+  private void setMigrationAsDone(Set<PortalKey> failedSitesToMigrate, Set<PortalKey> failedSitesToRemove) {
+    if (MigrationContext.isAppCleanupDone() && failedSitesToMigrate.isEmpty() && failedSitesToRemove.isEmpty()) {
+      settingService.remove(MigrationContext.CONTEXT);
+      MigrationContext.restartTransaction();
+
+      MigrationContext.setDone();
+      MigrationContext.restartTransaction();
+    }
+  }
+
+  private Set<PortalKey> removePortals(List<PortalKey> sitesToMigrate) {
+    Set<PortalKey> failedSitesToRemove = new HashSet<>();
+    long startTime = System.currentTimeMillis();
+    LOG.info("START CLEANUP PORTAL DATA ---------------------------------------------------");
+    doRemove(sitesToMigrate, failedSitesToRemove);
+    LOG.info("END PORTAL DATA CLEANUP in {}ms-----------------------------------------------------",
+             System.currentTimeMillis() - startTime);
+    return failedSitesToRemove;
+  }
+
+  private void removeAppRegistry() {
+    if (MigrationContext.isAppDone() && !MigrationContext.isAppCleanupDone()) {
+      appMigrationService.doRemove();
+      MigrationContext.restartTransaction();
+    }
+  }
+
+  private Set<PortalKey> migratePortals(List<PortalKey> sitesToMigrate) {
+    Set<PortalKey> failedSitesToMigrate = new HashSet<>();
+    long startTime = System.currentTimeMillis();
+    LOG.info("START ASYNC PORTAL DATA MIGRATION---------------------------------------------------");
+    doMigrate(sitesToMigrate, failedSitesToMigrate);
+    LOG.info("END PORTAL DATA MIGRATION in {}ms-----------------------------------------------------",
+             System.currentTimeMillis() - startTime);
+    return failedSitesToMigrate;
+  }
+
+  private void migrateAppRegistry() {
+    if (MigrationContext.isAppDone()) {
+      LOG.info("APPLICATION REGISTRY migration already finished, ignore it.");
+    } else {
+      appMigrationService.doMigration();
+      MigrationContext.restartTransaction();
+    }
+  }
+
+  private void doMigrate(List<PortalKey> sitesToMigrate, Set<PortalKey> failedSitesToMigrate) {
+    int totalSitesToMigrateCount = sitesToMigrate.size();
+    int siteToMigrateIndex = 0;
+    for (PortalKey siteToMigrateKey : sitesToMigrate) {
+      if (MigrationContext.isForceStop()) {
+        LOG.info("|  \\ FORCE STOPPING MIGRATION. Migrated {} / {} sites, failed = {}",
+                 siteToMigrateIndex,
+                 totalSitesToMigrateCount,
+                 failedSitesToMigrate.size());
+        return;
+      }
+
+      siteToMigrateIndex++;
+
+      boolean migrated = doMigrate(siteMigrationService,
+                                   siteToMigrateKey,
+                                   PortalEntityType.SITE,
+                                   siteToMigrateIndex,
+                                   totalSitesToMigrateCount,
+                                   failedSitesToMigrate);
+      if (!migrated || MigrationContext.isForceStop()) {
+        continue;
+      }
+      migrated = doMigrate(pageMigrationService,
+                           siteToMigrateKey,
+                           PortalEntityType.PAGE,
+                           siteToMigrateIndex,
+                           totalSitesToMigrateCount,
+                           failedSitesToMigrate);
+      if (!migrated || MigrationContext.isForceStop()) {
+        continue;
+      }
+
+      doMigrate(navMigrationService,
+                siteToMigrateKey,
+                PortalEntityType.NAVIGATION,
+                siteToMigrateIndex,
+                totalSitesToMigrateCount,
+                failedSitesToMigrate);
+    }
+  }
+
+  protected boolean doMigrate(AbstractMigrationService migrationService,
+                              PortalKey siteToMigrateKey,
+                              PortalEntityType entityType,
+                              int siteToMigrateIndex,
+                              int totalSitesToMigrateCount,
+                              Set<PortalKey> failedSitesToMigrate) {
+    boolean migrated = true;
+    long t1 = System.currentTimeMillis();
+    if (MigrationContext.isMigrated(siteToMigrateKey, entityType)) {
+      LOG.info("|  ---- \\ IGNORE::ALREADY migrated {} {} / {} (site: {}::{})",
+               entityType.getTitle(),
+               siteToMigrateIndex,
+               totalSitesToMigrateCount,
+               siteToMigrateKey.getType(),
+               siteToMigrateKey.getId());
+    } else {
+      LOG.info("|  ---- \\ START::migrate {} {} / {} (site: {}::{})",
+               entityType.getTitle(),
+               siteToMigrateIndex,
+               totalSitesToMigrateCount,
+               siteToMigrateKey.getType(),
+               siteToMigrateKey.getId());
+      try {
+        migrationService.doMigrate(siteToMigrateKey);
+        MigrationContext.setMigrated(siteToMigrateKey, entityType);
+
+        LOG.info("|  ---- / END::migrate {} {} / {} (site: {}::{}) in {}ms",
+                 entityType.getTitle(),
+                 siteToMigrateIndex,
+                 totalSitesToMigrateCount,
+                 siteToMigrateKey.getType(),
+                 siteToMigrateKey.getId(),
+                 System.currentTimeMillis() - t1);
+      } catch (Exception e) {
+        migrated = false;
+        failedSitesToMigrate.add(siteToMigrateKey);
+        LOG.error("|  ---- / END::migrate {} {} / {} (site: {}::{}) in {}ms",
+                  entityType.getTitle(),
+                  siteToMigrateIndex,
+                  totalSitesToMigrateCount,
+                  siteToMigrateKey.getType(),
+                  siteToMigrateKey.getId(),
+                  System.currentTimeMillis() - t1,
+                  e);
+      } finally {
+        MigrationContext.restartTransaction();
+      }
+    }
+    return migrated;
+  }
+
+  private void doRemove(List<PortalKey> sitesToMigrate, Set<PortalKey> failedSitesToRemove) {
+    int totalSitesToMigrateCount = sitesToMigrate.size();
+    int siteToMigrateIndex = 0;
+    for (PortalKey siteToMigrateKey : sitesToMigrate) {
+      if (MigrationContext.isForceStop()) {
+        LOG.info("|  \\ FORCE STOPPING CLEANUO. Cleaned up {} / {} sites, failed = {}",
+                 siteToMigrateIndex,
+                 totalSitesToMigrateCount,
+                 failedSitesToRemove.size());
+        return;
+      }
+
+      siteToMigrateIndex++;
+
+      boolean removed = doRemove(navMigrationService,
+                                 siteToMigrateKey,
+                                 PortalEntityType.NAVIGATION,
+                                 siteToMigrateIndex,
+                                 totalSitesToMigrateCount,
+                                 failedSitesToRemove);
+      if (!removed || MigrationContext.isForceStop()) {
+        continue;
+      }
+      removed = doRemove(pageMigrationService,
+                         siteToMigrateKey,
+                         PortalEntityType.PAGE,
+                         siteToMigrateIndex,
+                         totalSitesToMigrateCount,
+                         failedSitesToRemove);
+      if (!removed || MigrationContext.isForceStop()) {
+        continue;
+      }
+
+      doRemove(siteMigrationService,
+               siteToMigrateKey,
+               PortalEntityType.SITE,
+               siteToMigrateIndex,
+               totalSitesToMigrateCount,
+               failedSitesToRemove);
+    }
+  }
+
+  protected boolean doRemove(AbstractMigrationService migrationService,
+                             PortalKey siteToCleanupKey,
+                             PortalEntityType entityType,
+                             int siteToCleanupIndex,
+                             int totalSitesToCleanupCount,
+                             Set<PortalKey> failedSitesToCleanup) {
+    boolean removed = true;
+    long t1 = System.currentTimeMillis();
+    if (MigrationContext.isMigrated(siteToCleanupKey, entityType)) {
+      LOG.info("|  ---- \\ START::cleanup {} {} / {} (site: {}::{})",
+               entityType.getTitle(),
+               siteToCleanupIndex,
+               totalSitesToCleanupCount,
+               siteToCleanupKey.getType(),
+               siteToCleanupKey.getId());
+      try {
+        migrationService.doRemove(siteToCleanupKey);
+
+        LOG.info("|  ---- / END::cleanup {} {} / {} (site: {}::{}) in {}ms",
+                 entityType.getTitle(),
+                 siteToCleanupIndex,
+                 totalSitesToCleanupCount,
+                 siteToCleanupKey.getType(),
+                 siteToCleanupKey.getId(),
+                 System.currentTimeMillis() - t1);
+      } catch (Exception e) {
+        removed = false;
+        failedSitesToCleanup.add(siteToCleanupKey);
+        LOG.error("|  ---- / END::cleanup {} {} / {} (site: {}::{}) in {}ms",
+                  entityType.getTitle(),
+                  siteToCleanupIndex,
+                  totalSitesToCleanupCount,
+                  siteToCleanupKey.getType(),
+                  siteToCleanupKey.getId(),
+                  System.currentTimeMillis() - t1,
+                  e);
+      } finally {
+        MigrationContext.restartTransaction();
+      }
+    } else {
+      LOG.info("|  ---- \\ IGNORE::NOT migrated yet {} {} / {} (site: {}::{})",
+               entityType.getTitle(),
+               siteToCleanupIndex,
+               totalSitesToCleanupCount,
+               siteToCleanupKey.getType(),
+               siteToCleanupKey.getId());
+    }
+    return removed;
+  }
+
 }

@@ -16,151 +16,177 @@
  */
 package org.exoplatform.portal.jdbc.migration;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.pom.data.PortalKey;
 
 public final class MigrationContext {
+  protected static final String  CONTEXT_KEY                       = "PORTAL_MIGRATION_ENTITIES";
+
+  protected static final Context CONTEXT                           = Context.GLOBAL.id("PORTAL_MIGRATION_ENTITIES");
+
+  protected static final String  NAVIGATION_SCOPE                  = "NAVIGATION";
+
+  public static final String     PORTAL_RDBMS_MIGRATION_STATUS_KEY = "PORTAL_RDBMS_MIGRATION_DONE";
+
+  public static final String     PORTAL_RDBMS_APP_MIGRATION_KEY    = "PORTAL_RDBMS_APP_MIGRATION_DONE";
+
+  public static final String     PORTAL_RDBMS_APP_CLEANUP_KEY      = "PORTAL_RDBMS_APP_CLEANUP_DONE";
+
+  private static SettingService  settingService                    = null;
+
+  private static boolean         forceStop                         = false;
+
+  private static List<PortalKey> sitesToMigrate                    = null;
+
   private MigrationContext() {
   }
 
-  public static final String    PORTAL_RDBMS_MIGRATION_STATUS_KEY = "PORTAL_RDBMS_MIGRATION_DONE";
-
-  public static final String    PORTAL_RDBMS_SITE_MIGRATION_KEY   = "PORTAL_RDBMS_SITE_MIGRATION_DONE";
-
-  public static final String    PORTAL_RDBMS_SITE_CLEANUP_KEY     = "PORTAL_RDBMS_SITE_CLEANUP_DONE";
-
-  public static final String    PORTAL_RDBMS_PAGE_MIGRATION_KEY   = "PORTAL_RDBMS_PAGE_MIGRATION_DONE";
-
-  public static final String    PORTAL_RDBMS_PAGE_CLEANUP_KEY     = "PORTAL_RDBMS_PAGE_CLEANUP_DONE";
-
-  public static final String    PORTAL_RDBMS_NAV_MIGRATION_KEY    = "PORTAL_RDBMS_NAV_MIGRATION_DONE";
-
-  public static final String    PORTAL_RDBMS_NAV_CLEANUP_KEY      = "PORTAL_RDBMS_NAV_CLEANUP_DONE";
-
-  public static final String    PORTAL_RDBMS_APP_MIGRATION_KEY    = "PORTAL_RDBMS_APP_MIGRATION_DONE";
-
-  public static final String    PORTAL_RDBMS_APP_CLEANUP_KEY      = "PORTAL_RDBMS_APP_CLEANUP_DONE";
-
-  //
-  private static boolean        isDone                            = false;
-
-  private static boolean        isSiteDone                        = false;
-
-  private static boolean        isSiteCleanupDone                 = false;
-
-  private static boolean        isPageDone                        = false;
-
-  private static boolean        isPageCleanupDone                 = false;
-
-  private static boolean        isNavDone                         = false;
-
-  private static boolean        isNavCleanupDone                  = false;
-
-  private static boolean        isAppDone                         = false;
-
-  private static boolean        isAppCleanupDone                  = false;
-
-  private static Set<PortalKey> sitesMigrateFailed                = new HashSet<>();
-
-  private static Set<PortalKey> navigationFailed                  = new HashSet<>();
-
-  private static Set<String>    pagesMigrateFailed                = new HashSet<>();
-
   public static boolean isDone() {
-    return isDone;
+    return getSettingValue(PORTAL_RDBMS_MIGRATION_STATUS_KEY);
   }
 
-  public static void setDone(boolean isDoneArg) {
-    isDone = isDoneArg;
-  }
-
-  public static boolean isSiteDone() {
-    return isSiteDone;
-  }
-
-  public static void setSiteDone(boolean isSiteDone) {
-    MigrationContext.isSiteDone = isSiteDone;
-  }
-
-  public static boolean isSiteCleanupDone() {
-    return isSiteCleanupDone;
-  }
-
-  public static void setSiteCleanupDone(boolean isSiteCleanupDone) {
-    MigrationContext.isSiteCleanupDone = isSiteCleanupDone;
-  }
-
-  public static void setPageDone(boolean isPageDone) {
-    MigrationContext.isPageDone = isPageDone;
-  }
-
-  public static void setAppDone(boolean isAppDone) {
-    MigrationContext.isAppDone = isAppDone;
-  }
-
-  public static boolean isPageCleanupDone() {
-    return isPageCleanupDone;
-  }
-
-  public static void setPageCleanupDone(boolean isPageCleanupDone) {
-    MigrationContext.isPageCleanupDone = isPageCleanupDone;
-  }
-
-  public static boolean isNavDone() {
-    return isNavDone;
-  }
-
-  public static void setNavDone(boolean isNavDone) {
-    MigrationContext.isNavDone = isNavDone;
-  }
-
-  public static boolean isNavCleanupDone() {
-    return isNavCleanupDone;
-  }
-
-  public static void setNavCleanupDone(boolean isNavCleanupDone) {
-    MigrationContext.isNavCleanupDone = isNavCleanupDone;
-  }
-
-  public static boolean isAppCleanupDone() {
-    return isAppCleanupDone;
-  }
-
-  public static void setAppCleanupDone(boolean isAppCleanupDone) {
-    MigrationContext.isAppCleanupDone = isAppCleanupDone;
-  }
-
-  public static boolean isPageDone() {
-    return isPageDone;
+  public static void setDone() {
+    updateSettingValue(PORTAL_RDBMS_MIGRATION_STATUS_KEY, true);
   }
 
   public static boolean isAppDone() {
-    return isAppDone;
+    return getSettingValue(PORTAL_RDBMS_APP_MIGRATION_KEY);
   }
 
-  public static Set<PortalKey> getSitesMigrateFailed() {
-    return sitesMigrateFailed;
+  public static void setAppDone() {
+    updateSettingValue(PORTAL_RDBMS_APP_MIGRATION_KEY, true);
   }
 
-  public static void setSitesMigrateFailed(Set<PortalKey> sitesMigrateFailed) {
-    MigrationContext.sitesMigrateFailed = sitesMigrateFailed;
+  public static boolean isAppCleanupDone() {
+    return getSettingValue(PORTAL_RDBMS_APP_CLEANUP_KEY);
   }
 
-  public static Set<PortalKey> getNavigationFailed() {
-    return navigationFailed;
+  public static void setAppCleanupDone() {
+    updateSettingValue(PORTAL_RDBMS_APP_CLEANUP_KEY, true);
   }
 
-  public static void setNavigationFailed(Set<PortalKey> navigationFailed) {
-    MigrationContext.navigationFailed = navigationFailed;
+  public static void setMigrated(PortalKey siteToMigrateKey, PortalEntityType entityType) {
+    getSettingService().set(entityType.getContext(),
+                            new Scope(entityType.getScopeType(), siteToMigrateKey.getType()),
+                            siteToMigrateKey.getId(),
+                            SettingValue.create(true));
   }
 
-  public static Set<String> getPagesMigrateFailed() {
-    return pagesMigrateFailed;
+  public static boolean isMigrated(PortalKey siteToMigrateKey, PortalEntityType entityType) {
+    SettingValue<?> settingValue = getSettingService().get(entityType.getContext(),
+                                                           new Scope(entityType.getScopeType(), siteToMigrateKey.getType()),
+                                                           siteToMigrateKey.getId());
+    return settingValue != null && Boolean.parseBoolean(settingValue.getValue().toString());
   }
 
-  public static void setPagesMigrateFailed(Set<String> pagesMigrateFailed) {
-    MigrationContext.pagesMigrateFailed = pagesMigrateFailed;
+  public static void setPageMigrated(PageKey key) {
+    getSettingService().set(CONTEXT,
+                            Scope.PAGE.id(key.getSite().getTypeName() + "::" + key.getSite().getName()),
+                            key.getName(),
+                            SettingValue.create(true));
   }
+
+  public static boolean isPageMigrated(PageKey key) {
+    SettingValue<?> settingValue = getSettingService().get(CONTEXT,
+                                                           Scope.PAGE.id(key.getSite().getTypeName() + "::"
+                                                               + key.getSite().getName()),
+                                                           key.getName());
+    return settingValue != null && Boolean.parseBoolean(settingValue.getValue().toString());
+  }
+
+  public static void setForceStop() {
+    forceStop = true;
+  }
+
+  public static boolean isForceStop() {
+    return forceStop;
+  }
+
+  public static List<PortalKey> getSitesToMigrate() {
+    return sitesToMigrate;
+  }
+
+  public static void setSitesToMigrate(List<PortalKey> sitesToMigrate) {
+    MigrationContext.sitesToMigrate = sitesToMigrate;
+  }
+
+  public static SettingService getSettingService() {
+    if (settingService == null) {
+      settingService = PortalContainer.getInstance().getComponentInstanceOfType(SettingService.class);
+    }
+    return settingService;
+  }
+
+  public static void restartTransaction() {
+    if (forceStop) {
+      return;
+    }
+    int i = 0;
+    // Close transactions until no encapsulated transaction
+    boolean success = true;
+    do {
+      try {
+        RequestLifeCycle.end();
+        i++;
+      } catch (IllegalStateException e) {
+        success = false;
+      }
+    } while (success);
+
+    // Restart transactions with the same number of encapsulations
+    for (int j = 0; j < i; j++) {
+      RequestLifeCycle.begin(PortalContainer.getInstance());
+    }
+  }
+
+  private static boolean getSettingValue(String key) {
+    SettingValue<?> setting = getSettingService().get(MigrationContext.CONTEXT, Scope.GLOBAL.id(null), key);
+    if (setting != null) {
+      return Boolean.parseBoolean(setting.getValue().toString());
+    }
+    return false;
+  }
+
+  private static void updateSettingValue(String key, Boolean status) {
+    getSettingService().set(MigrationContext.CONTEXT, Scope.GLOBAL.id(null), key, SettingValue.create(status));
+  }
+
+  public enum PortalEntityType {
+    SITE(CONTEXT, Scope.PORTAL.getName(), "SITE"),
+    NAVIGATION(CONTEXT, NAVIGATION_SCOPE, "SITE NAVIGATION"),
+    PAGE(CONTEXT, Scope.PAGE.getName(), "SITE PAGES");
+
+    private Context context;
+
+    private String  scopeType;
+
+    private String  title;
+
+    private PortalEntityType(Context context, String scopeType, String title) {
+      this.context = context;
+      this.scopeType = scopeType;
+      this.title = title;
+    }
+
+    public Context getContext() {
+      return context;
+    }
+
+    public String getScopeType() {
+      return scopeType;
+    }
+
+    public String getTitle() {
+      return title;
+    }
+  }
+
 }
