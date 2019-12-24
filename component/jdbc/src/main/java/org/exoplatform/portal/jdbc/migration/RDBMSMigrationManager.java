@@ -9,11 +9,13 @@ import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.container.xml.*;
 import org.exoplatform.portal.jdbc.migration.MigrationContext.PortalEntityType;
 import org.exoplatform.portal.pom.data.PortalKey;
 import org.exoplatform.services.jcr.impl.core.SessionImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.web.filter.*;
 
 public class RDBMSMigrationManager implements Startable {
   private static final Log            LOG                          = ExoLogger.getLogger(RDBMSMigrationManager.class);
@@ -32,11 +34,14 @@ public class RDBMSMigrationManager implements Startable {
 
   private SettingService              settingService;
 
+  private ExtensibleFilter            extensibleFilter;
+
   public RDBMSMigrationManager(PortalContainer container,
                                SiteMigrationService siteMigrationService,
                                PageMigrationService pageMigrationService,
                                NavigationMigrationService navMigrationService,
                                AppRegistryMigrationService appMigrationService,
+                               ExtensibleFilter extensibleFilter,
                                SettingService settingService) {
     this.container = container;
     this.siteMigrationService = siteMigrationService;
@@ -44,6 +49,7 @@ public class RDBMSMigrationManager implements Startable {
     this.navMigrationService = navMigrationService;
     this.appMigrationService = appMigrationService;
     this.settingService = settingService;
+    this.extensibleFilter = extensibleFilter;
   }
 
   @Override
@@ -52,6 +58,8 @@ public class RDBMSMigrationManager implements Startable {
       LOG.info("Overall Portal JCR to RDBMS migration already finished, ignore it.");
       return;
     }
+
+    installMigrationFilter();
 
     Runnable migrateTask = new Runnable() {
       @Override
@@ -70,12 +78,12 @@ public class RDBMSMigrationManager implements Startable {
           List<PortalKey> sitesToMigrate = siteMigrationService.getSitesToMigrate();
 
           migrateAppRegistry();
-          Set<PortalKey> failedSitesToMigrate = migratePortals(sitesToMigrate);
+          Set<PortalKey> failedSitesToMigrate = migratePortals();
           removeAppRegistry();
-          Set<PortalKey> failedSitesToRemove = removePortals(sitesToMigrate);
+          Set<PortalKey> failedSitesToRemove = removePortals();
           setMigrationAsDone(failedSitesToMigrate, failedSitesToRemove);
 
-          LOG.info("END PORTAL Migration for {} sites, failed sites to migrate = {}, failed sites to cleanup = {}, app registry : migrated = {}, cleaned up = {}. Overall migration finished successfully= {}",
+          LOG.info("END PORTAL Migration for {} sites, failed sites to migrate = {}, failed sites to cleanup = {}. Overall migration finished successfully= {}",
                    sitesToMigrate.size(),
                    failedSitesToMigrate.isEmpty() ? "'0 sites'" : failedSitesToMigrate,
                    failedSitesToRemove.isEmpty() ? "'0 sites'" : failedSitesToRemove,
@@ -102,6 +110,16 @@ public class RDBMSMigrationManager implements Startable {
     migrationThread.start();
   }
 
+  private void installMigrationFilter() {
+    InitParams params = new InitParams();
+    ObjectParameter objectParameter = new ObjectParameter();
+    objectParameter.setName("filter");
+    FilterDefinition filterDefinition = new FilterDefinition(new MigrationFilter(), Collections.singletonList("/.*"));
+    objectParameter.setObject(filterDefinition);
+    params.addParameter(objectParameter);
+    this.extensibleFilter.addFilterDefinitions(new FilterDefinitionPlugin(params));
+  }
+
   @Override
   public void stop() {
     MigrationContext.setForceStop();
@@ -117,11 +135,11 @@ public class RDBMSMigrationManager implements Startable {
     }
   }
 
-  private Set<PortalKey> removePortals(List<PortalKey> sitesToMigrate) {
+  private Set<PortalKey> removePortals() {
     Set<PortalKey> failedSitesToRemove = new HashSet<>();
     long startTime = System.currentTimeMillis();
     LOG.info("START CLEANUP PORTAL DATA ---------------------------------------------------");
-    doRemove(sitesToMigrate, failedSitesToRemove);
+    doRemove(failedSitesToRemove);
     LOG.info("END PORTAL DATA CLEANUP in {}ms-----------------------------------------------------",
              System.currentTimeMillis() - startTime);
     return failedSitesToRemove;
@@ -134,11 +152,11 @@ public class RDBMSMigrationManager implements Startable {
     }
   }
 
-  private Set<PortalKey> migratePortals(List<PortalKey> sitesToMigrate) {
+  private Set<PortalKey> migratePortals() {
     Set<PortalKey> failedSitesToMigrate = new HashSet<>();
     long startTime = System.currentTimeMillis();
     LOG.info("START ASYNC PORTAL DATA MIGRATION---------------------------------------------------");
-    doMigrate(sitesToMigrate, failedSitesToMigrate);
+    doMigrate(failedSitesToMigrate);
     LOG.info("END PORTAL DATA MIGRATION in {}ms-----------------------------------------------------",
              System.currentTimeMillis() - startTime);
     return failedSitesToMigrate;
@@ -153,10 +171,9 @@ public class RDBMSMigrationManager implements Startable {
     }
   }
 
-  private void doMigrate(List<PortalKey> sitesToMigrate, Set<PortalKey> failedSitesToMigrate) {
-    int totalSitesToMigrateCount = sitesToMigrate.size();
-    int siteToMigrateIndex = 0;
-    for (PortalKey siteToMigrateKey : sitesToMigrate) {
+  private void doMigrate(Set<PortalKey> failedSitesToMigrate) {
+    int totalSitesToMigrateCount = MigrationContext.getSitesCountToMigrate();
+    for (int siteToMigrateIndex = 0; siteToMigrateIndex < totalSitesToMigrateCount; siteToMigrateIndex++) {
       if (MigrationContext.isForceStop()) {
         LOG.info("|  \\ FORCE STOPPING MIGRATION. Migrated {} / {} sites, failed = {}",
                  siteToMigrateIndex,
@@ -165,8 +182,7 @@ public class RDBMSMigrationManager implements Startable {
         return;
       }
 
-      siteToMigrateIndex++;
-
+      PortalKey siteToMigrateKey = MigrationContext.getNextSiteKeyToMigrate();
       boolean migrated = doMigrate(siteMigrationService,
                                    siteToMigrateKey,
                                    PortalEntityType.SITE,
@@ -246,7 +262,8 @@ public class RDBMSMigrationManager implements Startable {
     return migrated;
   }
 
-  private void doRemove(List<PortalKey> sitesToMigrate, Set<PortalKey> failedSitesToRemove) {
+  private void doRemove(Set<PortalKey> failedSitesToRemove) {
+    List<PortalKey> sitesToMigrate = siteMigrationService.getSitesToMigrate();
     int totalSitesToMigrateCount = sitesToMigrate.size();
     int siteToMigrateIndex = 0;
     for (PortalKey siteToMigrateKey : sitesToMigrate) {

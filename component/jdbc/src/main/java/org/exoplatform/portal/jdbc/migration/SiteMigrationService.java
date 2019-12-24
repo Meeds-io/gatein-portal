@@ -25,39 +25,28 @@ public class SiteMigrationService extends AbstractMigrationService {
     PortalData toMigrateSite = pomStorage.getPortalConfig(siteToMigrateKey);
     ContainerData portalLayoutContainer = this.migrateContainer(toMigrateSite.getPortalLayout());
 
-    PortalData created = modelStorage.getPortalConfig(siteToMigrateKey);
-    if (created == null) {
-      PortalData migrate = new PortalData(null,
-                                          toMigrateSite.getName(),
-                                          toMigrateSite.getType(),
-                                          toMigrateSite.getLocale(),
-                                          toMigrateSite.getLabel(),
-                                          toMigrateSite.getDescription(),
-                                          toMigrateSite.getAccessPermissions(),
-                                          toMigrateSite.getEditPermission(),
-                                          toMigrateSite.getProperties(),
-                                          toMigrateSite.getSkin(),
-                                          portalLayoutContainer,
-                                          toMigrateSite.getRedirects());
-      modelStorage.create(migrate);
-    } else {
-      PortalData migrate = new PortalData(created.getStorageId(),
-                                          created.getName(),
-                                          created.getType(),
-                                          created.getLocale(),
-                                          created.getLabel(),
-                                          created.getDescription(),
-                                          created.getAccessPermissions(),
-                                          created.getEditPermission(),
-                                          created.getProperties(),
-                                          created.getSkin(),
-                                          portalLayoutContainer,
-                                          created.getRedirects());
-      modelStorage.save(migrate);
+    PortalData existingSite = modelStorage.getPortalConfig(siteToMigrateKey);
+    if (existingSite != null) {
+      modelStorage.remove(existingSite);
+      MigrationContext.restartTransaction();
     }
 
-    created = modelStorage.getPortalConfig(siteToMigrateKey);
-    broadcastListener(created, created.getKey().toString());
+    PortalData migrate = new PortalData(null,
+                                        toMigrateSite.getName(),
+                                        toMigrateSite.getType(),
+                                        toMigrateSite.getLocale(),
+                                        toMigrateSite.getLabel(),
+                                        toMigrateSite.getDescription(),
+                                        toMigrateSite.getAccessPermissions(),
+                                        toMigrateSite.getEditPermission(),
+                                        toMigrateSite.getProperties(),
+                                        toMigrateSite.getSkin(),
+                                        portalLayoutContainer,
+                                        toMigrateSite.getRedirects());
+    modelStorage.create(migrate);
+
+    existingSite = modelStorage.getPortalConfig(siteToMigrateKey);
+    broadcastListener(existingSite, existingSite.getKey().toString());
   }
 
   @Override

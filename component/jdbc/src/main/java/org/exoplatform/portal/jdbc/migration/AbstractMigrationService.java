@@ -213,33 +213,31 @@ public abstract class AbstractMigrationService {
   }
 
   protected List<PortalKey> getSitesToMigrate() {
-    return getSitesToMigrate(false);
-  }
-
-  protected List<PortalKey> getSitesToMigrate(boolean forceRefresh) {
     List<PortalKey> portalKeys = MigrationContext.getSitesToMigrate();
-    if (!forceRefresh && portalKeys != null) {
+    if (portalKeys != null) {
       return portalKeys;
     }
-    portalKeys = new ArrayList<>(); // NOSONAR
+    portalKeys = Collections.synchronizedList(new LinkedList<>()); // NOSONAR
 
     long t1 = System.currentTimeMillis();
     log.info("  \\ START::COMPUTE site keys to migrate");
 
     findSites(portalKeys, SiteType.PORTAL);
     int portalSitesCount = portalKeys.size();
-    log.info("--- {} PORTAL sites to migrate", portalSitesCount);
+    log.info("  --- {} PORTAL sites to migrate", portalSitesCount);
+    MigrationContext.restartTransaction(); // To prevent session timeout
 
     findSites(portalKeys, SiteType.GROUP);
     int groupSitesCount = portalKeys.size() - portalSitesCount;
-    log.info("--- {} GROUP sites to migrate", groupSitesCount);
+    log.info("  --- {} GROUP sites to migrate", groupSitesCount);
+    MigrationContext.restartTransaction(); // To prevent session timeout
 
     findSites(portalKeys, SiteType.USER);
     int userSitesCount = portalKeys.size() - portalSitesCount - groupSitesCount;
-    log.info("--- {} USER sites to migrate", userSitesCount);
+    log.info("  --- {} USER sites to migrate", userSitesCount);
+    MigrationContext.restartTransaction(); // To prevent session timeout
 
     MigrationContext.setSitesToMigrate(portalKeys);
-
     log.info("  / END::COMPUTE site keys to migrate in {}ms", System.currentTimeMillis() - t1);
     return portalKeys;
   }

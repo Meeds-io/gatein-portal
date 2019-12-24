@@ -16,7 +16,7 @@
  */
 package org.exoplatform.portal.jdbc.migration;
 
-import java.util.List;
+import java.util.*;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
@@ -44,7 +44,11 @@ public final class MigrationContext {
 
   private static boolean         forceStop                         = false;
 
+  private static int             siteToMigrateIndex                = 0;
+
   private static List<PortalKey> sitesToMigrate                    = null;
+
+  private static List<PortalKey> priorizedSitesToMigrate           = Collections.synchronizedList(new LinkedList<>());
 
   private MigrationContext() {
   }
@@ -53,48 +57,55 @@ public final class MigrationContext {
     return getSettingValue(PORTAL_RDBMS_MIGRATION_STATUS_KEY);
   }
 
-  public static void setDone() {
+  public static boolean isMigrated(PortalKey siteToMigrateKey) {
+    return !getSitesToMigrate().contains(siteToMigrateKey)
+        || isDone()
+        || (isMigrated(siteToMigrateKey, PortalEntityType.NAVIGATION) && isMigrated(siteToMigrateKey, PortalEntityType.PAGE)
+            && isMigrated(siteToMigrateKey, PortalEntityType.SITE));
+  }
+
+  protected static void setDone() {
     updateSettingValue(PORTAL_RDBMS_MIGRATION_STATUS_KEY, true);
   }
 
-  public static boolean isAppDone() {
+  protected static boolean isAppDone() {
     return getSettingValue(PORTAL_RDBMS_APP_MIGRATION_KEY);
   }
 
-  public static void setAppDone() {
+  protected static void setAppDone() {
     updateSettingValue(PORTAL_RDBMS_APP_MIGRATION_KEY, true);
   }
 
-  public static boolean isAppCleanupDone() {
+  protected static boolean isAppCleanupDone() {
     return getSettingValue(PORTAL_RDBMS_APP_CLEANUP_KEY);
   }
 
-  public static void setAppCleanupDone() {
+  protected static void setAppCleanupDone() {
     updateSettingValue(PORTAL_RDBMS_APP_CLEANUP_KEY, true);
   }
 
-  public static void setMigrated(PortalKey siteToMigrateKey, PortalEntityType entityType) {
+  protected static void setMigrated(PortalKey siteToMigrateKey, PortalEntityType entityType) {
     getSettingService().set(entityType.getContext(),
                             new Scope(entityType.getScopeType(), siteToMigrateKey.getType()),
                             siteToMigrateKey.getId(),
                             SettingValue.create(true));
   }
 
-  public static boolean isMigrated(PortalKey siteToMigrateKey, PortalEntityType entityType) {
+  protected static boolean isMigrated(PortalKey siteToMigrateKey, PortalEntityType entityType) {
     SettingValue<?> settingValue = getSettingService().get(entityType.getContext(),
                                                            new Scope(entityType.getScopeType(), siteToMigrateKey.getType()),
                                                            siteToMigrateKey.getId());
     return settingValue != null && Boolean.parseBoolean(settingValue.getValue().toString());
   }
 
-  public static void setPageMigrated(PageKey key) {
+  protected static void setPageMigrated(PageKey key) {
     getSettingService().set(CONTEXT,
                             Scope.PAGE.id(key.getSite().getTypeName() + "::" + key.getSite().getName()),
                             key.getName(),
                             SettingValue.create(true));
   }
 
-  public static boolean isPageMigrated(PageKey key) {
+  protected static boolean isPageMigrated(PageKey key) {
     SettingValue<?> settingValue = getSettingService().get(CONTEXT,
                                                            Scope.PAGE.id(key.getSite().getTypeName() + "::"
                                                                + key.getSite().getName()),
@@ -102,30 +113,56 @@ public final class MigrationContext {
     return settingValue != null && Boolean.parseBoolean(settingValue.getValue().toString());
   }
 
-  public static void setForceStop() {
+  protected static void setForceStop() {
     forceStop = true;
   }
 
-  public static boolean isForceStop() {
+  protected static boolean isForceStop() {
     return forceStop;
   }
 
-  public static List<PortalKey> getSitesToMigrate() {
+  protected static List<PortalKey> getSitesToMigrate() {
     return sitesToMigrate;
   }
 
-  public static void setSitesToMigrate(List<PortalKey> sitesToMigrate) {
+  protected static int getSitesCountToMigrate() {
+    return sitesToMigrate == null ? 0 : sitesToMigrate.size();
+  }
+
+  protected static void addPriorizedSitesToMigrate(PortalKey priorizedSiteToMigrate) {
+    priorizedSitesToMigrate.add(priorizedSiteToMigrate);
+  }
+
+  protected static PortalKey getNextSiteKeyToMigrate() {
+    try {
+      while (!priorizedSitesToMigrate.isEmpty()) {
+        PortalKey portalKey = priorizedSitesToMigrate.get(0);
+        priorizedSitesToMigrate.remove(portalKey);
+
+        int indexOfPriorizedSiteKey = sitesToMigrate.indexOf(portalKey);
+        if (indexOfPriorizedSiteKey > siteToMigrateIndex) {
+          Collections.swap(sitesToMigrate, indexOfPriorizedSiteKey, siteToMigrateIndex);
+          return portalKey;
+        }
+      }
+      return sitesToMigrate.get(siteToMigrateIndex);
+    } finally {
+      siteToMigrateIndex++;
+    }
+  }
+
+  protected static void setSitesToMigrate(List<PortalKey> sitesToMigrate) {
     MigrationContext.sitesToMigrate = sitesToMigrate;
   }
 
-  public static SettingService getSettingService() {
+  protected static SettingService getSettingService() {
     if (settingService == null) {
       settingService = PortalContainer.getInstance().getComponentInstanceOfType(SettingService.class);
     }
     return settingService;
   }
 
-  public static void restartTransaction() {
+  protected static void restartTransaction() {
     if (forceStop) {
       return;
     }
@@ -159,7 +196,7 @@ public final class MigrationContext {
     getSettingService().set(MigrationContext.CONTEXT, Scope.GLOBAL.id(null), key, SettingValue.create(status));
   }
 
-  public enum PortalEntityType {
+  protected enum PortalEntityType {
     SITE(CONTEXT, Scope.PORTAL.getName(), "SITE"),
     NAVIGATION(CONTEXT, NAVIGATION_SCOPE, "SITE NAVIGATION"),
     PAGE(CONTEXT, Scope.PAGE.getName(), "SITE PAGES");

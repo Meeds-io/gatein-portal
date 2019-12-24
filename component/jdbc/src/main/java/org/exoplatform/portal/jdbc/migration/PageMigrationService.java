@@ -8,9 +8,8 @@ import org.exoplatform.portal.mop.*;
 import org.exoplatform.portal.mop.page.*;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.pom.config.POMDataStorage;
-import org.exoplatform.portal.pom.data.ModelDataStorage;
+import org.exoplatform.portal.pom.data.*;
 import org.exoplatform.portal.pom.data.PageData;
-import org.exoplatform.portal.pom.data.PortalKey;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.listener.ListenerService;
 
@@ -41,6 +40,9 @@ public class PageMigrationService extends AbstractMigrationService {
 
     QueryResult<PageContext> pages;
     do {
+      if (MigrationContext.isForceStop()) {
+        throw new InterruptedException();
+      }
       pages = jcrPageService.findPages(offset,
                                        limitThreshold,
                                        SiteType.valueOf(siteToMigrateKey.getType().toUpperCase()),
@@ -62,60 +64,51 @@ public class PageMigrationService extends AbstractMigrationService {
 
         try {
           SiteKey siteKey = key.getSite();
+          String siteType = siteKey.getTypeName();
+          String siteId = siteKey.getName();
+
           PageContext created = pageService.loadPage(key);
 
           org.exoplatform.portal.pom.data.PageKey pomPageKey =
                                                              new org.exoplatform.portal.pom.data.PageKey(siteKey.getTypeName(),
                                                                                                          siteKey.getName(),
                                                                                                          key.getName());
-          PageData pageData = pomStorage.getPage(pomPageKey);
-
+          PageData pageDataToMigrate = pomStorage.getPage(pomPageKey);
+          String storageId = null;
           if (created == null) {
             pageService.savePage(page);
-            PageData migrate = new PageData(
-                                            null,
-                                            pageData.getId(),
-                                            pageData.getName(),
-                                            pageData.getIcon(),
-                                            pageData.getTemplate(),
-                                            pageData.getFactoryId(),
-                                            pageData.getTitle(),
-                                            pageData.getDescription(),
-                                            pageData.getWidth(),
-                                            pageData.getHeight(),
-                                            pageData.getAccessPermissions(),
-                                            this.migrateComponents(pageData.getChildren()),
-                                            pageData.getOwnerType(),
-                                            pageData.getOwnerId(),
-                                            pageData.getEditPermission(),
-                                            pageData.isShowMaxWindow(),
-                                            pageData.getMoveAppsPermissions(),
-                                            pageData.getMoveContainersPermissions());
-
-            modelStorage.save(migrate);
           } else {
             PageData data = modelStorage.getPage(pomPageKey);
-            PageData migrate = new PageData(
-                                            data.getStorageId(),
-                                            data.getId(),
-                                            data.getName(),
-                                            data.getIcon(),
-                                            data.getTemplate(),
-                                            data.getFactoryId(),
-                                            data.getTitle(),
-                                            data.getDescription(),
-                                            data.getWidth(),
-                                            data.getHeight(),
-                                            data.getAccessPermissions(),
-                                            this.migrateComponents(pageData.getChildren()),
-                                            data.getOwnerType(),
-                                            data.getOwnerId(),
-                                            data.getEditPermission(),
-                                            data.isShowMaxWindow(),
-                                            data.getMoveAppsPermissions(),
-                                            data.getMoveContainersPermissions());
-            modelStorage.save(migrate);
+            storageId = data.getStorageId();
           }
+
+          log.info("|  ---- | {}::page {}::{}::{}",
+                   storageId == null ? "CREATE" : "UPDATE",
+                   siteType,
+                   siteId,
+                   page.getKey().getName());
+
+          List<ComponentData> pageLayout = this.migrateComponents(pageDataToMigrate.getChildren());
+
+          PageData migratedPage = new PageData(storageId,
+                                               pageDataToMigrate.getId(),
+                                               pageDataToMigrate.getName(),
+                                               pageDataToMigrate.getIcon(),
+                                               pageDataToMigrate.getTemplate(),
+                                               pageDataToMigrate.getFactoryId(),
+                                               pageDataToMigrate.getTitle(),
+                                               pageDataToMigrate.getDescription(),
+                                               pageDataToMigrate.getWidth(),
+                                               pageDataToMigrate.getHeight(),
+                                               pageDataToMigrate.getAccessPermissions(),
+                                               pageLayout,
+                                               pageDataToMigrate.getOwnerType(),
+                                               pageDataToMigrate.getOwnerId(),
+                                               pageDataToMigrate.getEditPermission(),
+                                               pageDataToMigrate.isShowMaxWindow(),
+                                               pageDataToMigrate.getMoveAppsPermissions(),
+                                               pageDataToMigrate.getMoveContainersPermissions());
+          modelStorage.save(migratedPage);
           MigrationContext.setPageMigrated(key);
 
           //
@@ -143,20 +136,46 @@ public class PageMigrationService extends AbstractMigrationService {
     int errors = 0;
     int offset = 0;
     QueryResult<PageContext> pages;
+    Set<PageKey> deletedPages = new HashSet<>();
     do {
-      pages = jcrPageService.findPages(offset, limitThreshold, null, null, null, null);
+      pages = jcrPageService.findPages(offset,
+                                       limitThreshold,
+                                       SiteType.valueOf(siteToMigrateKey.getType().toUpperCase()),
+                                       siteToMigrateKey.getId(),
+                                       null,
+                                       null);
 
       Iterator<PageContext> pageItr = pages.iterator();
       while (pageItr.hasNext()) {
         PageContext page = pageItr.next();
+        PageKey key = page.getKey();
+        String siteType = key.getSite().getTypeName();
+        String siteId = key.getSite().getName();
         try {
-          jcrPageService.destroyPage(page.getKey());
+          if (deletedPages.contains(key)) {
+            log.info("|  ---- | IGNORE::page {}::{}::{} (already deleted)",
+                     siteType,
+                     siteId,
+                     key.getName());
+            continue;
+          }
+          deletedPages.add(key);
+          log.info("|  ---- | REMOVE::page {}::{}::{}",
+                   siteType,
+                   siteId,
+                   key.getName());
+          jcrPageService.destroyPage(key);
         } catch (Exception ex) {
-          log.error("Can't remove page", ex);
+          log.error("Can't remove page {}::{}::{}",
+                    siteType,
+                    siteId,
+                    key.getName(),
+                    ex);
           errors++;
         }
       }
-    } while (pages.getSize() > 0);
+      MigrationContext.restartTransaction();
+    } while (pages.getSize() > 0 && errors < limitThreshold);
     if (errors > 0) {
       throw new IllegalStateException("Some errors (" + errors + ") was encountered while removing pages of site "
           + siteToMigrateKey.getType() + "/" + siteToMigrateKey.getId() + "");
