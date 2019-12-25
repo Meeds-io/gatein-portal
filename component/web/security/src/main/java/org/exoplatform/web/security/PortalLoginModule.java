@@ -190,7 +190,7 @@ public class PortalLoginModule extends AbstractLoginModule {
     }
 
     protected static boolean isClusteredSSO() {
-        return ExoContainer.getProfiles().contains("cluster");
+        return ExoContainer.hasProfile("cluster");
     }
 
     /**

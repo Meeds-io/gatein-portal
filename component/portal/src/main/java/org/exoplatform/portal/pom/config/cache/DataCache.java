@@ -42,7 +42,7 @@ public class DataCache extends TaskExecutionDecorator {
     private final AtomicLong readCount = new AtomicLong();
 
     /** . */
-    private boolean cluster = ExoContainer.getProfiles().contains("cluster");
+    private boolean cluster = ExoContainer.hasProfile("cluster");
 
     public DataCache(TaskExecutor next) {
         super(next);

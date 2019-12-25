@@ -55,7 +55,7 @@ public class PortletDisablerFilter implements RenderFilter {
     String configuredPortletProfiles = portletConfig.getInitParameter("exo.profiles");
     if (StringUtils.isNotBlank(configuredPortletProfiles)) {
       String[] portletProfiles = configuredPortletProfiles.trim().split(" *, *");
-      Set<String> activeProfiles = ExoContainer.getCurrentProfiles();
+      Set<String> activeProfiles = ExoContainer.getProfiles();
       enabled = Arrays.stream(portletProfiles).anyMatch(activeProfiles::contains);
       if (Boolean.FALSE.equals(enabled)) {
         setPortletEnabled(portletName, enabled);
