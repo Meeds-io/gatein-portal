@@ -235,9 +235,13 @@ public interface DataStorage {
 
     @Deprecated
     <A> A adapt(ModelObject modelObject, Class<A> type, boolean create);
+  
+    default Status getImportStatus() {
+      throw new UnsupportedOperationException();
+    }
 
-    Status getImportStatus();
-
-    void saveImportStatus(Status status);
+    default void saveImportStatus(Status status) {
+      throw new UnsupportedOperationException();
+    }
 
 }
