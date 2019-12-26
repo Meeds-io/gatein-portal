@@ -71,8 +71,7 @@ public class SettingScope extends SettingContext {
    */
   @Override
   public int hashCode() {
-    int result = super.repositoryName.hashCode();
-    result = 31 * result + scopePath.hashCode();
+    int result = scopePath.hashCode();
     return result;
   }
   /**
