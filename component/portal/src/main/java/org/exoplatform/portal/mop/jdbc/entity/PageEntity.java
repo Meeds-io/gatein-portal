@@ -30,9 +30,9 @@ import org.json.simple.JSONObject;
 import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.portal.mop.SiteType;
 
+@ExoEntity
 @Entity(name = "GateInPage")
 @SequenceGenerator(name = "SEQ_GTN_ID_GENERATOR", sequenceName = "SEQ_GTN_PAGE_ID")
-@ExoEntity
 @Table(name = "PORTAL_PAGES")
 @NamedQueries({
     @NamedQuery(name = "PageEntity.deleteByOwner", query = "DELETE GateInPage p WHERE p.owner.id = :ownerId"),

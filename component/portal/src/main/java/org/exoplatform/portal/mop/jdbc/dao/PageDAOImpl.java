@@ -70,7 +70,7 @@ public class PageDAOImpl extends AbstractDAO<PageEntity> implements PageDAO {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<PageEntity> criteria = cb.createQuery(PageEntity.class);
     Root<PageEntity> pageEntity = criteria.from(PageEntity.class);
-    Join<PageEntity, SiteEntity> join = pageEntity.join(PageEntity_.owner);
+    Join<PageEntity, SiteEntity> join = pageEntity.join("owner");
 
     //
     CriteriaQuery<PageEntity> select = criteria.select(pageEntity);
@@ -79,14 +79,14 @@ public class PageDAOImpl extends AbstractDAO<PageEntity> implements PageDAO {
     List<Predicate> predicates = new LinkedList<>();
 
     if (query.getSiteType() != null) {
-      predicates.add(cb.equal(join.get(SiteEntity_.siteType), convertSiteType(query.getSiteType())));
+      predicates.add(cb.equal(join.get("siteType"), convertSiteType(query.getSiteType())));
     }
     if (query.getSiteName() != null) {
-      predicates.add(cb.equal(join.get(SiteEntity_.name), query.getSiteName()));
+      predicates.add(cb.equal(join.get("name"), query.getSiteName()));
     }
 
     if (query.getDisplayName() != null) {
-      predicates.add(cb.like(cb.lower(pageEntity.get(PageEntity_.displayName)),
+      predicates.add(cb.like(cb.lower(pageEntity.get("displayName")),
                              "%" + query.getDisplayName().toLowerCase() + "%"));
     }
 

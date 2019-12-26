@@ -28,8 +28,8 @@ import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.Utils;
 import org.exoplatform.portal.mop.description.DescriptionService;
-import org.exoplatform.portal.mop.management.operations.page.PageUtils;
 import org.exoplatform.portal.mop.navigation.NavigationServiceException;
 import org.exoplatform.portal.mop.page.*;
 import org.exoplatform.portal.mop.user.*;
@@ -105,7 +105,7 @@ public class UIPageCreationWizard extends UIPageWizard {
 
         //
         PageService pageService = getApplicationComponent(PageService.class);
-        PageState pageState = PageUtils.toPageState(page);
+        PageState pageState = Utils.toPageState(page);
         pageService.savePage(new PageContext(page.getPageKey(), pageState));
 
         //

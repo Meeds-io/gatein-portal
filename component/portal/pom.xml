@@ -172,7 +172,10 @@
         <groupId>com.jcabi</groupId>
         <artifactId>jcabi-maven-plugin</artifactId>
       </plugin>
-
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.5.1</version>
+      </plugin>
       <plugin>
         <groupId>org.jibx</groupId>
         <artifactId>maven-jibx-plugin</artifactId>
@@ -190,7 +193,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -203,7 +205,6 @@
           </execution>
         </executions>
       </plugin>
-
     </plugins>
   </build>
 </project>
