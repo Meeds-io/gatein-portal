@@ -25,12 +25,12 @@ import java.util.List;
 
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccessImpl;
+import org.exoplatform.portal.mop.SearchTask;
 import org.exoplatform.portal.pom.config.POMSession;
 import org.exoplatform.portal.pom.config.POMTask;
 import org.exoplatform.portal.pom.config.TaskExecutionDecorator;
 import org.exoplatform.portal.pom.config.TaskExecutor;
 import org.exoplatform.portal.pom.config.tasks.PortalConfigTask;
-import org.exoplatform.portal.pom.config.tasks.SearchTask;
 import org.exoplatform.portal.pom.data.PortalKey;
 
 /**
@@ -59,8 +59,8 @@ public class PortalNamesCache extends TaskExecutionDecorator {
                 }
             } else if (task instanceof PortalConfigTask.Save || task instanceof PortalConfigTask.Remove) {
                 V result = super.execute(session, task);
-                session.scheduleForEviction(SearchTask.FindSiteKey.PORTAL_KEY);
-                session.scheduleForEviction(SearchTask.FindSiteKey.GROUP_KEY);
+                session.scheduleForEviction(org.exoplatform.portal.mop.FindSiteKey.PORTAL_KEY);
+                session.scheduleForEviction(org.exoplatform.portal.mop.FindSiteKey.GROUP_KEY);
                 return result;
             }
         }

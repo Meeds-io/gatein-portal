@@ -1,0 +1,861 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+
+    Copyright (C) 2009 eXo Platform SAS.
+
+    This is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as
+    published by the Free Software Foundation; either version 2.1 of
+    the License, or (at your option) any later version.
+
+    This software is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this software; if not, write to the Free
+    Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+    02110-1301 USA, or see the FSF site: http://www.fsf.org.
+
+-->
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+               xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+  <component>
+    <type>org.exoplatform.jpa.mock.DummyDependantComponent</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.naming.InitialContextInitializer</key>
+    <type>org.exoplatform.services.naming.InitialContextInitializer</type>
+    <init-params>
+      <properties-param>
+        <name>default-properties</name>
+        <description>Default initial context properties</description>
+        <property name="java.naming.factory.initial" value="org.exoplatform.services.naming.SimpleContextFactory" />
+      </properties-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.persistence.DataInitializer</key>
+    <type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializer</type>
+    <init-params>
+      <value-param>
+        <name>liquibase.datasource</name>
+        <value>java:/comp/env/exo-jpa_portal</value>
+      </value-param>
+      <value-param>
+        <name>liquibase.contexts</name>
+        <value>${exo.liquibase.contexts:production}</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.pom.config.POMDataStorage</key>
+    <type>org.exoplatform.portal.pom.config.POMDataStorage</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.pom.config.POMSessionManager</key>
+    <type>org.exoplatform.portal.pom.config.POMSessionManager</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.config.UserACL</key>
+    <type>org.exoplatform.portal.config.UserACL</type>
+    <init-params>
+      <value-param>
+        <name>super.user</name>
+        <description>administrator</description>
+        <value>root</value>
+      </value-param>
+
+      <value-param>
+        <name>portal.administrator.groups</name>
+        <description>administrator</description>
+        <value>/platform/administrators</value>
+      </value-param>
+
+      <value-param>
+        <name>portal.administrator.mstype</name>
+        <description>administrator</description>
+        <value>manager</value>
+      </value-param>
+
+      <value-param>
+        <name>portal.creator.groups</name>
+        <description>groups with membership type have permission to manage portal</description>
+        <value>*:/platform/administrators,*:/organization/management/executive-board</value>
+      </value-param>
+
+      <value-param>
+        <name>navigation.creator.membership.type</name>
+        <description>specific membership type have full permission with group navigation</description>
+        <value>manager</value>
+      </value-param>
+      <value-param>
+        <name>guests.group</name>
+        <description>guests group</description>
+        <value>/platform/guests</value>
+      </value-param>
+      <values-param>
+        <name>mandatory.groups</name>
+        <description>Groups that can not be deleted.</description>
+        <value>/platform/administrators</value>
+        <value>/platform/users</value>
+        <value>/platform/guests</value>
+      </values-param>
+      <values-param>
+        <name>mandatory.mstypes</name>
+        <description>Membership type that can not be deleted.</description>
+        <value>*</value>
+        <value>member</value>
+      </values-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.config.UserPortalConfigService</key>
+    <type>org.exoplatform.portal.config.UserPortalConfigService</type>
+    <init-params>
+      <value-param>
+        <name>default.import.mode</name>
+        <value>merge</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.gatein.common.transaction.JTAUserTransactionLifecycleService</key>
+    <type>org.gatein.common.transaction.JTAUserTransactionLifecycleServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.infinispan.transaction.lookup.TransactionManagerLookup</key>
+    <type>org.exoplatform.services.transaction.infinispan.JBossStandaloneJTAManagerLookup</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.transaction.TransactionService</key>
+    <type>org.exoplatform.services.transaction.infinispan.JBossTransactionsService</type>
+    <init-params>
+      <value-param>
+        <name>timeout</name>
+        <value>300</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.PageDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.PageDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.ContainerDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.ContainerDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.WindowDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.WindowDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.NavigationDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.NavigationDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.NodeDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.NodeDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.PermissionDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.PermissionDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.DescriptionDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.DescriptionDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.SiteDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.SiteDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.ApplicationDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.ApplicationDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.CategoryDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.CategoryDAOImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.pom.data.ModelDataStorage</key>
+    <type>org.exoplatform.portal.jdbc.service.JDBCModelStorageImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.config.DataStorage</key>
+    <type>org.exoplatform.portal.config.DataStorageImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.mop.navigation.NavigationStore</key>
+    <type>org.exoplatform.portal.mop.navigation.NavigationStoreImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.mop.navigation.NavigationService</key>
+    <type>org.exoplatform.portal.mop.navigation.JDBCNavigationServiceWrapper</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.mop.page.PageService</key>
+    <type>org.exoplatform.portal.jdbc.service.PageServiceWrapper</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.mop.page.PageServiceImpl</key>
+    <type>org.exoplatform.portal.mop.page.PageServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.mop.description.DescriptionService</key>
+    <type>org.exoplatform.portal.jdbc.service.DescriptionServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.config.UserACL</key>
+    <type>org.exoplatform.portal.config.UserACL</type>
+    <init-params>
+      <value-param>
+        <name>super.user</name>
+        <description>administrator</description>
+        <value>root</value>
+      </value-param>
+
+      <value-param>
+        <name>portal.administrator.groups</name>
+        <description>administrator</description>
+        <value>/platform/administrators</value>
+      </value-param>
+    </init-params>
+  </component>
+  <component>
+    <key>org.exoplatform.application.registry.ApplicationRegistryService</key>
+    <type>org.exoplatform.portal.jdbc.service.JDBCApplicationRegistryService</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.cache.CacheService</key>
+    <jmx-name>cache:type=CacheService</jmx-name>
+    <type>org.exoplatform.services.cache.impl.CacheServiceImpl</type>
+    <init-params>
+      <object-param>
+        <name>cache.config.default</name>
+        <description>The default cache configuration</description>
+        <object type="org.exoplatform.services.cache.ExoCacheConfig">
+          <field name="name">
+            <string>default</string>
+          </field>
+          <field name="maxSize">
+            <int>300</int>
+          </field>
+          <field name="liveTime">
+            <long>60</long>
+          </field>
+          <field name="distributed">
+            <boolean>false</boolean>
+          </field>
+          <field name="implementation">
+            <string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string>
+          </field>
+        </object>
+      </object-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.jcr.config.RepositoryServiceConfiguration</key>
+    <type>org.exoplatform.services.jcr.impl.config.RepositoryServiceConfigurationImpl</type>
+    <init-params>
+      <value-param>
+        <name>conf-path</name>
+        <description>JCR configuration file</description>
+        <value>jar:/conf/jcr/repository-configuration.xml</value>
+      </value-param>
+      <properties-param>
+        <name>working-conf</name>
+        <description>working-conf</description>
+        <property name="source-name" value="jdbcjcr"/>
+        <property name="dialect" value="hsqldb"/>
+        <property name="persister-class-name" value="org.exoplatform.services.jcr.impl.config.JDBCConfigurationPersister"/>
+      </properties-param>
+    </init-params>
+  </component>
+  <component>
+    <key>org.exoplatform.services.jcr.RepositoryService</key>
+    <type>org.exoplatform.services.jcr.impl.RepositoryServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.organization.idm.PicketLinkIDMService</key>
+    <type>org.exoplatform.services.organization.idm.PicketLinkIDMServiceImpl</type>
+    <init-params>
+      <value-param>
+        <name>config</name>
+        <value>jar:/conf/exo.portal.component.identity-picketlink-idm-config.xml</value>
+      </value-param>
+    </init-params>
+  </component>
+  <component>
+    <key>org.exoplatform.services.organization.idm.PicketLinkIDMCacheService</key>
+    <type>org.exoplatform.services.organization.idm.PicketLinkIDMCacheService</type>
+  </component>
+  <component>
+    <key>org.exoplatform.services.organization.OrganizationService</key>
+    <type>org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl</type>
+    <init-params>
+      <object-param>
+        <name>configuration</name>
+        <object type="org.exoplatform.services.organization.idm.Config">
+          <field name="useParentIdAsGroupType">
+            <boolean>true</boolean>
+          </field>
+        </object>
+      </object-param>
+    </init-params>
+  </component>
+  <component>
+    <key>org.exoplatform.services.database.HibernateService</key>
+    <jmx-name>database:type=HibernateService</jmx-name>
+    <type>org.exoplatform.services.database.impl.HibernateServiceImpl</type>
+    <init-params>
+      <properties-param>
+        <name>hibernate.properties</name>
+        <description>Default Hibernate Service</description>
+        <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+        <property name="hibernate.show_sql" value="false"/>
+        <property name="hibernate.current_session_context_class" value="thread"/>
+        <property name="hibernate.cache.use_second_level_cache" value="false"/>
+        <property name="hibernate.cache.use_query_cache" value="false"/>
+        <property name="hibernate.connection.datasource" value="jdbcidm"/>
+        <property name="hibernate.c3p0.min_size" value="5"/>
+        <property name="hibernate.c3p0.max_size" value="20"/>
+        <property name="hibernate.c3p0.timeout" value="1800"/>
+        <property name="hibernate.c3p0.max_statements" value="50"/>
+      </properties-param>
+    </init-params>
+  </component>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.database.HibernateService</target-component>
+    <component-plugin>
+      <name>add.hibernate.mapping</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.database.impl.AddHibernateMappingPlugin</type>
+      <init-params>
+        <values-param>
+          <name>hibernate.mapping</name>
+          <value>conf/mappings/HibernateRealm.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectCredentialBinaryValue.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectAttributeBinaryValue.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObject.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectCredential.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectCredentialType.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectAttribute.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectType.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectRelationship.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectRelationshipType.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectRelationshipName.hbm.xml</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <!--<external-component-plugins>
+    <target-component>org.exoplatform.portal.config.UserPortalConfigService</target-component>
+    <component-plugin>
+      <name>new.portal.config.user.listener</name>
+      <set-method>initListener</set-method>
+      <type>org.exoplatform.portal.config.NewPortalConfigListener</type>
+      <init-params>
+        <value-param>
+          <name>default.portal</name>
+          <value>classic</value>
+        </value-param>
+        <value-param>
+          <name>initializing.failure.ignore</name>
+          <value>true</value>
+        </value-param>
+        <value-param>
+          <name>page.templates.location</name>
+          <value>classpath:/org/exoplatform/portal/config/conf/template/pages</value>
+        </value-param>
+        <object-param>
+          <name>site.templates.location</name>
+          <object type="org.exoplatform.portal.config.SiteConfigTemplates">
+            <field name="location">
+              <string>classpath:/org/exoplatform/portal/config/conf</string>
+            </field>
+            <field name="portalTemplates">
+              <collection type="java.util.HashSet">
+                <value>
+                  <string>classic</string>
+                </value>
+                <value>
+                  <string>test</string>
+                </value>
+              </collection>
+            </field>
+            <field name="groupTemplates">
+              <collection type="java.util.HashSet">
+                <value>
+                  <string>group</string>
+                </value>
+              </collection>
+            </field>
+            <field name="userTemplates">
+              <collection type="java.util.HashSet">
+                <value>
+                  <string>user</string>
+                </value>
+              </collection>
+            </field>
+          </object>
+        </object-param>
+        <object-param>
+          <name>portal.configuration</name>
+          <object type="org.exoplatform.portal.config.NewPortalConfig">
+            <field name="predefinedOwner">
+              <collection type="java.util.HashSet">
+                <value>
+                  <string>classic</string>
+                </value>
+                <value>
+                  <string>test</string>
+                </value>
+                <value>
+                  <string>system</string>
+                </value>
+              </collection>
+            </field>
+            <field name="ownerType">
+              <string>portal</string>
+            </field>
+            <field name="templateLocation">
+              <string>classpath:/org/exoplatform/portal/config/conf</string>
+            </field>
+          </object>
+        </object-param>
+        <object-param>
+          <name>group.configuration</name>
+          <object type="org.exoplatform.portal.config.NewPortalConfig">
+            <field name="predefinedOwner">
+              <collection type="java.util.HashSet">
+                <value>
+                  <string>platform/administrators</string>
+                </value>
+                <value>
+                  <string>platform/users</string>
+                </value>
+                <value>
+                  <string>platform/guests</string>
+                </value>
+                <value>
+                  <string>test/legacy</string>
+                </value>
+                <value>
+                  <string>test/normalized</string>
+                </value>
+                <value>
+                  <string>organization/management/executive-board</string>
+                </value>
+              </collection>
+            </field>
+            <field name="ownerType">
+              <string>group</string>
+            </field>
+            <field name="templateLocation">
+              <string>classpath:/org/exoplatform/portal/config/conf</string>
+            </field>
+          </object>
+        </object-param>
+        &lt;!&ndash;
+                <object-param>
+                  <name>user.configuration</name>
+                  <object type="org.exoplatform.portal.config.NewPortalConfig">
+                    <field name="predefinedOwner">
+                      <collection type="java.util.HashSet">
+                        <value>
+                          <string>overwritelayout</string>
+                        </value>
+                      </collection>
+                    </field>
+                    <field name="ownerType">
+                      <string>user</string>
+                    </field>
+                    <field name="templateLocation">
+                      <string>classpath:/org/exoplatform/portal/config/conf</string>
+                    </field>
+                  </object>
+                </object-param>
+        &ndash;&gt;
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>-->
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
+    <component-plugin>
+      <name>user.portal.config.listener</name>
+      <set-method>addListenerPlugin</set-method>
+      <type>org.exoplatform.portal.config.UserPortalConfigListener</type>
+    </component-plugin>
+    <component-plugin>
+      <name>group.portal.config.listener</name>
+      <set-method>addListenerPlugin</set-method>
+      <type>org.exoplatform.portal.config.GroupPortalConfigListener</type>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.chromattic.ChromatticManager</target-component>
+    <component-plugin>
+      <name>chromattic</name>
+      <set-method>addLifeCycle</set-method>
+      <type>org.exoplatform.portal.pom.config.MOPChromatticLifeCycle</type>
+      <init-params>
+        <value-param>
+          <name>domain-name</name>
+          <value>mop</value>
+        </value-param>
+        <value-param>
+          <name>workspace-name</name>
+          <value>portal-system</value>
+        </value-param>
+        <values-param>
+          <name>entities</name>
+
+          <!-- The MOP node types -->
+          <value>org.gatein.mop.core.api.workspace.WorkspaceImpl</value>
+          <value>org.gatein.mop.core.api.workspace.UIContainerImpl</value>
+          <value>org.gatein.mop.core.api.workspace.UIWindowImpl</value>
+          <value>org.gatein.mop.core.api.workspace.UIBodyImpl</value>
+          <value>org.gatein.mop.core.api.workspace.PageImpl</value>
+          <value>org.gatein.mop.core.api.workspace.PageContainer</value>
+          <value>org.gatein.mop.core.api.workspace.NavigationImpl</value>
+          <value>org.gatein.mop.core.api.workspace.NavigationContainer</value>
+          <value>org.gatein.mop.core.api.workspace.PageLinkImpl</value>
+          <value>org.gatein.mop.core.api.workspace.URLLinkImpl</value>
+          <value>org.gatein.mop.core.api.workspace.PortalSiteContainer</value>
+          <value>org.gatein.mop.core.api.workspace.PortalSite</value>
+          <value>org.gatein.mop.core.api.workspace.GroupSiteContainer</value>
+          <value>org.gatein.mop.core.api.workspace.GroupSite</value>
+          <value>org.gatein.mop.core.api.workspace.UserSiteContainer</value>
+          <value>org.gatein.mop.core.api.workspace.UserSite</value>
+          <value>org.gatein.mop.core.api.workspace.TemplatizedImpl</value>
+          <value>org.gatein.mop.core.api.AttributesImpl</value>
+          <value>org.gatein.mop.core.api.Attribute</value>
+          <value>org.gatein.mop.core.api.PathAttribute</value>
+          <value>org.gatein.mop.core.api.StringAttribute</value>
+          <value>org.gatein.mop.core.api.BooleanAttribute</value>
+          <value>org.gatein.mop.core.api.IntegerAttribute</value>
+          <value>org.gatein.mop.core.api.DateAttribute</value>
+          <value>org.gatein.mop.core.api.workspace.content.CustomizationContainer</value>
+          <value>org.gatein.mop.core.api.workspace.content.ContextTypeContainer</value>
+          <value>org.gatein.mop.core.api.workspace.content.ContextType</value>
+          <value>org.gatein.mop.core.api.workspace.content.ContextSpecialization</value>
+          <value>org.gatein.mop.core.api.workspace.content.WorkspaceClone</value>
+          <value>org.gatein.mop.core.api.workspace.content.WorkspaceSpecialization</value>
+
+          <!-- GateIn node types -->
+          <value>org.exoplatform.portal.pom.spi.portlet.PortletState</value>
+          <value>org.exoplatform.portal.pom.spi.portlet.PreferenceState</value>
+          <value>org.exoplatform.portal.pom.spi.gadget.GadgetState</value>
+          <value>org.exoplatform.portal.pom.spi.wsrp.WSRPState</value>
+          <value>org.exoplatform.portal.mop.ProtectedResource</value>
+          <value>org.exoplatform.portal.mop.ProtectedContainer</value>
+          <value>org.exoplatform.portal.mop.Described</value>
+          <value>org.exoplatform.portal.mop.Visible</value>
+          <value>org.exoplatform.portal.mop.i18n.I18Nized</value>
+          <value>org.exoplatform.portal.mop.i18n.LanguageSpace</value>
+          <value>org.exoplatform.portal.mop.i18n.Language</value>
+          <value>org.exoplatform.portal.mop.importer.Imported</value>
+          <value>org.exoplatform.portal.mop.redirects.Redirectable</value>
+          <value>org.exoplatform.portal.mop.redirects.Redirect</value>
+          <value>org.exoplatform.portal.mop.redirects.Mappings</value>
+        </values-param>
+        <properties-param>
+          <name>options</name>
+          <property name="org.chromattic.api.Option.root_node.path" value="/production"/>
+          <property name="org.chromattic.api.Option.root_node.create" value="true"/>
+        </properties-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.cache.CacheService</target-component>
+
+    <!-- MOPSessionManager configuration -->
+    <component-plugin>
+      <name>addExoCacheConfig</name>
+      <set-method>addExoCacheConfig</set-method>
+      <type>org.exoplatform.services.cache.ExoCacheConfigPlugin</type>
+      <description>add Exo Cache Config</description>
+      <init-params>
+        <object-param>
+          <name>cache.config.MOPSessionManager</name>
+          <description>The JBoss Cache configuration for the MOP session Manager</description>
+          <object type="org.exoplatform.services.cache.ExoCacheConfig">
+            <field name="name"><string>MOPSessionManager</string></field>
+            <field name="maxSize"><int>${gatein.cache.mop.maxsize:5000}</int></field>
+            <field name="liveTime"><long>${gatein.cache.mop.livetime:600}</long></field>
+            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
+          </object>
+        </object-param>
+        <object-param profiles="cluster">
+          <name>cache.config.MOPSessionManager</name>
+          <description>The JBoss Cache configuration for the MOP session Manager</description>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>MOPSessionManager</string></field>
+            <field name="strategy"><string>LIRS</string></field>
+            <field name="maxEntries"><int>${gatein.cache.mop.maxnodes:5000}</int></field>
+            <field name="lifespan"><long>${gatein.cache.mop.expiration:600000}</long></field>
+            <field name="replicated"><boolean>true</boolean></field>
+          </object>
+        </object-param>
+        <!-- NavigationService configuration -->
+        <object-param>
+          <name>cache.config.NavigationService</name>
+          <description>The JBoss Cache configuration for the navigation service</description>
+          <object type="org.exoplatform.services.cache.ExoCacheConfig">
+            <field name="name"><string>NavigationService</string></field>
+            <field name="maxSize"><int>${gatein.cache.navigation.maxsize:5000}</int></field>
+            <field name="liveTime"><long>${gatein.cache.navigation.livetime:600}</long></field>
+            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
+          </object>
+        </object-param>
+        <object-param profiles="cluster">
+          <name>cache.config.NavigationService</name>
+          <description>The JBoss Cache configuration for the navigation service</description>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>NavigationService</string></field>
+            <field name="strategy"><string>LIRS</string></field>
+            <field name="maxEntries"><int>${gatein.cache.navigation.maxnodes:5000}</int></field>
+            <field name="lifespan"><long>${gatein.cache.navigation.expiration:600000}</long></field>
+            <field name="replicated"><boolean>true</boolean></field>
+          </object>
+        </object-param>
+        <!-- DescriptionService configuration -->
+        <object-param>
+          <name>cache.config.DescriptionService</name>
+          <description>The JBoss Cache configuration for the description service</description>
+          <object type="org.exoplatform.services.cache.ExoCacheConfig">
+            <field name="name"><string>DescriptionService</string></field>
+            <field name="maxSize"><int>${gatein.cache.description.maxsize:5000}</int></field>
+            <field name="liveTime"><long>${gatein.cache.description.livetime:600}</long></field>
+            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
+          </object>
+        </object-param>
+        <object-param profiles="cluster">
+          <name>cache.config.DescriptionService</name>
+          <description>The JBoss Cache configuration for the description service</description>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>DescriptionService</string></field>
+            <field name="strategy"><string>LIRS</string></field>
+            <field name="maxEntries"><int>${gatein.cache.description.maxnodes:5000}</int></field>
+            <field name="lifespan"><long>${gatein.cache.description.expiration:600000}</long></field>
+            <field name="replicated"><boolean>true</boolean></field>
+          </object>
+        </object-param>
+        <!-- PageService configuration -->
+        <object-param>
+          <name>cache.config.PageService</name>
+          <description>The JBoss Cache configuration for the page service</description>
+          <object type="org.exoplatform.services.cache.ExoCacheConfig">
+            <field name="name"><string>PageService</string></field>
+            <field name="maxSize"><int>${gatein.cache.page.maxsize:5000}</int></field>
+            <field name="liveTime"><long>${gatein.cache.page.livetime:600}</long></field>
+            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
+          </object>
+        </object-param>
+        <object-param profiles="cluster">
+          <name>cache.config.PageService</name>
+          <description>The JBoss Cache configuration for the page service</description>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>PageService</string></field>
+            <field name="strategy"><string>LIRS</string></field>
+            <field name="maxEntries"><int>${gatein.cache.page.maxnodes:5000}</int></field>
+            <field name="lifespan"><long>${gatein.cache.page.expiration:600000}</long></field>
+            <field name="replicated"><boolean>true</boolean></field>
+          </object>
+        </object-param>
+        <!-- TemplateService configuration -->
+        <object-param>
+          <name>cache.config.TemplateService</name>
+          <description>The JBoss Cache configuration for the template service</description>
+          <object type="org.exoplatform.services.cache.ExoCacheConfig">
+            <field name="name"><string>TemplateService</string></field>
+            <field name="maxSize"><int>${gatein.cache.template.maxsize:5000}</int></field>
+            <field name="liveTime"><long>${gatein.cache.template.livetime:-1}</long></field>
+            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
+          </object>
+        </object-param>
+        <object-param profiles="cluster">
+          <name>cache.config.TemplateService</name>
+          <description>The JBoss Cache configuration for the template service</description>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>TemplateService</string></field>
+            <field name="strategy"><string>LIRS</string></field>
+            <field name="maxEntries"><int>${gatein.cache.template.maxnodes:5000}</int></field>
+            <field name="lifespan"><long>${gatein.cache.template.expiration:600000}</long></field>
+            <field name="replicated"><boolean>true</boolean></field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.listener.ListenerService</target-component>
+    <component-plugin>
+      <name>org.exoplatform.portal.config.DataStorage.portalConfigRemoved</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.portal.pom.config.cache.LayoutUpdateListener</type>
+    </component-plugin>
+    <component-plugin>
+      <name>org.exoplatform.portal.config.DataStorage.portalConfigUpdated</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.portal.pom.config.cache.LayoutUpdateListener</type>
+    </component-plugin>
+    <component-plugin>
+      <name>org.exoplatform.portal.config.DataStorage.pageRemoved</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.portal.pom.config.cache.LayoutUpdateListener</type>
+    </component-plugin>
+    <component-plugin>
+      <name>org.exoplatform.portal.config.DataStorage.pageUpdated</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.portal.pom.config.cache.LayoutUpdateListener</type>
+    </component-plugin>
+  </external-component-plugins>
+
+  <!-- Bind datasource -->
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
+    <component-plugin>
+      <name>bind.datasource</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.naming.BindReferencePlugin</type>
+      <init-params>
+        <value-param>
+          <name>bind-name</name>
+          <value>java:/comp/env/exo-jpa_portal</value>
+        </value-param>
+        <value-param>
+          <name>class-name</name>
+          <value>javax.sql.DataSource</value>
+        </value-param>
+        <value-param>
+          <name>factory</name>
+          <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
+        </value-param>
+        <properties-param>
+          <name>ref-addresses</name>
+          <description>ref-addresses</description>
+          <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+          <property name="url" value="jdbc:hsqldb:mem:db/exojpa" />
+          <property name="username" value="sa" />
+          <property name="password" value="" />
+        </properties-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
+    <component-plugin>
+      <name>bind.datasource</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.naming.BindReferencePlugin</type>
+      <init-params>
+        <value-param>
+          <name>bind-name</name>
+          <value>jdbcjcr</value>
+        </value-param>
+        <value-param>
+          <name>class-name</name>
+          <value>javax.sql.DataSource</value>
+        </value-param>
+        <value-param>
+          <name>factory</name>
+          <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
+        </value-param>
+        <properties-param>
+          <name>ref-addresses</name>
+          <description>ref-addresses</description>
+          <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
+          <property name='url' value='jdbc:hsqldb:mem:db/jdbcexo'/>
+          <property name="username" value="sa"/>
+          <property name="password" value=""/>
+        </properties-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
+    <component-plugin>
+      <name>bind.datasource</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.naming.BindReferencePlugin</type>
+      <init-params>
+        <value-param>
+          <name>bind-name</name>
+          <value>jdbcidm</value>
+        </value-param>
+        <value-param>
+          <name>class-name</name>
+          <value>javax.sql.DataSource</value>
+        </value-param>
+        <value-param>
+          <name>factory</name>
+          <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
+        </value-param>
+        <properties-param>
+          <name>ref-addresses</name>
+          <description>ref-addresses</description>
+          <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
+          <property name="url" value="jdbc:hsqldb:mem:db/jdbcidm"/>
+          <property name="username" value="sa"/>
+          <property name="password" value=""/>
+        </properties-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
+    <component-plugin>
+      <name>PortalRDBMSChangeLogsPlugin</name>
+      <set-method>addChangeLogsPlugin</set-method>
+      <type>org.exoplatform.commons.persistence.impl.ChangeLogsPlugin</type>
+      <init-params>
+        <values-param>
+          <name>changelogs</name>
+          <description>Change logs of Portal RDBMS</description>
+          <value>db/changelog/portal-rdbms.db.changelog-1.0.0.xml</value>
+          <value>db/changelog/settings.db.changelog-1.0.0.xml</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <import>jar:/conf/exo.portal.component.portal-mop-configuration.xml</import>
+</configuration>
