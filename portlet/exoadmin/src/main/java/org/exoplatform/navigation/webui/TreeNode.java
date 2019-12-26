@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
-import org.exoplatform.portal.mop.Described.State;
+import org.exoplatform.portal.mop.org.exoplatform.portal.mop.State;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.navigation.NodeChangeListener;
 import org.exoplatform.portal.mop.navigation.NodeState;

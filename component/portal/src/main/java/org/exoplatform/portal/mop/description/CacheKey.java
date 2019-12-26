@@ -22,12 +22,12 @@ package org.exoplatform.portal.mop.description;
 import java.io.Serializable;
 import java.util.Locale;
 
-import org.exoplatform.commons.scope.AbstractScopedKey;
-
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
-public final class CacheKey extends AbstractScopedKey implements Serializable {
+public final class CacheKey implements Serializable {
+
+    private static final long serialVersionUID = -9141362478946246832L;
 
     /** . */
     final Locale locale;

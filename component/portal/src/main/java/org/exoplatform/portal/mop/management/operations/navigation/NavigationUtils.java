@@ -145,10 +145,10 @@ public class NavigationUtils {
         pageNode.setName(node.getName());
 
         if (node.getState().getLabel() == null) {
-            Map<Locale, Described.State> descriptions = service.getDescriptions(node.getId());
+            Map<Locale, org.exoplatform.portal.mop.State> descriptions = service.getDescriptions(node.getId());
             if (descriptions != null && !descriptions.isEmpty()) {
                 I18NString labels = new I18NString();
-                for (Map.Entry<Locale, Described.State> entry : descriptions.entrySet()) {
+                for (Map.Entry<Locale, org.exoplatform.portal.mop.State> entry : descriptions.entrySet()) {
                     labels.add(new LocalizedString(entry.getValue().getName(), entry.getKey()));
                 }
 

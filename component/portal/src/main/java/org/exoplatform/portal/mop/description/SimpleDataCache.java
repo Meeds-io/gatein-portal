@@ -38,7 +38,7 @@ public class SimpleDataCache extends DataCache {
     }
 
     @Override
-    protected Described.State getState(POMSession session, CacheKey key) {
+    protected org.exoplatform.portal.mop.State getState(POMSession session, CacheKey key) {
         MarshalledObject<CacheKey> marshalledKey = MarshalledObject.marshall(key);
         MarshalledObject<CacheValue> marshalledValue = map.get(marshalledKey);
         if (marshalledValue == null) {

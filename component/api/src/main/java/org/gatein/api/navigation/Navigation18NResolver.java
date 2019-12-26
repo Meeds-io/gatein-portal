@@ -86,7 +86,7 @@ public class Navigation18NResolver {
             }
         } else if (descriptionId != null) {
             Locale userLocale = getUserLocale();
-            Described.State described;
+            org.exoplatform.portal.mop.State described;
             try {
                 if (userLocale != null) {
                     described = service.resolveDescription(descriptionId, siteLocale, userLocale);

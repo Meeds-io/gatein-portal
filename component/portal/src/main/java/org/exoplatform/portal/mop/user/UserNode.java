@@ -162,7 +162,7 @@ public class UserNode {
             Locale userLocale = owner.navigation.portal.context.getUserLocale();
             Locale portalLocale = owner.navigation.portal.getLocale();
             DescriptionService descriptionService = owner.navigation.portal.service.getDescriptionService();
-            Described.State description = descriptionService.resolveDescription(id, portalLocale, userLocale);
+            org.exoplatform.portal.mop.State description = descriptionService.resolveDescription(id, portalLocale, userLocale);
             if (description != null) {
                 resolvedLabel = description.getName();
             }
@@ -182,7 +182,7 @@ public class UserNode {
         Locale userLocale = owner.navigation.portal.context.getUserLocale();
         DescriptionService descriptionService = owner.navigation.portal.service.getDescriptionService();
 
-        Described.State description = new Described.State(label, null);
+        org.exoplatform.portal.mop.State description = new org.exoplatform.portal.mop.State(label, null);
 
         descriptionService.setDescription(id, userLocale, description);
     }

@@ -57,7 +57,7 @@ public class ExoDataCache extends DataCache {
     }
 
     @Override
-    protected Described.State getState(POMSession session, CacheKey key) {
+    protected org.exoplatform.portal.mop.State getState(POMSession session, CacheKey key) {
         CacheValue value = values.get(session, key);
         return value != null ? value.state : null;
     }

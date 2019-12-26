@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.chromattic.api.annotations.MixinType;
-import org.chromattic.api.annotations.Property;
 
 /**
  * @author <a href="mailto:ppalaga@redhat.com">Peter Palaga</a>

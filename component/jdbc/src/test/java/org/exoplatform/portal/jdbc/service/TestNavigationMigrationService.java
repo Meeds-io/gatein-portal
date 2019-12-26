@@ -132,7 +132,7 @@ public class TestNavigationMigrationService extends AbstractPortalTest {
     NodeContext child = root.get("a");
     assertNotNull(nav);
 
-    jcrDescriptionService.setDescription(child.getId(), Locale.ENGLISH, new Described.State("testDescribe", "testDescribe"));
+    jcrDescriptionService.setDescription(child.getId(), Locale.ENGLISH, new org.exoplatform.portal.mop.State("testDescribe", "testDescribe"));
 
     sync(true);
 

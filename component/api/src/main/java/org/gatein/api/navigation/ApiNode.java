@@ -33,7 +33,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.exoplatform.commons.utils.ExpressionUtil;
-import org.exoplatform.portal.mop.Described;
+import org.exoplatform.portal.mop.State;
 import org.exoplatform.portal.mop.navigation.NodeChange;
 import org.exoplatform.portal.mop.navigation.NodeContext;
 import org.exoplatform.portal.mop.navigation.NodeState;
@@ -169,7 +169,7 @@ public class ApiNode implements Node {
             if (simple != null) {
                 displayName = new LocalizedString(simple);
             } else if (context.getId() != null) {
-                Map<Locale, Described.State> descriptions = navigation.loadDescriptions(context.getId());
+                Map<Locale, State> descriptions = navigation.loadDescriptions(context.getId());
                 displayName = ObjectFactory.createLocalizedString(descriptions);
             }
         }

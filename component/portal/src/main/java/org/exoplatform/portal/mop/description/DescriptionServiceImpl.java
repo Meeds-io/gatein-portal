@@ -55,11 +55,11 @@ public class DescriptionServiceImpl implements DescriptionService {
         this(manager, new ExoDataCache(cacheService));
     }
 
-    public Described.State resolveDescription(String id, Locale locale) throws NullPointerException {
+    public org.exoplatform.portal.mop.State resolveDescription(String id, Locale locale) throws NullPointerException {
         return resolveDescription(id, null, locale);
     }
 
-    public Described.State resolveDescription(String id, Locale locale2, Locale locale1) throws NullPointerException {
+    public org.exoplatform.portal.mop.State resolveDescription(String id, Locale locale2, Locale locale1) throws NullPointerException {
         if (id == null) {
             throw new NullPointerException("No null id accepted");
         }
@@ -69,18 +69,18 @@ public class DescriptionServiceImpl implements DescriptionService {
 
         //
         POMSession session = manager.getSession();
-        Described.State state = resolveDescription(session, id, locale1);
+        org.exoplatform.portal.mop.State state = resolveDescription(session, id, locale1);
         if (state == null && locale2 != null) {
             state = resolveDescription(session, id, locale2);
         }
         return state;
     }
 
-    private Described.State resolveDescription(POMSession session, String id, Locale locale) throws NullPointerException {
+    private org.exoplatform.portal.mop.State resolveDescription(POMSession session, String id, Locale locale) throws NullPointerException {
         return cache.getState(session, new CacheKey(locale, id));
     }
 
-    public Described.State getDescription(String id, Locale locale) {
+    public org.exoplatform.portal.mop.State getDescription(String id, Locale locale) {
         if (id == null) {
             throw new NullPointerException("No null id accepted");
         }
@@ -94,7 +94,7 @@ public class DescriptionServiceImpl implements DescriptionService {
         return desc != null ? desc.getState() : null;
     }
 
-    public void setDescription(String id, Locale locale, Described.State description) {
+    public void setDescription(String id, Locale locale, org.exoplatform.portal.mop.State description) {
         if (id == null) {
             throw new NullPointerException("No null id accepted");
         }
@@ -109,7 +109,7 @@ public class DescriptionServiceImpl implements DescriptionService {
         desc.setState(description);
     }
 
-    public Described.State getDescription(String id) {
+    public org.exoplatform.portal.mop.State getDescription(String id) {
         if (id == null) {
             throw new NullPointerException("No null id accepted");
         }
@@ -120,7 +120,7 @@ public class DescriptionServiceImpl implements DescriptionService {
         return desc != null ? desc.getState() : null;
     }
 
-    public void setDescription(String id, Described.State description) {
+    public void setDescription(String id, org.exoplatform.portal.mop.State description) {
         if (id == null) {
             throw new NullPointerException("No null id accepted");
         }
@@ -135,7 +135,7 @@ public class DescriptionServiceImpl implements DescriptionService {
         }
     }
 
-    public Map<Locale, Described.State> getDescriptions(String id) {
+    public Map<Locale, org.exoplatform.portal.mop.State> getDescriptions(String id) {
         if (id == null) {
             throw new NullPointerException("No null id accepted");
         }
@@ -143,9 +143,9 @@ public class DescriptionServiceImpl implements DescriptionService {
         WorkspaceObject obj = session.findObjectById(id);
         I18NAdapter able = obj.adapt(I18NAdapter.class);
         Map<Locale, Described> mixins = able.getI18NMixin(Described.class);
-        Map<Locale, Described.State> names = null;
+        Map<Locale, org.exoplatform.portal.mop.State> names = null;
         if (mixins != null) {
-            names = new HashMap<Locale, Described.State>(mixins.size());
+            names = new HashMap<Locale, org.exoplatform.portal.mop.State>(mixins.size());
             for (Map.Entry<Locale, Described> entry : mixins.entrySet()) {
                 names.put(entry.getKey(), entry.getValue().getState());
             }
@@ -153,7 +153,7 @@ public class DescriptionServiceImpl implements DescriptionService {
         return names;
     }
 
-    public void setDescriptions(String id, Map<Locale, Described.State> descriptions) {
+    public void setDescriptions(String id, Map<Locale, org.exoplatform.portal.mop.State> descriptions) {
         if (id == null) {
             throw new NullPointerException("No null id accepted");
         }
@@ -167,7 +167,7 @@ public class DescriptionServiceImpl implements DescriptionService {
 
         // Interface specifies it allows a null description map
         if (descriptions != null) {
-            for (Map.Entry<Locale, Described.State> entry : descriptions.entrySet()) {
+            for (Map.Entry<Locale, org.exoplatform.portal.mop.State> entry : descriptions.entrySet()) {
                 Described described = able.addI18NMixin(Described.class, entry.getKey());
                 described.setState(entry.getValue());
             }

@@ -19,10 +19,7 @@
 
 package org.exoplatform.portal.mop;
 
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.gatein.mop.api.workspace.ObjectType;
 import org.gatein.mop.api.workspace.Site;

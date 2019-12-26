@@ -116,12 +116,12 @@ public class TestDescriptionService extends AbstractPortalTest {
         //
         assertEquals(null, svc.resolveDescription(id, null, Locale.GERMAN));
         assertEquals(null, svc.resolveDescription(id, null, new Locale("", "GB")));
-        assertEquals(new Described.State("name_en", null), svc.resolveDescription(id, Locale.ENGLISH, Locale.GERMAN));
-        assertEquals(new Described.State("name_en_GB", null), svc.resolveDescription(id, Locale.UK, Locale.GERMAN));
-        assertEquals(new Described.State("name_en", null), svc.resolveDescription(id, Locale.US, Locale.GERMAN));
-        assertEquals(new Described.State("name_en", null), svc.resolveDescription(id, null, Locale.ENGLISH));
-        assertEquals(new Described.State("name_en", null), svc.resolveDescription(id, null, Locale.US));
-        assertEquals(new Described.State("name_en_GB", null), svc.resolveDescription(id, null, Locale.UK));
+        assertEquals(new org.exoplatform.portal.mop.State("name_en", null), svc.resolveDescription(id, Locale.ENGLISH, Locale.GERMAN));
+        assertEquals(new org.exoplatform.portal.mop.State("name_en_GB", null), svc.resolveDescription(id, Locale.UK, Locale.GERMAN));
+        assertEquals(new org.exoplatform.portal.mop.State("name_en", null), svc.resolveDescription(id, Locale.US, Locale.GERMAN));
+        assertEquals(new org.exoplatform.portal.mop.State("name_en", null), svc.resolveDescription(id, null, Locale.ENGLISH));
+        assertEquals(new org.exoplatform.portal.mop.State("name_en", null), svc.resolveDescription(id, null, Locale.US));
+        assertEquals(new org.exoplatform.portal.mop.State("name_en_GB", null), svc.resolveDescription(id, null, Locale.UK));
     }
 
     public void testResolveDescription() throws Exception {
@@ -140,12 +140,12 @@ public class TestDescriptionService extends AbstractPortalTest {
 
         //
         assertEquals(null, svc.resolveDescription(id, null, Locale.GERMAN));
-        assertEquals(new Described.State("name_en", null), svc.resolveDescription(id, Locale.ENGLISH, Locale.GERMAN));
-        assertEquals(new Described.State("name_en_GB", null), svc.resolveDescription(id, Locale.UK, Locale.GERMAN));
-        assertEquals(new Described.State("name_en", null), svc.resolveDescription(id, Locale.US, Locale.GERMAN));
-        assertEquals(new Described.State("name_en", null), svc.resolveDescription(id, null, Locale.ENGLISH));
-        assertEquals(new Described.State("name_en", null), svc.resolveDescription(id, null, Locale.US));
-        assertEquals(new Described.State("name_en_GB", null), svc.resolveDescription(id, null, Locale.UK));
+        assertEquals(new org.exoplatform.portal.mop.State("name_en", null), svc.resolveDescription(id, Locale.ENGLISH, Locale.GERMAN));
+        assertEquals(new org.exoplatform.portal.mop.State("name_en_GB", null), svc.resolveDescription(id, Locale.UK, Locale.GERMAN));
+        assertEquals(new org.exoplatform.portal.mop.State("name_en", null), svc.resolveDescription(id, Locale.US, Locale.GERMAN));
+        assertEquals(new org.exoplatform.portal.mop.State("name_en", null), svc.resolveDescription(id, null, Locale.ENGLISH));
+        assertEquals(new org.exoplatform.portal.mop.State("name_en", null), svc.resolveDescription(id, null, Locale.US));
+        assertEquals(new org.exoplatform.portal.mop.State("name_en_GB", null), svc.resolveDescription(id, null, Locale.UK));
     }
 
     public void testGetDefaultDescription() throws Exception {
@@ -158,7 +158,7 @@ public class TestDescriptionService extends AbstractPortalTest {
         described.setName("foo_name");
 
         //
-        assertEquals(new Described.State("foo_name", null), svc.getDescription(id));
+        assertEquals(new org.exoplatform.portal.mop.State("foo_name", null), svc.getDescription(id));
     }
 
     public void testSetDefaultDescription() throws Exception {
@@ -172,7 +172,7 @@ public class TestDescriptionService extends AbstractPortalTest {
         assertNull(svc.getDescription(id));
 
         //
-        svc.setDescription(id, new Described.State("foo_name", null));
+        svc.setDescription(id, new org.exoplatform.portal.mop.State("foo_name", null));
 
         //
         assertTrue(nav.isAdapted(Described.class));
@@ -200,7 +200,7 @@ public class TestDescriptionService extends AbstractPortalTest {
         Navigation nav = portal.getRootNavigation().addChild("default");
 
         //
-        svc.setDescription(nav.getObjectId(), Locale.ENGLISH, new Described.State("foo_english", null));
+        svc.setDescription(nav.getObjectId(), Locale.ENGLISH, new org.exoplatform.portal.mop.State("foo_english", null));
 
         //
         assertTrue(nav.isAdapted(I18Nized.class));
@@ -218,14 +218,14 @@ public class TestDescriptionService extends AbstractPortalTest {
 
         //
         try {
-            svc.setDescription(nav.getObjectId(), new Locale("", "GB"), new Described.State("foo_invalid", null));
+            svc.setDescription(nav.getObjectId(), new Locale("", "GB"), new org.exoplatform.portal.mop.State("foo_invalid", null));
             fail();
         } catch (IllegalArgumentException e) {
         }
 
         //
         try {
-            svc.setDescription(nav.getObjectId(), new Locale("en", "GB", "variant"), new Described.State("foo_invalid", null));
+            svc.setDescription(nav.getObjectId(), new Locale("en", "GB", "variant"), new org.exoplatform.portal.mop.State("foo_invalid", null));
             fail();
         } catch (IllegalArgumentException e) {
         }
@@ -241,7 +241,7 @@ public class TestDescriptionService extends AbstractPortalTest {
         desc.setName("add_english");
 
         //
-        svc.setDescription(nav.getObjectId(), Locale.FRENCH, new Described.State("add_french", null));
+        svc.setDescription(nav.getObjectId(), Locale.FRENCH, new org.exoplatform.portal.mop.State("add_french", null));
 
         //
         assertTrue(nav.isAdapted(I18Nized.class));
@@ -271,10 +271,10 @@ public class TestDescriptionService extends AbstractPortalTest {
         described.setName("foo_french");
 
         //
-        Map<Locale, Described.State> description = svc.getDescriptions(nav.getObjectId());
+        Map<Locale, org.exoplatform.portal.mop.State> description = svc.getDescriptions(nav.getObjectId());
         assertEquals(Tools.toSet(Locale.ENGLISH, Locale.FRENCH), description.keySet());
-        assertEquals(new Described.State("foo_english", null), description.get(Locale.ENGLISH));
-        assertEquals(new Described.State("foo_french", null), description.get(Locale.FRENCH));
+        assertEquals(new org.exoplatform.portal.mop.State("foo_english", null), description.get(Locale.ENGLISH));
+        assertEquals(new org.exoplatform.portal.mop.State("foo_french", null), description.get(Locale.FRENCH));
     }
 
     public void testSetDescriptions() throws Exception {
@@ -287,26 +287,26 @@ public class TestDescriptionService extends AbstractPortalTest {
         assertNull(svc.getDescriptions(nav.getObjectId()));
 
         //
-        Map<Locale, Described.State> description = new HashMap<Locale, Described.State>();
-        description.put(Locale.ENGLISH, new Described.State("bar_english", null));
-        description.put(Locale.FRENCH, new Described.State("bar_french", null));
+        Map<Locale, org.exoplatform.portal.mop.State> description = new HashMap<Locale, org.exoplatform.portal.mop.State>();
+        description.put(Locale.ENGLISH, new org.exoplatform.portal.mop.State("bar_english", null));
+        description.put(Locale.FRENCH, new org.exoplatform.portal.mop.State("bar_french", null));
         svc.setDescriptions(nav.getObjectId(), description);
 
         //
         description = svc.getDescriptions(nav.getObjectId());
         assertEquals(Tools.toSet(Locale.ENGLISH, Locale.FRENCH), description.keySet());
-        assertEquals(new Described.State("bar_english", null), description.get(Locale.ENGLISH));
-        assertEquals(new Described.State("bar_french", null), description.get(Locale.FRENCH));
+        assertEquals(new org.exoplatform.portal.mop.State("bar_english", null), description.get(Locale.ENGLISH));
+        assertEquals(new org.exoplatform.portal.mop.State("bar_french", null), description.get(Locale.FRENCH));
 
         //
-        description = new HashMap<Locale, Described.State>();
-        description.put(Locale.ENGLISH, new Described.State("bar_english_2", null));
+        description = new HashMap<Locale, org.exoplatform.portal.mop.State>();
+        description.put(Locale.ENGLISH, new org.exoplatform.portal.mop.State("bar_english_2", null));
         svc.setDescriptions(nav.getObjectId(), description);
 
         //
         description = svc.getDescriptions(nav.getObjectId());
         assertEquals(Tools.toSet(Locale.ENGLISH), description.keySet());
-        assertEquals(new Described.State("bar_english_2", null), description.get(Locale.ENGLISH));
+        assertEquals(new org.exoplatform.portal.mop.State("bar_english_2", null), description.get(Locale.ENGLISH));
     }
 
     public void testSetInvalidLocaleDescriptions() throws Exception {
@@ -318,13 +318,13 @@ public class TestDescriptionService extends AbstractPortalTest {
         //
         try {
             svc.setDescriptions(nav.getObjectId(),
-                    Collections.singletonMap(new Locale("", "GB"), new Described.State("bar_invalid", null)));
+                    Collections.singletonMap(new Locale("", "GB"), new org.exoplatform.portal.mop.State("bar_invalid", null)));
             fail();
         } catch (IllegalArgumentException e) {
         }
         try {
             svc.setDescriptions(nav.getObjectId(),
-                    Collections.singletonMap(new Locale("en", "GB", "variant"), new Described.State("bar_invalid", null)));
+                    Collections.singletonMap(new Locale("en", "GB", "variant"), new org.exoplatform.portal.mop.State("bar_invalid", null)));
             fail();
         } catch (IllegalArgumentException e) {
         }

@@ -148,7 +148,7 @@ public class NavigationFragmentImporter {
             }
 
             // Collect labels
-            Map<NodeContext<?>, Map<Locale, Described.State>> labelMap = new HashMap<NodeContext<?>, Map<Locale, Described.State>>();
+            Map<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>> labelMap = new HashMap<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>>();
 
             // Perform save
             perform(src, from, labelMap);
@@ -157,7 +157,7 @@ public class NavigationFragmentImporter {
             navigationService.saveNode(root, null);
 
             //
-            for (Map.Entry<NodeContext<?>, Map<Locale, Described.State>> entry : labelMap.entrySet()) {
+            for (Map.Entry<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>> entry : labelMap.entrySet()) {
                 String id = entry.getKey().getId();
                 descriptionService.setDescriptions(id, entry.getValue());
             }
@@ -170,7 +170,7 @@ public class NavigationFragmentImporter {
     }
 
     private void perform(PageNodeContainer src, final NodeContext<?> dst,
-            final Map<NodeContext<?>, Map<Locale, Described.State>> labelMap) {
+            final Map<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>> labelMap) {
         navigationService.rebaseNode(dst, Scope.CHILDREN, null);
 
         //
@@ -251,19 +251,19 @@ public class NavigationFragmentImporter {
     }
 
     private NodeContext<?> add(PageNode target, NodeContext<?> previous, NodeContext<?> parent,
-            Map<NodeContext<?>, Map<Locale, Described.State>> labelMap) {
+            Map<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>> labelMap) {
         I18NString labels = target.getLabels();
 
         //
-        Map<Locale, Described.State> description;
+        Map<Locale, org.exoplatform.portal.mop.State> description;
         if (labels.isSimple()) {
             description = null;
         } else if (labels.isEmpty()) {
             description = null;
         } else {
-            description = new HashMap<Locale, Described.State>();
+            description = new HashMap<Locale, org.exoplatform.portal.mop.State>();
             for (Map.Entry<Locale, String> entry : labels.getExtended(portalLocale).entrySet()) {
-                description.put(entry.getKey(), new Described.State(entry.getValue(), null));
+                description.put(entry.getKey(), new org.exoplatform.portal.mop.State(entry.getValue(), null));
             }
         }
 
@@ -297,27 +297,27 @@ public class NavigationFragmentImporter {
         return child;
     }
 
-    private void update(PageNode src, NodeContext<?> target, Map<NodeContext<?>, Map<Locale, Described.State>> labelMap) {
+    private void update(PageNode src, NodeContext<?> target, Map<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>> labelMap) {
         target.setState(src.getState());
 
         // Update extended labels if necessary
         I18NString labels = src.getLabels();
-        Map<Locale, Described.State> description;
+        Map<Locale, org.exoplatform.portal.mop.State> description;
         if (labels.isSimple()) {
             description = null;
         } else if (labels.isEmpty()) {
             description = null;
         } else {
-            description = new HashMap<Locale, Described.State>();
+            description = new HashMap<Locale, org.exoplatform.portal.mop.State>();
             for (Map.Entry<Locale, String> entry : labels.getExtended(portalLocale).entrySet()) {
-                description.put(entry.getKey(), new Described.State(entry.getValue(), null));
+                description.put(entry.getKey(), new org.exoplatform.portal.mop.State(entry.getValue(), null));
             }
         }
 
         if (description != null) {
             labelMap.put(target, description);
         } else {
-            labelMap.put(target, Collections.<Locale, Described.State> emptyMap());
+            labelMap.put(target, Collections.<Locale, org.exoplatform.portal.mop.State> emptyMap());
         }
     }
 }

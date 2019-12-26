@@ -22,7 +22,6 @@ package org.exoplatform.portal.mop;
 import java.util.Date;
 
 import org.chromattic.api.annotations.MixinType;
-import org.chromattic.api.annotations.Property;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

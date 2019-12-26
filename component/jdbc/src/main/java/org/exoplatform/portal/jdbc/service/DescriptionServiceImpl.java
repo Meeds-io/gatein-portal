@@ -38,7 +38,7 @@ public class DescriptionServiceImpl implements DescriptionService {
     this.descDAO = descDAO;
   }
 
-  public Described.State resolveDescription(String id, Locale locale) throws NullPointerException {
+  public org.exoplatform.portal.mop.State resolveDescription(String id, Locale locale) throws NullPointerException {
     if (id == null) {
       throw new NullPointerException("No null id accepted");
     }
@@ -51,7 +51,7 @@ public class DescriptionServiceImpl implements DescriptionService {
       for (Locale current = locale; current != null; current = parent(current)) {
         DescriptionState state = desc.getLocalized().get(I18N.toTagIdentifier(current));
         if (state != null) {
-          Described.State result = new Described.State(state.getName(), state.getDescription());
+          org.exoplatform.portal.mop.State result = new org.exoplatform.portal.mop.State(state.getName(), state.getDescription());
           return result;
         }
       }
@@ -59,15 +59,15 @@ public class DescriptionServiceImpl implements DescriptionService {
     return null;
   }
 
-  public Described.State resolveDescription(String id, Locale locale2, Locale locale1) throws NullPointerException {
-    Described.State state = resolveDescription(id, locale1);
+  public org.exoplatform.portal.mop.State resolveDescription(String id, Locale locale2, Locale locale1) throws NullPointerException {
+    org.exoplatform.portal.mop.State state = resolveDescription(id, locale1);
     if (state == null && locale2 != null) {
       state = resolveDescription(id, locale2);
     }
     return state;
   }
 
-  public Described.State getDescription(String id, Locale locale) {
+  public org.exoplatform.portal.mop.State getDescription(String id, Locale locale) {
     if (id == null) {
       throw new NullPointerException("No null id accepted");
     }
@@ -80,14 +80,14 @@ public class DescriptionServiceImpl implements DescriptionService {
     if (desc != null) {
       DescriptionState state = desc.getLocalized().get(I18N.toTagIdentifier(locale));
       if (state != null) {
-        Described.State result = new Described.State(state.getName(), state.getDescription());
+        org.exoplatform.portal.mop.State result = new org.exoplatform.portal.mop.State(state.getName(), state.getDescription());
         return result;
       }
     }
     return null;
   }
 
-  public void setDescription(String id, Locale locale, Described.State description) {
+  public void setDescription(String id, Locale locale, org.exoplatform.portal.mop.State description) {
     if (id == null) {
       throw new NullPointerException("No null id accepted");
     }
@@ -117,7 +117,7 @@ public class DescriptionServiceImpl implements DescriptionService {
     descDAO.saveDescriptions(id, state);
   }
 
-  public Described.State getDescription(String id) {
+  public org.exoplatform.portal.mop.State getDescription(String id) {
     if (id == null) {
       throw new NullPointerException("No null id accepted");
     }
@@ -127,14 +127,14 @@ public class DescriptionServiceImpl implements DescriptionService {
     if (desc != null) {
       DescriptionState state = desc.getState();
       if (state != null) {
-        Described.State result = new Described.State(state.getName(), state.getDescription());
+        org.exoplatform.portal.mop.State result = new org.exoplatform.portal.mop.State(state.getName(), state.getDescription());
         return result;
       }
     }
     return null;
   }
 
-  public void setDescription(String id, Described.State description) {
+  public void setDescription(String id, org.exoplatform.portal.mop.State description) {
     if (id == null) {
       throw new NullPointerException("No null id accepted");
     }
@@ -146,28 +146,28 @@ public class DescriptionServiceImpl implements DescriptionService {
     }
   }
 
-  public Map<Locale, Described.State> getDescriptions(String id) {
+  public Map<Locale, org.exoplatform.portal.mop.State> getDescriptions(String id) {
     if (id == null) {
       throw new NullPointerException("No null id accepted");
     }
-    Map<Locale, Described.State> names = null;
+    Map<Locale, org.exoplatform.portal.mop.State> names = null;
 
     DescriptionEntity desc = descDAO.getByRefId(id);
     if (desc != null) {
       Map<String, DescriptionState> localized = desc.getLocalized();
 
       if (localized != null) {
-        names = new HashMap<Locale, Described.State>(localized.size());
+        names = new HashMap<Locale, org.exoplatform.portal.mop.State>(localized.size());
         for (String locale : localized.keySet()) {
           DescriptionState state = localized.get(locale);
-          names.put(I18N.parseTagIdentifier(locale), new Described.State(state.getName(), state.getDescription()));
+          names.put(I18N.parseTagIdentifier(locale), new org.exoplatform.portal.mop.State(state.getName(), state.getDescription()));
         }
       }
     }
     return names;
   }
 
-  public void setDescriptions(String id, Map<Locale, Described.State> descriptions) {
+  public void setDescriptions(String id, Map<Locale, org.exoplatform.portal.mop.State> descriptions) {
     if (id == null) {
       throw new NullPointerException("No null id accepted");
     }
@@ -181,7 +181,7 @@ public class DescriptionServiceImpl implements DescriptionService {
           throw new IllegalArgumentException("No variant cab be set on locale");
         }
 
-        Described.State state = descriptions.get(locale);
+        org.exoplatform.portal.mop.State state = descriptions.get(locale);
         localized.put(I18N.toTagIdentifier(locale), new DescriptionState(state.getName(), state.getDescription()));
       }
 

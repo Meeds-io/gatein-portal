@@ -107,7 +107,7 @@ public class UIPageNodeForm extends UIFormTabPane {
 
     private static final String VISIBLE = "visible";
 
-    private Map<String, Described.State> cachedLabels;
+    private Map<String, org.exoplatform.portal.mop.State> cachedLabels;
 
     private String selectedLocale;
 
@@ -174,7 +174,7 @@ public class UIPageNodeForm extends UIFormTabPane {
     public void setValues(TreeNode pageNode) throws Exception {
         pageNode_ = pageNode;
         selectedLocale = getUIFormSelectBox(LANGUAGES).getValue();
-        cachedLabels = new HashMap<String, Described.State>();
+        cachedLabels = new HashMap<String, org.exoplatform.portal.mop.State>();
         if (pageNode == null) {
             getUIStringInput("name").setReadOnly(false);
             getChild(UIFormInputIconSelector.class).setSelectedIcon("Default");
@@ -270,7 +270,7 @@ public class UIPageNodeForm extends UIFormTabPane {
             icon = "Default";
         getChild(UIFormInputIconSelector.class).setSelectedIcon(icon);
         getUIStringInput(LABEL).setValue(pageNode.getLabel());
-        Map<Locale, Described.State> i18nizedLabels = pageNode.getI18nizedLabels();
+        Map<Locale, org.exoplatform.portal.mop.State> i18nizedLabels = pageNode.getI18nizedLabels();
         if (i18nizedLabels != null) {
             for (Locale key : i18nizedLabels.keySet()) {
                 String locale = key.getCountry() != "" ? key.getLanguage() + "_" + key.getCountry() : key.getLanguage();
@@ -344,9 +344,9 @@ public class UIPageNodeForm extends UIFormTabPane {
             }
         }
 
-        cachedLabels.put(getUIFormSelectBox(LANGUAGES).getValue(), new Described.State(getUIStringInput(I18N_LABEL).getValue(),
+        cachedLabels.put(getUIFormSelectBox(LANGUAGES).getValue(), new org.exoplatform.portal.mop.State(getUIStringInput(I18N_LABEL).getValue(),
                 null));
-        Map<Locale, Described.State> labels = new HashMap<Locale, Described.State>(cachedLabels.size());
+        Map<Locale, org.exoplatform.portal.mop.State> labels = new HashMap<Locale, org.exoplatform.portal.mop.State>(cachedLabels.size());
         getUIFormSelectBox(LANGUAGES).getValue();
         for (String strLocale : cachedLabels.keySet()) {
             Locale locale;
@@ -564,7 +564,7 @@ public class UIPageNodeForm extends UIFormTabPane {
     }
 
     private void updateCachedLabels(String locale, String label) {
-        cachedLabels.put(locale, new Described.State(label, null));
+        cachedLabels.put(locale, new org.exoplatform.portal.mop.State(label, null));
     }
 
     public void setSelectedLocale(String selectedLocale) {

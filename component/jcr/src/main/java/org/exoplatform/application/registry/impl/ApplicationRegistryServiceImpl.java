@@ -454,8 +454,6 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
                 // Check if the portlet has already existed in this category
                 ApplicationType appType;
                 if (remote) {
-                    appType = ApplicationType.WSRP_PORTLET;
-                } else {
                     appType = ApplicationType.PORTLET;
                 }
                 ContentDefinition contentDef = findApp(category, appType, portletName);

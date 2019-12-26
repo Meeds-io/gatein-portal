@@ -20,7 +20,6 @@
 package org.exoplatform.portal.mop.description;
 
 import java.io.Serializable;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.exoplatform.portal.mop.Described;
@@ -30,6 +29,8 @@ import org.exoplatform.portal.mop.Described;
  */
 public class CacheValue implements Serializable {
   
+    private static final long serialVersionUID = 1187065465332781105L;
+
     public static final CacheValue NULL_VALUE = new CacheValue();
 
     /** . */
@@ -42,7 +43,7 @@ public class CacheValue implements Serializable {
     final long serial;
 
     /** . */
-    final Described.State state;
+    final org.exoplatform.portal.mop.State state;
 
     private CacheValue() {
       state = null;
@@ -50,13 +51,13 @@ public class CacheValue implements Serializable {
       origin = null;
     }
 
-    public CacheValue(CacheKey origin, long serial, Described.State state) {
+    public CacheValue(CacheKey origin, long serial, org.exoplatform.portal.mop.State state) {
         this.origin = origin;
         this.serial = serial;
         this.state = state;
     }
 
-    public CacheValue(Described.State state) {
+    public CacheValue(org.exoplatform.portal.mop.State state) {
         this.origin = null;
         this.serial = SEQUENCE.incrementAndGet();
         this.state = state;

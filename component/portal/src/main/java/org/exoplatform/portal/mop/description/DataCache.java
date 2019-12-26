@@ -32,14 +32,14 @@ abstract class DataCache {
 
     protected abstract void removeState(CacheKey key);
 
-    protected abstract Described.State getState(POMSession session, CacheKey key);
+    protected abstract org.exoplatform.portal.mop.State getState(POMSession session, CacheKey key);
 
     protected final CacheValue getValue(POMSession session, CacheKey key) {
         WorkspaceObject obj = session.findObjectById(key.id);
         I18NAdapter able = obj.adapt(I18NAdapter.class);
         Resolution<Described> res = able.resolveI18NMixin(Described.class, key.locale);
         if (res != null) {
-            Described.State state = res.getMixin().getState();
+            org.exoplatform.portal.mop.State state = res.getMixin().getState();
             if (key.locale.equals(res.getLocale())) {
                 CacheValue foo = new CacheValue(state);
                 putValue(key, foo);

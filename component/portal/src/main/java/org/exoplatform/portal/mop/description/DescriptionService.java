@@ -41,7 +41,7 @@ public interface DescriptionService {
      * @return the description
      * @throws NullPointerException if the <code>id</code> or the <code>locale</code> argument is null
      */
-    Described.State resolveDescription(String id, Locale locale) throws NullPointerException;
+    org.exoplatform.portal.mop.State resolveDescription(String id, Locale locale) throws NullPointerException;
 
     /**
      * <p>
@@ -64,7 +64,7 @@ public interface DescriptionService {
      * @return the description
      * @throws NullPointerException if the <code>id</code> or the <code>locale1</code> argument is null
      */
-    Described.State resolveDescription(String id, Locale locale2, Locale locale1) throws NullPointerException;
+    org.exoplatform.portal.mop.State resolveDescription(String id, Locale locale2, Locale locale1) throws NullPointerException;
 
     /**
      * Returns the default description or null if it does not exist.
@@ -73,7 +73,7 @@ public interface DescriptionService {
      * @return the description
      * @throws NullPointerException if the id argument is null
      */
-    Described.State getDescription(String id) throws NullPointerException;
+    org.exoplatform.portal.mop.State getDescription(String id) throws NullPointerException;
 
     /**
      * Update the default description to the new description or remove it if the description argument is null.
@@ -82,7 +82,7 @@ public interface DescriptionService {
      * @param description the new description
      * @throws NullPointerException if the id argument is null
      */
-    void setDescription(String id, Described.State description) throws NullPointerException;
+    void setDescription(String id, org.exoplatform.portal.mop.State description) throws NullPointerException;
 
     /**
      * Returns a description for the specified locale argument or null if it does not exist.
@@ -92,7 +92,7 @@ public interface DescriptionService {
      * @return the description
      * @throws NullPointerException if the id or locale argument is null
      */
-    Described.State getDescription(String id, Locale locale) throws NullPointerException;
+    org.exoplatform.portal.mop.State getDescription(String id, Locale locale) throws NullPointerException;
 
     /**
      * Update the description for the specified locale to the new description or remove it if the description argument is null.
@@ -103,7 +103,7 @@ public interface DescriptionService {
      * @throws NullPointerException if the id or locale argument is null
      * @throws IllegalArgumentException if the locale is not valid
      */
-    void setDescription(String id, Locale locale, Described.State description) throws NullPointerException,
+    void setDescription(String id, Locale locale, org.exoplatform.portal.mop.State description) throws NullPointerException,
             IllegalArgumentException;
 
     /**
@@ -113,7 +113,7 @@ public interface DescriptionService {
      * @return the map the description map
      * @throws NullPointerException if the id is null
      */
-    Map<Locale, Described.State> getDescriptions(String id) throws NullPointerException;
+    Map<Locale, org.exoplatform.portal.mop.State> getDescriptions(String id) throws NullPointerException;
 
     /**
      * Updates the description of the specified object or remove the internationalized characteristic of the object if the
@@ -124,7 +124,7 @@ public interface DescriptionService {
      * @throws NullPointerException if the id is null
      * @throws IllegalArgumentException if the map contains an invalid locale
      */
-    void setDescriptions(String id, Map<Locale, Described.State> descriptions) throws NullPointerException,
+    void setDescriptions(String id, Map<Locale, org.exoplatform.portal.mop.State> descriptions) throws NullPointerException,
             IllegalArgumentException;
 
 }

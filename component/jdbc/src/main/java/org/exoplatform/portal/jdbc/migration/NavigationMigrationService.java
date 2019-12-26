@@ -106,7 +106,7 @@ public class NavigationMigrationService extends AbstractMigrationService {
       }
 
     }
-    Map<Locale, Described.State> descriptions = jcrDescriptionService.getDescriptions(jcrParent.getId());
+    Map<Locale, org.exoplatform.portal.mop.State> descriptions = jcrDescriptionService.getDescriptions(jcrParent.getId());
     descriptionService.setDescriptions(parent.getId(), descriptions);
   }
 

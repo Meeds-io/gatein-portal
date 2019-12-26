@@ -130,7 +130,7 @@ public class UIPageCreationWizard extends UIPageWizard {
         userPortal.saveNode(selectedNode, null);
 
         DescriptionService descriptionService = getApplicationComponent(DescriptionService.class);
-        Map<Locale, Described.State> descriptions = new HashMap<Locale, Described.State>();
+        Map<Locale, org.exoplatform.portal.mop.State> descriptions = new HashMap<Locale, org.exoplatform.portal.mop.State>();
         Map<String, String> cachedLabels = uiPageInfo.getCachedLabels();
 
         for (String strLocale : cachedLabels.keySet()) {
@@ -146,7 +146,7 @@ public class UIPageCreationWizard extends UIPageWizard {
                 locale = new Locale(strLocale);
             }
 
-            descriptions.put(locale, new Described.State(cachedLabels.get(strLocale), null));
+            descriptions.put(locale, new org.exoplatform.portal.mop.State(cachedLabels.get(strLocale), null));
         }
 
         descriptionService.setDescriptions(createdNode.getId(), descriptions);

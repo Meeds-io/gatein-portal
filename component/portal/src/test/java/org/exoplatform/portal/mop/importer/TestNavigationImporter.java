@@ -344,25 +344,25 @@ public class TestNavigationImporter extends AbstractTestNavigationService {
 
         // The fully explicit case
         NodeContext<?> a = (NodeContext<?>) node.getNode("a");
-        Map<Locale, Described.State> aDesc = descriptionService.getDescriptions(a.getId());
+        Map<Locale, org.exoplatform.portal.mop.State> aDesc = descriptionService.getDescriptions(a.getId());
         assertNotNull(aDesc);
         assertEquals(Tools.toSet(Locale.ENGLISH, Locale.FRENCH), aDesc.keySet());
-        assertEquals(new Described.State("a_en", null), aDesc.get(Locale.ENGLISH));
-        assertEquals(new Described.State("a_fr", null), aDesc.get(Locale.FRENCH));
+        assertEquals(new org.exoplatform.portal.mop.State("a_en", null), aDesc.get(Locale.ENGLISH));
+        assertEquals(new org.exoplatform.portal.mop.State("a_fr", null), aDesc.get(Locale.FRENCH));
         assertNull(a.getState().getLabel());
 
         // No explicit language means to use the portal locale
         NodeContext<?> b = (NodeContext<?>) node.getNode("b");
-        Map<Locale, Described.State> bDesc = descriptionService.getDescriptions(b.getId());
+        Map<Locale, org.exoplatform.portal.mop.State> bDesc = descriptionService.getDescriptions(b.getId());
         assertNotNull(bDesc);
         assertEquals(Tools.toSet(Locale.ENGLISH, Locale.FRENCH), bDesc.keySet());
-        assertEquals(new Described.State("b_en", null), bDesc.get(Locale.ENGLISH));
-        assertEquals(new Described.State("b_fr", null), bDesc.get(Locale.FRENCH));
+        assertEquals(new org.exoplatform.portal.mop.State("b_en", null), bDesc.get(Locale.ENGLISH));
+        assertEquals(new org.exoplatform.portal.mop.State("b_fr", null), bDesc.get(Locale.FRENCH));
         assertNull(b.getState().getLabel());
 
         // The simple use case : one single label without the xml:lang attribute
         NodeContext<?> c = (NodeContext<?>) node.getNode("c");
-        Map<Locale, Described.State> cDesc = descriptionService.getDescriptions(c.getId());
+        Map<Locale, org.exoplatform.portal.mop.State> cDesc = descriptionService.getDescriptions(c.getId());
         assertNull(cDesc);
         assertEquals("c_en", c.getState().getLabel());
 
@@ -389,8 +389,8 @@ public class TestNavigationImporter extends AbstractTestNavigationService {
         aDesc = descriptionService.getDescriptions(a.getId());
         assertNotNull(aDesc);
         assertEquals(Tools.toSet(Locale.ITALIAN, Locale.GERMAN), aDesc.keySet());
-        assertEquals(new Described.State("a_it", null), aDesc.get(Locale.ITALIAN));
-        assertEquals(new Described.State("a_de", null), aDesc.get(Locale.GERMAN));
+        assertEquals(new org.exoplatform.portal.mop.State("a_it", null), aDesc.get(Locale.ITALIAN));
+        assertEquals(new org.exoplatform.portal.mop.State("a_de", null), aDesc.get(Locale.GERMAN));
         assertNull(a.getState().getLabel());
 
         // No explicit language means to use the portal locale
@@ -398,8 +398,8 @@ public class TestNavigationImporter extends AbstractTestNavigationService {
         bDesc = descriptionService.getDescriptions(b.getId());
         assertNotNull(bDesc);
         assertEquals(Tools.toSet(Locale.ENGLISH, Locale.ITALIAN), bDesc.keySet());
-        assertEquals(new Described.State("foo_b_en", null), bDesc.get(Locale.ENGLISH));
-        assertEquals(new Described.State("b_it", null), bDesc.get(Locale.ITALIAN));
+        assertEquals(new org.exoplatform.portal.mop.State("foo_b_en", null), bDesc.get(Locale.ENGLISH));
+        assertEquals(new org.exoplatform.portal.mop.State("b_it", null), bDesc.get(Locale.ITALIAN));
         assertNull(b.getState().getLabel());
 
         // The simple use case : one single label without the xml:lang attribute
@@ -433,8 +433,8 @@ public class TestNavigationImporter extends AbstractTestNavigationService {
         aDesc = descriptionService.getDescriptions(a.getId());
         assertNotNull(aDesc);
         assertEquals(Tools.toSet(Locale.ENGLISH, Locale.FRENCH), aDesc.keySet());
-        assertEquals(new Described.State("bar_a_en", null), aDesc.get(Locale.ENGLISH));
-        assertEquals(new Described.State("bar_a_fr", null), aDesc.get(Locale.FRENCH));
+        assertEquals(new org.exoplatform.portal.mop.State("bar_a_en", null), aDesc.get(Locale.ENGLISH));
+        assertEquals(new org.exoplatform.portal.mop.State("bar_a_fr", null), aDesc.get(Locale.FRENCH));
         assertNull(a.getState().getLabel());
 
         // No explicit language means to use the portal locale
@@ -442,8 +442,8 @@ public class TestNavigationImporter extends AbstractTestNavigationService {
         bDesc = descriptionService.getDescriptions(b.getId());
         assertNotNull(bDesc);
         assertEquals(Tools.toSet(Locale.ENGLISH, Locale.FRENCH), bDesc.keySet());
-        assertEquals(new Described.State("bar_b_en", null), bDesc.get(Locale.ENGLISH));
-        assertEquals(new Described.State("bar_b_fr", null), bDesc.get(Locale.FRENCH));
+        assertEquals(new org.exoplatform.portal.mop.State("bar_b_en", null), bDesc.get(Locale.ENGLISH));
+        assertEquals(new org.exoplatform.portal.mop.State("bar_b_fr", null), bDesc.get(Locale.FRENCH));
         assertNull(b.getState().getLabel());
 
         // The simple use case : one single label without the xml:lang attribute

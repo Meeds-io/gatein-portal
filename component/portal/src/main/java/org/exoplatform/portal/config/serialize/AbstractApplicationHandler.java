@@ -87,23 +87,17 @@ public class AbstractApplicationHandler implements IMarshaller, IUnmarshaller, I
         ctx.parsePastStartTag(m_uri, m_name);
 
         //
-        Application<?> app;
-        TransientApplicationState state;
-        String contentId;
-        boolean isWSRP = false;
-        if (ctx.isAt(m_uri, "wsrp")) {
-            contentId = ctx.parseElementText(m_uri, "wsrp");
-            app = Application.createWSRPApplication();
-            isWSRP = true;
-        } else {
-
-            ctx.parsePastStartTag(m_uri, "portlet");
-            String applicationName = ctx.parseElementText(m_uri, "application-ref");
-            String portletName = ctx.parseElementText(m_uri, "portlet-ref");
-            contentId = applicationName + "/" + portletName;
-            app = Application.createPortletApplication();
+        if (!ctx.isAt(m_uri, "portlet")) {
+          return null;
         }
 
+        ctx.parsePastStartTag(m_uri, "portlet");
+        String applicationName = ctx.parseElementText(m_uri, "application-ref");
+        String portletName = ctx.parseElementText(m_uri, "portlet-ref");
+        String contentId = applicationName + "/" + portletName;
+        Application<?> app = Application.createPortletApplication();
+
+        TransientApplicationState state;
         if (ctx.isAt(m_uri, "preferences")) {
             PortletBuilder builder = new PortletBuilder();
             ctx.parsePastStartTag(m_uri, "preferences");
@@ -117,9 +111,7 @@ public class AbstractApplicationHandler implements IMarshaller, IUnmarshaller, I
             state = new TransientApplicationState(contentId, null);
         }
 
-        if (!isWSRP) {
-            ctx.parsePastEndTag(m_uri, "portlet");
-        }
+        ctx.parsePastEndTag(m_uri, "portlet");
 
         app.setState(state);
 

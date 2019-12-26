@@ -23,7 +23,6 @@ import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.ApplicationData;
 import org.exoplatform.portal.pom.data.ModelData;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
-import org.exoplatform.portal.pom.spi.wsrp.WSRP;
 
 /**
  * May 13, 2004
@@ -229,26 +228,14 @@ public class Application<S> extends ModelObject {
     }
 
     public static Application<Portlet> createPortletApplication(ApplicationData<Portlet> data) {
-        return new Application<Portlet>(data);
+        return new Application<>(data);
     }
 
     public static Application<Portlet> createPortletApplication(String storageId) {
-        return new Application<Portlet>(ApplicationType.PORTLET, storageId);
+        return new Application<>(ApplicationType.PORTLET, storageId);
     }
 
     public static Application<Portlet> createPortletApplication() {
-        return new Application<Portlet>(ApplicationType.PORTLET);
-    }
-
-    public static Application<WSRP> createWSRPApplication(ApplicationData<WSRP> wsrpwsrpIdApplicationData) {
-        return new Application<WSRP>(wsrpwsrpIdApplicationData);
-    }
-
-    public static Application<WSRP> createWSRPApplication() {
-        return new Application<WSRP>(ApplicationType.WSRP_PORTLET);
-    }
-
-    public static Application<WSRP> createWSRPApplication(String storageId) {
-        return new Application<WSRP>(ApplicationType.WSRP_PORTLET, storageId);
+        return new Application<>(ApplicationType.PORTLET);
     }
 }
