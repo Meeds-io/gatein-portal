@@ -22,7 +22,7 @@
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd http://www.exoplaform.org/xml/ns/kernel_1_2.xsd" xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
   <component>
     <key>org.exoplatform.application.registry.ApplicationRegistryService</key>
-    <type>org.exoplatform.application.registry.impl.ApplicationRegistryServiceImpl</type>
+    <type>org.exoplatform.portal.jdbc.service.JDBCApplicationRegistryService</type>
     <component-plugins>
       <component-plugin>
         <name>new.portal.portlets.registry</name>
