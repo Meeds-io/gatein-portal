@@ -18,8 +18,6 @@
  */
 package org.exoplatform.commons.file.resource;
 
-import org.exoplatform.services.jcr.impl.util.io.FileCleaner;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

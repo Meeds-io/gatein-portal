@@ -18,11 +18,10 @@
  */
 package org.exoplatform.commons.file.resource;
 
-import org.exoplatform.services.jcr.impl.util.io.FileCleaner;
+import java.io.File;
+
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-
-import java.io.File;
 
 /*
 * TreeFile implementation : Override delete File operation.
