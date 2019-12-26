@@ -25,15 +25,13 @@ package org.gatein.api.navigation;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.gatein.api.*;
+import org.gatein.api.site.SiteId;
+
 import org.exoplatform.commons.utils.ExpressionUtil;
-import org.exoplatform.portal.mop.Described;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.services.resources.ResourceBundleManager;
-import org.gatein.api.ApiException;
-import org.gatein.api.PortalRequest;
-import org.gatein.api.Util;
-import org.gatein.api.site.SiteId;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>

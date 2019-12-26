@@ -2,21 +2,14 @@ package org.exoplatform.portal.mop.jdbc.dao;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import javax.persistence.EntityTransaction;
 
-import org.exoplatform.application.registry.dao.*;
-import org.exoplatform.application.registry.entity.*;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
-import org.exoplatform.component.test.AbstractKernelTest;
-import org.exoplatform.component.test.ConfigurationUnit;
-import org.exoplatform.component.test.ConfiguredBy;
-import org.exoplatform.component.test.ContainerScope;
+import org.exoplatform.component.test.*;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
-import org.exoplatform.portal.mop.dao.*;
-import org.exoplatform.portal.mop.jdbc.dao.*;
+import org.exoplatform.portal.mop.jdbc.entity.*;
 
 @ConfiguredBy({
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})

@@ -69,6 +69,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.gatein.api</groupId>
+      <artifactId>gatein-api</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.gatein.mop</groupId>
       <artifactId>mop-api</artifactId>
     </dependency>
@@ -89,6 +94,11 @@
     </dependency>
 
     <dependency>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
     </dependency>
@@ -103,6 +113,12 @@
       <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.identity</artifactId>
       <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.exoplatform.gatein.portal</groupId>
+      <artifactId>exo.portal.component.test.core</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -152,6 +168,10 @@
     </pluginManagement>
 
     <plugins>
+      <plugin>
+        <groupId>com.jcabi</groupId>
+        <artifactId>jcabi-maven-plugin</artifactId>
+      </plugin>
 
       <plugin>
         <groupId>org.jibx</groupId>

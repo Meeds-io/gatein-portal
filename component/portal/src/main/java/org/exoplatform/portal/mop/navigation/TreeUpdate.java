@@ -20,11 +20,7 @@
 package org.exoplatform.portal.mop.navigation;
 
 import org.exoplatform.portal.mop.Utils;
-import org.exoplatform.portal.tree.diff.Adapters;
-import org.exoplatform.portal.tree.diff.HierarchyAdapter;
-import org.exoplatform.portal.tree.diff.HierarchyChangeIterator;
-import org.exoplatform.portal.tree.diff.HierarchyChangeType;
-import org.exoplatform.portal.tree.diff.HierarchyDiff;
+import org.exoplatform.portal.tree.diff.*;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

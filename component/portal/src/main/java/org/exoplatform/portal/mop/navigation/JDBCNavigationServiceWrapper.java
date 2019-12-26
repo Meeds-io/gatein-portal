@@ -21,12 +21,11 @@ package org.exoplatform.portal.mop.navigation;
 
 import java.util.List;
 
-import org.exoplatform.portal.mop.EventType;
-import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.services.listener.ListenerService;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+
+import org.exoplatform.portal.mop.*;
+import org.exoplatform.services.listener.ListenerService;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

@@ -19,10 +19,36 @@
 
 package org.exoplatform.portal.webui.application;
 
+import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.Map.Entry;
+
+import javax.portlet.MimeResponse;
+import javax.portlet.PortletMode;
+import javax.portlet.WindowState;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.namespace.QName;
+
+import org.gatein.common.i18n.LocalizedString;
+import org.gatein.common.net.media.MediaType;
+import org.gatein.common.util.MultiValuedPropertyMap;
+import org.gatein.common.util.ParameterValidation;
+import org.gatein.pc.api.*;
+import org.gatein.pc.api.PortletContext;
+import org.gatein.pc.api.cache.CacheLevel;
+import org.gatein.pc.api.info.*;
+import org.gatein.pc.api.invocation.*;
+import org.gatein.pc.api.invocation.response.*;
+import org.gatein.pc.api.state.PropertyChange;
+import org.gatein.pc.portlet.impl.spi.*;
+import org.gatein.portal.controller.resource.ResourceScope;
+import org.w3c.dom.Element;
+
 import org.exoplatform.Constants;
 import org.exoplatform.commons.utils.Text;
 import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.application.UserProfileLifecycle;
 import org.exoplatform.portal.application.state.ContextualPropertyManager;
@@ -31,15 +57,8 @@ import org.exoplatform.portal.config.NoSuchDataException;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.module.ModuleRegistry;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
-import org.exoplatform.portal.pom.spi.wsrp.WSRP;
 import org.exoplatform.portal.portlet.PortletExceptionHandleService;
-import org.exoplatform.portal.webui.application.UIPortletActionListener.ChangePortletModeActionListener;
-import org.exoplatform.portal.webui.application.UIPortletActionListener.ChangeWindowStateActionListener;
-import org.exoplatform.portal.webui.application.UIPortletActionListener.EditPortletActionListener;
-import org.exoplatform.portal.webui.application.UIPortletActionListener.ProcessActionActionListener;
-import org.exoplatform.portal.webui.application.UIPortletActionListener.ProcessEventsActionListener;
-import org.exoplatform.portal.webui.application.UIPortletActionListener.RenderActionListener;
-import org.exoplatform.portal.webui.application.UIPortletActionListener.ServeResourceActionListener;
+import org.exoplatform.portal.webui.application.UIPortletActionListener.*;
 import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.portal.webui.portal.UIPortalComponentActionListener.DeleteComponentActionListener;
 import org.exoplatform.portal.webui.util.Util;
@@ -53,61 +72,6 @@ import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
 import org.exoplatform.webui.event.Event.Phase;
-import org.gatein.common.i18n.LocalizedString;
-import org.gatein.common.net.media.MediaType;
-import org.gatein.common.util.MultiValuedPropertyMap;
-import org.gatein.common.util.ParameterValidation;
-import org.gatein.pc.api.Mode;
-import org.gatein.pc.api.PortletContext;
-import org.gatein.pc.api.PortletInvoker;
-import org.gatein.pc.api.PortletInvokerException;
-import org.gatein.pc.api.PortletStateType;
-import org.gatein.pc.api.StateString;
-import org.gatein.pc.api.StatefulPortletContext;
-import org.gatein.pc.api.cache.CacheLevel;
-import org.gatein.pc.api.info.EventInfo;
-import org.gatein.pc.api.info.MetaInfo;
-import org.gatein.pc.api.info.ModeInfo;
-import org.gatein.pc.api.info.ParameterInfo;
-import org.gatein.pc.api.info.PortletInfo;
-import org.gatein.pc.api.invocation.ActionInvocation;
-import org.gatein.pc.api.invocation.EventInvocation;
-import org.gatein.pc.api.invocation.PortletInvocation;
-import org.gatein.pc.api.invocation.RenderInvocation;
-import org.gatein.pc.api.invocation.ResourceInvocation;
-import org.gatein.pc.api.invocation.response.ErrorResponse;
-import org.gatein.pc.api.invocation.response.FragmentResponse;
-import org.gatein.pc.api.invocation.response.PortletInvocationResponse;
-import org.gatein.pc.api.state.AccessMode;
-import org.gatein.pc.api.state.PropertyChange;
-import org.gatein.pc.portlet.impl.spi.AbstractClientContext;
-import org.gatein.pc.portlet.impl.spi.AbstractPortalContext;
-import org.gatein.pc.portlet.impl.spi.AbstractRequestContext;
-import org.gatein.pc.portlet.impl.spi.AbstractSecurityContext;
-import org.gatein.pc.portlet.impl.spi.AbstractWindowContext;
-import org.gatein.portal.controller.resource.ResourceScope;
-import org.w3c.dom.Element;
-
-import javax.portlet.MimeResponse;
-import javax.portlet.PortletMode;
-import javax.portlet.WindowState;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.namespace.QName;
-import java.io.Serializable;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * This UI component represent a portlet window on a page. <br>
@@ -842,31 +806,8 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
 
         // instance context
         ExoPortletInstanceContext instanceContext;
-        // TODO: we should not be having these wsrp specific conditions through the code like
-        // this, it should either work the same was as normal portlets or abstracted out to another class.
-        if (ApplicationType.WSRP_PORTLET.equals(state.getApplicationType())) {
-            WSRP wsrp = (WSRP) preferencesPortletContext.getState();
-            AccessMode accessMode = AccessMode.CLONE_BEFORE_WRITE;
-
-            if (wsrp.getState() != null) {
-                StatefulPortletContext statefulPortletContext = StatefulPortletContext.create(
-                        preferencesPortletContext.getId(), PortletStateType.OPAQUE, wsrp.getState());
-
-                invocation.setTarget(statefulPortletContext);
-            } else {
-                PortletContext portletContext = PortletContext.createPortletContext(preferencesPortletContext.getId());
-                invocation.setTarget(portletContext);
-            }
-
-            // if the portlet is a cloned one already, we can modify it directly instead of requesting a clone
-            if (wsrp.isCloned()) {
-                accessMode = AccessMode.READ_WRITE;
-            }
-            instanceContext = new ExoPortletInstanceContext(preferencesPortletContext.getId(), accessMode);
-        } else {
-            instanceContext = new ExoPortletInstanceContext(preferencesPortletContext.getId());
-            invocation.setTarget(preferencesPortletContext);
-        }
+        instanceContext = new ExoPortletInstanceContext(preferencesPortletContext.getId());
+        invocation.setTarget(preferencesPortletContext);
         invocation.setInstanceContext(instanceContext);
         invocation.setServerContext(new ExoServerContext(servletRequest, prc.getResponse()));
         invocation.setUserContext(new ExoUserContext(servletRequest, userProfile));

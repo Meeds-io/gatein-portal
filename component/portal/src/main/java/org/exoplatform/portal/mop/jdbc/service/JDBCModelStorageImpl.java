@@ -31,8 +31,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import org.exoplatform.application.registry.dao.PermissionDAO;
-import org.exoplatform.application.registry.entity.PermissionEntity;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
@@ -414,11 +412,11 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     List<PermissionEntity> moveApps =
                                     permissionDAO.getPermissions(PageEntity.class.getName(),
                                                                  entity.getId(),
-                                                                 org.exoplatform.application.registry.entity.PermissionEntity.TYPE.MOVE_APP);
+                                                                 PermissionEntity.TYPE.MOVE_APP);
     List<PermissionEntity> moveContainers =
                                           permissionDAO.getPermissions(PageEntity.class.getName(),
                                                                        entity.getId(),
-                                                                       org.exoplatform.application.registry.entity.PermissionEntity.TYPE.MOVE_CONTAINER);
+                                                                       PermissionEntity.TYPE.MOVE_CONTAINER);
 
     PageData pageData =
                       new PageData("page_" + entity.getId(),
@@ -606,7 +604,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
             List<String> accessPermissions =
                                            buildPermission(permissionDAO.getPermissions(ContainerEntity.class.getName(),
                                                                                         srcContainer.getId(),
-                                                                                        org.exoplatform.application.registry.entity.PermissionEntity.TYPE.ACCESS));
+                                                                                        PermissionEntity.TYPE.ACCESS));
             if (accessPermissions.isEmpty()) {
               accessPermissions = Collections.singletonList(UserACL.EVERYONE);
             }
@@ -662,7 +660,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
     List<PermissionEntity> access = permissionDAO.getPermissions(WindowEntity.class.getName(),
                                                                  windowEntity.getId(),
-                                                                 org.exoplatform.application.registry.entity.PermissionEntity.TYPE.ACCESS);
+                                                                 PermissionEntity.TYPE.ACCESS);
 
     return new ApplicationData(String.valueOf(windowEntity.getId()),
                                null,
@@ -698,15 +696,15 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
     List<PermissionEntity> access = permissionDAO.getPermissions(ContainerEntity.class.getName(),
                                                                  entity.getId(),
-                                                                 org.exoplatform.application.registry.entity.PermissionEntity.TYPE.ACCESS);
+                                                                 PermissionEntity.TYPE.ACCESS);
     List<PermissionEntity> moveApps =
                                     permissionDAO.getPermissions(ContainerEntity.class.getName(),
                                                                  entity.getId(),
-                                                                 org.exoplatform.application.registry.entity.PermissionEntity.TYPE.MOVE_APP);
+                                                                 PermissionEntity.TYPE.MOVE_APP);
     List<PermissionEntity> moveConts =
                                      permissionDAO.getPermissions(ContainerEntity.class.getName(),
                                                                   entity.getId(),
-                                                                  org.exoplatform.application.registry.entity.PermissionEntity.TYPE.MOVE_CONTAINER);
+                                                                  PermissionEntity.TYPE.MOVE_CONTAINER);
 
     return new ContainerData(String.valueOf(entity.getId()),
                              entity.getWebuiId(),
@@ -826,11 +824,11 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
   private void savePermissions(long id, PortalData config) {
     permissionDAO.savePermissions(SiteEntity.class.getName(),
                                   id,
-                                  org.exoplatform.application.registry.entity.PermissionEntity.TYPE.ACCESS,
+                                  PermissionEntity.TYPE.ACCESS,
                                   config.getAccessPermissions());
     permissionDAO.savePermissions(SiteEntity.class.getName(),
                                   id,
-                                  org.exoplatform.application.registry.entity.PermissionEntity.TYPE.EDIT,
+                                  PermissionEntity.TYPE.EDIT,
                                   Arrays.asList(config.getEditPermission()));
   }
 
@@ -843,11 +841,11 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       access = srcData.getAccessPermissions();
       permissionDAO.savePermissions(typeName,
                                     id,
-                                    org.exoplatform.application.registry.entity.PermissionEntity.TYPE.MOVE_APP,
+                                    PermissionEntity.TYPE.MOVE_APP,
                                     srcData.getMoveAppsPermissions());
       permissionDAO.savePermissions(typeName,
                                     id,
-                                    org.exoplatform.application.registry.entity.PermissionEntity.TYPE.MOVE_CONTAINER,
+                                    PermissionEntity.TYPE.MOVE_CONTAINER,
                                     srcData.getMoveContainersPermissions());
     } else if (srcChild instanceof ApplicationData) {
       ApplicationData srcData = (ApplicationData) srcChild;
@@ -855,7 +853,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       access = srcData.getAccessPermissions();
     }
 
-    permissionDAO.savePermissions(typeName, id, org.exoplatform.application.registry.entity.PermissionEntity.TYPE.ACCESS, access);
+    permissionDAO.savePermissions(typeName, id, PermissionEntity.TYPE.ACCESS, access);
   }
 
   private SiteEntity buildSiteEntity(SiteEntity entity, PortalData config) throws Exception {
@@ -901,10 +899,10 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
     List<PermissionEntity> access = permissionDAO.getPermissions(SiteEntity.class.getName(),
                                                                  entity.getId(),
-                                                                 org.exoplatform.application.registry.entity.PermissionEntity.TYPE.ACCESS);
+                                                                 PermissionEntity.TYPE.ACCESS);
     List<PermissionEntity> edit = permissionDAO.getPermissions(SiteEntity.class.getName(),
                                                                entity.getId(),
-                                                               org.exoplatform.application.registry.entity.PermissionEntity.TYPE.EDIT);
+                                                               PermissionEntity.TYPE.EDIT);
     String editPer = edit.size() > 0 ? edit.get(0).getPermission() : null;
 
     List<RedirectData> redirects = Collections.emptyList();

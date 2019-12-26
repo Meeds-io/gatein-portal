@@ -5,11 +5,10 @@ import java.util.*;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import org.exoplatform.application.registry.dao.PermissionDAO;
-import org.exoplatform.application.registry.entity.PermissionEntity;
-import org.exoplatform.application.registry.entity.PermissionEntity.TYPE;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
+import org.exoplatform.portal.mop.jdbc.entity.PermissionEntity;
+import org.exoplatform.portal.mop.jdbc.entity.PermissionEntity.TYPE;
 
 public class PermissionDAOImpl extends GenericDAOJPAImpl<PermissionEntity, Long> implements PermissionDAO {
 
@@ -47,7 +46,7 @@ public class PermissionDAOImpl extends GenericDAOJPAImpl<PermissionEntity, Long>
 
     List<PermissionEntity> oldPers = getPermissions(refType, refId, type);
 
-    List<PermissionEntity> results = new LinkedList<PermissionEntity>();
+    List<PermissionEntity> results = new LinkedList<>();
     if (permissions != null) {
       for (String permission : permissions) {
         PermissionEntity entity = new PermissionEntity(refType, refId, permission, type);

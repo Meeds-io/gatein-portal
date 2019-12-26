@@ -22,23 +22,19 @@ package org.exoplatform.portal.pom.config;
 import java.io.Serializable;
 import java.lang.reflect.UndeclaredThrowableException;
 
-import org.exoplatform.commons.chromattic.ChromatticLifeCycle;
-import org.exoplatform.commons.chromattic.ChromatticManager;
-import org.exoplatform.commons.chromattic.SessionContext;
-import org.exoplatform.commons.scope.ScopedKey;
-import org.exoplatform.portal.mop.OwnerKey;
-import org.exoplatform.portal.pom.config.cache.DataCache;
-import org.exoplatform.portal.pom.config.cache.PortalNamesCache;
-import org.exoplatform.portal.pom.data.PortalKey;
-import org.exoplatform.services.cache.CacheService;
-import org.exoplatform.services.cache.CachedObjectSelector;
-import org.exoplatform.services.cache.ExoCache;
-import org.exoplatform.services.cache.ObjectCacheInfo;
-import org.exoplatform.services.jcr.RepositoryService;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.mop.core.api.MOPService;
+import org.infinispan.registry.ScopedKey;
 import org.picocontainer.Startable;
+
+import org.exoplatform.commons.chromattic.*;
+import org.exoplatform.portal.pom.config.cache.DataCache;
+import org.exoplatform.portal.pom.config.cache.PortalNamesCache;
+import org.exoplatform.portal.pom.data.OwnerKey;
+import org.exoplatform.portal.pom.data.PortalKey;
+import org.exoplatform.services.cache.*;
+import org.exoplatform.services.jcr.RepositoryService;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -55,7 +51,7 @@ public class POMSessionManager implements Startable {
     private MOPService pomService;
 
     /** . */
-    private final ExoCache<ScopedKey<?>, Object> cache;
+    private final ExoCache<Serializable, Object> cache;
 
     /** . */
     final ChromatticManager manager;
@@ -83,40 +79,16 @@ public class POMSessionManager implements Startable {
     }
 
     public void cachePut(Serializable key, Object value) {
-        ScopedKey<?> globalKey = ScopedKey.create(key);
-
         //
-        if (log.isTraceEnabled()) {
-            log.trace("Updating cache key=" + globalKey + " with value=" + value);
-        }
-
-        //
-        cache.put(globalKey, value);
+        cache.put(key, value);
     }
 
     public Object cacheGet(Serializable key) {
-        ScopedKey globalKey = ScopedKey.create(key);
-
-        //
-        Object value = cache.get(globalKey);
-
-        //
-        if (log.isTraceEnabled()) {
-            log.trace("Obtained for cache key=" + globalKey + " value=" + value);
-        }
-
-        //
+        Object value = cache.get(key);
         return value;
     }
 
     public void cacheRemove(Serializable key) {
-        final ScopedKey<?> globalKey = ScopedKey.create(key);
-
-        //
-        if (log.isTraceEnabled()) {
-            log.trace("Removing cache key=" + globalKey);
-        }
-
         //
         if (key instanceof PortalKey) {
             // This code seems complex but actually it tries to find all objects in cache that have the same
@@ -124,22 +96,19 @@ public class POMSessionManager implements Startable {
             // related to (portal,classic) are also evicted
             final PortalKey portalKey = (PortalKey) key;
             try {
-                cache.select(new CachedObjectSelector<ScopedKey<?>, Object>() {
-                    public boolean select(ScopedKey<?> selectedGlobalKey, ObjectCacheInfo<?> ocinfo) {
-                        if (globalKey.getScope().equals(selectedGlobalKey.getScope())) {
-                            Serializable selectedLocalKey = selectedGlobalKey.getKey();
-                            if (selectedLocalKey instanceof OwnerKey) {
-                                OwnerKey selectedOwnerKey = (OwnerKey) selectedLocalKey;
-                                if (selectedOwnerKey.getType().equals(portalKey.getType())
-                                        && selectedOwnerKey.getId().equals(portalKey.getId())) {
-                                    return true;
-                                }
+                cache.select(new CachedObjectSelector<Serializable, Object>() {
+                    public boolean select(Serializable selectedLocalKey, ObjectCacheInfo<?> ocinfo) {
+                        if (selectedLocalKey instanceof OwnerKey) {
+                            OwnerKey selectedOwnerKey = (OwnerKey) selectedLocalKey;
+                            if (selectedOwnerKey.getType().equals(portalKey.getType())
+                                    && selectedOwnerKey.getId().equals(portalKey.getId())) {
+                                return true;
                             }
                         }
                         return false;
                     }
 
-                    public void onSelect(ExoCache<? extends ScopedKey<?>, ?> exoCache, ScopedKey<?> key,
+                    public void onSelect(ExoCache<? extends Serializable, ?> exoCache, Serializable key,
                             ObjectCacheInfo<?> ocinfo) throws Exception {
                         cache.remove(key);
                     }
@@ -148,7 +117,7 @@ public class POMSessionManager implements Startable {
                 log.error("Unexpected error when clearing pom cache", e);
             }
         } else {
-            cache.remove(globalKey);
+            cache.remove(key);
         }
     }
 

@@ -31,7 +31,7 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.portal.mop.SiteType;
 
 @Entity(name = "GateInPage")
-@SequenceGenerator(name="SEQ_GTN_ID_GENERATOR", sequenceName="SEQ_GTN_PAGE_ID")
+@SequenceGenerator(name = "SEQ_GTN_ID_GENERATOR", sequenceName = "SEQ_GTN_PAGE_ID")
 @ExoEntity
 @Table(name = "PORTAL_PAGES")
 @NamedQueries({
@@ -42,10 +42,10 @@ public class PageEntity extends ComponentEntity implements Serializable {
   private static final long     serialVersionUID = -6195451978995765259L;
 
   @Id
-  @SequenceGenerator(name="SEQ_PAGE_ID_GENERATOR", sequenceName="SEQ_PAGE_ID_GENERATOR")
-  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_PAGE_ID_GENERATOR")
+  @SequenceGenerator(name = "SEQ_PAGE_ID_GENERATOR", sequenceName = "SEQ_PAGE_ID_GENERATOR")
+  @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_PAGE_ID_GENERATOR")
   @Column(name = "ID")
-  protected Long            id;
+  protected Long                id;
 
   @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "SITE_ID")
@@ -67,7 +67,7 @@ public class PageEntity extends ComponentEntity implements Serializable {
   private String                factoryId;
 
   @Column(name = "PAGE_BODY", length = 5000)
-  private String                pageBody         = new JSONArray().toJSONString();
+  private String                pageBody         = getJSONString(new JSONArray());
 
   @Transient
   private List<ComponentEntity> children         = new LinkedList<>();
@@ -169,7 +169,6 @@ public class PageEntity extends ComponentEntity implements Serializable {
       jChildren.add(child.toJSON());
     }
     obj.put("children", jChildren);
-
     return obj;
   }
 

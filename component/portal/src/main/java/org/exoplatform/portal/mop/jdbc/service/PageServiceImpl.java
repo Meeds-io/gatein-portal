@@ -8,8 +8,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import org.exoplatform.application.registry.dao.PermissionDAO;
-import org.exoplatform.application.registry.entity.PermissionEntity;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.Safe;
 import org.exoplatform.portal.mop.*;
@@ -291,13 +289,13 @@ public class PageServiceImpl implements PageService {
   }
 
   private void clonePermissions(long dstId, long srcId) {
-    clonePermissions(dstId, srcId, org.exoplatform.application.registry.entity.PermissionEntity.TYPE.ACCESS);
-    clonePermissions(dstId, srcId, org.exoplatform.application.registry.entity.PermissionEntity.TYPE.EDIT);
-    clonePermissions(dstId, srcId, org.exoplatform.application.registry.entity.PermissionEntity.TYPE.MOVE_APP);
-    clonePermissions(dstId, srcId, org.exoplatform.application.registry.entity.PermissionEntity.TYPE.MOVE_CONTAINER);
+    clonePermissions(dstId, srcId, PermissionEntity.TYPE.ACCESS);
+    clonePermissions(dstId, srcId, PermissionEntity.TYPE.EDIT);
+    clonePermissions(dstId, srcId, PermissionEntity.TYPE.MOVE_APP);
+    clonePermissions(dstId, srcId, PermissionEntity.TYPE.MOVE_CONTAINER);
   }
 
-  private void clonePermissions(long dstId, long srcId, org.exoplatform.application.registry.entity.PermissionEntity.TYPE type) {
+  private void clonePermissions(long dstId, long srcId, PermissionEntity.TYPE type) {
     List<PermissionEntity> permissions = permissionDAO.getPermissions(PageEntity.class.getName(), srcId, type);
     if (!permissions.isEmpty()) {
       permissionDAO.savePermissions(PageEntity.class.getName(), dstId, type, buildPermission(permissions));
@@ -389,19 +387,19 @@ public class PageServiceImpl implements PageService {
   private PageContext buildPageContext(PageEntity entity) {
     List<PermissionEntity> access = permissionDAO.getPermissions(PageEntity.class.getName(),
                                                                  entity.getId(),
-                                                                 org.exoplatform.application.registry.entity.PermissionEntity.TYPE.ACCESS);
+                                                                 PermissionEntity.TYPE.ACCESS);
     List<String> edit =
                       buildPermission(permissionDAO.getPermissions(PageEntity.class.getName(),
                                                                    entity.getId(),
-                                                                   org.exoplatform.application.registry.entity.PermissionEntity.TYPE.EDIT));
+                                                                   PermissionEntity.TYPE.EDIT));
     List<PermissionEntity> moveApps =
                                     permissionDAO.getPermissions(PageEntity.class.getName(),
                                                                  entity.getId(),
-                                                                 org.exoplatform.application.registry.entity.PermissionEntity.TYPE.MOVE_APP);
+                                                                 PermissionEntity.TYPE.MOVE_APP);
     List<PermissionEntity> moveConts =
                                      permissionDAO.getPermissions(PageEntity.class.getName(),
                                                                   entity.getId(),
-                                                                  org.exoplatform.application.registry.entity.PermissionEntity.TYPE.MOVE_CONTAINER);
+                                                                  PermissionEntity.TYPE.MOVE_CONTAINER);
 
     PageState state = new PageState(entity.getDisplayName(),
                                     entity.getDescription(),
@@ -436,19 +434,19 @@ public class PageServiceImpl implements PageService {
     if (state != null) {
       permissionDAO.savePermissions(PageEntity.class.getName(),
                                     pageId,
-                                    org.exoplatform.application.registry.entity.PermissionEntity.TYPE.ACCESS,
+                                    PermissionEntity.TYPE.ACCESS,
                                     state.getAccessPermissions());
       permissionDAO.savePermissions(PageEntity.class.getName(),
                                     pageId,
-                                    org.exoplatform.application.registry.entity.PermissionEntity.TYPE.EDIT,
+                                    PermissionEntity.TYPE.EDIT,
                                     Arrays.asList(state.getEditPermission()));
       permissionDAO.savePermissions(PageEntity.class.getName(),
                                     pageId,
-                                    org.exoplatform.application.registry.entity.PermissionEntity.TYPE.MOVE_APP,
+                                    PermissionEntity.TYPE.MOVE_APP,
                                     state.getMoveAppsPermissions());
       permissionDAO.savePermissions(PageEntity.class.getName(),
                                     pageId,
-                                    org.exoplatform.application.registry.entity.PermissionEntity.TYPE.MOVE_CONTAINER,
+                                    PermissionEntity.TYPE.MOVE_CONTAINER,
                                     state.getMoveContainersPermissions());
     }
   }

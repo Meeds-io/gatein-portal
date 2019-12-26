@@ -1,33 +1,27 @@
 package org.exoplatform.settings.rest;
 
-import org.exoplatform.commons.api.settings.SettingService;
-import org.exoplatform.commons.api.settings.SettingValue;
-import org.exoplatform.commons.api.settings.data.Context;
-import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.component.test.ConfigurationUnit;
-import org.exoplatform.component.test.ConfiguredBy;
-import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.portal.AbstractPortalTest;
-import org.exoplatform.services.rest.impl.*;
-import org.exoplatform.services.rest.tools.ByteArrayContainerResponseWriter;
-import org.exoplatform.services.rest.tools.ResourceLauncher;
-import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.services.security.Identity;
-import org.exoplatform.services.security.MembershipEntry;
-import org.json.JSONObject;
+import java.util.*;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.RuntimeDelegate;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
+
+import org.json.JSONObject;
+
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.component.test.*;
+import org.exoplatform.services.rest.impl.*;
+import org.exoplatform.services.rest.tools.ByteArrayContainerResponseWriter;
+import org.exoplatform.services.rest.tools.ResourceLauncher;
+import org.exoplatform.services.security.*;
 
 @ConfiguredBy({
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.settings-configuration.xml")
 })
-public class SettingResourceTest extends AbstractPortalTest {
+public class SettingResourceTest extends AbstractKernelTest {
 
   protected ProviderBinder providers;
 

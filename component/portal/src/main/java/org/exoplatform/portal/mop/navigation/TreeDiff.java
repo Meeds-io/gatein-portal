@@ -19,18 +19,9 @@
 
 package org.exoplatform.portal.mop.navigation;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
-import org.exoplatform.portal.tree.diff.HierarchyAdapter;
-import org.exoplatform.portal.tree.diff.HierarchyChangeIterator;
-import org.exoplatform.portal.tree.diff.HierarchyChangeType;
-import org.exoplatform.portal.tree.diff.HierarchyDiff;
-import org.exoplatform.portal.tree.diff.ListAdapter;
+import org.exoplatform.portal.tree.diff.*;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

@@ -7,7 +7,6 @@ import javax.persistence.EntityTransaction;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.component.test.*;
 import org.exoplatform.portal.config.DataStorage;
-import org.exoplatform.portal.config.TestDataStorage;
 import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.pom.data.ModelChange;
@@ -38,7 +37,6 @@ public class TestModelStorage extends TestDataStorage {
     storage_ = (DataStorage) getContainer().getComponentInstanceOfType(DataStorage.class);
   }
 
-  @Override
   protected void end(boolean save) {
     EntityManagerService managerService =
                                         getContainer().getComponentInstanceOfType(EntityManagerService.class);
@@ -50,7 +48,7 @@ public class TestModelStorage extends TestDataStorage {
         transaction.rollback();
       }
     }
-    super.end(save);
+    super.end();
   }
 
   @Override

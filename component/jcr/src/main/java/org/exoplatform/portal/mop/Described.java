@@ -20,6 +20,7 @@
 package org.exoplatform.portal.mop;
 
 import org.chromattic.api.annotations.MixinType;
+import org.chromattic.api.annotations.Property;
 
 /**
  * Something having a human readable name and a description. The semantic of the name is to be human readable, it can be

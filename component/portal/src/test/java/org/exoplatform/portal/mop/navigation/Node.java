@@ -25,6 +25,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.NodeModel;
+
 import junit.framework.Assert;
 
 /**

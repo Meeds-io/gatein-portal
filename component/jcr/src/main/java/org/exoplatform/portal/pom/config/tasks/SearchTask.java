@@ -20,9 +20,9 @@
 package org.exoplatform.portal.pom.config.tasks;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
+
+import org.gatein.mop.api.workspace.*;
 
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
@@ -30,12 +30,8 @@ import org.exoplatform.portal.application.PortletPreferences;
 import org.exoplatform.portal.config.Query;
 import org.exoplatform.portal.pom.config.POMSession;
 import org.exoplatform.portal.pom.config.POMTask;
-import org.exoplatform.portal.pom.data.Mapper;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
-import org.gatein.mop.api.workspace.ObjectType;
-import org.gatein.mop.api.workspace.Site;
-import org.gatein.mop.api.workspace.Workspace;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

@@ -19,17 +19,22 @@
 
 package org.exoplatform.portal.mop.jdbc.service;
 
-import java.util.LinkedList;
+import java.util.*;
 
+import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.mop.*;
 import org.exoplatform.portal.mop.navigation.*;
+import org.exoplatform.portal.pom.data.ContainerData;
+import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.services.listener.*;
 
-public class TestJDBCNavigationServiceWrapper extends AbstractTestNavigationService {
+public class TestJDBCNavigationServiceWrapper extends AbstractKernelTest {
 
     /** . */
     private NavigationService navigationService;
+
+    private JDBCModelStorageImpl modelStorage;
 
     /** . */
     private ListenerService listenerService;
@@ -42,9 +47,28 @@ public class TestJDBCNavigationServiceWrapper extends AbstractTestNavigationServ
         //
         listenerService = (ListenerService) container.getComponentInstanceOfType(ListenerService.class);
         navigationService = (NavigationService) container.getComponentInstanceOfType(NavigationService.class);
+        this.modelStorage = container.getComponentInstanceOfType(JDBCModelStorageImpl.class);
 
         //
         super.setUp();
+    }
+
+    protected void createSite(SiteType type, String siteName) throws Exception {
+        ContainerData container = new ContainerData(null, "testcontainer_" + siteName, "", "", "", "", "",
+                "", "", "", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+        PortalData portal = new PortalData(null, siteName, type.getName(), null, null,
+                null, new ArrayList<>(), null, null, null, container, null);
+        this.modelStorage.create(portal);
+
+        NavigationContext nav = new NavigationContext(type.key(siteName), new NavigationState(1));
+        this.navigationService.saveNavigation(nav);
+
+        end();
+    }
+
+    protected void createNavigation(SiteType siteType, String siteName) throws Exception {
+        createSite(siteType, siteName);
+        navigationService.saveNavigation(new NavigationContext(new SiteKey(siteType, siteName), new NavigationState(1)));
     }
 
     public void testNotification() throws Exception {
@@ -130,12 +154,12 @@ public class TestJDBCNavigationServiceWrapper extends AbstractTestNavigationServ
         //
         begin();
         createNavigation(SiteType.PORTAL, "wrapper_cache_invalidation");
-        end(true);
+        end();
 
         //
         begin();
         navigationService.saveNavigation(new NavigationContext(key, new NavigationState(0)));
-        end(true);
+        end();
 
         //
         begin();
@@ -143,7 +167,7 @@ public class TestJDBCNavigationServiceWrapper extends AbstractTestNavigationServ
         assertNotNull(nav);
         NodeContext<Node> root = navigationService.loadNode(Node.MODEL, nav, Scope.ALL, null);
         assertNotNull(root);
-        end(true);
+        end();
     }
 
     public void testCachingInMultiThreading() throws Exception {
@@ -151,7 +175,7 @@ public class TestJDBCNavigationServiceWrapper extends AbstractTestNavigationServ
         assertNull(navigationService.loadNavigation(foo));
         createSite(SiteType.PORTAL, "test_caching_in_multi_threading");
 
-        sync(true);
+        end();
 
         navigationService.saveNavigation(new NavigationContext(foo, new NavigationState(0)));
 
@@ -162,7 +186,7 @@ public class TestJDBCNavigationServiceWrapper extends AbstractTestNavigationServ
                 begin();
                 // Loading the foo navigation and update into the cache if any
                 assertNull(navigationService.loadNavigation(foo));
-                end(true);
+                end();
             }
         });
         t.start();
@@ -170,7 +194,7 @@ public class TestJDBCNavigationServiceWrapper extends AbstractTestNavigationServ
 
         assertNotNull(navigationService.loadNavigation(foo));
 
-        sync(true);
+        end();
 
         assertNotNull(navigationService.loadNavigation(foo));
     }

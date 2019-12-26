@@ -19,14 +19,11 @@
 package org.exoplatform.portal.pom.config;
 
 import org.chromattic.api.Chromattic;
-import org.exoplatform.portal.pom.spi.gadget.Gadget;
-import org.exoplatform.portal.pom.spi.gadget.GadgetContentProvider;
-import org.exoplatform.portal.pom.spi.portlet.Portlet;
-import org.exoplatform.portal.pom.spi.portlet.PortletContentProvider;
-import org.exoplatform.portal.pom.spi.wsrp.WSRP;
-import org.exoplatform.portal.pom.spi.wsrp.WSRPContentProvider;
 import org.gatein.mop.core.api.MOPService;
 import org.gatein.mop.core.api.content.ContentManagerRegistry;
+
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
+import org.exoplatform.portal.pom.spi.portlet.PortletContentProvider;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -49,7 +46,5 @@ public class PortalMOPService extends MOPService {
     @Override
     protected void configure(ContentManagerRegistry registry) {
         registry.register(Portlet.CONTENT_TYPE, new PortletContentProvider());
-        registry.register(WSRP.CONTENT_TYPE, new WSRPContentProvider());
-        registry.register(Gadget.CONTENT_TYPE, new GadgetContentProvider());
     }
 }

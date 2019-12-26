@@ -25,36 +25,38 @@ package org.exoplatform.portal.mop.page;
  */
 public class PageServiceException extends RuntimeException {
 
-    /** . */
-    private final PageError error;
+  private static final long serialVersionUID = -4283897454433923330L;
 
-    public PageServiceException(PageError error) {
-        super(error.toString());
-        this.error = error;
-    }
+  /** . */
+  private final PageError   error;
 
-    public PageServiceException(PageError error, String message) {
-        super(message);
+  public PageServiceException(PageError error) {
+    super(error.toString());
+    this.error = error;
+  }
 
-        //
-        this.error = error;
-    }
+  public PageServiceException(PageError error, String message) {
+    super(message);
 
-    public PageServiceException(PageError error, String message, Throwable cause) {
-        super(message, cause);
+    //
+    this.error = error;
+  }
 
-        //
-        this.error = error;
-    }
+  public PageServiceException(PageError error, String message, Throwable cause) {
+    super(message, cause);
 
-    public PageServiceException(PageError error, Throwable cause) {
-        super(cause);
+    //
+    this.error = error;
+  }
 
-        //
-        this.error = error;
-    }
+  public PageServiceException(PageError error, Throwable cause) {
+    super(cause);
 
-    public PageError getError() {
-        return error;
-    }
+    //
+    this.error = error;
+  }
+
+  public PageError getError() {
+    return error;
+  }
 }

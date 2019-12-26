@@ -19,10 +19,10 @@
 
 package org.exoplatform.portal.mop;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.chromattic.api.annotations.MixinType;
+import org.chromattic.api.annotations.Property;
 
 /**
  * Describe an object that can be secured

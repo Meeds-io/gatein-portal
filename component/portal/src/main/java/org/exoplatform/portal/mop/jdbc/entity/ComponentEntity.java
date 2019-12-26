@@ -2,6 +2,7 @@ package org.exoplatform.portal.mop.jdbc.entity;
 
 import java.io.Serializable;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public abstract class ComponentEntity implements Serializable {
@@ -17,9 +18,21 @@ public abstract class ComponentEntity implements Serializable {
   public abstract Long getId();
 
   public abstract void setId(Long id);
+
   public abstract TYPE getType();
 
   public enum TYPE {
-    SITE, PAGE, CONTAINER, WINDOW
+    SITE,
+    PAGE,
+    CONTAINER,
+    WINDOW
+  }
+
+  protected static final String getJSONString(JSONObject jsonObject) {
+    return jsonObject.toJSONString();
+  }
+
+  protected static final String getJSONString(JSONArray jsonArray) {
+    return jsonArray.toJSONString();
   }
 }

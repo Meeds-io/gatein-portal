@@ -19,12 +19,13 @@
 
 package org.exoplatform.portal.pom.config.tasks;
 
+import org.gatein.mop.api.content.Customization;
+
 import org.exoplatform.portal.config.NoSuchDataException;
 import org.exoplatform.portal.pom.config.POMSession;
 import org.exoplatform.portal.pom.config.POMTask;
 import org.exoplatform.portal.pom.config.cache.CacheableDataTask;
 import org.exoplatform.portal.pom.config.cache.DataAccessMode;
-import org.gatein.mop.api.content.Customization;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

@@ -18,14 +18,7 @@
  */
 package org.exoplatform.application.registry.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.gatein.common.i18n.LocalizedString;
 import org.gatein.mop.api.content.ContentType;
@@ -34,13 +27,11 @@ import org.gatein.pc.api.info.MetaInfo;
 import org.gatein.pc.api.info.PortletInfo;
 import org.picocontainer.Startable;
 
-import org.exoplatform.application.registry.Application;
-import org.exoplatform.application.registry.ApplicationCategoriesPlugins;
-import org.exoplatform.application.registry.ApplicationCategory;
-import org.exoplatform.application.registry.ApplicationRegistryService;
-import org.exoplatform.application.registry.dao.*;
-import org.exoplatform.application.registry.entity.*;
-import org.exoplatform.application.registry.entity.PermissionEntity.TYPE;
+import org.exoplatform.application.registry.*;
+import org.exoplatform.application.registry.dao.ApplicationDAO;
+import org.exoplatform.application.registry.dao.CategoryDAO;
+import org.exoplatform.application.registry.entity.ApplicationEntity;
+import org.exoplatform.application.registry.entity.CategoryEntity;
 import org.exoplatform.commons.utils.Safe;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
@@ -48,6 +39,9 @@ import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.ApplicationType;
+import org.exoplatform.portal.mop.jdbc.dao.PermissionDAO;
+import org.exoplatform.portal.mop.jdbc.entity.PermissionEntity;
+import org.exoplatform.portal.mop.jdbc.entity.PermissionEntity.TYPE;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;

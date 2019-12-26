@@ -31,14 +31,14 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
 @ExoEntity
 @Table(name = "PORTAL_WINDOWS")
 @NamedQueries({
-  @NamedQuery(name = "WindowEntity.findByIds", query = "SELECT w FROM GateInWindow w WHERE w.id in (:ids)") })
+    @NamedQuery(name = "WindowEntity.findByIds", query = "SELECT w FROM GateInWindow w WHERE w.id in (:ids)") })
 public class WindowEntity extends ComponentEntity implements Serializable {
 
   private static final long serialVersionUID = 6633792468705838255L;
 
   @Id
-  @SequenceGenerator(name="SEQ_WINDOW_ID_GENERATOR", sequenceName="SEQ_WINDOW_ID_GENERATOR")
-  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_WINDOW_ID_GENERATOR")
+  @SequenceGenerator(name = "SEQ_WINDOW_ID_GENERATOR", sequenceName = "SEQ_WINDOW_ID_GENERATOR")
+  @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_WINDOW_ID_GENERATOR")
   @Column(name = "ID")
   protected Long            id;
 
@@ -70,7 +70,7 @@ public class WindowEntity extends ComponentEntity implements Serializable {
   private String            height;
 
   @Column(name = "PROPERTIES", length = 2000)
-  private String            properties = new JSONObject().toJSONString();
+  private String            properties       = getJSONString(new JSONObject());
 
   @Column(name = "APP_TYPE")
   private AppType           appType;
@@ -201,7 +201,7 @@ public class WindowEntity extends ComponentEntity implements Serializable {
     return TYPE.WINDOW;
   }
 
-  public static enum AppType {
-    PORTLET, GADGET
+  public enum AppType {
+    PORTLET
   }
 }

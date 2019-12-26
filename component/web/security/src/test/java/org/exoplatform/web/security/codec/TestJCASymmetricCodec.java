@@ -18,19 +18,19 @@
  */
 package org.exoplatform.web.security.codec;
 
-import junit.framework.TestCase;
-
-import org.gatein.common.io.IOTools;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+
+import org.gatein.common.io.IOTools;
+
+import junit.framework.TestCase;
 
 /**
  * @author <a href="hoang281283@gmail.com">Minh Hoang TO</a>

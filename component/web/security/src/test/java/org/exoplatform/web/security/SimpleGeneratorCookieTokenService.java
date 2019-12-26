@@ -23,7 +23,6 @@
 
 package org.exoplatform.web.security;
 
-import org.exoplatform.commons.chromattic.ChromatticManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ObjectParameter;
 import org.exoplatform.web.security.codec.CodecInitializer;

@@ -19,17 +19,14 @@
 
 package org.exoplatform.portal.pom.config.tasks;
 
+import org.gatein.mop.api.workspace.*;
+
 import org.exoplatform.portal.config.NoSuchDataException;
 import org.exoplatform.portal.pom.config.POMSession;
 import org.exoplatform.portal.pom.config.cache.CacheableDataTask;
 import org.exoplatform.portal.pom.config.cache.DataAccessMode;
-import org.exoplatform.portal.pom.data.Mapper;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
-import org.gatein.mop.api.workspace.ObjectType;
-import org.gatein.mop.api.workspace.Page;
-import org.gatein.mop.api.workspace.Site;
-import org.gatein.mop.api.workspace.Workspace;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

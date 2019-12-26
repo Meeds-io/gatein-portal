@@ -36,6 +36,7 @@ import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Utils;
 import org.exoplatform.portal.mop.Visible;
+import org.exoplatform.portal.mop.management.operations.navigation.NavigationUtils;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.pom.config.POMSession;
 import org.exoplatform.portal.pom.config.POMSessionManager;
@@ -512,13 +513,13 @@ public class NavigationServiceImpl implements NavigationService {
             Navigation sourceNav = parentNav.addChild(index, name);
 
             //
-            parent.data = new NodeData(parentNav);
+            parent.data = NavigationUtils.getNodeData(parentNav);
 
             // Save the handle
             toPersist.put(target.handle, sourceNav.getObjectId());
 
             //
-            target.data = new NodeData(sourceNav);
+            target.data = NavigationUtils.getNodeData(sourceNav);
             target.handle = target.data.id;
             target.name = null;
             target.state = null;
@@ -538,7 +539,7 @@ public class NavigationServiceImpl implements NavigationService {
             sourceNav.destroy();
 
             //
-            parent.data = new NodeData(parentNav);
+            parent.data = NavigationUtils.getNodeData(parentNav);
             toUpdate.add(parent.handle);
 
             //
@@ -598,7 +599,7 @@ public class NavigationServiceImpl implements NavigationService {
             attrs.setValue(MappedAttributes.ICON, state.getIcon());
 
             //
-            source.data = new NodeData(sourceNav);
+            source.data = NavigationUtils.getNodeData(sourceNav);
             source.state = null;
 
             //
@@ -626,13 +627,13 @@ public class NavigationServiceImpl implements NavigationService {
             toNav.getChildren().add(index, sourceNav);
 
             //
-            from.data = new NodeData(fromNav);
+            from.data = NavigationUtils.getNodeData(fromNav);
 
             //
-            to.data = new NodeData(toNav);
+            to.data = NavigationUtils.getNodeData(toNav);
 
             //
-            target.data = new NodeData(sourceNav);
+            target.data = NavigationUtils.getNodeData(sourceNav);
 
             //
             toUpdate.add(target.handle);
@@ -650,11 +651,11 @@ public class NavigationServiceImpl implements NavigationService {
             sourceNav.setName(name);
 
             //
-            target.data = new NodeData(sourceNav);
+            target.data = NavigationUtils.getNodeData(sourceNav);
             target.name = null;
 
             //
-            parent.data = new NodeData(parentNav);
+            parent.data = NavigationUtils.getNodeData(parentNav);
 
             //
             toUpdate.add(parent.handle);

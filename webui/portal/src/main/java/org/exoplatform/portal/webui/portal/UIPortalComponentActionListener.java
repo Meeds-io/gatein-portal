@@ -303,11 +303,10 @@ public class UIPortalComponentActionListener {
                 PortalDataMapper.toUIContainer(uiContainer, container);
                 uiSource = uiContainer;
             } else {
-                Application app = null;
                 UIApplicationList appList = uiApp.findFirstComponentOfType(UIApplicationList.class);
-                app = appList.getApplication(sourceId);
+                Application app = appList.getApplication(sourceId);
                 @SuppressWarnings("unchecked")
-                ApplicationType<Object> applicationType = app.getType();
+                ApplicationType<Object> applicationType = (ApplicationType<Object>) app.getType();
 
                 //
                 @SuppressWarnings("unchecked")
@@ -333,7 +332,8 @@ public class UIPortalComponentActionListener {
                 } else {
                     state = new CloneApplicationState<Object>(app.getStorageId());
                 }
-                uiPortlet.setState(new PortletState<Object>(state, applicationType));
+                PortletState<Object> newState = new PortletState<Object>(state, applicationType);
+                uiPortlet.setState(newState);
                 uiPortlet.setPortletInPortal(uiTarget instanceof UIPortal);
 
                 // TODO Wait to fix issue EXOGTN-213 and then

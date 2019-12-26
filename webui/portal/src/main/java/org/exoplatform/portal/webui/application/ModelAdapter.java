@@ -23,21 +23,16 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.gatein.pc.api.*;
+
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.portal.config.DataStorage;
-import org.exoplatform.portal.config.model.ApplicationState;
-import org.exoplatform.portal.config.model.ApplicationType;
-import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.pc.ExoPortletState;
 import org.exoplatform.portal.pc.ExoPortletStateType;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
 import org.exoplatform.portal.pom.spi.portlet.Preference;
-import org.exoplatform.portal.pom.spi.wsrp.WSRP;
-import org.exoplatform.portal.pom.spi.wsrp.WSRPPortletStateType;
-import org.gatein.pc.api.PortletContext;
-import org.gatein.pc.api.PortletInvoker;
-import org.gatein.pc.api.StatefulPortletContext;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -50,10 +45,6 @@ public abstract class ModelAdapter<S, C extends Serializable> {
         if (type == ApplicationType.PORTLET) {
             @SuppressWarnings("unchecked")
             ModelAdapter<S, C> adapter = (ModelAdapter<S, C>) PORTLET;
-            return adapter;
-        } else if (type == ApplicationType.WSRP_PORTLET) {
-            @SuppressWarnings("unchecked")
-            ModelAdapter<S, C> adapter = (ModelAdapter<S, C>) WSRP;
             return adapter;
         } else {
             throw new AssertionError();
@@ -156,87 +147,6 @@ public abstract class ModelAdapter<S, C extends Serializable> {
      * properly handled in WSRP... This model needs to be revisited if we want to properly support consumer-side state
      * management. See GTNPORTAL-736.
      */
-    private static final ModelAdapter<WSRP, WSRP> WSRP = new ModelAdapter<WSRP, WSRP>() {
-        @Override
-        public Portlet getState(ExoContainer container, ApplicationState<WSRP> state) throws Exception {
-            return null; // return null for now
-        }
-
-        @Override
-        public PortletContext getProducerOfferedPortletContext(String applicationId) {
-            return PortletContext.createPortletContext(applicationId);
-        }
-
-        @Override
-        public StatefulPortletContext<WSRP> getPortletContext(ExoContainer container, String applicationId,
-                ApplicationState<WSRP> state) throws Exception {
-            DataStorage dataStorage = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
-            WSRP wsrp = dataStorage.load(state, ApplicationType.WSRP_PORTLET);
-            if (wsrp == null) {
-                // create
-                wsrp = new WSRP();
-                wsrp.setPortletId(applicationId);
-                if (!(state instanceof TransientApplicationState)) {
-                    // only save state if it's not transient
-                    dataStorage.save(state, wsrp);
-                }
-            }
-            return StatefulPortletContext.create(wsrp.getPortletId(), WSRPPortletStateType.instance, wsrp);
-        }
-
-        @Override
-        public ApplicationState<WSRP> update(ExoContainer container, WSRP updateState, ApplicationState<WSRP> state)
-                throws Exception {
-            if (state instanceof TransientApplicationState) {
-                TransientApplicationState<WSRP> transientState = (TransientApplicationState<WSRP>) state;
-                transientState.setContentState(updateState);
-                return transientState;
-            } else {
-                // todo: it is possible to get a CloneApplicationState for some reason, need to investigate
-
-                DataStorage dataStorage = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
-                return dataStorage.save(state, updateState);
-            }
-        }
-
-        @Override
-        public WSRP getStateFromModifiedContext(PortletContext originalPortletContext, PortletContext modifiedPortletContext) {
-            WSRP wsrp = new WSRP();
-            wsrp.setPortletId(modifiedPortletContext.getId());
-
-            // from the originalPortletContext see if we are dealing with a cloned context or not.
-            if (originalPortletContext instanceof StatefulPortletContext) {
-                Object originalState = ((StatefulPortletContext) originalPortletContext).getState();
-                if (originalState instanceof WSRP) {
-                    wsrp.setCloned(((WSRP) originalState).isCloned());
-                }
-            }
-
-            if (modifiedPortletContext instanceof StatefulPortletContext) {
-                Object modifiedState = ((StatefulPortletContext) modifiedPortletContext).getState();
-                if (modifiedState instanceof byte[]) {
-                    wsrp.setState((byte[]) modifiedState);
-                }
-            }
-
-            return wsrp;
-        }
-
-        @Override
-        public WSRP getstateFromClonedContext(PortletContext originalPortletContext, PortletContext clonedPortletContext) {
-            WSRP wsrp = new WSRP();
-            wsrp.setPortletId(clonedPortletContext.getId());
-            wsrp.setCloned(true);
-
-            // if we have an associated state, record it as well...
-            if (clonedPortletContext instanceof StatefulPortletContext) {
-                StatefulPortletContext statefulPortletContext = (StatefulPortletContext) clonedPortletContext;
-                wsrp.setState((byte[]) statefulPortletContext.getState());
-            }
-
-            return wsrp;
-        }
-    };
 
     public abstract PortletContext getProducerOfferedPortletContext(String applicationId);
 

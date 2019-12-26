@@ -42,10 +42,10 @@ public class SiteEntity extends ComponentEntity {
   private static final long     serialVersionUID = 3036823700771832314L;
 
   @Id
-  @SequenceGenerator(name="SEQ_SITE_ID_GENERATOR", sequenceName="SEQ_SITE_ID_GENERATOR")
-  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_SITE_ID_GENERATOR")
+  @SequenceGenerator(name = "SEQ_SITE_ID_GENERATOR", sequenceName = "SEQ_SITE_ID_GENERATOR")
+  @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_SITE_ID_GENERATOR")
   @Column(name = "ID")
-  protected Long            id;
+  protected Long                id;
 
   @Column(name = "TYPE")
   private SiteType              siteType;
@@ -66,13 +66,13 @@ public class SiteEntity extends ComponentEntity {
   private String                description;
 
   @Column(name = "PROPERTIES", length = 2000)
-  private String                properties = new JSONObject().toJSONString();
+  private String                properties       = getJSONString(new JSONObject());
 
   @Column(name = "SITE_BODY", length = 5000)
-  private String                siteBody         = new JSONArray().toJSONString();
+  private String                siteBody         = getJSONString(new JSONArray());
 
   @Transient
-  private List<ComponentEntity> children         = new LinkedList<ComponentEntity>();
+  private List<ComponentEntity> children         = new LinkedList<>();
 
   public Long getId() {
     return id;
@@ -163,7 +163,6 @@ public class SiteEntity extends ComponentEntity {
       jChildren.add(child.toJSON());
     }
     obj.put("children", jChildren);
-
     return obj;
   }
 

@@ -42,7 +42,6 @@ import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.pom.config.POMSessionManager;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
-import org.exoplatform.portal.pom.spi.wsrp.WSRP;
 
 import org.gatein.common.i18n.LocalizedString;
 import org.gatein.common.logging.Logger;
@@ -453,9 +452,7 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
 
                 // Check if the portlet has already existed in this category
                 ApplicationType appType;
-                if (remote) {
-                    appType = ApplicationType.PORTLET;
-                }
+                appType = ApplicationType.PORTLET;
                 ContentDefinition contentDef = findApp(category, appType, portletName);
                 if (contentDef == null) {
                     LocalizedString descriptionLS = metaInfo.getMetaValue(MetaInfo.DESCRIPTION);
@@ -464,15 +461,8 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
 
                     ContentType<?> contentType;
                     String contentId;
-                    if (remote) {
-                        contentType = WSRP.CONTENT_TYPE;
-                        contentId = portlet.getContext().getId();
-                        displayName += REMOTE_DISPLAY_NAME_SUFFIX; // add remote to display name to make it more obvious that
-                                                                   // the portlet is remote
-                    } else {
-                        contentType = Portlet.CONTENT_TYPE;
-                        contentId = info.getApplicationName() + "/" + info.getName();
-                    }
+                    contentType = Portlet.CONTENT_TYPE;
+                    contentId = info.getApplicationName() + "/" + info.getName();
 
                     contentDef = category.createContent(portletName, contentType, contentId);
                     contentDef.setDisplayName(displayName);
@@ -581,8 +571,6 @@ public class ApplicationRegistryServiceImpl implements ApplicationRegistryServic
                 if (chunks.length == 2) {
                     return "/" + chunks[0] + "/skin/DefaultSkin/portletIcons/" + chunks[1] + ".png";
                 }
-            } else if (type == WSRP.CONTENT_TYPE) {
-                return "/eXoResources/skin/sharedImages/Icon80x80/DefaultPortlet.png";
             }
         }
 

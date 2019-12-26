@@ -23,85 +23,87 @@ import static org.exoplatform.portal.mop.Utils.objectType;
 
 import java.util.Collection;
 
+import org.gatein.mop.api.workspace.*;
+
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.management.operations.navigation.NavigationUtils;
 import org.exoplatform.portal.pom.config.POMSession;
-import org.gatein.mop.api.workspace.Navigation;
-import org.gatein.mop.api.workspace.ObjectType;
-import org.gatein.mop.api.workspace.Site;
-import org.gatein.mop.api.workspace.Workspace;
 
 /**
- * todo : see if it makes sense to use a bloom filter for not found site black list
+ * todo : see if it makes sense to use a bloom filter for not found site black
+ * list
  *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
 abstract class DataCache {
 
-    protected abstract void removeNodes(Collection<String> keys);
+  protected abstract void removeNodes(Collection<String> keys);
 
-    protected abstract NodeData getNode(POMSession session, String key);
+  protected abstract NodeData getNode(POMSession session, String key);
 
-    protected abstract NavigationData getNavigation(POMSession session, SiteKey key);
+  protected abstract NavigationData getNavigation(POMSession session, SiteKey key);
 
-    protected abstract void removeNavigation(SiteKey key);
+  protected abstract void removeNavigation(SiteKey key);
 
-    protected abstract void clear();
+  protected abstract void clear();
 
-    final NodeData getNodeData(POMSession session, String nodeId) {
-        NodeData data;
-        if (session.isModified()) {
-            data = loadNode(session, nodeId);
-        } else {
-            data = getNode(session, nodeId);
-        }
-        return data;
+  final NodeData getNodeData(POMSession session, String nodeId) {
+    NodeData data;
+    if (session.isModified()) {
+      data = loadNode(session, nodeId);
+    } else {
+      data = getNode(session, nodeId);
     }
+    return data;
+  }
 
-    final NavigationData getNavigationData(POMSession session, SiteKey key) {
-        // Get cache entry even when session has been modified to populate new cache value
-        NavigationData data = getNavigation(session, key);
-        if (session.isModified()) {
-            data = loadNavigation(session, key);
-            // Null data => remove it from cache
-            if (data == null || data.key == null) {
-              removeNavigation(key);
-            }
-        }
-
-        //
-        return data;
-    }
-
-    final void removeNodeData(POMSession session, Collection<String> ids) {
-        removeNodes(ids);
-    }
-
-    final void removeNavigationData(POMSession session, SiteKey key) {
+  final NavigationData getNavigationData(POMSession session, SiteKey key) {
+    // Get cache entry even when session has been modified to populate new cache
+    // value
+    NavigationData data = getNavigation(session, key);
+    if (session.isModified()) {
+      data = loadNavigation(session, key);
+      // Null data => remove it from cache
+      if (data == null || data.key == null) {
         removeNavigation(key);
+      }
     }
 
-    protected final NodeData loadNode(POMSession session, String nodeId) {
-        Navigation navigation = session.findObjectById(ObjectType.NAVIGATION, nodeId);
-        if (navigation != null) {
-            return new NodeData(navigation);
-        } else {
-            return null;
-        }
-    }
+    //
+    return data;
+  }
 
-    protected final NavigationData loadNavigation(POMSession session, SiteKey key) {
-        Workspace workspace = session.getWorkspace();
-        ObjectType<Site> objectType = objectType(key.getType());
-        Site site = workspace.getSite(objectType, key.getName());
-        if (site != null) {
-            Navigation defaultNavigation = site.getRootNavigation().getChild("default");
-            if (defaultNavigation != null) {
-                return new NavigationData(key, defaultNavigation);
-            } else {
-                return NavigationData.EMPTY;
-            }
-        } else {
-            return NavigationData.EMPTY;
-        }
+  final void removeNodeData(POMSession session, Collection<String> ids) {
+    removeNodes(ids);
+  }
+
+  final void removeNavigationData(POMSession session, SiteKey key) {
+    removeNavigation(key);
+  }
+
+  protected final NodeData loadNode(POMSession session, String nodeId) {
+    Navigation navigation = session.findObjectById(ObjectType.NAVIGATION, nodeId);
+    if (navigation != null) {
+      return NavigationUtils.getNodeData(navigation);
+    } else {
+      return null;
     }
+  }
+
+  protected final NavigationData loadNavigation(POMSession session, SiteKey key) {
+    Workspace workspace = session.getWorkspace();
+    ObjectType<Site> objectType = objectType(key.getType());
+    Site site = workspace.getSite(objectType, key.getName());
+    if (site != null) {
+      Navigation defaultNavigation = site.getRootNavigation().getChild("default");
+      if (defaultNavigation != null) {
+        return new NavigationData(key, defaultNavigation);
+      } else {
+        return NavigationData.EMPTY;
+      }
+    } else {
+      return NavigationData.EMPTY;
+    }
+  }
+
 }

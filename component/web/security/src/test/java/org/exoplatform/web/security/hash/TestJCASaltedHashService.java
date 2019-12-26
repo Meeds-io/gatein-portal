@@ -22,18 +22,7 @@
 
 package org.exoplatform.web.security.hash;
 
-import static org.junit.Assert.assertTrue;
-
-import org.exoplatform.component.test.AbstractKernelTest;
-import org.exoplatform.component.test.ConfigurationUnit;
-import org.exoplatform.component.test.ConfiguredBy;
-import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.web.security.hash.SaltedHashException;
-import org.exoplatform.web.security.hash.SaltedHashService;
-import org.exoplatform.web.security.security.AutoReseedRandom;
-import org.exoplatform.web.security.security.SecureRandomService;
-import org.junit.Test;
+import org.exoplatform.component.test.*;
 
 /**
  * @author <a href="mailto:ppalaga@redhat.com">Peter Palaga</a>

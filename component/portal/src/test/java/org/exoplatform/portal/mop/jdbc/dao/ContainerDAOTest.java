@@ -5,13 +5,9 @@ import java.util.List;
 
 import javax.persistence.EntityTransaction;
 
-import org.exoplatform.application.registry.dao.ContainerDAO;
-import org.exoplatform.application.registry.entity.ContainerEntity;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
-import org.exoplatform.component.test.AbstractKernelTest;
-import org.exoplatform.component.test.ConfigurationUnit;
-import org.exoplatform.component.test.ConfiguredBy;
-import org.exoplatform.component.test.ContainerScope;
+import org.exoplatform.component.test.*;
+import org.exoplatform.portal.mop.jdbc.entity.ContainerEntity;
 
 @ConfiguredBy({
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})

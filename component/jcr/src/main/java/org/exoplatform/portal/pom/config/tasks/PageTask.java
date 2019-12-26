@@ -21,15 +21,12 @@ package org.exoplatform.portal.pom.config.tasks;
 
 import java.util.List;
 
-import org.exoplatform.portal.mop.PageKey;
+import org.gatein.mop.api.workspace.*;
+
 import org.exoplatform.portal.pom.config.POMSession;
 import org.exoplatform.portal.pom.config.cache.CacheableDataTask;
 import org.exoplatform.portal.pom.config.cache.DataAccessMode;
 import org.exoplatform.portal.pom.data.*;
-
-import org.gatein.mop.api.workspace.ObjectType;
-import org.gatein.mop.api.workspace.Site;
-import org.gatein.mop.api.workspace.Workspace;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

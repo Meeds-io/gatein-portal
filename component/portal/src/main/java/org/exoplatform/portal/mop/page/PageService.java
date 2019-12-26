@@ -1,11 +1,8 @@
 package org.exoplatform.portal.mop.page;
 
-import org.exoplatform.portal.mop.QueryResult;
-import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.SiteType;
-
-import java.util.ArrayList;
 import java.util.List;
+
+import org.exoplatform.portal.mop.*;
 
 /**
  * <p>

@@ -38,10 +38,10 @@ public class ContainerEntity extends ComponentEntity implements Serializable {
   private static final long     serialVersionUID = -8045606258160322858L;
 
   @Id
-  @SequenceGenerator(name="SEQ_CONTAINER_ID_GENERATOR", sequenceName="SEQ_CONTAINER_ID_GENERATOR")
-  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_CONTAINER_ID_GENERATOR")
+  @SequenceGenerator(name = "SEQ_CONTAINER_ID_GENERATOR", sequenceName = "SEQ_CONTAINER_ID_GENERATOR")
+  @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_CONTAINER_ID_GENERATOR")
   @Column(name = "ID")
-  protected Long            id;
+  protected Long                id;
 
   @Column(name = "WEBUI_ID", length = 200)
   private String                webuiId;
@@ -71,13 +71,13 @@ public class ContainerEntity extends ComponentEntity implements Serializable {
   private String                height;
 
   @Column(name = "PROPERTIES", length = 2000)
-  private String                properties       = new JSONObject().toJSONString();
+  private String                properties       = getJSONString(new JSONObject());
 
   @Transient
   private List<ComponentEntity> children         = new LinkedList<ComponentEntity>();
 
   @Column(name = "CONTAINER_BODY", length = 5000)
-  private String                containerBody    = new JSONArray().toJSONString();
+  private String                containerBody    = getJSONString(new JSONArray());
 
   public Long getId() {
     return id;
@@ -192,7 +192,6 @@ public class ContainerEntity extends ComponentEntity implements Serializable {
       jChildren.add(child.toJSON());
     }
     obj.put("children", jChildren);
-
     return obj;
   }
 

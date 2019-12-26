@@ -2,14 +2,10 @@ package org.exoplatform.portal.mop.jdbc.dao;
 
 import java.util.List;
 
-import org.exoplatform.application.registry.dao.SiteDAO;
-import org.exoplatform.application.registry.entity.SiteEntity;
-import org.exoplatform.component.test.AbstractKernelTest;
-import org.exoplatform.component.test.ConfigurationUnit;
-import org.exoplatform.component.test.ConfiguredBy;
-import org.exoplatform.component.test.ContainerScope;
+import org.exoplatform.component.test.*;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.jdbc.entity.SiteEntity;
 
 @ConfiguredBy({
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})

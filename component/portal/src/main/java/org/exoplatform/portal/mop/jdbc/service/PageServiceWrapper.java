@@ -5,7 +5,6 @@ import java.util.List;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 
-import org.exoplatform.application.registry.dao.PermissionDAO;
 import org.exoplatform.commons.api.persistence.DataInitializer;
 import org.exoplatform.portal.mop.*;
 import org.exoplatform.portal.mop.jdbc.dao.*;

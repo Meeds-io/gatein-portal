@@ -32,7 +32,6 @@ public class AppRegistryMigrationService {
     this.listenerService = listenerService;
   }
 
-  @SuppressWarnings("deprecation")
   public void doMigration() {
     long t = System.currentTimeMillis();
     LOG.info("| \\ START::Application Categories migration ---------------------------------");
@@ -54,8 +53,7 @@ public class AppRegistryMigrationService {
         if (created == null) {
           LOG.info("|  \\ START::migrate category {}", category.getName());
           for (Application app : category.getApplications()) {
-            if (app == null || app.getType() == null || ApplicationType.WSRP_PORTLET.equals(app.getType())
-                || ApplicationType.GADGET.equals(app.getType())) { // NOSONAR
+            if (app == null || !ApplicationType.PORTLET.equals(app.getType())) {
               continue;
             }
             appService.save(category, app);

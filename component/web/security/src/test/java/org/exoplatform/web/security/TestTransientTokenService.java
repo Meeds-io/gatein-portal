@@ -18,12 +18,11 @@
  */
 package org.exoplatform.web.security;
 
-import org.exoplatform.component.test.ConfigurationUnit;
-import org.exoplatform.component.test.ConfiguredBy;
-import org.exoplatform.component.test.ContainerScope;
+import org.gatein.wci.security.Credentials;
+
+import org.exoplatform.component.test.*;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.web.security.security.TransientTokenService;
-import org.gatein.wci.security.Credentials;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Hai Thanh Nguyen</a>

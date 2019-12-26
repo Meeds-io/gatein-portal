@@ -23,17 +23,6 @@ import java.io.Serializable;
 import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.portal.mop.Described;
-import org.exoplatform.portal.mop.Utils;
-import org.exoplatform.portal.mop.Visibility;
-import org.exoplatform.portal.mop.Visible;
-import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.pom.data.MappedAttributes;
-import org.gatein.mop.api.Attributes;
-import org.gatein.mop.api.workspace.Navigation;
-import org.gatein.mop.api.workspace.Site;
-import org.gatein.mop.api.workspace.link.Link;
-import org.gatein.mop.api.workspace.link.PageLink;
 
 /**
  * An immutable node data class.
@@ -58,71 +47,12 @@ public class NodeData implements Serializable {
     /** . */
     final String[] children;
 
-    NodeData(Navigation navigation) {
-        List<String> children = null;
-        List<Navigation> _children = navigation.getChildren();
-        if (_children == null) {
-            children = Collections.emptyList();
-        } else {
-            children = new ArrayList<>();
-            for (Navigation child : _children) {
-              children.add(child.getObjectId());
-            }
-        }
-
-        //
-        String label = null;
-        if (navigation.isAdapted(Described.class)) {
-            Described described = navigation.adapt(Described.class);
-            label = described.getName();
-        }
-
-        //
-        Visibility visibility = Visibility.DISPLAYED;
-        Date startPublicationDate = null;
-        Date endPublicationDate = null;
-        if (navigation.isAdapted(Visible.class)) {
-            Visible visible = navigation.adapt(Visible.class);
-            visibility = visible.getVisibility();
-            startPublicationDate = visible.getStartPublicationDate();
-            endPublicationDate = visible.getEndPublicationDate();
-        }
-
-        //
-        PageKey pageRef = null;
-        Link link = navigation.getLink();
-        if (link instanceof PageLink) {
-            PageLink pageLink = (PageLink) link;
-            org.gatein.mop.api.workspace.Page target = pageLink.getPage();
-            if (target != null) {
-                Site site = target.getSite();
-                pageRef = Utils.siteType(site.getObjectType()).key(site.getName()).page(target.getName());
-            }
-        }
-
-        //
-        Attributes attrs = navigation.getAttributes();
-
-        //
-        NodeState state = new NodeState(label, attrs.getValue(MappedAttributes.ICON),
-                startPublicationDate != null ? startPublicationDate.getTime() : -1,
-                endPublicationDate != null ? endPublicationDate.getTime() : -1, visibility, pageRef);
-
-        //
-        String parentId;
-        Navigation parent = navigation.getParent();
-        if (parent != null) {
-            parentId = parent.getObjectId();
-        } else {
-            parentId = null;
-        }
-
-        //
-        this.parentId = parentId;
-        this.id = navigation.getObjectId();
-        this.name = navigation.getName();
-        this.state = state;
-        this.children = children.toArray(new String[0]);
+    public NodeData(String parentId, String id, String name, NodeState state, String[] children) {
+      this.parentId = parentId;
+      this.id = id;
+      this.name = name;
+      this.state = state;
+      this.children = children;
     }
 
     NodeData(NodeContext<?> context) {
@@ -140,14 +70,6 @@ public class NodeData implements Serializable {
         NodeState state = context.getState();
 
         //
-        this.parentId = parentId;
-        this.id = id;
-        this.name = name;
-        this.state = state;
-        this.children = children;
-    }
-
-    NodeData(String parentId, String id, String name, NodeState state, String[] children) {
         this.parentId = parentId;
         this.id = id;
         this.name = name;

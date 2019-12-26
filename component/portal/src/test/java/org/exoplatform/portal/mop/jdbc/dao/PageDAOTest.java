@@ -2,15 +2,10 @@ package org.exoplatform.portal.mop.jdbc.dao;
 
 import org.gatein.api.page.PageQuery;
 
-import org.exoplatform.application.registry.dao.PageDAO;
-import org.exoplatform.application.registry.dao.SiteDAO;
-import org.exoplatform.application.registry.entity.PageEntity;
-import org.exoplatform.application.registry.entity.SiteEntity;
-import org.exoplatform.component.test.AbstractKernelTest;
-import org.exoplatform.component.test.ConfigurationUnit;
-import org.exoplatform.component.test.ConfiguredBy;
-import org.exoplatform.component.test.ContainerScope;
+import org.exoplatform.component.test.*;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.jdbc.entity.PageEntity;
+import org.exoplatform.portal.mop.jdbc.entity.SiteEntity;
 import org.exoplatform.portal.mop.page.PageKey;
 
 @ConfiguredBy({

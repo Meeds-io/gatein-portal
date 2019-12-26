@@ -12,6 +12,7 @@ import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.jdbc.dao.*;
 import org.exoplatform.portal.mop.jdbc.entity.*;
+import org.exoplatform.portal.mop.jdbc.entity.ComponentEntity.TYPE;
 import org.exoplatform.portal.mop.page.*;
 
 @ConfiguredBy({

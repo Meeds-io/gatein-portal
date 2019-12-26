@@ -28,6 +28,7 @@ import java.util.List;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.Utils;
 import org.exoplatform.portal.mop.importer.ImportMode;
 import org.exoplatform.portal.mop.management.operations.MOPSiteProvider;
 import org.exoplatform.portal.mop.management.operations.page.PageUtils;
@@ -35,6 +36,7 @@ import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageService;
 import org.gatein.mop.api.workspace.Site;
+import org.json.JSONObject;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
@@ -150,7 +152,7 @@ public class PageImportTask extends AbstractImportTask<Page.PageSet> {
 
         if (dst != null) {
             for (Page page : dst.getPages()) {
-                pageService.savePage(new PageContext(siteKey.page(page.getName()), PageUtils.toPageState(page)));
+                pageService.savePage(new PageContext(siteKey.page(page.getName()), Utils.toPageState(page)));
                 dataStorage.save(page);
                 dataStorage.save();
             }
@@ -167,7 +169,7 @@ public class PageImportTask extends AbstractImportTask<Page.PageSet> {
         }
         if (rollbackSaves != null && !rollbackSaves.getPages().isEmpty()) {
             for (Page page : rollbackSaves.getPages()) {
-                pageService.savePage(new PageContext(siteKey.page(page.getName()), PageUtils.toPageState(page)));
+                pageService.savePage(new PageContext(siteKey.page(page.getName()), Utils.toPageState(page)));
                 dataStorage.save(page);
                 dataStorage.save();
             }

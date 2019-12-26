@@ -22,28 +22,17 @@ package org.exoplatform.web.portal;
 import java.util.List;
 import java.util.Locale;
 
-import org.exoplatform.component.test.ConfigurationUnit;
-import org.exoplatform.component.test.ConfiguredBy;
-import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.portal.AbstractPortalTest;
+import org.exoplatform.component.test.*;
 import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.navigation.NavigationContext;
-import org.exoplatform.portal.mop.navigation.NavigationService;
-import org.exoplatform.portal.mop.navigation.NavigationState;
-import org.exoplatform.portal.mop.navigation.NodeContext;
-import org.exoplatform.portal.mop.navigation.NodeModel;
-import org.exoplatform.portal.mop.navigation.Scope;
-import org.exoplatform.portal.mop.user.SimpleUserPortalContext;
+import org.exoplatform.portal.mop.navigation.*;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.web.application.URLBuilder;
-import org.exoplatform.web.url.PortalURL;
-import org.exoplatform.web.url.ResourceType;
-import org.exoplatform.web.url.URLFactory;
+import org.exoplatform.web.url.*;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -53,7 +42,7 @@ import org.exoplatform.web.url.URLFactory;
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/web/portal/configuration.xml") })
-public class TestRefreshCurrentUserPortal extends AbstractPortalTest {
+public class TestRefreshCurrentUserPortal extends AbstractKernelTest {
 
     /** . */
     private RequestContext requestContext;
@@ -153,7 +142,7 @@ public class TestRefreshCurrentUserPortal extends AbstractPortalTest {
         assertEquals(2, navs.size());
         //workaround: ns.saveNode this method already save data to db
         //need to clear this test data, tearDown method not work correctly this case
-        sync(true);
+        end();
         RequestContext.setCurrentInstance(null);
     }
 

@@ -25,7 +25,6 @@ import org.exoplatform.component.test.*;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.jdbc.service.JDBCModelStorageImpl;
 import org.exoplatform.portal.mop.navigation.*;
 import org.exoplatform.portal.pom.data.ContainerData;
 import org.exoplatform.portal.pom.data.PortalData;
@@ -36,7 +35,10 @@ import org.exoplatform.portal.pom.data.PortalData;
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/test.navigation.configuration.xml") })
-public class TestJDBCNavigationService extends TestNavigationService {
+public class TestJDBCNavigationService extends AbstractKernelTest {
+  
+    /** . */
+    protected NavigationService  service;
 
     private JDBCModelStorageImpl modelStorage;
 
@@ -57,7 +59,7 @@ public class TestJDBCNavigationService extends TestNavigationService {
         NavigationContext nav = new NavigationContext(type.key(siteName), new NavigationState(1));
         this.service.saveNavigation(nav);
 
-        sync(true);
+        end();
     }
 
     public void testHiddenNode() throws Exception {
@@ -71,7 +73,7 @@ public class TestJDBCNavigationService extends TestNavigationService {
         this.service.saveNode(node, null);
 
         //
-        sync(true);
+        end();
 
         //
         nav = service.loadNavigation(SiteKey.portal("hidden_node"));
@@ -139,7 +141,7 @@ public class TestJDBCNavigationService extends TestNavigationService {
         this.service.saveNode(node, null);
 
         //
-        sync(true);
+        end();
 
         //
         NavigationContext nav = service.loadNavigation(SiteKey.portal("hidden_insert_1"));
@@ -180,7 +182,7 @@ public class TestJDBCNavigationService extends TestNavigationService {
         this.service.saveNode(node, null);
 
         //
-        sync(true);
+        end();
 
         //
         NavigationContext nav = service.loadNavigation(SiteKey.portal("hidden_insert_2"));
@@ -248,7 +250,7 @@ public class TestJDBCNavigationService extends TestNavigationService {
         this.service.saveNode(node, null);
 
         //
-        sync(true);
+        end();
 
         //
         NavigationContext nav = service.loadNavigation(SiteKey.portal("hidden_insert_3"));
@@ -346,7 +348,7 @@ public class TestJDBCNavigationService extends TestNavigationService {
         }
 
         //
-        sync(true);
+        end();
 
         //
         NavigationContext navigation = service.loadNavigation(SiteKey.portal("count"));
@@ -383,7 +385,7 @@ public class TestJDBCNavigationService extends TestNavigationService {
         }
 
         //
-        sync(true);
+        end();
 
         //
         NavigationContext navigation = service.loadNavigation(SiteKey.portal("insert_duplicate"));

@@ -9,7 +9,8 @@ import javax.jcr.query.QueryManager;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.portal.mop.*;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.portal.mop.description.DescriptionServiceImpl;
 import org.exoplatform.portal.mop.navigation.*;

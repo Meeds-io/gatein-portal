@@ -24,6 +24,9 @@ import java.util.*;
 import org.gatein.mop.api.workspace.ObjectType;
 import org.gatein.mop.api.workspace.Site;
 
+import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.mop.page.PageState;
+
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
@@ -64,6 +67,17 @@ public class Utils {
         @SuppressWarnings("unchecked")
         ComparableComparator instance = INSTANCE;
         return instance;
+    }
+
+    public static PageState toPageState(Page page) {
+      return new PageState(page.getTitle(),
+                           page.getDescription(),
+                           page.isShowMaxWindow(),
+                           page.getFactoryId(),
+                           page.getAccessPermissions() != null ? Arrays.asList(page.getAccessPermissions()) : null,
+                           page.getEditPermission(),
+                           page.getMoveAppsPermissions() != null ? Arrays.asList(page.getMoveAppsPermissions()) : null,
+                           page.getMoveContainersPermissions() != null ? Arrays.asList(page.getMoveContainersPermissions()) : null);
     }
 
     private static class ComparableComparator<T extends Comparable<T>> implements Comparator<T> {

@@ -27,19 +27,18 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
 import org.chromattic.api.UndeclaredRepositoryException;
-import org.exoplatform.portal.mop.EventType;
-import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.pom.config.POMSessionManager;
-import org.exoplatform.services.cache.CacheService;
-import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.core.ManageableRepository;
-import org.exoplatform.services.listener.ListenerService;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.mop.api.workspace.ObjectType;
 import org.gatein.mop.api.workspace.Site;
 import org.picocontainer.Startable;
+
+import org.exoplatform.portal.mop.*;
+import org.exoplatform.portal.pom.config.POMSessionManager;
+import org.exoplatform.services.cache.CacheService;
+import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.core.ManageableRepository;
+import org.exoplatform.services.listener.ListenerService;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

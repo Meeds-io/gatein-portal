@@ -19,20 +19,7 @@
 
 package org.exoplatform.navigation.webui.component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
@@ -40,50 +27,29 @@ import org.exoplatform.navigation.webui.TreeNode;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserACL;
-import org.exoplatform.portal.config.model.ModelObject;
-import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.mop.Described;
-import org.exoplatform.portal.mop.ProtectedContainer;
+import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
-import org.exoplatform.portal.mop.page.PageContext;
-import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.page.PageService;
-import org.exoplatform.portal.mop.page.PageState;
+import org.exoplatform.portal.mop.page.*;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.webui.page.UIPageSelector;
 import org.exoplatform.portal.webui.page.UIWizardPageSetInfo;
 import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.portal.webui.workspace.UIPortalApplication;
-import org.exoplatform.services.resources.LocaleConfig;
-import org.exoplatform.services.resources.LocaleConfigService;
-import org.exoplatform.services.resources.ResourceBundleService;
+import org.exoplatform.services.resources.*;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.application.portlet.PortletRequestContext;
-import org.exoplatform.webui.core.UIApplication;
-import org.exoplatform.webui.core.UIComponent;
-import org.exoplatform.webui.core.UIPopupWindow;
+import org.exoplatform.webui.core.*;
 import org.exoplatform.webui.core.model.SelectItemOption;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.Event.Phase;
 import org.exoplatform.webui.event.EventListener;
 import org.exoplatform.webui.exception.MessageException;
-import org.exoplatform.webui.form.UIFormDateTimeInput;
-import org.exoplatform.webui.form.UIFormInputBase;
-import org.exoplatform.webui.form.UIFormInputIconSelector;
-import org.exoplatform.webui.form.UIFormInputSet;
-import org.exoplatform.webui.form.UIFormSelectBox;
-import org.exoplatform.webui.form.UIFormStringInput;
-import org.exoplatform.webui.form.UIFormTabPane;
+import org.exoplatform.webui.form.*;
 import org.exoplatform.webui.form.input.UICheckBoxInput;
-import org.exoplatform.webui.form.validator.DateTimeValidator;
-import org.exoplatform.webui.form.validator.IdentifierValidator;
-import org.exoplatform.webui.form.validator.MandatoryValidator;
-import org.exoplatform.webui.form.validator.StringLengthValidator;
-import org.exoplatform.webui.form.validator.UserConfigurableValidator;
-import org.exoplatform.webui.form.validator.Validator;
+import org.exoplatform.webui.form.validator.*;
 
 /**
  * Author : Dang Van Minh, Pham Tuan minhdv81@yahoo.com Jun 14, 2006
@@ -663,8 +629,8 @@ public class UIPageNodeForm extends UIFormTabPane {
 
             /* Once there is a UI for setting these permissions, the defaults should
              * be replaced accordingly */
-            List<String> moveAppsPermissions = ProtectedContainer.DEFAULT_MOVE_APPLICATIONS_PERMISSIONS;
-            List<String> moveContainersPermissions = ProtectedContainer.DEFAULT_MOVE_CONTAINERS_PERMISSIONS;
+            List<String> moveAppsPermissions = Container.DEFAULT_MOVE_APPLICATIONS_PERMISSIONS;
+            List<String> moveContainersPermissions = Container.DEFAULT_MOVE_CONTAINERS_PERMISSIONS;
 
             PageState pageState = new PageState(uiPageTitle.getValue(), null, false, null,
                     accessPermission != null ? Arrays.asList(accessPermission) : null, editPermission, moveAppsPermissions, moveContainersPermissions);

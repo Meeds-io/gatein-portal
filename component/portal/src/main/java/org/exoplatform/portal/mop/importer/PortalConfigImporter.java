@@ -21,7 +21,6 @@ package org.exoplatform.portal.mop.importer;
 
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.pom.data.Mapper;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 

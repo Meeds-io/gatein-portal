@@ -19,18 +19,14 @@
 
 package org.exoplatform.portal.pom.config.cache;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccessImpl;
-import org.exoplatform.portal.mop.SearchTask;
-import org.exoplatform.portal.pom.config.POMSession;
-import org.exoplatform.portal.pom.config.POMTask;
-import org.exoplatform.portal.pom.config.TaskExecutionDecorator;
-import org.exoplatform.portal.pom.config.TaskExecutor;
+import org.exoplatform.portal.pom.config.*;
 import org.exoplatform.portal.pom.config.tasks.PortalConfigTask;
+import org.exoplatform.portal.pom.config.tasks.SearchTask;
+import org.exoplatform.portal.pom.config.tasks.SearchTask.FindSiteKey;
 import org.exoplatform.portal.pom.data.PortalKey;
 
 /**
@@ -59,8 +55,8 @@ public class PortalNamesCache extends TaskExecutionDecorator {
                 }
             } else if (task instanceof PortalConfigTask.Save || task instanceof PortalConfigTask.Remove) {
                 V result = super.execute(session, task);
-                session.scheduleForEviction(org.exoplatform.portal.mop.FindSiteKey.PORTAL_KEY);
-                session.scheduleForEviction(org.exoplatform.portal.mop.FindSiteKey.GROUP_KEY);
+                session.scheduleForEviction(FindSiteKey.PORTAL_KEY);
+                session.scheduleForEviction(FindSiteKey.GROUP_KEY);
                 return result;
             }
         }

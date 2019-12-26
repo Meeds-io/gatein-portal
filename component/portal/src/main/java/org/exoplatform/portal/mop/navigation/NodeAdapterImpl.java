@@ -18,9 +18,7 @@
  */
 package org.exoplatform.portal.mop.navigation;
 
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Julien Viet

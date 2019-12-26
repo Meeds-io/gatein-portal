@@ -109,8 +109,6 @@ public class PortalDataMapper {
         ApplicationType<S> type = state.getApplicationType();
         if (type == ApplicationType.PORTLET) {
             model = (Application<S>) Application.createPortletApplication(uiPortlet.getStorageId());
-        } else if (type == ApplicationType.WSRP_PORTLET) {
-            model = (Application<S>) Application.createWSRPApplication(uiPortlet.getStorageId());
         } else {
             throw new AssertionError();
         }
