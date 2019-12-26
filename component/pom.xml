@@ -47,7 +47,7 @@
     <module>management</module>
     <module>identity</module>
     <module>api</module>
-    <module>jdbc</module>
+    <module>jcr</module>
   </modules>
 
 </project>

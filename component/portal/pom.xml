@@ -34,11 +34,6 @@
   <dependencies>
 
     <dependency>
-      <groupId>org.exoplatform.jcr</groupId>
-      <artifactId>exo.jcr.component.ext</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.common</artifactId>
     </dependency>
@@ -79,17 +74,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.gatein.mop</groupId>
-      <artifactId>mop-core</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.chromattic</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
       <groupId>org.gatein.management</groupId>
       <artifactId>gatein-management-spi</artifactId>
     </dependency>
@@ -108,12 +92,6 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
-      <artifactId>exo.portal.component.test.jcr</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
