@@ -22,47 +22,27 @@
 
 package org.exoplatform.portal.mop.management.binding.xml;
 
-import static org.gatein.common.xml.stax.navigator.Exceptions.expectedElement;
-import static org.gatein.common.xml.stax.navigator.Exceptions.unexpectedElement;
-import static org.gatein.common.xml.stax.navigator.Exceptions.unknownElement;
-import static org.gatein.common.xml.stax.navigator.StaxNavUtils.getContent;
-import static org.gatein.common.xml.stax.navigator.StaxNavUtils.getRequiredContent;
-import static org.gatein.common.xml.stax.navigator.StaxNavUtils.parseContent;
-import static org.gatein.common.xml.stax.navigator.StaxNavUtils.parseRequiredContent;
-import static org.gatein.common.xml.stax.navigator.StaxNavUtils.requiresChild;
-import static org.gatein.common.xml.stax.navigator.StaxNavUtils.requiresSibling;
+import static org.gatein.common.xml.stax.navigator.Exceptions.*;
+import static org.gatein.common.xml.stax.navigator.StaxNavUtils.*;
 import static org.gatein.common.xml.stax.writer.StaxWriterUtils.writeOptionalContent;
 import static org.gatein.common.xml.stax.writer.StaxWriterUtils.writeOptionalElement;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.config.DataStorage;
-import org.exoplatform.portal.config.model.Application;
-import org.exoplatform.portal.config.model.ApplicationState;
-import org.exoplatform.portal.config.model.ApplicationType;
-import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.config.model.ModelObject;
-import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.config.model.PageBody;
-import org.exoplatform.portal.config.model.TransientApplicationState;
-import org.exoplatform.portal.config.serialize.JibxArraySerialize;
-import org.exoplatform.portal.pom.spi.portlet.Portlet;
-import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
-import org.exoplatform.portal.pom.spi.portlet.Preference;
-import org.exoplatform.portal.pom.spi.wsrp.WSRP;
 import org.gatein.common.xml.stax.navigator.Exceptions;
 import org.gatein.common.xml.stax.writer.StaxWriter;
 import org.gatein.common.xml.stax.writer.WritableValueTypes;
 import org.gatein.management.api.binding.Marshaller;
 import org.staxnav.StaxNavigator;
 import org.staxnav.ValueType;
+
+import org.exoplatform.container.*;
+import org.exoplatform.portal.config.DataStorage;
+import org.exoplatform.portal.config.model.*;
+import org.exoplatform.portal.config.serialize.JibxArraySerialize;
+import org.exoplatform.portal.pom.spi.portlet.*;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
@@ -75,9 +55,6 @@ public abstract class AbstractMarshaller<T> implements Marshaller<T> {
             ApplicationType<?> type = application.getType();
             if (ApplicationType.PORTLET == type) {
                 marshalPortletApplication(writer, safeCast(application, Portlet.class));
-            } else if (ApplicationType.WSRP_PORTLET == type) {
-                throw new UnsupportedOperationException("We dont support WSRP any more");
-//                marshalWsrpApplication(writer, safeCast(application, WSRP.class));
             }
         } else if (modelObject instanceof Page) {
             // marshalPageData(writer, (PageData) componentData);

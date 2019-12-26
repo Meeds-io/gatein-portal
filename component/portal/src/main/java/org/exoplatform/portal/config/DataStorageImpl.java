@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.*;
 import org.exoplatform.portal.config.model.*;
-import org.exoplatform.portal.mop.importer.Imported.Status;
+import org.exoplatform.portal.mop.importer.Status;
 import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.pom.data.*;
 import org.exoplatform.services.cache.CacheService;

@@ -42,7 +42,7 @@ import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.EventType;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.Imported;
-import org.exoplatform.portal.mop.importer.Imported.Status;
+import org.exoplatform.portal.mop.importer.Status;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.mop.user.UserNavigation;

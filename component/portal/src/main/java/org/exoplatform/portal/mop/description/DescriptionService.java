@@ -22,8 +22,6 @@ package org.exoplatform.portal.mop.description;
 import java.util.Locale;
 import java.util.Map;
 
-import org.exoplatform.portal.mop.Described;
-
 /**
  * The description service provides configuration and runtime interaction of described objects.
  *

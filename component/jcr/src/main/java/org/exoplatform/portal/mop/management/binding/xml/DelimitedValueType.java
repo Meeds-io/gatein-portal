@@ -22,7 +22,7 @@
 
 package org.exoplatform.portal.mop.management.binding.xml;
 
-import org.exoplatform.portal.pom.config.Utils;
+import org.apache.commons.lang3.StringUtils;
 import org.gatein.common.xml.stax.writer.WritableValueType;
 import org.staxnav.StaxNavException;
 import org.staxnav.ValueType;
@@ -42,12 +42,12 @@ public class DelimitedValueType extends ValueType<String[]> implements WritableV
 
     @Override
     protected String[] parse(String s) throws Exception {
-        return Utils.split(delimiter, s);
+        return StringUtils.split(s, delimiter);
     }
 
     @Override
     public String format(String[] value) throws StaxNavException {
-        String s = Utils.join(delimiter, value);
+        String s = StringUtils.join(value, delimiter);
 
         if (s != null && s.trim().length() == 0) {
             return null;

@@ -27,7 +27,7 @@ import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.importer.ImportMode;
 import org.exoplatform.portal.mop.importer.Imported;
-import org.exoplatform.portal.mop.importer.Imported.Status;
+import org.exoplatform.portal.mop.importer.Status;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationService;
 import org.exoplatform.portal.mop.navigation.Node;

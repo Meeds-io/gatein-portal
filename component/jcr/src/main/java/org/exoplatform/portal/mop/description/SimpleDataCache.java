@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 eXo Platform SAS.
+	 * Copyright (C) 2011 eXo Platform SAS.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -22,7 +22,6 @@ package org.exoplatform.portal.mop.description;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.exoplatform.commons.serialization.MarshalledObject;
-import org.exoplatform.portal.mop.Described;
 import org.exoplatform.portal.pom.config.POMSession;
 
 /**

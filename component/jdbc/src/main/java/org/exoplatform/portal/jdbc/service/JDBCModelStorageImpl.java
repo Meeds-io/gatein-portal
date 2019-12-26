@@ -52,7 +52,7 @@ import org.exoplatform.portal.config.NoSuchDataException;
 import org.exoplatform.portal.config.Query;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.mop.*;
-import org.exoplatform.portal.mop.importer.Imported.Status;
+import org.exoplatform.portal.mop.importer.Status;
 import org.exoplatform.portal.pom.config.tasks.SearchTask;
 import org.exoplatform.portal.pom.config.tasks.SearchTask.FindPortletPreferences;
 import org.exoplatform.portal.pom.data.*;

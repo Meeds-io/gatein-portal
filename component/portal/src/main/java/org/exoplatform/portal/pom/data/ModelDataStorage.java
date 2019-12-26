@@ -25,7 +25,7 @@ import java.util.List;
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.portal.config.Query;
 import org.exoplatform.portal.config.model.*;
-import org.exoplatform.portal.mop.importer.Imported.Status;
+import org.exoplatform.portal.mop.importer.Status;
 
 /**
  * Created by The eXo Platform SAS Apr 19, 2007

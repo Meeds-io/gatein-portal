@@ -19,32 +19,13 @@
 
 package org.exoplatform.portal.mop.importer;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
-import org.exoplatform.portal.config.model.I18NString;
-import org.exoplatform.portal.config.model.PageNode;
-import org.exoplatform.portal.config.model.PageNodeContainer;
-import org.exoplatform.portal.mop.Described;
+import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.description.DescriptionService;
-import org.exoplatform.portal.mop.navigation.GenericScope;
-import org.exoplatform.portal.mop.navigation.NavigationContext;
-import org.exoplatform.portal.mop.navigation.NavigationService;
-import org.exoplatform.portal.mop.navigation.NodeContext;
-import org.exoplatform.portal.mop.navigation.NodeModel;
-import org.exoplatform.portal.mop.navigation.NodeState;
-import org.exoplatform.portal.mop.navigation.Scope;
-import org.exoplatform.portal.tree.diff.Adapters;
-import org.exoplatform.portal.tree.diff.ListAdapter;
-import org.exoplatform.portal.tree.diff.ListChangeIterator;
-import org.exoplatform.portal.tree.diff.ListChangeType;
-import org.exoplatform.portal.tree.diff.ListDiff;
+import org.exoplatform.portal.mop.navigation.*;
+import org.exoplatform.portal.tree.diff.*;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

@@ -357,7 +357,7 @@ public class POMDataStorage implements ModelDataStorage {
     }
 
     @Override
-    public org.exoplatform.portal.mop.importer.Imported.Status getImportStatus() {      
+    public org.exoplatform.portal.mop.importer.Status getImportStatus() {      
         POMSession session = pomMgr.getSession();
   
         // Obtain the status
@@ -365,7 +365,7 @@ public class POMDataStorage implements ModelDataStorage {
         Imported imported = workspace.adapt(Imported.class);
         Integer st = imported.getStatus();
         if (st != null) {
-            org.exoplatform.portal.mop.importer.Imported.Status status = org.exoplatform.portal.mop.importer.Imported.Status.getStatus(st);
+            org.exoplatform.portal.mop.importer.Status status = org.exoplatform.portal.mop.importer.Status.getStatus(st);
             return status;
         } else {
             return null;
@@ -373,7 +373,7 @@ public class POMDataStorage implements ModelDataStorage {
     }
 
     @Override
-    public void saveImportStatus(org.exoplatform.portal.mop.importer.Imported.Status status) {
+    public void saveImportStatus(org.exoplatform.portal.mop.importer.Status status) {
         POMSession session = pomMgr.getSession();
   
         // Obtain the status

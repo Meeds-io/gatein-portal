@@ -37,6 +37,8 @@ import org.exoplatform.commons.chromattic.SessionContext;
 import org.exoplatform.commons.chromattic.SynchronizationListener;
 import org.exoplatform.commons.chromattic.SynchronizationStatus;
 import org.exoplatform.portal.config.NoSuchDataException;
+import org.exoplatform.portal.pom.config.Utils;
+
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.mop.api.Model;

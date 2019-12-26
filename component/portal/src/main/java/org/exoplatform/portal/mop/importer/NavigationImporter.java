@@ -31,7 +31,6 @@ import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationService;
 import org.exoplatform.portal.mop.navigation.NavigationState;
-import org.exoplatform.portal.pom.config.Utils;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -106,7 +105,7 @@ public class NavigationImporter {
                     List<String> path;
                     if (parentURI != null) {
                         path = new ArrayList<String>();
-                        String[] names = Utils.split("/", parentURI);
+                        String[] names = parentURI.split("/");
                         for (String name : names) {
                             if (name.length() > 0) {
                                 path.add(name);

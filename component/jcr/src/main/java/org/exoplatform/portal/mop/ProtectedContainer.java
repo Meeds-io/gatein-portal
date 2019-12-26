@@ -34,9 +34,6 @@ import org.chromattic.api.annotations.MixinType;
 @MixinType(name = "gtn:protectedcontainer")
 public abstract class ProtectedContainer {
 
-    public static final List<String> DEFAULT_MOVE_APPLICATIONS_PERMISSIONS = Collections.singletonList(ProtectedResource.EVERYONE);
-    public static final List<String> DEFAULT_MOVE_CONTAINERS_PERMISSIONS = Collections.singletonList(ProtectedResource.EVERYONE);
-
     @Property(name = "gtn:move-apps-permissions")
     public abstract List<String> getMoveAppsPermissions();
 
