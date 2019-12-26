@@ -18,8 +18,8 @@
  */
 package org.exoplatform.portal.jdbc.dao;
 
+import org.exoplatform.application.registry.entity.ApplicationEntity;
 import org.exoplatform.commons.api.persistence.GenericDAO;
-import org.exoplatform.portal.jdbc.entity.ApplicationEntity;
 
 public interface ApplicationDAO extends GenericDAO<ApplicationEntity, Long> {
 

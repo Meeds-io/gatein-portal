@@ -23,6 +23,7 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
+import org.exoplatform.application.registry.entity.DescriptionState;
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
 @Embeddable

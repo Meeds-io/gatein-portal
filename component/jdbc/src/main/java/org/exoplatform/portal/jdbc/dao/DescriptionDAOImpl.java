@@ -5,10 +5,11 @@ import java.util.Map;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
+import org.exoplatform.application.registry.dao.DescriptionDAO;
+import org.exoplatform.application.registry.entity.DescriptionEntity;
+import org.exoplatform.application.registry.entity.DescriptionState;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
-import org.exoplatform.portal.jdbc.entity.DescriptionEntity;
-import org.exoplatform.portal.jdbc.entity.DescriptionState;
 
 public class DescriptionDAOImpl extends GenericDAOJPAImpl<DescriptionEntity, Long> implements DescriptionDAO {
   

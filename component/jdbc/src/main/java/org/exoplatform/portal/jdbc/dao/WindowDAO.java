@@ -21,8 +21,8 @@ package org.exoplatform.portal.jdbc.dao;
 
 import java.util.List;
 
+import org.exoplatform.application.registry.entity.WindowEntity;
 import org.exoplatform.commons.api.persistence.GenericDAO;
-import org.exoplatform.portal.jdbc.entity.WindowEntity;
 
 public interface WindowDAO extends GenericDAO<WindowEntity, Long> {
 

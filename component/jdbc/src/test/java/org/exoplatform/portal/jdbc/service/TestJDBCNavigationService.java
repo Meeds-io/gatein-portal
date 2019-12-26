@@ -26,6 +26,7 @@ import java.util.List;
 import javax.jcr.NodeIterator;
 import javax.jcr.Session;
 
+import org.exoplatform.application.registry.impl.JDBCModelStorageImpl;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;

@@ -6,10 +6,12 @@ import java.util.List;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
+import org.exoplatform.application.registry.dao.*;
+import org.exoplatform.application.registry.entity.SiteEntity;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
-import org.exoplatform.portal.jdbc.entity.SiteEntity;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.dao.*;
 
 public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
   private PageDAO pageDAO;

@@ -22,6 +22,8 @@ import javax.persistence.*;
 
 import java.io.Serializable;
 
+import org.exoplatform.application.registry.entity.NodeEntity;
+import org.exoplatform.application.registry.entity.SiteEntity;
 import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.portal.mop.SiteType;
 

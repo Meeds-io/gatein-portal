@@ -1,4 +1,4 @@
-package org.exoplatform.portal.jdbc.entity;
+package org.exoplatform.application.registry.entity;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -39,7 +39,7 @@ public class CategoryEntity implements Serializable {
   private long                   modifiedDate;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ApplicationEntity> applications     = new HashSet<ApplicationEntity>();
+  private Set<ApplicationEntity> applications     = new HashSet<>();
 
   public Long getId() {
     return id;

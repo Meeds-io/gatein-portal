@@ -5,8 +5,9 @@ import java.util.UUID;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
+import org.exoplatform.application.registry.dao.CategoryDAO;
+import org.exoplatform.application.registry.entity.CategoryEntity;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
-import org.exoplatform.portal.jdbc.entity.CategoryEntity;
 
 public class CategoryDAOImpl extends GenericDAOJPAImpl<CategoryEntity, Long> implements CategoryDAO {
 

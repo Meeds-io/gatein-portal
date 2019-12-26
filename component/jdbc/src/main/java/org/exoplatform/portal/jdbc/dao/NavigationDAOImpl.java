@@ -21,9 +21,10 @@ package org.exoplatform.portal.jdbc.dao;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
+import org.exoplatform.application.registry.dao.NavigationDAO;
+import org.exoplatform.application.registry.entity.NavigationEntity;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
-import org.exoplatform.portal.jdbc.entity.NavigationEntity;
 import org.exoplatform.portal.mop.SiteType;
 
 public class NavigationDAOImpl extends GenericDAOJPAImpl<NavigationEntity, Long>implements NavigationDAO {

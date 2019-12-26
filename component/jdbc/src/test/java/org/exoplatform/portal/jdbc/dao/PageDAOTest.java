@@ -2,12 +2,14 @@ package org.exoplatform.portal.jdbc.dao;
 
 import org.gatein.api.page.PageQuery;
 
+import org.exoplatform.application.registry.dao.PageDAO;
+import org.exoplatform.application.registry.dao.SiteDAO;
+import org.exoplatform.application.registry.entity.PageEntity;
+import org.exoplatform.application.registry.entity.SiteEntity;
 import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.portal.jdbc.entity.PageEntity;
-import org.exoplatform.portal.jdbc.entity.SiteEntity;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageKey;
 

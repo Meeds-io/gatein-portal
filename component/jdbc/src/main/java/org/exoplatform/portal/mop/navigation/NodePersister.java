@@ -19,12 +19,12 @@
 
 package org.exoplatform.portal.mop.navigation;
 
-import org.exoplatform.portal.jdbc.service.Util;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.exoplatform.application.registry.impl.Util;
 
 /**
 * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

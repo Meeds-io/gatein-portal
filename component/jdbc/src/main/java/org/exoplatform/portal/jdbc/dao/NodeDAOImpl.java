@@ -18,8 +18,9 @@
  */
 package org.exoplatform.portal.jdbc.dao;
 
+import org.exoplatform.application.registry.dao.NodeDAO;
+import org.exoplatform.application.registry.entity.NodeEntity;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
-import org.exoplatform.portal.jdbc.entity.NodeEntity;
 
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;

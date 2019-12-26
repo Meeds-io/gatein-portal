@@ -23,10 +23,10 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.exoplatform.application.registry.dao.DescriptionDAO;
+import org.exoplatform.application.registry.entity.DescriptionEntity;
+import org.exoplatform.application.registry.entity.DescriptionState;
 import org.exoplatform.commons.utils.I18N;
-import org.exoplatform.portal.jdbc.dao.DescriptionDAO;
-import org.exoplatform.portal.jdbc.entity.DescriptionEntity;
-import org.exoplatform.portal.jdbc.entity.DescriptionState;
 import org.exoplatform.portal.mop.Described;
 import org.exoplatform.portal.mop.description.DescriptionService;
 

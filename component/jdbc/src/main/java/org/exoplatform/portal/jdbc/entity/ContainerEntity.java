@@ -27,6 +27,7 @@ import javax.persistence.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import org.exoplatform.application.registry.entity.ComponentEntity;
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
 @Entity(name = "GateInContainer")

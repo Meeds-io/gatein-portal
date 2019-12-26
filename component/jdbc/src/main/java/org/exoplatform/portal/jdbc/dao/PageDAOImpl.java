@@ -13,7 +13,10 @@ import org.gatein.api.site.SiteType;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.persistence.impl.EntityManagerHolder;
 import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.portal.jdbc.entity.*;
+import org.exoplatform.portal.jdbc.entity.PageEntity;
+import org.exoplatform.portal.jdbc.entity.PageEntity_;
+import org.exoplatform.portal.jdbc.entity.SiteEntity;
+import org.exoplatform.portal.jdbc.entity.SiteEntity_;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.page.PageKey;
 

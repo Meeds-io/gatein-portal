@@ -19,7 +19,7 @@
 
 package org.exoplatform.portal.mop.navigation;
 
-import org.exoplatform.portal.jdbc.service.Util;
+import org.exoplatform.application.registry.impl.Util;
 
 /**
 * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

@@ -18,8 +18,8 @@
  */
 package org.exoplatform.portal.jdbc.dao;
 
+import org.exoplatform.application.registry.entity.NodeEntity;
 import org.exoplatform.commons.api.persistence.GenericDAO;
-import org.exoplatform.portal.jdbc.entity.NodeEntity;
 
 import java.util.List;
 

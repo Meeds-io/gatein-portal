@@ -4,13 +4,14 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.exoplatform.application.registry.dao.DescriptionDAO;
+import org.exoplatform.application.registry.entity.DescriptionEntity;
+import org.exoplatform.application.registry.entity.DescriptionState;
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.portal.jdbc.entity.DescriptionEntity;
-import org.exoplatform.portal.jdbc.entity.DescriptionState;
 
 @ConfiguredBy({
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})

@@ -19,11 +19,12 @@
 
 package org.exoplatform.portal.jdbc.dao;
 
+import org.gatein.api.page.PageQuery;
+
 import org.exoplatform.commons.api.persistence.GenericDAO;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.portal.jdbc.entity.PageEntity;
 import org.exoplatform.portal.mop.page.PageKey;
-import org.gatein.api.page.PageQuery;
 
 public interface PageDAO extends GenericDAO<PageEntity, Long> {
 

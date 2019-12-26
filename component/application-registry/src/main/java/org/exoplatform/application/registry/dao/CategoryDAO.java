@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2009 eXo Platform SAS.
+/*
+ * Copyright (C) 2012 eXo Platform SAS.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -16,26 +16,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.exoplatform.application.registry.dao;
 
-package org.exoplatform.portal.pom.spi.gadget;
+import org.exoplatform.application.registry.entity.CategoryEntity;
+import org.exoplatform.commons.api.persistence.GenericDAO;
 
-import org.chromattic.api.annotations.PrimaryType;
-import org.chromattic.api.annotations.Property;
-import org.gatein.mop.core.api.workspace.content.AbstractCustomizationState;
+public interface CategoryDAO extends GenericDAO<CategoryEntity, Long> {
 
-/**
- * Gadget is dropped since PLF 5.3.x and this class will be removed in next version.
- * It's kept to support migrate data only.
- *
- * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
- * @version $Revision$
- */
-@Deprecated
-@PrimaryType(name = "mop:gadget")
-public abstract class GadgetState extends AbstractCustomizationState {
-    @Property(name = "mop:prefs")
-    public abstract String getUserPrefs();
-
-    public abstract void setUserPrefs(String userPrefs);
+  CategoryEntity findByName(String name);
 
 }

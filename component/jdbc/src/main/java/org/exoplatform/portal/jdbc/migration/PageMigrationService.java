@@ -69,8 +69,8 @@ public class PageMigrationService extends AbstractMigrationService {
 
           PageContext created = pageService.loadPage(key);
 
-          org.exoplatform.portal.pom.data.PageKey pomPageKey =
-                                                             new org.exoplatform.portal.pom.data.PageKey(siteKey.getTypeName(),
+          org.exoplatform.portal.mop.PageKey pomPageKey =
+                                                             new org.exoplatform.portal.mop.PageKey(siteKey.getTypeName(),
                                                                                                          siteKey.getName(),
                                                                                                          key.getName());
           PageData pageDataToMigrate = pomStorage.getPage(pomPageKey);

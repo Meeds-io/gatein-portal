@@ -8,10 +8,11 @@ import java.util.List;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import org.exoplatform.application.registry.dao.PermissionDAO;
+import org.exoplatform.application.registry.entity.PermissionEntity;
+import org.exoplatform.application.registry.entity.PermissionEntity.TYPE;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
-import org.exoplatform.portal.jdbc.entity.PermissionEntity;
-import org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE;
 
 public class PermissionDAOImpl extends GenericDAOJPAImpl<PermissionEntity, Long> implements PermissionDAO {
 

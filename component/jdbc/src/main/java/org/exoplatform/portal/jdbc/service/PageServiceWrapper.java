@@ -5,12 +5,10 @@ import java.util.List;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 
+import org.exoplatform.application.registry.dao.*;
+import org.exoplatform.application.registry.impl.PageServiceImpl;
+import org.exoplatform.application.registry.impl.PageServiceWrapper;
 import org.exoplatform.commons.api.persistence.DataInitializer;
-import org.exoplatform.portal.jdbc.dao.ContainerDAO;
-import org.exoplatform.portal.jdbc.dao.PageDAO;
-import org.exoplatform.portal.jdbc.dao.PermissionDAO;
-import org.exoplatform.portal.jdbc.dao.SiteDAO;
-import org.exoplatform.portal.jdbc.dao.WindowDAO;
 import org.exoplatform.portal.mop.EventType;
 import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteKey;

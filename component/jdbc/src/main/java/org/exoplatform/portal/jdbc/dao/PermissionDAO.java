@@ -20,9 +20,9 @@ package org.exoplatform.portal.jdbc.dao;
 
 import java.util.List;
 
+import org.exoplatform.application.registry.entity.PermissionEntity;
+import org.exoplatform.application.registry.entity.PermissionEntity.TYPE;
 import org.exoplatform.commons.api.persistence.GenericDAO;
-import org.exoplatform.portal.jdbc.entity.PermissionEntity;
-import org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE;
 
 public interface PermissionDAO extends GenericDAO<PermissionEntity, Long> {
   public List<PermissionEntity> getPermissions(String refType, Long refId, TYPE type);

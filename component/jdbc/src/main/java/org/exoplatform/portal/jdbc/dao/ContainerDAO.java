@@ -20,8 +20,8 @@ package org.exoplatform.portal.jdbc.dao;
 
 import java.util.List;
 
+import org.exoplatform.application.registry.entity.ContainerEntity;
 import org.exoplatform.commons.api.persistence.GenericDAO;
-import org.exoplatform.portal.jdbc.entity.ContainerEntity;
 
 public interface ContainerDAO extends GenericDAO<ContainerEntity, Long> {
 

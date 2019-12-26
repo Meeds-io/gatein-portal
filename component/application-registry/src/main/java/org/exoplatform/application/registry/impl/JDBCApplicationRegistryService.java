@@ -16,7 +16,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.portal.jdbc.service;
+package org.exoplatform.application.registry.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,21 +38,17 @@ import org.exoplatform.application.registry.Application;
 import org.exoplatform.application.registry.ApplicationCategoriesPlugins;
 import org.exoplatform.application.registry.ApplicationCategory;
 import org.exoplatform.application.registry.ApplicationRegistryService;
+import org.exoplatform.application.registry.dao.*;
+import org.exoplatform.application.registry.entity.*;
+import org.exoplatform.application.registry.entity.PermissionEntity.TYPE;
+import org.exoplatform.commons.utils.Safe;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.ApplicationType;
-import org.exoplatform.portal.jdbc.dao.ApplicationDAO;
-import org.exoplatform.portal.jdbc.dao.CategoryDAO;
-import org.exoplatform.portal.jdbc.dao.PermissionDAO;
-import org.exoplatform.portal.jdbc.entity.ApplicationEntity;
-import org.exoplatform.portal.jdbc.entity.CategoryEntity;
-import org.exoplatform.portal.jdbc.entity.PermissionEntity;
-import org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
-import org.exoplatform.portal.pom.spi.wsrp.WSRP;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.MembershipEntry;
@@ -188,7 +184,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
 
     ApplicationEntity appEntity = appDAO.find(category.getName(), application.getApplicationName());
     if (appEntity == null && application.getStorageId() != null) {
-      appEntity = appDAO.find(Util.parseLong(application.getStorageId()));
+      appEntity = appDAO.find(Safe.parseLong(application.getStorageId()));
     }
     appEntity = buildAppEntity(appEntity, application);
 
@@ -204,7 +200,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
   }
 
   public void update(Application application) {
-    ApplicationEntity appEntity = appDAO.find(Util.parseLong(application.getStorageId()));
+    ApplicationEntity appEntity = appDAO.find(Safe.parseLong(application.getStorageId()));
     if (appEntity != null) {
       appEntity = buildAppEntity(appEntity, application);
       appDAO.update(appEntity);
@@ -214,7 +210,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
   }
 
   public void remove(Application app) {
-    ApplicationEntity appEntity = appDAO.find(Util.parseLong(app.getStorageId()));
+    ApplicationEntity appEntity = appDAO.find(Safe.parseLong(app.getStorageId()));
     if (appEntity != null) {
       permissionDAO.deletePermissions(ApplicationEntity.class.getName(), appEntity.getId());
       appDAO.delete(appEntity);
@@ -313,7 +309,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
           ApplicationType<?> appType;
           String contentId;
           if (remote) {
-            appType = ApplicationType.WSRP_PORTLET;
+            appType = ApplicationType.PORTLET; // WSRP Portlet, but WSRP is deleted
             contentId = portlet.getContext().getId();
             displayName += REMOTE_DISPLAY_NAME_SUFFIX; // add remote to display
                                                        // name to make it more
@@ -432,10 +428,6 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
       if (chunks.length == 2) {
         return "/" + chunks[0] + "/skin/DefaultSkin/portletIcons/" + chunks[1] + ".png";
       }
-    } else if (type == WSRP.CONTENT_TYPE) {
-      return "/eXoResources/skin/sharedImages/Icon80x80/DefaultPortlet.png";
-    } else if (type == org.exoplatform.portal.pom.spi.gadget.Gadget.CONTENT_TYPE) {
-      return "/" + "eXoGadgets" + "/skin/DefaultSkin/portletIcons/" + contentId + ".png";
     }
     return null;
   }

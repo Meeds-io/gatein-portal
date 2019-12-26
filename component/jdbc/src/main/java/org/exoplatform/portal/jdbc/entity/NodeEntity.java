@@ -24,6 +24,8 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import org.exoplatform.application.registry.entity.NodeEntity;
+import org.exoplatform.application.registry.entity.PageEntity;
 import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;

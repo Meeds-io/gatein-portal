@@ -19,21 +19,12 @@
 
 package org.exoplatform.portal.config;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
+import org.gatein.common.io.IOTools;
 
 import org.exoplatform.component.test.AbstractGateInTest;
-import org.exoplatform.portal.pom.data.BodyData;
-import org.exoplatform.portal.pom.data.BodyType;
-import org.exoplatform.portal.pom.data.ComponentData;
-import org.exoplatform.portal.pom.data.ContainerData;
-import org.exoplatform.portal.pom.data.NavigationKey;
-import org.exoplatform.portal.pom.data.PageData;
-import org.exoplatform.portal.pom.data.PageKey;
-import org.exoplatform.portal.pom.data.PortalData;
-import org.exoplatform.portal.pom.data.PortalKey;
-import org.gatein.common.io.IOTools;
+import org.exoplatform.portal.pom.data.*;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

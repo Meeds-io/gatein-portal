@@ -1,17 +1,17 @@
-package org.exoplatform.portal.jdbc.dao;
+package org.exoplatform.application.registry.dao;
 
 import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityTransaction;
 
+import org.exoplatform.application.registry.entity.PermissionEntity;
+import org.exoplatform.application.registry.entity.PermissionEntity.TYPE;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.portal.jdbc.entity.PermissionEntity;
-import org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE;
 
 @ConfiguredBy({
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})

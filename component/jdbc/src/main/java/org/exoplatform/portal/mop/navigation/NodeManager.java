@@ -22,7 +22,7 @@ package org.exoplatform.portal.mop.navigation;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.exoplatform.portal.jdbc.service.Util;
+import org.exoplatform.application.registry.impl.Util;
 import org.exoplatform.portal.mop.navigation.NodeContext;
 import org.exoplatform.portal.mop.navigation.NodeModel;
 

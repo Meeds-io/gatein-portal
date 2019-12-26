@@ -5,7 +5,9 @@ import java.util.List;
 
 import javax.persistence.TypedQuery;
 
-import org.exoplatform.portal.jdbc.entity.WindowEntity;
+import org.exoplatform.application.registry.dao.AbstractDAO;
+import org.exoplatform.application.registry.dao.WindowDAO;
+import org.exoplatform.application.registry.entity.WindowEntity;
 
 public class WindowDAOImpl extends AbstractDAO<WindowEntity> implements WindowDAO {
 

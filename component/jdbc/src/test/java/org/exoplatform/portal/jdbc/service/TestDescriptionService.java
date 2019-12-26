@@ -26,12 +26,12 @@ import java.util.Map;
 
 import org.gatein.common.util.Tools;
 
+import org.exoplatform.application.registry.dao.DescriptionDAO;
 import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.jdbc.dao.DescriptionDAO;
 import org.exoplatform.portal.mop.Described;
 import org.exoplatform.portal.mop.Described.State;
 import org.exoplatform.portal.mop.description.DescriptionService;

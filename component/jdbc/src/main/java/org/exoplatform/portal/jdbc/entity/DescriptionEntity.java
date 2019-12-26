@@ -38,6 +38,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.exoplatform.application.registry.entity.DescriptionState;
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
 @Entity(name = "GateInDescription")

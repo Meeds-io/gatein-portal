@@ -17,25 +17,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.exoplatform.portal.jdbc.service;
+package org.exoplatform.application.registry.service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.exoplatform.application.registry.Application;
-import org.exoplatform.application.registry.ApplicationCategory;
-import org.exoplatform.application.registry.ApplicationRegistryService;
-import org.exoplatform.commons.chromattic.ChromatticManager;
-import org.exoplatform.component.test.AbstractKernelTest;
-import org.exoplatform.component.test.ConfigurationUnit;
-import org.exoplatform.component.test.ConfiguredBy;
-import org.exoplatform.component.test.ContainerScope;
+import org.exoplatform.application.registry.*;
+import org.exoplatform.component.test.*;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.model.ApplicationType;
-import org.exoplatform.services.organization.Group;
-import org.exoplatform.services.organization.MembershipType;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.*;
 
 @ConfiguredBy({
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
@@ -65,12 +56,10 @@ public class TestApplicationRegistryService extends AbstractKernelTest {
 
   protected OrganizationService        orgService;
 
-  protected ChromatticManager          chromatticManager;
-
   @Override
   protected void setUp() throws Exception {
     PortalContainer portalContainer = PortalContainer.getInstance();
-    service_ = (ApplicationRegistryService) portalContainer.getComponentInstanceOfType(ApplicationRegistryService.class);
+    service_ = portalContainer.getComponentInstanceOfType(ApplicationRegistryService.class);
     begin();
   }
 

@@ -16,7 +16,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.portal.jdbc.entity;
+package org.exoplatform.application.registry.entity;
 
 import java.io.Serializable;
 

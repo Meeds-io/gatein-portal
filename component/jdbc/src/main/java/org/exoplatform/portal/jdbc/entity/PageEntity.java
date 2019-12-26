@@ -27,6 +27,8 @@ import javax.persistence.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import org.exoplatform.application.registry.entity.ComponentEntity;
+import org.exoplatform.application.registry.entity.SiteEntity;
 import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.portal.mop.SiteType;
 

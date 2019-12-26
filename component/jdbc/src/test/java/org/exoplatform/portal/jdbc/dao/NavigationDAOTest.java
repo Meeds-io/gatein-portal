@@ -6,16 +6,16 @@ import java.util.UUID;
 
 import javax.persistence.EntityTransaction;
 
+import org.exoplatform.application.registry.dao.*;
+import org.exoplatform.application.registry.entity.*;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.portal.jdbc.entity.NavigationEntity;
-import org.exoplatform.portal.jdbc.entity.NodeEntity;
-import org.exoplatform.portal.jdbc.entity.SiteEntity;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
+import org.exoplatform.portal.mop.dao.*;
 
 @ConfiguredBy({
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})

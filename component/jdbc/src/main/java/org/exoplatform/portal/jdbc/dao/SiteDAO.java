@@ -21,8 +21,8 @@ package org.exoplatform.portal.jdbc.dao;
 
 import java.util.List;
 
+import org.exoplatform.application.registry.entity.SiteEntity;
 import org.exoplatform.commons.api.persistence.GenericDAO;
-import org.exoplatform.portal.jdbc.entity.SiteEntity;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 
