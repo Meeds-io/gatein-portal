@@ -35,7 +35,7 @@ import org.exoplatform.portal.mop.SiteType;
 @ExoEntity
 @Table(name = "PORTAL_PAGES")
 @NamedQueries({
-    @NamedQuery(name = "PageEntity.deleteByOwner", query = "DELETE GateInPage p WHERE p.id IN (select page.id FROM GateInPage page JOIN page.owner s WHERE s.siteType = :ownerType AND s.name = :ownerId)"),
+    @NamedQuery(name = "PageEntity.deleteByOwner", query = "DELETE GateInPage p WHERE p.owner.id = :ownerId"),
     @NamedQuery(name = "PageEntity.findByKey", query = "SELECT p FROM GateInPage p JOIN p.owner s WHERE s.siteType = :ownerType AND s.name = :ownerId AND p.name = :name") })
 public class PageEntity extends ComponentEntity implements Serializable {
 
@@ -70,7 +70,7 @@ public class PageEntity extends ComponentEntity implements Serializable {
   private String                pageBody         = new JSONArray().toJSONString();
 
   @Transient
-  private List<ComponentEntity> children         = new LinkedList<ComponentEntity>();
+  private List<ComponentEntity> children         = new LinkedList<>();
 
   public Long getId() {
     return id;

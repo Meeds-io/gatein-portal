@@ -173,7 +173,7 @@ public class RDBMSMigrationManager implements Startable {
 
   private void doMigrate(Set<PortalKey> failedSitesToMigrate) {
     int totalSitesToMigrateCount = MigrationContext.getSitesCountToMigrate();
-    for (int siteToMigrateIndex = 0; siteToMigrateIndex < totalSitesToMigrateCount; siteToMigrateIndex++) {
+    for (int siteToMigrateIndex = 1; siteToMigrateIndex <= totalSitesToMigrateCount; siteToMigrateIndex++) {
       if (MigrationContext.isForceStop()) {
         LOG.info("|  \\ FORCE STOPPING MIGRATION. Migrated {} / {} sites, failed = {}",
                  siteToMigrateIndex,

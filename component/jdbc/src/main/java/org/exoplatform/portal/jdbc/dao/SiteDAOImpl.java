@@ -26,7 +26,7 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
   @ExoTransactional
   public void delete(SiteEntity entity) {
     navDAO.deleteByOwner(entity.getSiteType(), entity.getName());
-    pageDAO.deleteByOwner(entity.getSiteType(), entity.getName());
+    pageDAO.deleteByOwner(entity.getId());
     super.delete(entity);
   }
 
@@ -71,7 +71,7 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
 
   @Override
   public List<SiteKey> findSiteKey(SiteType siteType) {
-    List<SiteKey> keys = new ArrayList<SiteKey>();
+    List<SiteKey> keys = new ArrayList<>();
 
     TypedQuery<String> query = getEntityManager().createNamedQuery("SiteEntity.findSiteKey", String.class);
     query.setParameter("siteType", siteType);

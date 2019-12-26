@@ -3,27 +3,17 @@ package org.exoplatform.portal.jdbc.dao;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.*;
+import javax.persistence.criteria.*;
 
-import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.gatein.api.common.Pagination;
 import org.gatein.api.page.PageQuery;
 import org.gatein.api.site.SiteType;
 
+import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.persistence.impl.EntityManagerHolder;
 import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.portal.jdbc.entity.PageEntity;
-import org.exoplatform.portal.jdbc.entity.PageEntity_;
-import org.exoplatform.portal.jdbc.entity.SiteEntity;
-import org.exoplatform.portal.jdbc.entity.SiteEntity_;
+import org.exoplatform.portal.jdbc.entity.*;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.page.PageKey;
 
@@ -46,11 +36,10 @@ public class PageDAOImpl extends AbstractDAO<PageEntity> implements PageDAO {
 
   @Override
   @ExoTransactional
-  public void deleteByOwner(org.exoplatform.portal.mop.SiteType siteType, String siteName) {
+  public void deleteByOwner(long id) {
     Query query = getEntityManager().createNamedQuery("PageEntity.deleteByOwner");
 
-    query.setParameter("ownerType", siteType);
-    query.setParameter("ownerId", siteName);
+    query.setParameter("ownerId", id);
     query.executeUpdate();
   }
 
@@ -67,7 +56,7 @@ public class PageDAOImpl extends AbstractDAO<PageEntity> implements PageDAO {
       }
 
       @Override
-      public PageEntity[] load(int offset, int limit) throws Exception, IllegalArgumentException {
+      public PageEntity[] load(int offset, int limit) throws Exception {
         if (limit < 0) {
           limit = getSize();
         }
@@ -87,7 +76,7 @@ public class PageDAOImpl extends AbstractDAO<PageEntity> implements PageDAO {
     CriteriaQuery<PageEntity> select = criteria.select(pageEntity);
     select.distinct(true);
 
-    List<Predicate> predicates = new LinkedList<Predicate>();
+    List<Predicate> predicates = new LinkedList<>();
 
     if (query.getSiteType() != null) {
       predicates.add(cb.equal(join.get(SiteEntity_.siteType), convertSiteType(query.getSiteType())));

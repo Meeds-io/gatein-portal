@@ -19,10 +19,10 @@ public class PageDAOTest extends AbstractKernelTest {
   
   @Override
   protected void setUp() throws Exception {    
-    begin();
     super.setUp();
     this.pageDAO = getService(PageDAO.class);
     this.siteDAO = getService(SiteDAO.class);
+    begin();
   }
 
   @Override

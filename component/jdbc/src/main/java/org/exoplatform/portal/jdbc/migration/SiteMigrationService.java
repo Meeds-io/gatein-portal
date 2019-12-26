@@ -1,5 +1,7 @@
 package org.exoplatform.portal.jdbc.migration;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.pom.config.POMDataStorage;
@@ -26,12 +28,20 @@ public class SiteMigrationService extends AbstractMigrationService {
     ContainerData portalLayoutContainer = this.migrateContainer(toMigrateSite.getPortalLayout());
 
     PortalData existingSite = modelStorage.getPortalConfig(siteToMigrateKey);
+    String storageId = null;
     if (existingSite != null) {
-      modelStorage.remove(existingSite);
-      MigrationContext.restartTransaction();
+      try {
+        modelStorage.remove(existingSite);
+        existingSite = null; // NOSONAR
+      } catch (Throwable e) {
+        log.warn("Unable to reimport site {}::{}, update it instead", existingSite.getName(), existingSite.getType(), e);
+        storageId = existingSite.getStorageId();
+      } finally {
+        MigrationContext.restartTransaction();
+      }
     }
 
-    PortalData migrate = new PortalData(null,
+    PortalData toMigratePortalSite = new PortalData(storageId,
                                         toMigrateSite.getName(),
                                         toMigrateSite.getType(),
                                         toMigrateSite.getLocale(),
@@ -43,7 +53,11 @@ public class SiteMigrationService extends AbstractMigrationService {
                                         toMigrateSite.getSkin(),
                                         portalLayoutContainer,
                                         toMigrateSite.getRedirects());
-    modelStorage.create(migrate);
+    if (StringUtils.isBlank(storageId)) {
+      modelStorage.create(toMigratePortalSite);
+    } else {
+      modelStorage.save(toMigratePortalSite);
+    }
 
     existingSite = modelStorage.getPortalConfig(siteToMigrateKey);
     broadcastListener(existingSite, existingSite.getKey().toString());
