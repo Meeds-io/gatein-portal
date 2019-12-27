@@ -19,7 +19,6 @@ package org.exoplatform.commons.api.settings;
 import java.io.Serializable;
 
 /**
- * All possible value types are stored in JCR.
  * @param T Type of the setting value object.
  * @LevelAPI Experimental
  */

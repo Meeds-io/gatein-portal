@@ -32,5 +32,21 @@
     <type>org.gatein.common.transaction.JTAUserTransactionLifecycleServiceImpl</type>
   </component>
 
+  <component>
+    <key>org.infinispan.transaction.lookup.TransactionManagerLookup</key>
+    <type>org.exoplatform.services.transaction.infinispan.JBossStandaloneJTAManagerLookup</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.transaction.TransactionService</key>
+    <type>org.exoplatform.services.transaction.infinispan.JBossTransactionsService</type>
+    <init-params>
+      <value-param>
+        <name>timeout</name>
+        <value>300</value>
+      </value-param>
+    </init-params>
+  </component>
+
 </configuration>
 
