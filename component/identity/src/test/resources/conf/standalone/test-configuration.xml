@@ -162,13 +162,11 @@
           <name>factory</name>
           <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
         </value-param>
-        <properties-param>
+        <properties-param profiles="hsqldb">
           <name>ref-addresses</name>
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
           <property name="url" value="jdbc:hsqldb:file:${gatein.test.tmp.dir}/db/data/jdbcidm"/>
-          <property name="username" value="sa"/>
-          <property name="password" value=""/>
         </properties-param>
         <properties-param profiles="mysql">
           <name>ref-addresses</name>
@@ -214,8 +212,6 @@
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
           <property name="url" value="jdbc:hsqldb:mem:db1" />
-          <property name="username" value="sa" />
-          <property name="password" value="" />
         </properties-param>
       </init-params>
     </component-plugin>

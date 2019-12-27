@@ -773,8 +773,6 @@
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
           <property name="url" value="jdbc:hsqldb:mem:db/exojpa" />
-          <property name="username" value="sa" />
-          <property name="password" value="" />
         </properties-param>
       </init-params>
     </component-plugin>
@@ -803,8 +801,6 @@
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
           <property name='url' value='jdbc:hsqldb:mem:db/jdbcexo'/>
-          <property name="username" value="sa"/>
-          <property name="password" value=""/>
         </properties-param>
       </init-params>
     </component-plugin>
@@ -833,8 +829,6 @@
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
           <property name="url" value="jdbc:hsqldb:mem:db/jdbcidm"/>
-          <property name="username" value="sa"/>
-          <property name="password" value=""/>
         </properties-param>
       </init-params>
     </component-plugin>

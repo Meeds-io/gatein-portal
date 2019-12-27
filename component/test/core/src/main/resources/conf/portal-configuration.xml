@@ -60,8 +60,6 @@
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
           <property name="url" value="jdbc:hsqldb:file:${gatein.test.tmp.dir}/db/data/jdbcjcr"/>
-          <property name="username" value="sa"/>
-          <property name="password" value=""/>
         </properties-param>
         <properties-param profiles="mysql">
           <name>ref-addresses</name>
