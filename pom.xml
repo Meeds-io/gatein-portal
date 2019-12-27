@@ -856,6 +856,10 @@
             <argLine>-Xms512m -Xmx512m</argLine>
             <systemProperties>
               <property>
+                <name>exo.files.storage.dir</name>
+                <value>target/files</value>
+              </property>
+              <property>
                 <name>log4j.configuration</name>
                 <value>gatein-log4j.properties</value>
               </property>
