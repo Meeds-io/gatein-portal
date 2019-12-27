@@ -23,6 +23,7 @@
 
 # Maven 
 target/
+bin/
 pom.xml.versionsBackup
 
 # IntelliJ project files 

@@ -17,23 +17,75 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.exoplatform.portal.mop.navigation;
+package org.exoplatform.portal.mop.jdbc.service;
 
-import java.util.Iterator;
+import java.util.*;
 
 import org.exoplatform.component.test.*;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.*;
 import org.exoplatform.portal.mop.navigation.*;
+import org.exoplatform.portal.pom.data.*;
 
 @ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.test.jcr-configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/portal/mop/navigation/configuration.xml")})
-public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationService {
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/portal/mop/navigation/configuration.xml") })
+public class TestJDBCNavigationServiceUpdate extends AbstractKernelTest {
+
+  /** . */
+  protected NavigationService  service;
+
+  private ModelDataStorage modelStorage;
+
+  protected void setUp() throws Exception {
+    begin();
+    this.service = getContainer().getComponentInstanceOfType(NavigationService.class);
+    this.modelStorage = getContainer().getComponentInstanceOfType(ModelDataStorage.class);
+  }
+
+  @Override
+  protected void tearDown() throws Exception {
+    end();
+  }
+
+  protected void createSite(SiteType type, String siteName) throws Exception {
+    ContainerData container = new ContainerData(null,
+                                                "testcontainer_" + siteName,
+                                                "",
+                                                "",
+                                                "",
+                                                "",
+                                                "",
+                                                "",
+                                                "",
+                                                "",
+                                                Collections.emptyList(),
+                                                Collections.emptyList(),
+                                                Collections.emptyList(),
+                                                Collections.emptyList());
+    PortalData portal = new PortalData(null,
+                                       siteName,
+                                       type.getName(),
+                                       null,
+                                       null,
+                                       null,
+                                       new ArrayList<>(),
+                                       null,
+                                       null,
+                                       null,
+                                       container,
+                                       null);
+    this.modelStorage.create(portal);
+
+    restartTransaction();
+  }
+
+  protected void createNavigation(SiteType siteType, String siteName) throws Exception {
+    createSite(siteType, siteName);
+    service.saveNavigation(new NavigationContext(new SiteKey(siteType, siteName), new NavigationState(1)));
+  }
 
   public void testNoop() throws Exception {
     createNavigation(SiteType.PORTAL, "update_no_op");
@@ -46,7 +98,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     NodeContext<Node> root = service.loadNode(Node.MODEL, navigation, Scope.ALL, null);
     Iterator<NodeChange<Node>> it = root.getNode().update(service, null);
@@ -56,7 +108,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
   public void testHasChanges() throws Exception {
     createNavigation(SiteType.PORTAL, "update_cannot_save");
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext navigation = service.loadNavigation(SiteKey.portal("update_cannot_save"));
@@ -87,7 +139,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     createNavigation(SiteType.PORTAL, "update_add_first");
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext navigation = service.loadNavigation(SiteKey.portal("update_add_first"));
@@ -98,7 +150,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     root1.getNode().update(service, null);
@@ -116,7 +168,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     Node a = root1.getChild("a");
@@ -126,7 +178,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     Iterator<NodeChange<Node>> changes = root1.update(service, null);
@@ -148,7 +200,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     NodeContext<Node> root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null);
     assertEquals(1, root1.getNodeSize());
@@ -158,7 +210,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     Iterator<NodeChange<Node>> changes = root1.getNode().update(service, null);
@@ -178,7 +230,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     NodeContext<Node> root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null);
     assertEquals(2, root1.getNodeSize());
@@ -190,7 +242,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     Iterator<NodeChange<Node>> changes = root1.getNode().update(service, null);
@@ -208,7 +260,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     createNavigation(SiteType.PORTAL, "update_add_with_same_name");
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext navigation = service.loadNavigation(SiteKey.portal("update_add_with_same_name"));
@@ -218,7 +270,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.saveNode(root1.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
@@ -241,7 +293,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     createNavigation(SiteType.PORTAL, "update_complex");
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext navigation = service.loadNavigation(SiteKey.portal("update_complex"));
@@ -257,7 +309,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.saveNode(root1.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
@@ -281,7 +333,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     Iterator<NodeChange<Node>> changes = root1.update(service, null);
@@ -323,7 +375,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     rootContext1.add(null, "foo");
     service.saveNode(rootContext1, null);
 
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.CHILDREN, null).getNode();
     String foo1Id = root1.getChild("foo").getId();
@@ -335,7 +387,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     foo.setState(new NodeState.Builder().label("foo2").build());
     service.saveNode(root2.getContext(), null);
     String foo2Id = foo.getId();
-    end();
+    restartTransaction();
 
     //
     Iterator<NodeChange<Node>> changes = root1.update(service, null);
@@ -358,7 +410,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     rootContext1.add(null, "foo");
     service.saveNode(rootContext1, null);
 
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.CHILDREN, null).getNode();
 
@@ -366,7 +418,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     Node root2 = service.loadNode(Node.MODEL, navigation, Scope.CHILDREN, null).getNode();
     root2.getChild("foo").setName("bar");
     service.saveNode(root2.getContext(), null);
-    end();
+    restartTransaction();
 
     //
     Iterator<NodeChange<Node>> it = root1.update(service, null);
@@ -384,7 +436,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     rootContext1.add(null, "foo").add(null, "bar");
     service.saveNode(rootContext1, null);
 
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.CHILDREN, null).getNode();
     Node root2 = service.loadNode(Node.MODEL, navigation, Scope.CHILDREN, null).getNode();
@@ -394,7 +446,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     Node root = service.loadNode(Node.MODEL, navigation, Scope.CHILDREN, null).getNode();
     root.getChild("foo").setState(new NodeState.Builder().label("foo").build());
     service.saveNode(root.getContext(), null);
-    end();
+    restartTransaction();
 
     //
     Iterator<NodeChange<Node>> changes = root1.update(service, Scope.GRANDCHILDREN);
@@ -433,17 +485,17 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     rootContext1.add(null, "foo").add(null, "bar");
     service.saveNode(rootContext1, null);
 
-    end();
+    restartTransaction();
 
     Node root = service.loadNode(Node.MODEL, navigation, Scope.CHILDREN, null).getNode();
     Node foo = root.getChild("foo");
-    end();
+    restartTransaction();
 
     //
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root1.getChild("foo").removeChild("bar");
     service.saveNode(root1.getContext(), null);
-    end();
+    restartTransaction();
 
     //
     foo.update(service, Scope.CHILDREN);
@@ -461,17 +513,17 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     rootContext1.add(null, "foo").add(null, "bar");
     service.saveNode(rootContext1, null);
 
-    end();
+    restartTransaction();
 
     Node root = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     Node bar = root.getChild("foo").getChild("bar");
-    end();
+    restartTransaction();
 
     //
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root1.getChild("foo").removeChild("bar");
     service.saveNode(root1.getContext(), null);
-    end();
+    restartTransaction();
 
     //
     Iterator<NodeChange<Node>> changes = bar.update(service, Scope.CHILDREN);
@@ -489,7 +541,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     foo.add(null, "bar2");
     service.saveNode(rootContext1, null);
 
-    end();
+    restartTransaction();
 
     Node root = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
 
@@ -509,22 +561,23 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     rootContext1.add(null, "foo").add(null, "bar");
     service.saveNode(rootContext1, null);
 
-    end();
+    restartTransaction();
 
     // Browser 1 : Expand the "foo" node
     Node root = service.loadNode(Node.MODEL, navigation, Scope.CHILDREN, null).getNode();
     Node foo = root.getChild("foo");
     // If this line is commented, the test is passed
     service.updateNode(foo.getContext(), Scope.CHILDREN, null);
-    end();
+    restartTransaction();
 
     // Browser 2: Change the "foo" node
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root1.getChild("foo").removeChild("bar");
     service.saveNode(root1.getContext(), null);
-    end();
+    restartTransaction();
 
-    // Browser 1: Try to expand the "foo" node 2 times ---> NPE after the 2nd updateNode method
+    // Browser 1: Try to expand the "foo" node 2 times ---> NPE after the 2nd
+    // updateNode method
     service.updateNode(foo.getContext(), Scope.CHILDREN, null);
     service.updateNode(foo.getContext(), Scope.CHILDREN, null);
   }
@@ -538,7 +591,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     NodeContext<Node> root = service.loadNode(Node.MODEL, navigation, Scope.ALL, null);
     Node a = root.getNode("a");
@@ -550,13 +603,14 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     root1.getNode("c").addChild(root1.getNode("a").getChild("b"));
     service.saveNode(root1.getNode().getContext(), null);
     //
-    end();
+    restartTransaction();
 
     // Browser 1: need NodeChange event to update UI
     NodeChangeQueue<NodeContext<Node>> queue = new NodeChangeQueue<NodeContext<Node>>();
     // If update "root1" --> NodeChange.Moved --> ok
     // If update "b" --> NodeChange.Add --> ok
-    // update "a" --> no NodeChange, we need an event here (NodeChange.Remove) so UI can be updated
+    // update "a" --> no NodeChange, we need an event here (NodeChange.Remove)
+    // so UI can be updated
     service.updateNode(a.getContext(), Scope.CHILDREN, queue);
     Iterator<NodeChange<NodeContext<Node>>> changes = queue.iterator();
     assertTrue(changes.hasNext());
@@ -571,7 +625,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.CHILDREN, null).getNode();
     Node a = root1.getChild("a");
@@ -585,7 +639,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     service.updateNode(a.getContext(), Scope.CHILDREN, null);
@@ -605,7 +659,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     rootContext1.add(null, "bar");
     service.saveNode(rootContext1, null);
 
-    end();
+    restartTransaction();
 
     Node root = service.loadNode(Node.MODEL, navigation, Scope.CHILDREN, null).getNode();
     Node foo = root.getChild("foo");
@@ -624,7 +678,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     createNavigation(SiteType.PORTAL, "update_removed_navigation");
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext navigation = service.loadNavigation(SiteKey.portal("update_removed_navigation"));
@@ -632,7 +686,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractTestNavigationServi
     service.destroyNavigation(navigation);
 
     //
-    end();
+    restartTransaction();
 
     //
     try {
