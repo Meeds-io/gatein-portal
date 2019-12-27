@@ -38,34 +38,38 @@ public class MigrationFilter implements Filter {
     String portalPath = httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
     Router router = controller.getRouter();
     if (router != null) {
-      Iterator<Map<QualifiedName, String>> matcher = router.matcher(portalPath, httpRequest.getParameterMap());
-      WebRequestHandler handler = null;
-      while (handler == null && matcher.hasNext()) {
-        Map<QualifiedName, String> parameters = matcher.next();
-        String handlerKey = parameters.get(WebAppController.HANDLER_PARAM);
-        if (handlerKey != null) {
-          handler = controller.getHandler(handlerKey);
-          if (handler instanceof PortalRequestHandler) {
-            String requestSiteType = parameters.get(PortalRequestHandler.REQUEST_SITE_TYPE);
-            String requestSiteName = parameters.get(PortalRequestHandler.REQUEST_SITE_NAME);
+      try {
+        Iterator<Map<QualifiedName, String>> matcher = router.matcher(portalPath, httpRequest.getParameterMap());
+        WebRequestHandler handler = null;
+        while (handler == null && matcher.hasNext()) {
+          Map<QualifiedName, String> parameters = matcher.next();
+          String handlerKey = parameters.get(WebAppController.HANDLER_PARAM);
+          if (handlerKey != null) {
+            handler = controller.getHandler(handlerKey);
+            if (handler instanceof PortalRequestHandler) {
+              String requestSiteType = parameters.get(PortalRequestHandler.REQUEST_SITE_TYPE);
+              String requestSiteName = parameters.get(PortalRequestHandler.REQUEST_SITE_NAME);
 
-            PortalKey portalKey = new PortalKey(requestSiteType, requestSiteName);
-            if (!MigrationContext.isMigrated(portalKey)) {
-              MigrationContext.addPriorizedSitesToMigrate(portalKey);
-              try {
-                int i = 0;
-                do {
-                  LOG.info("Wait until site {} / {} migration finishes", requestSiteType, requestSiteName);
-                  Thread.sleep(500);
-                  i++;
-                } while (!MigrationContext.isMigrated(portalKey) && i < MAX_WAIT_ATTEMPTS);
-              } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
+              PortalKey portalKey = new PortalKey(requestSiteType, requestSiteName);
+              if (!MigrationContext.isMigrated(portalKey)) {
+                MigrationContext.addPriorizedSitesToMigrate(portalKey);
+                try {
+                  int i = 0;
+                  do {
+                    LOG.info("Wait until site {} / {} migration finishes", requestSiteType, requestSiteName);
+                    Thread.sleep(500);
+                    i++;
+                  } while (!MigrationContext.isMigrated(portalKey) && i < MAX_WAIT_ATTEMPTS);
+                } catch (InterruptedException e) {
+                  Thread.currentThread().interrupt();
+                  return;
+                }
               }
             }
           }
         }
+      } catch (Exception e) {
+        LOG.warn("Error while checking Portal RDBMS migration status when a user requests a page", e);
       }
     }
     chain.doFilter(request, response);

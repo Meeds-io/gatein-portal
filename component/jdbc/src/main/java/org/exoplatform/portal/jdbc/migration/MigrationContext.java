@@ -58,7 +58,8 @@ public final class MigrationContext {
   }
 
   public static boolean isMigrated(PortalKey siteToMigrateKey) {
-    return !getSitesToMigrate().contains(siteToMigrateKey)
+    return sitesToMigrate == null
+        || !sitesToMigrate.contains(siteToMigrateKey)
         || isDone()
         || (isMigrated(siteToMigrateKey, PortalEntityType.NAVIGATION) && isMigrated(siteToMigrateKey, PortalEntityType.PAGE)
             && isMigrated(siteToMigrateKey, PortalEntityType.SITE));
