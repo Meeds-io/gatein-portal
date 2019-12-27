@@ -159,7 +159,7 @@
           <name>factory</name>
           <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
         </value-param>
-        <properties-param profiles="hsqldb">
+        <properties-param>
           <name>ref-addresses</name>
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>

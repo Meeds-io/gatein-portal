@@ -162,7 +162,7 @@
           <name>factory</name>
           <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
         </value-param>
-        <properties-param profiles="hsqldb">
+        <properties-param>
           <name>ref-addresses</name>
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
@@ -481,7 +481,6 @@
     </component-plugin>
   </external-component-plugins>
 
-  <!--<import>jar:/conf/exo.portal.component.test.jcr-configuration.xml</import>-->
   <!--<import>jar:/conf/exo.portal.component.identity-configuration.xml</import>-->
   <!--<import>jar:/org/exoplatform/services/organization/TestOrganization-configuration.xml</import>-->
 
