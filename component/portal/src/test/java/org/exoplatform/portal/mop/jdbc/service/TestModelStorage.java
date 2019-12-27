@@ -13,10 +13,11 @@ import org.exoplatform.portal.pom.data.ModelChange;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
 @ConfiguredBy({
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.test.jcr-configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/portal/mop/navigation/configuration.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/portal-configuration.xml"),
-
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/portal/config/conf/configuration.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/test.mop.portal.configuration.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml") })
@@ -87,7 +88,7 @@ public class TestModelStorage extends TestDataStorage {
   }
 
   public void testPageMerge() throws Exception {
-    Page page = storage_.getPage("portal::test::test4");
+    Page page = storage_.getPage("portal::test::test5");
 
     String app1Id = page.getChildren().get(0).getStorageId();
     Container container = (Container) page.getChildren().get(1);
@@ -106,7 +107,7 @@ public class TestModelStorage extends TestDataStorage {
 
     // Check it is existing at the correct location
     // and also that the ids are still the same
-    page = storage_.getPage("portal::test::test4");
+    page = storage_.getPage("portal::test::test5");
     assertEquals(2, page.getChildren().size());
     // assertEquals(PortletState.create("portal#test:/web/BannerPortlet/banner"),
     // ((Application)page.getChildren().get(0)).getInstanceState());
@@ -130,7 +131,7 @@ public class TestModelStorage extends TestDataStorage {
 
     // Check it is removed
     // and also that the ids are still the same
-    page = storage_.getPage("portal::test::test4");
+    page = storage_.getPage("portal::test::test5");
     assertEquals(2, page.getChildren().size());
     // assertEquals(PortletState.create("portal#test:/web/BannerPortlet/banner"),
     // ((Application)page.getChildren().get(0)).getInstanceState());
@@ -144,15 +145,6 @@ public class TestModelStorage extends TestDataStorage {
     // assertEquals(PortletState.create("portal#test:/web/FooterPortlet/footer"),
     // ((Application)container.getChildren().get(1)).getInstanceState());
     assertEquals(app3Id, container.getChildren().get(1).getStorageId());
-  }
-
-  /**
-   * As we drop support API to access/modify MOP mixin, so these test isn't need.
-   * @throws Exception
-   */
-  public void testAccessMixin() throws Exception {
-  }
-  public void testModifyMixin() throws Exception {
   }
 
   public void testGetAllPortalNames() throws Exception {
@@ -225,10 +217,6 @@ public class TestModelStorage extends TestDataStorage {
         && pConfig.getPortalLayout().getChildren().size() == 0);
   }
   
-  // We need to investigate why when the pref is null we need to replace it with
-  // empty string
-  // in chromattic, it's done by
-  // org.exoplatform.portal.pom.spi.portlet.PortletState
   public void testNullPreferenceValue() throws Exception {
     Page page = storage_.getPage("portal::test::test4");
     Application<Portlet> app = (Application<Portlet>) page.getChildren().get(0);

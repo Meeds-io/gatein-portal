@@ -40,8 +40,7 @@ public class WindowDAOTest extends AbstractKernelTest {
   public void testCreateContainer() {
     WindowEntity entity = createInstance("content1", AppType.PORTLET);
     windowDAO.create(entity);
-    end();
-    begin();
+    restartTransaction();
     
     WindowEntity result = windowDAO.find(entity.getId());
     assertNotNull(result);
@@ -53,8 +52,7 @@ public class WindowDAOTest extends AbstractKernelTest {
     windowDAO.create(entity1);
     WindowEntity entity2 = createInstance("content2", AppType.PORTLET);
     windowDAO.create(entity2);
-    end();
-    begin();
+    restartTransaction();
     
     List<WindowEntity> results = windowDAO.findByIds(Arrays.asList(entity1.getId(), entity2.getId()));
     assertEquals(2, results.size());

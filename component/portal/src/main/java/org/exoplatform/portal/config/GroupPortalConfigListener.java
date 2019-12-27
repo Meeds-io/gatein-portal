@@ -90,7 +90,6 @@ public class GroupPortalConfigListener extends GroupEventListener {
                 groupId = "/" + group.getGroupName();
             }
 
-            // Bug in JCR org service implementation
             if ("/administrators".equals(groupId)) {
                 groupId = "/platform/administrators";
             } else if ("/users".equals(groupId)) {

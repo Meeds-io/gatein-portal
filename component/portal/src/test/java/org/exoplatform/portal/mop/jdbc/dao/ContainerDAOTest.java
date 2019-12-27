@@ -39,8 +39,7 @@ public class ContainerDAOTest extends AbstractKernelTest {
   public void testCreateContainer() {
     ContainerEntity entity = createInstance("testContainer", "testDesc");
     containerDAO.create(entity);
-    end();
-    begin();
+    restartTransaction();
     
     ContainerEntity result = containerDAO.find(entity.getId());
     assertNotNull(result);
@@ -52,8 +51,7 @@ public class ContainerDAOTest extends AbstractKernelTest {
     containerDAO.create(entity1);
     ContainerEntity entity2 = createInstance("testContainer2", "testDesc2");
     containerDAO.create(entity2);    
-    end();
-    begin();
+    restartTransaction();
     
     List<ContainerEntity> results = containerDAO.findByIds(Arrays.asList(entity1.getId(), entity2.getId()));
     assertEquals(2, results.size());

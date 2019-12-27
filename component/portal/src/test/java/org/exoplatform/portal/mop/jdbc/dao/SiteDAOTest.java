@@ -29,8 +29,7 @@ public class SiteDAOTest extends AbstractKernelTest {
   public void testCreate() {
     SiteEntity siteEntity = creatSiteEntity();
     siteDAO.create(siteEntity);
-    end();
-    begin();
+    restartTransaction();
     
     SiteEntity result = siteDAO.find(siteEntity.getId());
     assertNotNull(result);
@@ -42,8 +41,7 @@ public class SiteDAOTest extends AbstractKernelTest {
   public void testFind() {
     SiteEntity siteEntity = creatSiteEntity();
     siteDAO.create(siteEntity);
-    end();
-    begin();
+    restartTransaction();
     
     SiteEntity result = siteDAO.findByKey(new SiteKey(siteEntity.getSiteType(), siteEntity.getName()));
     assertNotNull(result);

@@ -204,11 +204,15 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public <S> S load(ApplicationState<S> state, ApplicationType<S> type) throws Exception {
     if (state instanceof TransientApplicationState) {
       TransientApplicationState<S> transientState = (TransientApplicationState<S>) state;
       S prefs = transientState.getContentState();
-      return prefs != null ? prefs : null;
+      if (prefs == null && type.getContentType().getStateClass().equals(Portlet.class)) {
+        return (S) new Portlet();
+      }
+      return prefs;
     }
 
     Long id;
@@ -222,6 +226,8 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       byte[] customization = window.getCustomization();
       if (customization != null) {
         return (S) IOTools.unserialize(window.getCustomization());
+      } else if (type.getContentType().getStateClass().equals(Portlet.class)) {
+        return (S) new Portlet();
       } else {
         return null;
       }
@@ -517,24 +523,22 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
           // nothing to update on body data
           dstChild = containerDAO.find(srcChildId);
         } else {
-          log.warn("this layout component type is not supported: {}", srcChild);
+          throw new StaleModelException("this layout component type is not supported: " + srcChild);
         }
       }
 
       if (dstChild == null) { // create new
         if (srcChild instanceof ContainerData) {
           dstChild = buildContainerEntity(null, (ContainerData) srcChild);
-          containerDAO.create((ContainerEntity) dstChild);
+          dstChild = containerDAO.create((ContainerEntity) dstChild);
         } else if (srcChild instanceof ApplicationData) {
           dstChild = buildWindowEntity(null, (ApplicationData) srcChild);
-          windowDAO.create((WindowEntity) dstChild);
+          dstChild = windowDAO.create((WindowEntity) dstChild);
         } else if (srcChild instanceof BodyData) {
           dstChild = buildContainerEntity((BodyData) srcChild);
-          containerDAO.create((ContainerEntity) dstChild);
+          dstChild = containerDAO.create((ContainerEntity) dstChild);
         } else {
-          log.warn("this layout component type is not supported: {}", srcChild);
-          // throw new StaleModelException("Was not expecting child " +
-          // srcChild);
+          throw new StaleModelException("Was not expecting child " + srcChild);
         }
       }
 
@@ -821,7 +825,10 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     return results;
   }
 
-  private void savePermissions(long id, PortalData config) {
+  private void savePermissions(Long id, PortalData config) {
+    if (id == null) {
+      throw new IllegalArgumentException("id is null");
+    }
     permissionDAO.savePermissions(SiteEntity.class.getName(),
                                   id,
                                   PermissionEntity.TYPE.ACCESS,
@@ -832,7 +839,10 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
                                   Arrays.asList(config.getEditPermission()));
   }
 
-  private void savePermissions(long id, ComponentData srcChild) {
+  private void savePermissions(Long id, ComponentData srcChild) {
+    if (id == null) {
+      throw new IllegalArgumentException("id is null");
+    }
     List<String> access = null;
     String typeName = srcChild.getClass().getName();
     if (srcChild instanceof ContainerData) {
@@ -866,6 +876,12 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     entity.setName(config.getName());
     entity.setSiteType(SiteType.valueOf(config.getKey().getType().toUpperCase()));
     entity.setSkin(config.getSkin());
+    String propertiesString = "{}";
+    Map<String, String> properties = config.getProperties();
+    if (properties != null) {
+      propertiesString = new JSONObject(properties).toJSONString();
+    }
+    entity.setProperties(propertiesString);
 
     List<ComponentData> children = new ArrayList<ComponentData>();
     children.add(config.getPortalLayout());
@@ -891,7 +907,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     JSONArray siteBody = (JSONArray) parser.parse(entity.getSiteBody());
     List<ComponentData> children = buildChildren(siteBody);
     ContainerData rootContainer = null;
-    if (children.size() > 0) {
+    if (!children.isEmpty()) {
       rootContainer = (ContainerData) children.get(0);
     } else {
       throw new IllegalStateException("site doens't has root container layout");

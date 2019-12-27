@@ -71,8 +71,7 @@ public class TestPageService extends AbstractKernelTest {
     src.setPageBody(((JSONArray)src.toJSON().get("children")).toJSONString());
     
     pageDAO.create(src);
-    end();
-    begin();
+    restartTransaction();
     
     PageKey dstKey = new PageKey(SiteKey.portal("targetPortal"), "targetName");
     pageService.clone(srcKey, dstKey);

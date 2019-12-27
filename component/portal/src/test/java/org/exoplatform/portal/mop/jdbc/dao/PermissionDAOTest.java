@@ -29,8 +29,7 @@ public class PermissionDAOTest extends AbstractKernelTest {
   public void testCreate() {
     PermissionEntity per1 = new PermissionEntity("type1", 1l, "per1", TYPE.ACCESS);
     permissionDAO.create(per1);
-    end();
-    begin();
+    restartTransaction();
     
     PermissionEntity expected = permissionDAO.find(per1.getId());
     assertNotNull(expected);
@@ -42,8 +41,7 @@ public class PermissionDAOTest extends AbstractKernelTest {
     permissionDAO.create(per1);
     PermissionEntity per2 = new PermissionEntity("type2", 2L, "per2", TYPE.EDIT);
     permissionDAO.create(per2);
-    end();
-    begin();
+    restartTransaction();
     
     List<PermissionEntity> result1 = permissionDAO.getPermissions("type1", 1L, TYPE.ACCESS);
     assertEquals(1, result1.size());
@@ -61,8 +59,7 @@ public class PermissionDAOTest extends AbstractKernelTest {
     permissionDAO.create(per2);
     PermissionEntity per3 = new PermissionEntity("type3", 3L, "per3", TYPE.EDIT);
     permissionDAO.create(per3);
-    end();
-    begin();
+    restartTransaction();
     
     int deleted = permissionDAO.deletePermissions("type1", 1L);
     assertEquals(2, deleted);
@@ -76,8 +73,7 @@ public class PermissionDAOTest extends AbstractKernelTest {
     permissionDAO.create(per2);
     PermissionEntity per3 = new PermissionEntity("type1", 1L, "per3", TYPE.ACCESS);
     permissionDAO.create(per3);
-    end();
-    begin();
+    restartTransaction();
     
     List<PermissionEntity> results = permissionDAO.savePermissions("type1", 1L, TYPE.ACCESS, Arrays.asList("per1", "per4"));
     assertEquals(2, results.size());

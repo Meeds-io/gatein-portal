@@ -33,8 +33,7 @@ public class PageDAOTest extends AbstractKernelTest {
   public void testCreatePage() {
     PageEntity entity = createInstance("portal::b::c", "testCreatePage", "create page description");
     pageDAO.create(entity);
-    end();
-    begin();
+    restartTransaction();
     
     PageEntity result = pageDAO.find(entity.getId());
     assertNotNull(result);
@@ -45,8 +44,7 @@ public class PageDAOTest extends AbstractKernelTest {
     
     PageEntity entity = createInstance("portal::b::c", "testPage", null);
     pageDAO.create(entity);
-    end();
-    begin();
+    restartTransaction();
     
     PageEntity result = pageDAO.findByKey(PageKey.parse("portal::b::c"));
     assertNotNull(result);
@@ -58,8 +56,7 @@ public class PageDAOTest extends AbstractKernelTest {
     pageDAO.create(page1);    
     PageEntity page2 = createInstance("portal::b::c2", "Efg Hik", null);
     pageDAO.create(page2);    
-    end();
-    begin();
+    restartTransaction();
         
     PageQuery.Builder query1 = new PageQuery.Builder();    
     query1.withSiteType(org.gatein.api.site.SiteType.SITE).withSiteName("b").withDisplayName("ef");

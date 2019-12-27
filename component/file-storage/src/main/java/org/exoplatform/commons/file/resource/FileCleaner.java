@@ -42,7 +42,7 @@ public class FileCleaner extends WorkerThread {
   protected static final long                                       DEFAULT_TIMEOUT    = 30000;
 
   protected static final Log                                        LOG                =
-                                                                        ExoLogger.getLogger("exo.jcr.component.core.FileCleaner");
+                                                                        ExoLogger.getLogger(FileCleaner.class.getName());
 
   /**
    * In-share files database.
@@ -160,7 +160,7 @@ public class FileCleaner extends WorkerThread {
   }
 
   /**
-   * @see org.exoplatform.services.jcr.impl.proccess.WorkerThread#callPeriodically()
+   * @see WorkerThread#callPeriodically()
    */
   @Override
   protected void callPeriodically() throws Exception {

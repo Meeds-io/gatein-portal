@@ -137,8 +137,12 @@ public class PageServiceImpl implements PageService {
       pageDAO.delete(page);
       return true;
     } else {
-      return false;
+      SiteEntity site = siteDAO.findByKey(key.getSite());
+      if (site == null) {
+        throw new PageServiceException(PageError.NO_SITE);
+      }
     }
+    return false;
   }
 
   private void deleteChildren(JSONArray children) {

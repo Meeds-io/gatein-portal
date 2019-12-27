@@ -29,7 +29,6 @@ import org.exoplatform.portal.pom.data.ContainerData;
 import org.exoplatform.portal.pom.data.PortalData;
 
 @ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.test.jcr-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
@@ -46,6 +45,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
       PortalContainer container = PortalContainer.getInstance();
       this.service = (NavigationService) container.getComponentInstanceOfType(NavigationService.class);
       this.modelStorage = container.getComponentInstanceOfType(JDBCModelStorageImpl.class);
+      begin();
   }
 
   protected void createSite(SiteType type, String siteName) throws Exception {
@@ -55,10 +55,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
               null, new ArrayList<>(), null, null, null, container, null);
       this.modelStorage.create(portal);
 
-      NavigationContext nav = new NavigationContext(type.key(siteName), new NavigationState(1));
-      this.service.saveNavigation(nav);
-
-      end();
+      restartTransaction();
   }
 
   protected void createNavigation(SiteType siteType, String siteName) throws Exception {
@@ -78,7 +75,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     createSite(SiteType.PORTAL, "save_navigation");
 
     //
-    end();
+    restartTransaction();
 
     //
     nav = service.loadNavigation(SiteKey.portal("save_navigation"));
@@ -99,7 +96,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     assertEquals(5, nav.getData().getState().getPriority().intValue());
 
     //
-    end();
+    restartTransaction();
 
     //
     nav = service.loadNavigation(SiteKey.portal("save_navigation"));
@@ -122,7 +119,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     //
     nav = service.loadNavigation(SiteKey.portal("destroy_navigation"));
@@ -147,7 +144,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     assertNull(nav);
 
     //
-    end();
+    restartTransaction();
 
     //
     nav = service.loadNavigation(SiteKey.portal("destroy_navigation"));
@@ -158,7 +155,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     createNavigation(SiteType.PORTAL, "add_child");
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("add_child"));
@@ -196,7 +193,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     root1.assertConsistent();
 
     //
-    end();
+    restartTransaction();
 
     //
     Node root2 = service.loadNode(Node.MODEL, nav, Scope.CHILDREN, null).getNode();
@@ -217,7 +214,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("remove_child"));
@@ -250,7 +247,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     root1.assertConsistent();
 
     //
-    end();
+    restartTransaction();
 
     //
     Node root2 = service.loadNode(Node.MODEL, nav, Scope.CHILDREN, null).getNode();
@@ -266,7 +263,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     NavigationContext navigation = service.loadNavigation(SiteKey.portal("remove_transient_child"));
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("remove_transient_child"));
@@ -285,7 +282,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     root1.assertConsistent();
 
     //
-    end();
+    restartTransaction();
 
     //
     Node root2 = service.loadNode(Node.MODEL, nav, Scope.CHILDREN, null).getNode();
@@ -305,7 +302,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("rename"));
@@ -340,7 +337,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     root1.assertConsistent();
 
     //
-    end();
+    restartTransaction();
 
     //
     nav = service.loadNavigation(SiteKey.portal("rename"));
@@ -349,7 +346,6 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     assertNotNull(a2);
     // assertEquals(0, a2.getContext().getIndex());
 
-    // Does not pass randomly because of JCR bugs
     // root1.assertEquals(root2);
   }
 
@@ -363,7 +359,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("reorder_child"));
@@ -401,7 +397,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root1.getContext(), null);
 
     //
-    end();
+    restartTransaction();
     root1 = service.loadNode(Node.MODEL, nav, Scope.CHILDREN, null).getNode();
     root1.assertConsistent();
   }
@@ -415,7 +411,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("move_child"));
@@ -427,7 +423,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root1.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     Node root2 = service.loadNode(Node.MODEL, nav, Scope.ALL, null).getNode();
@@ -452,7 +448,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("save_move_after_1"));
@@ -472,7 +468,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     assertSame(c, root.getChild(2));
 
     //
-    end();
+    restartTransaction();
 
     //
     root = service.loadNode(Node.MODEL, nav, Scope.ALL, null).getNode();
@@ -494,7 +490,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("save_move_after_2"));
@@ -514,7 +510,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     assertSame(c, root.getChild(2));
 
     //
-    end();
+    restartTransaction();
 
     //
     root = service.loadNode(Node.MODEL, nav, Scope.ALL, null).getNode();
@@ -534,7 +530,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("rename_node"));
@@ -547,7 +543,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     root1.assertConsistent();
 
     //
-    end();
+    restartTransaction();
 
     //
     nav = service.loadNavigation(SiteKey.portal("rename_node"));
@@ -569,7 +565,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     root2.assertConsistent();
 
     //
-    end();
+    restartTransaction();
 
     //
     Node root3 = service.loadNode(Node.MODEL, nav, Scope.ALL, null).getNode();
@@ -601,7 +597,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("save_children"));
@@ -627,7 +623,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("save_recursive"));
@@ -641,7 +637,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     root1.assertConsistent();
 
     //
-    end();
+    restartTransaction();
 
     //
     Node root2 = service.loadNode(Node.MODEL, nav, Scope.ALL, null).getNode();
@@ -659,7 +655,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     createNavigation(SiteType.PORTAL, "save_state");
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("save_state"));
@@ -676,7 +672,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     root1.assertConsistent();
 
     //
-    end();
+    restartTransaction();
 
     //
     Node root2 = service.loadNode(Node.MODEL, nav, Scope.ALL, null).getNode();
@@ -698,7 +694,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("recreate_node"));
@@ -712,7 +708,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     root1.assertConsistent();
 
     //
-    end();
+    restartTransaction();
 
     //
     Node root2 = service.loadNode(Node.MODEL, nav, Scope.CHILDREN, null).getNode();
@@ -731,7 +727,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.GRANDCHILDREN, null).getNode();
     Node a1 = root1.getChild("a");
@@ -744,7 +740,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
 //    root1.assertConsistent();
 
     //
-    end();
+    restartTransaction();
 
     //
     navigation = service.loadNavigation(SiteKey.portal("move_to_added"));
@@ -769,7 +765,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.GRANDCHILDREN, null).getNode();
     Node a1 = root1.getChild("a");
@@ -783,7 +779,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     root1.assertConsistent();
 
     //
-    end();
+    restartTransaction();
 
     //
     navigation = service.loadNavigation(SiteKey.portal("moved_from_removed"));
@@ -802,7 +798,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     createNavigation(SiteType.PORTAL, "remove_added");
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext navigation = service.loadNavigation(SiteKey.portal("remove_added"));
@@ -815,7 +811,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     root.assertConsistent();
 
     //
-    end();
+    restartTransaction();
 
     //
     root = service.loadNode(Node.MODEL, navigation, Scope.GRANDCHILDREN, null).getNode();
@@ -826,7 +822,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     createNavigation(SiteType.PORTAL, "transitive_remove_transient");
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext navigation = service.loadNavigation(SiteKey.portal("transitive_remove_transient"));
@@ -839,7 +835,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     root.assertConsistent();
 
     //
-    end();
+    restartTransaction();
 
     //
     root = service.loadNode(Node.MODEL, navigation, Scope.GRANDCHILDREN, null).getNode();
@@ -850,7 +846,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     createNavigation(SiteType.PORTAL, "save_rename_created");
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("save_rename_created"));
@@ -873,7 +869,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root.getChild("a").addChild("b");
@@ -884,7 +880,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     try {
@@ -905,12 +901,12 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.CHILDREN, null).getNode();
 
     //
-    end();
+    restartTransaction();
 
     //
     Node root2 = service.loadNode(Node.MODEL, navigation, Scope.CHILDREN, null).getNode();
@@ -918,7 +914,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     service.saveNode(root1.getContext(), null);
@@ -936,7 +932,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root1.removeChild("a");
@@ -947,7 +943,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     service.saveNode(root1.getContext(), null);
@@ -964,7 +960,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root1.addChild(root1.getChild("a").getChild("b"));
@@ -975,7 +971,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     try {
@@ -995,7 +991,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root1.getChild("b").addChild(root1.getChild("a"));
@@ -1006,7 +1002,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     try {
@@ -1027,7 +1023,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root1.getChild("b").addChild(root1.getChild("a"));
@@ -1038,7 +1034,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     try {
@@ -1053,7 +1049,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     createNavigation(SiteType.PORTAL, "concurrent_add_duplicate");
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext navigation = service.loadNavigation(SiteKey.portal("concurrent_add_duplicate"));
@@ -1065,7 +1061,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     root1.addChild("a");
@@ -1085,7 +1081,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root1.addChild(1, "b");
@@ -1096,7 +1092,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     try {
@@ -1116,7 +1112,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root1.addChild(2, root1.getChild("a").getChild("b"));
@@ -1127,7 +1123,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     try {
@@ -1147,7 +1143,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root1.getChild("c").addChild(root1.getChild("a").getChild("b"));
@@ -1158,7 +1154,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     try {
@@ -1177,7 +1173,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root1.getChild("a").setName("b");
@@ -1188,7 +1184,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     try {
@@ -1207,7 +1203,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root1.getChild("a").setName("b");
@@ -1218,7 +1214,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     try {
@@ -1233,7 +1229,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     createNavigation(SiteType.PORTAL, "concurrent_save");
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext navigation = service.loadNavigation(SiteKey.portal("concurrent_save"));
@@ -1242,14 +1238,14 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root1.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     // Reload the root node and modify it
     root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root1.getChild("a").setState(root1.getState().builder().label("foo").build());
 
     //
-    end();
+    restartTransaction();
 
     // Edit navigation in another browser
     Node root2 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
@@ -1257,7 +1253,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     // Now click Save button in the first browser
     try {
@@ -1276,7 +1272,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     Node root2 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
@@ -1284,7 +1280,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     service.saveNode(root1.getContext(), null);
@@ -1298,7 +1294,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     Node a = root1.getChild("a");
@@ -1322,7 +1318,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     createNavigation(SiteType.PORTAL, "save_removed_navigation");
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext navigation = service.loadNavigation(SiteKey.portal("save_removed_navigation"));
@@ -1330,7 +1326,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.destroyNavigation(navigation);
 
     //
-    end();
+    restartTransaction();
 
     //
     try {
@@ -1345,7 +1341,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     createNavigation(SiteType.PORTAL, "pending_changes_bypass_cache");
 
     //
-    end();
+    restartTransaction();
 
     //
     NavigationContext nav = service.loadNavigation(SiteKey.portal("pending_changes_bypass_cache"));
@@ -1367,7 +1363,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     root1.getChild("a").addChild("c");
@@ -1379,7 +1375,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(root2.getContext(), null);
 
     //
-    end();
+    restartTransaction();
 
     //
     try {
@@ -1398,7 +1394,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     service.saveNode(rootContext1, null);
 
     //
-    end();
+    restartTransaction();
 
     Node root1 = service.loadNode(Node.MODEL, navigation, Scope.ALL, null).getNode();
     Node a = root1.getChild("a");

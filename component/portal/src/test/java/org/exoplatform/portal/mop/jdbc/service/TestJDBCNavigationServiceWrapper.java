@@ -21,7 +21,8 @@ package org.exoplatform.portal.mop.jdbc.service;
 
 import java.util.*;
 
-import org.exoplatform.component.test.AbstractKernelTest;
+import org.exoplatform.component.test.*;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.mop.*;
 import org.exoplatform.portal.mop.navigation.*;
@@ -29,6 +30,11 @@ import org.exoplatform.portal.pom.data.ContainerData;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.services.listener.*;
 
+@ConfiguredBy({
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/portal/mop/navigation/configuration.xml")})
 public class TestJDBCNavigationServiceWrapper extends AbstractKernelTest {
 
     /** . */
@@ -45,12 +51,13 @@ public class TestJDBCNavigationServiceWrapper extends AbstractKernelTest {
         PortalContainer container = getContainer();
 
         //
-        listenerService = (ListenerService) container.getComponentInstanceOfType(ListenerService.class);
-        navigationService = (NavigationService) container.getComponentInstanceOfType(NavigationService.class);
+        listenerService = container.getComponentInstanceOfType(ListenerService.class);
+        navigationService = container.getComponentInstanceOfType(NavigationService.class);
         this.modelStorage = container.getComponentInstanceOfType(JDBCModelStorageImpl.class);
 
         //
         super.setUp();
+        begin();
     }
 
     protected void createSite(SiteType type, String siteName) throws Exception {
@@ -63,12 +70,14 @@ public class TestJDBCNavigationServiceWrapper extends AbstractKernelTest {
         NavigationContext nav = new NavigationContext(type.key(siteName), new NavigationState(1));
         this.navigationService.saveNavigation(nav);
 
-        end();
+        restartTransaction();
     }
 
     protected void createNavigation(SiteType siteType, String siteName) throws Exception {
         createSite(siteType, siteName);
         navigationService.saveNavigation(new NavigationContext(new SiteKey(siteType, siteName), new NavigationState(1)));
+
+        restartTransaction();
     }
 
     public void testNotification() throws Exception {
@@ -93,33 +102,28 @@ public class TestJDBCNavigationServiceWrapper extends AbstractKernelTest {
         listenerService.addListener(EventType.NAVIGATION_UPDATED, updateListener);
         listenerService.addListener(EventType.NAVIGATION_DESTROYED, destroyListener);
 
-        //
-        begin();
+        // Create
         createSite(SiteType.PORTAL, "notification");
 
-        // Create
-        NavigationContext navigation = new NavigationContext(SiteKey.portal("notification"), new NavigationState(3));
-        navigationService.saveNavigation(navigation);
+        assertEquals(0, updateListener.events.size());
+        assertEquals(0, destroyListener.events.size());
         assertEquals(1, createListener.events.size());
         Event event = createListener.events.removeFirst();
         assertEquals(SiteKey.portal("notification"), event.getData());
         assertEquals(EventType.NAVIGATION_CREATED, event.getEventName());
-        assertSame(navigationService, event.getSource());
-        assertEquals(0, updateListener.events.size());
-        assertEquals(0, destroyListener.events.size());
-
-        //
 
         // Update
-        navigation.setState(new NavigationState(1));
+        restartTransaction();
+        NavigationContext navigation = new NavigationContext(SiteKey.portal("notification"), new NavigationState(3));
         navigationService.saveNavigation(navigation);
+        assertSame(navigationService, event.getSource());
         assertEquals(0, createListener.events.size());
         assertEquals(1, updateListener.events.size());
+        assertEquals(0, destroyListener.events.size());
         event = updateListener.events.removeFirst();
         assertEquals(SiteKey.portal("notification"), event.getData());
         assertEquals(EventType.NAVIGATION_UPDATED, event.getEventName());
         assertSame(navigationService, event.getSource());
-        assertEquals(0, destroyListener.events.size());
 
         // Update
         navigation = navigationService.loadNavigation(SiteKey.portal("notification"));
@@ -127,11 +131,7 @@ public class TestJDBCNavigationServiceWrapper extends AbstractKernelTest {
         root.setState(new NodeState.Builder(root.getState()).label("foo").build());
         navigationService.saveNode(root.getContext(), null);
         assertEquals(0, createListener.events.size());
-        assertEquals(1, updateListener.events.size());
-        event = updateListener.events.removeFirst();
-        assertEquals(SiteKey.portal("notification"), event.getData());
-        assertEquals(EventType.NAVIGATION_UPDATED, event.getEventName());
-        assertSame(navigationService, event.getSource());
+        assertEquals(0, updateListener.events.size());
         assertEquals(0, destroyListener.events.size());
 
         // Destroy
@@ -143,31 +143,22 @@ public class TestJDBCNavigationServiceWrapper extends AbstractKernelTest {
         assertEquals(SiteKey.portal("notification"), event.getData());
         assertEquals(EventType.NAVIGATION_DESTROYED, event.getEventName());
         assertSame(navigationService, event.getSource());
-
-        //
-        end();
     }
 
     public void testCacheInvalidation() throws Exception {
         SiteKey key = SiteKey.portal("wrapper_cache_invalidation");
 
         //
-        begin();
         createNavigation(SiteType.PORTAL, "wrapper_cache_invalidation");
-        end();
-
-        //
-        begin();
+        restartTransaction();
         navigationService.saveNavigation(new NavigationContext(key, new NavigationState(0)));
-        end();
+        restartTransaction();
 
         //
-        begin();
         NavigationContext nav = navigationService.loadNavigation(key);
         assertNotNull(nav);
         NodeContext<Node> root = navigationService.loadNode(Node.MODEL, nav, Scope.ALL, null);
         assertNotNull(root);
-        end();
     }
 
     public void testCachingInMultiThreading() throws Exception {
@@ -175,26 +166,28 @@ public class TestJDBCNavigationServiceWrapper extends AbstractKernelTest {
         assertNull(navigationService.loadNavigation(foo));
         createSite(SiteType.PORTAL, "test_caching_in_multi_threading");
 
-        end();
-
         navigationService.saveNavigation(new NavigationContext(foo, new NavigationState(0)));
 
         // Start a new thread to work with navigations in parallels
         Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                begin();
-                // Loading the foo navigation and update into the cache if any
-                assertNull(navigationService.loadNavigation(foo));
-                end();
+          @Override
+          public void run() {
+            ExoContainerContext.setCurrentContainer(getContainer());
+            begin();
+            try {
+              // Loading the foo navigation and update into the cache if any
+              assertNotNull(navigationService.loadNavigation(foo));
+            } finally {
+              end();
             }
+          }
         });
         t.start();
         t.join();
 
         assertNotNull(navigationService.loadNavigation(foo));
 
-        end();
+        restartTransaction();
 
         assertNotNull(navigationService.loadNavigation(foo));
     }

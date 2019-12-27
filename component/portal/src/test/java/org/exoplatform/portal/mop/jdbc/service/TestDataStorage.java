@@ -25,16 +25,17 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.gatein.common.transaction.JTAUserTransactionLifecycleService;
 
-import org.exoplatform.component.test.AbstractKernelTest;
+import org.exoplatform.component.test.*;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.config.DataStorage;
-import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.portal.config.*;
 import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.mop.*;
 import org.exoplatform.portal.mop.navigation.*;
-import org.exoplatform.portal.mop.page.*;
-import org.exoplatform.portal.pom.data.ModelChange;
+import org.exoplatform.portal.mop.page.PageContext;
+import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.portal.pom.data.*;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
 import org.exoplatform.services.listener.*;
@@ -46,6 +47,11 @@ import junit.framework.AssertionFailedError;
  * Created by The eXo Platform SARL Author : Tung Pham thanhtungty@gmail.com Nov
  * 13, 2007
  */
+@ConfiguredBy({
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/portal/mop/navigation/configuration.xml")})
 public class TestDataStorage extends AbstractKernelTest {
 
   /** . */
@@ -53,6 +59,9 @@ public class TestDataStorage extends AbstractKernelTest {
 
   /** . */
   private DataStorage                        storage_;
+  
+  /** . */
+  private ModelDataStorage                   modelStorage;
 
   /** . */
   private PageService                        pageService;
@@ -89,9 +98,10 @@ public class TestDataStorage extends AbstractKernelTest {
     storage_ = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
     pageService = (PageService) container.getComponentInstanceOfType(PageService.class);
     navService = (NavigationService) container.getComponentInstanceOfType(NavigationService.class);
+    modelStorage = container.getComponentInstanceOfType(ModelDataStorage.class);
     events = new LinkedList<Event>();
     listenerService = (ListenerService) container.getComponentInstanceOfType(ListenerService.class);
-    org = (OrganizationService) container.getComponentInstanceOfType(OrganizationService.class);
+    org = container.getComponentInstanceOfType(OrganizationService.class);
     jtaUserTransactionLifecycleService = (JTAUserTransactionLifecycleService) container
                                                                                        .getComponentInstanceOfType(JTAUserTransactionLifecycleService.class);
 
@@ -111,8 +121,8 @@ public class TestDataStorage extends AbstractKernelTest {
   }
 
   protected void tearDown() throws Exception {
-    end();
     super.tearDown();
+    end();
   }
 
   private void assertPageFound(int offset,
@@ -169,12 +179,16 @@ public class TestDataStorage extends AbstractKernelTest {
   }
 
   public void testPortalConfigRemove() throws Exception {
-    PortalConfig portal = storage_.getPortalConfig("portal", "test");
+    String siteName = "testPortalToRemove";
+    createSite(SiteType.PORTAL, siteName);
+    restartTransaction();
+
+    PortalConfig portal = storage_.getPortalConfig("portal", siteName);
     assertNotNull(portal);
 
     storage_.remove(portal);
-    assertEquals(1, events.size());
-    assertNull(storage_.getPortalConfig("portal", "test"));
+    assertEquals(1, events.stream().filter(event -> event.getEventName().equals(DataStorage.PORTAL_CONFIG_REMOVED)).count());
+    assertNull(storage_.getPortalConfig("portal", siteName));
 
     try {
       // Trying to remove non existing a portal config
@@ -265,52 +279,11 @@ public class TestDataStorage extends AbstractKernelTest {
     Page page = storage_.getPage("portal::test::test1");
     assertNotNull(page);
 
-    //
     try {
       storage_.remove(page);
       fail();
     } catch (UnsupportedOperationException e) {
     }
-  }
-
-  public void testWindowMove1() throws Exception {
-    Page page = storage_.getPage("portal::test::test4");
-    Application<?> a1 = (Application<?>) page.getChildren().get(0);
-    Container a2 = (Container) page.getChildren().get(1);
-    Application<?> a3 = (Application<?>) a2.getChildren().get(0);
-    Application<?> a4 = (Application<?>) a2.getChildren().remove(1);
-    page.getChildren().add(1, a4);
-    List<ModelChange> changes = storage_.save(page);
-
-    //
-    page = storage_.getPage("portal::test::test4");
-    assertEquals(3, page.getChildren().size());
-    Application<?> c1 = (Application<?>) page.getChildren().get(0);
-    assertEquals(a1.getStorageId(), c1.getStorageId());
-    Application<?> c2 = (Application<?>) page.getChildren().get(1);
-    assertEquals(a4.getStorageId(), c2.getStorageId());
-    Container c3 = (Container) page.getChildren().get(2);
-    assertEquals(a2.getStorageId(), c3.getStorageId());
-    assertEquals(1, c3.getChildren().size());
-    Application<?> c4 = (Application<?>) c3.getChildren().get(0);
-    assertEquals(a3.getStorageId(), c4.getStorageId());
-
-    //
-    assertEquals(6, changes.size());
-    ModelChange.Update ch1 = (ModelChange.Update) changes.get(0);
-    assertEquals(page.getStorageId(), ch1.getObject().getStorageId());
-    ModelChange.Update ch2 = (ModelChange.Update) changes.get(1);
-    assertEquals(a1.getStorageId(), ch2.getObject().getStorageId());
-    ModelChange.Move ch3 = (ModelChange.Move) changes.get(2);
-    // assertEquals(a2.getStorageId(), ch3.getSrcId());
-    // assertEquals(page.getStorageId(), ch3.getDstId());
-    assertEquals(a4.getStorageId(), ch3.getId());
-    ModelChange.Update ch4 = (ModelChange.Update) changes.get(3);
-    assertEquals(a4.getStorageId(), ch4.getObject().getStorageId());
-    ModelChange.Update ch5 = (ModelChange.Update) changes.get(4);
-    assertEquals(a2.getStorageId(), ch5.getObject().getStorageId());
-    ModelChange.Update ch6 = (ModelChange.Update) changes.get(5);
-    assertEquals(a3.getStorageId(), ch6.getObject().getStorageId());
   }
 
   public void testWindowMove2() throws Exception {
@@ -461,21 +434,7 @@ public class TestDataStorage extends AbstractKernelTest {
     groovyApp.setState(state);
     ((Container) page.getChildren().get(1)).getChildren().add(1, groovyApp);
 
-    // Save
-    List<ModelChange> changes = storage_.save(page);
-    assertEquals(6, changes.size());
-    ModelChange.Update c0 = (ModelChange.Update) changes.get(0);
-    assertSame(page.getStorageId(), c0.getObject().getStorageId());
-    ModelChange.Update c1 = (ModelChange.Update) changes.get(1);
-    assertSame(page.getChildren().get(0).getStorageId(), c1.getObject().getStorageId());
-    ModelChange.Update c2 = (ModelChange.Update) changes.get(2);
-    assertSame(page.getChildren().get(1).getStorageId(), c2.getObject().getStorageId());
-    ModelChange.Update c3 = (ModelChange.Update) changes.get(3);
-    assertSame(container.getChildren().get(0).getStorageId(), c3.getObject().getStorageId());
-    ModelChange.Create c4 = (ModelChange.Create) changes.get(4);
-    assertSame(container.getChildren().get(1).getStorageId(), c4.getObject().getStorageId());
-    ModelChange.Update c5 = (ModelChange.Update) changes.get(5);
-    assertSame(container.getChildren().get(2).getStorageId(), c5.getObject().getStorageId());
+    storage_.save(page);
 
     // Check it is existing at the correct location
     // and also that the ids are still the same
@@ -520,12 +479,10 @@ public class TestDataStorage extends AbstractKernelTest {
   }
 
   public void testClone() throws Exception {
-    pageService.clone(PageKey.parse("portal::test::test4"), PageKey.parse("portal::test::_test4"));
-
     // Get cloned page
-    Page clone = storage_.getPage("portal::test::_test4");
-    assertEquals(2, clone.getChildren().size());
-    Application<Portlet> banner1 = (Application<Portlet>) clone.getChildren().get(0);
+    Page page = storage_.getPage("portal::test::test5");
+    assertEquals(2, page.getChildren().size());
+    Application<Portlet> banner1 = (Application<Portlet>) page.getChildren().get(0);
     ApplicationState<Portlet> instanceId = banner1.getState();
 
     // Check instance id format
@@ -533,6 +490,24 @@ public class TestDataStorage extends AbstractKernelTest {
 
     // Check state
     Portlet pagePrefs = storage_.load(instanceId, ApplicationType.PORTLET);
+    assertEquals(new PortletBuilder().add("template", "par:/groovy/groovy/webui/component/UIBannerPortlet.gtmpl").build(),
+                 pagePrefs);
+
+    assertEquals(new PortletBuilder().add("template", "par:/groovy/groovy/webui/component/UIBannerPortlet.gtmpl").build(),
+                 pagePrefs);
+
+    pageService.clone(PageKey.parse("portal::test::test5"), PageKey.parse("portal::test::_test4"));
+
+    Page clone = storage_.getPage("portal::test::_test4");
+    assertEquals(2, clone.getChildren().size());
+    banner1 = (Application<Portlet>) clone.getChildren().get(0);
+    instanceId = banner1.getState();
+
+    // Check instance id format
+    assertEquals("web/BannerPortlet", storage_.getId(banner1.getState()));
+
+    // Check state
+    pagePrefs = storage_.load(instanceId, ApplicationType.PORTLET);
     assertEquals(new PortletBuilder().add("template", "par:/groovy/groovy/webui/component/UIBannerPortlet.gtmpl").build(),
                  pagePrefs);
 
@@ -590,6 +565,7 @@ public class TestDataStorage extends AbstractKernelTest {
 
     // Create new portal
     storage_.create(new PortalConfig(siteType, "testGetAllSiteNames"));
+    restartTransaction();
 
     // Test during tx we see the good names
     List<String> transientNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
@@ -603,11 +579,12 @@ public class TestDataStorage extends AbstractKernelTest {
     new Thread() {
       @Override
       public void run() {
-        begin();
         ExoContainerContext.setCurrentContainer(getContainer());
+        begin();
         try {
           List<String> isolatedNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
-          assertEquals(new HashSet<String>(names), new HashSet<String>(isolatedNames));
+          isolatedNames.removeAll(names);
+          assertEquals(Collections.singletonList("testGetAllSiteNames"), isolatedNames);
         } catch (Throwable t) {
           error.set(t);
         } finally {
@@ -625,11 +602,6 @@ public class TestDataStorage extends AbstractKernelTest {
       throw afe;
     }
 
-    // Now commit tx
-    end();
-
-    // We test we observe the change
-    begin();
     List<String> afterNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
     assertTrue(afterNames.containsAll(names));
     afterNames.removeAll(names);
@@ -638,7 +610,6 @@ public class TestDataStorage extends AbstractKernelTest {
     // Then we remove the newly created portal
     storage_.remove(new PortalConfig(siteType, "testGetAllSiteNames"));
 
-    // Test we are syeing the transient change
     transientNames.clear();
     transientNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
     assertEquals(names, transientNames);
@@ -648,13 +619,13 @@ public class TestDataStorage extends AbstractKernelTest {
     final CountDownLatch removeSync = new CountDownLatch(1);
     new Thread() {
       public void run() {
-        begin();
         ExoContainerContext.setCurrentContainer(getContainer());
+        begin();
         try {
           List<String> isolatedNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
           assertTrue("Was expecting " + isolatedNames + " to contain " + names, isolatedNames.containsAll(names));
           isolatedNames.removeAll(names);
-          assertEquals(Collections.singletonList("testGetAllSiteNames"), isolatedNames);
+          assertEquals(Collections.emptyList(), isolatedNames);
         } catch (Throwable t) {
           error.set(t);
         } finally {
@@ -673,10 +644,9 @@ public class TestDataStorage extends AbstractKernelTest {
     }
 
     //
-    end();
+    restartTransaction();
 
     // Now test it is still removed
-    begin();
     afterNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
     assertEquals(new HashSet<String>(names), new HashSet<String>(afterNames));
   }
@@ -716,7 +686,7 @@ public class TestDataStorage extends AbstractKernelTest {
     //
     prefs = storage_.load(state, ApplicationType.PORTLET);
     assertNotNull(prefs);
-    assertEquals(new PortletBuilder().add("template", "").build(), prefs);
+    assertEquals(new PortletBuilder().add("template", (String) null).build(), prefs);
   }
 
   public void testSiteLayout() throws Exception {
@@ -737,10 +707,6 @@ public class TestDataStorage extends AbstractKernelTest {
     assertTrue(pConfig.getPortalLayout().getChildren() != null && pConfig.getPortalLayout().getChildren().size() == 0);
 
     pConfig = storage_.getPortalConfig(PortalConfig.USER_TYPE, "root");
-    assertNotNull(pConfig);
-    assertNotNull("The User layout of " + pConfig.getName() + " is null", pConfig.getPortalLayout());
-
-    pConfig = storage_.getPortalConfig(PortalConfig.USER_TYPE, "mary");
     assertNotNull(pConfig);
     assertNotNull("The User layout of " + pConfig.getName() + " is null", pConfig.getPortalLayout());
   }
@@ -830,6 +796,19 @@ public class TestDataStorage extends AbstractKernelTest {
     pageService.destroyPage(pageContext.getKey());
     assertPageNotFound(0, 10, null, null, null, "Juuu2 Ziii2");
     jtaUserTransactionLifecycleService.finishJTATransaction();
+  }
+
+  protected void createSite(SiteType type, String siteName) throws Exception {
+      ContainerData container = new ContainerData(null, "testcontainer_" + siteName, "", "", "", "", "",
+              "", "", "", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+      PortalData portal = new PortalData(null, siteName, type.getName(), null, null,
+              null, new ArrayList<>(), null, null, null, container, null);
+      this.modelStorage.create(portal);
+
+      NavigationContext nav = new NavigationContext(type.key(siteName), new NavigationState(1));
+      this.navService.saveNavigation(nav);
+
+      restartTransaction();
   }
 
 }

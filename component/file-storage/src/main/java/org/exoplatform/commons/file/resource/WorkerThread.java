@@ -33,7 +33,7 @@ public abstract class WorkerThread extends Thread
    /**
     * Logger.
     */
-   private static final Log LOG = ExoLogger.getLogger("exo.jcr.component.core.WorkerThread");
+   private static final Log LOG = ExoLogger.getLogger(WorkerThread.class.getName());
 
    protected boolean stopped = false;
 

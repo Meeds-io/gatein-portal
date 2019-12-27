@@ -44,9 +44,6 @@
         <object-param>
           <name>site.templates.location</name>
           <object type="org.exoplatform.portal.config.SiteConfigTemplates">
-            <field name="location">
-              <string>classpath:/org/exoplatform/portal/config/conf</string>
-            </field>
             <field name="portalTemplates">
               <collection type="java.util.HashSet">
                 <value>
@@ -70,6 +67,9 @@
                   <string>user</string>
                 </value>
               </collection>
+            </field>
+            <field name="location">
+              <string>classpath:/org/exoplatform/portal/config/conf</string>
             </field>
           </object>
         </object-param>

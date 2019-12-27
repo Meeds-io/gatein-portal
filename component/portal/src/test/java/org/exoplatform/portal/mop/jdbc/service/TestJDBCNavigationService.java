@@ -30,7 +30,6 @@ import org.exoplatform.portal.pom.data.ContainerData;
 import org.exoplatform.portal.pom.data.PortalData;
 
 @ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.test.jcr-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
@@ -47,6 +46,7 @@ public class TestJDBCNavigationService extends AbstractKernelTest {
         PortalContainer container = PortalContainer.getInstance();
         this.service = (NavigationService) container.getComponentInstanceOfType(NavigationService.class);
         this.modelStorage = container.getComponentInstanceOfType(JDBCModelStorageImpl.class);
+        begin();
     }
 
     protected void createSite(SiteType type, String siteName) throws Exception {
@@ -58,8 +58,7 @@ public class TestJDBCNavigationService extends AbstractKernelTest {
 
         NavigationContext nav = new NavigationContext(type.key(siteName), new NavigationState(1));
         this.service.saveNavigation(nav);
-
-        end();
+        restartTransaction();
     }
 
     public void testHiddenNode() throws Exception {
@@ -73,7 +72,7 @@ public class TestJDBCNavigationService extends AbstractKernelTest {
         this.service.saveNode(node, null);
 
         //
-        end();
+        restartTransaction();
 
         //
         nav = service.loadNavigation(SiteKey.portal("hidden_node"));
@@ -141,7 +140,7 @@ public class TestJDBCNavigationService extends AbstractKernelTest {
         this.service.saveNode(node, null);
 
         //
-        end();
+        restartTransaction();
 
         //
         NavigationContext nav = service.loadNavigation(SiteKey.portal("hidden_insert_1"));
@@ -182,7 +181,7 @@ public class TestJDBCNavigationService extends AbstractKernelTest {
         this.service.saveNode(node, null);
 
         //
-        end();
+        restartTransaction();
 
         //
         NavigationContext nav = service.loadNavigation(SiteKey.portal("hidden_insert_2"));
@@ -250,7 +249,7 @@ public class TestJDBCNavigationService extends AbstractKernelTest {
         this.service.saveNode(node, null);
 
         //
-        end();
+        restartTransaction();
 
         //
         NavigationContext nav = service.loadNavigation(SiteKey.portal("hidden_insert_3"));
@@ -340,15 +339,11 @@ public class TestJDBCNavigationService extends AbstractKernelTest {
         assertSame(d, it.next());
     }
 
-    public void testCount() {
-        try {
-            this.createSite(SiteType.PORTAL, "count");
-        } catch (Exception ex) {
-            fail(ex);
-        }
+    public void testCount() throws Exception {
+        this.createSite(SiteType.PORTAL, "count");
 
         //
-        end();
+        restartTransaction();
 
         //
         NavigationContext navigation = service.loadNavigation(SiteKey.portal("count"));
@@ -385,7 +380,7 @@ public class TestJDBCNavigationService extends AbstractKernelTest {
         }
 
         //
-        end();
+        restartTransaction();
 
         //
         NavigationContext navigation = service.loadNavigation(SiteKey.portal("insert_duplicate"));

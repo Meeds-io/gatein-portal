@@ -114,20 +114,25 @@ public class TestRefreshCurrentUserPortal extends AbstractKernelTest {
 
     public void testCreate() throws Exception {
         List<UserNavigation> navs = userPortal.getNavigations();
-        assertEquals(2, navs.size());
-        RequestContext.setCurrentInstance(requestContext);
+        assertFalse(navs.isEmpty());
         NavigationService ns = (NavigationService) getContainer().getComponentInstanceOfType(NavigationService.class);
+        SiteKey siteKeyToTest = navs.get(0).getKey();
+
+        RequestContext.setCurrentInstance(requestContext);
         ns.saveNavigation(new NavigationContext(SiteKey.group("/platform"), new NavigationState(1)));
         navs = userPortal.getNavigations();
-        assertEquals(3, navs.size());
+        assertEquals(2, navs.size());
         RequestContext.setCurrentInstance(null);
     }
 
     public void testUpdate() throws Exception {
         List<UserNavigation> navs = userPortal.getNavigations();
-        assertEquals(2, navs.size());
+        assertFalse(navs.isEmpty());
+        int initialSize = navs.size();
         NavigationService ns = (NavigationService) getContainer().getComponentInstanceOfType(NavigationService.class);
-        NavigationContext nav = new NavigationContext(SiteKey.group("/platform"), new NavigationState(1));
+        SiteKey siteKeyToTest = navs.get(0).getKey();
+
+        NavigationContext nav = new NavigationContext(siteKeyToTest, new NavigationState(1));
         ns.saveNavigation(nav);
         navs = userPortal.getNavigations();
         assertEquals(2, navs.size());
@@ -136,13 +141,11 @@ public class TestRefreshCurrentUserPortal extends AbstractKernelTest {
         root.add(null, "foo");
         ns.saveNode(root, null);
         navs = userPortal.getNavigations();
-        assertEquals(3, navs.size());
+        assertEquals(2, navs.size());
         ns.destroyNavigation(nav);
         navs = userPortal.getNavigations();
-        assertEquals(2, navs.size());
-        //workaround: ns.saveNode this method already save data to db
-        //need to clear this test data, tearDown method not work correctly this case
-        end();
+        assertEquals(1, navs.size());
+        restartTransaction();
         RequestContext.setCurrentInstance(null);
     }
 
@@ -151,11 +154,11 @@ public class TestRefreshCurrentUserPortal extends AbstractKernelTest {
         NavigationContext nav = new NavigationContext(SiteKey.group("/platform"), new NavigationState(1));
         ns.saveNavigation(nav);
         List<UserNavigation> navs = userPortal.getNavigations();
-        assertEquals(3, navs.size());
+        assertEquals(2, navs.size());
         RequestContext.setCurrentInstance(requestContext);
         ns.destroyNavigation(nav);
         navs = userPortal.getNavigations();
-        assertEquals(2, navs.size());
+        assertEquals(1, navs.size());
         RequestContext.setCurrentInstance(null);
     }
 }

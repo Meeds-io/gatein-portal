@@ -71,12 +71,6 @@
     <key>org.exoplatform.web.security.GateInTokenStore</key>
     <type>org.exoplatform.web.security.jpa.JPAGateInTokenStorage</type>
   </component>
-  <component>
-    <type>org.exoplatform.web.security.JCRGateInTokenStorage</type>
-  </component>
-  <component>
-    <type>org.exoplatform.web.security.migrate.TokenDataMigrationService</type>
-  </component>
 
   <!-- Default CookieTokenService with salted hashing -->
   <component>

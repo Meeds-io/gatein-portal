@@ -297,7 +297,7 @@ public class NavigationStoreImpl implements NavigationStore {
 
   }
 
-  private NavigationEntity buildNavEntity(NavigationEntity entity, SiteKey key, int priority) {
+  private NavigationEntity buildNavEntity(NavigationEntity entity, SiteKey key, Integer priority) {
     if (entity == null) {
       entity = new NavigationEntity();
       NodeEntity rootNode = new NodeEntity();
@@ -306,7 +306,7 @@ public class NavigationStoreImpl implements NavigationStore {
       entity.setRootNode(rootNode);
 
     }
-    entity.setPriority(priority);
+    entity.setPriority(priority == null ? 0 : priority);
     entity.setOwner(siteDAO.findByKey(key));
     return entity;
   }

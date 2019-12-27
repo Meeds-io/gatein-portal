@@ -78,6 +78,25 @@ public class AbstractKernelTest extends AbstractGateInTest {
         RequestLifeCycle.end();
     }
 
+    protected void restartTransaction() {
+      int i = 0;
+      // Close transactions until no encapsulated transaction
+      boolean success = true;
+      do {
+        try {
+          end();
+          i++;
+        } catch (IllegalStateException e) {
+          success = false;
+        }
+      } while (success);
+
+      // Restart transactions with the same number of encapsulations
+      for (int j = 0; j < i; j++) {
+        begin();
+      }
+    }
+
     @Override
     protected void beforeRunBare() {
       String className = getClass().getName();

@@ -29,8 +29,7 @@ public class DescriptionDAOTest extends AbstractKernelTest {
   public void testCreate() {
     DescriptionEntity desc = createDescription("testCreate");
     descDAO.create(desc);
-    end();
-    begin();
+    restartTransaction();
 
     DescriptionEntity result = descDAO.find(desc.getId());
     assertNotNull(result);
@@ -40,12 +39,11 @@ public class DescriptionDAOTest extends AbstractKernelTest {
   public void testSave() {
     DescriptionEntity desc = createDescription("testSave");
     descDAO.create(desc);
-    end();
-    begin();
+    restartTransaction();
 
     descDAO.saveDescription("testSave", new DescriptionState("testName2", "testDesc2"));
-    end();
-    begin();
+    restartTransaction();
+
     DescriptionEntity result = descDAO.find(desc.getId());
     assertEquals("testName2", result.getState().getName());
     assertEquals("testDesc2", result.getState().getDescription());
@@ -54,15 +52,13 @@ public class DescriptionDAOTest extends AbstractKernelTest {
   public void testSave2() {
     DescriptionEntity desc = createDescription("testSave2");
     descDAO.create(desc);
-    end();
-    begin();
+    restartTransaction();
 
     Map<String, DescriptionState> localized = new HashMap<String, DescriptionState>();
     localized.put(I18N.toTagIdentifier(Locale.FRENCH), new DescriptionState("name1", "desc1"));
     localized.put(I18N.toTagIdentifier(Locale.ITALY), new DescriptionState("name2", "desc2"));
     descDAO.saveDescriptions("testSave2", localized);
-    end();
-    begin();
+    restartTransaction();
 
     DescriptionEntity result = descDAO.find(desc.getId());
     assertNotNull(result.getLocalized());
@@ -75,12 +71,10 @@ public class DescriptionDAOTest extends AbstractKernelTest {
   public void testDelete() {
     DescriptionEntity desc = createDescription("testDelete");
     descDAO.create(desc);
-    end();
-    begin();
+    restartTransaction();
     
     descDAO.deleteByRefId("testDelete");
-    end();
-    begin();
+    restartTransaction();
     assertNull(descDAO.find(desc.getId()));
     assertNull(descDAO.getByRefId("testDelete"));
   }

@@ -55,8 +55,8 @@ public class TestDescriptionService extends AbstractKernelTest {
   @Override
   protected void tearDown() throws Exception {
     descDAO.deleteAll();
-    end();
     super.tearDown();
+    end();
   }
 
   public void testResolveNoDescription() throws Exception {
