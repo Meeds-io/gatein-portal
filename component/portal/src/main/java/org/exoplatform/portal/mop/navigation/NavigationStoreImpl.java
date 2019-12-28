@@ -178,7 +178,12 @@ public class NavigationStoreImpl implements NavigationStore {
     target.setParent(to);
     if (to != null) {
       List<NodeEntity> children = to.getChildren();
-      children.add(index + 1, target);
+      if (index >= children.size()) {
+        index = children.size();
+      } else {
+        index++;
+      }
+      children.add(index, target);
       to.setChildren(children);
       to = nodeDAO.update(to);
     }

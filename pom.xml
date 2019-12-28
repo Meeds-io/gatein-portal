@@ -127,7 +127,6 @@
     <module>web</module>
     <module>examples</module>
     <module>starter</module>
-    <module>mobile-integration</module>
     <module>cdi</module>
     <module>testsuite</module>
   </modules>
@@ -526,96 +525,6 @@
         <artifactId>exo.portal.starter.war</artifactId>
         <version>${project.version}</version>
         <type>war</type>
-      </dependency>
-
-      <!-- GateIn Redirect -->
-      <dependency>
-        <groupId>org.gatein.web</groupId>
-        <artifactId>redirect</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.portal.portlet</groupId>
-        <artifactId>redirect</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-      </dependency>
-
-      <!-- GateIn Redirect Admin -->
-      <dependency>
-        <groupId>org.exoplatform.gatein.portal.portlet</groupId>
-        <artifactId>redirect-admin-ui</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.portal.portlet</groupId>
-        <artifactId>redirect-admin-ui</artifactId>
-        <version>${project.version}</version>
-        <classifier>jsf-bundled</classifier>
-        <type>war</type>
-      </dependency>
-
-      <!-- GateIn -->
-      <dependency>
-          <groupId>org.exoplatform.gatein.portal</groupId>
-          <artifactId>responsive-skin</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-      </dependency>
-      <dependency>
-          <groupId>org.exoplatform.gatein.portal</groupId>
-          <artifactId>portlet.responsive.banner</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-      </dependency>
-      <dependency>
-          <groupId>org.exoplatform.gatein.portal</groupId>
-          <artifactId>portlet.responsive.features</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-      </dependency>
-      <dependency>
-          <groupId>org.exoplatform.gatein.portal</groupId>
-          <artifactId>portlet.responsive.footer</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-      </dependency>
-      <dependency>
-          <groupId>org.exoplatform.gatein.portal</groupId>
-          <artifactId>portlet.responsive.header</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-      </dependency>
-      <dependency>
-          <groupId>org.exoplatform.gatein.portal</groupId>
-          <artifactId>portlet.responsive.navigation</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-      </dependency>
-      <dependency>
-          <groupId>org.exoplatform.gatein.portal</groupId>
-          <artifactId>portlet.responsive.community</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-      </dependency>
-      <dependency>
-          <groupId>org.exoplatform.gatein.portal</groupId>
-          <artifactId>mobile-extension-configuration</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-      </dependency>
-      <dependency>
-          <groupId>org.exoplatform.gatein.portal</groupId>
-          <artifactId>mobile-extension-login</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-      </dependency>
-      <dependency>
-          <groupId>org.exoplatform.gatein.portal</groupId>
-          <artifactId>mobile-extension-ear</artifactId>
-          <version>${project.version}</version>
-          <type>ear</type>
       </dependency>
 
       <!-- Reflext -->
