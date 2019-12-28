@@ -142,7 +142,6 @@ public abstract class ModelAdapter<S, C extends Serializable> {
     };
 
     /**
-     * todo: this ModelAdapter is not quite good, what is really needed is a ModelAdapter<WSRP, byte[]> so that the
      * StatefulPortletContext returned by getPortletContext is actually of type PortletStateType.OPAQUE so that it can be
      * properly handled in WSRP... This model needs to be revisited if we want to properly support consumer-side state
      * management. See GTNPORTAL-736.

@@ -80,7 +80,7 @@ import java.util.Date;
  * </ul>
 
  * <p>
- * It should be considered in the future if the password field can be removed altogether from {@link TokenEntry}.
+ * It should be considered in the future if the password field can be removed altogether.
  * </p>
  *
  */
@@ -213,7 +213,7 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
     }
 
     /**
-     * Removes all tokens stored in the {@link TokenContainer}.
+     * Removes all stored tokens
      */
     public void deleteAll() {
         this.tokenStore.deleteAll();
