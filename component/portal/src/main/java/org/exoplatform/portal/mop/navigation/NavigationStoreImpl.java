@@ -150,6 +150,15 @@ public class NavigationStoreImpl implements NavigationStore {
       return null;
     }
 
+    NodeEntity from = null;
+    if (fromId != null) {
+      from = nodeDAO.find(fromId);
+      if (from != null) {
+        List<NodeEntity> children = from.getChildren();
+        children.remove(target);
+      }
+    }
+
     int index = -1;
     NodeEntity to = null;
     if (toId != null) {
@@ -165,19 +174,18 @@ public class NavigationStoreImpl implements NavigationStore {
         }
       }
     }
+
     target.setParent(to);
     if (to != null) {
       List<NodeEntity> children = to.getChildren();
       children.add(index + 1, target);
       to.setChildren(children);
-      nodeDAO.update(to);
-    } else {
-      nodeDAO.update(target);
+      to = nodeDAO.update(to);
     }
+    target = nodeDAO.update(target);
 
-    NodeEntity from = null;
-    if (fromId != null) {
-      from = nodeDAO.find(fromId);
+    if (from != null && fromId != toId) {
+      from = nodeDAO.update(from);
     }
     return new NodeData[] { buildNodeData(target), buildNodeData(from), buildNodeData(to) };
   }

@@ -213,7 +213,7 @@ public class PortalImplTest extends AbstractApiTest {
 
         assertNotNull(sites);
         assertEquals(1, sites.size());
-        assertEquals("classic", sites.get(0).getId().getName());
+        assertEquals(defaultSiteId.getName(), sites.get(0).getId().getName());
     }
 
     @Test
@@ -474,7 +474,7 @@ public class PortalImplTest extends AbstractApiTest {
     public void getSite() {
         createSite(defaultSiteId);
 
-        assertNotNull(portal.getSite(new SiteId("classic")));
+        assertNotNull(portal.getSite(defaultSiteId));
     }
 
     @Test(expected = ApiException.class)
