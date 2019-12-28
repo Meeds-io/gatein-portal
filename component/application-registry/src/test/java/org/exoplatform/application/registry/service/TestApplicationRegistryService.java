@@ -29,7 +29,9 @@ import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.services.organization.*;
 
 @ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.application-registry-configuration.xml"),
+})
 public class TestApplicationRegistryService extends AbstractKernelTest {
 
   protected static String              demo      = "demo";

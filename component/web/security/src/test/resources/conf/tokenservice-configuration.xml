@@ -44,11 +44,6 @@
   </component>
 
   <component>
-    <key>org.exoplatform.commons.chromattic.ChromatticManager</key>
-    <type>org.exoplatform.commons.chromattic.ChromatticManager</type>
-  </component>
-
-  <component>
     <key>org.exoplatform.web.security.security.SecureRandomService</key>
     <type>org.exoplatform.web.security.security.SecureRandomService</type>
   </component>
@@ -183,86 +178,5 @@
     <key>org.exoplatform.commons.api.settings.SettingService</key>
     <type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
   </component>
-
-  <external-component-plugins>
-    <target-component>org.exoplatform.commons.chromattic.ChromatticManager</target-component>
-    <component-plugin>
-      <name>chromattic</name>
-      <set-method>addLifeCycle</set-method>
-      <type>org.exoplatform.commons.chromattic.ChromatticLifeCycle</type>
-      <init-params>
-        <value-param>
-          <name>domain-name</name>
-          <value>autologin</value>
-        </value-param>
-        <value-param>
-          <name>workspace-name</name>
-          <value>portal-test</value>
-        </value-param>
-        <values-param>
-          <name>entities</name>
-          <value>org.exoplatform.web.security.security.TokenContainer</value>
-          <value>org.exoplatform.web.security.security.TokenEntry</value>
-          <value>org.exoplatform.web.security.security.HashedToken</value>
-        </values-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-
-  <external-component-plugins>
-    <target-component>org.exoplatform.commons.chromattic.ChromatticManager</target-component>
-    <component-plugin>
-      <name>chromattic</name>
-      <set-method>addLifeCycle</set-method>
-      <type>org.exoplatform.commons.chromattic.ChromatticLifeCycle</type>
-      <init-params>
-        <value-param>
-          <name>domain-name</name>
-          <value>remindpwd</value>
-        </value-param>
-        <value-param>
-          <name>workspace-name</name>
-          <value>portal-test</value>
-        </value-param>
-        <values-param>
-          <name>entities</name>
-          <value>org.exoplatform.web.security.security.TokenContainer</value>
-          <value>org.exoplatform.web.security.security.TokenEntry</value>
-          <value>org.exoplatform.web.security.security.HashedToken</value>
-        </values-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-
-  <!--<external-component-plugins>
-    <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
-    <component-plugin>
-      <name>bind.datasource</name>
-      <set-method>addPlugin</set-method>
-      <type>org.exoplatform.services.naming.BindReferencePlugin</type>
-      <init-params>
-        <value-param>
-          <name>bind-name</name>
-          <value>java:/comp/env/exo-jpa_portal</value>
-        </value-param>
-        <value-param>
-          <name>class-name</name>
-          <value>javax.sql.DataSource</value>
-        </value-param>
-        <value-param>
-          <name>factory</name>
-          <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
-        </value-param>
-        <properties-param>
-          <name>ref-addresses</name>
-          <description>ref-addresses</description>
-          <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
-          <property name="url" value="jdbc:hsqldb:mem:db/exojpa" />
-          <property name="username" value="sa" />
-          <property name="password" value="" />
-        </properties-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>-->
 
 </configuration>
