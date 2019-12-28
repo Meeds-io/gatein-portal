@@ -456,7 +456,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
     Node a = root.getChild("a");
     Node b = root.getChild("b");
     Node c = root.getChild("c");
-    root.addChild(1, a);
+    root.addChild(0, a);
     assertSame(a, root.getChild(0));
     assertSame(b, root.getChild(1));
     assertSame(c, root.getChild(2));
