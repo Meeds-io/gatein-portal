@@ -331,7 +331,7 @@ public class UIPortal extends UIContainer {
             PortalRequestContext prContext = Util.getPortalRequestContext();
             HttpServletRequest req = prContext.getRequest();
 
-            // Delete the token from JCR
+            // Delete the token from store
             String token = getTokenCookie(req);
             if (token != null) {
                 AbstractTokenService<GateInToken, String> tokenService = AbstractTokenService.getInstance(CookieTokenService.class);

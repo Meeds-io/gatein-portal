@@ -39,6 +39,47 @@
         <description>administrator</description>
         <value>/platform/administrators</value>
       </value-param>
+
+      <value-param>
+        <name>portal.administrator.mstype</name>
+        <description>administrator</description>
+        <value>manager</value>
+      </value-param>
+
+      <value-param>
+        <name>portal.creator.groups</name>
+        <description>groups with membership type have permission to manage portal</description>
+        <value>*:/platform/administrators,*:/organization/management/executive-board</value>
+      </value-param>
+
+      <value-param>
+        <name>navigation.creator.membership.type</name>
+        <description>specific membership type have full permission with group navigation</description>
+        <value>manager</value>
+      </value-param>
+
+      <value-param>
+        <name>guests.group</name>
+        <description>guests group</description>
+        <value>/platform/guests</value>
+      </value-param>
+
+      <values-param>
+        <name>mandatory.groups</name>
+        <description>Groups that can not be deleted.</description>
+        <value>/platform/administrators</value>
+        <value>/platform/users</value>
+        <value>/platform/guests</value>
+        <value>/spaces</value>
+      </values-param>
+
+      <values-param>
+        <name>mandatory.mstypes</name>
+        <description>Membership type that can not be deleted.</description>
+        <value>member</value>
+        <value>manager</value>
+        <value>*</value>
+      </values-param>
     </init-params>
   </component>
 

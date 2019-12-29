@@ -49,7 +49,7 @@ import java.util.Date;
  * <li>The tokens are not stored in plain text, but intead only their salted hash is stored. See {@link #saltedHashService}. To
  * enable this, the following was done:
  * <ul>
- * <li>The structure of the underlying JCR store was changed from
+ * <li>The structure of the underlying store was changed from
  *
  * <pre>
  * autologin
@@ -101,7 +101,7 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
 
     private final Logger log = LoggerFactory.getLogger(CookieTokenService.class);
 
-    public CookieTokenService(InitParams initParams, GateInTokenStore tokenStore/*, ChromatticManager chromatticManager*/, CodecInitializer codecInitializer)
+    public CookieTokenService(InitParams initParams, GateInTokenStore tokenStore, CodecInitializer codecInitializer)
             throws TokenServiceInitializationException {
         super(initParams);
 
