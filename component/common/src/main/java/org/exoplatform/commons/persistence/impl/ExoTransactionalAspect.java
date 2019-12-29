@@ -54,6 +54,9 @@ public class ExoTransactionalAspect {
 
     // Do we need to start EntityManager ?
     EntityManagerService service = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(EntityManagerService.class);
+    if (service == null) {
+      throw new IllegalStateException("Cannot find EntityManagerService instance. This may happen when ExoContainerContext.getCurrentContainer is not set in current thread.");
+    }
     entityManager = service.getEntityManager();
     if (entityManager == null) {
       LOG.debug("Injecting new PersistenceContext");
