@@ -222,11 +222,6 @@
   </component>
 
   <component>
-    <key>org.exoplatform.commons.scope.ScopeManager</key>
-    <type>org.exoplatform.commons.scope.ScopeManager</type>
-  </component>
-
-  <component>
     <key>org.exoplatform.services.cache.CacheService</key>
     <jmx-name>cache:type=CacheService</jmx-name>
     <type>org.exoplatform.services.cache.impl.CacheServiceImpl</type>
@@ -269,11 +264,6 @@
         <value>${exo.cache.async.config.template:jar:/conf/platform/cache/infinispan/cluster/cache-async-config.xml}</value>
       </value-param>
     </init-params>
-  </component>
-
-  <component>
-    <key>org.exoplatform.commons.chromattic.ChromatticManager</key>
-    <type>org.exoplatform.commons.chromattic.ChromatticManager</type>
   </component>
 
   <component>
