@@ -71,7 +71,9 @@ public class AbstractKernelTest extends AbstractGateInTest {
     }
 
     protected void begin() {
-        RequestLifeCycle.begin(getContainer());
+        PortalContainer container = getContainer();
+        ExoContainerContext.setCurrentContainer(container);
+        RequestLifeCycle.begin(container);
     }
 
     protected void end() {
