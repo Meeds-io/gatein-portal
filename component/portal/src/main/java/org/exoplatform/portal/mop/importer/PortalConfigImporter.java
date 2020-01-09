@@ -52,16 +52,14 @@ public class PortalConfigImporter {
         PortalConfig dst = null;
 
         //
-        boolean portalExists = existingPortalConfig == null;
+        boolean portalNotExists = existingPortalConfig == null;
         switch (mode) {
             case CONSERVE:
-                dst = null;
-                break;
             case INSERT:
-                if (portalExists) {
-                    dst = src;
+                if (portalNotExists) {
+                  dst = src;
                 } else {
-                    dst = null;
+                  dst = null;
                 }
                 break;
             case MERGE:
@@ -77,8 +75,8 @@ public class PortalConfigImporter {
                      src.getType(),
                      src.getName(),
                      mode,
-                     portalExists);
-            if (portalExists) {
+                     portalNotExists);
+            if (portalNotExists) {
                 service.create(dst);
             } else {
                 service.save(dst);

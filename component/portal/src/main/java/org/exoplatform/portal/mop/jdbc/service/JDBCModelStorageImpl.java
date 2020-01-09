@@ -527,7 +527,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
         }
       }
 
-      if (dstChild == null) { // create new
+      if (dstChild == null || dstChild.getId() == null) { // create new
         if (srcChild instanceof ContainerData) {
           dstChild = buildContainerEntity(null, (ContainerData) srcChild);
           dstChild = containerDAO.create((ContainerEntity) dstChild);
@@ -539,6 +539,9 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
           dstChild = containerDAO.create((ContainerEntity) dstChild);
         } else {
           throw new StaleModelException("Was not expecting child " + srcChild);
+        }
+        if (dstChild.getId() == null) {
+          throw new IllegalStateException("Id of saved child wasn't found: " + dstChild.getType() + " / " + dstChild);
         }
       }
 

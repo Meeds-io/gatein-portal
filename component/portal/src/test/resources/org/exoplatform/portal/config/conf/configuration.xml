@@ -44,6 +44,9 @@
         <object-param>
           <name>site.templates.location</name>
           <object type="org.exoplatform.portal.config.SiteConfigTemplates">
+            <field name="location">
+              <string>classpath:/org/exoplatform/portal/config/conf</string>
+            </field>
             <field name="portalTemplates">
               <collection type="java.util.HashSet">
                 <value>
@@ -68,9 +71,6 @@
                 </value>
               </collection>
             </field>
-            <field name="location">
-              <string>classpath:/org/exoplatform/portal/config/conf</string>
-            </field>
           </object>
         </object-param>
         <object-param>
@@ -91,6 +91,12 @@
             </field>
             <field name="ownerType">
               <string>portal</string>
+            </field>
+            <field name="override">
+              <string>true</string>
+            </field>
+            <field name="importMode">
+              <string>merge</string>
             </field>
             <field name="templateLocation">
               <string>classpath:/org/exoplatform/portal/config/conf</string>

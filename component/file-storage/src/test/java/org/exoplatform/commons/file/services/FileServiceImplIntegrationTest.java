@@ -17,6 +17,7 @@ import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
+import org.exoplatform.container.ExoContainerContext;
 
 /**
  * TODO do not use BaseExoTestCase to not be stuck with Junit 3
@@ -114,10 +115,13 @@ public class FileServiceImplIntegrationTest extends AbstractKernelTest {
                                                            "john",
                                                            false,
                                                            new ByteArrayInputStream(text.getBytes())));
+    Throwable error = null;
     for (int i = 0; i < 10; i++) {
       executorService.execute(new Runnable() {
         @Override
         public void run() {
+          ExoContainerContext.setCurrentContainer(getContainer());
+          begin();
           try {
             fileService.writeFile(new FileItem(null,
                                                "file1",
@@ -128,14 +132,16 @@ public class FileServiceImplIntegrationTest extends AbstractKernelTest {
                                                "john",
                                                false,
                                                new ByteArrayInputStream(text.getBytes())));
-          } catch (Exception e) {
-            fail("Error while adding File: " + e.getMessage());
+          } catch (Throwable e) {
+            fail("Error while adding File: " + error.getMessage());
           } finally {
+            end();
             counter.incrementAndGet();
           }
         }
       });
     }
+
     do {
       Thread.sleep(100);
     } while (counter.get() < 10);
@@ -161,6 +167,8 @@ public class FileServiceImplIntegrationTest extends AbstractKernelTest {
       executorService.execute(new Runnable() {
         @Override
         public void run() {
+          ExoContainerContext.setCurrentContainer(getContainer());
+          begin();
           try {
             fileService.updateFile(new FileItem(fileItem.getFileInfo().getId(),
                                                 "file1",
@@ -171,9 +179,10 @@ public class FileServiceImplIntegrationTest extends AbstractKernelTest {
                                                 "john",
                                                 false,
                                                 new ByteArrayInputStream(text.getBytes())));
-          } catch (Exception e) {
+          } catch (Throwable e) {
             fail("Error while adding File: " + e.getMessage());
           } finally {
+            end();
             counter.incrementAndGet();
           }
         }

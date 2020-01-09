@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 eXo Platform SAS.
+ * Copyright (C) 2011 eXo Platform SAS.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -16,23 +16,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.portal.mop.jdbc.dao;
 
-import java.util.List;
+package org.exoplatform.portal.config;
 
-import javax.persistence.TypedQuery;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.portal.mop.importer.ImportMode;
 
-import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
-import org.exoplatform.portal.mop.jdbc.entity.NodeEntity;
+/**
+ * @author <a href="trongtt@gmail.com">Trong Tran</a>
+ * @version $Revision$
+ */
+public class TestSiteDataImportConserve extends AbstractSiteDataImportTest {
 
-public class NodeDAOImpl extends GenericDAOJPAImpl<NodeEntity, Long> implements NodeDAO {
+  @Override
+  protected ImportMode getMode() {
+    return ImportMode.CONSERVE;
+  }
 
-    @Override
-    public List<NodeEntity> findAllByPage(Long pageId) {
-        TypedQuery<NodeEntity> query = getEntityManager().createNamedQuery("NodeEntity.findByPage",
-                NodeEntity.class);
-        query.setParameter("pageId", pageId);
+  @Override
+  protected void afterSecondBootWithOverride(PortalContainer container) throws Exception {
+    afterSecondBoot(container);
+  }
 
-        return query.getResultList();
-    }
 }

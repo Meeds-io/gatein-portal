@@ -2,6 +2,7 @@ package org.exoplatform.portal.mop.jdbc.service;
 
 import java.util.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.gatein.api.page.PageQuery;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -232,7 +233,7 @@ public class PageServiceImpl implements PageService {
                                             String pageName,
                                             String pageTitle) {
     PageQuery.Builder builder = new PageQuery.Builder();
-    builder.withDisplayName(pageTitle).withSiteType(convert(siteType)).withSiteName(siteName);
+    builder.withDisplayName(pageTitle).withSiteType(convert(siteType)).withSiteName(StringUtils.trim(siteName));
     builder.withPagination(from, limit);
     ListAccess<PageEntity> dataSet = pageDAO.findByQuery(builder.build());
     try {

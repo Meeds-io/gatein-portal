@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 eXo Platform SAS.
+ * Copyright (C) 2009 eXo Platform SAS.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -16,23 +16,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.portal.mop.jdbc.dao;
 
-import java.util.List;
+package org.exoplatform.portal.config;
 
-import javax.persistence.TypedQuery;
+import org.exoplatform.portal.pom.config.Utils;
 
-import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
-import org.exoplatform.portal.mop.jdbc.entity.NodeEntity;
+import junit.framework.TestCase;
 
-public class NodeDAOImpl extends GenericDAOJPAImpl<NodeEntity, Long> implements NodeDAO {
+/**
+ * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @version $Revision$
+ */
+public class TestEscape extends TestCase {
 
-    @Override
-    public List<NodeEntity> findAllByPage(Long pageId) {
-        TypedQuery<NodeEntity> query = getEntityManager().createNamedQuery("NodeEntity.findByPage",
-                NodeEntity.class);
-        query.setParameter("pageId", pageId);
-
-        return query.getResultList();
+    public void testQueryEscape() {
+        assertEquals("\\%", Utils.queryEscape("%"));
+        assertEquals("''", Utils.queryEscape("'"));
+        assertEquals("\\\"", Utils.queryEscape("\""));
+        assertEquals("\\_", Utils.queryEscape("_"));
+        assertEquals("\\\\", Utils.queryEscape("\\"));
     }
+
 }
