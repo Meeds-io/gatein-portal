@@ -31,6 +31,7 @@ import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.importer.Imported.Status;
 import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.pom.config.tasks.PreferencesTask;
 import org.exoplatform.portal.pom.data.ModelChange;
@@ -211,12 +212,16 @@ public interface DataStorage {
     List<String> getAllGroupNames() throws Exception;
 
     /**
+     * This method is deprecated ad it's for the standalone feature but we will drop this feature in PLF 5.3.x (portal RDBMS)
+     * so this method will always return NULL from PLF 5.3.x
+     *
      * Returns a String array that contains two elements. The first one is the site type and the second one is site name. <br>
      *
      * @param applicationStorageId
      * @return
      * @throws Exception
      */
+    @Deprecated
     String[] getSiteInfo(String applicationStorageId) throws Exception;
 
     <S> Application<S> getApplicationModel(String applicationStorageId) throws Exception;
@@ -225,8 +230,18 @@ public interface DataStorage {
      * Public API to access/modify MOP mixin, temporarily put here
      **************************************************************/
 
+    @Deprecated
     <A> A adapt(ModelObject modelObject, Class<A> type);
 
+    @Deprecated
     <A> A adapt(ModelObject modelObject, Class<A> type, boolean create);
+  
+    default Status getImportStatus() {
+      throw new UnsupportedOperationException();
+    }
+
+    default void saveImportStatus(Status status) {
+      throw new UnsupportedOperationException();
+    }
 
 }

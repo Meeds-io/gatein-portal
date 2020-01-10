@@ -36,7 +36,8 @@ import org.gatein.wci.security.Credentials;
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/jcr-configuration.xml") })
 public class TestTransientTokenService extends AbstractTokenServiceTest<TransientTokenService> {
 
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
+        super.setUp();
         PortalContainer container = getContainer();
         service = (TransientTokenService) container.getComponentInstanceOfType(TransientTokenService.class);
     }

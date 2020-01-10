@@ -31,6 +31,21 @@
   </component>
 
   <component>
+    <key>org.exoplatform.web.security.jpa.TokenDAO</key>
+    <type>org.exoplatform.web.security.jpa.TokenDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.web.security.GateInTokenStore</key>
+    <type>org.exoplatform.web.security.jpa.JPAGateInTokenStorage</type>
+  </component>
+  <component>
+    <type>org.exoplatform.web.security.JCRGateInTokenStorage</type>
+  </component>
+  <component>
+    <type>org.exoplatform.web.security.migrate.TokenDataMigrationService</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.web.security.security.CookieTokenService</key>
     <type>org.exoplatform.web.security.security.CookieTokenService</type>
     <init-params>

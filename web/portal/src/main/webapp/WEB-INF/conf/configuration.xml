@@ -66,4 +66,5 @@
   <import>war:/conf/portal/web-configuration.xml</import>
   <!--<import>war:/conf/portal/redirect-configuration.xml</import>-->
   <import>war:/conf/api/api-configuration.xml</import>
+  <import>war:/conf/jdbc/configuration.xml</import>
 </configuration>

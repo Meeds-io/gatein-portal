@@ -43,6 +43,10 @@ public class TestSimpleGeneratorService extends AbstractKernelTest {
         PortalContainer container = getContainer();
         service = (SimpleGeneratorCookieTokenService) container.getComponentInstanceOfType(SimpleGeneratorCookieTokenService.class);
         Thread.sleep(1000); // for enough time initial database
+        begin();
+    }
+    protected void tearDown() {
+        end();
     }
 
     /**

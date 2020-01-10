@@ -19,15 +19,23 @@
 
 package org.exoplatform.portal.mop.navigation;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.mop.AbstractMOPTest;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.portal.mop.description.DescriptionServiceImpl;
 import org.exoplatform.portal.pom.config.POMSessionManager;
+import org.exoplatform.portal.pom.data.ContainerData;
+import org.exoplatform.portal.pom.data.ModelDataStorage;
+import org.exoplatform.portal.pom.data.PortalData;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -43,7 +51,7 @@ public abstract class AbstractTestNavigationService extends AbstractMOPTest {
     protected POMSessionManager mgr;
 
     /** . */
-    protected NavigationServiceImpl service;
+    protected NavigationService service;
 
     /** . */
     protected DataStorage dataStorage;
@@ -51,18 +59,40 @@ public abstract class AbstractTestNavigationService extends AbstractMOPTest {
     /** . */
     protected DescriptionService descriptionService;
 
+    protected ModelDataStorage modelDataStorage;
+
     @Override
     protected void setUp() throws Exception {
         PortalContainer container = PortalContainer.getInstance();
         mgr = (POMSessionManager) container.getComponentInstanceOfType(POMSessionManager.class);
-        service = new NavigationServiceImpl(mgr);
+        service = getNavigationService();
         descriptionService = new DescriptionServiceImpl(mgr);
         dataStorage = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
+        modelDataStorage = (ModelDataStorage) container.getComponentInstanceOfType(ModelDataStorage.class);
 
         // Clear the cache for each test
-        service.clearCache();
+        if (service instanceof  NavigationServiceImpl) {
+            ((NavigationServiceImpl)service).clearCache();
+        }
 
         //
         super.setUp();
+    }
+
+    protected NavigationService getNavigationService() {
+        return new NavigationServiceImpl(mgr);
+    }
+
+    protected void createSite(SiteType siteType, String siteName) throws Exception {
+        ContainerData container = new ContainerData(null, "test", "", "", "", "", "",
+                "", "", "", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+        modelDataStorage.create(new PortalData(null,
+                siteName, siteType.getName(), null, null,
+                null, new ArrayList<>(), null, null, null, container, null));
+    }
+
+    protected void createNavigation(SiteType siteType, String siteName) throws Exception {
+        createSite(siteType, siteName);
+        service.saveNavigation(new NavigationContext(new SiteKey(siteType, siteName), new NavigationState(1)));
     }
 }

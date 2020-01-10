@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+  <!-- Managing both DB that use sequences and db that use auto increment -->
+  <property name="autoIncrement" value="true"
+    dbms="mysql,mssql,h2,sybase,db2,hsqldb" />
+  <property name="autoIncrement" value="false" dbms="oracle,postgresql" />
+
+  <!-- Application Registry -->
+  <changeSet author="gatein-token" id="1.0.0-1">
+    <createTable tableName="PORTAL_TOKENS">
+      <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_PORTAL_TOKENS"/>
+      </column>
+      <column name="TOKEN_ID" type="NVARCHAR(200)">
+        <constraints nullable="false" unique="true" uniqueConstraintName="UK_GATEIN_TOKEN_ID"/>
+      </column>
+      <column name="TOKEN_HASH" type="NVARCHAR(200)"/>
+      <column name="USERNAME" type="NVARCHAR(200)" />
+      <column name="PASSWORD" type="NVARCHAR(200)"/>
+      <column name="EXPIRATION_TIME" type="BIGINT"/>
+    </createTable>
+    <modifySql dbms="mysql">
+      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
+    </modifySql>
+  </changeSet>
+  <changeSet author="gatein-token" id="1.0.0-2" dbms="oracle,postgresql">
+    <createSequence sequenceName="SEQ_GATEIN_TOKEN_ID_GENERATOR" startValue="1"/>
+  </changeSet>
+</databaseChangeLog>

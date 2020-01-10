@@ -53,6 +53,9 @@ import org.exoplatform.portal.mop.redirects.Redirectable;
 import org.exoplatform.portal.pom.config.POMSession;
 import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.services.jcr.util.Text;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.mop.api.Attributes;
@@ -73,6 +76,8 @@ import org.gatein.mop.core.util.Tools;
  * @version $Revision$
  */
 public class Mapper {
+    /** . */
+    private final static Log LOG = ExoLogger.getLogger(Mapper.class);
 
     /** . */
     private static final Set<String> propertiesBlackList = Tools.set("jcr:uuid", "jcr:primaryType");
@@ -88,9 +93,6 @@ public class Mapper {
 
     /** . */
     private final POMSession session;
-
-    /** . */
-    private final Logger log = LoggerFactory.getLogger(Mapper.class);
 
     public Mapper(POMSession session) {
         this.session = session;
@@ -308,7 +310,7 @@ public class Mapper {
                 template.templatize(dst.getRootNavigation());
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -479,6 +481,9 @@ public class Mapper {
             } else if (component instanceof UIWindow) {
                 UIWindow window = (UIWindow) component;
                 ApplicationData<?> application = load(window);
+                if (application == null) {
+                  continue;
+                }
                 mo = application;
             } else if (component instanceof UIBody) {
                 mo = new BodyData(component.getObjectId(), BodyType.PAGE);
@@ -748,18 +753,17 @@ public class Mapper {
 
         //
         Customization<?> customization = src.getCustomization();
+        ApplicationType<S> type = null;
+        PersistentApplicationState<S> instanceState = null;
+        if (customization == null) {
+          return null;
+        } else {
+          ContentType<?> contentType = customization.getType();
+          String customizationid = customization.getId();
 
-        //
-        ContentType<?> contentType = customization.getType();
-
-        //
-        String customizationid = customization.getId();
-
-        // julien: should type check that
-        ApplicationType<S> type = (ApplicationType<S>) ApplicationType.getType(contentType);
-
-        //
-        PersistentApplicationState<S> instanceState = new PersistentApplicationState<S>(customizationid);
+          type = (ApplicationType<S>) ApplicationType.getType(contentType);
+          instanceState = new PersistentApplicationState<S>(customizationid);
+        }
 
         //
         HashMap<String, String> properties = new HashMap<String, String>();

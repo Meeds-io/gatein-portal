@@ -1,0 +1,601 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2003-2011 eXo Platform SAS.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<configuration
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+  xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">  
+  <component>
+    <type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.PageDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.PageDAOImpl</type>
+  </component> 
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.ContainerDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.ContainerDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.WindowDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.WindowDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.NodeDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.NodeDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.NavigationDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.NavigationDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.PermissionDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.PermissionDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.DescriptionDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.DescriptionDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.SiteDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.SiteDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.ApplicationDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.ApplicationDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.jdbc.dao.CategoryDAO</key>
+    <type>org.exoplatform.portal.jdbc.dao.CategoryDAOImpl</type>
+  </component>
+   
+  <component>
+    <key>org.exoplatform.portal.pom.data.ModelDataStorage</key>
+    <type>org.exoplatform.portal.jdbc.service.JDBCModelStorageImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.mop.page.PageService</key>
+    <type>org.exoplatform.portal.jdbc.service.PageServiceWrapper</type>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.portal.pom.config.POMDataStorage</key>
+    <type>org.exoplatform.portal.pom.config.POMDataStorage</type>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.portal.mop.description.DescriptionService</key>
+    <type>org.exoplatform.portal.jdbc.service.DescriptionServiceImpl</type>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.portal.mop.navigation.NavigationService</key>
+    <type>org.exoplatform.portal.mop.navigation.JDBCNavigationServiceWrapper</type>
+  </component>
+  <component>
+    <key>org.exoplatform.portal.mop.navigation.NavigationStore</key>
+    <type>org.exoplatform.portal.mop.navigation.NavigationStoreImpl</type>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.application.registry.ApplicationRegistryService</key>
+    <type>org.exoplatform.portal.jdbc.service.JDBCApplicationRegistryService</type>
+    <component-plugins>
+      <component-plugin>
+        <name>new.portal.portlets.registry</name>
+        <set-method>initListener</set-method>
+        <type>org.exoplatform.application.registry.ApplicationCategoriesPlugins</type>
+        <description>this listener init the portlets are registered in PortletRegister</description>
+        <init-params>
+          <object-param>
+            <name>administration</name>
+            <description>description</description>
+            <object type="org.exoplatform.application.registry.ApplicationCategory">
+              <field name="name">
+                <string>Administration</string>
+              </field>
+              <field name="displayName">
+                <string>Administration</string>
+              </field>
+              <field name="description">
+                <string>application for administration</string>
+              </field>
+              <field name="accessPermissions">
+                <collection type="java.util.ArrayList" item-type="java.lang.String">
+                  <value>
+                    <string>*:/platform/administrators</string>
+                  </value>
+                  <value>
+                    <string>*:/organization/management/executive-board</string>
+                  </value>
+                </collection>
+              </field>
+              <field name="applications">
+                <collection type="java.util.ArrayList">
+                  <value>
+                    <object type="org.exoplatform.application.registry.Application">
+                      <field name="applicationName">
+                        <string>ApplicationRegistryPortlet</string>
+                      </field>
+                      <field name="categoryName">
+                        <string>administration</string>
+                      </field>
+                      <field name="displayName">
+                        <string>Application Registry</string>
+                      </field>
+                      <field name="description">
+                        <string>Application Registry</string>
+                      </field>
+                      <field name="type">
+                        <string>portlet</string>
+                      </field>
+                      <field name="contentId">
+                        <string>exoadmin/ApplicationRegistryPortlet</string>
+                      </field>
+                      <field name="accessPermissions">
+                        <collection type="java.util.ArrayList" item-type="java.lang.String">
+                          <value>
+                            <string>*:/platform/administrators</string>
+                          </value>
+                          <value>
+                            <string>*:/organization/management/executive-board</string>
+                          </value>
+                        </collection>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.application.registry.Application">
+                      <field name="applicationName">
+                        <string>OrganizationPortlet</string>
+                      </field>
+                      <field name="categoryName">
+                        <string>administration</string>
+                      </field>
+                      <field name="displayName">
+                        <string>Organization Management</string>
+                      </field>
+                      <field name="description">
+                        <string>Organization Management</string>
+                      </field>
+                      <field name="type">
+                        <string>portlet</string>
+                      </field>
+                      <field name="contentId">
+                        <string>exoadmin/OrganizationPortlet</string>
+                      </field>
+                      <field name="accessPermissions">
+                        <collection type="java.util.ArrayList" item-type="java.lang.String">
+                          <value>
+                            <string>*:/platform/administrators</string>
+                          </value>
+                          <value>
+                            <string>*:/organization/management/executive-board</string>
+                          </value>
+                        </collection>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.application.registry.Application">
+                      <field name="applicationName">
+                        <string>AccountPortlet</string>
+                      </field>
+                      <field name="categoryName">
+                        <string>administration</string>
+                      </field>
+                      <field name="displayName">
+                        <string>New Account</string>
+                      </field>
+                      <field name="description">
+                        <string>New Account</string>
+                      </field>
+                      <field name="type">
+                        <string>portlet</string>
+                      </field>
+                      <field name="contentId">
+                        <string>exoadmin/AccountPortlet</string>
+                      </field>
+                      <field name="accessPermissions">
+                        <collection type="java.util.ArrayList" item-type="java.lang.String">
+                          <value>
+                            <string>*:/platform/administrators</string>
+                          </value>
+                          <value>
+                            <string>*:/organization/management/executive-board</string>
+                          </value>
+                        </collection>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.application.registry.Application">
+                      <field name="applicationName">
+                        <string>RedirectsAndImportExportAdminPortlet</string>
+                      </field>
+                      <field name="categoryName">
+                        <string>administration</string>
+                      </field>
+                      <field name="displayName">
+                        <string>Site Redirects and Import/Export</string>
+                      </field>
+                      <field name="description">
+                        <string>Site Redirects and Import/Export</string>
+                      </field>
+                      <field name="type">
+                        <string>portlet</string>
+                      </field>
+                      <field name="contentId">
+                        <string>redirect-admin/RedirectsAndImportExportAdminPortlet</string>
+                      </field>
+                      <field name="accessPermissions">
+                        <collection type="java.util.ArrayList" item-type="java.lang.String">
+                          <value>
+                            <string>*:/platform/administrators</string>
+                          </value>
+                          <value>
+                            <string>*:/organization/management/executive-board</string>
+                          </value>
+                        </collection>
+                      </field>
+                    </object>
+                  </value>
+                </collection>
+              </field>
+            </object>
+          </object-param>
+
+          <object-param>
+            <name>web</name>
+            <description>description</description>
+            <object type="org.exoplatform.application.registry.ApplicationCategory">
+              <field name="name">
+                <string>web</string>
+              </field>
+              <field name="displayName">
+                <string>web</string>
+              </field>
+              <field name="description">
+                <string>BasicPortlets</string>
+              </field>
+              <field name="accessPermissions">
+                <collection type="java.util.ArrayList" item-type="java.lang.String">
+                  <value>
+                    <string>*:/platform/users</string>
+                  </value>
+                </collection>
+              </field>
+              <field name="applications">
+                <collection type="java.util.ArrayList">
+                  <value>
+                    <object type="org.exoplatform.application.registry.Application">
+                      <field name="categoryName">
+                        <string>web</string>
+                      </field>
+                      <field name="applicationName">
+                        <string>IFramePortlet</string>
+                      </field>
+                      <field name="displayName">
+                        <string>IFrame</string>
+                      </field>
+                      <field name="description">
+                        <string>IFrame</string>
+                      </field>
+                      <field name="type">
+                        <string>portlet</string>
+                      </field>
+                      <field name="contentId">
+                        <string>web/IFramePortlet</string>
+                      </field>
+                      <field name="accessPermissions">
+                        <collection type="java.util.ArrayList" item-type="java.lang.String">
+                          <value>
+                            <string>*:/platform/users</string>
+                          </value>
+                        </collection>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.application.registry.Application">
+                      <field name="categoryName">
+                        <string>web</string>
+                      </field>
+                      <field name="applicationName">
+                        <string>SiteMapPortlet</string>
+                      </field>
+                      <field name="displayName">
+                        <string>SiteMap</string>
+                      </field>
+                      <field name="description">
+                        <string>SiteMap</string>
+                      </field>
+                      <field name="type">
+                        <string>portlet</string>
+                      </field>
+                      <field name="contentId">
+                        <string>web/SiteMapPortlet</string>
+                      </field>
+                      <field name="accessPermissions">
+                        <collection type="java.util.ArrayList" item-type="java.lang.String">
+                          <value>
+                            <string>*:/platform/users</string>
+                          </value>
+                        </collection>
+                      </field>
+                    </object>
+                  </value>
+                </collection>
+              </field>
+            </object>
+          </object-param>
+        </init-params>
+      </component-plugin>
+      
+     <component-plugin>
+      <name>wcm.portlets.registry</name>
+      <set-method>initListener</set-method>
+      <type>org.exoplatform.application.registry.ApplicationCategoriesPlugins</type>
+      <description>this listener init the portlets are registered in PortletRegister</description>
+      <init-params>
+        <object-param>
+          <name>Content</name>
+          <description>Content</description>
+          <object type="org.exoplatform.application.registry.ApplicationCategory">
+            <field name="name">
+              <string>Content</string>
+            </field>
+            <field name="displayName">
+              <string>Content</string>
+            </field>
+            <field name="accessPermissions">
+              <collection type="java.util.ArrayList" item-type="java.lang.String">
+                <value>
+                  <string>*:/platform/users</string>
+                </value>
+              </collection>
+            </field>
+            <field name="applications">
+              <collection type="java.util.ArrayList">
+              </collection>
+            </field>
+          </object>
+         </object-param>
+
+        </init-params>
+      </component-plugin>
+      
+      <component-plugin>
+        <name>new.portal.portlets.registry</name>
+        <set-method>initListener</set-method>
+        <type>org.exoplatform.application.registry.ApplicationCategoriesPlugins</type>
+        <description>this listener init the portlets are registered in PortletRegister</description>
+        <init-params>
+          <object-param>
+            <name>administration</name>
+            <description>description</description>
+            <object type="org.exoplatform.application.registry.ApplicationCategory">
+              <field name="name"><string>Administration</string></field>
+              <field name="displayName"><string>Administration</string></field>
+              <field name="description"><string>Applications for administration</string></field>
+              <field name="accessPermissions">
+                <collection type="java.util.ArrayList" item-type="java.lang.String">
+                  <value><string>*:/platform/administrators</string></value>
+                </collection>
+              </field>
+              <field name="applications">
+                <collection type="java.util.ArrayList">
+                  <value>
+                    <object type="org.exoplatform.application.registry.Application">
+                      <field name="applicationName"><string>ApplicationRegistryPortlet</string></field>
+                      <field name="categoryName"><string>administration</string></field>
+                      <field name="displayName"><string>Application Registry</string></field>
+                      <field name="description"><string>Application Registry</string></field>
+                      <field name="type"><string>portlet</string></field>
+                      <field name="contentId"><string>exoadmin/ApplicationRegistryPortlet</string></field>
+                      <field name="accessPermissions">
+                        <collection type="java.util.ArrayList" item-type="java.lang.String">
+                          <value><string>*:/platform/administrators</string></value>
+                        </collection>
+                      </field>
+                    </object>
+                  </value><value>
+                    <object type="org.exoplatform.application.registry.Application">
+                      <field name="applicationName"><string>GroupNavigationPortlet</string></field>
+                      <field name="categoryName"><string>administration</string></field>
+                      <field name="displayName"><string>Group Navigations</string></field>
+                      <field name="description"><string>Group Navigation Portlet</string></field>
+                      <field name="type"><string>portlet</string></field>
+                      <field name="contentId"><string>exoadmin/GroupNavigationPortlet</string></field>
+                      <field name="accessPermissions">
+                        <collection type="java.util.ArrayList" item-type="java.lang.String">
+                          <value><string>*:/platform/administrators</string></value>
+                        </collection>
+                      </field>
+                    </object>
+                  </value><value>
+                    <object type="org.exoplatform.application.registry.Application">
+                      <field name="applicationName"><string>AccountPortlet</string></field>
+                      <field name="categoryName"><string>administration</string></field>
+                      <field name="displayName"><string>New User Account</string></field>
+                      <field name="description"><string>New User Account</string></field>
+                      <field name="type"><string>portlet</string></field>
+                      <field name="contentId"><string>exoadmin/AccountPortlet</string></field>
+                      <field name="accessPermissions">
+                        <collection type="java.util.ArrayList" item-type="java.lang.String">
+                          <value><string>*:/platform/administrators</string></value>
+                        </collection>
+                      </field>
+                    </object>
+                  </value><value>
+                    <object type="org.exoplatform.application.registry.Application">
+                      <field name="applicationName"><string>OrganizationPortlet</string></field>
+                      <field name="categoryName"><string>administration</string></field>
+                      <field name="displayName"><string>Organization</string></field>
+                      <field name="description"><string>Organization Portlet</string></field>
+                      <field name="type"><string>portlet</string></field>
+                      <field name="contentId"><string>exoadmin/OrganizationPortlet</string></field>
+                      <field name="accessPermissions">
+                        <collection type="java.util.ArrayList" item-type="java.lang.String">
+                          <value><string>*:/platform/administrators</string></value>
+                        </collection>
+                      </field>
+                    </object>
+                  </value><value>
+                    <object type="org.exoplatform.application.registry.Application">
+                      <field name="applicationName"><string>PageManagementPortlet</string></field>
+                      <field name="categoryName"><string>administration</string></field>
+                      <field name="displayName"><string>Pages</string></field>
+                      <field name="description"><string>Page Management Portlet</string></field>
+                      <field name="type"><string>portlet</string></field>
+                      <field name="contentId"><string>exoadmin/PageManagementPortlet</string></field>
+                      <field name="accessPermissions">
+                        <collection type="java.util.ArrayList" item-type="java.lang.String">
+                          <value><string>*:/platform/administrators</string></value>
+                        </collection>
+                      </field>
+                    </object>
+                  </value><value>
+                    <object type="org.exoplatform.application.registry.Application">
+                      <field name="applicationName"><string>RegisterPortlet</string></field>
+                      <field name="categoryName"><string>administration</string></field>
+                      <field name="displayName"><string>Register</string></field>
+                      <field name="description"><string>Register Portlet</string></field>
+                      <field name="type"><string>portlet</string></field>
+                      <field name="contentId"><string>exoadmin/RegisterPortlet</string></field>
+                      <field name="accessPermissions">
+                        <collection type="java.util.ArrayList" item-type="java.lang.String">
+                          <value><string>*:/platform/administrators</string></value>
+                        </collection>
+                      </field>
+                    </object>
+                  </value>
+                </collection>
+              </field>
+            </object>
+          </object-param>
+          <object-param>
+            <name>content</name>
+            <description>description</description>
+            <object type="org.exoplatform.application.registry.ApplicationCategory">
+              <field name="name"><string>Content</string></field>
+              <field name="displayName"><string>Content</string></field>
+              <field name="description"><string>Applications for content</string></field>
+              <field name="accessPermissions">
+                <collection type="java.util.ArrayList" item-type="java.lang.String">
+                  <value><string>*:/platform/web-contributors</string></value>
+                </collection>
+              </field>
+              <field name="applications">
+                <collection type="java.util.ArrayList">
+                  <value>
+                    <object type="org.exoplatform.application.registry.Application">
+                      <field name="applicationName"><string>LogoPortlet</string></field>
+                      <field name="categoryName"><string>content</string></field>
+                      <field name="displayName"><string>Simple Logo</string></field>
+                      <field name="description"><string>Logo Portlet</string></field>
+                      <field name="type"><string>portlet</string></field>
+                      <field name="contentId"><string>web/LogoPortlet</string></field>
+                      <field name="accessPermissions">
+                        <collection type="java.util.ArrayList" item-type="java.lang.String">
+                          <value><string>*:/platform/web-contributors</string></value>
+                        </collection>
+                      </field>
+                    </object>
+                  </value>
+                </collection>
+              </field>
+            </object>
+          </object-param>
+          <object-param>
+            <name>tools</name>
+            <description>description</description>
+            <object type="org.exoplatform.application.registry.ApplicationCategory">
+              <field name="name"><string>Tools</string></field>
+              <field name="displayName"><string>Tools</string></field>
+              <field name="description"><string>Applications for tools</string></field>
+              <field name="accessPermissions">
+                <collection type="java.util.ArrayList" item-type="java.lang.String">
+                  <value><string>*:/platform/users</string></value>
+                </collection>
+              </field>
+              <field name="applications">
+                <collection type="java.util.ArrayList">
+                  <value>
+                    <object type="org.exoplatform.application.registry.Application">
+                      <field name="applicationName"><string>IFramePortlet</string></field>
+                      <field name="categoryName"><string>tools</string></field>
+                      <field name="displayName"><string>IFrame</string></field>
+                      <field name="description"><string>IFrame Portlet</string></field>
+                      <field name="type"><string>portlet</string></field>
+                      <field name="contentId"><string>web/IFramePortlet</string></field>
+                      <field name="accessPermissions">
+                        <collection type="java.util.ArrayList" item-type="java.lang.String">
+                          <value><string>*:/platform/users</string></value>
+                        </collection>
+                      </field>
+                    </object>
+                  </value>
+                </collection>
+              </field>
+            </object>
+          </object-param>
+        </init-params>
+      </component-plugin>
+    </component-plugins>
+  </component>
+
+  <component>
+    <key>org.exoplatform.portal.mop.page.PageServiceImpl</key>
+    <type>org.exoplatform.portal.mop.page.PageServiceImpl</type>
+  </component>
+  <component>
+    <type>org.exoplatform.application.registry.impl.ApplicationRegistryServiceImpl</type>
+  </component>
+  <component>
+    <type>org.exoplatform.portal.jdbc.migration.SiteMigrationService</type>
+  </component>
+  <component>
+    <type>org.exoplatform.portal.jdbc.migration.PageMigrationService</type>
+  </component>
+  <component>
+    <type>org.exoplatform.portal.jdbc.migration.NavigationMigrationService</type>
+  </component>
+  <component>
+    <type>org.exoplatform.portal.jdbc.migration.AppRegistryMigrationService</type>
+  </component>
+  <component>
+    <type>org.exoplatform.portal.jdbc.migration.RDBMSMigrationManager</type>
+  </component>
+
+  <external-component-plugins>
+    <!-- The full qualified name of the ListenerService -->
+    <target-component>org.exoplatform.services.listener.ListenerService</target-component>
+    <component-plugin>
+      <!-- The name of the listener that is also the name of the target event -->
+      <name>org.exoplatform.portal.jdbc.entity.NodeEntity.removed</name>
+      <!-- The name of the method to call on the ListenerService in order to register the Listener -->
+      <set-method>addListener</set-method>
+      <!-- The full qualified name of the Listener -->
+      <type>org.exoplatform.portal.jdbc.service.NodeDescriptionListener</type>
+    </component-plugin>    
+  </external-component-plugins>
+</configuration>

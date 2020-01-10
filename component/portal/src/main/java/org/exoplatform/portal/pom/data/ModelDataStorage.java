@@ -27,6 +27,8 @@ import org.exoplatform.portal.config.Query;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.mop.importer.Imported.Status;
+import org.jgroups.annotations.Unsupported;
 
 /**
  * Created by The eXo Platform SAS Apr 19, 2007
@@ -49,7 +51,8 @@ public interface ModelDataStorage {
      * Saves a page. If a page with the same id already exists then a merge operation will occur, otherwise it throws
      * {@link IllegalStateException}
      *
-     * The operation returns a list of the change object that describes the changes that occured during the save operation.
+     * From PLF 5.3.x (RDBMS implementation) we drop support return the change list as it's not used any where.
+     * So the method always return the empty list.
      *
      * @param page the page to save
      * @return the list of model changes that occured during the save operation
@@ -71,6 +74,14 @@ public interface ModelDataStorage {
 
     void save() throws Exception;
 
+    /**
+     * This method is deprecated as it is for standalone mode but we drop support this feature in PLF 5.3.x (portal RDBMS)
+     * So this method will be dropped too. It will always return NULL
+     * @param workspaceObjectId
+     * @return
+     * @throws Exception
+     */
+    @Deprecated
     String[] getSiteInfo(String workspaceObjectId) throws Exception;
 
     <S> ApplicationData<S> getApplicationData(String applicationStorageId);
@@ -80,8 +91,13 @@ public interface ModelDataStorage {
      *
      * temporarily put here
      ***************************************************************/
+    @Deprecated
     <A> A adapt(ModelData modelData, Class<A> type);
-
+    @Deprecated
     <A> A adapt(ModelData modelData, Class<A> type, boolean create);
+
+    Status getImportStatus();
+
+    void saveImportStatus(Status status);
 
 }

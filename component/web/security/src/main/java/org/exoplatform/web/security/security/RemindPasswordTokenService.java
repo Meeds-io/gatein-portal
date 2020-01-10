@@ -24,6 +24,7 @@ package org.exoplatform.web.security.security;
 
 import org.exoplatform.commons.chromattic.ChromatticManager;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.web.security.GateInTokenStore;
 import org.exoplatform.web.security.codec.CodecInitializer;
 
 /**
@@ -32,9 +33,9 @@ import org.exoplatform.web.security.codec.CodecInitializer;
  */
 public class RemindPasswordTokenService extends CookieTokenService {
 
-    public RemindPasswordTokenService(InitParams initParams, ChromatticManager chromatticManager, CodecInitializer codecInitializer)
+    public RemindPasswordTokenService(InitParams initParams, GateInTokenStore tokenStore, CodecInitializer codecInitializer)
             throws TokenServiceInitializationException {
-        super(initParams, chromatticManager, codecInitializer);
+        super(initParams, tokenStore, codecInitializer);
     }
 
     @Override

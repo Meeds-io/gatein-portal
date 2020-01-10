@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import junit.framework.AssertionFailedError;
 
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
@@ -622,6 +623,7 @@ public class TestDataStorage extends AbstractConfigTest {
             @Override
             public void run() {
                 begin();
+                ExoContainerContext.setCurrentContainer(getContainer());
                 try {
                     List<String> isolatedNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
                     assertEquals(new HashSet<String>(names), new HashSet<String>(isolatedNames));
@@ -666,6 +668,7 @@ public class TestDataStorage extends AbstractConfigTest {
         new Thread() {
             public void run() {
                 begin();
+                ExoContainerContext.setCurrentContainer(getContainer());
                 try {
                     List<String> isolatedNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
                     assertTrue("Was expecting " + isolatedNames + " to contain " + names, isolatedNames.containsAll(names));
@@ -870,29 +873,6 @@ public class TestDataStorage extends AbstractConfigTest {
 
         PortalConfig pConfig = storage_.getPortalConfig(PortalConfig.USER_TYPE, "testing");
         assertNotNull("the User's PortalConfig is not null", pConfig);
-    }
-
-    public void testWSRP() throws Exception {
-        WSRP wsrp = new WSRP();
-        String id = "portlet id";
-        wsrp.setPortletId(id);
-        TransientApplicationState<WSRP> state = new TransientApplicationState<WSRP>("test", wsrp);
-        Application<WSRP> wsrpApplication = Application.createWSRPApplication();
-        wsrpApplication.setState(state);
-
-        Page container = new Page();
-        String pageId = "portal::test::wsrp_page";
-        container.setPageId(pageId);
-        container.getChildren().add(wsrpApplication);
-        pageService.savePage(new PageContext(container.getPageKey(), null));
-        storage_.save(container);
-
-        container = storage_.getPage(pageId);
-        wsrpApplication = (Application<WSRP>) container.getChildren().get(0);
-
-        wsrp = storage_.load(wsrpApplication.getState(), ApplicationType.WSRP_PORTLET);
-        assertNotNull(wsrp);
-        assertEquals(id, wsrp.getPortletId());
     }
 
     public void testJTA() throws Exception {

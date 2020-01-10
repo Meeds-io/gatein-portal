@@ -24,6 +24,24 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd http://www.exoplaform.org/xml/ns/kernel_1_2.xsd"
     xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
+  <component>
+    <type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.persistence.DataInitializer</key>
+    <type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializer</type>
+    <init-params>
+      <value-param>
+        <name>liquibase.datasource</name>
+        <value>java:/comp/env/exo-jpa_portal</value>
+      </value-param>
+      <value-param>
+        <name>liquibase.contexts</name>
+        <value>${exo.liquibase.contexts:production}</value>
+      </value-param>
+    </init-params>
+  </component>
 
   <component>
     <key>org.exoplatform.commons.chromattic.ChromatticManager</key>
@@ -43,6 +61,21 @@
         <value>jar:/conf</value>
       </value-param>
     </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.web.security.jpa.TokenDAO</key>
+    <type>org.exoplatform.web.security.jpa.TokenDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.web.security.GateInTokenStore</key>
+    <type>org.exoplatform.web.security.jpa.JPAGateInTokenStorage</type>
+  </component>
+  <component>
+    <type>org.exoplatform.web.security.JCRGateInTokenStorage</type>
+  </component>
+  <component>
+    <type>org.exoplatform.web.security.migrate.TokenDataMigrationService</type>
   </component>
 
   <!-- Default CookieTokenService with salted hashing -->
@@ -138,6 +171,25 @@
     </init-params>
   </component>
 
+  <component>
+    <key>org.exoplatform.commons.api.event.EventManager</key>
+    <type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
+  </component>
+  <component>
+    <type>org.exoplatform.settings.jpa.dao.SettingContextDAO</type>
+  </component>
+  <component>
+    <type>org.exoplatform.settings.jpa.dao.SettingScopeDAO</type>
+  </component>
+  <component>
+    <type>org.exoplatform.settings.jpa.dao.SettingsDAO</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.settings.SettingService</key>
+    <type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
+  </component>
+
   <external-component-plugins>
     <target-component>org.exoplatform.commons.chromattic.ChromatticManager</target-component>
     <component-plugin>
@@ -187,5 +239,36 @@
       </init-params>
     </component-plugin>
   </external-component-plugins>
+
+  <!--<external-component-plugins>
+    <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
+    <component-plugin>
+      <name>bind.datasource</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.naming.BindReferencePlugin</type>
+      <init-params>
+        <value-param>
+          <name>bind-name</name>
+          <value>java:/comp/env/exo-jpa_portal</value>
+        </value-param>
+        <value-param>
+          <name>class-name</name>
+          <value>javax.sql.DataSource</value>
+        </value-param>
+        <value-param>
+          <name>factory</name>
+          <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
+        </value-param>
+        <properties-param>
+          <name>ref-addresses</name>
+          <description>ref-addresses</description>
+          <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+          <property name="url" value="jdbc:hsqldb:mem:db/exojpa" />
+          <property name="username" value="sa" />
+          <property name="password" value="" />
+        </properties-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>-->
 
 </configuration>

@@ -81,7 +81,6 @@ public class UIAddApplicationForm extends UIForm {
         addUIFormInput(new UIFormStringInput(FIELD_NAME, null, null).addValidator(StringLengthValidator.class, 3, 30));
         List<SelectItemOption<String>> types = new ArrayList<>(2);
         types.add(new SelectItemOption<>(ApplicationType.PORTLET.getName()));
-        types.add(new SelectItemOption<>(ApplicationType.WSRP_PORTLET.getName()));
         UIFormSelectBox uiSelectBox = new UIFormSelectBox(FIELD_TYPE, null, types);
         uiSelectBox.setOnChange("ChangeType");
         addUIFormInput(uiSelectBox);
@@ -139,8 +138,6 @@ public class UIAddApplicationForm extends UIForm {
         ApplicationType type = ApplicationType.getType(typeName);
         if (ApplicationType.PORTLET == type) {
             return createApplicationsFromPortlets(false);
-        } else if (ApplicationType.WSRP_PORTLET == type) {
-            return createApplicationsFromPortlets(true);
         }
 
         return Collections.emptyList();

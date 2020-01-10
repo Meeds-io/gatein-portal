@@ -83,6 +83,10 @@ public class NavigationContext {
         }
     }
 
+    public NavigationData getData() {
+        return this.data;
+    }
+
     /**
      * Updates the navigation state the behavior is not the same wether or not the navigation is persistent:
      * When the navigation is persistent, any state is allowed:

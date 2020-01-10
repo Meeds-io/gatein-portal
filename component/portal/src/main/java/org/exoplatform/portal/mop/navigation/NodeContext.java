@@ -19,12 +19,7 @@
 
 package org.exoplatform.portal.mop.navigation;
 
-import java.util.AbstractCollection;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import org.exoplatform.portal.tree.list.ListTree;
 
@@ -366,7 +361,7 @@ public final class NodeContext<N> extends ListTree<NodeContext<N>> {
         }
 
         //
-        NodeContext<N> nodeContext = new NodeContext<N>(tree, "" + tree.sequence++, name, NodeState.INITIAL, true);
+        NodeContext<N> nodeContext = new NodeContext<N>(tree, "seq_" + tree.sequence++, name, NodeState.INITIAL, true);
         _add(index, nodeContext);
         return nodeContext;
     }
@@ -463,7 +458,7 @@ public final class NodeContext<N> extends ListTree<NodeContext<N>> {
             tree.addChange(new NodeChange.Moved<NodeContext<N>>(previousParent, this, previous, child));
         } else {
             // The name should never be null as it's a newly created node
-            tree.addChange(new NodeChange.Created<NodeContext<N>>(this, previous, child, child.name));
+            tree.addChange(new NodeChange.Created<NodeContext<N>>(this, previous, child, child.getName()));
         }
     }
 
