@@ -20,6 +20,7 @@
 package org.exoplatform.web;
 
 import java.util.EventObject;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -107,6 +108,14 @@ public class GenericHttpListener extends AbstractHttpSessionListener implements 
      * the Portal ThreadLocal 3) Broadcast the CONTEXT_DESTROYED event 4) Flush the {@link ThreadLocal} for the PortalContainer
      */
     public void contextDestroyed(ServletContextEvent event) {
+        RootContainer rootContainer = RootContainer.getInstance();
+        List<ServletContextListener> listeners = rootContainer.getComponentInstancesOfType(ServletContextListener.class);
+        if (listeners != null && !listeners.isEmpty()) {
+          for (ServletContextListener servletContextListener : listeners) {
+            servletContextListener.contextDestroyed(event);
+          }
+        }
+
         boolean hasBeenSet = false;
         final ExoContainer oldContainer = ExoContainerContext.getCurrentContainer();
         try {
@@ -144,6 +153,14 @@ public class GenericHttpListener extends AbstractHttpSessionListener implements 
      * PortalContainer
      */
     public void contextInitialized(final ServletContextEvent event) {
+        RootContainer rootContainer = RootContainer.getInstance();
+        List<ServletContextListener> listeners = rootContainer.getComponentInstancesOfType(ServletContextListener.class);
+        if (listeners != null && !listeners.isEmpty()) {
+          for (ServletContextListener servletContextListener : listeners) {
+            servletContextListener.contextInitialized(event);
+          }
+        }
+
         final PortalContainerPostInitTask task = new PortalContainerPostInitTask() {
             public void execute(ServletContext scontext, PortalContainer portalContainer) {
                 try {
@@ -154,7 +171,7 @@ public class GenericHttpListener extends AbstractHttpSessionListener implements 
             }
         };
         ServletContext ctx = event.getServletContext();
-        RootContainer.getInstance().addInitTask(event.getServletContext(), task);
+        rootContainer.addInitTask(ctx, task);
     }
 
     /**
@@ -174,8 +191,7 @@ public class GenericHttpListener extends AbstractHttpSessionListener implements 
      */
     private <T extends EventObject> void broadcast(PortalContainer portalContainer, String eventName, T event) {
         try {
-            ListenerService listenerService = (ListenerService) portalContainer
-                    .getComponentInstanceOfType(ListenerService.class);
+            ListenerService listenerService = portalContainer.getComponentInstanceOfType(ListenerService.class);
             listenerService.broadcast(eventName, portalContainer, event);
         } catch (Exception e) {
             log.warn("Cannot broadcast the event '" + eventName + "'", e);
