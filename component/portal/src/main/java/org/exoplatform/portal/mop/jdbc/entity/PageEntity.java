@@ -36,7 +36,7 @@ import org.exoplatform.portal.mop.SiteType;
 @Table(name = "PORTAL_PAGES")
 @NamedQueries({
     @NamedQuery(name = "PageEntity.deleteByOwner", query = "DELETE GateInPage p WHERE p.owner.id = :ownerId"),
-    @NamedQuery(name = "PageEntity.findByKey", query = "SELECT p FROM GateInPage p JOIN p.owner s WHERE s.siteType = :ownerType AND s.name = :ownerId AND p.name = :name") })
+    @NamedQuery(name = "PageEntity.findByKey", query = "SELECT p FROM GateInPage p WHERE p.name = :name AND p.owner.siteType = :ownerType AND p.owner.name = :ownerId") })
 public class PageEntity extends ComponentEntity implements Serializable {
 
   private static final long     serialVersionUID = -6195451978995765259L;
