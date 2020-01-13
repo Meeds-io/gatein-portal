@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.persistence.EntityTransaction;
 
+import org.gatein.api.common.Pagination;
+
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.component.test.*;
 import org.exoplatform.portal.mop.jdbc.entity.WindowEntity;
@@ -57,7 +59,99 @@ public class WindowDAOTest extends AbstractKernelTest {
     List<WindowEntity> results = windowDAO.findByIds(Arrays.asList(entity1.getId(), entity2.getId()));
     assertEquals(2, results.size());
   }
-  
+
+  public void testDeleteByContentId() {
+    String toDeleteContentId = "App1/toDeletePortlet1";
+    windowDAO.create(createInstance(toDeleteContentId, AppType.PORTLET));
+    windowDAO.create(createInstance(toDeleteContentId, AppType.PORTLET));
+    windowDAO.create(createInstance(toDeleteContentId, AppType.PORTLET));
+    windowDAO.create(createInstance(toDeleteContentId, AppType.PORTLET));
+    windowDAO.create(createInstance(toDeleteContentId, AppType.PORTLET));
+
+    windowDAO.create(createInstance("App2/toNotDeletePortlet2", AppType.PORTLET));
+    restartTransaction();
+
+    List<Long> results = windowDAO.findIdsByContentIds(Arrays.asList(toDeleteContentId, "App2/toNotDeletePortlet2"),
+                                                       new Pagination(0, 10));
+    assertEquals(6, results.size());
+
+    windowDAO.deleteByContentId(toDeleteContentId);
+    results = windowDAO.findIdsByContentIds(Arrays.asList(toDeleteContentId), new Pagination(0, 10));
+    assertEquals(0, results.size());
+    results = windowDAO.findIdsByContentIds(Arrays.asList(toDeleteContentId, "App2/toNotDeletePortlet2"), new Pagination(0, 10));
+    assertEquals(1, results.size());
+  }
+
+  public void testUpdateContentId() {
+    String oldContentId = "App1/toUpdatePortlet1";
+    String newContentId = "App1/updatedPortlet1";
+    windowDAO.create(createInstance(oldContentId, AppType.PORTLET));
+    windowDAO.create(createInstance(oldContentId, AppType.PORTLET));
+    windowDAO.create(createInstance(oldContentId, AppType.PORTLET));
+    windowDAO.create(createInstance(oldContentId, AppType.PORTLET));
+    windowDAO.create(createInstance(oldContentId, AppType.PORTLET));
+
+    windowDAO.create(createInstance("App2/toNotUpdatePortlet2", AppType.PORTLET));
+    restartTransaction();
+
+    List<Long> results = windowDAO.findIdsByContentIds(Arrays.asList(newContentId), new Pagination(0, 10));
+    assertEquals(0, results.size());
+
+    results = windowDAO.findIdsByContentIds(Arrays.asList(oldContentId, "App2/toNotUpdatePortlet2"),
+                                            new Pagination(0, 10));
+    assertEquals(6, results.size());
+
+    windowDAO.updateContentId(oldContentId, newContentId);
+
+    results = windowDAO.findIdsByContentIds(Arrays.asList(oldContentId), new Pagination(0, 10));
+    assertEquals(0, results.size());
+
+    results = windowDAO.findIdsByContentIds(Arrays.asList(oldContentId, "App2/toNotUpdatePortlet2"), new Pagination(0, 10));
+    assertEquals(1, results.size());
+
+    results = windowDAO.findIdsByContentIds(Arrays.asList(oldContentId, newContentId, "App2/toNotUpdatePortlet2"),
+                                            new Pagination(0, 10));
+    assertEquals(6, results.size());
+
+    results = windowDAO.findIdsByContentIds(Arrays.asList(newContentId), new Pagination(0, 10));
+    assertEquals(5, results.size());
+  }
+
+  public void testfindByContentIds() {
+    WindowEntity entity1 = createInstance("App1/portlet1", AppType.PORTLET);
+    windowDAO.create(entity1);
+    WindowEntity entity2 = createInstance("App2/portlet2", AppType.PORTLET);
+    windowDAO.create(entity2);
+    restartTransaction();
+
+    List<Long> results = windowDAO.findIdsByContentIds(Arrays.asList("App1/portlet1", "App2/portlet1"), new Pagination(0, 10));
+    assertEquals(1, results.size());
+
+    results = windowDAO.findIdsByContentIds(Arrays.asList("app1/portlet1", "app2/portlet2"), new Pagination(0, 10));
+    assertEquals(0, results.size());
+
+    results = windowDAO.findIdsByContentIds(Arrays.asList("App1/portlet1", "App2/portlet2"), new Pagination(0, 10));
+    assertEquals(2, results.size());
+
+    results = windowDAO.findIdsByContentIds(Arrays.asList("App1/portlet1", "App2/portlet2"), new Pagination(0, 1));
+    assertEquals(1, results.size());
+
+    results = windowDAO.findIdsByContentIds(Arrays.asList("App1/portlet1", "App2/portlet2"), new Pagination(0, 1).getNext());
+    assertEquals(1, results.size());
+
+    results = windowDAO.findIdsByContentIds(Arrays.asList("App1/portlet1", "App2/portlet2"),
+                                            new Pagination(0, 1).getNext().getNext());
+    assertEquals(0, results.size());
+
+    results = windowDAO.findIdsByContentIds(Arrays.asList(), new Pagination(0, 10));
+    assertNotNull(results);
+    assertEquals(0, results.size());
+
+    results = windowDAO.findIdsByContentIds(Arrays.asList("app1"), new Pagination(0, 10));
+    assertNotNull(results);
+    assertEquals(0, results.size());
+  }
+
   private WindowEntity createInstance(String contentId, AppType type) {
     WindowEntity entity = new WindowEntity();
     entity.setAppType(type);

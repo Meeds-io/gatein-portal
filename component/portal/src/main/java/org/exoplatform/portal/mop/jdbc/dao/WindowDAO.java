@@ -21,6 +21,8 @@ package org.exoplatform.portal.mop.jdbc.dao;
 
 import java.util.List;
 
+import org.gatein.api.common.Pagination;
+
 import org.exoplatform.commons.api.persistence.GenericDAO;
 import org.exoplatform.portal.mop.jdbc.entity.WindowEntity;
 
@@ -29,5 +31,11 @@ public interface WindowDAO extends GenericDAO<WindowEntity, Long> {
   List<WindowEntity> findByIds(List<Long> ids);
 
   void deleteById(Long id);
+
+  List<Long> findIdsByContentIds(List<String> contentIds, Pagination pagination);
+
+  int updateContentId(String oldContentId, String newContentId);
+
+  int deleteByContentId(String oldContentId);
 
 }

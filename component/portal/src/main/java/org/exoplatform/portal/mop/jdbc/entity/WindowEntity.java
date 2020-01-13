@@ -31,7 +31,11 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
 @ExoEntity
 @Table(name = "PORTAL_WINDOWS")
 @NamedQueries({
-    @NamedQuery(name = "WindowEntity.findByIds", query = "SELECT w FROM GateInWindow w WHERE w.id in (:ids)") })
+    @NamedQuery(name = "WindowEntity.findByIds", query = "SELECT w FROM GateInWindow w WHERE w.id IN (:ids)"),
+    @NamedQuery(name = "WindowEntity.findByContentIds", query = "SELECT w.id FROM GateInWindow w WHERE w.contentId IN (:contentIds)"),
+    @NamedQuery(name = "WindowEntity.updateContentId", query = "UPDATE GateInWindow SET contentId = :newContentId WHERE contentId = :oldContentId"),
+    @NamedQuery(name = "WindowEntity.deleteByContentId", query = "DELETE GateInWindow WHERE contentId = :contentId"),
+})
 public class WindowEntity extends ComponentEntity implements Serializable {
 
   private static final long serialVersionUID = 6633792468705838255L;
