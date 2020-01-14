@@ -45,7 +45,7 @@
     <init-params>
       <values-param>
         <name>service.configuration</name>
-        <value>jcr-token</value>
+        <value>cookie-token</value>
         <value>7</value>
         <value>DAY</value>
         <value>autologin</value>

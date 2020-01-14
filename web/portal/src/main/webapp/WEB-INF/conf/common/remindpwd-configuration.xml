@@ -31,7 +31,7 @@
     <init-params>
       <values-param>
         <name>service.configuration</name>
-        <value>jcr-token</value>
+        <value>password-reminder-token</value>
         <value>${gatein.portal.resetpassword.expiretime:24}</value>
         <value>HOUR</value>
         <value>remindpwd</value>
