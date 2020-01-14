@@ -35,6 +35,35 @@
       </value-param>
     </init-params>
   </component>
+
+  <component>
+    <key>CacheConfigurationProperties</key>
+    <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
+    <init-params>
+      <properties-param>
+        <name>CacheManagementProperties</name>
+        <description>Filter used to notify caches</description>
+        <property name="exo.cache.config.template" value="jar:/conf/cache/infinispan/local/cache-config.xml" />
+      </properties-param>
+      <properties-param profiles="cluster">
+        <name>CacheManagementProperties</name>
+        <description>Filter used to notify caches</description>
+        <property name="exo.cache.config.template" value="jar:/conf/cache/infinispan/cluster/cache-config.xml" />
+        <property name="exo.cache.async.config.template" value="jar:/conf/cache/infinispan/cluster/cache-async-config.xml" />
+      </properties-param>
+      <properties-param profiles="cluster">
+        <name>JGroupsProperties</name>
+        <description>Jgroups configuration</description>
+        <property name="exo.service.cluster.jgroups.config" value="jar:/conf/jgroups/jgroups-service-udp.xml" />
+      </properties-param>
+      <properties-param profiles="cluster-jgroups-tcp">
+        <name>JGroupsProperties</name>
+        <description>Jgroups configuration</description>
+        <property name="exo.service.cluster.jgroups.config" value="jar:/conf/jgroups/jgroups-service-tcp.xml" />
+      </properties-param>
+    </init-params>
+  </component>
+
   <component>
     <key>org.exoplatform.commons.api.persistence.DataInitializer</key>
     <type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializer</type>
@@ -61,6 +90,7 @@
         <values-param>
           <name>changelogs</name>
           <description>Change logs of settings</description>
+          <value>db/changelog/quartz.db.changelog-1.0.0.xml</value>
           <value>db/changelog/settings.db.changelog-1.0.0.xml</value>
         </values-param>
       </init-params>
