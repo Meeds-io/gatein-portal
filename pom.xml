@@ -128,7 +128,6 @@
     <module>examples</module>
     <module>starter</module>
     <module>cdi</module>
-    <module>testsuite</module>
   </modules>
 
   <dependencyManagement>
