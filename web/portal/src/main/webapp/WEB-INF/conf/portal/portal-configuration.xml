@@ -55,7 +55,7 @@
       <value-param>
         <name>portal.creator.groups</name>
         <description>groups with membership type have permission to manage portal</description>
-        <value>*:/platform/administrators,*:/organization/management/executive-board</value>
+        <value>*:/platform/administrators</value>
       </value-param>
 
       <value-param>
