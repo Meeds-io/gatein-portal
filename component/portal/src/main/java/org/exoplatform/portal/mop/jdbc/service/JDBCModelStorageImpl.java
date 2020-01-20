@@ -516,7 +516,10 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
         } else if (srcChild instanceof ApplicationData) {
           dstChild = windowDAO.find(srcChildId);
           if (dstChild != null) {
-            buildWindowEntity((WindowEntity) dstChild, (ApplicationData) srcChild);
+            dstChild = buildWindowEntity((WindowEntity) dstChild, (ApplicationData) srcChild);
+            if (dstChild == null) {
+              continue;
+            }
             windowDAO.update((WindowEntity) dstChild);
           }
         } else if (srcChild instanceof BodyData) {
@@ -533,6 +536,9 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
           dstChild = containerDAO.create((ContainerEntity) dstChild);
         } else if (srcChild instanceof ApplicationData) {
           dstChild = buildWindowEntity(null, (ApplicationData) srcChild);
+          if (dstChild == null) {
+            continue;
+          }
           dstChild = windowDAO.create((WindowEntity) dstChild);
         } else if (srcChild instanceof BodyData) {
           dstChild = buildContainerEntity((BodyData) srcChild);
@@ -768,6 +774,10 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
       dst = new WindowEntity();
 
       ApplicationType type = srcChild.getType();
+      if (type == null) {
+        log.warn("Application type of instance {} is not recognized, ignore it", dst.getContentId());
+        return null;
+      }
       if (ApplicationType.PORTLET.getName().equals(type.getName())) {
         dst.setAppType(AppType.PORTLET);
       }
