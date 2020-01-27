@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.persistence.TypedQuery;
 
-import org.exoplatform.portal.mop.jdbc.entity.ContainerEntity;
+import org.exoplatform.portal.jdbc.entity.ContainerEntity;
 
 public class ContainerDAOImpl extends AbstractDAO<ContainerEntity> implements ContainerDAO {
 

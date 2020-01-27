@@ -23,8 +23,8 @@ import javax.persistence.TypedQuery;
 
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
+import org.exoplatform.portal.jdbc.entity.NavigationEntity;
 import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.jdbc.entity.NavigationEntity;
 
 public class NavigationDAOImpl extends GenericDAOJPAImpl<NavigationEntity, Long>implements NavigationDAO {
 

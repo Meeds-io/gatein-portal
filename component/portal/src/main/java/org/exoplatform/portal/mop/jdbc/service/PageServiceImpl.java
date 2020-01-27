@@ -11,10 +11,10 @@ import org.json.simple.parser.ParseException;
 
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.Safe;
+import org.exoplatform.portal.jdbc.entity.*;
+import org.exoplatform.portal.jdbc.entity.ComponentEntity.TYPE;
 import org.exoplatform.portal.mop.*;
 import org.exoplatform.portal.mop.jdbc.dao.*;
-import org.exoplatform.portal.mop.jdbc.entity.*;
-import org.exoplatform.portal.mop.jdbc.entity.ComponentEntity.TYPE;
 import org.exoplatform.portal.mop.page.*;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;

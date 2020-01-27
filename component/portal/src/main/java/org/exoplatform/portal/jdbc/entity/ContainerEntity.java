@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2016 eXo Platform SAS.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -16,8 +16,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.portal.mop.jdbc.entity;
+package org.exoplatform.portal.jdbc.entity;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,52 +28,56 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
-import org.exoplatform.portal.mop.SiteType;
 
-@Entity(name = "GateInSite")
+@Entity(name = "GateInContainer")
 @ExoEntity
-@Table(name = "PORTAL_SITES")
-@NamedQueries({
-    @NamedQuery(name = "SiteEntity.findByKey", query = "SELECT s FROM GateInSite s WHERE s.siteType = :siteType AND s.name = :name"),
-    @NamedQuery(name = "SiteEntity.findByType", query = "SELECT s FROM GateInSite s WHERE s.siteType = :siteType"),
-    @NamedQuery(name = "SiteEntity.findSiteKey", query = "SELECT s.name FROM GateInSite s WHERE s.siteType = :siteType")
-})
-public class SiteEntity extends ComponentEntity {
+@Table(name = "PORTAL_CONTAINERS")
+@NamedQueries({ @NamedQuery(name = "ContainerEntity.findByIds", query = "SELECT c FROM GateInContainer c WHERE c.id in (:ids)") })
+public class ContainerEntity extends ComponentEntity implements Serializable {
 
-  private static final long     serialVersionUID = 3036823700771832314L;
+  private static final long     serialVersionUID = -8045606258160322858L;
 
   @Id
-  @SequenceGenerator(name = "SEQ_SITE_ID_GENERATOR", sequenceName = "SEQ_SITE_ID_GENERATOR")
-  @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_SITE_ID_GENERATOR")
+  @SequenceGenerator(name = "SEQ_CONTAINER_ID_GENERATOR", sequenceName = "SEQ_CONTAINER_ID_GENERATOR")
+  @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_CONTAINER_ID_GENERATOR")
   @Column(name = "ID")
   protected Long                id;
 
-  @Column(name = "TYPE")
-  private SiteType              siteType;
+  @Column(name = "WEBUI_ID", length = 200)
+  private String                webuiId;
 
   @Column(name = "NAME", length = 200)
   private String                name;
 
-  @Column(name = "LOCALE", length = 20)
-  private String                locale;
+  @Column(name = "ICON", length = 200)
+  private String                icon;
 
-  @Column(name = "SKIN", length = 200)
-  private String                skin;
+  @Column(name = "TEMPLATE", length = 500)
+  private String                template;
 
-  @Column(name = "LABEL", length = 200)
-  private String                label;
+  @Column(name = "FACTORY_ID", length = 200)
+  private String                factoryId;
+
+  @Column(name = "TITLE", length = 200)
+  private String                title;
 
   @Column(name = "DESCRIPTION", length = 2000)
   private String                description;
 
+  @Column(name = "WIDTH", length = 20)
+  private String                width;
+
+  @Column(name = "HEIGHT", length = 20)
+  private String                height;
+
   @Column(name = "PROPERTIES", length = 2000)
   private String                properties       = getJSONString(new JSONObject());
 
-  @Column(name = "SITE_BODY", length = 5000)
-  private String                siteBody         = getJSONString(new JSONArray());
-
   @Transient
-  private List<ComponentEntity> children         = new LinkedList<>();
+  private List<ComponentEntity> children         = new LinkedList<ComponentEntity>();
+
+  @Column(name = "CONTAINER_BODY", length = 5000)
+  private String                containerBody    = getJSONString(new JSONArray());
 
   public Long getId() {
     return id;
@@ -80,6 +85,14 @@ public class SiteEntity extends ComponentEntity {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public String getWebuiId() {
+    return webuiId;
+  }
+
+  public void setWebuiId(String webuiId) {
+    this.webuiId = webuiId;
   }
 
   public String getName() {
@@ -90,28 +103,36 @@ public class SiteEntity extends ComponentEntity {
     this.name = name;
   }
 
-  public String getLocale() {
-    return locale;
+  public String getIcon() {
+    return icon;
   }
 
-  public void setLocale(String locale) {
-    this.locale = locale;
+  public void setIcon(String icon) {
+    this.icon = icon;
   }
 
-  public String getSkin() {
-    return skin;
+  public String getTemplate() {
+    return template;
   }
 
-  public void setSkin(String skin) {
-    this.skin = skin;
+  public void setTemplate(String template) {
+    this.template = template;
   }
 
-  public String getLabel() {
-    return label;
+  public String getFactoryId() {
+    return factoryId;
   }
 
-  public void setLabel(String label) {
-    this.label = label;
+  public void setFactoryId(String factoryId) {
+    this.factoryId = factoryId;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   public String getDescription() {
@@ -122,20 +143,20 @@ public class SiteEntity extends ComponentEntity {
     this.description = description;
   }
 
-  public String getSiteBody() {
-    return siteBody;
+  public String getWidth() {
+    return width;
   }
 
-  public void setSiteBody(String siteBody) {
-    this.siteBody = siteBody;
+  public void setWidth(String width) {
+    this.width = width;
   }
 
-  public SiteType getSiteType() {
-    return siteType;
+  public String getHeight() {
+    return height;
   }
 
-  public void setSiteType(SiteType siteType) {
-    this.siteType = siteType;
+  public void setHeight(String height) {
+    this.height = height;
   }
 
   public List<ComponentEntity> getChildren() {
@@ -154,6 +175,14 @@ public class SiteEntity extends ComponentEntity {
     this.properties = properties;
   }
 
+  public String getContainerBody() {
+    return containerBody;
+  }
+
+  public void setContainerBody(String containerBody) {
+    this.containerBody = containerBody;
+  }
+
   @Override
   public JSONObject toJSON() {
     JSONObject obj = super.toJSON();
@@ -168,7 +197,7 @@ public class SiteEntity extends ComponentEntity {
 
   @Override
   public TYPE getType() {
-    return TYPE.SITE;
+    return TYPE.CONTAINER;
   }
 
 }

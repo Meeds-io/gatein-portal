@@ -8,11 +8,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import org.exoplatform.component.test.*;
+import org.exoplatform.portal.jdbc.entity.*;
+import org.exoplatform.portal.jdbc.entity.ComponentEntity.TYPE;
 import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.jdbc.dao.*;
-import org.exoplatform.portal.mop.jdbc.entity.*;
-import org.exoplatform.portal.mop.jdbc.entity.ComponentEntity.TYPE;
 import org.exoplatform.portal.mop.page.*;
 
 @ConfiguredBy({

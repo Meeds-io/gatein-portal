@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.exoplatform.component.test.*;
-import org.exoplatform.portal.mop.jdbc.entity.PermissionEntity;
-import org.exoplatform.portal.mop.jdbc.entity.PermissionEntity.TYPE;
+import org.exoplatform.portal.jdbc.entity.PermissionEntity;
+import org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE;
 
 @ConfiguredBy({
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})

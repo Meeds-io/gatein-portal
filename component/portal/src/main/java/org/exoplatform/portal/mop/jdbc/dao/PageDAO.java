@@ -23,7 +23,7 @@ import org.gatein.api.page.PageQuery;
 
 import org.exoplatform.commons.api.persistence.GenericDAO;
 import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.portal.mop.jdbc.entity.PageEntity;
+import org.exoplatform.portal.jdbc.entity.PageEntity;
 import org.exoplatform.portal.mop.page.PageKey;
 
 public interface PageDAO extends GenericDAO<PageEntity, Long> {

@@ -23,7 +23,7 @@ import java.util.List;
 import javax.persistence.TypedQuery;
 
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
-import org.exoplatform.portal.mop.jdbc.entity.NodeEntity;
+import org.exoplatform.portal.jdbc.entity.NodeEntity;
 
 public class NodeDAOImpl extends GenericDAOJPAImpl<NodeEntity, Long> implements NodeDAO {
 

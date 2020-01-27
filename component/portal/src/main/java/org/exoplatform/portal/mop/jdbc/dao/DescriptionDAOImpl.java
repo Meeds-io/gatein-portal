@@ -7,8 +7,8 @@ import javax.persistence.TypedQuery;
 
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
-import org.exoplatform.portal.mop.jdbc.entity.DescriptionEntity;
-import org.exoplatform.portal.mop.jdbc.entity.DescriptionState;
+import org.exoplatform.portal.jdbc.entity.DescriptionEntity;
+import org.exoplatform.portal.jdbc.entity.DescriptionState;
 
 public class DescriptionDAOImpl extends GenericDAOJPAImpl<DescriptionEntity, Long> implements DescriptionDAO {
   

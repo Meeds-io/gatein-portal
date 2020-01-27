@@ -21,7 +21,7 @@ package org.exoplatform.portal.mop.jdbc.dao;
 import java.util.List;
 
 import org.exoplatform.commons.api.persistence.GenericDAO;
-import org.exoplatform.portal.mop.jdbc.entity.ContainerEntity;
+import org.exoplatform.portal.jdbc.entity.ContainerEntity;
 
 public interface ContainerDAO extends GenericDAO<ContainerEntity, Long> {
 

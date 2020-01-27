@@ -21,8 +21,8 @@ package org.exoplatform.portal.mop.jdbc.dao;
 import java.util.Map;
 
 import org.exoplatform.commons.api.persistence.GenericDAO;
-import org.exoplatform.portal.mop.jdbc.entity.DescriptionEntity;
-import org.exoplatform.portal.mop.jdbc.entity.DescriptionState;
+import org.exoplatform.portal.jdbc.entity.DescriptionEntity;
+import org.exoplatform.portal.jdbc.entity.DescriptionState;
 
 public interface DescriptionDAO extends GenericDAO<DescriptionEntity, Long> {
   public DescriptionEntity getByRefId(String refId);

@@ -19,8 +19,8 @@
 package org.exoplatform.portal.mop.jdbc.dao;
 
 import org.exoplatform.commons.api.persistence.GenericDAO;
+import org.exoplatform.portal.jdbc.entity.NavigationEntity;
 import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.jdbc.entity.NavigationEntity;
 
 public interface NavigationDAO extends GenericDAO<NavigationEntity, Long> {
 

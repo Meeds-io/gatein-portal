@@ -21,7 +21,7 @@ package org.exoplatform.portal.mop.jdbc.dao;
 import java.util.List;
 
 import org.exoplatform.commons.api.persistence.GenericDAO;
-import org.exoplatform.portal.mop.jdbc.entity.NodeEntity;
+import org.exoplatform.portal.jdbc.entity.NodeEntity;
 
 public interface NodeDAO extends GenericDAO<NodeEntity, Long> {
     List<NodeEntity> findAllByPage(Long pageId);

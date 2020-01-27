@@ -1,7 +1,7 @@
 package org.exoplatform.portal.mop.jdbc.service;
 
+import org.exoplatform.portal.jdbc.entity.NodeEntity;
 import org.exoplatform.portal.mop.description.DescriptionService;
-import org.exoplatform.portal.mop.jdbc.entity.NodeEntity;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 

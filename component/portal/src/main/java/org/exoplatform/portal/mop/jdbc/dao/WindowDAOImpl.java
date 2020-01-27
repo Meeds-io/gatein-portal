@@ -9,7 +9,7 @@ import javax.persistence.TypedQuery;
 import org.gatein.api.common.Pagination;
 
 import org.exoplatform.commons.api.persistence.ExoTransactional;
-import org.exoplatform.portal.mop.jdbc.entity.WindowEntity;
+import org.exoplatform.portal.jdbc.entity.WindowEntity;
 
 public class WindowDAOImpl extends AbstractDAO<WindowEntity> implements WindowDAO {
 

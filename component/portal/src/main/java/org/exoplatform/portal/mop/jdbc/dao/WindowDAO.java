@@ -24,7 +24,7 @@ import java.util.List;
 import org.gatein.api.common.Pagination;
 
 import org.exoplatform.commons.api.persistence.GenericDAO;
-import org.exoplatform.portal.mop.jdbc.entity.WindowEntity;
+import org.exoplatform.portal.jdbc.entity.WindowEntity;
 
 public interface WindowDAO extends GenericDAO<WindowEntity, Long> {
 

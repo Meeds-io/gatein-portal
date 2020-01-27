@@ -3,9 +3,9 @@ package org.exoplatform.portal.mop.jdbc.dao;
 import java.util.List;
 
 import org.exoplatform.component.test.*;
+import org.exoplatform.portal.jdbc.entity.SiteEntity;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.jdbc.entity.SiteEntity;
 
 @ConfiguredBy({
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})

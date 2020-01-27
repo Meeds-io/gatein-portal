@@ -1,4 +1,4 @@
-package org.exoplatform.portal.mop.jdbc.entity;
+package org.exoplatform.portal.jdbc.entity;
 
 import java.io.Serializable;
 

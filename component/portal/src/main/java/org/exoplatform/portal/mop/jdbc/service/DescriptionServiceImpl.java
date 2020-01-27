@@ -22,10 +22,10 @@ package org.exoplatform.portal.mop.jdbc.service;
 import java.util.*;
 
 import org.exoplatform.commons.utils.I18N;
+import org.exoplatform.portal.jdbc.entity.DescriptionEntity;
+import org.exoplatform.portal.jdbc.entity.DescriptionState;
 import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.portal.mop.jdbc.dao.DescriptionDAO;
-import org.exoplatform.portal.mop.jdbc.entity.DescriptionEntity;
-import org.exoplatform.portal.mop.jdbc.entity.DescriptionState;
 
 public class DescriptionServiceImpl implements DescriptionService {
 

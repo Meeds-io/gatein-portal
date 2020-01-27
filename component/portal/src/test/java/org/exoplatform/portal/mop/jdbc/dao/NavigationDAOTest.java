@@ -7,9 +7,9 @@ import javax.persistence.EntityTransaction;
 
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.component.test.*;
+import org.exoplatform.portal.jdbc.entity.*;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
-import org.exoplatform.portal.mop.jdbc.entity.*;
 
 @ConfiguredBy({
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
