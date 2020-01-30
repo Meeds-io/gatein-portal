@@ -20,17 +20,14 @@
 package org.exoplatform.portal.config;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.gatein.common.logging.Logger;
+import org.gatein.common.logging.LoggerFactory;
+import org.jibx.runtime.JiBXException;
+
 import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.BaseComponentPlugin;
@@ -38,33 +35,13 @@ import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.config.model.ModelUnmarshaller;
-import org.exoplatform.portal.config.model.NavigationFragment;
-import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.config.model.Page.PageSet;
-import org.exoplatform.portal.config.model.PageNavigation;
-import org.exoplatform.portal.config.model.PageNode;
-import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.config.model.UnmarshalledObject;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.description.DescriptionService;
-import org.exoplatform.portal.mop.importer.ImportMode;
-import org.exoplatform.portal.mop.importer.Imported;
-import org.exoplatform.portal.mop.importer.Imported.Status;
-import org.exoplatform.portal.mop.importer.NavigationImporter;
-import org.exoplatform.portal.mop.importer.PageImporter;
-import org.exoplatform.portal.mop.importer.PortalConfigImporter;
+import org.exoplatform.portal.mop.importer.*;
 import org.exoplatform.portal.mop.navigation.NavigationService;
-import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageService;
-import org.exoplatform.portal.mop.page.PageServiceWrapper;
-import org.exoplatform.portal.pom.config.POMSession;
-import org.exoplatform.portal.pom.config.POMSessionManager;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
-import org.gatein.mop.api.workspace.Workspace;
-import org.jibx.runtime.JiBXException;
 
 /**
  * Created by The eXo Platform SARL Author : Tuan Nguyen tuan08@users.sourceforge.net May 22, 2006
@@ -116,9 +93,6 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
     private Logger log = LoggerFactory.getLogger(getClass());
 
     /** . */
-    private final POMSessionManager pomMgr;
-
-    /** . */
     private NavigationService navigationService_;
 
     /** . */
@@ -128,7 +102,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
 
     private boolean isFirstStartup = false;
 
-    public NewPortalConfigListener(UserPortalConfigService owner, POMSessionManager pomMgr, DataStorage dataStorage,
+    public NewPortalConfigListener(UserPortalConfigService owner, DataStorage dataStorage,
             PageService pageService, ConfigurationManager cmanager, InitParams params, NavigationService navigationService,
             DescriptionService descriptionService) throws Exception {
         owner_ = owner;
@@ -181,7 +155,6 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
                 ele.setOverrideMode(overrideExistingData);
             }
         }
-        this.pomMgr = pomMgr;
     }
 
     private void touchImport() {

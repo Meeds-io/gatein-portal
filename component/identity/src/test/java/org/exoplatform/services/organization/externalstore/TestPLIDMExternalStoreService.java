@@ -22,8 +22,7 @@ import org.exoplatform.services.organization.idm.externalstore.PicketLinkIDMExte
 
 import exo.portal.component.identiy.opendsconfig.opends.OpenDSService;
 
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.test.jcr-configuration.xml"),
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-external-ldap-store-configuration.xml") })
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-external-ldap-store-configuration.xml") })
 public class TestPLIDMExternalStoreService extends AbstractKernelTest {
 
   private static final String                     NICKNAME_PARAM           = "user.name.nickName";

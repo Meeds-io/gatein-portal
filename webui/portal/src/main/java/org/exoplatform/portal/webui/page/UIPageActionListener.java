@@ -24,22 +24,14 @@ import java.util.ArrayList;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserPortalConfig;
-import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.config.model.ModelObject;
-import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.management.operations.page.PageUtils;
+import org.exoplatform.portal.mop.Utils;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationService;
-import org.exoplatform.portal.mop.page.PageContext;
-import org.exoplatform.portal.mop.page.PageService;
-import org.exoplatform.portal.mop.page.PageState;
-import org.exoplatform.portal.mop.user.UserNavigation;
-import org.exoplatform.portal.mop.user.UserNode;
-import org.exoplatform.portal.mop.user.UserNodeFilterConfig;
-import org.exoplatform.portal.mop.user.UserPortal;
+import org.exoplatform.portal.mop.page.*;
+import org.exoplatform.portal.mop.user.*;
 import org.exoplatform.portal.webui.portal.PageNodeEvent;
 import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
@@ -195,7 +187,7 @@ public class UIPageActionListener {
 
                 //
                 PageService pageService = uiPage.getApplicationComponent(PageService.class);
-                PageState pageState = PageUtils.toPageState(page);
+                PageState pageState = Utils.toPageState(page);
                 pageService.savePage(new PageContext(page.getPageKey(), pageState));
 
                 //

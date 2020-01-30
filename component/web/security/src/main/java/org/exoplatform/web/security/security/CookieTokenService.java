@@ -49,7 +49,7 @@ import java.util.Date;
  * <li>The tokens are not stored in plain text, but intead only their salted hash is stored. See {@link #saltedHashService}. To
  * enable this, the following was done:
  * <ul>
- * <li>The structure of the underlying JCR store was changed from
+ * <li>The structure of the underlying store was changed from
  *
  * <pre>
  * autologin
@@ -80,7 +80,7 @@ import java.util.Date;
  * </ul>
 
  * <p>
- * It should be considered in the future if the password field can be removed altogether from {@link TokenEntry}.
+ * It should be considered in the future if the password field can be removed altogether.
  * </p>
  *
  */
@@ -101,7 +101,7 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
 
     private final Logger log = LoggerFactory.getLogger(CookieTokenService.class);
 
-    public CookieTokenService(InitParams initParams, GateInTokenStore tokenStore/*, ChromatticManager chromatticManager*/, CodecInitializer codecInitializer)
+    public CookieTokenService(InitParams initParams, GateInTokenStore tokenStore, CodecInitializer codecInitializer)
             throws TokenServiceInitializationException {
         super(initParams);
 
@@ -213,7 +213,7 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
     }
 
     /**
-     * Removes all tokens stored in the {@link TokenContainer}.
+     * Removes all stored tokens
      */
     public void deleteAll() {
         this.tokenStore.deleteAll();

@@ -29,7 +29,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.*;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.web.AbstractFilter;
@@ -59,6 +59,7 @@ public class RememberMeFilter extends AbstractFilter {
 
     private void doFilter(HttpServletRequest req, HttpServletResponse resp, FilterChain chain) throws IOException,
             ServletException {
+        ExoContainerContext.setCurrentContainer(getContainer());
         if (req.getRemoteUser() == null) {
             String token = LoginServlet.getRememberMeTokenCookie(req);
             if (token != null) {

@@ -46,7 +46,7 @@ public class ClusteredSSOFilter extends AbstractFilter {
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
-        if (ExoContainer.getProfiles().contains("cluster")) {
+        if (ExoContainer.hasProfile("cluster")) {
             HttpServletRequest httpRequest = (HttpServletRequest) request;
 
             Credentials credentials = (Credentials) httpRequest.getSession().getAttribute(

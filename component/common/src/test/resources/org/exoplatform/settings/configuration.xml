@@ -93,10 +93,4 @@
         <type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
     </component>
 
-    <component>
-        <type>org.exoplatform.settings.impl.SettingServiceImpl</type>
-    </component>
-
-    <import>jar:/org/exoplatform/settings/jcr-configuration.xml</import>
-
 </configuration>

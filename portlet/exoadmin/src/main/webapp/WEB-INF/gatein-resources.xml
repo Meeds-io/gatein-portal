@@ -53,28 +53,6 @@
     <css-path>/skin/applicationregistry/webui/component/UIApplicationRegistryPortlet/DefaultStylesheet.css</css-path>
   </portlet-skin>
 
-
-  <!-- AdminToolbarPortlet skins -->
-
-
-  <!-- PortalNavigationPortlet skins -->
-
-  <portlet-skin>
-    <application-name>exoadmin</application-name>
-    <portlet-name>PortalNavigationPortlet</portlet-name>
-    <skin-name>Default</skin-name>
-    <css-path>/skin/navigation/webui/component/DefaultStylesheet.css</css-path>
-  </portlet-skin>
-
-  <!-- GroupNavigationPortlet skins -->
-
-  <portlet-skin>
-    <application-name>exoadmin</application-name>
-    <portlet-name>GroupNavigationPortlet</portlet-name>
-    <skin-name>Default</skin-name>
-    <css-path>/skin/navigation/webui/component/DefaultStylesheet.css</css-path>
-  </portlet-skin>
-
   <!-- Register Portlet skins -->
 
   <portlet-skin>
@@ -157,36 +135,29 @@
   </portlet>
 
   <portlet>
-    <name>GroupNavigationPortlet</name>
-    <module>
-      <depends>
-        <module>webui-ext</module>
-      </depends>
-    </module>
-  </portlet>
-
-  <portlet>
-    <name>PortalNavigationPortlet</name>
-    <module>
-      <depends>
-        <module>webui-ext</module>
-      </depends>
-    </module>
-  </portlet>
-
-  <portlet>
-    <name>PageManagementPortlet</name>
-    <module>
-      <depends>
-        <module>portal</module>
-      </depends>
-      <depends>
-        <module>uiForm</module>
-      </depends>
-      <depends>
-        <module>webui-ext</module>
-      </depends>
-    </module>
+      <name>Branding</name>
+      <module>
+          <script>
+              <minify>false</minify>
+              <path>/js/branding.bundle.js</path>
+          </script>
+          <depends>
+              <module>vue</module>
+          </depends>
+          <depends>
+              <module>eXoVueI18n</module>
+          </depends>
+          <depends>
+            <module>jquery</module>
+            <as>$</as>
+          </depends>
+          <depends>
+              <module>extensionRegistry</module>
+          </depends>
+          <depends>
+              <module>filedrop</module>
+          </depends> 
+      </module>
   </portlet>
 
 </gatein-resources>

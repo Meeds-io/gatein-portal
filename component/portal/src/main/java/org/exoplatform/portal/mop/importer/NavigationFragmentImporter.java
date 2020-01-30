@@ -19,32 +19,13 @@
 
 package org.exoplatform.portal.mop.importer;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
-import org.exoplatform.portal.config.model.I18NString;
-import org.exoplatform.portal.config.model.PageNode;
-import org.exoplatform.portal.config.model.PageNodeContainer;
-import org.exoplatform.portal.mop.Described;
+import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.description.DescriptionService;
-import org.exoplatform.portal.mop.navigation.GenericScope;
-import org.exoplatform.portal.mop.navigation.NavigationContext;
-import org.exoplatform.portal.mop.navigation.NavigationService;
-import org.exoplatform.portal.mop.navigation.NodeContext;
-import org.exoplatform.portal.mop.navigation.NodeModel;
-import org.exoplatform.portal.mop.navigation.NodeState;
-import org.exoplatform.portal.mop.navigation.Scope;
-import org.exoplatform.portal.tree.diff.Adapters;
-import org.exoplatform.portal.tree.diff.ListAdapter;
-import org.exoplatform.portal.tree.diff.ListChangeIterator;
-import org.exoplatform.portal.tree.diff.ListChangeType;
-import org.exoplatform.portal.tree.diff.ListDiff;
+import org.exoplatform.portal.mop.navigation.*;
+import org.exoplatform.portal.tree.diff.*;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -148,7 +129,7 @@ public class NavigationFragmentImporter {
             }
 
             // Collect labels
-            Map<NodeContext<?>, Map<Locale, Described.State>> labelMap = new HashMap<NodeContext<?>, Map<Locale, Described.State>>();
+            Map<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>> labelMap = new HashMap<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>>();
 
             // Perform save
             perform(src, from, labelMap);
@@ -157,7 +138,7 @@ public class NavigationFragmentImporter {
             navigationService.saveNode(root, null);
 
             //
-            for (Map.Entry<NodeContext<?>, Map<Locale, Described.State>> entry : labelMap.entrySet()) {
+            for (Map.Entry<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>> entry : labelMap.entrySet()) {
                 String id = entry.getKey().getId();
                 descriptionService.setDescriptions(id, entry.getValue());
             }
@@ -170,7 +151,7 @@ public class NavigationFragmentImporter {
     }
 
     private void perform(PageNodeContainer src, final NodeContext<?> dst,
-            final Map<NodeContext<?>, Map<Locale, Described.State>> labelMap) {
+            final Map<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>> labelMap) {
         navigationService.rebaseNode(dst, Scope.CHILDREN, null);
 
         //
@@ -251,19 +232,19 @@ public class NavigationFragmentImporter {
     }
 
     private NodeContext<?> add(PageNode target, NodeContext<?> previous, NodeContext<?> parent,
-            Map<NodeContext<?>, Map<Locale, Described.State>> labelMap) {
+            Map<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>> labelMap) {
         I18NString labels = target.getLabels();
 
         //
-        Map<Locale, Described.State> description;
+        Map<Locale, org.exoplatform.portal.mop.State> description;
         if (labels.isSimple()) {
             description = null;
         } else if (labels.isEmpty()) {
             description = null;
         } else {
-            description = new HashMap<Locale, Described.State>();
+            description = new HashMap<Locale, org.exoplatform.portal.mop.State>();
             for (Map.Entry<Locale, String> entry : labels.getExtended(portalLocale).entrySet()) {
-                description.put(entry.getKey(), new Described.State(entry.getValue(), null));
+                description.put(entry.getKey(), new org.exoplatform.portal.mop.State(entry.getValue(), null));
             }
         }
 
@@ -297,27 +278,27 @@ public class NavigationFragmentImporter {
         return child;
     }
 
-    private void update(PageNode src, NodeContext<?> target, Map<NodeContext<?>, Map<Locale, Described.State>> labelMap) {
+    private void update(PageNode src, NodeContext<?> target, Map<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>> labelMap) {
         target.setState(src.getState());
 
         // Update extended labels if necessary
         I18NString labels = src.getLabels();
-        Map<Locale, Described.State> description;
+        Map<Locale, org.exoplatform.portal.mop.State> description;
         if (labels.isSimple()) {
             description = null;
         } else if (labels.isEmpty()) {
             description = null;
         } else {
-            description = new HashMap<Locale, Described.State>();
+            description = new HashMap<Locale, org.exoplatform.portal.mop.State>();
             for (Map.Entry<Locale, String> entry : labels.getExtended(portalLocale).entrySet()) {
-                description.put(entry.getKey(), new Described.State(entry.getValue(), null));
+                description.put(entry.getKey(), new org.exoplatform.portal.mop.State(entry.getValue(), null));
             }
         }
 
         if (description != null) {
             labelMap.put(target, description);
         } else {
-            labelMap.put(target, Collections.<Locale, Described.State> emptyMap());
+            labelMap.put(target, Collections.<Locale, org.exoplatform.portal.mop.State> emptyMap());
         }
     }
 }

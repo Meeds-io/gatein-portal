@@ -1,57 +1,45 @@
-<%
-  import org.exoplatform.webui.form.UIFormInputBase;
+<% 
+	def rcontext = _ctx.getRequestContext();
+	rcontext.getJavascriptManager().require("SHARED/uiForm");
+	String fieldName; 
 %>
-<% String fieldName; %>
-<div class="UIForm $uicomponent.id">
-	<%uiform.begin()%>
-	<div class="HorizontalLayout">
-		<div class="FormContainer">
-			<table class="UIFormGrid" summary="Component $uicomponent.id">
-				<%
-                                        boolean required = false;
-                                        for (field in uiform.getChildren()) {
-                                          if (!required && field instanceof UIFormInputBase) {
-                                            required = ((UIFormInputBase) field).isMandatory();
-                                          }                                          
-                                        }
-                                        if (required) {
-                                %>
-                                        <tr>
-                                          <td class="FieldLabel portlet-form-label" scope="row"></td>
-                                          <td class="FieldComponent portlet-input-field require"><%=_ctx.appRes("legend.required_field") %> (*)</td>
-                                        </tr>
-                                <%
-                                        }
-					for(field in uiform.getChildren()) {
+<div class="uiForm $uicomponent.id">
+	<%
+	uiform.begin()
+		//this template is reused much (especially in ecms)
+		//we need to add .resizable class bydefault to resize content when it is in popup
+	%>
+		<div class="form-horizontal resizable">
+				<% 
+					for(field in uiform.getChildren()) { 
 						if(field.isRendered()) {
 				%>
-							<tr>
+							<div class="control-group">
 								<%fieldName = uicomponent.getLabel(field.getName());%>
 								<%
 									if(fieldName != null && fieldName.length() > 0 && !fieldName.equals(uicomponent.getId()) && !fieldName.equals(field.getName())) {
-								%>
-									<td class="FieldLabel portlet-form-label" scope="row">                                                                          
-										<label for="<%= field.getName() %>"><%=uicomponent.getLabel(field.getName()) %></label>
-									</td>
-									<td class="FieldComponent portlet-input-field"><% uiform.renderField(field) %></td>
+								%>												
+									<label class="control-label" for="$field.id">
+										<%=uicomponent.getLabel(field.getName()) %>
+									</label>
+									<div class="controls"><% uiform.renderField(field) %></div>
 								<%} else {%>
-									<td class="FieldComponent portlet-input-field" colspan="2"><% uiform.renderField(field) %></td>
+									<div class="controls-full"><% uiform.renderField(field) %></div>
 								<%}%>
-							</tr>
+							</div>							
 				<%
 						}
 					}
 				%>
-			</table>
-			<div class="UIAction">
-				<% for(action in uicomponent.getActions()) {
-						 String actionLabel = _ctx.appRes(uicomponent.getName() + ".action." + action);
-						 String link = uicomponent.event(action);
-				%>
-							<a href="javascript:void(0);" onclick="$link" class="ActionButton LightBlueStyle">$actionLabel</a>
-				<%}%>
-			</div>
 		</div>
-	</div>
+		<div class="uiAction uiActionBorder"> 
+			<% for(action in uicomponent.getActions()) { 
+					 String actionLabel = _ctx.appRes(uicomponent.getName() + ".action." + action);
+					 String link = uicomponent.event(action);
+			%>
+					<button id ="calendar-event-attachment-$action" type="button" onclick="$link" class="btn">$actionLabel</button>
+			<%}%>
+		</div>
+		
 	<%uiform.end()%>
 </div>

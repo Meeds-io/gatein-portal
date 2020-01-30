@@ -44,4 +44,25 @@
     </portlet-application>
   </page>
 
+  <page>
+    <name>test1</name>
+    <title>Home Page</title>
+    <access-permissions>Everyone</access-permissions>
+    <edit-permission>*:/platform/administrators</edit-permission>
+    <portlet-application>
+      <portlet>
+        <application-ref>site1</application-ref>
+        <portlet-ref>home</portlet-ref>
+        <preferences>
+          <preference>
+            <name>foo</name>
+            <value>foo_value</value>
+          </preference>
+        </preferences>
+      </portlet>
+      <access-permissions>Everyone</access-permissions>
+      <show-info-bar>true</show-info-bar>
+    </portlet-application>
+  </page>
+
 </page-set>

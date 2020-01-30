@@ -33,18 +33,6 @@
       <page-reference>portal::@owner@::homepage</page-reference>
     </node>
     <node>
-      <name>groupnavigation</name>
-      <label>Group Navigation</label>
-      <visibility>SYSTEM</visibility>
-      <page-reference>portal::@owner@::groupnavigation</page-reference>
-    </node>
-    <node>
-      <name>portalnavigation</name>
-      <label>Portal Navigation</label>
-      <visibility>SYSTEM</visibility>
-      <page-reference>portal::@owner@::portalnavigation</page-reference>
-    </node>
-    <node>
       <name>register</name>
       <label>Register</label>
       <visibility>SYSTEM</visibility>

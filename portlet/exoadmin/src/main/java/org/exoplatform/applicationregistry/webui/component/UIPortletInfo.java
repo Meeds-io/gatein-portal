@@ -69,8 +69,6 @@ public class UIPortletInfo extends UIContainer {
             // I really hate the fact that the code to create Applications is spread all over and doesn't properly deal with
             // application types
             if (portlet.isRemote()) {
-                app.setType(ApplicationType.WSRP_PORTLET);
-            } else {
                 app.setType(ApplicationType.PORTLET);
             }
             app.setDisplayName(portlet.getDisplayName());
@@ -86,7 +84,7 @@ public class UIPortletInfo extends UIContainer {
     private String getCategorieNames() throws Exception {
         ApplicationRegistryService appRegService = getApplicationComponent(ApplicationRegistryService.class);
         List<String> nameList = new ArrayList<String>();
-        ApplicationType appType = portlet_.isRemote() ? ApplicationType.WSRP_PORTLET : ApplicationType.PORTLET;
+        ApplicationType appType = ApplicationType.PORTLET;
 
         List<ApplicationCategory> categories = appRegService.getApplicationCategories(portlet_.getName(), appType, null);
         for (ApplicationCategory category : categories) {

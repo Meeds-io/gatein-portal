@@ -20,12 +20,12 @@
 package org.exoplatform.portal.mop.navigation;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import org.apache.commons.lang.StringUtils;
+import org.gatein.mop.api.workspace.Navigation;
+
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.pom.data.MappedAttributes;
-import org.gatein.mop.api.workspace.Navigation;
 
 /**
  * An immutable navigation data class.

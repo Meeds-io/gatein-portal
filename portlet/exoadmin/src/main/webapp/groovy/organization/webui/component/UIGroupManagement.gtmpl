@@ -6,13 +6,16 @@
 	import	org.exoplatform.organization.webui.component.GroupManagement;
 	import	org.exoplatform.services.organization.Group;
 	
+   def rContext = _ctx.getRequestContext();
+   rContext.getJavascriptManager().require("SHARED/bts_tooltip").require("SHARED/jquery", "\$")
+                           .addScripts("\$('#${uicomponent.parent.id}').find('*[rel=\"tooltip\"]').tooltip();");
 %>
-<div class="UIGroupManagement">
-	<%uicomponent.renderChild(UIBreadcumbs.class); %>
-	<div class="GroupPanel ClearFix">
-		<div class="GroupNavigation">
-			<div class="TitleBar">
-				<div class="Title"><%=_ctx.appRes("UIGroupManagement.label.Groups")%></div>
+<div class="uiGroupManagement">
+	<div class="uiBox"><%uicomponent.renderChild(UIBreadcumbs.class); %></div>
+	<div class="groupPanel clearfix">
+		<div class="groupNavigation pull-left">
+			<div class="uiBox">
+				<h5 class="title clearfix">
 				<% String actionLink = "javascript:void(0);";
 					 Group group = uicomponent.getChild(UIGroupExplorer.class).getCurrentGroup();
 					 String groupId = null;
@@ -22,18 +25,26 @@
 					 		((groupId != null) && GroupManagement.isSuperUserOfGroup(null, groupId))) {
 				%>
 						<% actionLink = uicomponent.event("DeleteGroup","delete"); %>
-						<a class="TreeActionIcon RemoveGroupIcon" href="javascript:void(0);" onclick="$actionLink" title="<%=_ctx.appRes("UIGroupManagement.label.DeleteGroup")%>"><span class="skipHidden"><%=_ctx.appRes("UIGroupManagement.label.DeleteGroup")%></span></a>
+							<a class="actionIcon pull-right" href="javascript:void(0);" onclick="$actionLink" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIGroupManagement.label.DeleteGroup")%>">
+							  <i class="uiIconTrash uiIconLightGray"><span class="skipHidden"><%=_ctx.appRes("UIGroupManagement.label.DeleteGroup")%></span></i>
+							</a>							
 						<% actionLink = uicomponent.event("EditGroup","Edit"); %>
-						<a class="TreeActionIcon EditGroupIcon" href="javascript:void(0);" onclick="$actionLink" title="<%=_ctx.appRes("UIGroupManagement.label.EditGroup")%>"><span class="skipHidden"><%=_ctx.appRes("UIGroupManagement.label.EditGroup")%></span></a>
+							<a class="actionIcon pull-right" href="javascript:void(0);" onclick="$actionLink" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIGroupManagement.label.EditGroup")%>">
+							  <i class="uiIconEdit uiIconLightGray"><span class="skipHidden"><%=_ctx.appRes("UIGroupManagement.label.EditGroup")%></span></i>
+							</a>					
 						<% actionLink = uicomponent.event("AddGroup","add"); %>
-						<a class="TreeActionIcon AddGroupIcon" href="javascript:void(0);" onclick="$actionLink" title="<%=_ctx.appRes("UIGroupManagement.label.AddGroup")%>"><span class="skipHidden"><%=_ctx.appRes("UIGroupManagement.label.AddGroup")%></span></a>
-				 <%}%>
-			</div> 
-			<div class="GroupNavigationContainer"><% uicomponent.renderChild(UIGroupExplorer.class) %></div>
+							<a class="actionIcon pull-right" href="javascript:void(0);" onclick="$actionLink" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIGroupManagement.label.AddGroup")%>">
+							  <i class="uiIconPlus uiIconLightGray"><span class="skipHidden"><%=_ctx.appRes("UIGroupManagement.label.AddGroup")%></span></i>
+							</a>
+				<%}%>
+				<%=_ctx.appRes("UIGroupManagement.label.Groups")%>
+				</h5>
+				 <div class="groupNavigationContainer"><% uicomponent.renderChild(UIGroupExplorer.class) %></div>
+			</div> 			
 		</div>
-		<div class="GroupDetail">
-			<div >
-				<% uicomponent.renderChild(UIGroupDetail.class) %>
+		<div class="groupDetail">
+		    <div class="innerGroupDetail">
+			    <% uicomponent.renderChild(UIGroupDetail.class) %>
 			</div>
 		</div>
 	</div>

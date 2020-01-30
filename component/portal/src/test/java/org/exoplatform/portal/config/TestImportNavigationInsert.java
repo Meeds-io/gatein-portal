@@ -62,15 +62,6 @@ public class TestImportNavigationInsert extends AbstractImportNavigationTest {
 
     @Override
     protected final void afterTwoPhaseOverrideReboot(NodeContext<?> root) {
-        assertState(root);
-    }
-
-    @Override
-    protected final void afterTwoPhaseNoOverrideReconfigure(NodeContext<?> root) {
-        assertState(root);
-    }
-
-    protected void assertState(NodeContext<?> root) {
         assertEquals(3, root.getNodeCount());
         NodeContext<?> foo = root.get("foo");
         assertNotNull(foo);
@@ -89,4 +80,5 @@ public class TestImportNavigationInsert extends AbstractImportNavigationTest {
         assertEquals("daa_icon", daa.getState().getIcon());
         assertEquals(0, daa.getNodeCount());
     }
+
 }

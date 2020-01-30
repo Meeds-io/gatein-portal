@@ -19,14 +19,15 @@
 
 package org.exoplatform.portal.config;
 
-import org.exoplatform.component.test.AbstractGateInTest;
 import org.exoplatform.portal.pom.config.Utils;
+
+import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
-public class TestEscape extends AbstractGateInTest {
+public class TestEscape extends TestCase {
 
     public void testQueryEscape() {
         assertEquals("\\%", Utils.queryEscape("%"));

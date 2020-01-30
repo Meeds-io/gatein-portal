@@ -13,83 +13,63 @@
      return tmp;
   }
 %>
-<div class="UIChangeLanguageForm">
-  <div class="UIFormTabPane">
-    <div class="UITabPane">
+<div class="uiChangeLanguageForm uiBox">
+
     
-      <div class="UIBarStyle">
-        <div class="TitleBar">
-          <div class="LeftBar">
-            <div class="RightBar">
-              <div class="MiddleBar">
-                <span><%=_ctx.appRes("UIChangeLanguage.title.LanguageSetting")%></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      
+     <h5 class="title"><%=_ctx.appRes("UIChangeLanguage.title.LanguageSetting")%></h5>
+             
     
-      <div class="TabPaneContent">
-        <div class="WorkingArea"> 
-          <div class="HorizontalLayout">
-            <div class="UITabContentContainer">
-              <%
-                for(selector in uicomponent.getChildren()) { 
-                  String selectorDisplay = "none"; 
-                  if(selector.isRendered()) selectorDisplay="block"; 
-                  categories = selector.getItemCategories();
+      
+    <div class="uiContentBox">
+      <%
+        for(selector in uicomponent.getChildren()) { 
+          
+          categories = selector.getItemCategories();
+      %>               
+            <%/*Begin ItemDetailList:*/%>
+            
+              <% 
+                for(category in categories) {
+                  
+                  options = category.getSelectItemOptions();
               %>
-              <div class="UITabContent" id="UITabContent" style="display: $selectorDisplay;">                 
-                <div class="UIItemSelector">  
-                  <div class="RightColumnStyle">                            
-                    <%/*Begin ItemDetailList:*/%>
-                    <div class="ItemDetailList" style="margin:0px 0px 0px 0px">                                                                     
-                      <div class="ItemDetailContainer" style="border:none">
-                      <% 
-                        for(category in categories) {
-                          String itemDetailDisplay = "none";
-                          if(category.isSelected()) itemDetailDisplay = "block";
-                          options = category.getSelectItemOptions();
-                      %>
-                        <div class="ItemDetail" style="display: $itemDetailDisplay">
-                        <% 
-                          for(opt in options) {
-                            String itemSelected = "NormalItem";
-                            if (opt.isSelected()) {                  
-                              selected = makeJSON(selector.name, opt.value);                                                                                
-                              itemSelected = "SelectedItem";
-                            } 
-                            selectOptions.put(makeJSON(selector.name, opt.value));
-                        %>
-                          <div class="$itemSelected ClearFix">
-                            <div class="Icon"><span></span></div>
-                            <a href="javascript:;" class="NodeLabel" tabindex="1"><%=opt.getLabel()%></a>
-                            <div class="PercentLabel"><%=opt.getDescription()%></div>
-                          </div>
-                        <%}%> 
-                        </div>
-                     <%}%>
-                      </div>                
-                    </div>  
-                    <%/*End ItemDetailList*/%>      
-                  </div>
-                </div>
-                    
-              </div>
-              <%
-              	 }
-              	 rcontext.getJavascriptManager().require("SHARED/selectors", "selectors")
-              	 			.addScripts("selectors.UILanguageSelector.init($selected, $selectOptions);");              
-              %>
-            </div>
-            <div class="UIAction"> 
-              <a href="<%=uicomponent.url("Save");%>" class="ActionButton LightBlueStyle" tabindex="1"><%=_ctx.appRes("UIChangeLanguage.action.save");%></a>
-              <a href="javascript:void(0);" onclick="<%=uicomponent.event("Close");%>" class="ActionButton LightBlueStyle" tabindex="1"><%=_ctx.appRes("UIChangeLanguage.action.close");%></a>
-            </div>
-  
-          </div>
-        </div>
-      </div>  
-    </div>  
-  </div>
+                <table class="uiGrid no-border-cell table table-hover table-striped itemDetailList" cellspacing="0">
+                	<colgroup>
+                		<col width="5%">             
+                		<col width="75%"> 
+                		<col width="20%">                       
+                	</colgroup>
+                <% 
+                  for(opt in options) {
+                    String itemSelected = "normalItem";
+                    if (opt.isSelected()) {                  
+                      selected = makeJSON(selector.name, opt.value);                                                                                
+                      itemSelected = "selectedItem";
+                    } 
+                    selectOptions.put(makeJSON(selector.name, opt.value));
+                %>
+                  <tr class="$itemSelected">
+                    <td><div class="uiIconTick uiIconBlue"><span></span></div></td>
+                    <td><a href="javascript:;" class="nodeLabel" tabindex="1"><%=opt.getLabel()%></a></td>
+                    <td class="percentLabel"><%=opt.getDescription()%></td>
+                  </tr>
+                <%}%> 
+                </table>
+             <%}%>
+               
+            <%/*End ItemDetailList*/%>      
+          
+            
+     
+      <%
+      	 }
+      	 rcontext.getJavascriptManager().require("SHARED/selectors", "selectors")
+      	 			.addScripts("selectors.UILanguageSelector.init($selected, $selectOptions);");              
+      %>
+   	</div>
+   	<div class="uiAction uiActionBorder"> 
+      <a href="<%=uicomponent.url("Save");%>" class="btn" tabindex="1"><%=_ctx.appRes("UIChangeLanguage.action.save");%></a>
+      <a href="javascript:void(0);" onclick="<%=uicomponent.event("Close");%>" class="btn" tabindex="1"><%=_ctx.appRes("UIChangeLanguage.action.close");%></a>
+    </div>    
 </div>

@@ -36,8 +36,6 @@ public abstract class AbstractImportFragmentTest extends AbstractImportTest {
         return "fragment2";
     }
 
-    protected abstract void assertState(NodeContext<?> root);
-
     @Override
     protected final void afterTwoPhasesBoot(NodeContext<?> root) {
         assertEquals(1, root.getNodeSize());
@@ -45,24 +43,5 @@ public abstract class AbstractImportFragmentTest extends AbstractImportTest {
         assertNotNull(foo);
         assertEquals("foo_icon", foo.getState().getIcon());
         assertEquals(0, foo.getNodeSize());
-    }
-
-    @Override
-    protected final void afterTwoPhaseNoOverrideReboot(NodeContext<?> root) {
-        assertEquals(1, root.getNodeSize());
-        NodeContext<?> foo = root.get("foo");
-        assertNotNull(foo);
-        assertEquals("foo_icon", foo.getState().getIcon());
-        assertEquals(0, foo.getNodeSize());
-    }
-
-    @Override
-    protected final void afterTwoPhaseOverrideReboot(NodeContext<?> root) {
-        assertState(root);
-    }
-
-    @Override
-    protected final void afterTwoPhaseNoOverrideReconfigure(NodeContext<?> root) {
-        assertState(root);
     }
 }

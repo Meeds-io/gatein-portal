@@ -159,19 +159,9 @@ public class UIAddApplicationForm extends UIForm {
             String portletName = info.getName();
             Application app = new Application();
             app.setApplicationName(portletName);
-            // app.setApplicationGroup(info.getApplicationName());
-            ApplicationType appType;
-            String contentId;
+            ApplicationType appType = ApplicationType.PORTLET;
+            String contentId = info.getApplicationName() + "/" + info.getName();;
             String displayName = Util.getLocalizedStringValue(displayNameLS, portletName);
-            if (remote) {
-                appType = ApplicationType.WSRP_PORTLET;
-                contentId = portlet.getContext().getId();
-                displayName += ApplicationRegistryService.REMOTE_DISPLAY_NAME_SUFFIX; // add remote to display name to make it
-                                                                                      // more obvious that the portlet is remote
-            } else {
-                appType = ApplicationType.PORTLET;
-                contentId = info.getApplicationName() + "/" + info.getName();
-            }
             app.setType(appType);
             app.setDisplayName(displayName);
             app.setDescription(Util.getLocalizedStringValue(descriptionLS, portletName));

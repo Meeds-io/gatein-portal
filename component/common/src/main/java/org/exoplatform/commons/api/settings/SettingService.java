@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Stores and removes a value associated with a key in JCR.
+ * Stores and removes a value associated with a key.
  * 
  * @LevelAPI Experimental
  */

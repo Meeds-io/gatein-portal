@@ -18,11 +18,10 @@
  */
 package org.exoplatform.web.security;
 
-import org.exoplatform.component.test.ConfigurationUnit;
-import org.exoplatform.component.test.ConfiguredBy;
-import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.web.security.security.CookieTokenService;
 import org.gatein.wci.security.Credentials;
+
+import org.exoplatform.component.test.*;
+import org.exoplatform.web.security.security.CookieTokenService;
 
 /**
  *
@@ -30,9 +29,7 @@ import org.gatein.wci.security.Credentials;
  *
  */
 
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/tokenservice-configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.test.jcr-configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/jcr-configuration.xml") })
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/tokenservice-configuration.xml") })
 public abstract class AbstractCookieTokenServiceTest extends AbstractTokenServiceTest<CookieTokenService> {
 
     @Override

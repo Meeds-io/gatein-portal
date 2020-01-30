@@ -160,8 +160,12 @@ public abstract class AbstractTokenService<T extends Token, K> implements Starta
                 }
             }
         } catch (Exception e) {
+          if (log.isDebugEnabled()) {
+            log.warn("Error retrieving token", e);
+          } else {
+            log.warn("Error retrieving token. Cause: " + e.getMessage());
+          }
         }
-
         return null;
     }
 

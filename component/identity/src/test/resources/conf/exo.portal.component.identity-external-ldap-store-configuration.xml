@@ -85,12 +85,6 @@
   </component>
 
   <component>
-    <key>org.exoplatform.services.organization.idm.PicketLinkIDMCacheService</key>
-    <type>org.exoplatform.services.organization.idm.PicketLinkIDMCacheService</type>
-  </component>
-
-
-  <component>
     <key>org.gatein.common.transaction.JTAUserTransactionLifecycleService</key>
     <type>org.gatein.common.transaction.JTAUserTransactionLifecycleServiceImpl</type>
   </component>
@@ -281,8 +275,6 @@
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
           <property name="url" value="jdbc:hsqldb:file:${gatein.test.tmp.dir}/db/data/jdbcidm"/>
-          <property name="username" value="sa"/>
-          <property name="password" value=""/>
         </properties-param>
         <properties-param profiles="mysql">
           <name>ref-addresses</name>

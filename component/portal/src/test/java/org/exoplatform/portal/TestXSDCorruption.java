@@ -19,11 +19,13 @@
 
 package org.exoplatform.portal;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+
+import org.apache.commons.io.IOUtils;
 
 import junit.framework.TestCase;
-
-import org.gatein.common.io.IOTools;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -32,22 +34,29 @@ import org.gatein.common.io.IOTools;
 public class TestXSDCorruption extends TestCase {
 
     private void assertHash(String expected, String resourcePath) throws Exception {
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath);
-        assertNotNull(in);
-        byte[] bytes = IOTools.getBytes(in);
-        java.security.MessageDigest digester = java.security.MessageDigest.getInstance("MD5");
-        digester.update(bytes);
-        StringBuilder sb = new StringBuilder();
-        for (byte b : digester.digest()) {
-            String hex = Integer.toHexString(b);
-            if (hex.length() == 1) {
-                sb.append('0');
-                sb.append(hex.charAt(0));
-            } else {
-                sb.append(hex.substring(hex.length() - 2));
-            }
-        }
-        assertEquals(expected, sb.toString());
+        String hash = getHashOfFile(resourcePath);
+        assertEquals(expected, hash);
+    }
+
+    private String getHashOfFile(String resourcePath) throws IOException, NoSuchAlgorithmException {
+      InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath);
+      assertNotNull(in);
+      String content = IOUtils.toString(in);
+      // Normalize line ending character
+      content = content.replaceAll("\r\n", "\n");
+      java.security.MessageDigest digester = java.security.MessageDigest.getInstance("MD5");
+      digester.update(content.getBytes());
+      StringBuilder sb = new StringBuilder();
+      for (byte b : digester.digest()) {
+          String hex = Integer.toHexString(b);
+          if (hex.length() == 1) {
+              sb.append('0');
+              sb.append(hex.charAt(0));
+          } else {
+              sb.append(hex.substring(hex.length() - 2));
+          }
+      }
+      return sb.toString();
     }
 
     public void testGateInObjects1_x() throws Exception {

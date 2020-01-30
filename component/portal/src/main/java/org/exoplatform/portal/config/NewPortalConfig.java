@@ -163,6 +163,6 @@ public final class NewPortalConfig {
     @Override
     public String toString() {
         return "PortalConfig[predefinedOwner=" + predefinedOwner + ",ownerType=" + ownerType + ",templateName=" + templateName
-                + ",label=" + label + ",description=" + description + ",location=" + location + "]";
+                + ",label=" + label + ",description=" + description + ",location=" + location + ",templateLocation=" + templateLocation + "]";
     }
 }

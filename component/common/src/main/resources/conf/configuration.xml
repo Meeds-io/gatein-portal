@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+
+    Copyright (C) 2009 eXo Platform SAS.
+
+    This is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as
+    published by the Free Software Foundation; either version 2.1 of
+    the License, or (at your option) any later version.
+
+    This software is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this software; if not, write to the Free
+    Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+    02110-1301 USA, or see the FSF site: http://www.fsf.org.
+
+-->
+
+<configuration
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd http://www.exoplaform.org/xml/ns/kernel_1_2.xsd"
+    xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
+
+  <component>
+    <key>org.exoplatform.container.PropertyConfigurator</key>
+    <type>org.exoplatform.container.PropertyConfigurator</type>
+    <init-params>
+      <value-param>
+        <name>properties.url</name>
+        <value>jar:/configuration.properties</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>CacheConfigurationProperties</key>
+    <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
+    <init-params>
+      <properties-param>
+        <name>CacheManagementProperties</name>
+        <description>Filter used to notify caches</description>
+        <property name="exo.cache.config.template" value="jar:/conf/cache/infinispan/local/cache-config.xml" />
+      </properties-param>
+      <properties-param profiles="cluster">
+        <name>CacheManagementProperties</name>
+        <description>Filter used to notify caches</description>
+        <property name="exo.cache.config.template" value="jar:/conf/cache/infinispan/cluster/cache-config.xml" />
+        <property name="exo.cache.async.config.template" value="jar:/conf/cache/infinispan/cluster/cache-async-config.xml" />
+      </properties-param>
+      <properties-param profiles="cluster">
+        <name>JGroupsProperties</name>
+        <description>Jgroups configuration</description>
+        <property name="exo.service.cluster.jgroups.config" value="jar:/conf/jgroups/jgroups-service-udp.xml" />
+      </properties-param>
+      <properties-param profiles="cluster-jgroups-tcp">
+        <name>JGroupsProperties</name>
+        <description>Jgroups configuration</description>
+        <property name="exo.service.cluster.jgroups.config" value="jar:/conf/jgroups/jgroups-service-tcp.xml" />
+      </properties-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.persistence.DataInitializer</key>
+    <type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializer</type>
+    <init-params>
+      <value-param>
+        <name>liquibase.datasource</name>
+        <value>${exo.jpa.datasource.name:java:/comp/env/exo-jpa_portal}</value>
+      </value-param>
+      <value-param>
+        <name>liquibase.contexts</name>
+        <value>${exo.liquibase.contexts:production}</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <!-- Data Initialization -->
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
+    <component-plugin>
+      <name>CommonsChangeLogsPlugin</name>
+      <set-method>addChangeLogsPlugin</set-method>
+      <type>org.exoplatform.commons.persistence.impl.ChangeLogsPlugin</type>
+      <init-params>
+        <values-param>
+          <name>changelogs</name>
+          <description>Change logs of settings</description>
+          <value>db/changelog/quartz.db.changelog-1.0.0.xml</value>
+          <value>db/changelog/settings.db.changelog-1.0.0.xml</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+</configuration>

@@ -35,11 +35,4 @@ public abstract class AbstractImportNavigationTest extends AbstractImportTest {
     protected final String getConfig2() {
         return "navigation2";
     }
-
-    @Override
-    protected final void afterTwoPhaseNoOverrideReboot(NodeContext<?> root) {
-        assertEquals(2, root.getNodeCount());
-        assertNotNull(root.get("foo"));
-        assertNotNull(root.get("daa"));
-    }
 }

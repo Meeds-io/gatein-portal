@@ -24,10 +24,7 @@ import java.util.List;
 
 /**
  * Is the central point of the event system where listeners are registered (and/or unregistered) and events are fired.
- * @param <S> This is a generic object of source. It can be a file/folder/content or something else 
- * extended from <code>BaseObject</code>.
- * @param <D> This is a generic object of data. It can be an event type, such as NODE_ADDED/PROPERTY_CHANGED/NODE_REMOVED
- * which is corresponding to the JCR events.
+ * @param <S> This is a generic object of source.
  * @LevelAPI Experimental
  */
 public interface EventManager<S, D> {

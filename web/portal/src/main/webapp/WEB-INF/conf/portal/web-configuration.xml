@@ -85,17 +85,21 @@
   <external-component-plugins>
     <target-component>org.exoplatform.web.filter.ExtensibleFilter</target-component>
     <component-plugin>
-      <name>Favicon filter Plugin</name>
+      <name>Facicon And JSP filter Plugin</name>
       <set-method>addFilterDefinitions</set-method>
       <type>org.exoplatform.web.filter.FilterDefinitionPlugin</type>
       <init-params>
         <object-param>
-          <name>Favicon Filter</name>
+          <name>Facicon And JSP Filter</name>
           <object type="org.exoplatform.web.filter.FilterDefinition">
-            <field name="filter"><object type="org.exoplatform.web.filter.RedefinableResourceFilter"/></field>
+            <field name="filter">
+              <object type="org.exoplatform.web.filter.RedefinableResourceFilter"/>
+            </field>
             <field name="patterns">
-              <!-- WARNING: the mapping is expressed with regular expressions -->
               <collection type="java.util.ArrayList" item-type="java.lang.String">
+                <value>
+                  <string>.*/.*\.jsp</string>
+                </value>
                 <value>
                   <string>.*/favicon\.ico</string>
                 </value>

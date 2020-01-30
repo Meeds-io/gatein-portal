@@ -22,7 +22,6 @@
  ******************************************************************************/
 package org.exoplatform.web.security.security;
 
-import org.exoplatform.commons.chromattic.ChromatticManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.web.security.GateInTokenStore;
 import org.exoplatform.web.security.codec.CodecInitializer;

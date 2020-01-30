@@ -51,6 +51,10 @@
       <artifactId>sso-integration</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.exoplatform.gatein.sso</groupId>
+      <artifactId>sso-agent</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.web.oauth-common</artifactId>
     </dependency>

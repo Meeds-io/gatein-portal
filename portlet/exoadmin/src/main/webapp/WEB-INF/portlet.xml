@@ -120,104 +120,6 @@
   </portlet>
 
   <portlet>
-    <description xml:lang="EN">Group Navigation Portlet</description>
-    <portlet-name>GroupNavigationPortlet</portlet-name>
-    <display-name xml:lang="EN">Group Navigation Portlet</display-name>
-    <portlet-class>org.exoplatform.webui.application.portlet.PortletApplicationController</portlet-class>
-
-    <init-param>
-      <name>webui.configuration</name>
-      <value>/WEB-INF/conf/portlet/exoadmin/GroupNavigationPortlet/webui/configuration.xml</value>
-    </init-param>
-
-    <expiration-cache>0</expiration-cache>
-    <supports>
-      <mime-type>text/html</mime-type>
-      <portlet-mode>help</portlet-mode>
-    </supports>
-    <supported-locale>en</supported-locale>
-
-    <resource-bundle>locale.portlet.exoadmin.GroupNavigationPortlet</resource-bundle>
-    <portlet-info>
-      <title>Group Navigation Portlet</title>
-      <short-title>Group Navigation Portlet</short-title>
-      <keywords>Administration</keywords>
-    </portlet-info>
-    <portlet-preferences>
-      <preference>
-        <name>level</name>
-        <value>2</value>
-      </preference>
-    </portlet-preferences>
-    <supported-publishing-event>
-      <name>NavigationChange</name>
-    </supported-publishing-event>
-  </portlet>
-
-  <portlet>
-    <description xml:lang="EN">Portal Navigation Portlet</description>
-    <portlet-name>PortalNavigationPortlet</portlet-name>
-    <display-name xml:lang="EN">Portal Navigation Portlet</display-name>
-    <portlet-class>org.exoplatform.webui.application.portlet.PortletApplicationController</portlet-class>
-
-    <init-param>
-      <name>webui.configuration</name>
-      <value>/WEB-INF/conf/portlet/exoadmin/PortalNavigationPortlet/webui/configuration.xml</value>
-    </init-param>
-
-    <expiration-cache>0</expiration-cache>
-    <supports>
-      <mime-type>text/html</mime-type>
-      <portlet-mode>help</portlet-mode>
-    </supports>
-    <supported-locale>en</supported-locale>
-
-    <resource-bundle>locale.portlet.exoadmin.PortalNavigationPortlet</resource-bundle>
-    <portlet-info>
-      <title>Portal Navigation Portlet</title>
-      <short-title>Portal Navigation Portlet</short-title>
-      <keywords>System</keywords>
-    </portlet-info>
-
-    <portlet-preferences>
-      <preference>
-        <name>level</name>
-        <value>2</value>
-      </preference>
-    </portlet-preferences>
-
-  </portlet>
-
-  <portlet>
-    <description xml:lang="EN">Page Management Portlet</description>
-    <portlet-name>PageManagementPortlet</portlet-name>
-    <display-name xml:lang="EN">Page Management Portlet</display-name>
-    <portlet-class>org.exoplatform.webui.application.portlet.PortletApplicationController</portlet-class>
-
-    <init-param>
-      <name>webui.configuration</name>
-      <value>/WEB-INF/conf/portlet/exoadmin/PageManagementPortlet/webui/configuration.xml</value>
-    </init-param>
-
-    <expiration-cache>0</expiration-cache>
-    <supports>
-      <mime-type>text/html</mime-type>
-      <portlet-mode>help</portlet-mode>
-    </supports>
-    <supported-locale>en</supported-locale>
-
-    <resource-bundle>locale.portlet.exoadmin.AccountPortlet</resource-bundle>
-    <portlet-info>
-      <title>Page Management Portlet</title>
-      <short-title>Page Management Portlet</short-title>
-      <keywords>Administration</keywords>
-    </portlet-info>
-    <supported-publishing-event>
-      <name>NavigationChange</name>
-    </supported-publishing-event>
-  </portlet>
-
-  <portlet>
     <description xml:lang="EN">Application Registry</description>
     <portlet-name>ApplicationRegistryPortlet</portlet-name>
     <display-name xml:lang="EN">Application Registry</display-name>
@@ -249,33 +151,6 @@
       <role-name>admin</role-name>
       <role-link>admin</role-link>
     </security-role-ref>
-  </portlet>
-
-  <portlet>
-    <description xml:lang="EN">Administration Toolbar Portlet</description>
-    <portlet-name>AdminToolbarPortlet</portlet-name>
-    <display-name xml:lang="EN">Administration Toolbar Portlet</display-name>
-    <portlet-class>org.exoplatform.webui.application.portlet.PortletApplicationController</portlet-class>
-
-    <init-param>
-      <name>webui.configuration</name>
-      <value>/WEB-INF/conf/portlet/exoadmin/AdminToolbarPortlet/webui/configuration.xml</value>
-    </init-param>
-
-    <expiration-cache>0</expiration-cache>
-    <supports>
-      <mime-type>text/html</mime-type>
-      <portlet-mode>help</portlet-mode>
-    </supports>
-    <supported-locale>en</supported-locale>
-    <resource-bundle>locale.portlet.exoadmin.AdminToolbarPortlet</resource-bundle>
-    <portlet-info>
-      <title>Administration Toolbar Portlet</title>
-      <short-title>Administration Toolbar</short-title>
-      <keywords>gatein_internal</keywords>
-    </portlet-info>
-
-    <supported-public-render-parameter>navigation_uri</supported-public-render-parameter>
   </portlet>
 
   <portlet>
@@ -403,6 +278,23 @@
       <short-title>Star Toolbar</short-title>
       <keywords>gatein_internal</keywords>
     </portlet-info>
+  </portlet>
+
+  <portlet>
+    <portlet-name>Branding</portlet-name>
+    <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
+    <init-param>
+        <name>portlet-view-dispatched-file-path</name>
+        <value>/company-branding-app/index.html</value>
+    </init-param>
+    <supports>
+      <mime-type>text/html</mime-type>
+    </supports>
+	  <supported-locale>en</supported-locale>
+    <resource-bundle>locale.portlet.exoadmin.Branding</resource-bundle>
+	  <portlet-info>
+	    <title>Company Branding</title>
+	  </portlet-info>
   </portlet>
 
   <event-definition>

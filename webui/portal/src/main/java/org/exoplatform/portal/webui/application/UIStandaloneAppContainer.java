@@ -47,7 +47,7 @@ public class UIStandaloneAppContainer extends UIContainer {
             StandaloneAppRequestContext context = (StandaloneAppRequestContext) event.getRequestContext();
             HttpServletRequest req = context.getRequest();
 
-            // Delete the token from JCR
+            // Delete the token from store
             String token = getTokenCookie(req);
             if (token != null) {
                 AbstractTokenService tokenService = AbstractTokenService.getInstance(CookieTokenService.class);

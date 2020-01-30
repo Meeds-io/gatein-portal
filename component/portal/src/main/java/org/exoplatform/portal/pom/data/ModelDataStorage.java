@@ -24,11 +24,8 @@ import java.util.List;
 
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.portal.config.Query;
-import org.exoplatform.portal.config.model.ApplicationState;
-import org.exoplatform.portal.config.model.ApplicationType;
-import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.mop.importer.Imported.Status;
-import org.jgroups.annotations.Unsupported;
+import org.exoplatform.portal.config.model.*;
+import org.exoplatform.portal.mop.importer.Status;
 
 /**
  * Created by The eXo Platform SAS Apr 19, 2007
@@ -36,6 +33,8 @@ import org.jgroups.annotations.Unsupported;
  * This interface is used to load the PortalConfig, Page config and Navigation config from the database
  */
 public interface ModelDataStorage {
+
+    String DEFAULT_SHAREDLAYOUT_PATH = "war:/conf/portal/portal/sharedlayout.xml";
 
     void create(PortalData config) throws Exception;
 
@@ -70,7 +69,7 @@ public interface ModelDataStorage {
 
     <T> LazyPageList<T> find(Query<T> q, Comparator<T> sortComparator) throws Exception;
 
-    Container getSharedLayout() throws Exception;
+    Container getSharedLayout(String siteName) throws Exception;
 
     void save() throws Exception;
 

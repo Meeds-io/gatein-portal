@@ -24,24 +24,15 @@ package org.gatein.api.navigation;
 import java.util.Locale;
 import java.util.Map;
 
-import org.exoplatform.portal.mop.Described;
-import org.exoplatform.portal.mop.Described.State;
-import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.description.DescriptionService;
-import org.exoplatform.portal.mop.navigation.NavigationContext;
-import org.exoplatform.portal.mop.navigation.NavigationService;
-import org.exoplatform.portal.mop.navigation.NavigationState;
-import org.exoplatform.portal.mop.navigation.NodeChangeListener;
-import org.exoplatform.portal.mop.navigation.NodeContext;
-import org.exoplatform.portal.mop.navigation.Scope;
-import org.exoplatform.services.resources.ResourceBundleManager;
 import org.gatein.api.ApiException;
-import org.gatein.api.EntityNotFoundException;
 import org.gatein.api.PortalRequest;
-import org.gatein.api.Util;
 import org.gatein.api.internal.Parameters;
 import org.gatein.api.site.Site;
 import org.gatein.api.site.SiteId;
+
+import org.exoplatform.portal.mop.description.DescriptionService;
+import org.exoplatform.portal.mop.navigation.*;
+import org.exoplatform.services.resources.ResourceBundleManager;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -169,7 +160,7 @@ public class NavigationImpl implements Navigation {
         save(navCtx);
     }
 
-    Map<Locale, Described.State> loadDescriptions(String id) {
+    Map<Locale, org.exoplatform.portal.mop.State> loadDescriptions(String id) {
         try {
             return descriptionService.getDescriptions(id);
         } catch (Throwable t) {
@@ -248,12 +239,12 @@ public class NavigationImpl implements Navigation {
         ApiNode node = ctx.getNode();
         if (node != null && node.isDisplayNameChanged()) {
             if (!node.getDisplayNames().isLocalized()) {
-                Map<Locale, Described.State> descriptions = loadDescriptions(ctx.getId());
+                Map<Locale, org.exoplatform.portal.mop.State> descriptions = loadDescriptions(ctx.getId());
                 if (descriptions != null) {
                     setDescriptions(ctx.getId(), null);
                 }
             } else {
-                Map<Locale, State> descriptions = ObjectFactory.createDescriptions(node.getDisplayNames());
+                Map<Locale, org.exoplatform.portal.mop.State> descriptions = ObjectFactory.createDescriptions(node.getDisplayNames());
                 setDescriptions(ctx.getId(), descriptions);
             }
         }
@@ -263,7 +254,7 @@ public class NavigationImpl implements Navigation {
         }
     }
 
-    private void setDescriptions(String id, Map<Locale, Described.State> descriptions) {
+    private void setDescriptions(String id, Map<Locale, org.exoplatform.portal.mop.State> descriptions) {
         try {
             descriptionService.setDescriptions(id, descriptions);
         } catch (Throwable t) {

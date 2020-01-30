@@ -39,75 +39,64 @@
         <description>administrator</description>
         <value>/platform/administrators</value>
       </value-param>
+
+      <value-param>
+        <name>portal.administrator.mstype</name>
+        <description>administrator</description>
+        <value>manager</value>
+      </value-param>
+
+      <value-param>
+        <name>portal.creator.groups</name>
+        <description>groups with membership type have permission to manage portal</description>
+        <value>*:/platform/administrators,*:/organization/management/executive-board</value>
+      </value-param>
+
+      <value-param>
+        <name>navigation.creator.membership.type</name>
+        <description>specific membership type have full permission with group navigation</description>
+        <value>manager</value>
+      </value-param>
+
+      <value-param>
+        <name>guests.group</name>
+        <description>guests group</description>
+        <value>/platform/guests</value>
+      </value-param>
+
+      <values-param>
+        <name>mandatory.groups</name>
+        <description>Groups that can not be deleted.</description>
+        <value>/platform/administrators</value>
+        <value>/platform/users</value>
+        <value>/platform/guests</value>
+        <value>/spaces</value>
+      </values-param>
+
+      <values-param>
+        <name>mandatory.mstypes</name>
+        <description>Membership type that can not be deleted.</description>
+        <value>member</value>
+        <value>manager</value>
+        <value>*</value>
+      </values-param>
     </init-params>
   </component>
 
   <component>
-    <key>org.exoplatform.application.registry.ApplicationRegistryService</key>
-    <type>org.exoplatform.application.registry.impl.ApplicationRegistryServiceImpl</type>
+    <key>org.exoplatform.application.registry.dao.CategoryDAO</key>
+    <type>org.exoplatform.application.registry.dao.CategoryDAOImpl</type>
   </component>
 
-  <external-component-plugins>
-    <target-component>org.exoplatform.commons.chromattic.ChromatticManager</target-component>
-    <component-plugin>
-      <name>chromattic</name>
-      <set-method>addLifeCycle</set-method>
-      <type>org.exoplatform.application.registry.impl.ApplicationRegistryChromatticLifeCycle</type>
-      <init-params>
-        <value-param>
-          <name>domain-name</name>
-          <value>app</value>
-        </value-param>
-        <value-param>
-          <name>workspace-name</name>
-          <value>portal-test</value>
-        </value-param>
-        <values-param>
-          <name>entities</name>
-          <value>org.exoplatform.application.registry.impl.ContentRegistry</value>
-          <value>org.exoplatform.application.registry.impl.CategoryDefinition</value>
-          <value>org.exoplatform.application.registry.impl.ContentDefinition</value>
-          <value>org.chromattic.ext.ntdef.NTFile</value>
-          <value>org.chromattic.ext.ntdef.NTFolder</value>
-          <value>org.chromattic.ext.ntdef.NTResource</value>
-        </values-param>
-        <properties-param>
-          <name>options</name>
-          <property name="org.chromattic.api.Option.root_node.path" value="/production"/>
-          <property name="org.chromattic.api.Option.root_node.create" value="true"/>
-        </properties-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
+  <component>
+    <key>org.exoplatform.application.registry.dao.ApplicationDAO</key>
+    <type>org.exoplatform.application.registry.dao.ApplicationDAOImpl</type>
+  </component>
 
-  <external-component-plugins>
-    <target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
-    <component-plugin>
-      <name>add.namespaces</name>
-      <set-method>addPlugin</set-method>
-      <type>org.exoplatform.services.jcr.impl.AddNamespacesPlugin</type>
-      <init-params>
-        <properties-param>
-          <name>namespaces</name>
-          <property name="gtn" value="http://www.gatein.org/jcr/gatein/1.0/"/>
-          <property name="app" value="http://www.gatein.org/jcr/application-registry/1.0/"/>
-        </properties-param>
-      </init-params>
-    </component-plugin>
-    <component-plugin>
-      <name>add.nodeType</name>
-      <set-method>addPlugin</set-method>
-      <type>org.exoplatform.services.jcr.impl.AddNodeTypePlugin</type>
-      <init-params>
-        <values-param>
-          <name>autoCreatedInNewRepository</name>
-          <description>Node types configuration file</description>
-          <value>jar:/conf/gatein-nodetypes.xml</value>
-          <value>jar:/conf/application-nodetypes.xml</value>
-        </values-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
+  <component>
+    <key>org.exoplatform.application.registry.ApplicationRegistryService</key>
+    <type>org.exoplatform.application.registry.impl.JDBCApplicationRegistryService</type>
+  </component>
 
   <external-component-plugins>
     <target-component>org.exoplatform.portal.config.UserPortalConfigService</target-component>

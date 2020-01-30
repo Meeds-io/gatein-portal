@@ -7,10 +7,10 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
-import org.exoplatform.services.organization.Group;
-import org.exoplatform.services.organization.impl.GroupImpl;
 import org.junit.Test;
 
+import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.impl.GroupImpl;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.MembershipEntry;
 

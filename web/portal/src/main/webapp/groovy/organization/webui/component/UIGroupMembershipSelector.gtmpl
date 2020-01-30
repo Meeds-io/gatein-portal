@@ -2,32 +2,31 @@
 	import	org.exoplatform.webui.core.UIBreadcumbs; 
 	import	org.exoplatform.webui.core.UITree; 
 %>
-<div class="UIGroupMembershipSelector" id="$uicomponent.id">
-	<div class="Container ClearFix"> 
-		<div class="SelectedGroupPath"><% uicomponent.renderChild(UIBreadcumbs.class); %></div>
-		<div class="GroupSelector">
-			<div class="ContentContainer">
-				<div class="MembershipTitle"><%=_ctx.appRes("UIGroupMembershipSelector.label.selectGroup")%></div>
+<div class="uiGroupMembershipSelector" id="$uicomponent.id">
+	<div class="uiGrayLightBox uiBox noRounded "><% uicomponent.renderChild(UIBreadcumbs.class); %></div>
+    <div class="row-fluid" >
+      <div class="span6">
+			<div class="uiBox selectGroup noRounded">
+				 <h6 class="title"><%=_ctx.appRes("UIGroupMembershipSelector.label.selectGroup")%></h6>
 				<%uicomponent.renderChild(UITree.class);%>
+			</div>       
+      </div>
+	  <div class="span6">
+		  <div class="uiBox noRounded childGoup">
+			<h6 class="title"><%=_ctx.appRes("UIGroupMembershipSelector.label.selectMembership")%></h6>
+			<div class="uiContentBox">
+			  <ul>
+			  <%                
+			  for(member in uicomponent.getListMemberhip()){
+			  %>
+				<li>
+				  <span class="uiIconMiniArrowRight"></span>
+				  <a href="javascript:void(0);" onclick="<%=uicomponent.event("SelectMembership", member)%>" title="$member">$member</a>
+				</li>  
+			  <%}%>
+			  </ul>
 			</div>
-		</div>
-		<div class="MembershipSelector">
-			<div class="ContentContainer">
-				<div class="MembershipTitle"><%=_ctx.appRes("UIGroupMembershipSelector.label.selectMembership")%></div>
-				<div class="OverflowContainer">
-					<%								
-					boolean even = true;
-					for(member in uicomponent.getListMemberhip()){
-						String rowCssClass = "OddRow";
-						if(even) rowCssClass = "EvenRow";	
-						even = !even;
-					%>
-						<div class="$rowCssClass">
-							<a class="ItemIcon" href="javascript:void(0);" onclick="<%=uicomponent.event("SelectMembership", member)%>" title="$member">$member</a>
-						</div>
-					<%}%>
-				</div>
-			</div>
-		</div>
-	</div>
+		  </div>
+		</div>	
+    </div>
 </div> 		

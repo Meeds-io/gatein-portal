@@ -139,4 +139,12 @@ public class Safe {
             throw new UndeclaredThrowableException(e);
         }
     }
+
+    public static long parseLong(String s) {
+        try {
+            return s == null ? 0 : Long.parseLong(s);
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
+    }
 }

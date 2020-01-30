@@ -19,19 +19,25 @@
 
 package org.exoplatform.web.login.recovery;
 
-import org.exoplatform.commons.utils.I18N;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.Constants;
-import org.exoplatform.services.organization.UserProfile;
-import org.exoplatform.services.resources.LocaleContextInfo;
+import java.io.*;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+import org.gatein.wci.security.Credentials;
 
+import org.exoplatform.commons.utils.I18N;
+import org.exoplatform.commons.utils.MailUtils;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.portal.Constants;
 import org.exoplatform.services.mail.MailService;
 import org.exoplatform.services.mail.Message;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.*;
+import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.controller.QualifiedName;
@@ -39,28 +45,12 @@ import org.exoplatform.web.controller.router.Router;
 import org.exoplatform.web.security.Token;
 import org.exoplatform.web.security.security.RemindPasswordTokenService;
 
-import org.gatein.wci.security.Credentials;
-
-import javax.servlet.http.HttpServletRequest;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * @author <a href="mailto:tuyennt@exoplatform.com">Tuyen Nguyen The</a>.
  */
 public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
-
-    protected static Logger log = LoggerFactory.getLogger(PasswordRecoveryServiceImpl.class);
+  
+    protected static Logger                  log                = LoggerFactory.getLogger(PasswordRecoveryServiceImpl.class);
 
     private final OrganizationService orgService;
     private final MailService mailService;
@@ -121,7 +111,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         String tokenId = remindPasswordTokenService.createToken(credentials);
 
         Router router = webController.getRouter();
-        Map<QualifiedName, String> params = new HashMap<QualifiedName, String>();
+        Map<QualifiedName, String> params = new HashMap<>();
         params.put(WebAppController.HANDLER_PARAM, PasswordRecoveryHandler.NAME);
         params.put(PasswordRecoveryHandler.TOKEN, tokenId);
         params.put(PasswordRecoveryHandler.LANG, I18N.toTagIdentifier(locale));
@@ -137,8 +127,8 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         String emailBody = buildEmailBody(user, bundle, url.toString());
         String emailSubject = getEmailSubject(user, bundle);
 
-        String senderName = getSenderName();
-        String from = getSenderEmail();
+        String senderName = MailUtils.getSenderName();
+        String from = MailUtils.getSenderEmail();
         if (senderName != null && !senderName.trim().isEmpty()) {
             from = senderName + " <" + from + ">";
         }
@@ -226,18 +216,10 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         return bundle.getString("gatein.forgotPassword.email.subject");
     }
 
-    protected String getSenderName() {
-        return "";
-    }
-
-    protected String getSenderEmail() {
-        return System.getProperty("gatein.email.smtp.from", "noreply@gatein.org");
-    }
-
     @Override
     public String getPasswordRecoverURL(String tokenId, String lang) {
         Router router = webController.getRouter();
-        Map<QualifiedName, String> params = new HashMap<QualifiedName, String>();
+        Map<QualifiedName, String> params = new HashMap<>();
         params.put(WebAppController.HANDLER_PARAM, PasswordRecoveryHandler.NAME);
         if (tokenId != null) {
           params.put(PasswordRecoveryHandler.TOKEN, tokenId);

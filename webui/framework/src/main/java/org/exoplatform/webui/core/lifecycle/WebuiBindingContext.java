@@ -20,12 +20,12 @@
 package org.exoplatform.webui.core.lifecycle;
 
 import java.io.Writer;
-import java.util.List;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.groovyscript.text.BindingContext;
+import org.exoplatform.groovyscript.text.TemplateService;
 import org.exoplatform.resolver.ResourceResolver;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -149,5 +149,32 @@ public class WebuiBindingContext extends BindingContext {
 
     public void include(String name, ResourceResolver resourceResolver) throws Exception {
         service_.include(name, clone(), resourceResolver);
+    }
+
+    /**
+     * Includes the list of gtmpl templates to current
+     * {@link WebuiBindingContext} for the parent template identified by its name
+     * 
+     * @param parentAppName parent template name
+     */
+    public void includeTemplates(String parentAppName) {
+      TemplateService templateService = PortalContainer.getInstance()
+                                                       .getComponentInstanceOfType(TemplateService.class);
+      Set<String> templateExtensions = templateService.getTemplateExtensions(parentAppName);
+      if (templateExtensions == null || templateExtensions.isEmpty()) {
+        return;
+      }
+      for (String templateExtension : templateExtensions) {
+        try {
+          ResourceResolver resourceResolver = getRequestContext().getResourceResolver(templateExtension);
+          if (resourceResolver == null) {
+            log.warn("Can't find an adequate resource resolver for template '{}'. Using default.", templateExtension);
+            resourceResolver = getResourceResolver();
+          }
+          include(templateExtension, resourceResolver);
+        } catch (Exception e) {
+          log.warn("Error while processing template: '{}'", templateExtension, e);
+        }
+      }
     }
 }

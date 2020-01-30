@@ -71,11 +71,32 @@ public class AbstractKernelTest extends AbstractGateInTest {
     }
 
     protected void begin() {
-        RequestLifeCycle.begin(getContainer());
+        PortalContainer container = getContainer();
+        ExoContainerContext.setCurrentContainer(container);
+        RequestLifeCycle.begin(container);
     }
 
     protected void end() {
         RequestLifeCycle.end();
+    }
+
+    protected void restartTransaction() {
+      int i = 0;
+      // Close transactions until no encapsulated transaction
+      boolean success = true;
+      do {
+        try {
+          end();
+          i++;
+        } catch (IllegalStateException e) {
+          success = false;
+        }
+      } while (success);
+
+      // Restart transactions with the same number of encapsulations
+      for (int j = 0; j < i; j++) {
+        begin();
+      }
     }
 
     @Override

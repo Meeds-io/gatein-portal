@@ -25,71 +25,55 @@
 	UIPopupWindow uipopup = uicomponent.getChild(UIPopupWindow.class); 		
 	UIFormInputSet uiform = uicomponent.getChild(UIFormInputSet.class); 
 %>
-<div class="UIPageSelector" id="<%=uicomponent.getId();%>">
-	<div class="PageSelectorTitle ClearFix">
-		<div class="Icon BlueInfoBox16x16Icon"><span></span></div>
-		<div class="Title"><%=_ctx.appRes(uicomponent.getId()+".label.currentSelectedPage")%></div>
-	</div>
-	<div class="UIFormInfo">
-		<div class="FormInfoBG">
-			<div class="FormInfoIcon UIForm">
-				<table class="UIPropertyInfo UIFormGrid" summary="Page selector table">
-                                        <% if (page == null) { %>
-                                        <tr><td colspan="2" class="require"><%=_ctx.appRes("legend.required_field") %> (*)</td></tr>
-                                        <% } %>
-					<tr>
-						<td class="FieldLabel" scope="row"><%=_ctx.appRes(uicomponent.getId()+".header.id")%>:</td>
-						<td class="FieldComponent">
+<div class="uiPageSelector" id="<%=uicomponent.getId();%>">
+	
+	<h6><i class="uiIconPageInfo"> </i> <%=_ctx.appRes(uicomponent.getId()+".label.currentSelectedPage")%></h6>
+	
+	<div class="form-horizontal">
+		<div class="control-group">
+			<label class="control-label"> <%=_ctx.appRes(uicomponent.getId()+".header.id")%>:</label>
+			<div class="controls">
 							<% if(page != null) { %>
 							$pageId
 							<% } %>
-						</td>
-					</tr>
-					<tr>
-						<td class="FieldLabel" scope="row"><%=_ctx.appRes(uicomponent.getId()+".label.name")%>:</td>
-						<td class="FieldComponent">
-							<% if(page == null) { %>
-							<% uiform.renderChild("pageName");%>
-							<% } else { %>
-							$name
-							<% } %>
-						</td>
-					</tr>
-					<tr>
-						<td class="FieldLabel" scope="row"><%=_ctx.appRes(uicomponent.getId()+".label.title")%>:</td>
-						<td class="FieldComponent">
-							<% if(page == null) { %>
-							<% uiform.renderChild("pageTitle");%>
-							<% } else { %>
-							$title
-							<% } %>
-						</td>
-					</tr>
-				</table>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label"><%=_ctx.appRes(uicomponent.getId()+".label.name")%>:</label>
+			<div class="controls">
+				<% if(page == null) { %>
+				<% uiform.renderChild("pageName");%>
+				<% } else { %>
+				$name
+				<% } %>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label"><%=_ctx.appRes(uicomponent.getId()+".label.title")%>:</label>
+			<div class="controls">
+				<% if(page == null) { %>
+				<% uiform.renderChild("pageTitle");%>
+				<% } else { %>
+				$title
+				<% } %>
 			</div>
 		</div>
 	</div>
-	<div class="UIAction">
+	<div class="uiAction uiActionBorder">
 		 <%
 		String clearPageEvent = "javascript:void(0);"; 
-		String css = "FloatBlockHidden ActionButton SimpleStyle"; 
+		String css = "disabled btn"; 
 		def uiForm = uicomponent.getAncestorOfType(UIForm.class);
 		createPageEvent = uiForm.event("CreatePage"); 
 		if(page != null) {
 			clearPageEvent = uiForm.event("ClearPage"); 
-			css = "ActionButton SimpleStyle"; 
+			css = "btn"; 
 		} 
 		%>
-			<span onclick="<%=clearPageEvent%>" class="<%=css%>" title="<%=_ctx.appRes(uicomponent.getId()+".label.clearPage")%>">
-				<a href="javascript:void(0);" class="DustBin16x16Icon Icon"><%=_ctx.appRes(uicomponent.getId() + ".label.clearPage")%></a>
-			</span>
 		<% if(page == null) { %>
-			<span onclick="<%=createPageEvent%>" class="ActionButton SimpleStyle" title="<%=_ctx.appRes(uicomponent.getId()+".label.createPage")%>">
-				<a href="javascript:void(0);" class="GreenPlusPage16x16Icon Icon"><%=_ctx.appRes(uicomponent.getId() + ".label.createPage")%></a>
-			</span> 	
+			<button type="button" onclick="<%=createPageEvent%>" class="btn"><i class="uiIconAddPage uiIconWhite"> </i> <%=_ctx.appRes(uicomponent.getId() + ".label.createPage")%></button>	
 		<% } %>
-			<span class="ActionButton SimpleStyle" onclick="<%=uicomponent.event("OpenSelectPagePopUp")%>" title="<%=_ctx.appRes(uicomponent.getId()+".label.searchandSelectPage")%>">
-				<a href="javascript:void(0);" class="Icon SelectPageIcon"><%=_ctx.appRes(uicomponent.getId()+".label.searchandSelectPage")%></a>
-			</span>		
+			<button type="button" onclick="<%=uicomponent.event("OpenSelectPagePopUp")%>" class="btn"><i class="uiIconSelectPage"> </i> <%=_ctx.appRes(uicomponent.getId()+".label.searchandSelectPage")%></button>
+			<button type="button" onclick="<%=clearPageEvent%>" class="<%=css%>"><i class="uiIconDelete"> </i> <%=_ctx.appRes(uicomponent.getId() + ".label.clearPage")%></button>
 	</div>
 </div>

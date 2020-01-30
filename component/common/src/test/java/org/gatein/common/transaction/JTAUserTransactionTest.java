@@ -38,7 +38,6 @@ import org.exoplatform.container.PortalContainer;
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 @ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.test.jcr-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/gatein/common/transaction/configuration.xml") })
 public class JTAUserTransactionTest extends AbstractKernelTest {
 

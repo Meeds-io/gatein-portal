@@ -18,11 +18,8 @@
  */
 package org.exoplatform.web.security;
 
-import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.web.security.security.AbstractTokenService;
-
-import javax.persistence.EntityTransaction;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Hai Thanh Nguyen</a>

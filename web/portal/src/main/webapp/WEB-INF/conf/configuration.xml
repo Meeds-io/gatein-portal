@@ -30,11 +30,10 @@
   <import>war:/conf/common/autologin-configuration.xml</import>
   <import>war:/conf/common/remindpwd-configuration.xml</import>
   <import>war:/conf/common/encoder-configuration.xml</import>
-  <import>war:/conf/jcr/jcr-configuration.xml</import>
-  <import>war:/conf/jcr/jcr-datasource-configuration.xml</import>
 
   <!--PicketLink IDM integration-->
   <import>war:/conf/organization/idm-configuration.xml</import>
+  <import>war:/conf/organization/idm-externalstore-configuration.xml</import>
   <import>war:/conf/organization/search-configuration.xml</import>
   <import>war:/conf/organization/rest-configuration.xml</import>
 
@@ -64,6 +63,8 @@
   <import>war:/conf/portal/application-registry-configuration.xml</import>
   <import>war:/conf/portal/controller-configuration.xml</import>
   <import>war:/conf/portal/web-configuration.xml</import>
+  <import>war:/conf/portal/branding-configuration.xml</import>
+  <import>war:/conf/portal/module-configuration.xml</import>
   <!--<import>war:/conf/portal/redirect-configuration.xml</import>-->
   <import>war:/conf/api/api-configuration.xml</import>
   <import>war:/conf/jdbc/configuration.xml</import>

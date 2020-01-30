@@ -20,10 +20,7 @@
 package org.exoplatform.groovyscript.text;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -84,6 +81,8 @@ public class TemplateService implements Startable {
     private boolean collectTemplateStatistics_ = true;
 
     private Vector<TemplateStatisticTime> statisticTimes = new Vector<>();
+
+    private Map<String, Set<String>> templateExtensions = new HashMap<>();
 
     private final Loader<ResourceKey, GroovyTemplate, ResourceResolver> loader = new Loader<ResourceKey, GroovyTemplate, ResourceResolver>() {
         public GroovyTemplate retrieve(ResourceResolver context, ResourceKey key) throws Exception {
@@ -282,6 +281,34 @@ public class TemplateService implements Startable {
 
       public void computeStatistic() {
         templateStatistic.setTime(time);
+      }
+    }
+
+    /**
+     * Add template extension by compoennt plugin injected from kernel
+     * configuration
+     * 
+     * @param templateExtensionPlugin list of gtmpl templates added in component
+     *          plugin
+     */
+    public void addTemplateExtension(TemplateExtensionPlugin templateExtensionPlugin) {
+      String parentTemplateName = templateExtensionPlugin.getName();
+      if (StringUtils.isBlank(parentTemplateName)) {
+        log.warn("Can't register empty plugin name");
+        return;
+      }
+      if (!templateExtensions.containsKey(parentTemplateName)) {
+        templateExtensions.put(parentTemplateName, new HashSet<>());
+      }
+      templateExtensions.get(parentTemplateName).addAll(templateExtensionPlugin.getTemplates());
+    }
+
+    public Set<String> getTemplateExtensions(String templateName) {
+      Set<String> list = templateExtensions.get(templateName);
+      if (list == null) {
+        return Collections.emptySet();
+      } else {
+        return Collections.unmodifiableSet(list);
       }
     }
 }

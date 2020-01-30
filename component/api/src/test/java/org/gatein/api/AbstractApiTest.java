@@ -35,6 +35,7 @@ import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.component.test.KernelLifeCycle;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.portal.config.DataStorage;
@@ -49,6 +50,8 @@ import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.mop.page.PageState;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityRegistry;
 import org.exoplatform.services.security.MembershipEntry;
@@ -66,13 +69,16 @@ import org.junit.ClassRule;
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
 @ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.test.jcr-configuration.xml"),
+        @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/portal/mop/navigation/configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.resources-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.web.oauth-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.api-configuration.xml") })
 public class AbstractApiTest {
+
+    protected static final Log LOG = ExoLogger.getLogger(AbstractApiTest.class);
 
     @ClassRule
     public static KernelLifeCycle kernelLifeCycle = new KernelLifeCycle();
@@ -97,20 +103,25 @@ public class AbstractApiTest {
 
     @Before
     public void before() throws Exception {
-        defaultSiteId = new SiteId("classic");
-        container = kernelLifeCycle.getContainer();
-        portal = (Portal) container.getComponentInstanceOfType(Portal.class);
-        assertNotNull("Portal component not found in container", portal);
-        identityRegistry = (IdentityRegistry) container.getComponentInstanceOfType(IdentityRegistry.class);
+        try {
+          defaultSiteId = new SiteId("classic2");
+          container = kernelLifeCycle.getContainer();
+          portal = (Portal) container.getComponentInstanceOfType(Portal.class);
+          assertNotNull("Portal component not found in container", portal);
+          identityRegistry = (IdentityRegistry) container.getComponentInstanceOfType(IdentityRegistry.class);
 
-        RequestLifeCycle.begin(container);
-        HashSet<MembershipEntry> memberships = new HashSet<MembershipEntry>();
-        memberships.add(new MembershipEntry("/platform/users", "member"));
-        Identity john = new Identity("john", memberships);
-        identityRegistry.register(john);
+          ExoContainerContext.setCurrentContainer(container);
+          RequestLifeCycle.begin(container);
+          HashSet<MembershipEntry> memberships = new HashSet<MembershipEntry>();
+          memberships.add(new MembershipEntry("/platform/users", "member"));
+          Identity john = new Identity("john", memberships);
+          identityRegistry.register(john);
 
-        BasicPortalRequest.setInstance(new BasicPortalRequest(new User("john"), defaultSiteId, NodePath.root(), Locale.ENGLISH,
-                portal, new BasicPortalRequest.BasicURIResolver("/portal")));
+          BasicPortalRequest.setInstance(new BasicPortalRequest(new User("john"), defaultSiteId, NodePath.root(), Locale.ENGLISH,
+                  portal, new BasicPortalRequest.BasicURIResolver("/portal")));
+        } catch (Exception e) {
+          LOG.error("Error starting container", e);
+        }
     }
 
     protected void createSite(SiteId siteId, String... pages) {
@@ -137,6 +148,7 @@ public class AbstractApiTest {
 
             createPage(siteId, pages);
         } catch (Exception e) {
+            LOG.error("Error while creating site", e);
             AssertionFailedError afe = new AssertionFailedError();
             afe.initCause(e);
             throw afe;

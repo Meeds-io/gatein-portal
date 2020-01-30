@@ -19,7 +19,6 @@
 package org.exoplatform.groovyscript;
 
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.services.jcr.impl.Constants;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 
@@ -188,13 +187,13 @@ public class GroovyTemplate implements Externalizable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException  {
         byte[] bytes = new byte[in.readInt()];
         in.readFully(bytes);
-        templateId = new String(bytes, Constants.DEFAULT_ENCODING);
+        templateId = new String(bytes, DEFAULT_ENCODING);
         bytes = new byte[in.readInt()];
         in.readFully(bytes);
-        templateName = new String(bytes, Constants.DEFAULT_ENCODING);
+        templateName = new String(bytes, DEFAULT_ENCODING);
         bytes = new byte[in.readInt()];
         in.readFully(bytes);
-        templateText = new String(bytes, Constants.DEFAULT_ENCODING);
+        templateText = new String(bytes, DEFAULT_ENCODING);
     }
 
     @Override

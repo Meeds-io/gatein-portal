@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+               xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+  <component>
+    <key>org.exoplatform.portal.branding.BrandingService</key>
+    <type>org.exoplatform.portal.branding.BrandingServiceImpl</type>
+    <init-params>
+      <value-param>
+        <name>exo.branding.company.name</name>
+        <value>${exo.branding.company.name:}</value>
+      </value-param>
+      <value-param>
+        <name>exo.branding.company.logo</name>
+        <value>${exo.branding.company.logo:}</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <type>org.exoplatform.portal.branding.BrandingRestResourcesV1</type>
+  </component>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.file.services.NameSpaceService</target-component>
+    <component-plugin>
+      <name>BrandingNameSpacePlugin</name>
+      <set-method>addNameSpacePlugin</set-method>
+      <type>org.exoplatform.commons.file.services.NameSpacePlugin</type>
+      <init-params>
+        <properties-param>
+          <name>fileNameSpace.params</name>
+          <property name="name" value="CompanyBranding"/>
+          <property name="description" value="Company Branding files storage"/>
+        </properties-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+</configuration>

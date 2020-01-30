@@ -1,71 +1,73 @@
 package org.exoplatform.portal.mop.page;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.Utils;
 import org.gatein.mop.api.workspace.Page;
 import org.gatein.mop.api.workspace.Site;
+
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.Utils;
 
 /**
  * An immutable page data class.
  *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
-class PageData implements Serializable {
+public class PageData implements Serializable {
 
-    /** Useful. */
-    static final PageData EMPTY = new PageData();
+  private static final long serialVersionUID = -2859289738034643799L;
 
-    /** . */
-    final PageKey key;
+  /** Useful. */
+  static final PageData     EMPTY            = new PageData();
 
-    /** . */
-    final String id;
+  /** . */
+  final PageKey             key;
 
-    /** . */
-    final PageState state;
+  /** . */
+  final String              id;
 
-    private PageData() {
-        this.key = null;
-        this.id = null;
-        this.state = null;
+  /** . */
+  final PageState           state;
+
+  public PageData(PageKey key, String id, PageState state) {
+    this.key = key;
+    this.id = id;
+    this.state = state;
+  }
+
+  private PageData() {
+    this.key = null;
+    this.id = null;
+    this.state = null;
+  }
+
+  protected Object readResolve() {
+    if (key == null && state == null && id == null) {
+      return EMPTY;
+    } else {
+      return this;
     }
+  }
 
-    PageData(Page page) {
-        Site site = page.getSite();
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (!(o instanceof PageData))
+      return false;
 
-        //
-        this.key = new SiteKey(Utils.siteType(site.getObjectType()), site.getName()).page(page.getName());
-        this.id = page.getObjectId();
-        this.state = new PageState(page);
-    }
+    PageData pageData = (PageData) o;
 
-    protected Object readResolve() {
-        if (key == null && state == null && id == null) {
-            return EMPTY;
-        } else {
-            return this;
-        }
-    }
+    if (key != null ? !key.equals(pageData.key) : pageData.key != null)
+      return false;
+    return StringUtils.equals(id, pageData.id);
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PageData)) return false;
-
-        PageData pageData = (PageData) o;
-
-        if (key != null ? !key.equals(pageData.key) : pageData.key != null) return false;
-        return StringUtils.equals(id, pageData.id);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = key != null ? key.hashCode() : 0;
-        result = 31 * result + (id != null ? id.hashCode() : 0);
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    int result = key != null ? key.hashCode() : 0;
+    result = 31 * result + (id != null ? id.hashCode() : 0);
+    return result;
+  }
 }

@@ -6,17 +6,17 @@
   import java.text.SimpleDateFormat;
   import org.exoplatform.commons.utils.HTMLEntityEncoder;
 
-  String[] beanFields =  uicomponent.getBeanFields() ;
-  String[] beanActions =  uicomponent.getBeanActions() ;
+  String[] beanFields =  uicomponent.getBeanFields() ;  
+  String[] beanActions =  uicomponent.getBeanActions() ;  
   def uiParent = uicomponent.getParent();
 
   String name = uicomponent.getLabel() ;
-  UIForm uiForm = uicomponent.getAncestorOfType(UIForm.class);
-
+  UIForm uiForm = uicomponent.getAncestorOfType(UIForm.class); 
+  
   DateFormat dateFormat = null;
 %>
 <div id="$uicomponent.id">
-    <table class="UIGrid" cellspacing="0" summary="Page list">
+    <table class="uiGrid table table-hover table-striped" cellspacing="0" summary="Page list">
         <thead>
             <tr>
                 <%if(name != null) {%>
@@ -32,22 +32,18 @@
                             <th id="<%=field%>" scope="col"><%=_ctx.appRes(uiParent.getName()+".header."+field)%></th>
                     <%}%>
                     <%if(beanActions != null && beanActions.length > 0) { %>
-                            <th id="actions" scope="col"><%=_ctx.appRes(uiParent.getName()+".header.action")%></th>
+                            <th class="center" id="actions" scope="col"><%=_ctx.appRes(uiParent.getName()+".header.action")%></th>
                     <%}%>
                 <%}%>
             </tr>
         </thead>
         <tbody class="FeedBox">
-			<%
-			boolean even = true;
-			for (bean in uicomponent.getBeans())  {
-				if(even) rowClass = "EvenRow";
-				else rowClass =	"OddRow";
-				even = !even;
-			%>
-	        <tr class="$rowClass">
+			<% 			
+			for (bean in uicomponent.getBeans())  { 				
+			%>   
+	        <tr >
 			      <%
-		        for(field in beanFields) {
+		        for(field in beanFields) { 
 		          def fieldValue = uicomponent.getFieldValue(bean, field) ;
 		          def cssClass = "" ;
 		          if(fieldValue != null) {
@@ -55,38 +51,37 @@
 		            if(fieldClass == Integer.class)  cssClass = "number" ;
 		            else if(java.util.Date.class.isAssignableFrom(fieldClass)) {
 		              if(dateFormat == null) dateFormat = new SimpleDateFormat("HH:mm:ss yyyy-MM-dd");
-		              cssClass = "Datetime" ;
+		              cssClass = "dateTime" ;
 		              fieldValue = dateFormat.format(fieldValue);
-		            }
+		            } 
 		            else {
-		        	  cssClass = "Text" ;
-		        	  fieldValue = HTMLEntityEncoder.getInstance().encode(fieldValue.toString());
-		    	    }
+		                cssClass = "text" ;
+		                fieldValue = HTMLEntityEncoder.getInstance().encode(fieldValue.toString());
+		            }
 		          } else {
 		            fieldValue = "";
 		          }
 		          String value = fieldValue.toString();
-		          println "<td headers=\"$field\"><div class=\""+cssClass+"\" title='$fieldValue'>"+fieldValue+"</div></td>";
-		        }
-			      if(beanActions != null && beanActions.length > 0) {
+		          println "<td headers=\"$field\"><span class=\""+cssClass+"\" title='$fieldValue'>"+fieldValue+"</span></td>";
+		        }  
+			      if(beanActions != null && beanActions.length > 0) { 
 			      %>
-	           <td headers="actions">
-	                <div class="ActionContainer">
+	           <td class="center actionContainer" headers="actions"> 
 	                  <%
-	                    def beanIdField = uicomponent.getBeanIdField() ;
-	                    for(action in beanActions) {
+	                    def beanIdField = uicomponent.getBeanIdField() ;           
+	                    for(action in beanActions) { 
 	                      def beanId = uicomponent.getFieldValue(bean, beanIdField)  ;
 	                        if(action == null) continue;
 	                      String title = _ctx.appRes(uiParent.getParent().getName() + ".action.title." + action);
 	                      String actionLink = uiParent.event(action, beanId);
-	                    %>
-	                        <a href="javascript:void(0);" onclick="$actionLink" title="$title"><img alt="$title" title="$title" src="/eXoResources/skin/sharedImages/Blank.gif" class="${action}Icon" /></a>
-	                  <%}%>
-	                </div>
+	                    %>             
+
+	                        <a href="javascript:void(0);" onclick="$actionLink" data-toggle="tooltip" data-placement="bottom"  data-original-title="$title" class="actionIcon" ><i class="uiIcon${action} uiIconLightGray"></i></a>
+	                  <%}%>          
 	            </td>
 	      <%
 	            }
-	      %>
+	      %>  
             </tr>
         <%
             }

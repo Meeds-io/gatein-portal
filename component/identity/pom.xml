@@ -51,6 +51,7 @@
     <dependency>
       <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.common</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -62,6 +63,7 @@
       <groupId>org.picketlink.idm</groupId>
       <artifactId>picketlink-idm-core</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.picketlink.idm</groupId>
       <artifactId>picketlink-idm-hibernate</artifactId>
@@ -75,12 +77,6 @@
     <dependency>
       <groupId>org.picketlink.idm</groupId>
       <artifactId>picketlink-idm-ldap</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.infinispan</groupId>
-          <artifactId>infinispan-core</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -96,6 +92,11 @@
     <dependency>
       <groupId>io.swagger</groupId>
       <artifactId>swagger-jaxrs</artifactId>
+    </dependency>
+
+    <dependency>
+       <groupId>javax.transaction</groupId>
+       <artifactId>jta</artifactId>
     </dependency>
 
     <dependency>
@@ -172,6 +173,7 @@
               <include>org/exoplatform/services/tck/organization/Test*.java</include>
               <include>org/exoplatform/services/organization/Test*.java</include>
               <include>org/exoplatform/services/organization/externalstore/Test*.java</include>
+              <include>org/exoplatform/services/organization/externalstore/jpa/Test*.java</include>
             </includes>
             <excludes>
               <exclude>**/AbstractOrganizationServiceTest.java</exclude>
@@ -181,6 +183,7 @@
               <gatein.test.tmp.dir>${project.build.directory}/datadir</gatein.test.tmp.dir>
               <orgservice.test.configuration.skipDateTests>true</orgservice.test.configuration.skipDateTests>
               <orgservice.test.configuration.skipCISearchTests>true</orgservice.test.configuration.skipCISearchTests>
+              <exo.jpa.datasource.name>java:/comp/env/exo-jpa_portal</exo.jpa.datasource.name>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -188,6 +191,23 @@
     </pluginManagement>
 
     <plugins>
+      <plugin>
+        <groupId>com.jcabi</groupId>
+        <artifactId>jcabi-maven-plugin</artifactId>
+        <!-- Workaround for bug https://github.com/jcabi/jcabi-aspects/issues/257 -->
+        <dependencies>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjtools</artifactId>
+                <version>1.9.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>1.9.1</version>
+            </dependency>
+        </dependencies>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>

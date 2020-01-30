@@ -2,17 +2,17 @@
 <!--
 
     Copyright (C) 2009 eXo Platform SAS.
-
+    
     This is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as
     published by the Free Software Foundation; either version 2.1 of
     the License, or (at your option) any later version.
-
+    
     This software is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     Lesser General Public License for more details.
-
+    
     You should have received a copy of the GNU Lesser General Public
     License along with this software; if not, write to the Free
     Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
@@ -20,10 +20,9 @@
 
 -->
 
-<configuration
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd http://www.exoplaform.org/xml/ns/kernel_1_2.xsd"
-    xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+  xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
   <external-component-plugins>
     <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
     <component-plugin>
@@ -56,20 +55,20 @@
                 <value>
                   <object type="org.exoplatform.services.organization.OrganizationConfig$MembershipType">
                     <field name="type">
-                      <string>manager</string>
+                      <string>*</string>
                     </field>
                     <field name="description">
-                      <string>manager membership type</string>
+                      <string>Any membership type</string>
                     </field>
                   </object>
                 </value>
                 <value>
                   <object type="org.exoplatform.services.organization.OrganizationConfig$MembershipType">
                     <field name="type">
-                      <string>*</string>
+                      <string>manager</string>
                     </field>
                     <field name="description">
-                      <string>any membership type</string>
+                      <string>manager membership type</string>
                     </field>
                   </object>
                 </value>
@@ -95,7 +94,6 @@
                 </value>
               </collection>
             </field>
-
             <field name="group">
               <collection type="java.util.ArrayList">
                 <value>
@@ -126,7 +124,7 @@
                       <string>the /platform/administrators group</string>
                     </field>
                     <field name="label">
-                      <string>Administrators</string>
+                      <string>Administration</string>
                     </field>
                   </object>
                 </value>
@@ -168,7 +166,7 @@
                       <string>organization</string>
                     </field>
                     <field name="parentId">
-                      <string></string>
+                      <string />
                     </field>
                     <field name="description">
                       <string>the organization group</string>
@@ -178,196 +176,66 @@
                     </field>
                   </object>
                 </value>
+                 <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                       <field name="name">
+                          <string>management</string>
+                       </field>
+                       <field name="parentId">
+                          <string>/organization</string>
+                       </field>
+                       <field name="description">
+                          <string>the /organization/management group</string>
+                       </field>
+                       <field name="label">
+                          <string>Management</string>
+                       </field>
+                    </object>
+                 </value>
+                 <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                       <field name="name">
+                          <string>executive-board</string>
+                       </field>
+                       <field name="parentId">
+                          <string>/organization/management</string>
+                       </field>
+                       <field name="description">
+                          <string>the /organization/management/executive-board group</string>
+                       </field>
+                       <field name="label">
+                          <string>Executive Board</string>
+                       </field>
+                    </object>
+                 </value>
                 <value>
                   <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
                     <field name="name">
-                      <string>management</string>
+                      <string>employees</string>
                     </field>
                     <field name="parentId">
                       <string>/organization</string>
                     </field>
                     <field name="description">
-                      <string>the /organization/management group</string>
+                      <string>the /organization/employees group</string>
                     </field>
                     <field name="label">
-                      <string>Management</string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field name="name">
-                      <string>executive-board</string>
-                    </field>
-                    <field name="parentId">
-                      <string>/organization/management</string>
-                    </field>
-                    <field name="description">
-                      <string>the /organization/management/executive-board group</string>
-                    </field>
-                    <field name="label">
-                      <string>Executive Board</string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field name="name">
-                      <string>human-resources</string>
-                    </field>
-                    <field name="parentId">
-                      <string>/organization/management</string>
-                    </field>
-                    <field name="description">
-                      <string>the /organization/management/human-resource group</string>
-                    </field>
-                    <field name="label">
-                      <string>Human Resources</string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field name="name">
-                      <string>communication</string>
-                    </field>
-                    <field name="parentId">
-                      <string>/organization</string>
-                    </field>
-                    <field name="description">
-                      <string>the /organization/communication group</string>
-                    </field>
-                    <field name="label">
-                      <string>Communication</string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field name="name">
-                      <string>marketing</string>
-                    </field>
-                    <field name="parentId">
-                      <string>/organization/communication</string>
-                    </field>
-                    <field name="description">
-                      <string>the /organization/communication/marketing group</string>
-                    </field>
-                    <field name="label">
-                      <string>Marketing</string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field name="name">
-                      <string>press-and-media</string>
-                    </field>
-                    <field name="parentId">
-                      <string>/organization/communication</string>
-                    </field>
-                    <field name="description">
-                      <string>the /organization/communication/press-and-media group</string>
-                    </field>
-                    <field name="label">
-                      <string>Press and Media</string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field name="name">
-                      <string>operations</string>
-                    </field>
-                    <field name="parentId">
-                      <string>/organization</string>
-                    </field>
-                    <field name="description">
-                      <string>the /organization/operations and media group</string>
-                    </field>
-                    <field name="label">
-                      <string>Operations</string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field name="name">
-                      <string>sales</string>
-                    </field>
-                    <field name="parentId">
-                      <string>/organization/operations</string>
-                    </field>
-                    <field name="description">
-                      <string>the /organization/operations/sales group</string>
-                    </field>
-                    <field name="label">
-                      <string>Sales</string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field name="name">
-                      <string>finances</string>
-                    </field>
-                    <field name="parentId">
-                      <string>/organization/operations</string>
-                    </field>
-                    <field name="description">
-                      <string>the /organization/operations/finances group</string>
-                    </field>
-                    <field name="label">
-                      <string>Finances</string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field name="name">
-                      <string>customers</string>
-                    </field>
-                    <field name="parentId">
-                      <string></string>
-                    </field>
-                    <field name="description">
-                      <string>the /customers group</string>
-                    </field>
-                    <field name="label">
-                      <string>Customers</string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field name="name">
-                      <string>partners</string>
-                    </field>
-                    <field name="parentId">
-                      <string></string>
-                    </field>
-                    <field name="description">
-                      <string>the /partners group</string>
-                    </field>
-                    <field name="label">
-                      <string>Partners</string>
+                      <string>Employees</string>
                     </field>
                   </object>
                 </value>
               </collection>
             </field>
 
-
             <field name="user">
               <collection type="java.util.ArrayList">
                 <value>
                   <object type="org.exoplatform.services.organization.OrganizationConfig$User">
                     <field name="userName">
-                      <string>root</string>
+                      <string>${exo.super.user}</string>
                     </field>
-                    <!-- Use configuration.properties to set up root password file -->
                     <field name="password">
-                      <string></string>
+                      <string>gtn</string>
                     </field>
                     <field name="firstName">
                       <string>Root</string>
@@ -376,82 +244,10 @@
                       <string>Root</string>
                     </field>
                     <field name="email">
-                      <string>root@gatein.org</string>
+                      <string>root@gatein.com</string>
                     </field>
                     <field name="groups">
-                      <string>
-                        manager:/platform/administrators,member:/platform/users,
-                        member:/organization/management/executive-board
-                      </string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$User">
-                    <field name="userName">
-                      <string>john</string>
-                    </field>
-                    <field name="password">
-                      <string>gtn</string>
-                    </field>
-                    <field name="firstName">
-                      <string>John</string>
-                    </field>
-                    <field name="lastName">
-                      <string>Anthony</string>
-                    </field>
-                    <field name="email">
-                      <string>john@gatein.org</string>
-                    </field>
-                    <field name="groups">
-                      <string>
-                        member:/platform/administrators,member:/platform/users,
-                        manager:/organization/management/executive-board
-                      </string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$User">
-                    <field name="userName">
-                      <string>mary</string>
-                    </field>
-                    <field name="password">
-                      <string>gtn</string>
-                    </field>
-                    <field name="firstName">
-                      <string>Mary</string>
-                    </field>
-                    <field name="lastName">
-                      <string>Kelly</string>
-                    </field>
-                    <field name="email">
-                      <string>mary@gatein.org</string>
-                    </field>
-                    <field name="groups">
-                      <string>member:/platform/users</string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$User">
-                    <field name="userName">
-                      <string>demo</string>
-                    </field>
-                    <field name="password">
-                      <string>gtn</string>
-                    </field>
-                    <field name="firstName">
-                      <string>Demo</string>
-                    </field>
-                    <field name="lastName">
-                      <string>gtn</string>
-                    </field>
-                    <field name="email">
-                      <string>demo@gatein.org</string>
-                    </field>
-                    <field name="groups">
-                      <string>member:/platform/guests,member:/platform/users</string>
+                      <string>*:/platform/administrators,*:/platform/users,*:/organization/employees,member:/organization/management/executive-board</string>
                     </field>
                   </object>
                 </value>
@@ -489,16 +285,7 @@
             <field name="ignoredUser">
               <collection type="java.util.HashSet">
                 <value>
-                  <string>root</string>
-                </value>
-                <value>
-                  <string>john</string>
-                </value>
-                <value>
-                  <string>mary</string>
-                </value>
-                <value>
-                  <string>demo</string>
+                  <string>${exo.super.user}</string>
                 </value>
               </collection>
             </field>
@@ -506,7 +293,42 @@
         </object-param>
       </init-params>
     </component-plugin>
-
+    <component-plugin>
+      <name>new.user.event.listener</name>
+      <set-method>addListenerPlugin</set-method>
+      <type>org.exoplatform.services.organization.impl.NewUserEventListener</type>
+      <description>this listener assign group and membership to a new created user</description>
+      <init-params>
+        <object-param>
+          <name>configuration</name>
+          <description>description</description>
+          <object type="org.exoplatform.services.organization.impl.NewUserConfig">
+            <field name="group">
+              <collection type="java.util.ArrayList">
+                <value>
+                  <object type="org.exoplatform.services.organization.impl.NewUserConfig$JoinGroup">
+                    <field name="groupId">
+                      <string>/platform/users</string>
+                    </field>
+                    <field name="membership">
+                      <string>member</string>
+                    </field>
+                  </object>
+                </value>
+              </collection>
+            </field>
+            <field name="ignoredUser">
+              <collection type="java.util.HashSet">
+                <value>
+                  <string>${exo.super.user}</string>
+                </value>
+              </collection>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+    
     <component-plugin>
       <name>MembershipUpdateListener</name>
       <set-method>addListenerPlugin</set-method>

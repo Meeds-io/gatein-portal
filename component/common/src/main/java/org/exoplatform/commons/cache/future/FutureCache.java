@@ -106,6 +106,9 @@ public abstract class FutureCache<K, V, C> {
      * @return the value
      */
     public final V get(final C context, final K key) {
+        if (key == null) {
+          return null;
+        }
         // First we try a simple cache get
         V value = get(key);
 
@@ -153,7 +156,7 @@ public abstract class FutureCache<K, V, C> {
                 }
             } finally {
                 // Clean up the per key map but only if our insertion succeeded and with our future
-                if (inserted) {
+                if (inserted && key != null) {
                     futureEntries.remove(key, retrieval);
                 }
             }

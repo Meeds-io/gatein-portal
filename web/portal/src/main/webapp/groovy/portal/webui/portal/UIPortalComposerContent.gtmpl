@@ -6,47 +6,34 @@
 	def jsManager = rcontext.getJavascriptManager();
 	
 	String selTabId = uicomponent.getSelectedTabId(); 
-	jsManager.require("SHARED/portalComposer", "portalComposer")
-				.addScripts("portalComposer.initComposerContent('$uicomponent.id', '$selTabId');");
+	jsManager.require("SHARED/portalRequest").require("SHARED/portalComposer", "portalComposer")
+		.require("SHARED/bts_tab")
+		.addScripts("portalComposer.initComposerContent('$uicomponent.id', '$selTabId');");
 %>
 
-<div class="UITabPane" id="$uicomponent.id">
-	<div class="UIHorizontalTabs">
-		<div class="TabsContainer">
+<div class="uiTabNormal" id="$uicomponent.id">
+	<ul class="nav nav-tabs">
 			<%			
 				UIApplicationList appList = uicomponent.getChild(UIApplicationList.class);
 				UIContainerList contList = uicomponent.getChild(UIContainerList.class);
+				String appLink = "ajaxAsyncGetRequest('" + uicomponent.url("SelectTab",appList.getId()) + "', true)";
+				String contLink = "ajaxAsyncGetRequest('" + uicomponent.url("SelectTab",contList.getId()) + "', true)";
 			%>
-			<div class="UITab GrayTabStyle">
-				<div class="<%= appList.getId().equals(selTabId) ? "SelectedTab" : "NormalTab" %>">
-					<div class="LeftTab">
-						<div class="RightTab">
-							<% String appLink = "ajaxAsyncGetRequest('" + uicomponent.url("SelectTab",appList.getId()) + "', true)" %>								
-							<div class="MiddleTab">
-								<%=_ctx.appRes("UITabPane.title." + appList.getId());%>
-								<input type="hidden" name="${appList.getId()}" value="$appLink"/>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="UITab GrayTabStyle">			
-				<div class="<%= contList.getId().equals(selTabId) ? "SelectedTab" : "NormalTab" %>">
-					<div class="LeftTab">
-						<div class="RightTab">
-							<% String contLink = "ajaxAsyncGetRequest('" + uicomponent.url("SelectTab",contList.getId()) + "', true)" %>								
-							<div class="MiddleTab">
-								<%=_ctx.appRes("UITabPane.title." + contList.getId());%>
-								<input type="hidden" name="${contList.getId()}" value="$contLink"/>
-							</div>
-						</div>
-					</div>
-				</div>				
-			</div>							
+		<li class="<%= appList.getId().equals(selTabId) ? "active" : "" %>">
+			<a data-toggle="tab" data-target="#appList"><%=_ctx.appRes("UITabPane.title." + appList.getId());%></a>
+			<input type="hidden" name="${appList.getId()}" value="$appLink"/>
+		</li>
+		<li class="<%= contList.getId().equals(selTabId) ? "active" : "" %>">
+			<a data-toggle="tab" data-target="#contList"><%=_ctx.appRes("UITabPane.title." + contList.getId());%></a>
+			<input type="hidden" name="${contList.getId()}" value="$contLink"/>
+		</li>
+	</ul>
+	<div class="tab-content">
+		<div id="appList" class="tab-pane fade <%= appList.getId().equals(selTabId) ? "in active" : "" %>">
+			<% uicomponent.renderUIComponent(appList);  %>
 		</div>
-	</div>
-	<div class="UITabContentContainer GrayTabContainer">
-		<div class="UITabContent" style="display: <%=appList.getId().equals(selTabId) ? "block": "none"%>;overflow:auto;"><% uicomponent.renderUIComponent(appList);  %></div>
-		<div class="UITabContent" style="display: <%=contList.getId().equals(selTabId) ? "block": "none"%>;overflow:auto;"><% uicomponent.renderUIComponent(contList);  %></div>
+		<div id="contList" class="tab-pane fade <%= contList.getId().equals(selTabId) ? "in active" : "" %>">
+			<% uicomponent.renderUIComponent(contList);  %>
+		</div>
 	</div>	
 </div>	

@@ -21,17 +21,14 @@
  */
 package org.gatein.api.navigation;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
-import org.exoplatform.portal.mop.Described;
-import org.exoplatform.portal.mop.navigation.NodeState;
 import org.gatein.api.ApiException;
 import org.gatein.api.common.i18n.Localized.Value;
 import org.gatein.api.common.i18n.LocalizedString;
 import org.gatein.api.navigation.Visibility.Status;
+
+import org.exoplatform.portal.mop.navigation.NodeState;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -40,12 +37,12 @@ public class ObjectFactory {
     private ObjectFactory() {
     }
 
-    public static LocalizedString createLocalizedString(Map<Locale, Described.State> descriptions) {
+    public static LocalizedString createLocalizedString(Map<Locale, org.exoplatform.portal.mop.State> descriptions) {
         if (descriptions == null)
             return null;
 
         Map<Locale, String> m = new HashMap<Locale, String>();
-        for (Map.Entry<Locale, Described.State> entry : descriptions.entrySet()) {
+        for (Map.Entry<Locale, org.exoplatform.portal.mop.State> entry : descriptions.entrySet()) {
             // For some reason (UI issue possibly) an english locale can be set with no value.
             if (entry.getValue().getName() != null) {
                 m.put(entry.getKey(), entry.getValue().getName());
@@ -54,10 +51,10 @@ public class ObjectFactory {
         return new LocalizedString(m);
     }
 
-    public static Map<Locale, Described.State> createDescriptions(LocalizedString string) {
-        Map<Locale, Described.State> descriptions = new HashMap<Locale, Described.State>();
+    public static Map<Locale, org.exoplatform.portal.mop.State> createDescriptions(LocalizedString string) {
+        Map<Locale, org.exoplatform.portal.mop.State> descriptions = new HashMap<Locale, org.exoplatform.portal.mop.State>();
         for (Value<String> v : string.getLocalizedValues()) {
-            descriptions.put(v.getLocale(), new Described.State(v.getValue(), null));
+            descriptions.put(v.getLocale(), new org.exoplatform.portal.mop.State(v.getValue(), null));
         }
         return descriptions;
     }

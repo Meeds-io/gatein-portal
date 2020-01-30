@@ -186,25 +186,17 @@ public class SiteImpl implements Site {
 
             // In order to properly create a site (which includes creating it from a template) it seemed much harder
             // to get it working properly (NewPortalConfigListener)
-            if (areWeInATestEnvironment()) {
-                try {
-                    storage.create(portalConfig); // Just create an empty site
-                } catch (Exception e) {
-                    throw new ApiException("Exception creating site " + id + " in testing environment.");
-                }
-            } else {
-                try {
-                    switch (id.getType()) {
-                        case SITE:
-                            service.createUserPortalConfig(portalConfig.getType(), portalConfig.getName(), templateName);
-                            break;
-                        case SPACE:
-                            service.createGroupSite(portalConfig.getName());
-                            break;
-                    }
-                } catch (Exception e) {
-                    throw new ApiException("Could not create site " + id, e);
-                }
+            try {
+              switch (id.getType()) {
+              case SITE:
+                service.createUserPortalConfig(portalConfig.getType(), portalConfig.getName(), templateName);
+                break;
+              case SPACE:
+                service.createGroupSite(portalConfig.getName());
+                break;
+              }
+            } catch (Exception e) {
+              throw new ApiException("Could not create site " + id, e);
             }
 
             // Retrieve the site that was created above and replay any changes done via the Site api object.
@@ -283,10 +275,4 @@ public class SiteImpl implements Site {
         out.writeObject(portalConfig.build());
     }
 
-    private static boolean areWeInATestEnvironment() {
-        J2EEServerInfo server = RootContainer.getInstance().getServerEnvironment();
-        String serverName = (server == null) ? null : server.getServerName();
-
-        return ("test".equals(serverName) || "standalone".equals(serverName));
-    }
 }

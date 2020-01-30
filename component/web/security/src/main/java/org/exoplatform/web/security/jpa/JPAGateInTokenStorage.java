@@ -38,6 +38,7 @@ public class JPAGateInTokenStorage implements GateInTokenStore {
     }
 
     @Override
+    @ExoTransactional
     public TokenData getToken(String tokenId) {
         TokenEntity entity = this.tokenDAO.findByTokenId(tokenId);
         if (entity != null) {
@@ -74,10 +75,11 @@ public class JPAGateInTokenStorage implements GateInTokenStore {
     @Override
     @ExoTransactional
     public void cleanExpired() {
-        this.tokenDAO.cleanExpired();;
+        this.tokenDAO.cleanExpired();
     }
 
     @Override
+    @ExoTransactional
     public long size() {
         return this.tokenDAO.count();
     }

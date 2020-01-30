@@ -1,3 +1,4 @@
+
 <%
    import org.exoplatform.webui.core.UIComponent;
    import org.exoplatform.webui.form.UIForm;
@@ -6,6 +7,10 @@
    import org.gatein.common.text.EntityEncoder;
    import org.exoplatform.commons.utils.HTMLEntityEncoder;
 
+   def rcontext = _ctx.getRequestContext();
+   rcontext.getJavascriptManager().require("SHARED/bts_tooltip").require("SHARED/jquery", "\$")
+   				 .addScripts("\$('[rel=\"tooltip\"]').tooltip();");
+   
    String[] beanFields = uicomponent.getBeanFields();
    String[] beanActions = uicomponent.getBeanActions();
    int colnum = 0;
@@ -13,66 +18,58 @@
       colnum = beanFields.length + 1;
    else if(beanFields != null && beanFields.length > 0)
       colnum = beanFields.length;
-
+      
    UIComponent uiParent = uicomponent.getParent();
    String name = uicomponent.getLabel();
    UIForm uiForm = uicomponent.getAncestorOfType(UIForm.class);
+
+   def emptyMessage = _ctx.appRes(uicomponent.getId() + ".msg.empty");
+   if("empty".equals(emptyMessage)) {
+        emptyMessage = _ctx.appRes("UIGrid.msg.empty");
+   }
 %>
 <div id="$uicomponent.id">
-   <table class="UIGrid" cellspacing="0" summary="Component $uicomponent.id">
+   <table class="uiGrid table table-hover table-striped" cellspacing="0" summary="Component $uicomponent.id">
       <thead>
       <tr>
          <% if (name != null)
          		{ for (field in beanFields)
          			{ %>
-         				<th class="portlet-table-header" id="<%= field%>" scope="col"><%=_ctx.appRes(name + ".header." + field)%></th>
+         				<th id="<%= field%>" scope="col"><%=_ctx.appRes(name + ".header." + field)%></th>
          		<% }
          			if (beanActions != null)
          			{ %>
-         				<th class="portlet-table-header" id="actions" scope="col"><%=_ctx.appRes(name + ".header.action")%></th>
+         				<th class="center" id="actions" scope="col"><%=_ctx.appRes(name + ".header.action")%></th>
          		<% }
          		}
          		if (name == null)
          		{
          			for (field in beanFields)
          			{ %>
-         				<th class="portlet-table-header" id="<%= field%>" scope="col"><%=_ctx.appRes(uiParent.getName() + ".header." + field)%></th>
+         				<th id="<%= field%>" scope="col"><%=_ctx.appRes(uiParent.getName() + ".header." + field)%></th>
          	 <% }
          			if (beanActions != null && beanActions.length > 0)
          			{ %>
-         				<th class="portlet-table-header" id="actions" scope="col"><%=_ctx.appRes(uiParent.getName() + ".header.action")%></th>
+         				<th class="center" id="actions" scope="col"><%=_ctx.appRes(uiParent.getName() + ".header.action")%></th>
          	 <% }
          		} %>
       </tr>
       </thead>
-      <tbody class="portlet-table-body">
+      <tbody>
       <% if (uicomponent.getUIPageIterator().getAvailable() < 1)
       { %>
       <tr>
-      	 <td style="font-style:italic; color: #FF5604; text-align: center;" colspan="<%=colnum%>">
-            <%=_ctx.appRes("UIGrid.msg.empty")%>
+      	 <td class="empty center" colspan="<%=colnum%>">
+            <%=emptyMessage%>
          </td>
       </tr>
       <% }
       else
       {
-         def rowClass = "";
-         boolean even = true;
-         def rowStyle = null;
          for (bean in uicomponent.getBeans())
          {
-            if (even) rowClass = "EvenRow";
-            else rowClass = "OddRow portlet-table-alternate";
-            even = !even;
-            if (bean instanceof org.exoplatform.services.organization.User) {
-                if(!uicomponent.getFieldValue(bean, "enabled")) {
-                    rowStyle = "font-style: italic; background: darkgray";
-                } else {
-                    rowStyle = null;
-                }
-            }
       %>
-      <tr class="$rowClass" style="$rowStyle">
+      <tr>
          <%
                EntityEncoder encoder = HTMLEntityEncoder.getInstance();
                for (field in beanFields)
@@ -84,56 +81,42 @@
                      if(fieldClass == Integer.class)	cssClass = "number";
                      else if(java.util.Date.class.isAssignableFrom(fieldClass)) {
                         def dateFormat = new SimpleDateFormat("HH:mm:ss yyyy-MM-dd");
-                        cssClass = "Datetime";
+                        cssClass = "datetime";
                         fieldValue = dateFormat.format(fieldValue);
-                     }
-                     else cssClass = "Text";
+                  }
+                  else cssClass = "text";
                   } else {
                      fieldValue = "";
                   }
                   String value = encoder.encode(fieldValue.toString());
-                  println "<td headers=\"$field\"><div class=\""+cssClass+"\" title='$value'>"+value+"</div></td>";
+                  println "<td headers=\"$field\"><span  class=\""+cssClass+"\" >"+value+"</span></td>";
                }
                if (beanActions != null && beanActions.length > 0)
                {
          %>
-         <td headers="actions">
-            <div class="ActionContainer">
-               <%
-                     def beanIdField = uicomponent.getBeanIdField();
-                     def beanId = uicomponent.getBeanIdFor(bean);
-                     def classIcon = "";
-                     for (action in beanActions)
-                     {
-                        if (action == null) continue;
-                        String title = _ctx.appRes(org.exoplatform.webui.application.WebuiRequestContext.stripUUIDSuffix(uiParent.getName()) + ".action.title." + action);
-                        String actionLink = "";
-                        if (uiForm != null)
-                        {
-                           actionLink = uiForm.event(action, uiParent.getId(), beanId);
-                        }
-                        else
-                        {
-                           actionLink = uiParent.event(action, beanId);
-                        }
-                        classIcon = action + "Icon";
-                        if (action == "DisableEnableUser") {
-                            if (bean instanceof org.exoplatform.services.organization.User) {
-                                if (uicomponent.getFieldValue(bean, "enabled")) {
-                                    title = "Disabled User";
-                                    classIcon = "CheckDisable";
-                                } else {
-                                    title = "Enabled User";
-                                    classIcon = "Check";
-                                }
-                            }
-                        }
-               %>
-               <a href="javascript:;" onclick="$actionLink">
-               <img alt="$title" title="$title" src="/eXoResources/skin/sharedImages/Blank.gif" class="${classIcon}"/>
-               </a>
-               <% } %>
-            </div>
+         <td headers="actions" class="center actionContainer">
+           <%
+                 def beanIdField = uicomponent.getBeanIdField();
+                 def beanId = uicomponent.getBeanIdFor(bean);
+                 for (action in beanActions)
+                 {
+                    if (action == null) continue;
+                    String title = _ctx.appRes(org.exoplatform.webui.application.WebuiRequestContext.stripUUIDSuffix(uiParent.getName()) + ".action.title." + action);
+                    String actionLink = "";
+                    if (uiForm != null)
+                    {
+                       actionLink = uiForm.event(action, uiParent.getId(), beanId);
+                    }
+                    else
+                    {
+                       actionLink = uiParent.event(action, beanId);
+                    }
+           %>
+              <a class="actionIcon" href="javascript:void(0)" onclick="$actionLink" rel="tooltip" data-placement="bottom" title="$title" >
+               	<i class="uiIcon${action} uiIconLightGray"></i>
+              </a>
+           <% } %>
+           
          </td>
          <%
                }

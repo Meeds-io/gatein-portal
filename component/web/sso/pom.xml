@@ -34,6 +34,5 @@
   <modules>
     <module>sso-integration-configs</module>
     <module>sso-agent-configs</module>
-    <module>sso-saml</module>
   </modules>
 </project>

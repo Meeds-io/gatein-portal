@@ -30,7 +30,6 @@
   <packaging>jar</packaging>
   <name>GateIn Portal Component Common</name>
   <dependencies>
-
     <dependency>
       <groupId>javax.portlet</groupId>
       <artifactId>portlet-api</artifactId>
@@ -39,30 +38,26 @@
       <groupId>org.gatein.common</groupId>
       <artifactId>common-common</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.gatein.mop</groupId>
+      <artifactId>mop-api</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.component.ext.cache.impl.infinispan.v8</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.exoplatform.kernel</groupId>
+      <artifactId>exo.kernel.component.command</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.database</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.jcr</groupId>
-      <artifactId>exo.jcr.component.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.jcr</groupId>
-      <artifactId>exo.jcr.component.ext</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.chromattic</groupId>
-      <artifactId>chromattic.api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.chromattic</groupId>
-      <artifactId>chromattic.spi</artifactId>
+      <groupId>org.exoplatform.core</groupId>
+      <artifactId>exo.core.component.security.core</artifactId>
     </dependency>
     <!-- Staxnav -->
     <dependency>
@@ -73,6 +68,26 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.transaction</groupId>
+      <artifactId>jta</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
     </dependency>
 
     <dependency>
@@ -121,12 +136,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
-      <artifactId>exo.portal.component.test.jcr</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -135,14 +144,6 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.chromattic</groupId>
-      <artifactId>chromattic.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.chromattic</groupId>
-      <artifactId>chromattic.apt</artifactId>
     </dependency>
   </dependencies>
 
@@ -162,6 +163,18 @@
       <plugin>
         <groupId>com.jcabi</groupId>
         <artifactId>jcabi-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>

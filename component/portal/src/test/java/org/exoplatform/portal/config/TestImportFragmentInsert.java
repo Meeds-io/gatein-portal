@@ -27,26 +27,30 @@ import org.exoplatform.portal.mop.navigation.NodeContext;
  */
 public class TestImportFragmentInsert extends AbstractImportFragmentTest {
 
-    @Override
-    protected ImportMode getMode() {
-        return ImportMode.INSERT;
-    }
+  @Override
+  protected ImportMode getMode() {
+    return ImportMode.INSERT;
+  }
 
-    @Override
-    protected final void afterOnePhaseBoot(NodeContext<?> root) {
-        assertState(root);
-    }
+  @Override
+  protected final void afterOnePhaseBoot(NodeContext<?> root) {
+    assertEquals(1, root.getNodeSize());
+    NodeContext<?> foo = root.get("foo");
+    assertNotNull(foo);
+    assertEquals("foo_icon", foo.getState().getIcon());
+    assertEquals(1, foo.getNodeSize());
+    NodeContext<?> bar = foo.get("bar");
+    assertNotNull(bar);
+    assertEquals("bar_icon", bar.getState().getIcon());
+    assertEquals(0, bar.getNodeSize());
+  }
 
-    @Override
-    protected void assertState(NodeContext<?> root) {
-        assertEquals(1, root.getNodeSize());
-        NodeContext<?> foo = root.get("foo");
-        assertNotNull(foo);
-        assertEquals("foo_icon", foo.getState().getIcon());
-        assertEquals(1, foo.getNodeSize());
-        NodeContext<?> bar = foo.get("bar");
-        assertNotNull(bar);
-        assertEquals("bar_icon", bar.getState().getIcon());
-        assertEquals(0, bar.getNodeSize());
-    }
+  @Override
+  protected final void afterTwoPhaseOverrideReboot(NodeContext<?> root) {
+      assertEquals(1, root.getNodeSize());
+      NodeContext<?> foo = root.get("foo");
+      assertNotNull(foo);
+      assertEquals("foo_icon", foo.getState().getIcon());
+      assertEquals(1, foo.getNodeSize());
+  }
 }

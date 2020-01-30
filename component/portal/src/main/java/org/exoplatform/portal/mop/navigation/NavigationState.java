@@ -20,7 +20,6 @@
 package org.exoplatform.portal.mop.navigation;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 
 /**

@@ -691,22 +691,8 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                     new Object[] { "jbidGroup", jbidGroup, "processed", processed });
         }
 
-        // Check in cache
-        if (getIntegrationCache() != null) {
-            String cachedId = getIntegrationCache().getGtnGroupId(getCacheNS(), jbidGroup.getKey());
-            if (cachedId != null) {
-                return cachedId;
-            }
-        }
-
         if (jbidGroup.equals(getRootGroup())) {
-            String calculatedId = "";
-
-            if (getIntegrationCache() != null) {
-                getIntegrationCache().putGtnGroupId(getCacheNS(), jbidGroup.getKey(), calculatedId);
-            }
-
-            return calculatedId;
+            return "";
         }
 
         if (processed == null) {
@@ -742,14 +728,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                         + "defined by type mappings or just place it under root /");
             }
 
-            String calculatedId = obtainMappedId(jbidGroup, gtnGroupName);
-
-            if (getIntegrationCache() != null) {
-                getIntegrationCache().putGtnGroupId(getCacheNS(), jbidGroup.getKey(), calculatedId);
-            }
-
-            return calculatedId;
-
+            return obtainMappedId(jbidGroup, gtnGroupName);
         }
 
         processed.add(jbidGroup);
@@ -765,23 +744,11 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                 // if we finally reached the first group from the looped ones then just return id calculated from
                 // mappings or connect it to the root
             } else {
-                String calculatedId = obtainMappedId(jbidGroup, gtnGroupName);
-
-                if (getIntegrationCache() != null) {
-                    getIntegrationCache().putGtnGroupId(getCacheNS(), jbidGroup.getKey(), calculatedId);
-                }
-
-                return calculatedId;
+              return obtainMappedId(jbidGroup, gtnGroupName);
             }
         }
 
-        String calculatedId = parentGroupId + "/" + gtnGroupName;
-
-        if (getIntegrationCache() != null) {
-            getIntegrationCache().putGtnGroupId(getCacheNS(), jbidGroup.getKey(), calculatedId);
-        }
-
-        return calculatedId;
+        return parentGroupId + "/" + gtnGroupName;
 
     }
 
@@ -875,12 +842,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         return jbidGroup;
     }
 
-    private IntegrationCache getIntegrationCache() {
-        // TODO: refactor to remove cast. For now to avoid adding new config option and share existing cache instannce
-        // TODO: it should be there.
-        return ((PicketLinkIDMServiceImpl) service_).getIntegrationCache();
-    }
-
     /**
      * Returns namespace to be used with integration cache
      *
@@ -899,22 +860,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
      * @throws Exception
      */
     protected org.picketlink.idm.api.Group getRootGroup() throws Exception {
-        org.picketlink.idm.api.Group rootGroup = null;
-
-        if (getIntegrationCache() != null) {
-            rootGroup = getIntegrationCache().getRootGroup(getCacheNS());
-        }
-
-        if (rootGroup == null) {
-            rootGroup = obtainRootGroup();
-
-            if (getIntegrationCache() != null) {
-                getIntegrationCache().putRootGroup(getCacheNS(), rootGroup);
-            }
-        }
-
-        return rootGroup;
-
+       return obtainRootGroup();
     }
 
     /**

@@ -32,6 +32,9 @@
     This web.xml file is mandatory in each .par archive file.
   </description>
 
+  <listener>
+    <listener-class>org.exoplatform.container.web.PortalContainerConfigOwner</listener-class>
+  </listener>
 
   <filter>
     <filter-name>ResourceRequestFilter</filter-name>

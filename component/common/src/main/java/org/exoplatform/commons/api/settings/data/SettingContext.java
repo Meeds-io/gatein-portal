@@ -16,12 +16,10 @@
  */
 package org.exoplatform.commons.api.settings.data;
 
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.services.jcr.RepositoryService;
+import java.io.Serializable;
+
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-
-import java.io.Serializable;
 
 /**
  * Associates setting properties with a specified context (GLOBAL/USER).
@@ -32,18 +30,15 @@ public class SettingContext implements Serializable {
   private static final Log  LOG              = ExoLogger.getLogger(SettingContext.class);
 
   private static final long serialVersionUID = 437625857263645213L;
-  /**
-   * Name of the repository in JCR.
-   */
-  protected String          repositoryName;
+
   /**
    * Context of the setting object.
    */
   protected Context         context;
   /**
-   * Path of the context in JCR.
+   * Path of the context.
    */
-  protected String          ContextPath;
+  protected String          contextPath;
 
   /**
    * Creates a SettingContext object with a specified context type.
@@ -53,8 +48,7 @@ public class SettingContext implements Serializable {
   public SettingContext(Context context) {
     super();
     this.context = context;
-    this.repositoryName = getCurrentRepositoryName();
-    this.ContextPath = Tools.buildContextPath(context);
+    this.contextPath = Tools.buildContextPath(context);
   }
   /**
    * Compares a specified object with the SettingContext for equality.
@@ -70,12 +64,7 @@ public class SettingContext implements Serializable {
 
     if (obj instanceof SettingContext) {
       SettingContext dest = (SettingContext) obj;
-      if (this.repositoryName == null) {
-        return this.getContextPath().equals(dest.getContextPath());
-      } else {
-        return this.repositoryName.equals(dest.getRepositoryName())
-            && this.getContextPath().equals(dest.getContextPath());
-      }
+      return this.getContextPath().equals(dest.getContextPath());
     }
     return false;
   }
@@ -85,9 +74,7 @@ public class SettingContext implements Serializable {
    */
   @Override
   public int hashCode() {
-    int result = repositoryName == null ? 0 : repositoryName.hashCode();
-    result = 31 * result + ContextPath.hashCode();
-    return result;
+    return contextPath.hashCode();
   }
 
   /**
@@ -96,16 +83,9 @@ public class SettingContext implements Serializable {
    * @LevelAPI Experimental
    */
   public String getContextPath() {
-    return ContextPath;
+    return contextPath;
   }
-  /**
-   * Gets a repository name associated with the SettingContext object.
-   * @return The repository name.
-   * @LevelAPI Experimental
-   */
-  public String getRepositoryName() {
-    return repositoryName;
-  }
+
   /**
    * Gets a context object associated with the SettingContext object.
    * @return The context object.
@@ -113,25 +93,5 @@ public class SettingContext implements Serializable {
    */
   public Context getContext() {
     return context;
-  }
-  /**
-   * Gets the current repository name.
-   */
-  public static String getCurrentRepositoryName() {
-    RepositoryService repositoryService = (RepositoryService) PortalContainer.getInstance()
-                                                                             .getComponentInstanceOfType(RepositoryService.class);
-    try {
-      if (repositoryService == null || repositoryService.getCurrentRepository() == null
-          || repositoryService.getCurrentRepository().getConfiguration() == null) {
-        return null;
-      } else {
-        return repositoryService.getCurrentRepository().getConfiguration().getName();
-      }
-    } catch (Exception e) {
-      if(LOG.isDebugEnabled()) {
-        LOG.warn("An error occurred when getting current repository name, null will be returned", e);
-      }
-      return null;
-    }
   }
 }

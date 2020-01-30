@@ -20,8 +20,9 @@
  */
 package org.exoplatform.web.security.mock.jpa;
 
-import org.exoplatform.services.naming.InitialContextInitializer;
 import org.picocontainer.Startable;
+
+import org.exoplatform.services.naming.InitialContextInitializer;
 
 /**
  * Dummy Startable component to make sure the datasource is bound before others
@@ -38,7 +39,6 @@ public class DummyDependantComponent implements Startable {
   @Override
   public void start() {
     // nothing
-    System.out.println("Start here");
   }
 
   @Override

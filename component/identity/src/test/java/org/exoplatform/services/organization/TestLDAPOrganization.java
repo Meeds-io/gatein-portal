@@ -11,7 +11,6 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.idm.Config;
-import org.exoplatform.services.organization.idm.PicketLinkIDMCacheService;
 import org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl;
 import org.exoplatform.services.organization.idm.UserDAOImpl;
 import org.exoplatform.services.organization.idm.cache.CacheableUserHandlerImpl;
@@ -25,7 +24,6 @@ import java.util.Set;
  * Created by exo on 5/5/16.
  */
 @ConfiguredBy({
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.test.jcr-configuration.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-ldap-configuration.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/services/organization/TestOrganization-configuration.xml") })
 public class TestLDAPOrganization extends TestOrganization {
@@ -39,9 +37,6 @@ public class TestLDAPOrganization extends TestOrganization {
   PortalContainer container;
 
   OrganizationService organization;
-
-  PicketLinkIDMCacheService picketLinkIDMCacheService;
-
 
   @Override
   protected void beforeRunBare() {
@@ -60,7 +55,6 @@ public class TestLDAPOrganization extends TestOrganization {
     container = PortalContainer.getInstance();
     organization = (OrganizationService) container.getComponentInstanceOfType(OrganizationService.class);
     uHandler = organization.getUserHandler();
-    picketLinkIDMCacheService = (PicketLinkIDMCacheService) container.getComponentInstanceOfType(PicketLinkIDMCacheService.class);
     super.setUp();
     synchronizeUsers();
   }
@@ -135,7 +129,6 @@ public class TestLDAPOrganization extends TestOrganization {
     User test2 = organization.getUserHandler().findUserByName("admin");
     assertNotNull(test2);
     openDSService.cleanUpDN("uid=admin,ou=People,o=test,dc=portal,dc=example,dc=com");
-    picketLinkIDMCacheService.invalidateAll();
     if (organization.getUserHandler() instanceof CacheableUserHandlerImpl) {
       ((CacheableUserHandlerImpl) organization.getUserHandler()).clearCache();
     }

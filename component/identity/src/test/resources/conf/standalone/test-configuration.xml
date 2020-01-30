@@ -8,11 +8,6 @@
   </component>
 
   <component>
-    <key>org.exoplatform.services.organization.idm.PicketLinkIDMCacheService</key>
-    <type>org.exoplatform.services.organization.idm.PicketLinkIDMCacheService</type>
-  </component>
-
-  <component>
     <key>org.gatein.common.transaction.JTAUserTransactionLifecycleService</key>
     <type>org.gatein.common.transaction.JTAUserTransactionLifecycleServiceImpl</type>
   </component>
@@ -110,6 +105,18 @@
     </init-params>
   </component>
 
+  <component>
+    <key>org.exoplatform.services.naming.InitialContextInitializer</key>
+    <type>org.exoplatform.commons.InitialContextInitializer2</type>
+    <init-params>
+      <properties-param>
+        <name>default-properties</name>
+        <description>Default initial context properties</description>
+        <property name="java.naming.factory.initial" value="org.exoplatform.services.naming.SimpleContextFactory"/>
+      </properties-param>
+    </init-params>
+  </component>
+
   <!-- Init data -->
   <external-component-plugins>
     <target-component>org.exoplatform.services.database.HibernateService</target-component>
@@ -160,8 +167,6 @@
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
           <property name="url" value="jdbc:hsqldb:file:${gatein.test.tmp.dir}/db/data/jdbcidm"/>
-          <property name="username" value="sa"/>
-          <property name="password" value=""/>
         </properties-param>
         <properties-param profiles="mysql">
           <name>ref-addresses</name>
@@ -207,8 +212,6 @@
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
           <property name="url" value="jdbc:hsqldb:mem:db1" />
-          <property name="username" value="sa" />
-          <property name="password" value="" />
         </properties-param>
       </init-params>
     </component-plugin>
@@ -404,7 +407,7 @@
                 <value>
                   <object type="org.exoplatform.services.organization.OrganizationConfig$User">
                     <field  name="userName"><string>root</string></field>
-                    <field  name="password"><string>exo</string></field>
+                    <field  name="password"><string>gtn</string></field>
                     <field  name="firstName"><string>Root</string></field>
                     <field  name="lastName"><string>Root</string></field>
                     <field  name="email"><string>root@localhost</string></field>
@@ -420,7 +423,7 @@
                 <value>
                   <object type="org.exoplatform.services.organization.OrganizationConfig$User">
                     <field  name="userName"><string>john</string></field>
-                    <field  name="password"><string>exo</string></field>
+                    <field  name="password"><string>gtn</string></field>
                     <field  name="firstName"><string>John</string></field>
                     <field  name="lastName"><string>Anthony</string></field>
                     <field  name="email"><string>john@localhost</string></field>
@@ -435,7 +438,7 @@
                 <value>
                   <object type="org.exoplatform.services.organization.OrganizationConfig$User">
                     <field  name="userName"><string>marry</string></field>
-                    <field  name="password"><string>exo</string></field>
+                    <field  name="password"><string>gtn</string></field>
                     <field  name="firstName"><string>Marry</string></field>
                     <field  name="lastName"><string>Kelly</string></field>
                     <field  name="email"><string>marry@localhost</string></field>
@@ -447,7 +450,7 @@
                 <value>
                   <object type="org.exoplatform.services.organization.OrganizationConfig$User">
                     <field  name="userName"><string>demo</string></field>
-                    <field  name="password"><string>exo</string></field>
+                    <field  name="password"><string>gtn</string></field>
                     <field  name="firstName"><string>Demo</string></field>
                     <field  name="lastName"><string>exo</string></field>
                     <field  name="email"><string>demo@localhost</string></field>
@@ -474,7 +477,6 @@
     </component-plugin>
   </external-component-plugins>
 
-  <!--<import>jar:/conf/exo.portal.component.test.jcr-configuration.xml</import>-->
   <!--<import>jar:/conf/exo.portal.component.identity-configuration.xml</import>-->
   <!--<import>jar:/org/exoplatform/services/organization/TestOrganization-configuration.xml</import>-->
 

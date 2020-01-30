@@ -1,50 +1,45 @@
-<%
+<%	
 	import org.exoplatform.portal.webui.workspace.UIPortalApplication;
 	import org.exoplatform.web.application.JavascriptManager;
-	import org.gatein.common.text.EntityEncoder;
+  import org.gatein.common.text.EntityEncoder;
 	import org.exoplatform.commons.utils.HTMLEntityEncoder;
 	import org.exoplatform.portal.webui.workspace.UIPortalApplication.EditMode;
 
 	import javax.portlet.WindowState;
-
+	
 	def rcontext = _ctx.getRequestContext();
-
+	
 	UIPortalApplication uiPortalApp = rcontext.getUIApplication();
 	boolean hasAccessPermission = uicomponent.hasAccessPermission();
 	if(!uiPortalApp.isEditing() && !hasAccessPermission) return;
 	EditMode editMode = uiPortalApp.getEditMode();
-
+	
 	JavascriptManager jsmanager = rcontext.getJavascriptManager();
 
 	WindowState windowState = uicomponent.getCurrentWindowState();
 	String portletId = uicomponent.getId();
 	EntityEncoder encoder = HTMLEntityEncoder.getInstance();
-
+	
 	String title = encoder.encode(uicomponent.getDisplayTitle());
 	if(uiPortalApp.isEditing()) {
-		def id = "UIPortlet-" + portletId;
-		jsmanager.require("SHARED/portal", "portal").addScripts("portal.UIPortal.initMouseHover('" + id + "');");
+	   def id = "UIPortlet-" + portletId;
+	   jsmanager.require("SHARED/portal", "portal").addScripts("portal.UIPortal.initMouseHover('" + id + "');");
 %>
 	<div class="UIPortlet <%=hasAccessPermission?"":"ProtectedPortlet"%>" id="$id" style="top: 0px; left:0px;">
 		<div class="UIComponentBlock">
-
-		<%if (editMode == EditMode.BLOCK) { %>
+		
+		<%if (editMode == EditMode.BLOCK) { %>	
 			<div class="LAYOUT-BLOCK LAYOUT-PORTLET">
-				<div class="PortletLayoutDecorator">
+				
 					<%/*Begin Middle Portlet Layout Decorator*/%>
-					<div class="LPortletLayoutDecorator">
-						<div class="RPortletLayoutDecorator">
-							<div class="CPortletLayoutDecorator">
-									<%
-									if(hasAccessPermission) {
-										print title;
-									} else print "<div class='ProtectedContent'>"+_ctx.appRes("UIPortlet.label.protectedContent")+"</div>";
-									%>
-							</div>
-						</div>
-					</div>
-
-				</div>
+					<div class="portletLayoutDecorator">
+					<%
+					if(hasAccessPermission) {
+						print title;
+					} else print "<div class='ProtectedContent'>"+_ctx.appRes("UIPortlet.label.protectedContent")+"</div>";
+					%>
+					</div>		
+				
 			</div>
 		<%} else { %>
 			<div class="VIEW-BLOCK VIEW-PORTLET" id="VIEW-${portletId}">
@@ -72,52 +67,55 @@
 			String theme = uicomponent.getSuitedTheme(null);
 	%>
 				<div class="UIWindow $theme UIDragObject UIResizeObject" id="UIWindow-${portletId}"	${cssStyle} >
-					<div class="WindowBarLeft">
-						<div class="WindowBarRight">
-							<div class="WindowBarCenter ClearFix">
+					<div class="windowBar clearfix">
+						
 								<%
 									if(uicomponent.getShowWindowState())
 									{
 										String maximizedAction = uicomponent.event("ChangeWindowState", (windowState != WindowState.MAXIMIZED)? "maximized" : "normal");
 										String minimizedAction = uicomponent.event("ChangeWindowState", (windowState != WindowState.MINIMIZED)? "minimized" : "normal");
-										String maximizedMode = (windowState != WindowState.MAXIMIZED)? "Maximized" : "Normal";
-										String minimizedMode = (windowState != WindowState.MINIMIZED)? "Minimized" : "Normal";
+										String maximizedMode = (windowState != WindowState.MAXIMIZED)? "maximized" : "restore";
+										String minimizedMode = (windowState != WindowState.MINIMIZED)? "minimized" : "restore";
 										String renderMaxi = (windowState != WindowState.MAXIMIZED)? _ctx.appRes("UIPortlet.tooltip.Maximize") : _ctx.appRes("UIPortlet.tooltip.MaximizeRestore");
 										String renderMini = (windowState != WindowState.MINIMIZED)? _ctx.appRes("UIPortlet.tooltip.Minimize") : _ctx.appRes("UIPortlet.tooltip.MinimizeRestore");
 								%>
-										<div class="ControlIcon ${maximizedMode}Icon" title="$renderMaxi"	onclick="$maximizedAction" ></div>
-										<div class="ControlIcon ${minimizedMode}Icon" title="$renderMini"	onclick="$minimizedAction" ></div>
+										<a href="javascript:void(0)" class="pull-right" title="$renderMaxi"	onclick="$maximizedAction" ><i class="${maximizedMode}Icon"></i></a>
+										<a href="javascript:void(0)" class="pull-right" title="$renderMini"	onclick="$minimizedAction" ><i class="${minimizedMode}Icon"></i></a>
 								<%}
-
+								
 								List supportModes = uicomponent.getSupportModes();
 									if(uicomponent.getShowPortletMode() && supportModes.size() > 0) {
-										jsmanager.require("SHARED/popupCategory", "popup").addScripts("popup.init('UIWindow-" + portletId + "');");
+									   jsmanager.require("SHARED/popupCategory", "popup").addScripts("popup.init('UIWindow-" + portletId + "');");
 								%>
-										<div class="ControlIcon ArrowDownIcon" title="<%=_ctx.appRes("UIPortlet.tooltip.PortletMode");%>" style="position: relative;">
-											<button class="PopupCategoryMask"></button>
+										<div href="javascript:void(0)" class="pull-right dropdown" title="<%=_ctx.appRes("UIPortlet.tooltip.PortletMode");%>">
+											<i class="uiIconArrowDown dropdown-toggle" data-toggle="dropdown"></i>
 											<% /*Begin Popup Menu*/ %>
-												<div class="UIPopupCategory" style="display: none;">
-													<div class="PopupCategoryDecorator">
-														<%
+												<ul class="dropdown-menu" role="menu">
+													
+														<% 
 															for(String mode in supportModes) {
 																if(mode.equals("edit") && rcontext.getRemoteUser()==null) continue;
 																	String actionLink = uicomponent.event("ChangePortletMode", mode);
 																	String modeLabel = _ctx.appRes("PortletMode.label." + mode);
 															%>
+																	<li>
 																		<a class="CategoryItem" href="javascript:void(0);" onclick="$actionLink" title="$modeLabel">
 																			$modeLabel
 																		</a>
-															<%
+																	</li>
+															<%				
 															}
 															if(supportModes != null && supportModes.size() > 0 && !supportModes.contains("view")) {
 																String modeLabel = _ctx.appRes("PortletMode.label.view");
-														%>
+														%> 
+																<li>
 																	<a class="CategoryItem" href="javascript:void(0);" onclick="<%=uicomponent.event("ChangePortletMode", "view")%>" title="$modeLabel">
 																		$modeLabel
-																	</a>
-														<%}%>
-													</div>
-												</div>
+																	</a>		
+																</li>										
+														 <%}%> 	
+												
+												</ul>
 											<% /*End Popup Menu*/ %>
 										</div>
 								<%}%>
@@ -127,38 +125,30 @@
 									String portletIcon = uicomponent.getIcon();
 									if(portletIcon == null) portletIcon = "PortletIcon";
 								%>
-								<div class="$portletIcon WindowPortletIcon NovaPortletIcon WindowPortletInfo PortletName"><%=hasAccessPermission ? title : _ctx.appRes("UIPortlet.label.protectedContent")%></div>
-
-							</div>
-						</div>
+								<h5 class="portletName"><i class="$portletIcon"> </i> <%=hasAccessPermission ? title : _ctx.appRes("UIPortlet.label.protectedContent")%></h5>
+							 
+							
 					</div>
 					<%/*End Window Portlet Bar*/ %>
-
-					<div class="MiddleDecoratorLeft">
-						<div class="MiddleDecoratorRight">
-							<div class="MiddleDecoratorCenter">
-								<div id="<%=editMode == EditMode.NO_EDIT ? portletId : "EditMode-"+ portletId%>" style="width: 100%">
-									<div class="PORTLET-FRAGMENT UIResizableBlock UIApplication" style="width: 100%; height: $windowHeight;">
-										<%
-											if(windowState != WindowState.MINIMIZED) {
-												if(hasAccessPermission) println portletContent;
-												else println "<div class='ProtectedContent'>"+_ctx.appRes("UIPortlet.label.protectedContent")+"</div>";
-											}
-										%>
-									</div>
-								</div>
-							</div>
+					
+					
+					<div class="middleDecorator">
+						<div id="<%=editMode == EditMode.NO_EDIT ? portletId : "EditMode-"+ portletId%>" style="width: 100%">
+							<div class="PORTLET-FRAGMENT UIResizableBlock UIApplication" style="width: 100%; height: $windowHeight;">
+								<% 
+									if(windowState != WindowState.MINIMIZED) {
+										if(hasAccessPermission) println portletContent;
+										else println "<div class='ProtectedContent'>"+_ctx.appRes("UIPortlet.label.protectedContent")+"</div>";
+									}
+								%>
+							</div>		
 						</div>
 					</div>
-
+					
 					<%//Begin Bottom Decorator %>
-					<div class="BottomDecoratorLeft">
-						<div class="BottomDecoratorRight">
-							<div class="BottomDecoratorCenter ClearFix">
-									<div class="ResizeArea" title="<%=_ctx.appRes("UIPortlet.tooltip.ResizeWindow");%>"><span></span></div>
-									<div class="Information"><%=_ctx.appRes("UIPortlet.lable.information");%></div>
-							</div>
-						</div>
+					<div class="bottomDecorator clearfix">
+						<div class="resizeArea" title="<%=_ctx.appRes("UIPortlet.tooltip.ResizeWindow");%>"><span></span></div>
+						<div class="information"><%=_ctx.appRes("UIPortlet.lable.information");%></div>							
 					</div>
 				</div>
 <%//End Bottom Decorator %>
@@ -172,27 +162,27 @@
 				cssStyle += "width: "+ windowWidth +";";
 			}
  			String windowHeight = uicomponent.getHeight();
-			if(windowHeight != null)
+ 			if(windowHeight != null)
 			{
 				cssStyle += "height: "+ windowHeight +";";
 			}
  %>
  				<div id="<%=editMode == EditMode.NO_EDIT ? portletId : "EditMode-"+ portletId%>">
 					<div class="PORTLET-FRAGMENT" style="${cssStyle}">
- 						<%
+ 						<% 
 							if(hasAccessPermission)
-							{
-								println portletContent;
-							}
+              {
+							   println portletContent; 
+              }
 							else
 							{
-								println "<div class='ProtectedContent'>"+_ctx.appRes("UIPortlet.label.protectedContent")+"</div>";
+                 println "<div class='ProtectedContent'>"+_ctx.appRes("UIPortlet.label.protectedContent")+"</div>";
 							}
 						%>
 					</div>
-				</div>
+				</div>	
 <%
-		}
+		} 
 	}
 }
 	if(uiPortalApp.isEditing()) {
@@ -200,30 +190,32 @@
 %>
 			</div>
 		<%} %>
-
+			
 			<div class="EDITION-BLOCK EDITION-PORTLET" style="display: none;position: relative; z-index: 999;">
 				<div style="position: absolute; top: -86px;">
 					<div class="NewLayer"><span></span></div>
-					<div class="CONTROL-PORTLET CONTROL-BLOCK UIInfoBar">
+					<div class="CONTROL-PORTLET CONTROL-BLOCK uiInfoBar">
 						<%/*Begin InfoBar*/%>
-						<div class="BlueRoundedStyle ClearFix">
-							<div class="DragControlArea" title="<%=_ctx.appRes("UIPortlet.tooltip.DragControl");%>"><span></span></div>
-							<%
+						
+							<i class="uiIconDragDrop uiIconWhite" rel="tooltip" data-placement="right"  title="<%=_ctx.appRes("UIPortlet.tooltip.DragControl");%>"></i>
+							<% 
 								String portletIcon = uicomponent.getIcon();
-								if(portletIcon == null) portletIcon = "PortletIcon";
-
+								if(portletIcon == null || portletIcon == "PortletIcon") portletIcon = "uiIconPortletConfig uiIconWhite";
+								else portletIcon = "PortletIconOnEdit " + portletIcon;
+                        
 								if(title.length() > 30) title = title.substring(0,27) + "...";
 							%>
-							<div class="PortletIcon $portletIcon"><%=hasAccessPermission ? title : _ctx.appRes("UIPortlet.label.protectedContent")%></div>
+							<i class="$portletIcon"></i>
+							<span><%=hasAccessPermission ? title : _ctx.appRes("UIPortlet.label.protectedContent")%></span>
 							<%if(hasAccessPermission) {%>
-								<a href="javascript:void(0);" onclick="<%=uicomponent.event("EditPortlet","$uicomponent.id")%>" class="EditIcon" title="<%=_ctx.appRes("UIPortlet.tooltip.editPortlet");%>"></a>
-								<a href="javascript:void(0);" onclick="<%=uicomponent.event("DeleteComponent","$uicomponent.id")%>" class="DeleteIcon" title="<%=_ctx.appRes("UIPortlet.tooltip.deletePortlet");%>"></a>
-							<%}%>
-						</div>
+								<a href="javascript:void(0);" onclick="<%=uicomponent.event("EditPortlet","$uicomponent.id")%>" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIPortlet.tooltip.editPortlet")%>"><i class="uiIconEdit uiIconWhite"></i></a>
+								<a href="javascript:void(0);" onclick="<%=uicomponent.event("DeleteComponent","$uicomponent.id")%>" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIPortlet.tooltip.deletePortlet")%>"><i class="uiIconTrash uiIconWhite"></i></a>
+							<%}%>	
+					
 						<%/*End InfoBar*/ %>
 					</div>
 				</div>
-			</div>
+			</div>	
 		</div>
 	</div>
 <%}%>

@@ -19,45 +19,31 @@
 
 package org.exoplatform.portal.webui.page;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.mop.Described;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.Utils;
 import org.exoplatform.portal.mop.description.DescriptionService;
-import org.exoplatform.portal.mop.management.operations.page.PageUtils;
 import org.exoplatform.portal.mop.navigation.NavigationServiceException;
-import org.exoplatform.portal.mop.page.PageContext;
-import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.page.PageService;
-import org.exoplatform.portal.mop.page.PageState;
-import org.exoplatform.portal.mop.user.UserNavigation;
-import org.exoplatform.portal.mop.user.UserNode;
-import org.exoplatform.portal.mop.user.UserPortal;
+import org.exoplatform.portal.mop.page.*;
+import org.exoplatform.portal.mop.user.*;
 import org.exoplatform.portal.webui.navigation.UIPageNodeSelector;
 import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.portal.webui.portal.UIPortalComposer;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
 import org.exoplatform.portal.webui.util.Util;
-import org.exoplatform.portal.webui.workspace.UIPortalApplication;
-import org.exoplatform.portal.webui.workspace.UIPortalToolPanel;
-import org.exoplatform.portal.webui.workspace.UIWorkingWorkspace;
+import org.exoplatform.portal.webui.workspace.*;
 import org.exoplatform.portal.webui.workspace.UIPortalApplication.EditMode;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.web.url.navigation.NodeURL;
 import org.exoplatform.webui.application.WebuiRequestContext;
-import org.exoplatform.webui.config.annotation.ComponentConfig;
-import org.exoplatform.webui.config.annotation.ComponentConfigs;
-import org.exoplatform.webui.config.annotation.EventConfig;
+import org.exoplatform.webui.config.annotation.*;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.EventListener;
@@ -119,7 +105,7 @@ public class UIPageCreationWizard extends UIPageWizard {
 
         //
         PageService pageService = getApplicationComponent(PageService.class);
-        PageState pageState = PageUtils.toPageState(page);
+        PageState pageState = Utils.toPageState(page);
         pageService.savePage(new PageContext(page.getPageKey(), pageState));
 
         //
@@ -130,7 +116,7 @@ public class UIPageCreationWizard extends UIPageWizard {
         userPortal.saveNode(selectedNode, null);
 
         DescriptionService descriptionService = getApplicationComponent(DescriptionService.class);
-        Map<Locale, Described.State> descriptions = new HashMap<Locale, Described.State>();
+        Map<Locale, org.exoplatform.portal.mop.State> descriptions = new HashMap<Locale, org.exoplatform.portal.mop.State>();
         Map<String, String> cachedLabels = uiPageInfo.getCachedLabels();
 
         for (String strLocale : cachedLabels.keySet()) {
@@ -146,7 +132,7 @@ public class UIPageCreationWizard extends UIPageWizard {
                 locale = new Locale(strLocale);
             }
 
-            descriptions.put(locale, new Described.State(cachedLabels.get(strLocale), null));
+            descriptions.put(locale, new org.exoplatform.portal.mop.State(cachedLabels.get(strLocale), null));
         }
 
         descriptionService.setDescriptions(createdNode.getId(), descriptions);

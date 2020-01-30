@@ -117,11 +117,6 @@
   </component>
 
   <component>
-    <key>org.exoplatform.services.organization.idm.PicketLinkIDMCacheService</key>
-    <type>org.exoplatform.services.organization.idm.PicketLinkIDMCacheService</type>
-  </component>
-
-  <component>
     <key>org.exoplatform.services.organization.idm.PicketLinkIDMService</key>
     <type>org.exoplatform.services.organization.idm.PicketLinkIDMServiceImpl</type>
     <init-params>

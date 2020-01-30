@@ -13,6 +13,8 @@ import org.exoplatform.portal.mop.SiteType;
  */
 public class PageKey implements Serializable {
 
+    private static final long serialVersionUID = -5005776237959733435L;
+
     /** . */
     private static final HashMap<String, SiteType> map = new HashMap<String, SiteType>();
 

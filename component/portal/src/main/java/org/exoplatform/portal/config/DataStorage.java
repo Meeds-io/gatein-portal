@@ -31,9 +31,8 @@ import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.mop.importer.Imported.Status;
+import org.exoplatform.portal.mop.importer.Status;
 import org.exoplatform.portal.mop.page.PageService;
-import org.exoplatform.portal.pom.config.tasks.PreferencesTask;
 import org.exoplatform.portal.pom.data.ModelChange;
 
 /**
@@ -150,7 +149,6 @@ public interface DataStorage {
     /**
      * Return content state. If can't find, return null
      *
-     * @see PreferencesTask
      * @param state - ApplicationState object
      * @param type - ApplicationType object
      */
@@ -194,10 +192,13 @@ public interface DataStorage {
     <T> ListAccess<T> find2(Query<T> q, Comparator<T> sortComparator) throws Exception;
 
     /**
-     * Return Container object - info that be used to build this Container is retrieved from
-     * /conf/portal/portal/sharedlayout.xml
+     * Return shared layout containing common layout of all sites (user, group and sites).
+     * This will retrieve the layout from /conf/portal/portal/sharedlayout-{siteName}.xml
+     * else if not found, retrieve it from /conf/portal/portal/sharedlayout.xml
+     * 
+     * @param siteName 
      */
-    Container getSharedLayout() throws Exception;
+    Container getSharedLayout(String siteName) throws Exception;
 
     void save() throws Exception;
 
