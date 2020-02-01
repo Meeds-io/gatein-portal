@@ -58,6 +58,7 @@
     <title><%=HTMLEntityEncoder.getInstance().encode(title)%></title>
     
     <!-- Metadatas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <% if (portal.viewport != null) { %>
       <meta name="viewport" content = "${portal.viewport}"/>
