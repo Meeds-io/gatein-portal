@@ -58,7 +58,9 @@ public abstract class AbstractCookieTokenServiceTest extends AbstractTokenServic
     @Override
     public void testDeleteToken() throws Exception {
         String tokenId = service.createToken(new Credentials("root", "gtn"));
-        assertNotSame(service.getToken(tokenId), service.deleteToken(tokenId));
+        GateInToken deletedToken = service.deleteToken(tokenId);
+        assertNotNull(deletedToken);
+        assertNotSame(service.getToken(tokenId), deletedToken);
         assertNull(service.getToken(tokenId));
         assertEquals(0, service.size());
         service.deleteToken(tokenId);

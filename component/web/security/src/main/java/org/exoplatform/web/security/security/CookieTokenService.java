@@ -196,6 +196,7 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
             if (result != null) {
                 CookieToken token = new CookieToken(cookieTokenString);
                 tokenStore.deleteToken(token.getId());
+                return result;
             }
         } catch (TokenParseException e) {
             log.warn("Could not parse cookie token:"+ e.getMessage());
