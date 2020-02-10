@@ -9,62 +9,6 @@
                   xsi:schemaLocation="http://www.exoplatform.org/xml/ns/gatein_resources_1_4 http://www.exoplatform.org/xml/ns/gatein_resources_1_4"
                   xmlns="http://www.exoplatform.org/xml/ns/gatein_resources_1_4">
 
-  <!-- BannerPortlet skins -->
-
-  <portlet-skin>
-    <application-name>web</application-name>
-    <portlet-name>BannerPortlet</portlet-name>
-    <skin-name>Default</skin-name>
-    <css-path>/skin/portal/webui/component/UIBannerPortlet/DefaultStylesheet.css</css-path>
-  </portlet-skin>
-
-  <!-- FooterPortlet skins -->
-
-  <portlet-skin>
-    <application-name>web</application-name>
-    <portlet-name>FooterPortlet</portlet-name>
-    <skin-name>Default</skin-name>
-    <css-path>/skin/portal/webui/component/UIFooterPortlet/DefaultStylesheet.css</css-path>
-  </portlet-skin>
-
-
-  <!-- NavigationPortlet skins -->
-
-  <portlet-skin>
-    <application-name>web</application-name>
-    <portlet-name>NavigationPortlet</portlet-name>
-    <skin-name>Default</skin-name>
-    <css-path>/skin/portal/webui/component/UINavigationPortlet/DefaultStylesheet.css</css-path>
-  </portlet-skin>
-
-  <!-- SiteMapPortlet skins -->
-
-  <portlet-skin>
-    <application-name>web</application-name>
-    <portlet-name>SiteMapPortlet</portlet-name>
-    <skin-name>Default</skin-name>
-    <css-path>/skin/portal/webui/component/UISiteMap/DefaultStylesheet.css</css-path>
-  </portlet-skin>
-
-
-  <!-- SiteMapPortlet skins -->
-
-  <portlet-skin>
-    <application-name>web</application-name>
-    <portlet-name>LogoPortlet</portlet-name>
-    <skin-name>Default</skin-name>
-    <css-path>/skin/portal/webui/component/UILogoPortlet/DefaultStylesheet.css</css-path>
-  </portlet-skin>
-
-  <!-- IFramePortlet skins -->
-
-  <portlet-skin>
-    <application-name>web</application-name>
-    <portlet-name>IFramePortlet</portlet-name>
-    <skin-name>Default</skin-name>
-    <css-path>/skin/portal/webui/component/UIIFramePortlet/DefaultStylesheet.css</css-path>
-  </portlet-skin>
-
   <portlet>
     <name>BannerPortlet</name>
     <module>

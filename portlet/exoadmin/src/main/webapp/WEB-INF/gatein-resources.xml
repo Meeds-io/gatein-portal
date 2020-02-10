@@ -25,43 +25,6 @@
     xsi:schemaLocation="http://www.exoplatform.org/xml/ns/gatein_resources_1_4 http://www.exoplatform.org/xml/ns/gatein_resources_1_4"
     xmlns="http://www.exoplatform.org/xml/ns/gatein_resources_1_4">
 
-
-  <!-- OrganizationPortlet skins -->
-
-  <portlet-skin>
-    <application-name>exoadmin</application-name>
-    <portlet-name>OrganizationPortlet</portlet-name>
-    <skin-name>Default</skin-name>
-    <css-path>/skin/organization/webui/component/UIOrganizationPortlet/DefaultStylesheet.css</css-path>
-  </portlet-skin>
-
-  <!-- AccountPortlet skins -->
-
-  <portlet-skin>
-    <application-name>exoadmin</application-name>
-    <portlet-name>AccountPortlet</portlet-name>
-    <skin-name>Default</skin-name>
-    <css-path>/skin/account/webui/component/UIAccountPortlet/DefaultStylesheet.css</css-path>
-  </portlet-skin>
-
-  <!-- ApplicationRegistryPortlet skins -->
-
-  <portlet-skin>
-    <application-name>exoadmin</application-name>
-    <portlet-name>ApplicationRegistryPortlet</portlet-name>
-    <skin-name>Default</skin-name>
-    <css-path>/skin/applicationregistry/webui/component/UIApplicationRegistryPortlet/DefaultStylesheet.css</css-path>
-  </portlet-skin>
-
-  <!-- Register Portlet skins -->
-
-  <portlet-skin>
-    <application-name>exoadmin</application-name>
-    <portlet-name>RegisterPortlet</portlet-name>
-    <skin-name>Default</skin-name>
-    <css-path>/skin/register/webui/component/DefaultStylesheet.css</css-path>
-  </portlet-skin>
-
   <portlet>
     <name>RegisterPortlet</name>
     <module>
