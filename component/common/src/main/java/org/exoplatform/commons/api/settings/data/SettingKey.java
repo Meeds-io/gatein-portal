@@ -69,9 +69,6 @@ public class SettingKey extends SettingScope {
     if (this == obj) {
       return true;
     }
-    if (!super.equals(obj)) {
-      return false;
-    }
     if (obj instanceof SettingKey) {
       SettingKey that = (SettingKey) obj;
       return (this.key.equals(that.getKey())) && (this.scopePath.equals(that.getScopePath()));
