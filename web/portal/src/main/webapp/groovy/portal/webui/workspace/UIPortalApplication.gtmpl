@@ -180,6 +180,7 @@
    <div class="visible-tabletL"></div>
    <div class="visible-phone"></div>
    <div class="visible-phone-small"></div>
+   <div class="VuetifyApp"><div data-app="true" class="v-application transparent theme--light" id="vuetify-apps"></div></div>
    <div class="$uicomponent.skin" id="UIPortalApplication" style="!height: 100%;">
      <div class="ajaxLoadingMask clearfix" id="AjaxLoadingMask" style="display: none; margin: auto;">
        <a onclick="javascript:ajaxAbort();" class="uiIconClose uiIconWhite pull-right"></a>
