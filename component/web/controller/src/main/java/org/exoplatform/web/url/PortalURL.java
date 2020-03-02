@@ -335,6 +335,10 @@ public abstract class PortalURL<R, U extends PortalURL<R, U>> {
         }
     }
 
+    public URLContext getContext() {
+      return context;
+    }
+
     /**
      * Generates the URL value.
      *
@@ -342,6 +346,6 @@ public abstract class PortalURL<R, U extends PortalURL<R, U>> {
      */
     public final String toString() {
         PortalURL _this = this;
-        return context.render(_this);
+        return getContext().render(_this);
     }
 }
