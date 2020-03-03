@@ -1,6 +1,7 @@
 package org.exoplatform.portal.branding;
 
 import java.io.Serializable;
+import java.util.*;
 
 public class Branding implements Serializable {
 
@@ -11,6 +12,8 @@ public class Branding implements Serializable {
   private String topBarTheme;
 
   private Logo logo;
+
+  private Map<String, String> themeColors      = new HashMap<>();
 
   public Branding() {
   }
@@ -37,6 +40,14 @@ public class Branding implements Serializable {
   
   public void setLogo(Logo logo) {
     this.logo = logo;
+  }
+
+  public Map<String, String> getThemeColors() {
+    return themeColors;
+  }
+
+  public void setThemeColors(Map<String, String> themeColors) {
+    this.themeColors = themeColors;
   }
 
   @Override

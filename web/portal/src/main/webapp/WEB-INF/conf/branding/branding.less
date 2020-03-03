@@ -1,0 +1,50 @@
+//put your custom CSS variables here (see variables.less for possible custom CSS variables)
+
+@primaryColor: #578dc9;
+@primaryBackground: #f0f0f0;
+@secondaryColor: #000000;
+@secondaryBackground: #476a9c;
+@tertiaryColor: #385989;
+
+@primaryColorLight: lighten(@primaryColor, 10%);
+@primaryColorLighter: lighten(@primaryColor, 18.5%);
+@primaryColorLighterGradientEnd: darken(@primaryColorLighter, 15%);
+@primaryDarkerColor: darken(@primaryColor, 10.5%);
+@primaryDarkColor: darken(@primaryColor, 15%);
+@primaryDarkColorGradientEnd: darken(@primaryColor, 5%);
+@primaryDarkerColorGradientEnd: darken(@primaryColor, 15%);
+@switchOnColor: lighten(@primaryColor, 30%);
+
+@allPagesPrimaryColor: ~"--allPagesPrimaryColor";
+@allPagesPrimaryColorLight: ~"--allPagesPrimaryColorLight";
+@allPagesPrimaryColorLighter: ~"--allPagesPrimaryColorLighter";
+@allPagesPrimaryColorLighterGradientEnd: ~"--allPagesPrimaryColorLighterGradientEnd";
+@allPagesPrimaryDarkerColor: ~"--allPagesPrimaryDarkerColor";
+@allPagesPrimaryDarkerColorGradientEnd: ~"--allPagesPrimaryDarkerColorGradientEnd";
+@allPagesPrimaryDarkColor: ~"--allPagesPrimaryDarkColor";
+@allPagesPrimaryDarkColorGradientEnd: ~"--allPagesPrimaryDarkColorGradientEnd";
+@allPagesPrimaryBackground: ~"--allPagesPrimaryBackground";
+@allPagesSecondarySkinColor: ~"--allPagesSecondarySkinColor";
+@allPagesSecondaryBackground: ~"--allPagesSecondaryBackground";
+@allPagesSecondaryColor: ~"--allPagesSecondaryColor";
+@allPagesSecondaryColorDark: ~"--allPagesSecondaryColorDark";
+@allPagesTertiaryColor: ~"--allPagesTertiaryColor";
+@allPagesUiSwitchOnColor: ~"--allPagesUiSwitchOnColor";
+
+:root {
+  @{allPagesPrimaryColor}: @primaryColor;
+  @{allPagesPrimaryColorLight}: @primaryColorLight;
+  @{allPagesPrimaryColorLighter}: @primaryColorLighter;
+  @{allPagesPrimaryColorLighterGradientEnd}: @primaryColorLighterGradientEnd;
+  @{allPagesPrimaryDarkerColor}: @primaryDarkerColor;
+  @{allPagesPrimaryDarkerColorGradientEnd}: @primaryDarkerColorGradientEnd;
+  @{allPagesPrimaryDarkColor}: @primaryDarkColor;
+  @{allPagesPrimaryDarkColorGradientEnd}: @primaryDarkColorGradientEnd;
+  @{allPagesPrimaryBackground}: @primaryBackground;
+  @{allPagesSecondarySkinColor}: @secondaryBackground;
+  @{allPagesSecondaryBackground}: @secondaryBackground;
+  @{allPagesSecondaryColor}: @secondaryColor;
+  @{allPagesSecondaryColorDark}: darken(@secondaryColor, 15%);
+  @{allPagesTertiaryColor}: @tertiaryColor;
+  @{allPagesUiSwitchOnColor}: @switchOnColor;
+}

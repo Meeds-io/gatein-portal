@@ -12,7 +12,7 @@
     "watch": "webpack --config webpack.dev.js --progress --colors --watch -d",
     "test": "jest",
     "test-coverage": "jest --coverage",
-    "lint": "eslint --fix ./src/main/webapp/company-branding-app/components/*.vue",
+    "lint": "eslint --fix ./src/main/webapp/company-branding-app/components/*.vue ./src/main/webapp/company-branding-app/components/modal/*.vue",
     "eslint-check": "eslint --print-config . | eslint-config-prettier-check",
     "build": "webpack --config webpack.prod.js --mode production"
   },

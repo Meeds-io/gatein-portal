@@ -9,6 +9,12 @@ const lang = typeof eXo !== 'undefined' ? eXo.env.portal.language : 'en';
 const url = `${brandingConstants.PORTAL}/${brandingConstants.PORTAL_REST}/i18n/bundle/locale.portlet.exoadmin.Branding-${lang}.json`;
 
 Vue.directive('exo-tooltip', companyBrandingDirectives.tooltip);
+Vue.use(Vuetify);
+
+const vuetify = new Vuetify({
+  dark: true,
+  iconfont: 'mdi',
+});
 
 // get overrided components if exists
 if (extensionRegistry) {
@@ -27,7 +33,8 @@ export function init() {
     new Vue({
       el: '#branding',
       template: '<exo-company-branding></exo-company-branding>',
-      i18n
+      i18n,
+      vuetify,
     });
   });
 }

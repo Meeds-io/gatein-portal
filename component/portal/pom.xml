@@ -151,6 +151,11 @@
         <artifactId>jersey-client</artifactId>
         <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>com.github.sommeri</groupId>
+      <artifactId>less4j</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

@@ -1,75 +1,100 @@
 <template>
-  <div class="uiBrandingPortlet">
-    <div id="mustpng" class="alert">
-      <i class="uiIconWarning"></i>{{ $t('mustpng.label') }}
-    </div>
-    <div id="toobigfile" class="alert">
-      <i class="uiIconWarning"></i>{{ $t('toobigfile.label') }}
-    </div>
-    <div id="savenotok" class="alert">
-      <i class="uiIconWarning"></i>{{ $t('info.savenotok.label') }}
-    </div>
-    <div class="logoForm boxContent">
-      <h4>{{ $t('companyName.label') }}</h4>
-      <div>
-        <input id="companyNameInput" v-model="branding.companyName" :placeholder="$t('companyName.placeholder')" type="text" name="formOp" value="">
-        <div class="info">{{ $t('companyName.input.hint') }}</div>
-      </div> 
-      <h4>
-        {{ $t('selectlogo.label') }}
-      </h4>
-      <div class="clearfix">
-        <div class="pull-left">
-          <div class="fileDrop">
-            <div ref="dropFileBox" class="dropZone">
-              <label class="dropMsg" for="attachLogo">
-                <i class="uiIcon attachFileIcon"></i> {{ $t('attachment') }}
-              </label>
-              <input id="attachLogo" type="file" class="attachFile" name="file" @change="onFileChange">
+  <v-app
+    color="transaprent"
+    class="uiBrandingPortlet"
+    flat>
+    <main>
+      <div id="mustpng" class="alert">
+        <i class="uiIconWarning"></i>{{ $t('mustpng.label') }}
+      </div>
+      <div id="toobigfile" class="alert">
+        <i class="uiIconWarning"></i>{{ $t('toobigfile.label') }}
+      </div>
+      <div id="savenotok" class="alert">
+        <i class="uiIconWarning"></i>{{ $t('info.savenotok.label') }}
+      </div>
+      <div class="logoForm boxContent">
+        <h4>{{ $t('companyName.label') }}</h4>
+        <div>
+          <input id="companyNameInput" v-model="branding.companyName" :placeholder="$t('companyName.placeholder')" type="text" name="formOp" value="">
+          <div class="info">{{ $t('companyName.input.hint') }}</div>
+        </div> 
+        <h4>
+          {{ $t('selectlogo.label') }}
+        </h4>
+        <div class="clearfix">
+          <div class="pull-left">
+            <div class="fileDrop">
+              <div ref="dropFileBox" class="dropZone">
+                <label class="dropMsg" for="attachLogo">
+                  <i class="uiIcon attachFileIcon"></i> {{ $t('attachment') }}
+                </label>
+                <input id="attachLogo" type="file" class="attachFile" name="file" @change="onFileChange">
+              </div>
+            </div>
+            <div class="info">{{ $t('noteselectlogo.label') }}</div>
+          </div>
+          <div class="pull-left">
+            <div id="previewLogo" class="previewLogo">
+              <a v-if="removeLogoButtonDisplayed" :title="$t('delete.label')" class="removeButton" @click="removeLogo"><i class="uiIconRemove"></i></a>
+              <img id="previewLogoImg" :src="logoPreview" alt="">
+            </div>
+            <div v-if="uploadInProgress" :class="[uploadProgress === 100 ? 'upload-completed': '']" class="progress progress-striped pull-left">
+              <div :style="'width:' + uploadProgress + '%'" class="bar">{{ uploadProgress }}%</div>
             </div>
           </div>
-          <div class="info">{{ $t('noteselectlogo.label') }}</div>
         </div>
-        <div class="pull-left">
-          <div id="previewLogo" class="previewLogo">
-            <a v-if="removeLogoButtonDisplayed" :title="$t('delete.label')" class="removeButton" @click="removeLogo"><i class="uiIconRemove"></i></a>
-            <img id="previewLogoImg" :src="logoPreview" alt="">
-          </div>
-          <div v-if="uploadInProgress" :class="[uploadProgress === 100 ? 'upload-completed': '']" class="progress progress-striped pull-left">
-            <div :style="'width:' + uploadProgress + '%'" class="bar">{{ uploadProgress }}%</div>
-          </div>
-        </div>
-      </div>
-      <div class="navigationStyle boxContent">
-        <h4>
-          {{ $t('selectstyle.label') }}
-        </h4>
+        <div class="themeStyle boxContent">
+          <h4>
+            {{ $t('themeColors.label') }}
+          </h4>
 
-        <div id="navigationStyle" class="btn-group uiDropdownWithIcon">
-          <div class="control-group">
-            <label class="uiRadio">
-              <input v-model="branding.topBarTheme" class="radio" type="radio" value="Dark" @change="changePreviewStyle"> <span>{{ $t('style.dark.label') }}</span>
-            </label>
-            <label class="uiRadio">
-              <input v-model="branding.topBarTheme" class="radio" type="radio" value="Light" @change="changePreviewStyle"> <span>{{ $t('style.light.label') }}</span>
-            </label>
+          <v-row>
+            <v-col>
+              <exo-color-picker v-model="branding.themeColors.primaryColor" label="Primary color" />
+            </v-col>
+            <v-col>
+              <exo-color-picker v-model="branding.themeColors.primaryBackground" label="Primary background" />
+            </v-col>
+            <v-col>
+              <exo-color-picker v-model="branding.themeColors.secondaryColor" label="Secondary color" />
+            </v-col>
+            <v-col>
+              <exo-color-picker v-model="branding.themeColors.secondaryBackground" label="Secondary background" />
+            </v-col>
+          </v-row>
+        </div>
+        <div class="navigationStyle boxContent">
+          <h4>
+            {{ $t('selectstyle.label') }}
+          </h4>
+  
+          <div id="navigationStyle" class="btn-group uiDropdownWithIcon">
+            <div class="control-group">
+              <label class="uiRadio">
+                <input v-model="branding.topBarTheme" class="radio" type="radio" value="Dark" @change="changePreviewStyle"> <span>{{ $t('style.dark.label') }}</span>
+              </label>
+              <label class="uiRadio">
+                <input v-model="branding.topBarTheme" class="radio" type="radio" value="Light" @change="changePreviewStyle"> <span>{{ $t('style.light.label') }}</span>
+              </label>
+            </div>
+          </div>
+        </div>    
+        <div class="preview boxContent">
+          <div id="StylePreview">
           </div>
         </div>
-      </div>    
-      <div class="preview boxContent">
-        <div id="StylePreview">
+        <div class="uiAction boxContent">
+          <button id="save" :disabled="!branding.companyName || !branding.companyName.trim()" class="btn btn-primate" type="button" @click="save">
+            {{ $t('save.label') }}
+          </button>
+          <button id="cancel" class="btn" type="button" @click="cancel">
+            {{ $t('cancel.label') }}
+          </button>
         </div>
       </div>
-      <div class="uiAction boxContent">
-        <button id="save" :disabled="!branding.companyName || !branding.companyName.trim()" class="btn btn-primate" type="button" @click="save">
-          {{ $t('save.label') }}
-        </button>
-        <button id="cancel" class="btn" type="button" @click="cancel">
-          {{ $t('cancel.label') }}
-        </button>
-      </div>
-    </div>
-  </div>
+    </main>
+  </v-app>
 </template>
 
 <script>
@@ -88,8 +113,16 @@ export default {
           uploadId: null,
           data: [],
           size: 0,
-        }
+        },
+        themeColors: {
+          primaryColor: '#ffffff',
+          primaryBackground: '#ffffff',
+          secondaryColor: '#ffffff',
+          secondaryBackground: '#ffffff',
+        },
       },
+      primaryColor: '#ffffff',
+      color: null,
       defaultLogo: null,
       uploadInProgress: false,
       uploadProgress: 0,
@@ -214,6 +247,7 @@ export default {
         if(data.logo) {
           this.branding.logo = data.logo;
         }
+        Object.assign(this.branding.themeColors, data.themeColors);
       });
 
       const defaultLogoPromise = brandingServices.getBrandingDefaultLogo().then(data => {

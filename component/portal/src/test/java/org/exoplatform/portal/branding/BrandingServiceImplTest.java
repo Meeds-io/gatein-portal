@@ -7,8 +7,8 @@ import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.services.FileService;
-import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.container.xml.ValueParam;
+import org.exoplatform.container.configuration.ConfigurationManager;
+import org.exoplatform.container.xml.*;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
 import org.junit.Test;
@@ -17,9 +17,7 @@ import org.exoplatform.commons.api.settings.SettingService;
 import org.mockito.ArgumentCaptor;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -32,6 +30,7 @@ public class BrandingServiceImplTest {
     SettingService settingService = mock(SettingService.class);
     FileService fileService = mock(FileService.class);
     UploadService uploadService = mock(UploadService.class);
+    ConfigurationManager configurationManager = mock(ConfigurationManager.class);
 
     InitParams initParams = new InitParams();
     ValueParam companyName = new ValueParam();
@@ -39,7 +38,7 @@ public class BrandingServiceImplTest {
     companyName.setValue("Default Company Name");
     initParams.addParam(companyName);
 
-    BrandingService brandingService = new BrandingServiceImpl(initParams, settingService, fileService, uploadService);
+    BrandingService brandingService = new BrandingServiceImpl(configurationManager, settingService, fileService, uploadService, initParams);
 
     // When
     Branding brandingInformation = brandingService.getBrandingInformation();
@@ -50,12 +49,127 @@ public class BrandingServiceImplTest {
   }
 
   @Test
+  public void shouldGetDefaultBrandingThemeColorsWhenNoUpdate() {
+    // Given
+    SettingService settingService = mock(SettingService.class);
+    FileService fileService = mock(FileService.class);
+    UploadService uploadService = mock(UploadService.class);
+    ConfigurationManager configurationManager = mock(ConfigurationManager.class);
+
+    String primaryColor = "#3f8487";
+    String primaryBackground = "#f0f0f0";
+    String secondaryColor = "#000000";
+    String secondaryBackground = "#e25d5d";
+
+    InitParams initParams = new InitParams();
+    ValuesParam colorsTheme = new ValuesParam();
+    colorsTheme.setName(BrandingServiceImpl.BRANDING_THEME_VARIABLES);
+    List<String> variables = new ArrayList<>();
+    variables.add("primaryColor:" + primaryColor);
+    variables.add("primaryBackground:" + primaryBackground);
+    variables.add("secondaryColor:" + secondaryColor);
+    variables.add("secondaryBackground:" + secondaryBackground);
+    colorsTheme.setValues(variables);
+
+    ValueParam companyName = new ValueParam();
+    companyName.setName(BrandingServiceImpl.BRANDING_COMPANY_NAME_INIT_PARAM);
+    companyName.setValue("Default Company Name");
+
+    initParams.addParam(companyName);
+    initParams.addParam(colorsTheme);
+
+    BrandingServiceImpl brandingService = new BrandingServiceImpl(configurationManager, settingService, fileService, uploadService, initParams);
+    brandingService.start();
+
+    // When
+    Branding brandingInformation = brandingService.getBrandingInformation();
+
+    // Then
+    assertNotNull(brandingInformation);
+    assertNotNull("Default Theme colors shouldn't be null", brandingInformation.getThemeColors());
+
+    assertEquals(4, brandingInformation.getThemeColors().size());
+    assertEquals(primaryColor, brandingInformation.getThemeColors().get("primaryColor"));
+    assertEquals(primaryBackground, brandingInformation.getThemeColors().get("primaryBackground"));
+    assertEquals(secondaryColor, brandingInformation.getThemeColors().get("secondaryColor"));
+    assertEquals(secondaryBackground, brandingInformation.getThemeColors().get("secondaryBackground"));
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @Test
+  public void shouldGetSavedBrandingThemeColorsWhenUpdate() {
+    // Given
+    SettingService settingService = mock(SettingService.class);
+    FileService fileService = mock(FileService.class);
+    UploadService uploadService = mock(UploadService.class);
+    ConfigurationManager configurationManager = mock(ConfigurationManager.class);
+
+    String primaryColorNewValue = "#3f8488";
+    String primaryBackgroundNewValue = "#f0f0f1";
+    String secondaryColorNewValue = "#000001";
+    String secondaryBackgroundNewValue = "#e25d5e";
+
+    when(settingService.get(eq(BrandingServiceImpl.BRANDING_CONTEXT),
+                            eq(BrandingServiceImpl.BRANDING_SCOPE),
+                            eq("primaryColor"))).thenReturn((SettingValue) SettingValue.create(primaryColorNewValue));
+    when(settingService.get(eq(BrandingServiceImpl.BRANDING_CONTEXT),
+                            eq(BrandingServiceImpl.BRANDING_SCOPE),
+                            eq("primaryBackground"))).thenReturn((SettingValue) SettingValue.create(primaryBackgroundNewValue));
+    when(settingService.get(eq(BrandingServiceImpl.BRANDING_CONTEXT),
+                            eq(BrandingServiceImpl.BRANDING_SCOPE),
+                            eq("secondaryColor"))).thenReturn((SettingValue) SettingValue.create(secondaryColorNewValue));
+    when(settingService.get(eq(BrandingServiceImpl.BRANDING_CONTEXT),
+                            eq(BrandingServiceImpl.BRANDING_SCOPE),
+                            eq("secondaryBackground"))).thenReturn((SettingValue) SettingValue.create(secondaryBackgroundNewValue));
+
+    String primaryColor = "#3f8487";
+    String primaryBackground = "#f0f0f0";
+    String secondaryColor = "#000000";
+    String secondaryBackground = "#e25d5d";
+
+    InitParams initParams = new InitParams();
+
+    ValuesParam colorsTheme = new ValuesParam();
+    colorsTheme.setName(BrandingServiceImpl.BRANDING_THEME_VARIABLES);
+    List<String> variables = new ArrayList<>();
+    variables.add("primaryColor:" + primaryColor);
+    variables.add("primaryBackground:" + primaryBackground);
+    variables.add("secondaryColor:" + secondaryColor);
+    variables.add("secondaryBackground:" + secondaryBackground);
+    colorsTheme.setValues(variables);
+
+    ValueParam companyName = new ValueParam();
+    companyName.setName(BrandingServiceImpl.BRANDING_COMPANY_NAME_INIT_PARAM);
+    companyName.setValue("Default Company Name");
+
+    initParams.addParam(companyName);
+    initParams.addParam(colorsTheme);
+
+    BrandingServiceImpl brandingService = new BrandingServiceImpl(configurationManager, settingService, fileService, uploadService, initParams);
+    brandingService.start();
+
+    // When
+    Branding brandingInformation = brandingService.getBrandingInformation();
+
+    // Then
+    assertNotNull(brandingInformation);
+    assertNotNull("Default Theme colors shouldn't be null", brandingInformation.getThemeColors());
+
+    assertEquals(4, brandingInformation.getThemeColors().size());
+    assertEquals(primaryColorNewValue, brandingInformation.getThemeColors().get("primaryColor"));
+    assertEquals(primaryBackgroundNewValue, brandingInformation.getThemeColors().get("primaryBackground"));
+    assertEquals(secondaryColorNewValue, brandingInformation.getThemeColors().get("secondaryColor"));
+    assertEquals(secondaryBackgroundNewValue, brandingInformation.getThemeColors().get("secondaryBackground"));
+  }
+
+  @Test
   public void shouldGetUpdatedBrandingInformationWhenInformationUpdated() {
     // Given
     SettingService settingService = mock(SettingService.class);
     when(settingService.get(eq(Context.GLOBAL), eq(Scope.GLOBAL), eq(BrandingServiceImpl.BRANDING_COMPANY_NAME_SETTING_KEY))).thenReturn(new SettingValue("Updated Company Name"));
     FileService fileService = mock(FileService.class);
     UploadService uploadService = mock(UploadService.class);
+    ConfigurationManager configurationManager = mock(ConfigurationManager.class);
 
     InitParams initParams = new InitParams();
     ValueParam companyName = new ValueParam();
@@ -63,7 +177,7 @@ public class BrandingServiceImplTest {
     companyName.setValue("Default Company Name");
     initParams.addParam(companyName);
 
-    BrandingService brandingService = new BrandingServiceImpl(initParams, settingService, fileService, uploadService);
+    BrandingService brandingService = new BrandingServiceImpl(configurationManager, settingService, fileService, uploadService, initParams);
 
     // When
     Branding brandingInformation = brandingService.getBrandingInformation();
@@ -79,6 +193,7 @@ public class BrandingServiceImplTest {
     SettingService settingService = mock(SettingService.class);
     FileService fileService = mock(FileService.class);
     UploadService uploadService = mock(UploadService.class);
+    ConfigurationManager configurationManager = mock(ConfigurationManager.class);
 
     InitParams initParams = new InitParams();
     ValueParam companyName = new ValueParam();
@@ -86,11 +201,36 @@ public class BrandingServiceImplTest {
     companyName.setValue("Default Company Name");
     initParams.addParam(companyName);
 
-    BrandingService brandingService = new BrandingServiceImpl(initParams, settingService, fileService, uploadService);
+    String primaryColor = "#3f8487";
+    String primaryBackground = "#f0f0f0";
+    String secondaryColor = "#000000";
+    String secondaryBackground = "#e25d5d";
+
+    String primaryColorNewValue = "#3f8488";
+    String primaryBackgroundNewValue = "#f0f0f1";
+    String secondaryColorNewValue = null;
+    String secondaryBackgroundNewValue = null;
+
+    ValuesParam colorsTheme = new ValuesParam();
+    colorsTheme.setName(BrandingServiceImpl.BRANDING_THEME_VARIABLES);
+    List<String> variables = new ArrayList<>();
+    variables.add("primaryColor:" + primaryColor);
+    variables.add("primaryBackground:" + primaryBackground);
+    variables.add("secondaryColor:" + secondaryColor);
+    variables.add("secondaryBackground:" + secondaryBackground);
+    colorsTheme.setValues(variables);
+    initParams.addParam(colorsTheme);
+
+    BrandingService brandingService = new BrandingServiceImpl(configurationManager, settingService, fileService, uploadService, initParams);
 
     Branding newBranding = new Branding();
     newBranding.setCompanyName("New Company Name");
     newBranding.setTopBarTheme("Pink");
+    newBranding.setThemeColors(new HashMap<String, String>());
+    newBranding.getThemeColors().put("primaryColor", primaryColorNewValue);
+    newBranding.getThemeColors().put("primaryBackground", primaryBackgroundNewValue);
+    newBranding.getThemeColors().put("secondaryColor", secondaryColorNewValue);
+    newBranding.getThemeColors().put("secondaryBackground", secondaryBackgroundNewValue);
 
     ArgumentCaptor<Context> settingContext = ArgumentCaptor.forClass(Context.class);
     ArgumentCaptor<Scope> settingScope = ArgumentCaptor.forClass(Scope.class);
@@ -101,19 +241,40 @@ public class BrandingServiceImplTest {
     brandingService.updateBrandingInformation(newBranding);
 
     // Then
-    verify(settingService, times(2)).set(settingContext.capture(), settingScope.capture(), settingKey.capture(), settingValue.capture());
+    verify(settingService, times(4)).set(settingContext.capture(), settingScope.capture(), settingKey.capture(), settingValue.capture());
+    verify(settingService, times(1)).remove(eq(BrandingServiceImpl.BRANDING_CONTEXT), eq(BrandingServiceImpl.BRANDING_SCOPE), eq("secondaryColor"));
+    verify(settingService, times(1)).remove(eq(BrandingServiceImpl.BRANDING_CONTEXT), eq(BrandingServiceImpl.BRANDING_SCOPE), eq("secondaryBackground"));
+
     List<Context> contexts = settingContext.getAllValues();
     List<Scope> scopes = settingScope.getAllValues();
     List<String> keys = settingKey.getAllValues();
     List<SettingValue> values = settingValue.getAllValues();
+
     assertEquals(Context.GLOBAL, contexts.get(0));
     assertEquals(Scope.GLOBAL, scopes.get(0));
     assertEquals(BrandingServiceImpl.BRANDING_COMPANY_NAME_SETTING_KEY, keys.get(0));
     assertEquals("New Company Name", values.get(0).getValue());
+
     assertEquals(Context.GLOBAL, contexts.get(1));
     assertEquals(Scope.GLOBAL, scopes.get(1));
     assertEquals(BrandingServiceImpl.BRANDING_TOPBAR_THEME_SETTING_KEY, keys.get(1));
     assertEquals("Pink", values.get(1).getValue());
+
+    assertEquals(BrandingServiceImpl.BRANDING_CONTEXT, contexts.get(2));
+    assertEquals(BrandingServiceImpl.BRANDING_SCOPE, scopes.get(2));
+    assertEquals(BrandingServiceImpl.BRANDING_CONTEXT, contexts.get(3));
+    assertEquals(BrandingServiceImpl.BRANDING_SCOPE, scopes.get(3));
+
+    String firstThemeColorParam = keys.get(2);
+    String firstThemeColorValue = values.get(2).getValue().toString();
+
+    String secondThemeColorParam = keys.get(3);
+    String secondThemeColorValue = values.get(3).getValue().toString();
+
+    assertEquals("primaryColor", secondThemeColorParam);
+    assertEquals("primaryBackground", firstThemeColorParam);
+    assertEquals(primaryColorNewValue, secondThemeColorValue);
+    assertEquals(primaryBackgroundNewValue, firstThemeColorValue);
   }
 
   @Test
@@ -127,6 +288,7 @@ public class BrandingServiceImplTest {
     when(fileService.writeFile(any(FileItem.class))).thenReturn(fileItem);
     when(fileService.getFileInfo(anyLong())).thenReturn(fileInfo);
     UploadService uploadService = mock(UploadService.class);
+    ConfigurationManager configurationManager = mock(ConfigurationManager.class);
 
     InitParams initParams = new InitParams();
     ValueParam companyName = new ValueParam();
@@ -134,7 +296,7 @@ public class BrandingServiceImplTest {
     companyName.setValue("Default Company Name");
     initParams.addParam(companyName);
 
-    BrandingService brandingService = new BrandingServiceImpl(initParams, settingService, fileService, uploadService);
+    BrandingService brandingService = new BrandingServiceImpl(configurationManager, settingService, fileService, uploadService, initParams);
 
     Branding newBranding = new Branding();
     Logo logo = new Logo();
@@ -171,6 +333,8 @@ public class BrandingServiceImplTest {
     // Given
     SettingService settingService = mock(SettingService.class);
     FileService fileService = mock(FileService.class);
+    ConfigurationManager configurationManager = mock(ConfigurationManager.class);
+
     FileInfo fileInfo = new FileInfo(2L, "myLogo", "image/png",
             BrandingServiceImpl.FILE_API_NAME_SPACE, "myLogo".getBytes().length, new Date(), "john", null, false);
     FileItem fileItem = new FileItem(fileInfo, null);
@@ -189,7 +353,7 @@ public class BrandingServiceImplTest {
     companyName.setValue("Default Company Name");
     initParams.addParam(companyName);
 
-    BrandingService brandingService = new BrandingServiceImpl(initParams, settingService, fileService, uploadService);
+    BrandingService brandingService = new BrandingServiceImpl(configurationManager, settingService, fileService, uploadService, initParams);
 
     Branding newBranding = new Branding();
     Logo logo = new Logo();

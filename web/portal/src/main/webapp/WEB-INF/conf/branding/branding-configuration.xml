@@ -14,6 +14,18 @@
         <name>exo.branding.company.logo</name>
         <value>${exo.branding.company.logo:}</value>
       </value-param>
+      <value-param>
+        <name>exo.branding.theme.path</name>
+        <value>${exo.branding.theme.path:war:/conf/branding/branding.less}</value>
+      </value-param>
+      <values-param>
+        <name>exo.branding.theme.variables</name>
+        <value>${exo.branding.theme.primaryColor:primaryColor:#578dc9}</value>
+        <value>${exo.branding.theme.primaryBackground:primaryBackground:#f0f0f0}</value>
+        <value>${exo.branding.theme.secondaryColor:secondaryColor:#000000}</value>
+        <value>${exo.branding.theme.secondaryBackground:secondaryBackground:#476a9c}</value>
+        <value>${exo.branding.theme.tertiaryColor:tertiaryColor:#385989}</value>
+      </values-param>
     </init-params>
   </component>
 

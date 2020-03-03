@@ -22,6 +22,8 @@ import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -114,6 +116,19 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
     cc.setMaxAge(86400);
     builder.cacheControl(cc);
     return builder.cacheControl(cc).build();
+  }
+
+  @GET
+  @Path("/css")
+  @ApiOperation(value = "Get Branding CSS content", httpMethod = "GET", response = Response.class)
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Branding css retrieved"),
+      @ApiResponse(code = 304, message = "Branding css not modified"),
+      @ApiResponse(code = 500, message = "Server error when retrieving branding css")
+  })
+  public Response getBrandingCSS(@Context Request request) {
+    String themeCSS = brandingService.getThemeCSSContent();
+    return Response.ok(themeCSS, "text/css").build();
   }
 
   @GET

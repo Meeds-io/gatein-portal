@@ -1,5 +1,8 @@
 package org.exoplatform.portal.branding;
 
+import java.util.List;
+import java.util.Map;
+
 public interface BrandingService {
 
   Branding getBrandingInformation();
@@ -21,5 +24,10 @@ public interface BrandingService {
   void updateTopBarTheme(String style);
 
   void updateLogo(Logo logo);
+
+  /**
+   * @return CSS content of colors for theme
+   */
+  String getThemeCSSContent();
 
 }

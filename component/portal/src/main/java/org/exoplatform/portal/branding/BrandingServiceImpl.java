@@ -18,10 +18,15 @@ package org.exoplatform.portal.branding;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.Date;
+import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.picocontainer.Startable;
+
+import com.github.sommeri.less4j.*;
+import com.github.sommeri.less4j.LessCompiler.Configuration;
+import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
@@ -30,8 +35,9 @@ import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.commons.file.services.FileStorageException;
-import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.container.xml.ValueParam;
+import org.exoplatform.commons.utils.IOUtil;
+import org.exoplatform.container.configuration.ConfigurationManager;
+import org.exoplatform.container.xml.*;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
@@ -39,46 +45,81 @@ import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
 
 @SuppressWarnings("unchecked")
-public class BrandingServiceImpl implements BrandingService {
-  private static final Log   LOG                               = ExoLogger.getExoLogger(BrandingServiceImpl.class);
+public class BrandingServiceImpl implements BrandingService, Startable {
+  private static final Log     LOG                               = ExoLogger.getExoLogger(BrandingServiceImpl.class);
 
-  public static final String BRANDING_COMPANY_NAME_INIT_PARAM  = "exo.branding.company.name";
+  public static final String   BRANDING_COMPANY_NAME_INIT_PARAM  = "exo.branding.company.name";
 
-  public static final String BRANDING_LOGO_INIT_PARAM          = "exo.branding.company.logo";
+  public static final String   BRANDING_LOGO_INIT_PARAM          = "exo.branding.company.logo";
 
-  public static final String BRANDING_COMPANY_NAME_SETTING_KEY = "exo.branding.company.name";
+  public static final String   BRANDING_COMPANY_NAME_SETTING_KEY = "exo.branding.company.name";
 
-  public static final String BRANDING_TOPBAR_THEME_SETTING_KEY = "bar_navigation_style";
+  public static final String   BRANDING_THEME_LESS_PATH          = "exo.branding.theme.path";
+  
+  public static final String   BRANDING_THEME_VARIABLES          = "exo.branding.theme.variables";
 
-  public static final String BRANDING_LOGO_ID_SETTING_KEY      = "exo.branding.company.id";
+  public static final String   BRANDING_TOPBAR_THEME_SETTING_KEY = "bar_navigation_style";
 
-  public static final String FILE_API_NAME_SPACE               = "CompanyBranding";
+  public static final String   BRANDING_LOGO_ID_SETTING_KEY      = "exo.branding.company.id";
 
-  public static final String LOGO_NAME                         = "logo.png";
+  public static final String   FILE_API_NAME_SPACE               = "CompanyBranding";
 
-  public static final String BRANDING_DEFAULT_LOGO_PATH        = "/logo/DefaultLogo.png";
+  public static final String   LOGO_NAME                         = "logo.png";
 
-  private SettingService     settingService;
+  public static final String   BRANDING_DEFAULT_LOGO_PATH        = "/logo/DefaultLogo.png";
 
-  private FileService        fileService;
+  public static final Context  BRANDING_CONTEXT                  = Context.GLOBAL.id("BRANDING");
 
-  private UploadService      uploadService;
+  public static final Scope    BRANDING_SCOPE                    = Scope.APPLICATION.id("BRANDING");
 
-  private String             defaultCompanyName                = "";
+  private SettingService       settingService;
 
-  private String             defaultTopbarTheme                = "Dark";
+  private FileService          fileService;
 
-  private String             defaultConfiguredLogoPath         = null;
+  private UploadService        uploadService;
 
-  public BrandingServiceImpl(InitParams initParams,
+  private ConfigurationManager configurationManager;
+
+  private String               defaultCompanyName                = "";
+
+  private String               defaultTopbarTheme                = "Dark";
+
+  private String               defaultConfiguredLogoPath         = null;
+
+  private String               lessFilePath                      = null;
+
+  private Map<String, String>  themeVariables                    = null;
+
+  private String               lessThemeContent                  = null;
+
+  private String               themeCSSContent                   = null;
+
+  public BrandingServiceImpl(ConfigurationManager configurationManager,
                              SettingService settingService,
                              FileService fileService,
-                             UploadService uploadService) {
+                             UploadService uploadService,
+                             InitParams initParams) {
+    this.configurationManager = configurationManager;
     this.settingService = settingService;
     this.fileService = fileService;
     this.uploadService = uploadService;
 
     this.loadInitParams(initParams);
+  }
+
+  @Override
+  public void start() {
+    computeThemeCSS();
+  }
+
+  @Override
+  public void stop() {
+    // Nothing to stop
+  }
+
+  @Override
+  public String getThemeCSSContent() {
+    return themeCSSContent;
   }
 
   /**
@@ -98,6 +139,24 @@ public class BrandingServiceImpl implements BrandingService {
       if (logoParam != null) {
         this.defaultConfiguredLogoPath = logoParam.getValue();
       }
+
+      ValueParam lessFileParam = initParams.getValueParam(BRANDING_THEME_LESS_PATH);
+      if (lessFileParam != null) {
+        this.lessFilePath = lessFileParam.getValue();
+      }
+
+      ValuesParam lessVariablesParam = initParams.getValuesParam(BRANDING_THEME_VARIABLES);
+      if (lessVariablesParam != null) {
+        List<String> variables = lessVariablesParam.getValues();
+        this.themeVariables = new HashMap<>();
+        for (String themeVariable : variables) {
+          if (StringUtils.isBlank(themeVariable) || !themeVariable.contains(":")) {
+            continue;
+          }
+          String[] themeVariablesPart = themeVariable.split(":");
+          this.themeVariables.put(themeVariablesPart[0], themeVariablesPart[1]);
+        }
+      }
     }
   }
 
@@ -112,6 +171,7 @@ public class BrandingServiceImpl implements BrandingService {
     branding.setCompanyName(getCompanyName());
     branding.setTopBarTheme(getTopBarTheme());
     branding.setLogo(getLogo());
+    branding.setThemeColors(getThemeColors());
     return branding;
   }
 
@@ -126,6 +186,7 @@ public class BrandingServiceImpl implements BrandingService {
     updateCompanyName(branding.getCompanyName());
     updateTopBarTheme(branding.getTopBarTheme());
     updateLogo(branding.getLogo());
+    updateThemeColors(branding.getThemeColors());
   }
 
   @Override
@@ -288,6 +349,81 @@ public class BrandingServiceImpl implements BrandingService {
         throw new IllegalStateException("Error while updating logo", e);
       }
     }
+  }
+
+  private Map<String, String> getThemeColors() {
+    if (themeVariables == null || themeVariables.isEmpty()) {
+      return Collections.emptyMap();
+    }
+
+    Map<String, String> themeColors = new HashMap<>();
+    Set<String> variables = themeVariables.keySet();
+    for (String themeVariable : variables) {
+      SettingValue<?> storedColorValue = settingService.get(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable);
+      String colorValue = storedColorValue == null
+          || storedColorValue.getValue() == null ? themeVariables.get(themeVariable) : storedColorValue.getValue().toString();
+      if (StringUtils.isNotBlank(colorValue)) {
+        themeColors.put(themeVariable, colorValue);
+      }
+    }
+    return themeColors;
+  }
+
+  private void updateThemeColors(Map<String, String> themeColors) {
+    if (themeVariables == null || themeVariables.isEmpty()) {
+      return;
+    }
+
+    Set<String> variables = themeVariables.keySet();
+    for (String themeVariable : variables) {
+      if (themeColors != null && themeColors.get(themeVariable) != null) {
+        String themeColor = themeColors.get(themeVariable);
+        settingService.set(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable, SettingValue.create(themeColor));
+      } else {
+        settingService.remove(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable);
+      }
+    }
+
+    // Refresh Theme
+    computeThemeCSS();
+  }
+
+  private String computeThemeCSS() {
+    if (StringUtils.isNotBlank(lessFilePath)) {
+      try {
+        InputStream inputStream = configurationManager.getInputStream(lessFilePath);
+        lessThemeContent = IOUtil.getStreamContentAsString(inputStream);
+      } catch (Exception e) {
+        LOG.warn("Error retrieving less file content", e);
+      }
+    }
+
+    if (themeVariables != null && !themeVariables.isEmpty()) {
+      Set<String> variables = themeVariables.keySet();
+      for (String themeVariable : variables) {
+        SettingValue<?> storedColorValue = settingService.get(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable);
+        String colorValue = storedColorValue == null
+            || storedColorValue.getValue() == null ? themeVariables.get(themeVariable) : storedColorValue.getValue().toString();
+        if (StringUtils.isNotBlank(colorValue) && StringUtils.isNotBlank(lessThemeContent)) {
+          lessThemeContent = lessThemeContent.replaceAll("@" + themeVariable + ":[ #a-zA-Z0-9]*;?\r?\n",
+                                                         "@" + themeVariable + ": " + colorValue + ";\n");
+        }
+      }
+
+      if (StringUtils.isNotBlank(lessThemeContent)) {
+        LessCompiler compiler = new ThreadUnsafeLessCompiler();
+        try {
+          Configuration configuration = new Configuration();
+          configuration.setLinkSourceMap(false);
+          LessCompiler.CompilationResult result = compiler.compile(lessThemeContent, configuration);
+          this.themeCSSContent  = result.getCss();
+        } catch (Less4jException e) {
+          LOG.warn("Error compiling less file content", e);
+        }
+      }
+    }
+
+    return this.themeCSSContent;
   }
 
   private InputStream getUploadDataAsStream(String uploadId) throws FileNotFoundException {
