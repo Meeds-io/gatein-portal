@@ -491,15 +491,17 @@ public class UserPortalImpl implements UserPortal {
         return null;
       }
       UserNavigation globalNavigation = getNavigation(SiteKey.portal(this.service.getGlobalPortal()));
-      MatchingScope globalScope = new MatchingScope(globalNavigation, filterConfig, segments);
-      globalScope.resolve();
-      if (globalScope.score > 0) {
-        UserNode globalNode = globalScope.userNode;
-        if (globalNode != null) {
-          globalNode.owner.filterConfig.path = null;
-        }
-        if (globalNode != null && StringUtils.equals(globalScope.userNode.getURI(), globalNode.getURI())) {
-          return globalNode;
+      if (globalNavigation != null) {
+        MatchingScope globalScope = new MatchingScope(globalNavigation, filterConfig, segments);
+        globalScope.resolve();
+        if (globalScope.score > 0) {
+          UserNode globalNode = globalScope.userNode;
+          if (globalNode != null) {
+            globalNode.owner.filterConfig.path = null;
+          }
+          if (globalNode != null && StringUtils.equals(globalScope.userNode.getURI(), globalNode.getURI())) {
+            return globalNode;
+          }
         }
       }
       return null;
