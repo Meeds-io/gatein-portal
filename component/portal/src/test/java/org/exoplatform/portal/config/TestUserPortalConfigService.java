@@ -26,12 +26,11 @@ import org.gatein.common.util.Tools;
 import org.exoplatform.component.test.*;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.model.*;
-import org.exoplatform.portal.mop.EventType;
-import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.*;
+import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageService;
-import org.exoplatform.portal.mop.user.UserNavigation;
-import org.exoplatform.portal.mop.user.UserPortal;
+import org.exoplatform.portal.mop.user.*;
 import org.exoplatform.portal.pom.data.ModelDataStorage;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.services.listener.*;
@@ -195,6 +194,136 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
         assertTrue(navigations.containsKey("user::root"));
       }
     }.execute("root");
+  }
+
+  public void testGetAllPortalNames() {
+    new UnitTest() {
+      public void execute() throws Exception {
+        assertTrue(userPortalConfigSer_.getAllPortalNames().contains("system"));
+
+        String originalGlobalPortal = userPortalConfigSer_.globalPortal_;
+        userPortalConfigSer_.globalPortal_ = "system";
+        try {
+          assertFalse(userPortalConfigSer_.getAllPortalNames().contains("system"));
+        } finally {
+          userPortalConfigSer_.globalPortal_ = originalGlobalPortal;
+        }
+      }
+    }.execute("root");
+  }
+
+  public void testGetGlobalUserPortalConfig() {
+    new UnitTest() {
+      public void execute() throws Exception {
+        UserPortalConfig userPortalCfg = userPortalConfigSer_.getUserPortalConfig("classic", "john");
+        assertNotNull(userPortalCfg);
+        PortalConfig portalCfg = userPortalCfg.getPortalConfig();
+        assertNotNull(portalCfg);
+        assertEquals(PortalConfig.PORTAL_TYPE, portalCfg.getType());
+        assertEquals("classic", portalCfg.getName());
+        UserPortal userPortal = userPortalCfg.getUserPortal();
+        assertNotNull(userPortal.getNavigations());
+        Map<String, UserNavigation> navigations = toMap(userPortal);
+        assertTrue(navigations.containsKey("portal::classic"));
+        assertFalse(navigations.containsKey("portal::" + userPortalConfigSer_.getGlobalPortal()));
+
+        String originalGlobalPortal = userPortalConfigSer_.globalPortal_;
+        userPortalConfigSer_.globalPortal_ = "system";
+        try {
+          userPortalCfg = userPortalConfigSer_.getUserPortalConfig("classic", "john");
+          userPortal = userPortalCfg.getUserPortal();
+          navigations = toMap(userPortal);
+
+          assertTrue(navigations.containsKey("portal::classic"));
+          assertTrue(navigations.containsKey("portal::system"));
+        } finally {
+          userPortalConfigSer_.globalPortal_ = originalGlobalPortal;
+        }
+      }
+    }.execute("john");
+  }
+
+  public void testGetGlobalUserNodes() {
+    new UnitTest() {
+      public void execute() throws Exception {
+        UserNodeFilterConfig.Builder filterConfigBuilder = UserNodeFilterConfig.builder();
+        filterConfigBuilder.withReadWriteCheck().withVisibility(Visibility.DISPLAYED, Visibility.TEMPORAL);
+        filterConfigBuilder.withTemporalCheck();
+        UserNodeFilterConfig filterConfig = filterConfigBuilder.build();
+
+        UserPortalConfig userPortalCfg = userPortalConfigSer_.getUserPortalConfig("classic", "john");
+        assertNotNull(userPortalCfg);
+        PortalConfig portalCfg = userPortalCfg.getPortalConfig();
+        assertNotNull(portalCfg);
+        assertEquals(PortalConfig.PORTAL_TYPE, portalCfg.getType());
+        assertEquals("classic", portalCfg.getName());
+        UserPortal userPortal = userPortalCfg.getUserPortal();
+        Collection<UserNode> nodes = userPortal.getNodes(SiteType.PORTAL, Scope.ALL, filterConfig);
+        assertNotNull(nodes);
+
+        int initialNodesSize = nodes.size();
+        assertTrue(initialNodesSize > 0);
+
+        String originalGlobalPortal = userPortalConfigSer_.globalPortal_;
+        userPortalConfigSer_.globalPortal_ = "systemtest";
+        try {
+          userPortalCfg = userPortalConfigSer_.getUserPortalConfig("classic", "john");
+          portalCfg = userPortalCfg.getPortalConfig();
+          userPortal = userPortalCfg.getUserPortal();
+          nodes = userPortal.getNodes(SiteType.PORTAL, Scope.ALL, filterConfig);
+          assertNotNull(nodes);
+
+          assertEquals(initialNodesSize + 1, nodes.size());
+          UserNode homeNode = nodes.iterator().next();
+          assertEquals("home", homeNode.getName());
+          assertEquals("classic", homeNode.getNavigation().getKey().getName());
+
+          UserNode lastUserNode = new ArrayList<>(nodes).get(initialNodesSize);
+          assertEquals("systemhome", lastUserNode.getName());
+          assertEquals("systemtest", lastUserNode.getNavigation().getKey().getName());
+        } finally {
+          userPortalConfigSer_.globalPortal_ = originalGlobalPortal;
+        }
+      }
+    }.execute("john");
+  }
+
+  public void testGetGlobalUserNode() {
+    new UnitTest() {
+      public void execute() throws Exception {
+        UserPortalConfig userPortalCfg = userPortalConfigSer_.getUserPortalConfig("classic", "john");
+        assertNotNull(userPortalCfg);
+
+        PortalConfig portalCfg = userPortalCfg.getPortalConfig();
+        assertNotNull(portalCfg);
+
+        UserPortal userPortal = userPortalCfg.getUserPortal();
+        assertNotNull(userPortal);
+
+        UserNodeFilterConfig.Builder filterConfigBuilder = UserNodeFilterConfig.builder();
+        filterConfigBuilder.withReadWriteCheck().withVisibility(Visibility.DISPLAYED, Visibility.TEMPORAL);
+        filterConfigBuilder.withTemporalCheck();
+        UserNodeFilterConfig filterConfig = filterConfigBuilder.build();
+
+        UserNode userNode = userPortal.resolvePath(filterConfig, "systemhome");
+        assertNotNull(userNode);
+        assertEquals("home", userNode.getName());
+
+        String originalGlobalPortal = userPortalConfigSer_.globalPortal_;
+        userPortalConfigSer_.globalPortal_ = "systemtest";
+        try {
+          userPortalCfg = userPortalConfigSer_.getUserPortalConfig("classic", "john");
+          portalCfg = userPortalCfg.getPortalConfig();
+          userPortal = userPortalCfg.getUserPortal();
+          userNode = userPortal.resolvePath(filterConfig, "systemhome");
+
+          assertNotNull(userNode);
+          assertEquals("systemhome", userNode.getName());
+        } finally {
+          userPortalConfigSer_.globalPortal_ = originalGlobalPortal;
+        }
+      }
+    }.execute("john");
   }
 
   public void testJohnGetUserPortalConfig() {

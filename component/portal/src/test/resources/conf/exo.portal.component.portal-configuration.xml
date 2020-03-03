@@ -222,6 +222,11 @@
         <name>default.import.mode</name>
         <value>merge</value>
       </value-param>
+      <value-param>
+        <name>global.portal</name>
+        <description>System site name that defines generic pages</description>
+        <value>systemportal</value>
+      </value-param>
     </init-params>
   </component>
 

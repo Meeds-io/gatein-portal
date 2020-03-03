@@ -19,13 +19,6 @@
 
 package org.exoplatform.portal.mop.user;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PageNavigation;
 import org.exoplatform.portal.config.model.PortalConfig;
@@ -43,6 +36,9 @@ import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.IdentityConstants;
 
+import java.util.*;
+
+import org.apache.commons.lang3.StringUtils;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 
@@ -191,10 +187,41 @@ public class UserPortalImpl implements UserPortal {
                 Collections.sort(navigations, USER_NAVIGATION_COMPARATOR);
             }
 
+            // Add global navigation at the end
+            NavigationContext globalPortalNav = service.getNavigationService()
+                                                       .loadNavigation(new SiteKey(SiteType.PORTAL, service.getGlobalPortal()));
+            if (globalPortalNav != null && globalPortalNav.getState() != null) {
+                navigations.add(new UserNavigation(this, globalPortalNav, false));
+            }
+
             //
             this.navigations = Collections.unmodifiableList(navigations);
         }
         return navigations;
+    }
+
+    @Override
+    public Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig userFilterConfig) {
+      Collection<UserNode> resultUserNodes = new ArrayList<>();
+      Set<String> addedUserNodesURI = new HashSet<>();
+      List<UserNavigation> userNavigations = getNavigations();
+
+      for (UserNavigation userNavigation : userNavigations) {
+        if (userNavigation.getKey().getType() != siteType) {
+          continue;
+        }
+
+        UserNode rootNode = getNode(userNavigation, scope, userFilterConfig, null);
+        Collection<UserNode> userNodes = rootNode.getChildren();
+        for (UserNode userNode : userNodes) {
+          if (addedUserNodesURI.contains(userNode.getURI())) {
+            continue;
+          }
+          addedUserNodesURI.add(userNode.getURI());
+          resultUserNodes.add(userNode);
+        }
+      }
+      return resultUserNodes;
     }
 
     public UserNavigation getNavigation(SiteKey key) throws NullPointerException, UserPortalException,
@@ -444,13 +471,37 @@ public class UserPortalImpl implements UserPortal {
 
         //
         if (scope.score > 0) {
-            UserNode ret = scope.userNode;
-            if (ret != null) {
-                ret.owner.filterConfig.path = null;
+          UserNode ret = scope.userNode;
+          if (ret != null && !StringUtils.equals(scope.userNode.getURI(), ret.getURI())) {
+            UserNode globalNode = getGlobalUserNode(filterConfig, navigation.getKey(), segments);
+            if (globalNode != null) {
+              return globalNode;
             }
-            return ret;
-        } else {
-            return null;
+          }
+          if (ret != null) {
+            ret.owner.filterConfig.path = null;
+          }
+          return ret;
         }
+        return getGlobalUserNode(filterConfig, navigation.getKey(), segments);
+    }
+
+    private UserNode getGlobalUserNode(UserNodeFilterConfig filterConfig, SiteKey siteKey, String[] segments) {
+      if (siteKey.getType() != SiteType.PORTAL) {
+        return null;
+      }
+      UserNavigation globalNavigation = getNavigation(SiteKey.portal(this.service.getGlobalPortal()));
+      MatchingScope globalScope = new MatchingScope(globalNavigation, filterConfig, segments);
+      globalScope.resolve();
+      if (globalScope.score > 0) {
+        UserNode globalNode = globalScope.userNode;
+        if (globalNode != null) {
+          globalNode.owner.filterConfig.path = null;
+        }
+        if (globalNode != null && StringUtils.equals(globalScope.userNode.getURI(), globalNode.getURI())) {
+          return globalNode;
+        }
+      }
+      return null;
     }
 }

@@ -87,6 +87,9 @@
                 <value>
                   <string>system</string>
                 </value>
+                <value>
+                  <string>systemtest</string>
+                </value>
               </collection>
             </field>
             <field name="ownerType">

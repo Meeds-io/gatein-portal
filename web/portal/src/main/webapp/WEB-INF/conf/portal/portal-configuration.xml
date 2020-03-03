@@ -127,6 +127,11 @@
             <description>Default template to use when creating a site</description>
             <value>basic</value>
           </value-param>
+          <value-param>
+            <name>global.portal</name>
+            <description>Global site name that defines generic pages</description>
+            <value>${exo.portal.global.siteName:global}</value>
+          </value-param>
           <object-param>
             <name>site.templates.location</name>
             <description>description</description>

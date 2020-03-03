@@ -19,10 +19,10 @@
 
 package org.exoplatform.portal.mop.user;
 
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.navigation.NavigationServiceException;
 import org.exoplatform.portal.mop.navigation.NodeChangeListener;
 import org.exoplatform.portal.mop.navigation.Scope;
@@ -81,7 +81,18 @@ public interface UserPortal {
      * @throws NavigationServiceException any navigation service exception
      */
     UserNode getNode(UserNavigation navigation, Scope scope, UserNodeFilterConfig filterConfig,
-            NodeChangeListener<UserNode> listener) throws NullPointerException, UserPortalException, NavigationServiceException;
+            NodeChangeListener<UserNode> listener);
+
+    /**
+     * Load the list of user nodes computed from the list of
+     * {@link UserNavigation} of type siteType (PORTAL, GROUP or USER)
+     * 
+     * @param siteType site type: PORTAL, GROUP or USER
+     * @param scope an optional scope
+     * @param filterConfig an optional filter
+     * @return a {@link Collection} of {@link UserNode}
+     */
+    Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig filterConfig);
 
     /**
      * Update the specified content with the most recent state.

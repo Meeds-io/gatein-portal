@@ -114,7 +114,7 @@ public class UIPageActionListener {
                 currentNavPath = showedUIPortal.getNavPath();
             }
 
-            if (currentNavPath != null && currentNavPath.getNavigation().getKey().equals(targetNav.getKey())) {
+            if (currentNavPath != null && currentNavPath.getNavigation().getKey().equals(siteKey)) {
                 // Case 1: Both navigation type and id are not changed, but current page node is changed and it is not a first
                 // request.
                 if (!currentNavPath.getURI().equals(targetNode.getURI())) {
@@ -126,20 +126,20 @@ public class UIPageActionListener {
                 UIWorkingWorkspace uiWorkingWS = uiPortalApp.getChildById(UIPortalApplication.UI_WORKING_WS_ID);
                 uiWorkingWS.setRenderedChild(UIPortalApplication.UI_VIEWING_WS_ID);
                 uiPortalApp.setModeState(UIPortalApplication.NORMAL_MODE);
-                showedUIPortal = uiPortalApp.getCachedUIPortal(targetNav.getKey());
+                showedUIPortal = uiPortalApp.getCachedUIPortal(siteKey);
                 if (showedUIPortal != null) {
                     showedUIPortal.setNavPath(targetNode);
                     uiPortalApp.setCurrentSite(showedUIPortal);
 
                     DataStorage storageService = uiPortalApp.getApplicationComponent(DataStorage.class);
-                    PortalConfig associatedPortalConfig = storageService.getPortalConfig(targetNav.getKey().getTypeName(),
-                            targetNav.getKey().getName());
+                    PortalConfig associatedPortalConfig = storageService.getPortalConfig(siteKey.getTypeName(),
+                                                                                         siteKey.getName());
                     UserPortalConfig userPortalConfig = pcontext.getUserPortalConfig();
 
                     // Update layout-related data on UserPortalConfig
                     userPortalConfig.setPortalConfig(associatedPortalConfig);
                 } else {
-                    showedUIPortal = buildUIPortal(targetNav.getKey(), uiPortalApp, pcontext.getUserPortalConfig());
+                    showedUIPortal = buildUIPortal(siteKey, uiPortalApp, pcontext.getUserPortalConfig());
                     if (showedUIPortal == null) {
                         return;
                     }

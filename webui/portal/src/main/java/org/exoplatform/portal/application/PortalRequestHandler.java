@@ -31,8 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.commons.utils.Safe;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.config.DataStorage;
-import org.exoplatform.portal.config.StaleModelException;
+import org.exoplatform.portal.config.*;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.PortalProperties;
 import org.exoplatform.services.log.ExoLogger;
@@ -48,6 +47,8 @@ import org.exoplatform.web.application.RequestFailure;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.core.UIApplication;
+
+import org.apache.commons.codec.binary.StringUtils;
 import org.gatein.common.text.EntityEncoder;
 
 /**
@@ -159,17 +160,21 @@ public class PortalRequestHandler extends WebRequestHandler {
         PortalRequestContext context = new PortalRequestContext(app, controllerContext, requestSiteType, requestSiteName,
                 requestPath, requestLocale);
 
+        UserPortalConfigService portalConfigService = (UserPortalConfigService) PortalContainer.getComponent(UserPortalConfigService.class);
         DataStorage storage = (DataStorage) PortalContainer.getComponent(DataStorage.class);
         PortalConfig persistentPortalConfig = storage.getPortalConfig(requestSiteType, requestSiteName);
 
         if (context.getUserPortalConfig() == null) {
-            if (persistentPortalConfig == null) {
+            if (persistentPortalConfig == null
+                || StringUtils.equals(persistentPortalConfig.getName(), portalConfigService.getGlobalPortal())) {
                 return false;
             } else if (req.getRemoteUser() == null) {
                 context.requestAuthenticationLogin();
             } else {
                 context.sendError(HttpServletResponse.SC_FORBIDDEN);
             }
+        } else if (persistentPortalConfig != null && StringUtils.equals(persistentPortalConfig.getName(), portalConfigService.getGlobalPortal())) {
+          return false;
         } else {
             if (persistentPortalConfig != null) {
                 String cacheControl = persistentPortalConfig.getProperty(PortalProperties.CACHE_CONTROL);

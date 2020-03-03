@@ -65,6 +65,9 @@ import org.picocontainer.Startable;
  * for a given user.
  */
 public class UserPortalConfigService implements Startable {
+
+    public static final String DEFAULT_GLOBAL_PORTAL = "global";
+
     DataStorage storage_;
 
     UserACL userACL_;
@@ -87,6 +90,9 @@ public class UserPortalConfigService implements Startable {
 
     /** . */
     boolean destroyUserPortal;
+    
+    /** . */
+    String globalPortal_;
 
     /** . */
     private final ImportMode defaultImportMode;
@@ -113,6 +119,10 @@ public class UserPortalConfigService implements Startable {
         ValueParam defaultImportModeParam = params == null ? null : params.getValueParam("default.import.mode");
         ImportMode defaultImportMode = defaultImportModeParam == null ? ImportMode.CONSERVE : ImportMode
                 .valueOf(defaultImportModeParam.getValue().toUpperCase().trim());
+
+        //
+        ValueParam globalPortalParam = params == null ? null : params.getValueParam("global.portal");
+        this.globalPortal_ = globalPortalParam == null ? DEFAULT_GLOBAL_PORTAL : globalPortalParam.getValue();
 
         //
         this.storage_ = storage;
@@ -463,11 +473,20 @@ public class UserPortalConfigService implements Startable {
         return getAllSiteNames(SiteType.GROUP);
     }
 
+    public String getGlobalPortal() {
+      return globalPortal_;
+    }
+
     private List<String> getAllSiteNames(SiteType siteType) throws Exception {
         List<String> list;
         switch (siteType) {
             case PORTAL:
                 list = storage_.getAllPortalNames();
+
+                // Avoid retrieving global portal as an accessible site via UI
+                if (StringUtils.isNotBlank(globalPortal_)) {
+                  list.remove(globalPortal_);
+                }
                 break;
             case GROUP:
                 list = storage_.getAllGroupNames();
