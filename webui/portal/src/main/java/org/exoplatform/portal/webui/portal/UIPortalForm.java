@@ -122,7 +122,10 @@ public class UIPortalForm extends UIFormTabPane {
 
         UIFormInputSet uiPortalSetting = this.<UIFormInputSet> getChildById(PORTAL_SETTING_FORM_INPUTSET_NAME);
         UIFormStringInput uiNameInput = uiPortalSetting.getUIStringInput(FIELD_NAME);
-        uiNameInput.setReadOnly(false);
+        uiNameInput.addValidator(MandatoryValidator.class)
+        .addValidator(StringLengthValidator.class, 3, 30)
+        .addValidator(IdentifierValidator.class)
+        .setReadOnly(false);
 
         setSelectedTab(uiPortalSetting.getId());
 
@@ -233,11 +236,9 @@ public class UIPortalForm extends UIFormTabPane {
 
         UIFormInputSet uiSettingSet = new UIFormInputSet(PORTAL_SETTING_FORM_INPUTSET_NAME);
         UIFormInputSet uiPropertiesSet = new UIFormInputSet("Properties");
-        uiSettingSet.addUIFormInput(new UIFormStringInput(FIELD_NAME, FIELD_NAME, null).addValidator(MandatoryValidator.class)
-                .addValidator(StringLengthValidator.class, 3, 30).addValidator(IdentifierValidator.class).setReadOnly(true));
+        uiSettingSet.addUIFormInput(new UIFormStringInput(FIELD_NAME, FIELD_NAME, null).setReadOnly(true));
 
-        uiSettingSet.addUIFormInput(new UIFormStringInput(FIELD_LABEL, FIELD_LABEL, null)
-                .addValidator(SpecialCharacterValidator.class));
+        uiSettingSet.addUIFormInput(new UIFormStringInput(FIELD_LABEL, FIELD_LABEL, null));
         uiSettingSet.addUIFormInput(new UIFormStringInput(FIELD_DESCRIPTION, FIELD_DESCRIPTION, null));
         uiSettingSet.addUIFormInput(new UIFormSelectBox(FIELD_LOCALE, FIELD_LOCALE, languages)
                 .addValidator(MandatoryValidator.class));
