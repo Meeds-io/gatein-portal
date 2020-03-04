@@ -409,7 +409,7 @@
       if (script == null || script == "")
         return;
       try {
-        eval($("<div />").html(script).text());
+        eval(script);
         return;
       } catch (err) {
         console.error(err.message);
