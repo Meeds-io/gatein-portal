@@ -469,10 +469,11 @@ public class UIPortalComponentActionListener {
 
             UIMaskWorkspace uiMaskWS = uiApp.getChildById(UIPortalApplication.UI_MASK_WS_ID);
             UIPortalForm portalForm = uiMaskWS.createUIComponent(UIPortalForm.class, null, "UIPortalForm");
-            portalForm.setPortalOwner(portalName);
+            portalForm.setEditingSiteKey(uiPortal.getSiteKey());
             portalForm.setBindingBean();
             uiMaskWS.setWindowSize(700, -1);
             context.addUIComponentToUpdateByAjax(uiMaskWS);
         }
     }
+
 }

@@ -27,7 +27,7 @@ import org.exoplatform.portal.pom.data.*;
 /**
  * @author Tuan Nguyen
  **/
-public class Container extends ModelObject {
+public class Container extends ModelObject implements Cloneable {
 
   public static final String       EVERYONE                              = "Everyone";
 
@@ -246,6 +246,25 @@ public class Container extends ModelObject {
                              Utils.safeImmutableList(moveAppsPermissions),
                              Utils.safeImmutableList(moveContainersPermissions),
                              children);
+  }
+
+  @Override
+  public void resetStorage() {
+    super.resetStorage();
+    if (children != null && !children.isEmpty()) {
+      for (ModelObject child : children) {
+        child.resetStorage();
+      }
+    }
+  }
+
+  @Override
+  public Container clone() {
+    try {
+      return (Container) super.clone();
+    } catch (CloneNotSupportedException e) {
+      return new Container(build());
+    }
   }
 
   protected List<ComponentData> buildChildren() {

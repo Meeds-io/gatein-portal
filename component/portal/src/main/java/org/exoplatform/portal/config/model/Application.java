@@ -19,10 +19,13 @@
 
 package org.exoplatform.portal.config.model;
 
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.portal.application.Preference;
+import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.ApplicationData;
-import org.exoplatform.portal.pom.data.ModelData;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
+import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
 
 /**
  * May 13, 2004
@@ -30,7 +33,7 @@ import org.exoplatform.portal.pom.spi.portlet.Portlet;
  * @author: Tuan Nguyen
  * @version: $Id: Portlet.java,v 1.7 2004/09/30 01:00:05 tuan08 Exp $
  **/
-public class Application<S> extends ModelObject {
+public class Application<S> extends ModelObject implements Cloneable {
 
     /** The application state. */
     private ApplicationState<S> state;
@@ -221,7 +224,7 @@ public class Application<S> extends ModelObject {
     }
 
     @Override
-    public ModelData build() {
+    public ApplicationData build() {
         return new ApplicationData<S>(storageId, storageName, getType(), state, id, title, icon, description, showInfoBar,
                 showApplicationState, showApplicationMode, theme, width, height, Utils.safeImmutableMap(properties),
                 Utils.safeImmutableList(accessPermissions));
@@ -238,4 +241,34 @@ public class Application<S> extends ModelObject {
     public static Application<Portlet> createPortletApplication() {
         return new Application<>(ApplicationType.PORTLET);
     }
+
+    @Override
+    public void resetStorage() {
+      if (!(this.state instanceof TransientApplicationState)) {
+        try {
+          DataStorage dataStorage = ExoContainerContext.getService(DataStorage.class);
+          Portlet preferences = (Portlet) dataStorage.load(this.state, this.type);
+          String contentId = dataStorage.getId(this.state);
+
+          if (this.type == ApplicationType.PORTLET) {
+            this.state = new TransientApplicationState(contentId, preferences);
+          } else {
+            // No other application type is supported
+          }
+        } catch (Exception e) {
+          throw new IllegalStateException("Error while building transient application state", e);
+        }
+      }
+      super.resetStorage();
+    }
+
+    @Override
+    public Application clone() {
+      try {
+        return (Application) super.clone();
+      } catch (CloneNotSupportedException e) {
+        return new Application(build());
+      }
+    }
+
 }

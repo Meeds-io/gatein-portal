@@ -36,7 +36,7 @@ import org.exoplatform.portal.pom.data.RedirectMappingsData;
  * @author: Tuan Nguyen
  * @version: $Id: PortalConfig.java,v 1.7 2004/08/06 03:02:29 tuan08 Exp $
  **/
-public class PortalConfig extends ModelObject {
+public class PortalConfig extends ModelObject implements Cloneable {
 
     public static final String USER_TYPE = SiteType.USER.getName();
 
@@ -66,6 +66,8 @@ public class PortalConfig extends ModelObject {
     private String skin;
 
     private Container portalLayout;
+
+    private boolean defaultLayout;
 
     private transient boolean modifiable;
 
@@ -107,6 +109,7 @@ public class PortalConfig extends ModelObject {
         this.properties = new Properties(data.getProperties());
         this.skin = data.getSkin();
         this.portalLayout = new Container(data.getPortalLayout());
+        this.defaultLayout = data.isDefaultLayout();
         this.portalRedirects = buildPortalRedirects(data.getRedirects());
     }
 
@@ -172,6 +175,14 @@ public class PortalConfig extends ModelObject {
 
     public void setModifiable(boolean b) {
         modifiable = b;
+    }
+
+    public boolean isDefaultLayout() {
+      return defaultLayout;
+    }
+
+    public void setDefaultLayout(boolean defaultLayout) {
+      this.defaultLayout = defaultLayout;
     }
 
     public void setPortalRedirects(ArrayList<PortalRedirect> portalRedirects) {
@@ -306,8 +317,18 @@ public class PortalConfig extends ModelObject {
         return "PortalConfig[name=" + name + ",type=" + type + "]";
     }
 
+    @Override
+    public PortalConfig clone() {
+      try {
+        return (PortalConfig) super.clone();
+      } catch (CloneNotSupportedException e) {
+        return new PortalConfig(build());
+      }
+    }
+
     /**
      * Retuns Container that contains only PageBody
+     * to be able to display, at least, the page content
      *
      * @return
      */
@@ -323,7 +344,7 @@ public class PortalConfig extends ModelObject {
         List<String> accessPermissions = Utils.safeImmutableList(this.accessPermissions);
         Map<String, String> properties = Utils.safeImmutableMap(this.properties);
         return new PortalData(storageId, name, type, locale, label, description, accessPermissions, editPermission, properties,
-                skin, portalLayout.build(), buildRedirectData());
+                skin, portalLayout.build(), defaultLayout, buildRedirectData());
     }
 
     private ArrayList<RedirectData> buildRedirectData() {
@@ -372,5 +393,10 @@ public class PortalConfig extends ModelObject {
         } else {
             return null;
         }
+    }
+
+    public void useDefaultPortalLayout() {
+      this.setPortalLayout(initDefaultLayout());
+      this.setDefaultLayout(true);
     }
 }

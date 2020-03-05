@@ -165,13 +165,19 @@ public class PortalDataMapper {
         model.setModifiable(uiPortal.isModifiable());
         model.setProperties(uiPortal.getProperties());
         model.setPortalRedirects(uiPortal.getPortalRedirects());
+        model.setDefaultLayout(uiPortal.isUseDynamicLayout());
 
         model.setPortalLayout(new Container());
 
         List<UIComponent> children = uiPortal.getChildren();
-        if (children == null)
-            return model;
-        ArrayList<ModelObject> newChildren = new ArrayList<ModelObject>();
+        if (children == null || children.isEmpty()) {
+          // Use default portal layout when the UI doesn't define one
+          // The default portal layout will add just the PageBody component
+          // which is mandatory to display page content inside PortalLayout
+          model.useDefaultPortalLayout();
+          return model;
+        }
+        ArrayList<ModelObject> newChildren = new ArrayList<>();
         for (UIComponent child : children) {
             ModelObject component = buildModelObject(child);
             if (component != null)
@@ -295,6 +301,7 @@ public class PortalDataMapper {
         uiPortal.setEditPermission(model.getEditPermission());
         uiPortal.setProperties(model.getProperties());
         uiPortal.setRedirects(model.getPortalRedirects());
+        uiPortal.setUseDynamicLayout(model.isDefaultLayout());
 
 
         Container layout = model.getPortalLayout();

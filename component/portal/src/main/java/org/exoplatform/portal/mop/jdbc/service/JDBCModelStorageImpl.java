@@ -888,6 +888,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     entity.setLocale(config.getLocale());
     entity.setName(config.getName());
     entity.setSiteType(SiteType.valueOf(config.getKey().getType().toUpperCase()));
+    entity.setDefaultSiteBody(config.isDefaultLayout());
     entity.setSkin(config.getSkin());
     String propertiesString = "{}";
     Map<String, String> properties = config.getProperties();
@@ -959,6 +960,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
                           Collections.unmodifiableMap(properties),
                           entity.getSkin(),
                           rootContainer,
+                          entity.isDefaultSiteBody(),
                           redirects);
   }
 

@@ -40,10 +40,7 @@ import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.PortalHttpServletResponseWrapper;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.WebRequestHandler;
-import org.exoplatform.web.application.ApplicationLifecycle;
-import org.exoplatform.web.application.ApplicationRequestPhaseLifecycle;
-import org.exoplatform.web.application.Phase;
-import org.exoplatform.web.application.RequestFailure;
+import org.exoplatform.web.application.*;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.core.UIApplication;
@@ -161,8 +158,7 @@ public class PortalRequestHandler extends WebRequestHandler {
                 requestPath, requestLocale);
 
         UserPortalConfigService portalConfigService = (UserPortalConfigService) PortalContainer.getComponent(UserPortalConfigService.class);
-        DataStorage storage = (DataStorage) PortalContainer.getComponent(DataStorage.class);
-        PortalConfig persistentPortalConfig = storage.getPortalConfig(requestSiteType, requestSiteName);
+        PortalConfig persistentPortalConfig = context.getDynamicPortalConfig();
 
         if (context.getUserPortalConfig() == null) {
             if (persistentPortalConfig == null
@@ -213,16 +209,14 @@ public class PortalRequestHandler extends WebRequestHandler {
      */
     @SuppressWarnings("unchecked")
     protected void processRequest(PortalRequestContext context, PortalApplication app) throws Exception {
-        WebuiRequestContext.setCurrentInstance(context);
+        RequestContext.setCurrentInstance(context);
         PortalRequestImpl.createInstance(context);
-        if (context.getResponse() instanceof PortalHttpServletResponseWrapper) {
-          ((PortalHttpServletResponseWrapper) context.getResponse()).setWrapMethods(true);
-        }
-
-        UIApplication uiApp = app.getStateManager().restoreUIRootComponent(context);
-
         List<ApplicationLifecycle> lifecycles = app.getApplicationLifecycle();
         try {
+            if (context.getResponse() instanceof PortalHttpServletResponseWrapper) {
+              ((PortalHttpServletResponseWrapper) context.getResponse()).setWrapMethods(true);
+            }
+            UIApplication uiApp = app.getStateManager().restoreUIRootComponent(context);
             if (context.getUIApplication() != uiApp)
                 context.setUIApplication(uiApp);
             for (ApplicationLifecycle lifecycle : lifecycles)
@@ -263,24 +257,28 @@ public class PortalRequestHandler extends WebRequestHandler {
                 log.error("Error while handling request", NonStaleModelEx);
             }
         } finally {
-            if (context.getResponse() instanceof PortalHttpServletResponseWrapper) {
-              PortalHttpServletResponseWrapper portalHttpServletResponseWrapper = (PortalHttpServletResponseWrapper) context.getResponse();
-              portalHttpServletResponseWrapper.commit();
-              portalHttpServletResponseWrapper.setWrapMethods(false);
-            }
-
-            // We flush the writer here for all
-            context.getWriter().flush();
-
-            //
             try {
-                for (ApplicationLifecycle lifecycle : lifecycles)
-                    lifecycle.onEndRequest(app, context);
-            } catch (Exception exception) {
-                log.error("Error while ending request on all ApplicationLifecycle", exception);
+              if (context.getResponse() instanceof PortalHttpServletResponseWrapper) {
+                PortalHttpServletResponseWrapper portalHttpServletResponseWrapper = (PortalHttpServletResponseWrapper) context.getResponse();
+                portalHttpServletResponseWrapper.commit();
+                portalHttpServletResponseWrapper.setWrapMethods(false);
+              }
+
+              // We flush the writer here for all
+              context.getWriter().flush();
+              //
+              try {
+                  for (ApplicationLifecycle lifecycle : lifecycles)
+                      lifecycle.onEndRequest(app, context);
+              } catch (Exception exception) {
+                  log.error("Error while ending request on all ApplicationLifecycle", exception);
+              }
+            } finally {
+              // To avoid memory leak, the ThreadLocal instances have to be purged all
+              // time, even if an error occurs
+              RequestContext.setCurrentInstance(null);
+              PortalRequestImpl.clearInstance();
             }
-            PortalRequestImpl.clearInstance();
-            WebuiRequestContext.setCurrentInstance(null);
         }
     }
 

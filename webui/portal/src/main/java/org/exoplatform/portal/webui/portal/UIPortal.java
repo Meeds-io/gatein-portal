@@ -101,6 +101,16 @@ public class UIPortal extends UIContainer {
 
     private ArrayList<PortalRedirect> portalRedirects;
 
+    private boolean useDynamicLayout;
+
+    public boolean isUseDynamicLayout() {
+      return useDynamicLayout;
+    }
+
+    public void setUseDynamicLayout(Boolean useDynamicLayout) {
+      this.useDynamicLayout = useDynamicLayout;
+    }
+
     public SiteKey getSiteKey() {
         return siteKey;
     }

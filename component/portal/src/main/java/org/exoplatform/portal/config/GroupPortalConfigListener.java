@@ -74,15 +74,13 @@ public class GroupPortalConfigListener extends GroupEventListener {
     }
 
     @Override
-    public void preSave(Group group, boolean isNew) throws Exception {
+    public void postSave(Group group, boolean isNew) throws Exception {
         if (!isNew) {
             return;
         }
 
         RequestLifeCycle.begin(PortalContainer.getInstance());
-
         try {
-
             String groupId = group.getId();
 
             // Bug in hibernate org service implementation

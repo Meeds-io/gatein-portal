@@ -63,6 +63,11 @@ public abstract class ModelObject {
         this.storageName = storageName;
     }
 
+    public void resetStorage() {
+      this.storageId = null;
+      this.storageName = null;
+    }
+
     public abstract ModelData build();
 
     public static ModelObject build(ModelData data) {

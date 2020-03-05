@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.jibx.runtime.JiBXException;
@@ -38,10 +39,12 @@ import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.config.model.Page.PageSet;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.portal.mop.importer.*;
 import org.exoplatform.portal.mop.navigation.NavigationService;
 import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.services.resources.LocaleConfigService;
 
 /**
  * Created by The eXo Platform SARL Author : Tuan Nguyen tuan08@users.sourceforge.net May 22, 2006
@@ -98,19 +101,27 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
     /** . */
     private DescriptionService descriptionService_;
 
+    /** . */
+    private LocaleConfigService localeConfigService_;
+
+    /** . */
+    private UserACL userACL_;
+
     final Set<String> createdOwners = new HashSet<String>();
 
     private boolean isFirstStartup = false;
 
     public NewPortalConfigListener(UserPortalConfigService owner, DataStorage dataStorage,
             PageService pageService, ConfigurationManager cmanager, InitParams params, NavigationService navigationService,
-            DescriptionService descriptionService) throws Exception {
+            DescriptionService descriptionService, UserACL userACL, LocaleConfigService localeConfigService) throws Exception {
         owner_ = owner;
         cmanager_ = cmanager;
         dataStorage_ = dataStorage;
         pageService_ = pageService;
         navigationService_ = navigationService;
         descriptionService_ = descriptionService;
+        userACL_ = userACL;
+        localeConfigService_ = localeConfigService;
 
         ValueParam valueParam = params.getValueParam("page.templates.location");
         if (valueParam != null)
@@ -411,22 +422,45 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
 
     public boolean createPortalConfig(NewPortalConfig config, String owner) throws Exception {
         String type = config.getOwnerType();
-        UnmarshalledObject<PortalConfig> obj = getConfig(config, owner, type, PortalConfig.class);
+        String fixedOwnerName = fixOwnerName(type, owner);
 
-        PortalConfig pConfig;
-        if (obj == null) {
-            String fixedName = fixOwnerName(type, owner);
-            if (dataStorage_.getPortalConfig(type, fixedName) != null) {
-                return true;
-            } else {
-                pConfig = new PortalConfig(type, fixedName);
-            }
+        PortalConfig pConfig = null;
+
+        if (config.isUseDefaultPortalLayout()) {
+          // If PortalConfig already exists, no need to erase the data with empty
+          // and predefined data
+          PortalConfig persistedPortalConfig = dataStorage_.getPortalConfig(type, fixedOwnerName);
+          if (persistedPortalConfig != null) {
+            return true;
+          }
+
+          // PortalConfig doesn't exists in storage => force to use default layout
+          pConfig = getDefaultPortalConfig(type, fixedOwnerName);
         } else {
-            pConfig = obj.getObject();
+          // If nor template location neither template name, we will use default PortalLayout created by constructor
+          if (StringUtils.isNotBlank(config.getTemplateName()) || StringUtils.isNotBlank(config.getTemplateLocation())) {
+            UnmarshalledObject<PortalConfig> obj = getConfig(config, owner, type, PortalConfig.class);
+            if (obj != null) {
+              pConfig = obj.getObject();
+            }
+          }
+
+          // If no XML configuration
+          if (pConfig == null) {
+            PortalConfig persistedPortalConfig = dataStorage_.getPortalConfig(type, fixedOwnerName);
+            // PortalConfig exists in storage => Do not reimport
+            if (persistedPortalConfig != null) {
+              return true;
+            } else {
+              // PortalConfig doesn't exists in storage => use default layout
+              pConfig = getDefaultPortalConfig(type, fixedOwnerName);
+            }
+          }
         }
 
+        // If XML configuration of PortalConfig exists or PortalConfig doesn't exist
+        // in storage, import PortalConfig switch default ImportMode
         ImportMode importMode = getRightMode(config.getImportMode());
-
         PortalConfigImporter portalImporter = new PortalConfigImporter(importMode, pConfig, dataStorage_);
         try {
             portalImporter.perform();
@@ -508,7 +542,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
 
         //
         if (xml == null) {
-            String templateName = config.getTemplateName() != null ? config.getTemplateName() : fileName;
+            String templateName = StringUtils.isBlank(config.getTemplateName()) ? fileName : config.getTemplateName();
             path = "/" + ownerType + "/template/" + templateName + "/" + fileName + ".xml";
             xml = getDefaultConfig(config.getTemplateLocation(), path);
             if (xml != null) {
@@ -537,11 +571,19 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         return null;
     }
 
+    private String fixPath(String path) {
+      while (path.contains("//")) {
+        path = path.replaceAll("//", "/");
+      }
+      return path;
+    }
+
     private String getDefaultConfig(String location, String path) {
         String s = location + path;
         String content = null;
         try {
             log.debug("Attempt to load file " + s);
+            s = fixPath(s);
             content = IOUtil.getStreamContentAsString(cmanager_.getInputStream(s));
             log.debug("Loaded file from path " + s + " with content " + content);
         } catch (Exception ignore) {
@@ -552,12 +594,16 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
 
     public Page createPageFromTemplate(String ownerType, String owner, String temp) throws Exception {
         String path = pageTemplatesLocation_ + "/" + temp + "/page.xml";
+        path = fixPath(path);
         InputStream is = cmanager_.getInputStream(path);
         String xml = IOUtil.getStreamContentAsString(is);
         return fromXML(ownerType, owner, xml, Page.class).getObject();
     }
 
     public String getTemplateConfig(String type, String name) {
+        if (StringUtils.isBlank(name)) {
+          return null;
+        }
         for (SiteConfigTemplates tempConfig : templateConfigs) {
             Set<String> templates = tempConfig.getTemplates(type);
             if (templates != null && templates.contains(name))
@@ -635,6 +681,38 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
             }
         }
         return obj;
+    }
+
+    private PortalConfig getDefaultPortalConfig(String type, String ownerName) throws Exception {
+      PortalConfig pConfig = new PortalConfig(type, ownerName);
+      pConfig.useDefaultPortalLayout();
+      checkPortalConfigGroupProperties(pConfig);
+      return pConfig;
+    }
+
+    private void checkPortalConfigGroupProperties(PortalConfig portalConfig) throws Exception {
+      if (portalConfig.getAccessPermissions() == null || portalConfig.getAccessPermissions().length == 0) {
+        if (StringUtils.equals(portalConfig.getType(), SiteType.GROUP.getName())) {
+          portalConfig.setAccessPermissions(new String[] { "*:" + portalConfig.getName() });
+        } else if (StringUtils.equals(portalConfig.getType(), SiteType.USER.getName())) {
+          portalConfig.setAccessPermissions(new String[] { portalConfig.getName() });
+        } else {
+          portalConfig.setAccessPermissions(new String[] { UserACL.EVERYONE });
+        }
+      }
+
+      if (StringUtils.isBlank(portalConfig.getEditPermission())) {
+        if (StringUtils.equals(portalConfig.getType(), SiteType.GROUP.getName())) {
+          portalConfig.setEditPermission(userACL_.getAdminMSType() + ":" + portalConfig.getName());
+        } else if (StringUtils.equals(portalConfig.getType(), SiteType.USER.getName())) {
+          portalConfig.setEditPermission( portalConfig.getName() );
+        } else {
+          portalConfig.setEditPermission(userACL_.getSuperUser());
+        }
+      }
+      if (StringUtils.isBlank(portalConfig.getLocale())) {
+        portalConfig.setLocale(localeConfigService_.getDefaultLocaleConfig().getLocaleName());
+      }
     }
 
     private static String fixOwnerName(String type, String owner) {

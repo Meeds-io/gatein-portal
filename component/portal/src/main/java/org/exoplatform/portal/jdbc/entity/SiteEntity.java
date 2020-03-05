@@ -68,6 +68,9 @@ public class SiteEntity extends ComponentEntity {
   @Column(name = "PROPERTIES", length = 2000)
   private String                properties       = getJSONString(new JSONObject());
 
+  @Column(name = "DEFAULT_SITE_BODY")
+  private boolean               defaultSiteBody  = false;
+
   @Column(name = "SITE_BODY", length = 5000)
   private String                siteBody         = getJSONString(new JSONArray());
 
@@ -152,6 +155,14 @@ public class SiteEntity extends ComponentEntity {
 
   public void setProperties(String properties) {
     this.properties = properties;
+  }
+
+  public void setDefaultSiteBody(boolean defaultSiteBody) {
+    this.defaultSiteBody = defaultSiteBody;
+  }
+
+  public boolean isDefaultSiteBody() {
+    return defaultSiteBody;
   }
 
   @Override

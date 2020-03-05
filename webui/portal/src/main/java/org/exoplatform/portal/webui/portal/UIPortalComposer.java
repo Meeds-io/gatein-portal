@@ -160,6 +160,17 @@ public class UIPortalComposer extends UIContainer {
         String portalName = prContext.getPortalOwner();
 
         PortalConfig portalConfig = (PortalConfig) PortalDataMapper.buildModelObject(editPortal);
+        if (isEditted()) {
+          // Old value = false and new value = true: User has changed explicitly the
+          // flag of isDefaultLayout with checkbox, thus the default layout has to
+          // be used
+          if (!uiPortal.isUseDynamicLayout() && portalConfig.isDefaultLayout()) {
+            portalConfig.useDefaultPortalLayout();
+            // A modification was made on layout, thus we will not use default layout anymore
+          } else if (uiPortal.isUseDynamicLayout() && portalConfig.isDefaultLayout()) {
+            portalConfig.setDefaultLayout(false);
+          }
+        }
         DataStorage dataStorage = getApplicationComponent(DataStorage.class);
         UserACL acl = getApplicationComponent(UserACL.class);
 
@@ -176,7 +187,7 @@ public class UIPortalComposer extends UIContainer {
             // caught in the ApplicationLifecycle
             rebuildUIPortal(uiPortalApp, editPortal, dataStorage);
         }
-        prContext.getUserPortalConfig().setPortalConfig(portalConfig);
+        uiPortalApp.reloadPortalProperties();
         PortalConfig pConfig = dataStorage.getPortalConfig(portalName);
         if (pConfig != null) {
             editPortal.setModifiable(acl.hasEditPermission(pConfig));
@@ -210,7 +221,7 @@ public class UIPortalComposer extends UIContainer {
     }
 
     private void rebuildUIPortal(UIPortalApplication uiPortalApp, UIPortal uiPortal, DataStorage storage) throws Exception {
-        PortalConfig portalConfig = storage.getPortalConfig(uiPortal.getSiteType().getName(), uiPortal.getName());
+        PortalConfig portalConfig = Util.getPortalRequestContext().getDynamicPortalConfig();
         UserPortalConfig userPortalConfig = Util.getPortalRequestContext().getUserPortalConfig();
         userPortalConfig.setPortalConfig(portalConfig);
         uiPortal.getChildren().clear();
@@ -318,25 +329,20 @@ public class UIPortalComposer extends UIContainer {
         public void execute(Event<UIPortalComposer> event) throws Exception {
             UIComponent temp = null;
             UIPortal uiPortal = null;
-            String portalOwner = null;
+            SiteKey editingSiteKey = null;
             UIEditInlineWorkspace uiEditWS = event.getSource().getAncestorOfType(UIEditInlineWorkspace.class);
             temp = uiEditWS.getUIComponent();
             if (temp != null && (temp instanceof UIPortal)) {
                 uiPortal = (UIPortal) temp;
-                if (uiPortal.getSiteType().equals(SiteType.PORTAL)) {
-                    portalOwner = uiPortal.getName();
-                } else {
-                    portalOwner = Util.getPortalRequestContext().getPortalOwner();
-                }
             } else {
                 uiPortal = Util.getUIPortal();
-                portalOwner = Util.getPortalRequestContext().getPortalOwner();
             }
+            editingSiteKey = uiPortal.getSiteKey();
 
             UIPortalApplication uiApp = uiPortal.getAncestorOfType(UIPortalApplication.class);
             UIMaskWorkspace uiMaskWS = uiApp.getChildById(UIPortalApplication.UI_MASK_WS_ID);
             UIPortalForm portalForm = uiMaskWS.createUIComponent(UIPortalForm.class, null, "UIPortalForm");
-            portalForm.setPortalOwner(portalOwner);
+            portalForm.setEditingSiteKey(editingSiteKey);
             portalForm.setBindingBean();
             if (SiteType.USER.equals(uiPortal.getSiteType())) {
                 portalForm.removeChildById("PermissionSetting");
@@ -430,9 +436,7 @@ public class UIPortalComposer extends UIContainer {
             prContext.ignoreAJAXUpdateOnPortlets(true);
 
             if (uiComposer.isPortalExist(editPortal)) {
-                DataStorage storage = uiPortalApp.getApplicationComponent(DataStorage.class);
-                PortalConfig pConfig = storage.getPortalConfig(uiPortal.getSiteKey().getTypeName(), uiPortal.getSiteKey()
-                        .getName());
+                PortalConfig pConfig = prContext.getDynamicPortalConfig();
                 if (pConfig != null) {
                     prContext.getUserPortalConfig().setPortalConfig(pConfig);
                 }

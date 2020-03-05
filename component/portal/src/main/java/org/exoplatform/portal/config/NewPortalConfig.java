@@ -46,6 +46,8 @@ public final class NewPortalConfig {
      */
     private Object override;
 
+    private boolean useDefaultPortalLayout = false;
+
     /**
      * @deprecated use the location instead
      */
@@ -65,6 +67,7 @@ public final class NewPortalConfig {
         this.predefinedOwner = new HashSet<String>(cfg.predefinedOwner);
         this.importMode = cfg.importMode;
         this.override = cfg.override;
+        this.useDefaultPortalLayout = cfg.useDefaultPortalLayout;
     }
 
     public NewPortalConfig(String path) {
@@ -158,6 +161,14 @@ public final class NewPortalConfig {
 
     public void setOverrideMode(boolean overrideMode) {
       this.override = overrideMode;
+    }
+
+    public void setUseDefaultPortalLayout(boolean useDefaultPortalLayout) {
+      this.useDefaultPortalLayout = useDefaultPortalLayout;
+    }
+
+    public boolean isUseDefaultPortalLayout() {
+      return useDefaultPortalLayout;
     }
 
     @Override

@@ -383,7 +383,7 @@ public class UIPortalApplication extends UIApplication {
             SiteKey siteKey = uiPortal.getSiteKey();
 
             UIPortal tmp = null;
-            PortalConfig portalConfig = dataStorage.getPortalConfig(siteKey.getTypeName(), siteKey.getName());
+            PortalConfig portalConfig = Util.getPortalRequestContext().getDynamicPortalConfig();
             if (portalConfig != null) {
                 tmp = this.createUIComponent(UIPortal.class, null, null);
                 PortalDataMapper.toUIPortal(tmp, portalConfig);
@@ -766,7 +766,7 @@ public class UIPortalApplication extends UIApplication {
 
             pcontext.getJavascriptManager().require("SHARED/base").addScripts(js.toString());
 
-            SiteKey siteKey = new SiteKey(pcontext.getSiteType(), pcontext.getSiteName());
+            SiteKey siteKey = pcontext.getSiteKey();
             PageNodeEvent<UIPortalApplication> pnevent = new PageNodeEvent<UIPortalApplication>(this,
                     PageNodeEvent.CHANGE_NODE, siteKey, pcontext.getNodePath());
             broadcast(pnevent, Event.Phase.PROCESS);
@@ -965,14 +965,6 @@ public class UIPortalApplication extends UIApplication {
     }
 
     /**
-     * Use {@link PortalRequestContext#setUserPortalConfig(UserPortalConfig)} instead
-     */
-    @Deprecated
-    public void setUserPortalConfig(UserPortalConfig userPortalConfig) {
-        Util.getPortalRequestContext().setUserPortalConfig(userPortalConfig);
-    }
-
-    /**
      * Reload portal properties. This is needed to be called when it is changing Portal site<br>
      * If user has been authenticated, get the skin name setting from user profile.<br>
      * anonymous user or no skin setting in user profile, use the skin setting in portal config
@@ -981,6 +973,8 @@ public class UIPortalApplication extends UIApplication {
      */
     public void reloadPortalProperties() throws Exception {
         PortalRequestContext context = Util.getPortalRequestContext();
+        context.refreshPortalConfig();
+
         String user = context.getRemoteUser();
         String portalSkin = null;
         OrganizationService orgService = getApplicationComponent(OrganizationService.class);
@@ -1082,5 +1076,9 @@ public class UIPortalApplication extends UIApplication {
             default:
                 throw new IllegalStateException("Unexpected "+ UIPortalApplication.class.getName() +".modeState value "+ modeState +".");
         }
+    }
+
+    public String getLastPortal() {
+      return lastPortal;
     }
 }

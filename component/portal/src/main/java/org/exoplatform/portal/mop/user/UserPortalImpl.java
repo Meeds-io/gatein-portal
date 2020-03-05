@@ -76,7 +76,7 @@ public class UserPortalImpl implements UserPortal {
     final UserPortalConfigService service;
 
     /** . */
-    private final PortalConfig portal;
+    private final PortalConfig portalConfig;
 
     /** . */
     final UserPortalContext context;
@@ -106,7 +106,7 @@ public class UserPortalImpl implements UserPortal {
         this.portalLocale = locale != null ? new Locale(locale) : null;
         this.service = service;
         this.portalName = portalName;
-        this.portal = portal;
+        this.portalConfig = portal;
         this.userName = userName;
         this.context = context;
         this.navigations = null;
@@ -114,6 +114,10 @@ public class UserPortalImpl implements UserPortal {
 
     public Locale getLocale() {
         return portalLocale;
+    }
+
+    public PortalConfig getPortalConfig() {
+      return portalConfig;
     }
 
     /**
@@ -128,7 +132,7 @@ public class UserPortalImpl implements UserPortal {
             NavigationContext portalNav = service.getNavigationService().loadNavigation(
                     new SiteKey(SiteType.PORTAL, portalName));
             if (portalNav != null && portalNav.getState() != null) {
-                navigations.add(new UserNavigation(this, portalNav, service.getUserACL().hasEditPermission(portal)));
+                navigations.add(new UserNavigation(this, portalNav, service.getUserACL().hasEditPermission(portalConfig)));
             }
             //
             if (userName != null) {

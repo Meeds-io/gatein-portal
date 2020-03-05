@@ -45,8 +45,8 @@ import org.exoplatform.commons.xml.DOMSerializer;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.config.UserPortalConfig;
-import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.config.*;
+import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageContext;
@@ -158,7 +158,16 @@ public class PortalRequestContext extends WebuiRequestContext {
     /** . */
     private final ControllerContext controllerContext;
 
+    /** . */
+    private final DynamicPortalLayoutService portalLayoutService;
+
+    private final UserPortalConfigService portalConfigService;
+
+    private final DataStorage dataStorage;
+
     private UserPortalConfig userPortalConfig;
+
+    private PortalConfig currentPortalConfig;
 
     public JavascriptManager getJavascriptManager() {
         return jsmanager_;
@@ -182,6 +191,9 @@ public class PortalRequestContext extends WebuiRequestContext {
         this.urlFactory = (URLFactoryService) PortalContainer.getComponent(URLFactoryService.class);
         this.controllerContext = controllerContext;
         this.jsmanager_ = new JavascriptManager();
+        this.portalLayoutService = ExoContainerContext.getService(DynamicPortalLayoutService.class);
+        this.dataStorage = ExoContainerContext.getService(DataStorage.class);
+        this.portalConfigService = ExoContainerContext.getService(UserPortalConfigService.class);
 
         //
         request_ = controllerContext.getRequest();
@@ -269,29 +281,13 @@ public class PortalRequestContext extends WebuiRequestContext {
 
     public UserPortalConfig getUserPortalConfig() {
         if (userPortalConfig == null) {
-            String portalName = null;
             String remoteUser = getRemoteUser();
             SiteType siteType = getSiteType();
 
-            ExoContainer appContainer = getApplication().getApplicationServiceContainer();
-            UserPortalConfigService service_ = (UserPortalConfigService) appContainer
-                    .getComponentInstanceOfType(UserPortalConfigService.class);
-            if (SiteType.PORTAL == siteType) {
-                portalName = getSiteName();
-            }
-
+            String portalName = getCurrentPortalSite();
             HttpSession session = request_.getSession();
-            if (portalName == null) {
-                if (session != null) {
-                    portalName = (String) session.getAttribute(LAST_PORTAL_NAME);
-                }
-            }
-
-            if (portalName == null) {
-                portalName = service_.getDefaultPortal();
-            }
             try {
-                userPortalConfig = service_.getUserPortalConfig(portalName, remoteUser,
+                userPortalConfig = portalConfigService.getUserPortalConfig(portalName, remoteUser,
                         PortalRequestContext.USER_PORTAL_CONTEXT);
                 if (userPortalConfig != null) {
                     session.setAttribute(LAST_PORTAL_NAME, portalName);
@@ -304,8 +300,28 @@ public class PortalRequestContext extends WebuiRequestContext {
         return userPortalConfig;
     }
 
-    public void setUserPortalConfig(UserPortalConfig upc) {
-        userPortalConfig = upc;
+    private String getCurrentPortalSite() {
+      String portalName = null;
+      HttpSession _session = request_.getSession();
+      if (SiteType.PORTAL == getSiteType()) {
+          portalName = getSiteName();
+      }
+
+      if (portalName == null) {
+          if (_session != null) {
+              portalName = (String) _session.getAttribute(LAST_PORTAL_NAME);
+          }
+      }
+
+      if (portalName == null) {
+          portalName = portalConfigService.getDefaultPortal();
+      }
+      return portalName;
+    }
+
+    public void refreshPortalConfig() {
+        this.userPortalConfig = null;
+        this.currentPortalConfig = null;
     }
 
     public String getInitialURI() {
@@ -355,6 +371,19 @@ public class PortalRequestContext extends WebuiRequestContext {
 
     public void setPageTitle(String title) {
         this.pageTitle = title;
+    }
+
+    public PortalConfig getDynamicPortalConfig() throws Exception {
+      if (this.currentPortalConfig == null) {
+        SiteKey displayingSiteKey = getSiteKey();
+
+        if (portalLayoutService == null) {
+          this.currentPortalConfig = dataStorage.getPortalConfig(displayingSiteKey.getTypeName(), displayingSiteKey.getName());
+        } else {
+          this.currentPortalConfig = portalLayoutService.getPortalConfigWithDynamicLayout(displayingSiteKey, getCurrentPortalSite());
+        }
+      }
+      return this.currentPortalConfig;
     }
 
     public String getTitle() throws Exception {

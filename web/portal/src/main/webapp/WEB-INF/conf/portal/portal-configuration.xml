@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Copyright (C) 2009 eXo Platform SAS.
@@ -97,9 +97,89 @@
     <key>org.exoplatform.portal.mop.page.PageService</key>
     <type>org.exoplatform.portal.mop.page.PageServiceWrapper</type>
   </component>
+
   <component>
     <key>org.exoplatform.portal.mop.description.DescriptionService</key>
     <type>org.exoplatform.portal.mop.description.DescriptionServiceImpl</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.portal.config.DynamicPortalLayoutService</type>
+    <component-plugins>
+      <component-plugin>
+        <name>group.layout.matcher</name>
+        <set-method>addDynamicLayoutMatcher</set-method>
+        <type>org.exoplatform.portal.config.DynamicPortalLayoutMatcherPlugin</type>
+        <description>Dynamic group layout matcher to use current site</description>
+        <priority>10</priority>
+        <init-params>
+          <value-param>
+            <name>enabled</name>
+            <description>Wheter the matcher is disabled or not</description>
+            <value>${exo.portal.dynamic.group.layout.enabled:true}</value>
+          </value-param>
+          <value-param>
+            <name>useCurrentPortalLayout</name>
+            <description>Wheter use current site layout for groups or not</description>
+            <value>${exo.portal.dynamic.group.layout.useCurrentPortalLayout:true}</value>
+          </value-param>
+          <value-param>
+            <name>layoutTemplatePath</name>
+            <description>Dynamic group layout template path</description>
+            <value>${exo.portal.dynamic.group.layout.layoutTemplatePath:}</value>
+          </value-param>
+          <object-param>
+            <name>matcher</name>
+            <description>Dynamic group layout matcher</description>
+            <object type="org.exoplatform.portal.config.DynamicPortalLayoutMatcher">
+              <field name="siteTypeRegex">
+                <string>group</string>
+              </field>
+            </object>
+          </object-param>
+        </init-params>
+      </component-plugin>
+      <component-plugin>
+        <name>user.layout.matcher</name>
+        <set-method>addDynamicLayoutMatcher</set-method>
+        <type>org.exoplatform.portal.config.DynamicPortalLayoutMatcherPlugin</type>
+        <description>Dynamic user layout matcher to use current site</description>
+        <priority>10</priority>
+        <init-params>
+          <value-param>
+            <name>enabled</name>
+            <description>Wheter the matcher is disabled or not</description>
+            <value>${exo.portal.dynamic.user.layout.enabled:true}</value>
+          </value-param>
+          <value-param>
+            <name>useCurrentPortalLayout</name>
+            <description>Wheter use current site layout for users or not</description>
+            <value>${exo.portal.dynamic.user.layout.useCurrentPortalLayout:true}</value>
+          </value-param>
+          <value-param>
+            <name>layoutTemplatePath</name>
+            <description>Dynamic user layout template path</description>
+            <value>${exo.portal.dynamic.user.layout.layoutTemplatePath:}</value>
+          </value-param>
+          <object-param>
+            <name>matcher</name>
+            <description>Dynamic user layout matcher</description>
+            <object type="org.exoplatform.portal.config.DynamicPortalLayoutMatcher">
+              <field name="siteTypeRegex">
+                <string>user</string>
+              </field>
+            </object>
+          </object-param>
+        </init-params>
+      </component-plugin>
+    </component-plugins>
+    <init-params>
+      <value-param>
+        <name>forceIgnoreStoredLayout</name>
+        <description>Whether ignore or not persisted layout to retrieve dynamic layout if exists</description>
+        <value>${exo.portal.stored.layout.ignore:false}</value>
+      </value-param>
+    </init-params>
   </component>
 
   <component>
@@ -149,14 +229,14 @@
               <field name="groupTemplates">
                 <collection type="java.util.HashSet">
                   <value>
-                    <string>group</string>
+                    <string>${exo.portal.default.groupSite.template:group}</string>
                   </value>
                 </collection>
               </field>
               <field name="userTemplates">
                 <collection type="java.util.HashSet">
                   <value>
-                    <string>user</string>
+                    <string>${exo.portal.default.userSite.template:user}</string>
                   </value>
                 </collection>
               </field>
@@ -217,7 +297,15 @@
       </value-param>
       <value-param>
         <name>default.import.mode</name>
-        <value>merge</value>
+        <value>${exo.portal.default.importMode:merge}</value>
+      </value-param>
+      <value-param>
+        <name>default.groupSite.template</name>
+        <value>${exo.portal.default.groupSite.template:}</value>
+      </value-param>
+      <value-param>
+        <name>default.userSite.template</name>
+        <value>${exo.portal.default.userSite.template:}</value>
       </value-param>
     </init-params>
   </component>

@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.exoplatform.commons.serialization.api.annotations.Serialized;
+import org.exoplatform.web.application.Parameter;
 import org.exoplatform.web.application.RequireJS;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
@@ -54,9 +55,22 @@ public class UIVirtualList extends UIComponentDecorator {
         this.autoAdjustHeight = auto;
     }
 
+    @Override
+    public String event(String name) throws Exception {
+      UIComponent parent = this.getParent();
+      return parent.event(name);
+    }
+
+    @Override
     public String event(String name, String beanId) throws Exception {
         UIComponent parent = this.getParent();
         return parent.event(name, beanId);
+    }
+
+    @Override
+    public String event(String name, String beanId, Parameter[] params) throws Exception {
+      UIComponent parent = this.getParent();
+      return parent.event(name, beanId, params);
     }
 
     public void dataBind(Iterator<List<?>> source) throws Exception {

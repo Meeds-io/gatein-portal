@@ -22,8 +22,7 @@ package org.exoplatform.portal.webui.page;
 import java.util.ArrayList;
 
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.DataStorage;
-import org.exoplatform.portal.config.UserPortalConfig;
+import org.exoplatform.portal.config.*;
 import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
@@ -49,6 +48,7 @@ import org.exoplatform.webui.event.EventListener;
  * @version $Revision$
  */
 public class UIPageActionListener {
+
     public static class ChangeNodeActionListener extends EventListener<UIPortalApplication> {
         public void execute(Event<UIPortalApplication> event) throws Exception {
             PortalRequestContext pcontext = PortalRequestContext.getCurrentInstance();
@@ -108,7 +108,6 @@ public class UIPageActionListener {
                 }
             }
 
-            UserNavigation targetNav = targetNode.getNavigation();
             UserNode currentNavPath = null;
             if (showedUIPortal != null) {
                 currentNavPath = showedUIPortal.getNavPath();
@@ -131,15 +130,13 @@ public class UIPageActionListener {
                     showedUIPortal.setNavPath(targetNode);
                     uiPortalApp.setCurrentSite(showedUIPortal);
 
-                    DataStorage storageService = uiPortalApp.getApplicationComponent(DataStorage.class);
-                    PortalConfig associatedPortalConfig = storageService.getPortalConfig(siteKey.getTypeName(),
-                                                                                         siteKey.getName());
+                    PortalConfig associatedPortalConfig = pcontext.getDynamicPortalConfig();
                     UserPortalConfig userPortalConfig = pcontext.getUserPortalConfig();
 
                     // Update layout-related data on UserPortalConfig
                     userPortalConfig.setPortalConfig(associatedPortalConfig);
                 } else {
-                    showedUIPortal = buildUIPortal(siteKey, uiPortalApp, pcontext.getUserPortalConfig());
+                    showedUIPortal = buildUIPortal(uiPortalApp, pcontext);
                     if (showedUIPortal == null) {
                         return;
                     }
@@ -150,27 +147,24 @@ public class UIPageActionListener {
             }
 
             showedUIPortal.refreshUIPage();
-            pcontext.setFullRender(true);
+            pcontext.ignoreAJAXUpdateOnPortlets(true);
             pcontext.addUIComponentToUpdateByAjax(uiPortalApp.getChildById(UIPortalApplication.UI_WORKING_WS_ID));
         }
 
-        private UIPortal buildUIPortal(SiteKey siteKey, UIPortalApplication uiPortalApp, UserPortalConfig userPortalConfig)
+        private UIPortal buildUIPortal(UIPortalApplication uiPortalApp, PortalRequestContext pcontext)
                 throws Exception {
-            DataStorage storage = uiPortalApp.getApplicationComponent(DataStorage.class);
-            if (storage == null) {
-                return null;
-            }
-            PortalConfig portalConfig = storage.getPortalConfig(siteKey.getTypeName(), siteKey.getName());
+            PortalConfig portalConfig = pcontext.getDynamicPortalConfig();
             Container layout = portalConfig.getPortalLayout();
             if (layout != null) {
-                userPortalConfig.setPortalConfig(portalConfig);
+                pcontext.getUserPortalConfig().setPortalConfig(portalConfig);
             }
             UIPortal uiPortal = uiPortalApp.createUIComponent(UIPortal.class, null, null);
 
             // Reset selected navigation on userPortalConfig
-            PortalDataMapper.toUIPortal(uiPortal, userPortalConfig.getPortalConfig());
+            PortalDataMapper.toUIPortal(uiPortal, pcontext.getDynamicPortalConfig());
             return uiPortal;
         }
+
     }
 
     public static class RemoveChildActionListener extends EventListener<UIPage> {

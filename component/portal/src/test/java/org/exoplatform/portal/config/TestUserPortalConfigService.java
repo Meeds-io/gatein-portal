@@ -450,6 +450,130 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
     }.execute("root");
   }
 
+  public void testCreateGroupPortalConfigWithDefaultTemplate() {
+    new UnitTest() {
+      public void execute() throws Exception {
+        String originalDefaultGroupSiteTemplate = userPortalConfigSer_.getDefaultGroupSiteTemplate();
+
+        // Test creating group site with default template having a predefined
+        // group.xml
+        userPortalConfigSer_.setDefaultGroupSiteTemplate("group");
+        try {
+          String groupId = "/groupTemplate101";
+          userPortalConfigSer_.createGroupSite(groupId);
+
+          PortalConfig groupPortalConfig = storage_.getPortalConfig(PortalConfig.GROUP_TYPE, groupId);
+
+          assertNotNull(groupPortalConfig);
+          assertNotNull(groupPortalConfig.getPortalLayout());
+          assertNotNull(groupPortalConfig.getPortalLayout().getChildren());
+          assertEquals(4, groupPortalConfig.getPortalLayout().getChildren().size());
+          assertFalse(groupPortalConfig.isDefaultLayout());
+        } finally {
+          userPortalConfigSer_.setDefaultGroupSiteTemplate(originalDefaultGroupSiteTemplate);
+        }
+
+        // Test creating group site with not existing template
+        userPortalConfigSer_.setDefaultGroupSiteTemplate("fake");
+        try {
+          String groupId = "/groupTemplate102";
+          userPortalConfigSer_.createGroupSite(groupId);
+
+          PortalConfig groupPortalConfig = storage_.getPortalConfig(PortalConfig.GROUP_TYPE, groupId);
+
+          assertNotNull(groupPortalConfig);
+          assertNotNull(groupPortalConfig.getPortalLayout());
+          assertNotNull(groupPortalConfig.getPortalLayout().getChildren());
+          assertEquals(1, groupPortalConfig.getPortalLayout().getChildren().size());
+          assertEquals(PageBody.class, groupPortalConfig.getPortalLayout().getChildren().get(0).getClass());
+          assertTrue(groupPortalConfig.isDefaultLayout());
+        } finally {
+          userPortalConfigSer_.setDefaultGroupSiteTemplate(originalDefaultGroupSiteTemplate);
+        }
+
+        // Test creating group site with null template
+        userPortalConfigSer_.setDefaultGroupSiteTemplate(null);
+        try {
+          String groupId = "/groupTemplate103";
+          userPortalConfigSer_.createGroupSite(groupId);
+
+          PortalConfig groupPortalConfig = storage_.getPortalConfig(PortalConfig.GROUP_TYPE, groupId);
+
+          assertNotNull(groupPortalConfig);
+          assertNotNull(groupPortalConfig.getPortalLayout());
+          assertNotNull(groupPortalConfig.getPortalLayout().getChildren());
+          assertEquals(1, groupPortalConfig.getPortalLayout().getChildren().size());
+          assertEquals(PageBody.class, groupPortalConfig.getPortalLayout().getChildren().get(0).getClass());
+          assertTrue(groupPortalConfig.isDefaultLayout());
+        } finally {
+          userPortalConfigSer_.setDefaultGroupSiteTemplate(originalDefaultGroupSiteTemplate);
+        }
+      }
+    }.execute("root");
+  }
+
+  public void testCreateUserPortalConfigWithDefaultTemplate() {
+    new UnitTest() {
+      public void execute() throws Exception {
+        String originalDefaultUserSiteTemplate = userPortalConfigSer_.getDefaultUserSiteTemplate();
+
+        // Test creating user site with default template having a predefined
+        // user.xml
+        userPortalConfigSer_.setDefaultUserSiteTemplate("user");
+        try {
+          String userId = "/userTemplate101";
+          userPortalConfigSer_.createUserSite(userId);
+
+          PortalConfig userPortalConfig = storage_.getPortalConfig(PortalConfig.USER_TYPE, userId);
+
+          assertNotNull(userPortalConfig);
+          assertNotNull(userPortalConfig.getPortalLayout());
+          assertNotNull(userPortalConfig.getPortalLayout().getChildren());
+          assertEquals(2, userPortalConfig.getPortalLayout().getChildren().size());
+          assertFalse(userPortalConfig.isDefaultLayout());
+        } finally {
+          userPortalConfigSer_.setDefaultUserSiteTemplate(originalDefaultUserSiteTemplate);
+        }
+
+        // Test creating user site with not existing template
+        userPortalConfigSer_.setDefaultUserSiteTemplate("fake");
+        try {
+          String userId = "userTemplate102";
+          userPortalConfigSer_.createUserSite(userId);
+
+          PortalConfig userPortalConfig = storage_.getPortalConfig(PortalConfig.USER_TYPE, userId);
+
+          assertNotNull(userPortalConfig);
+          assertNotNull(userPortalConfig.getPortalLayout());
+          assertNotNull(userPortalConfig.getPortalLayout().getChildren());
+          assertEquals(1, userPortalConfig.getPortalLayout().getChildren().size());
+          assertEquals(PageBody.class, userPortalConfig.getPortalLayout().getChildren().get(0).getClass());
+          assertTrue(userPortalConfig.isDefaultLayout());
+        } finally {
+          userPortalConfigSer_.setDefaultUserSiteTemplate(originalDefaultUserSiteTemplate);
+        }
+
+        // Test creating user site with null template
+        userPortalConfigSer_.setDefaultUserSiteTemplate(null);
+        try {
+          String userId = "userTemplate103";
+          userPortalConfigSer_.createUserSite(userId);
+
+          PortalConfig userPortalConfig = storage_.getPortalConfig(PortalConfig.USER_TYPE, userId);
+
+          assertNotNull(userPortalConfig);
+          assertNotNull(userPortalConfig.getPortalLayout());
+          assertNotNull(userPortalConfig.getPortalLayout().getChildren());
+          assertEquals(1, userPortalConfig.getPortalLayout().getChildren().size());
+          assertEquals(PageBody.class, userPortalConfig.getPortalLayout().getChildren().get(0).getClass());
+          assertTrue(userPortalConfig.isDefaultLayout());
+        } finally {
+          userPortalConfigSer_.setDefaultUserSiteTemplate(originalDefaultUserSiteTemplate);
+        }
+      }
+    }.execute("root");
+  }
+
   public void testRemoveUserPortalConfig() {
     new UnitTest() {
       public void execute() throws Exception {

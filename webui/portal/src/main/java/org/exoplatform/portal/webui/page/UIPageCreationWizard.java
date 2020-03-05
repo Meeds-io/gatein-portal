@@ -362,7 +362,7 @@ public class UIPageCreationWizard extends UIPageWizard {
 
 //            UIPortal currentPortal = uiPortalApp.getCurrentSite();
             DataStorage dataStorage = uiPortalApp.getApplicationComponent(DataStorage.class);
-            PortalConfig portalConfig = dataStorage.getPortalConfig(pcontext.getSiteType().getName(), pcontext.getSiteName());
+            PortalConfig portalConfig = pcontext.getDynamicPortalConfig();
             UIPortal transientPortal = uiWorkingWS.createUIComponent(UIPortal.class, null, null);
             PortalDataMapper.toUIPortal(transientPortal, portalConfig);
             UIPageBody uiPageBody = transientPortal.findFirstComponentOfType(UIPageBody.class);

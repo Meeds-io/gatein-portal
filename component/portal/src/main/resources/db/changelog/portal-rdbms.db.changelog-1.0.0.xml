@@ -307,4 +307,9 @@
     <addUniqueConstraint columnNames="REF_TYPE, REF_ID, PERMISSION, TYPE" constraintName="UK_PORTAL_PERMISSIONS"
               tableName="PORTAL_PERMISSIONS"/>
   </changeSet>
+  <changeSet author="portal" id="1.0.0-28">
+    <addColumn tableName="PORTAL_SITES">
+      <column name="DEFAULT_SITE_BODY" type="BOOLEAN" defaultValueBoolean="false" />
+    </addColumn>
+  </changeSet>
 </databaseChangeLog>

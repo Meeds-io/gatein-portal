@@ -22,7 +22,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 
 /**
@@ -54,6 +53,8 @@ public class PortalData extends ModelData {
     /** . */
     private final ContainerData portalLayout;
 
+    private final boolean defaultLayout;
+
     private final String label;
 
     private final String description;
@@ -72,12 +73,31 @@ public class PortalData extends ModelData {
       this.skin = null;
       this.portalLayout = null;
       this.redirects = null;
+      this.defaultLayout = false;
     }
 
     public PortalData(String storageId, String name, String type, String locale, String label, String description,
             List<String> accessPermissions, String editPermission, Map<String, String> properties, String skin,
             ContainerData portalLayout, List<RedirectData> redirects) {
-        super(storageId, null);
+      this(storageId,
+           name,
+           type,
+           locale,
+           label,
+           description,
+           accessPermissions,
+           editPermission,
+           properties,
+           skin,
+           portalLayout,
+           false,
+           redirects);
+  }
+
+    public PortalData(String storageId, String name, String type, String locale, String label, String description,
+                      List<String> accessPermissions, String editPermission, Map<String, String> properties, String skin,
+                      ContainerData portalLayout, boolean defaultLayout, List<RedirectData> redirects) {
+      super(storageId, null);
 
         //
         this.key = new PortalKey(type, name);
@@ -90,6 +110,7 @@ public class PortalData extends ModelData {
         this.skin = skin;
         this.portalLayout = portalLayout;
         this.redirects = redirects;
+        this.defaultLayout = defaultLayout;
     }
 
     public PortalKey getKey() {
@@ -138,6 +159,10 @@ public class PortalData extends ModelData {
 
     public String getLabel() {
         return label;
+    }
+
+    public boolean isDefaultLayout() {
+      return defaultLayout;
     }
 
     @Override

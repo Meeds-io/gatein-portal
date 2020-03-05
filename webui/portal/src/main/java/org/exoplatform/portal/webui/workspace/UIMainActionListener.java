@@ -162,8 +162,7 @@ public class UIMainActionListener {
             UIWorkingWorkspace uiWorkingWS = event.getSource();
 
             if (authorizeEditSite(currentPortal, portalApp)) {
-                DataStorage dataStorage = portalApp.getApplicationComponent(DataStorage.class);
-                PortalConfig portalConfig = dataStorage.getPortalConfig(pcontext.getSiteType().getName(), pcontext.getSiteName());
+                PortalConfig portalConfig = pcontext.getDynamicPortalConfig();
                 UIPortal transientPortal = uiWorkingWS.createUIComponent(UIPortal.class, null, null);
                 PortalDataMapper.toUIPortal(transientPortal, portalConfig);
                 transientPortal.setNavPath(currentPortal.getNavPath());

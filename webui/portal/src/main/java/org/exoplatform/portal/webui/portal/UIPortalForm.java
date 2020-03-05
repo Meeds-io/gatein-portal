@@ -37,6 +37,7 @@ import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.PortalProperties;
+import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.resource.SkinService;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
@@ -66,6 +67,7 @@ import org.exoplatform.webui.form.UIFormInputSet;
 import org.exoplatform.webui.form.UIFormSelectBox;
 import org.exoplatform.webui.form.UIFormStringInput;
 import org.exoplatform.webui.form.UIFormTabPane;
+import org.exoplatform.webui.form.input.UICheckBoxInput;
 import org.exoplatform.webui.form.validator.IdentifierValidator;
 import org.exoplatform.webui.form.validator.MandatoryValidator;
 import org.exoplatform.webui.form.validator.SpecialCharacterValidator;
@@ -78,7 +80,8 @@ import org.exoplatform.webui.organization.UIPermissionSelector;
         @ComponentConfig(lifecycle = UIFormLifecycle.class, template = "system:/groovy/webui/form/UIFormTabPane.gtmpl", events = {
                 @EventConfig(listeners = UIPortalForm.SaveActionListener.class),
                 @EventConfig(listeners = UIMaskWorkspace.CloseActionListener.class, phase = Phase.DECODE),
-                @EventConfig(listeners = UIPortalForm.CheckShowActionListener.class) }),
+                @EventConfig(listeners = UIPortalForm.CheckShowActionListener.class),
+        }),
         @ComponentConfig(id = "CreatePortal", lifecycle = UIFormLifecycle.class, template = "system:/groovy/webui/form/UIFormTabPane.gtmpl", events = {
                 @EventConfig(name = "Save", listeners = UIPortalForm.CreateActionListener.class),
                 @EventConfig(listeners = UIPortalForm.SelectItemOptionActionListener.class, phase = Phase.DECODE),
@@ -110,8 +113,10 @@ public class UIPortalForm extends UIFormTabPane {
 
     private static final String FIELD_DESCRIPTION = "description";
 
+    private static final String FIELD_DYNAMIC_LAYOUT = "useDynamicLayout";
 
-    private String portalOwner_;
+
+    private SiteKey editingSiteKey;
 
     private List<SelectItemOption<String>> languages = new ArrayList<SelectItemOption<String>>();
 
@@ -126,6 +131,8 @@ public class UIPortalForm extends UIFormTabPane {
         .addValidator(StringLengthValidator.class, 3, 30)
         .addValidator(IdentifierValidator.class)
         .setReadOnly(false);
+
+        uiPortalSetting.getChildById(FIELD_DYNAMIC_LAYOUT).setRendered(false);
 
         setSelectedTab(uiPortalSetting.getId());
 
@@ -167,7 +174,7 @@ public class UIPortalForm extends UIFormTabPane {
                 && uiEditWS.getUIComponent() != null && (uiEditWS.getUIComponent() instanceof UIPortal)) {
             editPortal = (UIPortal) uiEditWS.getUIComponent();
         } else {
-            PortalConfig pConfig = dataStorage.getPortalConfig(getPortalOwner());
+            PortalConfig pConfig = dataStorage.getPortalConfig(getEditingSiteTypeName(), getEditingSiteName());
             editPortal = this.createUIComponent(UIPortal.class, null, null);
             PortalDataMapper.toUIPortal(editPortal, pConfig);
         }
@@ -176,7 +183,7 @@ public class UIPortalForm extends UIFormTabPane {
 
         UIFormInputSet uiSettingSet = getChildById(PORTAL_SETTING_FORM_INPUTSET_NAME);
 
-        ((UIFormStringInput) uiSettingSet.getChildById(FIELD_NAME)).setValue(getPortalOwner());
+        ((UIFormStringInput) uiSettingSet.getChildById(FIELD_NAME)).setValue(getEditingSiteName());
 
         LocaleConfigService localeConfigService = getApplicationComponent(LocaleConfigService.class);
         LocaleConfig localeConfig = localeConfigService.getLocaleConfig(editPortal.getLocale());
@@ -258,6 +265,8 @@ public class UIPortalForm extends UIFormTabPane {
 
         addUIFormInput(uiSettingSet);
 
+        uiSettingSet.addUIFormInput(new UICheckBoxInput(FIELD_DYNAMIC_LAYOUT, FIELD_DYNAMIC_LAYOUT, false));
+
         // add to properties tab
         List<SelectItemOption<String>> listSessionAlive = new ArrayList<SelectItemOption<String>>();
         listSessionAlive.add(new SelectItemOption<String>(PortalProperties.SESSION_ALWAYS, PortalProperties.SESSION_ALWAYS));
@@ -325,12 +334,27 @@ public class UIPortalForm extends UIFormTabPane {
         }
     }
 
-    public void setPortalOwner(String portalOwner) {
-        this.portalOwner_ = portalOwner;
+    public void setEditingSiteKey(SiteKey siteKey) {
+        this.editingSiteKey = siteKey;
+        if (siteKey == null || siteKey.getType() == SiteType.PORTAL) {
+          UIFormInputSet uiPortalSetting = this.<UIFormInputSet> getChildById(PORTAL_SETTING_FORM_INPUTSET_NAME);
+          uiPortalSetting.getChildById(FIELD_DYNAMIC_LAYOUT).setRendered(false);
+        } else {
+          UIFormInputSet uiPortalSetting = this.<UIFormInputSet> getChildById(PORTAL_SETTING_FORM_INPUTSET_NAME);
+          uiPortalSetting.getChildById(FIELD_DYNAMIC_LAYOUT).setRendered(true);
+        }
     }
 
-    public String getPortalOwner() {
-        return portalOwner_;
+    public String getEditingSiteName() {
+        return this.editingSiteKey == null ? null : this.editingSiteKey.getName();
+    }
+
+    public String getEditingSiteTypeName() {
+      return this.editingSiteKey == null ? null : this.editingSiteKey.getTypeName();
+    }
+
+    public SiteKey getEditingSiteKey() {
+      return editingSiteKey;
     }
 
     public static class SaveActionListener extends EventListener<UIPortalForm> {
@@ -342,7 +366,7 @@ public class UIPortalForm extends UIFormTabPane {
             PortalRequestContext prContext = Util.getPortalRequestContext();
             UIPortalApplication uiPortalApp = (UIPortalApplication) prContext.getUIApplication();
 
-            PortalConfig pConfig = dataService.getPortalConfig(uiForm.getPortalOwner());
+            PortalConfig pConfig = dataService.getPortalConfig(uiForm.getEditingSiteTypeName(), uiForm.getEditingSiteName());
             if (pConfig != null && acl.hasPermission(pConfig)) {
                 UIPortal uiPortal = uiForm.createUIComponent(UIPortal.class, null, null);
                 PortalDataMapper.toUIPortal(uiPortal, pConfig);
@@ -353,11 +377,7 @@ public class UIPortalForm extends UIFormTabPane {
                     PortalConfig portalConfig = (PortalConfig) PortalDataMapper.buildModelObject(uiPortal);
                     dataService.save(portalConfig);
                     UserPortalConfigService service = uiForm.getApplicationComponent(UserPortalConfigService.class);
-                    if (prContext.getPortalOwner().equals(uiForm.getPortalOwner())) {
-                        prContext.setUserPortalConfig(service.getUserPortalConfig(uiForm.getPortalOwner(),
-                                prContext.getRemoteUser(), PortalRequestContext.USER_PORTAL_CONTEXT));
-                        uiPortalApp.reloadPortalProperties();
-                    }
+                    uiPortalApp.reloadPortalProperties();
 
                     // We should use IPC to update some portlets in the future instead of
                     UIWorkingWorkspace uiWorkingWS = uiPortalApp.getChild(UIWorkingWorkspace.class);

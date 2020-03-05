@@ -19,46 +19,31 @@
 
 package org.exoplatform.portal.config;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.picocontainer.Startable;
+
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.exoplatform.portal.config.model.Application;
-import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.config.model.ModelObject;
-import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.portal.mop.importer.ImportMode;
-import org.exoplatform.portal.mop.navigation.NavigationContext;
-import org.exoplatform.portal.mop.navigation.NavigationService;
-import org.exoplatform.portal.mop.navigation.NavigationState;
-import org.exoplatform.portal.mop.page.PageContext;
-import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.portal.mop.navigation.*;
+import org.exoplatform.portal.mop.page.*;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserPortalContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.OrganizationService;
-import org.picocontainer.Startable;
+import org.exoplatform.services.resources.LocaleConfigService;
 
 /**
  * Created by The eXo Platform SAS Apr 19, 2007 This service is used to load the PortalConfig, Page config and Navigation config
@@ -66,7 +51,11 @@ import org.picocontainer.Startable;
  */
 public class UserPortalConfigService implements Startable {
 
-    public static final String DEFAULT_GLOBAL_PORTAL = "global";
+  public static final String      DEFAULT_GLOBAL_PORTAL       = "global";
+
+  public static final String      DEFAULT_GROUP_SITE_TEMPLATE = "group";
+
+  public static final String      DEFAULT_USER_SITE_TEMPLATE  = "user";
 
     DataStorage storage_;
 
@@ -95,6 +84,12 @@ public class UserPortalConfigService implements Startable {
     String globalPortal_;
 
     /** . */
+    String defaultGroupSiteTemplate;
+
+    /** . */
+    String defaultUserSiteTemplate;
+
+    /** . */
     private final ImportMode defaultImportMode;
 
     private PortalConfig defaultPortalConfig;
@@ -102,7 +97,8 @@ public class UserPortalConfigService implements Startable {
     private Log log = ExoLogger.getLogger("Portal:UserPortalConfigService");
 
     public UserPortalConfigService(UserACL userACL, DataStorage storage, OrganizationService orgService,
-            NavigationService navService, DescriptionService descriptionService, PageService pageService, InitParams params)
+            NavigationService navService, DescriptionService descriptionService, PageService pageService,
+            InitParams params)
             throws Exception {
 
         //
@@ -124,6 +120,13 @@ public class UserPortalConfigService implements Startable {
         ValueParam globalPortalParam = params == null ? null : params.getValueParam("global.portal");
         this.globalPortal_ = globalPortalParam == null ? DEFAULT_GLOBAL_PORTAL : globalPortalParam.getValue();
 
+        ValueParam defaultGroupSiteTemplateParam = params == null ? null : params.getValueParam("default.groupSite.template");
+        String defaultGroupSiteTemplate = defaultGroupSiteTemplateParam == null ? DEFAULT_GROUP_SITE_TEMPLATE : defaultGroupSiteTemplateParam.getValue();
+
+        //
+        ValueParam defaultUserSiteTemplateParam = params == null ? null : params.getValueParam("default.userSite.template");
+        String defaultUserSiteTemplate = defaultUserSiteTemplateParam == null ? DEFAULT_USER_SITE_TEMPLATE : defaultUserSiteTemplateParam.getValue();
+
         //
         this.storage_ = storage;
         this.orgService_ = orgService;
@@ -134,6 +137,8 @@ public class UserPortalConfigService implements Startable {
         this.createUserPortal = createUserPortal;
         this.destroyUserPortal = destroyUserPortal;
         this.defaultImportMode = defaultImportMode;
+        this.defaultGroupSiteTemplate = defaultGroupSiteTemplate;
+        this.defaultUserSiteTemplate = defaultUserSiteTemplate;
     }
 
     public PageService getPageService() {
@@ -162,6 +167,22 @@ public class UserPortalConfigService implements Startable {
 
     public void setDestroyUserPortal(boolean destroyUserPortal) {
         this.destroyUserPortal = destroyUserPortal;
+    }
+
+    public String getDefaultGroupSiteTemplate() {
+      return defaultGroupSiteTemplate;
+    }
+
+    public void setDefaultGroupSiteTemplate(String defaultGroupSiteTemplate) {
+      this.defaultGroupSiteTemplate = defaultGroupSiteTemplate;
+    }
+
+    public String getDefaultUserSiteTemplate() {
+      return defaultUserSiteTemplate;
+    }
+
+    public void setDefaultUserSiteTemplate(String defaultUserSiteTemplate) {
+      this.defaultUserSiteTemplate = defaultUserSiteTemplate;
     }
 
     /**
@@ -331,15 +352,14 @@ public class UserPortalConfigService implements Startable {
      * @throws Exception a nasty exception
      */
     public void createUserSite(String userName) throws Exception {
-        // Create the portal from the template
-        createUserPortalConfig(PortalConfig.USER_TYPE, userName, "user");
+        // Create the portal using default template
+        createUserPortalConfig(PortalConfig.USER_TYPE, userName, getDefaultUserSiteTemplate());
 
         // Need to insert the corresponding user site if needed
         PortalConfig cfg = storage_.getPortalConfig(PortalConfig.USER_TYPE, userName);
         if (cfg == null) {
-            cfg = new PortalConfig(PortalConfig.USER_TYPE);
-            cfg.setPortalLayout(new Container());
-            cfg.setName(userName);
+            cfg = new PortalConfig(PortalConfig.USER_TYPE, userName);
+            cfg.useDefaultPortalLayout();
             storage_.create(cfg);
         }
 
@@ -364,15 +384,14 @@ public class UserPortalConfigService implements Startable {
      * @throws Exception a nasty exception
      */
     public void createGroupSite(String groupId) throws Exception {
-        // Create the portal from the template
-        createUserPortalConfig(PortalConfig.GROUP_TYPE, groupId, "group");
+        // Create the portal using default template
+        createUserPortalConfig(PortalConfig.GROUP_TYPE, groupId, getDefaultGroupSiteTemplate());
 
         // Need to insert the corresponding group site
         PortalConfig cfg = storage_.getPortalConfig(PortalConfig.GROUP_TYPE, groupId);
         if (cfg == null) {
-            cfg = new PortalConfig(PortalConfig.GROUP_TYPE);
-            cfg.setPortalLayout(new Container());
-            cfg.setName(groupId);
+            cfg = new PortalConfig(PortalConfig.GROUP_TYPE, groupId);
+            cfg.useDefaultPortalLayout();
             storage_.create(cfg);
         }
     }
@@ -386,10 +405,16 @@ public class UserPortalConfigService implements Startable {
      * @throws Exception any exception
      */
     public void createUserPortalConfig(String siteType, String siteName, String template) throws Exception {
-        String templatePath = newPortalConfigListener_.getTemplateConfig(siteType, template);
+        NewPortalConfig portalConfig = null;
+        if (StringUtils.isBlank(template)) {
+          portalConfig = new NewPortalConfig();
+          portalConfig.setUseDefaultPortalLayout(true);
+        } else {
+          String templatePath = newPortalConfigListener_.getTemplateConfig(siteType, template);
+          portalConfig = new NewPortalConfig(templatePath);
+          portalConfig.setTemplateName(template);
+        }
 
-        NewPortalConfig portalConfig = new NewPortalConfig(templatePath);
-        portalConfig.setTemplateName(template);
         portalConfig.setOwnerType(siteType);
         newPortalConfigListener_.createPortalConfig(portalConfig, siteName);
         newPortalConfigListener_.createPage(portalConfig, siteName);
@@ -635,4 +660,5 @@ public class UserPortalConfigService implements Startable {
             }
         }
     }
+
 }
