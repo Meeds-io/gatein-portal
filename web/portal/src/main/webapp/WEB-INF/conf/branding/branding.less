@@ -1,10 +1,11 @@
 //put your custom CSS variables here (see variables.less for possible custom CSS variables)
 
-@primaryColor: #578dc9;
+@primaryColor: #3f8487;
 @primaryBackground: #f0f0f0;
 @secondaryColor: #000000;
-@secondaryBackground: #476a9c;
-@tertiaryColor: #385989;
+@secondaryBackground: #e25d5d;
+@tertiaryColor: @secondaryBackground;
+@greyColor: #999999;
 
 @primaryColorLight: lighten(@primaryColor, 10%);
 @primaryColorLighter: lighten(@primaryColor, 18.5%);
@@ -13,7 +14,9 @@
 @primaryDarkColor: darken(@primaryColor, 15%);
 @primaryDarkColorGradientEnd: darken(@primaryColor, 5%);
 @primaryDarkerColorGradientEnd: darken(@primaryColor, 15%);
-@switchOnColor: lighten(@primaryColor, 30%);
+
+@primaryHoverBackgroundColor: darken(desaturate(spin(@primaryColor, 3.7152), 13.9064), 11.9608);
+@btnPrimaryDisableBackground: lighten(desaturate(spin(@primaryColor, 0.0714), 0.6494), 22.7451);
 
 @allPagesPrimaryColor: ~"--allPagesPrimaryColor";
 @allPagesPrimaryColorLight: ~"--allPagesPrimaryColorLight";
@@ -24,27 +27,33 @@
 @allPagesPrimaryDarkColor: ~"--allPagesPrimaryDarkColor";
 @allPagesPrimaryDarkColorGradientEnd: ~"--allPagesPrimaryDarkColorGradientEnd";
 @allPagesPrimaryBackground: ~"--allPagesPrimaryBackground";
+@allPagesPrimaryDisableBackground: ~"--allPagesBtnPrimaryDisableBackground";
+@allPagesBtnPrimaryHoverBackgroundColor: ~"--allPagesBtnPrimaryHoverBackgroundColor";
 @allPagesSecondarySkinColor: ~"--allPagesSecondarySkinColor";
 @allPagesSecondaryBackground: ~"--allPagesSecondaryBackground";
 @allPagesSecondaryColor: ~"--allPagesSecondaryColor";
 @allPagesSecondaryColorDark: ~"--allPagesSecondaryColorDark";
 @allPagesTertiaryColor: ~"--allPagesTertiaryColor";
 @allPagesUiSwitchOnColor: ~"--allPagesUiSwitchOnColor";
+@allPageGreyColor: ~"--allPagesGreyColor";
 
 :root {
-  @{allPagesPrimaryColor}: @primaryColor;
-  @{allPagesPrimaryColorLight}: @primaryColorLight;
-  @{allPagesPrimaryColorLighter}: @primaryColorLighter;
-  @{allPagesPrimaryColorLighterGradientEnd}: @primaryColorLighterGradientEnd;
-  @{allPagesPrimaryDarkerColor}: @primaryDarkerColor;
-  @{allPagesPrimaryDarkerColorGradientEnd}: @primaryDarkerColorGradientEnd;
-  @{allPagesPrimaryDarkColor}: @primaryDarkColor;
-  @{allPagesPrimaryDarkColorGradientEnd}: @primaryDarkColorGradientEnd;
-  @{allPagesPrimaryBackground}: @primaryBackground;
-  @{allPagesSecondarySkinColor}: @secondaryBackground;
-  @{allPagesSecondaryBackground}: @secondaryBackground;
-  @{allPagesSecondaryColor}: @secondaryColor;
-  @{allPagesSecondaryColorDark}: darken(@secondaryColor, 15%);
-  @{allPagesTertiaryColor}: @tertiaryColor;
-  @{allPagesUiSwitchOnColor}: @switchOnColor;
+    @{allPagesPrimaryColor}: @primaryColor;
+    @{allPagesPrimaryColorLight}: @primaryColorLight;
+    @{allPagesPrimaryColorLighter}: @primaryColorLighter;
+    @{allPagesPrimaryColorLighterGradientEnd}: @primaryColorLighterGradientEnd;
+    @{allPagesPrimaryDarkerColor}: @primaryDarkerColor;
+    @{allPagesPrimaryDarkerColorGradientEnd}: @primaryDarkerColorGradientEnd;
+    @{allPagesPrimaryDarkColor}: @primaryDarkColor;
+    @{allPagesPrimaryDarkColorGradientEnd}: @primaryDarkColorGradientEnd;
+    @{allPagesBtnPrimaryHoverBackgroundColor}: @primaryHoverBackgroundColor;
+    @{allPagesPrimaryBackground}: @primaryBackground;
+    @{allPagesPrimaryDisableBackground}: @btnPrimaryDisableBackground;
+    @{allPagesSecondarySkinColor}: @secondaryBackground;
+    @{allPagesSecondaryBackground}: @secondaryBackground;
+    @{allPagesSecondaryColor}: @secondaryColor;
+    @{allPagesSecondaryColorDark}: darken(@secondaryColor, 15%);
+    @{allPagesTertiaryColor}: @tertiaryColor;
+    @{allPagesUiSwitchOnColor}: @primaryColor;
+    @{allPageGreyColor}: @greyColor ;
 }
