@@ -95,10 +95,13 @@ public class IDMMembershipListAccess implements ListAccess<Membership>, Serializ
 
         List<Role> roles = null;
 
+
         if (fullResults != null) {
             // If we already have fullResults (all pages) we can simply sublist them
             int toIndex = (index + length > fullResults.size()) ? fullResults.size() : index + length;
             roles = fullResults.subList(index, toIndex);
+            roles = filterEnabled(roles);
+
         } else {
           if (group != null) {
             if (isMembershipTypeNotUsed() && associatedUsers != null && !associatedUsers.isEmpty()) {
@@ -144,7 +147,8 @@ public class IDMMembershipListAccess implements ListAccess<Membership>, Serializ
               IdentitySearchCriteria crit = usePaginatedQuery ? new IdentitySearchCriteriaImpl().page(index, length)
                                                               : new IdentitySearchCriteriaImpl().page(0, rolesCount);
               crit.sort(SortOrder.ASCENDING);
-              roles = new LinkedList<Role>(getIDMService().getIdentitySession().getRoleManager().findRoles(group, null, crit));
+                roles = new LinkedList<Role>(getIDMService().getIdentitySession().getRoleManager().findRoles(group, null,crit));
+                roles = filterEnabled(roles);
             }
           } else if (user != null) {
             // Decide if use paginated query or skip pagination and obtain full
@@ -154,13 +158,15 @@ public class IDMMembershipListAccess implements ListAccess<Membership>, Serializ
             crit.sort(SortOrder.ASCENDING);
             roles = new LinkedList<Role>(getIDMService().getIdentitySession().getRoleManager().findRoles(user, null, crit));
           }
-    
+
+          //Filter enabled users
+            roles = filterEnabled(roles);
           // If pagination wasn't used, we have all roles and we can save them for
           // future
           if (!usePaginatedQuery) {
             fullResults = roles;
             int toIndex = (index + length > fullResults.size()) ? fullResults.size() : index + length;
-            roles = fullResults.subList(index, toIndex);
+              roles = fullResults.subList(index, toIndex);
           }
         }
 
@@ -196,6 +202,8 @@ public class IDMMembershipListAccess implements ListAccess<Membership>, Serializ
     }
 
     public int getSize() throws Exception {
+        List<Role> roles = null;
+        roles = new LinkedList<Role>(getIDMService().getIdentitySession().getRoleManager().findRoles(group, null));
         if (log.isTraceEnabled()) {
             Tools.logMethodIn(log, LogLevel.TRACE, "getSize", null);
         }
@@ -204,7 +212,8 @@ public class IDMMembershipListAccess implements ListAccess<Membership>, Serializ
 
         if (size < 0) {
             if (group != null && user == null) {
-                result = rolesCount = getIDMService().getIdentitySession().getRoleManager().getRolesCount(group, null, null);
+                roles = filterEnabled(roles);
+                result = rolesCount = roles.size();
                 if (isMembershipTypeNotUsed()) {
                   Collection<User> associatedUsersCollection = getIDMService().getIdentitySession()
                                                                     .getRelationshipManager()
@@ -241,6 +250,16 @@ public class IDMMembershipListAccess implements ListAccess<Membership>, Serializ
     private boolean isMembershipTypeNotUsed() {
       return StringUtils.isNotBlank(groupId) && StringUtils.isNotBlank(associationMembershipType)
           && getOrganizationService().getConfiguration().isIgnoreMappedMembershipTypeForGroup(groupId);
+    }
+
+    private List<Role>  filterEnabled(List<Role> roles) throws Exception {
+        List<Role> enabledUsersRoles = new ArrayList<>();
+        for(Role role:roles) {
+            if(getIDMService().getIdentitySession().getAttributesManager().getAttribute(role.getUser().getId(),"enabled")==null){
+                enabledUsersRoles.add(role);
+            }
+        }
+        return enabledUsersRoles;
     }
 
 }
