@@ -1,0 +1,17 @@
+<div class="VuetifyApp">
+  <div id="HamburgerNavigationMenu">
+    <a class="HamburgerNavigationMenuLink">
+      <div class="px-5 py-3 mt-2">
+        <i aria-hidden="true"
+          class="v-icon notranslate fa fa-bars theme--light"
+          style="font-size: 22px;"></i>
+      </div>
+    </a>
+    <script>
+      require(['SHARED/HamburgerMenu'], function(hamgergerMenu) {
+        hamgergerMenu.init();
+      });
+    </script>
+  </div>
+  <%uicomponent.renderChildren();%>
+</div>

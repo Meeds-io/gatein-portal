@@ -198,6 +198,7 @@
         <value>locale.navigation.group.platform.users</value>
         <value>locale.navigation.group.platform.guests</value>
         <value>locale.navigation.group.organization.management.executive-board</value>
+        <value>locale.portal.HamburgerMenu</value>
       </values-param>
       <values-param>
         <name>portal.resource.names</name>

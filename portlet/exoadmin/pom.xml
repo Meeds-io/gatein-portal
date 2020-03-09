@@ -32,10 +32,6 @@
   <name>GateIn Portal Portlet eXoAdmin</name>
 
   <properties>
-    <!-- Maven Plugin for JS and CSS bundling and Unit Test execution -->
-    <com.github.eirslett.frontend.version>1.6</com.github.eirslett.frontend.version>
-    <node.version>v10.4.1</node.version>
-    <npm.version>6.1.0</npm.version>
     <portlet.version>2.0</portlet.version>
   </properties>
 
