@@ -60,8 +60,8 @@
       <access-permissions>*:/platform/users</access-permissions>
       <factory-id>addonContainer</factory-id>
     </container>
-    <container id="AdminToolBarPortlet" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
-      <name>AdminToolBarPortlet</name>
+    <container id="DrawerAdminToolBarPortlet" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
+      <name>DrawerAdminToolBarPortlet</name>
       <access-permissions>*:/platform/administrators;editor:/platform/web-contributors</access-permissions>
       <factory-id>addonContainer</factory-id>
     </container>
