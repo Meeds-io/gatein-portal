@@ -66,7 +66,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   public static final String   LOGO_NAME                         = "logo.png";
 
-  public static final String   BRANDING_DEFAULT_LOGO_PATH        = "/logo/DefaultLogo.png";
+  public static final String   BRANDING_DEFAULT_LOGO_PATH        = "war:/../logo/DefaultLogo.png";
 
   public static final Context  BRANDING_CONTEXT                  = Context.GLOBAL.id("BRANDING");
 
@@ -93,6 +93,8 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   private String               lessThemeContent                  = null;
 
   private String               themeCSSContent                   = null;
+  
+  private Logo                 defaultLogo                       = null;
 
   public BrandingServiceImpl(ConfigurationManager configurationManager,
                              SettingService settingService,
@@ -258,27 +260,29 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   @Override
   public Logo getDefaultLogo() {
-    if (StringUtils.isNotBlank(defaultConfiguredLogoPath)) {
+    String logoPath = defaultConfiguredLogoPath;
+    if (StringUtils.isBlank(logoPath)) {
+      logoPath = BRANDING_DEFAULT_LOGO_PATH;
+    } else {
       try {
-        File file = new File(defaultConfiguredLogoPath);
-
+        File file = new File(logoPath);
         if (file.exists()) {
-          return new Logo(null, Files.readAllBytes(file.toPath()), file.length(), file.lastModified());
+          this.defaultLogo = new Logo(null, Files.readAllBytes(file.toPath()), file.length(), file.lastModified());
         }
       } catch (IOException e) {
-        LOG.warn("The file of the default configured logo cannot be retrieved (" + defaultConfiguredLogoPath + ")", e);
-        return null;
+        LOG.warn("The file of the default configured logo cannot be retrieved (" + logoPath + ")", e);
       }
     }
 
-    try {
-      byte[] bytes = IOUtils.toByteArray(this.getClass().getResourceAsStream(BRANDING_DEFAULT_LOGO_PATH));
-      return new Logo(null, bytes, bytes.length, 0);
-    } catch (IOException e) {
-      LOG.warn("The file of the default platform logo cannot be retrieved", e);
+    if (this.defaultLogo == null) {
+      try {
+        byte[] bytes = IOUtils.toByteArray(this.configurationManager.getInputStream(logoPath));
+        this.defaultLogo = new Logo(null, bytes, bytes.length, 0);
+      } catch (Exception e) {
+        LOG.warn("The file of the default platform logo cannot be retrieved", e);
+      }
     }
-
-    return null;
+    return this.defaultLogo;
   }
 
   @Override
@@ -345,6 +349,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
                                   inputStream);
           fileService.updateFile(fileItem);
         }
+        this.defaultLogo = null;
       } catch (Exception e) {
         throw new IllegalStateException("Error while updating logo", e);
       }

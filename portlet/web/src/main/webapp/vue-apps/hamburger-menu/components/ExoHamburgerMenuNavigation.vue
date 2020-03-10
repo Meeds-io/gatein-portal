@@ -4,10 +4,11 @@
     class="HamburgerNavigationMenu"
     flat>
     <a class="HamburgerNavigationMenuLink">
-      <div class="px-5 py-3 mt-2" @click="openOrHideMenu()">
-        <v-icon size="22">fa-bars</v-icon>
+      <div class="px-5 py-3" @click="openOrHideMenu()">
+        <v-icon size="24">fa-bars</v-icon>
       </div>
     </a>
+    <v-divider vertical />
     <v-navigation-drawer
       id="HamburgerMenuNavigation"
       v-model="hamburgerMenu"
@@ -18,7 +19,8 @@
       left
       temporary
       max-width="100vw"
-      max-height="100vh">
+      max-height="100vh"
+      height="100vh">
       <v-row class="HamburgerMenuLevelsParent fill-height" no-gutters @mouseleave="hideSecondLevel()">
         <div class="HamburgerMenuFirstLevelParent border-box-sizing">
           <v-flex v-for="contentDetail in contents" :key="contentDetail.id">
@@ -81,7 +83,7 @@ export default {
       if (extensions.length < eXo.portal.hamburgerMenuItems) {
         return;
       }
-      extensions.sort((a, b) => (a.priority - b.priority));
+      extensions.sort((a, b) => a.priority - b.priority);
       this.contents = extensions;
       const contentsToLoad = this.contents.filter(contentDetail => !contentDetail.loaded);
       this.initializing = contentsToLoad.length;
