@@ -137,7 +137,8 @@
     });
     // Portal Response Script
     div.children("div.PortalResponseScript").each(function() {
-      portalResp.script = this.innerHTML;
+      // Unescape \" in scripts to make sure JSON snippets are correctly formatted
+      portalResp.script = this.innerHTML.replace(/"\\&quot;/g, '\\"').replace(/\\&quot;"/g, '\\"');
       $(this).css("display", "none");
     });
   }
@@ -409,7 +410,10 @@
       if (script == null || script == "")
         return;
       try {
-        eval(script);
+        // Set script in textarea to decode HTML entities without removing HTML tags
+        let textarea = document.createElement("textarea");
+        textarea.innerHTML = script;
+        eval(textarea.value);
         return;
       } catch (err) {
         console.error(err.message);
