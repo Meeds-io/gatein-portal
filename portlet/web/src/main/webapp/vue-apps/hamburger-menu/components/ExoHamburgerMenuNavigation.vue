@@ -19,15 +19,15 @@
       temporary
       max-width="100vw"
       max-height="100vh">
-      <v-row class="fill-height" no-gutters @mouseleave="hideSecondLevel()">
-        <v-flex style="min-height:100%;max-width:310px;min-width:310px;">
-          <div v-for="contentDetail in contents" :key="contentDetail.id">
+      <v-row class="HamburgerMenuLevelsParent fill-height" no-gutters @mouseleave="hideSecondLevel()">
+        <div class="HamburgerMenuFirstLevelParent border-box-sizing">
+          <v-flex v-for="contentDetail in contents" :key="contentDetail.id">
             <div :id="contentDetail.id"></div>
-          </div>
-        </v-flex>
-        <v-flex v-show="secondLevel">
+          </v-flex>
+        </div>
+        <div v-show="secondLevel" :class="secondLevel && 'open'" class="HamburgerMenuSecondLevelParent border-box-sizing">
           <div id="HamburgerMenuSecondLevel"></div>
-        </v-flex>
+        </div>
       </v-row>
     </v-navigation-drawer>
   </v-app>
@@ -78,7 +78,10 @@ export default {
   methods: {
     refreshMenu() {
       const extensions = extensionRegistry.loadExtensions('exo-hamburger-menu-navigation', 'exo-hamburger-menu-navigation-items');
-      extensions.sort((a, b) => a - b);
+      if (extensions.length < eXo.portal.hamburgerMenuItems) {
+        return;
+      }
+      extensions.sort((a, b) => (a.priority - b.priority));
       this.contents = extensions;
       const contentsToLoad = this.contents.filter(contentDetail => !contentDetail.loaded);
       this.initializing = contentsToLoad.length;
@@ -115,7 +118,7 @@ export default {
       }
       this.secondLevel = true;
       if (contentDetail.vueComponentInstance.mountSecondLevel) {
-        contentDetail.vueComponentInstance.mountSecondLevel('#HamburgerMenuSecondLevel');
+        contentDetail.vueComponentInstance.mountSecondLevel('.HamburgerMenuSecondLevelParent > div');
       }
     },
     hideSecondLevel() {

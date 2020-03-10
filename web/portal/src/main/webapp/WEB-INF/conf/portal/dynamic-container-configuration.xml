@@ -61,7 +61,7 @@
           <value>hamburger-menu-items-container</value>
         </value-param>
         <object-param>
-          <name>SiteHamburgerMenu</name>
+          <name>AdministrationHamburgerMenu</name>
           <description></description>
           <object type="org.exoplatform.commons.addons.PortletModel">
             <field name="contentId">
@@ -105,7 +105,7 @@
           <value>hamburger-menu-items-container</value>
         </value-param>
         <object-param>
-          <name>SiteHamburgerMenu</name>
+          <name>UserHamburgerMenu</name>
           <description></description>
           <object type="org.exoplatform.commons.addons.PortletModel">
             <field name="contentId">

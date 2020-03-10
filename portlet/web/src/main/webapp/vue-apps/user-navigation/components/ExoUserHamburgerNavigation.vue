@@ -7,13 +7,13 @@
     class="white">
     <v-row class="mx-0 settingsTitle">
       <v-list-item class="settingsTitleWrapper" @click="navigateTo('settings')">
-        <v-list-item-icon class="my-2 mr-6"><i class="uiIcon settingsIcon"></i></v-list-item-icon>
+        <v-list-item-icon class="my-2 mr-6"><i class="uiIcon uiIconToolbarNavItem settingsIcon"></i></v-list-item-icon>
         <v-list-item-content class="subtitle-2 settingsTitleLabel">{{ this.$t('menu.settings.title') }}</v-list-item-content>
       </v-list-item>
     </v-row>
     <v-row class="mx-0 logoutLinks">
       <v-list-item @click="logOut()">
-        <v-list-item-icon class="my-2 mr-6"><i class="uiIcon logoutIcon"></i></v-list-item-icon>
+        <v-list-item-icon class="my-2 mr-6"><i class="uiIcon uiIconToolbarNavItem logoutIcon"></i></v-list-item-icon>
         <v-list-item-content class="subtitle-2 settingsTitleLabel">{{ this.$t('menu.logout.label') }}</v-list-item-content>
       </v-list-item>
     </v-row>

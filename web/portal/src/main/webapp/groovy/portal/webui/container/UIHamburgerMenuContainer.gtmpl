@@ -1,3 +1,9 @@
+<%
+  import org.exoplatform.commons.addons.AddOnService;
+
+  AddOnService addOnService = uicomponent.getApplicationComponent(AddOnService.class);
+  def hamburgerMenuItemsCount = addOnService.getApplications('hamburger-menu-items-container').size();
+%>
 <div class="VuetifyApp">
   <div id="HamburgerNavigationMenu">
     <a class="HamburgerNavigationMenuLink">
@@ -8,6 +14,7 @@
       </div>
     </a>
     <script>
+      eXo.portal.hamburgerMenuItems = <%=hamburgerMenuItemsCount%>;
       require(['SHARED/HamburgerMenu'], function(hamgergerMenu) {
         hamgergerMenu.init();
       });

@@ -16,7 +16,7 @@
             v-for="(item, i) in items"
             :key="i">
             <v-list-item-icon class="mr-6 my-2">
-              <i :class="`uiIcon icon${item.text}`"></i>
+              <i :class="`uiIcon uiIconToolbarNavItem icon${item.text}`"></i>
             </v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title
@@ -33,9 +33,6 @@
 <script>
 export default {
   data: () => ({
-    fullName: '',
-    avatar: '',
-    position: '',
     item: 0,
     items: [
       { text: 'Snapshot', url: '' },
@@ -45,7 +42,6 @@ export default {
     ],
   }),
   created(){
-    this.avatar=`/portal/rest/v1/social/users/${eXo.env.portal.userName}/avatar`;
     const pageName = window.location.pathname.split(`${eXo.env.portal.context}/${eXo.env.portal.portalName}/`)[1];
     const index = this.items.findIndex(obj => obj.url === pageName);
     this.item = index;
