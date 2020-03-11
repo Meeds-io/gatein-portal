@@ -3,7 +3,7 @@
     id="AdministrationHamburgerNavigation"
     px-0
     py-0
-    class="white">
+    class="white d-none d-sm-block">
     <v-row class="mx-0 administrationTitle">
       <v-list-item @mouseover="openDrawer()" @click="openDrawer()">
         <v-list-item-icon class="mb-2 mt-3 mr-6 titleIcon"><i class="uiIcon uiIconToolbarNavItem uiAdministrationIcon"></i></v-list-item-icon>
@@ -136,6 +136,11 @@ export default {
         }
       ],
     };
+  },
+  mounted() {
+    if (!$('#AdministrationHamburgerNavigation').is(':visible')) {
+      this.$destroy();
+    }
   },
   methods: {
     mountSecondLevel(parentId) {

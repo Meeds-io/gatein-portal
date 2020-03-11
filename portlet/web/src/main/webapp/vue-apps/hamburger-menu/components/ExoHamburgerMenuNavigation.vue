@@ -14,7 +14,7 @@
       v-model="hamburgerMenu"
       :hide-overlay="initializing"
       :style="hamburgerMenuStyle"
-      :width="secondLevel ? 620 : 310"
+      :width="drawerWidth"
       absolute
       left
       temporary
@@ -22,7 +22,7 @@
       max-height="100vh"
       height="100vh">
       <v-row class="HamburgerMenuLevelsParent fill-height" no-gutters @mouseleave="hideSecondLevel()">
-        <div class="HamburgerMenuFirstLevelParent border-box-sizing">
+        <div :class="secondLevel && 'd-none d-sm-block'" class="HamburgerMenuFirstLevelParent border-box-sizing">
           <v-flex v-for="contentDetail in contents" :key="contentDetail.id">
             <div :id="contentDetail.id"></div>
           </v-flex>
@@ -30,6 +30,7 @@
         <div v-show="secondLevel" :class="secondLevel && 'open'" class="HamburgerMenuSecondLevelParent border-box-sizing">
           <div id="HamburgerMenuSecondLevel"></div>
         </div>
+        <span id="HamburgerMenuVisibility" class="d-none d-sm-block" />
       </v-row>
     </v-navigation-drawer>
   </v-app>
@@ -45,6 +46,8 @@ export default {
       contents: [],
       vueChildInstances: {},
       idleTime: 20,
+      isMobile: false,
+      idleTimeToDisplaySecondLevel: 20,
       vuetify: new Vuetify({
         dark: true,
         iconfont: 'mdi',
@@ -52,6 +55,9 @@ export default {
     };
   },
   computed: {
+    drawerWidth() {
+      return this.isMobile || !this.secondLevel ? '310' : '620';
+    },
     hamburgerMenuStyle() {
       return this.initializing ? 'left: -5000px;' : '';
     },
@@ -78,6 +84,12 @@ export default {
       }
     });
     this.refreshMenu();
+  },
+  mounted() {
+    this.isMobile = !$('#HamburgerMenuVisibility').is(':visible');
+    $(window).resize(() => {
+      this.isMobile = !$('#HamburgerMenuVisibility').is(':visible');
+    });
   },
   methods: {
     refreshMenu() {
@@ -106,7 +118,12 @@ export default {
                     el: `#${contentDetail.id}`,
                   });
                   this.vueChildInstances[contentDetail.id].$on('open-second-level', () => {
-                    this.openSecondLevel(contentDetail);
+                    window.setTimeout(() => {
+                      this.openSecondLevel(contentDetail);
+                    }, this.idleTimeToDisplaySecondLevel);
+                  });
+                  this.vueChildInstances[contentDetail.id].$on('close-second-level', () => {
+                    this.hideSecondLevel();
                   });
                 }
               }
