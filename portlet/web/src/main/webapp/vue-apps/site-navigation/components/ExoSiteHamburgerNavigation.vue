@@ -39,8 +39,7 @@
 
 export default {
   data: () => ({
-    BASE_SITE_URI: eXo.env.server.portalBaseURL.replace(new RegExp(`${eXo.env.portal.selectedNodeUri.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`,'g'), ''),
-    currentNavigationNode: 0,
+    BASE_SITE_URI: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/`,
     navigationScope: 'children',
     navigationVisibilities: ['displayed'],
     navigations: [],
