@@ -5,8 +5,7 @@ import java.util.*;
 import javax.servlet.http.*;
 
 import org.apache.commons.lang3.LocaleUtils;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.container.*;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
@@ -14,6 +13,8 @@ import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.portal.Constants;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.resources.*;
@@ -29,8 +30,39 @@ public class LocaleContextInfoUtils {
   
   private static final String LOCALE_SESSION_ATTR = "org.gatein.LOCALE";
   
-  private static final Logger LOG = LoggerFactory.getLogger(LocaleContextInfoUtils.class);
-  
+  private static final Log LOG = ExoLogger.getLogger(LocaleContextInfoUtils.class);
+
+  /**
+   * Computes locale of currently authenticated user based on multiple
+   * conditions switch implemented {@link LocalePolicy}: - User Profile Locale
+   * (coming from User preferences) - Session Locale - Browser Locale - Cookie
+   * Locale
+   * 
+   * @param request {@link HttpServletRequestWrapper}
+   * @return {@link Locale} retrieved using {@link LocalePolicy}, else return
+   *         default configured locale in {@link LocaleConfigService}
+   */
+  public static Locale computeLocale(HttpServletRequest request) {
+    LocalePolicy localePolicy = ExoContainerContext.getService(LocalePolicy.class);
+    LocaleContextInfo localeCtx = buildLocaleContextInfo(request);
+    Set<Locale> supportedLocales = getSupportedLocales();
+    Locale locale = localePolicy.determineLocale(localeCtx);
+    boolean supported = supportedLocales.contains(locale);
+    if (!supported && StringUtils.isNotBlank(locale.getCountry())) {
+      locale = new Locale(locale.getLanguage());
+      supported = supportedLocales.contains(locale);
+    }
+    if (!supported) {
+      LocaleConfigService localeConfigService = ExoContainerContext.getService(LocaleConfigService.class);
+      Locale defaultLocale = localeConfigService.getDefaultLocaleConfig().getLocale();
+      LOG.warn("Unsupported locale returned by LocalePolicy: {}. Falling back to default configured local '{}'.",
+               locale,
+               defaultLocale);
+      locale = defaultLocale;
+    }
+    return locale;
+  }
+
   /**
    *  Helper method for setters invocation on {@link LocaleContextInfo} object
    * @param request

@@ -11,18 +11,23 @@
         dense 
         min-width="90%"
         class="pb-0">
-        <v-list-item-group v-model="item">
+        <v-list-item-group v-model="selectedNavigationIndex">
           <v-list-item
-            v-for="(item, i) in items"
-            :key="i">
+            v-for="nav in navigations"
+            :key="nav.uri"
+            :input-value="nav.selected"
+            :active="nav.selected"
+            :selected="nav.selected"
+            :href="`${BASE_SITE_URI}${nav.uri}`"
+            link >
             <v-list-item-icon class="mr-6 my-2">
-              <i :class="`uiIcon uiIconToolbarNavItem icon${item.text}`"></i>
+              <i :class="nav.iconClass"></i>
             </v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title
                 class="subtitle-2"
-                @click="navigateTo(item.url)"
-                v-text="item.text"/>
+                v-text="nav.label" >
+              </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list-item-group>
@@ -31,27 +36,36 @@
   </v-container>
 </template>
 <script>
+
 export default {
   data: () => ({
-    item: 0,
-    items: [
-      { text: 'Snapshot', url: '' },
-      { text: 'Stream', url: 'stream' },
-      { text: 'Spaces', url: 'spaces' },
-      { text: 'People', url: 'connexions' },
-    ],
+    BASE_SITE_URI: eXo.env.server.portalBaseURL.replace(new RegExp(`${eXo.env.portal.selectedNodeUri.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`,'g'), ''),
+    currentNavigationNode: 0,
+    navigationScope: 'children',
+    navigationVisibilities: ['displayed'],
+    navigations: [],
   }),
-  created(){
-    const pageName = window.location.pathname.split(`${eXo.env.portal.context}/${eXo.env.portal.portalName}/`)[1];
-    const index = this.items.findIndex(obj => obj.url === pageName);
-    this.item = index;
+  computed:{
+    visibilityQueryParams() {
+      return this.navigationVisibilities.map(visibilityName => `visibility=${visibilityName}`).join('&');
+    },
+    selectedNavigationIndex() {
+      return this.navigations.findIndex(nav => nav.uri === eXo.env.portal.selectedNodeUri);
+    },
   },
-    
-  methods: {
-    navigateTo(pagelink) {
-      location.href=`${eXo.env.portal.context}/${eXo.env.portal.portalName}/${pagelink}`;
-    }
-  }
+  watch: {
+    navigations() {
+      this.navigations.forEach(nav => {
+        const capitilizedName = `${nav.name[0].toUpperCase()}${nav.name.slice(1)}`;
+        nav.iconClass = `uiIcon uiIconFile uiIconToolbarNavItem uiIcon${capitilizedName} icon${capitilizedName} ${nav.icon}`;
+      });
+    },
+  },
+  created(){
+    fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/navigations/portal/${eXo.env.portal.portalName}?scope=${this.navigationScope}&${this.visibilityQueryParams}`)
+      .then(resp => resp && resp.ok && resp.json())
+      .then(data => this.navigations = data);
+  },
 };
 </script>
 
