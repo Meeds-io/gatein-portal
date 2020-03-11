@@ -41,7 +41,9 @@ export default {
       initializing: false,
       hamburgerMenu: false,
       secondLevel: false,
+      openedSecondLevel: null,
       contents: [],
+      vueChildInstances: {},
       idleTime: 20,
       vuetify: new Vuetify({
         dark: true,
@@ -93,18 +95,20 @@ export default {
           window.setTimeout(() => {
             try {
               if ($(`#${contentDetail.id}`).length) {
-                const VueHamburgerMenuItem = Vue.extend(contentDetail.vueComponent);
-                contentDetail.vueComponentInstance = new VueHamburgerMenuItem({
-                  i18n: new VueI18n({
-                    locale: this.$i18n.locale,
-                    messages: this.$i18n.messages,
-                  }),
-                  vuetify,
-                  el: `#${contentDetail.id}`,
-                });
-                contentDetail.vueComponentInstance.$on('open-second-level', () => {
-                  this.openSecondLevel(contentDetail);
-                });
+                if (!this.vueChildInstances[contentDetail.id]) {
+                  const VueHamburgerMenuItem = Vue.extend(contentDetail.vueComponent);
+                  this.vueChildInstances[contentDetail.id] = new VueHamburgerMenuItem({
+                    i18n: new VueI18n({
+                      locale: this.$i18n.locale,
+                      messages: this.$i18n.messages,
+                    }),
+                    vuetify,
+                    el: `#${contentDetail.id}`,
+                  });
+                  this.vueChildInstances[contentDetail.id].$on('open-second-level', () => {
+                    this.openSecondLevel(contentDetail);
+                  });
+                }
               }
             } finally {
               contentDetail.loaded = true;
@@ -115,12 +119,14 @@ export default {
       });
     },
     openSecondLevel(contentDetail) {
-      if (!contentDetail.secondLevel || !contentDetail.vueComponentInstance) {
+      if (!contentDetail.secondLevel || !this.vueChildInstances[contentDetail.id]) {
         return;
       }
       this.secondLevel = true;
-      if (contentDetail.vueComponentInstance.mountSecondLevel) {
-        contentDetail.vueComponentInstance.mountSecondLevel('.HamburgerMenuSecondLevelParent > div');
+
+      if (this.openedSecondLevel !== contentDetail.id && this.vueChildInstances[contentDetail.id].mountSecondLevel) {
+        this.openedSecondLevel = contentDetail.id;
+        this.vueChildInstances[contentDetail.id].mountSecondLevel('.HamburgerMenuSecondLevelParent > div');
       }
     },
     hideSecondLevel() {
