@@ -18,156 +18,115 @@
   </v-container>
 </template>
 <script>
+
 export default {
   data() {
     return {
-      drawer: null,
       vuetify: new Vuetify({
         dark: true,
         iconfont: 'mdi',
       }),
-      usersItems: [
-        {
-          name: 'Add users',
-          path: 'administrators/administration/newStaff'
-        },
-        {
-          name: 'Users & Roles',
-          path:'administrators/administration/management'
-        }
-      ],
-      contentItems: [
-        {
-          name: 'Explorer',
-          path: 'web-contributors/siteExplorer'
-        },
-        {
-          name: 'Repository Admin',
-          path: 'web-contributors/wcmAdmin'
-        }
-      ],
-      gamificationItems: [
-        {
-          name: 'Connector',
-          children: [
-            {
-              name: 'Github',
-              path: '#'
-            }
-          ]
-        },
-        {
-          name: 'Rules',
-          path: 'administrators/gamification/rules'
-        },
-        {
-          name: 'Badges',
-          path: 'administrators/gamification/badges'
-        },
-        {
-          name: 'Domains',
-          path: 'administrators/gamification/domains'
-        },
-      ],
-      rewardsItems: [
-        {
-          name: 'Kudos',
-          path: 'administrators/rewardAdministration/kudosAdministration'
-        },
-        {
-          name: 'Wallet',
-          path: 'rewarding/rewardAdministration/walletAdministration'
-        },
-        {
-          name: 'Rewards',
-          path: 'rewarding/rewardAdministration'
-        }
-      ],
-      searchItems: [
-        {
-          name: 'Indexing',
-          path: 'administrators/searchIndexing'
-        },
-        {
-          name: 'Connectors',
-          path: '#'
-        }
-      ],
-      portalItems: [
-        {
-          name: 'Sites',
-          path: 'administrators/portalnavigation'
-        },
-        {
-          name: 'Pages',
-          path: 'administrators/administration/pageManagement'
-        },
-        {
-          name: 'Branding',
-          path: 'administrators/branding'
-        },
-        {
-          name: 'Layout composer categories',
-          path: 'administrators/administration/registry'
-        }
-      ],
-      spacesItems: [
-        {
-          name: 'Manage Spaces',
-          path: 'users/spacesAdministration'
-        },
-        {
-          name: 'Manage Templates',
-          path: 'administrators/spacesTemplates'
-        }
-      ],
-      othersItems: [
-        {
-          name: 'Applications',
-          path: 'administrators/appCenterAdminSetup'
-        },
-        {
-          name: 'Notifications',
-          path: 'administrators/notification'
-        },
-        {
-          name: 'Web Conferencing',
-          path: 'administrators/webconferencing'
-        }
-      ],
+      navigationScope: 'ALL',
+      navigationVisibilities: ['displayed'],
+      navigations: [],
+      embeddedTree: {
+        // users
+        'administration/newStaff': 'users',
+        'administration/management': 'users',
+        // content
+        'siteExplorer': 'content',
+        'wcmAdmin': 'content',
+        // gamification
+        'hook_management': 'gamification',
+        'gamification/rules': 'gamification',
+        'gamification/badges': 'gamification',
+        'gamification/domains': 'gamification',
+        // rewards
+        'rewardAdministration/kudosAdministration': 'reward',
+        'rewardAdministration/walletAdministration': 'reward',
+        'rewardAdministration/rewardAdministration': 'reward',
+        // search
+        'searchIndexing': 'search',
+        'search': 'search',
+        // portal
+        'portalnavigation': 'portal',
+        'groupnavigation': 'portal',
+        'administration/pageManagement': 'portal',
+        'branding': 'portal',
+        'administration/registry': 'portal',
+        // spaces
+        'spacesAdministration': 'spaces',
+        'spacesTemplates': 'spaces',
+        // other
+        'appCenterAdminSetup': 'other',
+        'notification': 'other',
+        'webconferencing': 'other',
+      },
     };
   },
-  mounted() {
-    if (!$('#AdministrationHamburgerNavigation').is(':visible')) {
-      this.$destroy();
-    }
+  computed:{
+    navigationTree() {
+      const navigationTree = [];
+      const navigationParentObjects = {};
+
+      let navigationsList = this.navigations.slice();
+      navigationsList = this.filterDisplayedNavigations(navigationsList);
+      this.computeLink(navigationsList);
+
+      Object.keys(this.embeddedTree).forEach(embeddedTreeUri => {
+        let nav = this.findNodeByUri(embeddedTreeUri, navigationsList);
+        if (nav) {
+          nav.displayed = true;
+          const key = this.embeddedTree[embeddedTreeUri];
+          nav = Object.assign({}, nav);
+          nav.children = nav.children && nav.children.slice();
+
+          if (navigationParentObjects[key]) {
+            navigationParentObjects[key].children.push(nav);
+          } else {
+            navigationParentObjects[key] = {
+              key: key,
+              label: this.$t(`menu.administration.navigation.${key}`),
+              children: [nav],
+            };
+            navigationTree.push(navigationParentObjects[key]);
+          }
+        }
+      });
+
+      navigationsList = this.filterDisplayedNavigations(navigationsList, true);
+      const key = 'other';
+
+      navigationsList.forEach(nav => {
+        if (navigationParentObjects[key]) {
+          navigationParentObjects[key].children.push(nav);
+        } else {
+          navigationParentObjects[key] = {
+            key: key,
+            label: this.$t(`menu.administration.navigation.${key}`),
+            children: [nav],
+          };
+          navigationTree.push(navigationParentObjects[key]);
+        }
+      });
+      return navigationTree;
+    },
+  },
+  created() {
+    fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/navigations/group?exclude=/spaces.*&${this.visibilityQueryParams}`)
+      .then(resp => resp && resp.ok && resp.json())
+      .then(data => this.navigations = data);
   },
   methods: {
     mountSecondLevel(parentId) {
       const VueHamburgerMenuItem = Vue.extend({
         data: () => {
           return {
-            usersItems: this.usersItems,
-            contentItems: this.contentItems,
-            gamificationItems: this.gamificationItems,
-            rewardsItems: this.rewardsItems,
-            searchItems: this.searchItems,
-            portalItems: this.portalItems,
-            spacesItems: this.spacesItems,
-            othersItems: this.othersItems,
+            navigations: this.navigationTree,
           };
         },
         template: `
-          <div>
-            <exo-administration-menu-item :administration-item="usersItems" item-title="Users"/>
-            <exo-administration-menu-item :administration-item="contentItems" item-title="Content"/>
-            <exo-administration-menu-item :administration-item="gamificationItems" item-title="Gamification"/>
-            <exo-administration-menu-item :administration-item="rewardsItems" item-title="Reward"/>
-            <exo-administration-menu-item :administration-item="searchItems" item-title="Search"/>
-            <exo-administration-menu-item :administration-item="portalItems" item-title="Portal"/>
-            <exo-administration-menu-item :administration-item="spacesItems" item-title="Spaces"/>
-            <exo-administration-menu-item :administration-item="othersItems" item-title="Other"/>
-          </div>
+          <exo-administration-navigations :navigations="navigations" />
         `,
       });
       const vuetify = this.vuetify;
@@ -181,7 +140,38 @@ export default {
     },
     openDrawer() {
       this.$emit('open-second-level');
-    }
+    },
+    filterDisplayedNavigations(navigations, excludeHidden) {
+      return navigations.filter(nav => {
+        if (nav.children) {
+          nav.children = this.filterDisplayedNavigations(nav.children);
+        }
+        // eslint-disable-next-line no-extra-parens
+        return !nav.displayed && (!excludeHidden || nav.visibility !== 'HIDDEN') && (nav.pageKey || (nav.children && nav.children.length));
+      });
+    },
+    computeLink(navigations) {
+      navigations.forEach(nav => {
+        if (nav.children) {
+          this.computeLink(nav.children);
+        }
+        const uriPart = nav.siteKey.name.replace(/\//g, ':');
+        nav.link = `${eXo.env.portal.context}/g/${uriPart}/${nav.uri}`;
+      });
+    },
+    findNodeByUri(uri, navigations) {
+      for (const index in navigations) {
+        const nav = navigations[index];
+        if (nav.uri === uri) {
+          return nav;
+        } else if (nav.children) {
+          const result = this.findNodeByUri(uri, nav.children);
+          if (result) {
+            return result;
+          }
+        }
+      }
+    },
   }
 };
 </script>

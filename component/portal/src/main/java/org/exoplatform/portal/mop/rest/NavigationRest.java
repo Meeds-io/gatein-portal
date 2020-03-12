@@ -14,6 +14,7 @@ import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.mop.*;
 import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.user.*;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -39,11 +40,33 @@ public class NavigationRest implements ResourceContainer {
     this.portalConfigService = portalConfigService;
   }
 
+  @Path("/{siteType}")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Gets a specific setting value", httpMethod = "GET", response = Response.class, notes = "This returns the requested site navigations")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 404, message = "Setting does not exist"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response getSiteTypeNavigations(@Context HttpServletRequest request,
+                                         @ApiParam(value = "Portal site type, possible values: PORTAL, GROUP or USER", required = true) @PathParam("siteType") String siteTypeName,
+                                         @ApiParam(value = "Site names regex to exclude from results", required = false) @QueryParam("exclude") String excludedSiteName,
+                                         @ApiParam(value = "Scope of navigations tree to retrieve, possible values: ALL, CHILDREN, GRANDCHILDREN, SINGLE", defaultValue = "ALL", required = false) @QueryParam("scope") String scopeName,
+                                         @ApiParam(value = "Multivalued visibilities of navigation nodes to retrieve, possible values: DISPLAYED, HIDDEN, SYSTEM or TEMPORAL. If empty, all visibilities will be used.", defaultValue = "All possible values combined", required = false) @QueryParam("visibility") List<String> visibilityNames) {
+    if (StringUtils.isBlank(siteTypeName)) {
+      return Response.status(400).build();
+    }
+
+    return getNavigations(request, siteTypeName, null, excludedSiteName, scopeName, visibilityNames);
+  }
+
   @Path("/{siteType}/{siteName}")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Gets a specific setting value", httpMethod = "GET", response = Response.class, notes = "This returns the requested site navigation")
+  @ApiOperation(value = "Gets a specific setting value", httpMethod = "GET", response = Response.class, notes = "This returns the requested site navigations")
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Request fulfilled"),
       @ApiResponse(code = 400, message = "Invalid query input"),
@@ -58,6 +81,15 @@ public class NavigationRest implements ResourceContainer {
       return Response.status(400).build();
     }
 
+    return getNavigations(request, siteTypeName, siteName, null, scopeName, visibilityNames);
+  }
+
+  private Response getNavigations(HttpServletRequest request,
+                                  String siteTypeName,
+                                  String siteName,
+                                  String excludedSiteName,
+                                  String scopeName,
+                                  List<String> visibilityNames) {
     ConversationState state = ConversationState.getCurrent();
     Identity userIdentity = state == null ? null : state.getIdentity();
     String username = userIdentity == null ? null : userIdentity.getUserId();
@@ -94,7 +126,7 @@ public class NavigationRest implements ResourceContainer {
     }
 
     String portalName = siteName;
-    if (siteType != SiteType.PORTAL) {
+    if (siteType != SiteType.PORTAL || StringUtils.isBlank(siteName)) {
       portalName = portalConfigService.getDefaultPortal();
     }
 
@@ -109,8 +141,8 @@ public class NavigationRest implements ResourceContainer {
 
       UserPortal userPortal = userPortalConfig.getUserPortal();
       Collection<UserNode> nodes = null;
-      if (siteType == SiteType.PORTAL) {
-        nodes = userPortal.getNodes(siteType, scope, userFilterConfig);
+      if (siteType == SiteType.PORTAL || StringUtils.isBlank(siteName)) {
+        nodes = userPortal.getNodes(siteType, excludedSiteName, scope, userFilterConfig);
       } else {
         UserNavigation navigation = userPortal.getNavigation(new SiteKey(siteType, siteName));
         if (navigation == null) {
@@ -125,7 +157,6 @@ public class NavigationRest implements ResourceContainer {
       LOG.error("Error retrieving ");
       return Response.status(500).build();
     }
-
   }
 
   private List<ResultUserNode> convertNodes(Collection<UserNode> nodes) {
@@ -191,9 +222,9 @@ public class NavigationRest implements ResourceContainer {
    * {@link UserNode#getParent()} attributes using {@link JsonParserImpl}
    */
   public static final class ResultUserNode {
-    private UserNode     userNode;
+    private UserNode             userNode;
 
-    List<ResultUserNode> subNodes;
+    private List<ResultUserNode> subNodes;
 
     public ResultUserNode(UserNode userNode) {
       this.userNode = userNode;
@@ -243,5 +274,12 @@ public class NavigationRest implements ResourceContainer {
       return userNode.getEndPublicationTime();
     }
 
+    public SiteKey getSiteKey() {
+      return userNode.getNavigation().getKey();
+    }
+
+    public PageKey getPageKey() {
+      return userNode.getPageRef();
+    }
   }
 }

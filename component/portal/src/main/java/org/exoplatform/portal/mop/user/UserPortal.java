@@ -95,6 +95,18 @@ public interface UserPortal {
     Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig filterConfig);
 
     /**
+     * Load the list of user nodes computed from the list of
+     * {@link UserNavigation} of type siteType (PORTAL, GROUP or USER)
+     * 
+     * @param siteType site type: PORTAL, GROUP or USER
+     * @param excludedSiteName site name regex to exclude
+     * @param scope an optional scope
+     * @param filterConfig an optional filter
+     * @return a {@link Collection} of {@link UserNode}
+     */
+    Collection<UserNode> getNodes(SiteType siteType, String excludedSiteName, Scope scope, UserNodeFilterConfig filterConfig);
+
+    /**
      * Update the specified content with the most recent state.
      *
      * @param node the node to update

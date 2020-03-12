@@ -1,18 +1,24 @@
 <template>
   <v-list
+    v-if="menuItem && menuItem.label && menuItem.key && menuItem.children && menuItem.children.length"
     dense
     rounded
     class="adminMenu contentMenuWrapper py-0">
-    <v-subheader class="text-uppercase subtitle-2 font-weight-bold">{{ itemTitle }}</v-subheader>
+    <v-subheader class="text-uppercase subtitle-2 font-weight-bold">{{ menuItem.label }}</v-subheader>
     <v-treeview
-      :items="administrationItem"
+      :items="menuItem.children"
+      item-children="children"
+      item-key="name"
+      item-text="label"
       dense
       rounded
       hoverable
-      class="subItemTitle"
-      item-key="name">
+      open-all
+      class="subItemTitle">
       <template slot="label" slot-scope="{ item }">
-        <a @click="navigateTo(item.path)">{{ item.name }}</a>
+        <a v-if="item && item.link" :href="item.link">{{ item.label }}</a>
+        <span v-else-if="item">{{ item.label }}</span>
+        <span v-else>{{ item }}</span>
       </template>
     </v-treeview>
   </v-list>
@@ -22,19 +28,10 @@
 export default {
   name: 'AdministrationMenuItemApp',
   props: {
-    administrationItem: {
+    menuItem: {
       type: Object,
       default: null
     },
-    itemTitle: {
-      type: String,
-      default: null
-    }
   },
-  methods: {
-    navigateTo(pagelink) {
-      location.href=`/portal/g/:platform:${ pagelink }` ;
-    }
-  }
 };
 </script>
