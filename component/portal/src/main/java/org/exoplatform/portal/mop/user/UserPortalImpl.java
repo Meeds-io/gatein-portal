@@ -37,6 +37,8 @@ import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.IdentityConstants;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.gatein.common.logging.Logger;
@@ -48,466 +50,594 @@ import org.gatein.common.logging.LoggerFactory;
  */
 public class UserPortalImpl implements UserPortal {
 
-    public static final Comparator<UserNavigation> USER_NAVIGATION_COMPARATOR = new Comparator<UserNavigation>() {
-        public int compare(UserNavigation nav1, UserNavigation nav2) {
-            /* Because we cannot tell how expensive getPriority() is
-             * we better store the priorities into local variables */
-            int priority1 = nav1.getPriority();
-            int priority2 = nav2.getPriority();
-            if (priority1 == priority2) {
-                /* A fix for GTNPORTAL-3322. The original comparator has not imposed
-                 * a total ordering as required by the Comparator interface: "The implementor
-                 * must ensure that sgn(compare(x, y)) == -sgn(compare(y, x)) for all x and y."
-                 * This was not the case when comparing two nodes both having UNDEFINED_PRIORITY. */
-                return 0;
-            } else if (priority1 == PageNavigation.UNDEFINED_PRIORITY) {
-                return 1;
-            } else if (priority2 == PageNavigation.UNDEFINED_PRIORITY) {
-                return -1;
+  public static final Comparator<UserNavigation> USER_NAVIGATION_COMPARATOR = new Comparator<UserNavigation>() {
+                                                                              public int compare(UserNavigation nav1,
+                                                                                                 UserNavigation nav2) {
+                                                                                                                                               /*
+                                                                                                                                                * Because
+                                                                                                                                                * we
+                                                                                                                                                * cannot
+                                                                                                                                                * tell
+                                                                                                                                                * how
+                                                                                                                                                * expensive
+                                                                                                                                                * getPriority
+                                                                                                                                                * (
+                                                                                                                                                * )
+                                                                                                                                                * is
+                                                                                                                                                * we
+                                                                                                                                                * better
+                                                                                                                                                * store
+                                                                                                                                                * the
+                                                                                                                                                * priorities
+                                                                                                                                                * into
+                                                                                                                                                * local
+                                                                                                                                                * variables
+                                                                                                                                                */
+                                                                                int priority1 = nav1.getPriority();
+                                                                                int priority2 = nav2.getPriority();
+                                                                                if (priority1 == priority2) {
+                                                                                                                                               /*
+                                                                                                                                                * A
+                                                                                                                                                * fix
+                                                                                                                                                * for
+                                                                                                                                                * GTNPORTAL
+                                                                                                                                                * -
+                                                                                                                                                * 3322.
+                                                                                                                                                * The
+                                                                                                                                                * original
+                                                                                                                                                * comparator
+                                                                                                                                                * has
+                                                                                                                                                * not
+                                                                                                                                                * imposed
+                                                                                                                                                * a
+                                                                                                                                                * total
+                                                                                                                                                * ordering
+                                                                                                                                                * as
+                                                                                                                                                * required
+                                                                                                                                                * by
+                                                                                                                                                * the
+                                                                                                                                                * Comparator
+                                                                                                                                                * interface:
+                                                                                                                                                * "The
+                                                                                                                                                * implementor
+                                                                                                                                                * must
+                                                                                                                                                * ensure
+                                                                                                                                                * that
+                                                                                                                                                * sgn
+                                                                                                                                                * (
+                                                                                                                                                * compare
+                                                                                                                                                * (
+                                                                                                                                                * x,
+                                                                                                                                                * y
+                                                                                                                                                * )
+                                                                                                                                                * )
+                                                                                                                                                * ==
+                                                                                                                                                * -sgn
+                                                                                                                                                * (
+                                                                                                                                                * compare
+                                                                                                                                                * (
+                                                                                                                                                * y,
+                                                                                                                                                * x
+                                                                                                                                                * )
+                                                                                                                                                * )
+                                                                                                                                                * for
+                                                                                                                                                * all
+                                                                                                                                                * x
+                                                                                                                                                * and
+                                                                                                                                                * y
+                                                                                                                                                * .
+                                                                                                                                                * "
+                                                                                                                                                * This
+                                                                                                                                                * was
+                                                                                                                                                * not
+                                                                                                                                                * the
+                                                                                                                                                * case
+                                                                                                                                                * when
+                                                                                                                                                * comparing
+                                                                                                                                                * two
+                                                                                                                                                * nodes
+                                                                                                                                                * both
+                                                                                                                                                * having
+                                                                                                                                                * UNDEFINED_PRIORITY.
+                                                                                                                                                */
+                                                                                  return 0;
+                                                                                } else if (priority1 == PageNavigation.UNDEFINED_PRIORITY) {
+                                                                                  return 1;
+                                                                                } else if (priority2 == PageNavigation.UNDEFINED_PRIORITY) {
+                                                                                  return -1;
+                                                                                } else {
+                                                                                  return priority1 - priority2;
+                                                                                }
+                                                                              }
+                                                                            };
+
+  private final Logger                           log                        = LoggerFactory.getLogger(UserPortalImpl.class);
+
+  /** . */
+  final UserPortalConfigService                  service;
+
+  /** . */
+  private final PortalConfig                     portalConfig;
+
+  /** . */
+  final UserPortalContext                        context;
+
+  /** . */
+  final String                                   userName;
+
+  /** . */
+  private List<UserNavigation>                   navigations;
+
+  /** . */
+  private final String                           portalName;
+
+  /** . */
+  private final Locale                           portalLocale;
+
+  public UserPortalImpl(UserPortalConfigService service,
+                        String portalName,
+                        PortalConfig portal,
+                        String userName,
+                        UserPortalContext context) {
+    if (context == null) {
+      throw new NullPointerException("No null context argument allowed");
+    }
+
+    //
+    String locale = portal.getLocale();
+
+    //
+    this.portalLocale = locale != null ? new Locale(locale) : null;
+    this.service = service;
+    this.portalName = portalName;
+    this.portalConfig = portal;
+    this.userName = userName;
+    this.context = context;
+    this.navigations = null;
+  }
+
+  public Locale getLocale() {
+    return portalLocale;
+  }
+
+  public PortalConfig getPortalConfig() {
+    return portalConfig;
+  }
+
+  /**
+   * Returns an immutable sorted list of the valid navigations related to the
+   * user.
+   *
+   * @return the navigations
+   * @throws UserPortalException any user portal exception
+   */
+  public List<UserNavigation> getNavigations() throws UserPortalException, NavigationServiceException {
+    if (navigations == null) {
+      List<UserNavigation> navigations = new ArrayList<UserNavigation>(userName == null ? 1 : 10);
+      NavigationContext portalNav = service.getNavigationService()
+                                           .loadNavigation(
+                                                           new SiteKey(SiteType.PORTAL, portalName));
+      if (portalNav != null && portalNav.getState() != null) {
+        navigations.add(new UserNavigation(this, portalNav, service.getUserACL().hasEditPermission(portalConfig)));
+      }
+      //
+      if (userName != null) {
+        // Add user nav if any
+        NavigationContext userNavigation = service.getNavigationService().loadNavigation(SiteKey.user(userName));
+        if (userNavigation != null && userNavigation.getState() != null) {
+          navigations.add(new UserNavigation(this, userNavigation, true));
+        }
+
+        // Add group navigations
+        if (service.getUserACL().getSuperUser().equals(userName)) {
+          List<NavigationContext> navCtxs = service.getNavigationService().loadNavigations(SiteType.GROUP);
+          for (NavigationContext navCtx : navCtxs) {
+            if (!navCtx.getKey().getName().equals(service.getUserACL().getGuestsGroup())) {
+              navigations.add(new UserNavigation(this, navCtx, true));
+            }
+          }
+        } else {
+          Collection<?> groups = null;
+          try {
+            ConversationState conv = ConversationState.getCurrent();
+            if (conv != null && conv.getIdentity() != null && !IdentityConstants.ANONIM.equals(conv.getIdentity().getUserId())
+                && !IdentityConstants.SYSTEM.equals(conv.getIdentity().getUserId())) {
+              groups = conv.getIdentity().getGroups();
             } else {
-                return priority1 - priority2;
+              groups = service.getOrganizationService().getGroupHandler().findGroupsOfUser(userName);
             }
-        }
-    };
-
-    private final Logger log = LoggerFactory.getLogger(UserPortalImpl.class);
-
-    /** . */
-    final UserPortalConfigService service;
-
-    /** . */
-    private final PortalConfig portalConfig;
-
-    /** . */
-    final UserPortalContext context;
-
-    /** . */
-    final String userName;
-
-    /** . */
-    private List<UserNavigation> navigations;
-
-    /** . */
-    private final String portalName;
-
-    /** . */
-    private final Locale portalLocale;
-
-    public UserPortalImpl(UserPortalConfigService service, String portalName, PortalConfig portal, String userName,
-            UserPortalContext context) {
-        if (context == null) {
-            throw new NullPointerException("No null context argument allowed");
-        }
-
-        //
-        String locale = portal.getLocale();
-
-        //
-        this.portalLocale = locale != null ? new Locale(locale) : null;
-        this.service = service;
-        this.portalName = portalName;
-        this.portalConfig = portal;
-        this.userName = userName;
-        this.context = context;
-        this.navigations = null;
-    }
-
-    public Locale getLocale() {
-        return portalLocale;
-    }
-
-    public PortalConfig getPortalConfig() {
-      return portalConfig;
-    }
-
-    /**
-     * Returns an immutable sorted list of the valid navigations related to the user.
-     *
-     * @return the navigations
-     * @throws UserPortalException any user portal exception
-     */
-    public List<UserNavigation> getNavigations() throws UserPortalException, NavigationServiceException {
-        if (navigations == null) {
-            List<UserNavigation> navigations = new ArrayList<UserNavigation>(userName == null ? 1 : 10);
-            NavigationContext portalNav = service.getNavigationService().loadNavigation(
-                    new SiteKey(SiteType.PORTAL, portalName));
-            if (portalNav != null && portalNav.getState() != null) {
-                navigations.add(new UserNavigation(this, portalNav, service.getUserACL().hasEditPermission(portalConfig)));
+          } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+              log.debug("Could not retrieve groups", e);
             }
-            //
-            if (userName != null) {
-                // Add user nav if any
-                NavigationContext userNavigation = service.getNavigationService().loadNavigation(SiteKey.user(userName));
-                if (userNavigation != null && userNavigation.getState() != null) {
-                    navigations.add(new UserNavigation(this, userNavigation, true));
+            // throw new UserPortalException("Could not retrieve groups", e);
+          }
+
+          if (groups != null) {
+            for (Object group : groups) {
+              String groupId = null;
+              if (group instanceof Group) {
+                groupId = ((Group) group).getId().trim();
+              } else {
+                groupId = group.toString().trim();
+              }
+              if (!groupId.equals(service.getUserACL().getGuestsGroup())) {
+                NavigationContext groupNavigation = service.getNavigationService()
+                                                           .loadNavigation(
+                                                                           SiteKey.group(groupId));
+                if (groupNavigation != null && groupNavigation.getState() != null) {
+                  navigations.add(new UserNavigation(this,
+                                                     groupNavigation,
+                                                     service.getUserACL()
+                                                            .hasEditPermissionOnNavigation(groupNavigation.getKey())));
                 }
-
-                // Add group navigations
-                if (service.getUserACL().getSuperUser().equals(userName)) {
-                    List<NavigationContext> navCtxs = service.getNavigationService().loadNavigations(SiteType.GROUP);
-                    for (NavigationContext navCtx : navCtxs) {
-                        if (!navCtx.getKey().getName().equals(service.getUserACL().getGuestsGroup())) {
-                            navigations.add(new UserNavigation(this, navCtx, true));
-                        }
-                    }
-                } else {
-                    Collection<?> groups = null;
-                    try {
-                        ConversationState conv = ConversationState.getCurrent();
-                        if (conv != null && conv.getIdentity() != null && !IdentityConstants.ANONIM.equals(conv.getIdentity().getUserId())
-                            && !IdentityConstants.SYSTEM.equals(conv.getIdentity().getUserId())) {
-                          groups = conv.getIdentity().getGroups();
-                        } else {
-                          groups = service.getOrganizationService().getGroupHandler().findGroupsOfUser(userName);
-                        }
-                    } catch (Exception e) {
-                        if(log.isDebugEnabled()) {
-                            log.debug("Could not retrieve groups", e);
-                        }
-                        //throw new UserPortalException("Could not retrieve groups", e);
-                    }
-
-                    if(groups != null) {
-                        for (Object group : groups) {
-                            String groupId = null;
-                            if(group instanceof Group) {
-                              groupId = ((Group) group).getId().trim();
-                            } else {
-                              groupId = group.toString().trim();
-                            }
-                            if (!groupId.equals(service.getUserACL().getGuestsGroup())) {
-                                NavigationContext groupNavigation = service.getNavigationService().loadNavigation(
-                                        SiteKey.group(groupId));
-                                if (groupNavigation != null && groupNavigation.getState() != null) {
-                                    navigations.add(new UserNavigation(this, groupNavigation, service.getUserACL()
-                                            .hasEditPermissionOnNavigation(groupNavigation.getKey())));
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Sort the list finally
-                Collections.sort(navigations, USER_NAVIGATION_COMPARATOR);
+              }
             }
-
-            // Add global navigation at the end
-            NavigationContext globalPortalNav = service.getNavigationService()
-                                                       .loadNavigation(new SiteKey(SiteType.PORTAL, service.getGlobalPortal()));
-            if (globalPortalNav != null && globalPortalNav.getState() != null) {
-                navigations.add(new UserNavigation(this, globalPortalNav, false));
-            }
-
-            //
-            this.navigations = Collections.unmodifiableList(navigations);
+          }
         }
-        return navigations;
+
+        // Sort the list finally
+        Collections.sort(navigations, USER_NAVIGATION_COMPARATOR);
+      }
+
+      // Add global navigation at the end
+      NavigationContext globalPortalNav = service.getNavigationService()
+                                                 .loadNavigation(new SiteKey(SiteType.PORTAL, service.getGlobalPortal()));
+      if (globalPortalNav != null && globalPortalNav.getState() != null) {
+        navigations.add(new UserNavigation(this, globalPortalNav, false));
+      }
+
+      //
+      this.navigations = Collections.unmodifiableList(navigations);
+    }
+    return navigations;
+  }
+
+  @Override
+  public Collection<UserNode> getNodes(SiteType siteType,
+                                       String excludedSiteName,
+                                       Scope scope,
+                                       UserNodeFilterConfig filterConfig) {
+    Collection<UserNode> resultUserNodes = new ArrayList<>();
+    Set<String> addedUserNodesURI = new HashSet<>();
+    List<UserNavigation> userNavigations = getNavigations();
+
+    for (UserNavigation userNavigation : userNavigations) {
+      SiteKey siteKey = userNavigation.getKey();
+      if (siteKey.getType() != siteType) {
+        continue;
+      }
+      if (StringUtils.isNotBlank(excludedSiteName) && Pattern.matches(excludedSiteName, siteKey.getName())) {
+        continue;
+      }
+
+      UserNode rootNode = getNode(userNavigation, scope, filterConfig, null);
+      Collection<UserNode> userNodes = rootNode.getChildren();
+      for (UserNode userNode : userNodes) {
+        if (addedUserNodesURI.contains(userNode.getURI())) {
+          continue;
+        }
+        addedUserNodesURI.add(userNode.getURI());
+        resultUserNodes.add(userNode);
+      }
+    }
+    return resultUserNodes;
+  }
+
+  @Override
+  public Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig filterConfig) {
+    return getNodes(siteType, null, scope, filterConfig);
+  }
+
+  public UserNavigation getNavigation(SiteKey key) throws NullPointerException,
+                                                   UserPortalException,
+                                                   NavigationServiceException {
+    if (key == null) {
+      throw new NullPointerException("No null key accepted");
+    }
+    for (UserNavigation navigation : getNavigations()) {
+      if (navigation.getKey().equals(key)) {
+        return navigation;
+      }
+    }
+    return null;
+  }
+
+  public void refresh() {
+    navigations = null;
+  }
+
+  public UserNode getNode(UserNavigation userNavigation,
+                          Scope scope,
+                          UserNodeFilterConfig filterConfig,
+                          NodeChangeListener<UserNode> listener) throws NullPointerException,
+                                                                 UserPortalException,
+                                                                 NavigationServiceException {
+    UserNodeContext context = new UserNodeContext(userNavigation, filterConfig);
+    NodeContext<UserNode> nodeContext = service.getNavigationService()
+                                               .loadNode(context,
+                                                         userNavigation.navigation,
+                                                         scope,
+                                                         new UserNodeListener(listener));
+    if (nodeContext != null) {
+      return nodeContext.getNode().filter();
+    } else {
+      return null;
+    }
+  }
+
+  public void updateNode(UserNode node, Scope scope, NodeChangeListener<UserNode> listener) throws NullPointerException,
+                                                                                            IllegalArgumentException,
+                                                                                            UserPortalException,
+                                                                                            NavigationServiceException {
+    if (node == null) {
+      throw new NullPointerException("No null node accepted");
+    }
+    service.getNavigationService().updateNode(node.context, scope, new UserNodeListener(listener));
+    node.filter();
+  }
+
+  public void rebaseNode(UserNode node, Scope scope, NodeChangeListener<UserNode> listener) throws NullPointerException,
+                                                                                            IllegalArgumentException,
+                                                                                            UserPortalException,
+                                                                                            NavigationServiceException {
+    if (node == null) {
+      throw new NullPointerException("No null node accepted");
+    }
+    service.getNavigationService().rebaseNode(node.context, scope, new UserNodeListener(listener));
+    node.filter();
+  }
+
+  public void saveNode(UserNode node, NodeChangeListener<UserNode> listener) throws NullPointerException,
+                                                                             UserPortalException,
+                                                                             NavigationServiceException {
+    if (node == null) {
+      throw new NullPointerException("No null node accepted");
+    }
+    service.getNavigationService().saveNode(node.context, new UserNodeListener(listener));
+    navigations = null;
+    node.filter();
+  }
+
+  /**
+   * Note : the scope implementation is not stateless but we don't care in this
+   * case.
+   */
+  private class MatchingScope extends GenericScope.Branch.Visitor implements Scope {
+    final UserNavigation       userNavigation;
+
+    final UserNodeFilterConfig filterConfig;
+
+    final String[]             match;
+
+    int                        score;
+
+    String                     id;
+
+    UserNode                   userNode;
+
+    MatchingScope(UserNavigation userNavigation, UserNodeFilterConfig filterConfig, String[] match) {
+      this.userNavigation = userNavigation;
+      this.filterConfig = filterConfig;
+      this.match = match;
+    }
+
+    public Visitor get() {
+      return this;
     }
 
     @Override
-    public Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig userFilterConfig) {
-      Collection<UserNode> resultUserNodes = new ArrayList<>();
-      Set<String> addedUserNodesURI = new HashSet<>();
-      List<UserNavigation> userNavigations = getNavigations();
+    protected int getSize() {
+      return match.length;
+    }
 
-      for (UserNavigation userNavigation : userNavigations) {
-        if (userNavigation.getKey().getType() != siteType) {
-          continue;
-        }
+    @Override
+    protected String getName(int index) {
+      return match[index];
+    }
 
-        UserNode rootNode = getNode(userNavigation, scope, userFilterConfig, null);
-        Collection<UserNode> userNodes = rootNode.getChildren();
-        for (UserNode userNode : userNodes) {
-          if (addedUserNodesURI.contains(userNode.getURI())) {
-            continue;
-          }
-          addedUserNodesURI.add(userNode.getURI());
-          resultUserNodes.add(userNode);
+    @Override
+    protected Visitor getFederated() {
+      return Scope.CHILDREN.get();
+    }
+
+    void resolve() throws NavigationServiceException {
+      UserNodeContext context = new UserNodeContext(userNavigation, filterConfig);
+      NodeContext<UserNode> nodeContext = service.getNavigationService()
+                                                 .loadNode(context,
+                                                           userNavigation.navigation,
+                                                           this,
+                                                           null);
+      if (score > 0) {
+        userNode = nodeContext.getNode().filter().find(id);
+      }
+    }
+
+    public VisitMode enter(int depth, String id, String name, NodeState state) {
+      VisitMode vm = super.enter(depth, id, name, state);
+      if (depth == 0) {
+        score = 0;
+        MatchingScope.this.id = null;
+      } else {
+        if (vm == VisitMode.ALL_CHILDREN) {
+          MatchingScope.this.id = id;
+          score++;
         }
       }
-      return resultUserNodes;
+      return vm;
+    }
+  }
+
+  public UserNode getDefaultPath(UserNodeFilterConfig filterConfig) throws UserPortalException, NavigationServiceException {
+    for (UserNavigation userNavigation : getNavigations()) {
+      UserNode node = getDefaultPath(userNavigation, filterConfig);
+      if (node != null) {
+        return node;
+      }
     }
 
-    public UserNavigation getNavigation(SiteKey key) throws NullPointerException, UserPortalException,
-            NavigationServiceException {
-        if (key == null) {
-            throw new NullPointerException("No null key accepted");
-        }
-        for (UserNavigation navigation : getNavigations()) {
-            if (navigation.getKey().equals(key)) {
-                return navigation;
-            }
-        }
-        return null;
-    }
+    //
+    return null;
+  }
 
-    public void refresh() {
-        navigations = null;
-    }
-
-    public UserNode getNode(UserNavigation userNavigation, Scope scope, UserNodeFilterConfig filterConfig,
-            NodeChangeListener<UserNode> listener) throws NullPointerException, UserPortalException, NavigationServiceException {
-        UserNodeContext context = new UserNodeContext(userNavigation, filterConfig);
-        NodeContext<UserNode> nodeContext = service.getNavigationService().loadNode(context, userNavigation.navigation, scope,
-                new UserNodeListener(listener));
-        if (nodeContext != null) {
-            return nodeContext.getNode().filter();
-        } else {
-            return null;
-        }
-    }
-
-    public void updateNode(UserNode node, Scope scope, NodeChangeListener<UserNode> listener) throws NullPointerException,
-            IllegalArgumentException, UserPortalException, NavigationServiceException {
-        if (node == null) {
-            throw new NullPointerException("No null node accepted");
-        }
-        service.getNavigationService().updateNode(node.context, scope, new UserNodeListener(listener));
-        node.filter();
-    }
-
-    public void rebaseNode(UserNode node, Scope scope, NodeChangeListener<UserNode> listener) throws NullPointerException,
-            IllegalArgumentException, UserPortalException, NavigationServiceException {
-        if (node == null) {
-            throw new NullPointerException("No null node accepted");
-        }
-        service.getNavigationService().rebaseNode(node.context, scope, new UserNodeListener(listener));
-        node.filter();
-    }
-
-    public void saveNode(UserNode node, NodeChangeListener<UserNode> listener) throws NullPointerException,
-            UserPortalException, NavigationServiceException {
-        if (node == null) {
-            throw new NullPointerException("No null node accepted");
-        }
-        service.getNavigationService().saveNode(node.context, new UserNodeListener(listener));
-        navigations = null;
-        node.filter();
-    }
-
-    /**
-     * Note : the scope implementation is not stateless but we don't care in this case.
-     */
-    private class MatchingScope extends GenericScope.Branch.Visitor implements Scope {
-        final UserNavigation userNavigation;
-        final UserNodeFilterConfig filterConfig;
-        final String[] match;
-        int score;
-        String id;
-        UserNode userNode;
-
-        MatchingScope(UserNavigation userNavigation, UserNodeFilterConfig filterConfig, String[] match) {
-            this.userNavigation = userNavigation;
-            this.filterConfig = filterConfig;
-            this.match = match;
-        }
-
-        public Visitor get() {
-            return this;
-        }
-
-        @Override
-        protected int getSize() {
-            return match.length;
-        }
-
-        @Override
-        protected String getName(int index) {
-            return match[index];
-        }
-
-        @Override
-        protected Visitor getFederated() {
-            return Scope.CHILDREN.get();
-        }
-
-        void resolve() throws NavigationServiceException {
-            UserNodeContext context = new UserNodeContext(userNavigation, filterConfig);
-            NodeContext<UserNode> nodeContext = service.getNavigationService().loadNode(context, userNavigation.navigation,
-                    this, null);
-            if (score > 0) {
-                userNode = nodeContext.getNode().filter().find(id);
-            }
-        }
-
-        public VisitMode enter(int depth, String id, String name, NodeState state) {
-            VisitMode vm = super.enter(depth, id, name, state);
-            if (depth == 0) {
-                score = 0;
-                MatchingScope.this.id = null;
-            } else {
-                if (vm == VisitMode.ALL_CHILDREN) {
-                    MatchingScope.this.id = id;
-                    score++;
-                }
-            }
-            return vm;
-        }
-    }
-
-    public UserNode getDefaultPath(UserNodeFilterConfig filterConfig) throws UserPortalException, NavigationServiceException {
-        for (UserNavigation userNavigation : getNavigations()) {
-            UserNode node = getDefaultPath(userNavigation, filterConfig);
-            if (node != null) {
-                return node;
-            }
-        }
+  public UserNode getDefaultPath(UserNavigation userNavigation, UserNodeFilterConfig filterConfig)
+                                                                                                   throws UserPortalException,
+                                                                                                   NavigationServiceException {
+    NavigationContext navigation = userNavigation.navigation;
+    if (navigation.getState() != null) {
+      UserNodeContext context = new UserNodeContext(userNavigation, null);
+      NodeContext<UserNode> nodeContext = service.getNavigationService()
+                                                 .loadNode(context,
+                                                           navigation,
+                                                           Scope.CHILDREN,
+                                                           null);
+      if (nodeContext != null) {
+        UserNode root = nodeContext.getNode();
 
         //
-        return null;
-    }
-
-    public UserNode getDefaultPath(UserNavigation userNavigation, UserNodeFilterConfig filterConfig)
-            throws UserPortalException, NavigationServiceException {
-        NavigationContext navigation = userNavigation.navigation;
-        if (navigation.getState() != null) {
-            UserNodeContext context = new UserNodeContext(userNavigation, null);
-            NodeContext<UserNode> nodeContext = service.getNavigationService().loadNode(context, navigation, Scope.CHILDREN,
-                    null);
-            if (nodeContext != null) {
-                UserNode root = nodeContext.getNode();
-
-                //
-                if (filterConfig == null) {
-                    filterConfig = UserNodeFilterConfig.builder().build();
-                }
-                UserNodeFilter filter = new UserNodeFilter(userNavigation.portal, filterConfig);
-
-                // Filter node by node
-                for (UserNode node : root.getChildren()) {
-                    if (node.context.accept(filter)) {
-                        return node;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    public UserNode resolvePath(UserNodeFilterConfig filterConfig, String path) throws NullPointerException,
-            UserPortalException, NavigationServiceException {
-        if (path == null) {
-            throw new NullPointerException("No null path accepted");
-        }
-
-        // Parse path
-        String[] segments = Utils.parsePath(path);
-
-        // Find the first navigation available or return null
-        if (segments == null) {
-            return getDefaultPath(filterConfig);
-        }
-
-        // Create a filter as we need one for the path
         if (filterConfig == null) {
-            filterConfig = UserNodeFilterConfig.builder().build();
-        } else {
-            filterConfig = UserNodeFilterConfig.builder(filterConfig).build();
+          filterConfig = UserNodeFilterConfig.builder().build();
         }
+        UserNodeFilter filter = new UserNodeFilter(userNavigation.portal, filterConfig);
 
-        // Restrict the filter with path
-        filterConfig.path = segments;
-
-        // Get navigations
-        List<UserNavigation> navigations = getNavigations();
-
-        //
-        MatchingScope best = null;
-        for (UserNavigation navigation : navigations) {
-            MatchingScope scope = new MatchingScope(navigation, filterConfig, segments);
-            scope.resolve();
-            if (scope.score == segments.length) {
-                best = scope;
-                break;
-            } else {
-                if (best == null) {
-                    best = scope;
-                } else {
-                    if (scope.score > best.score) {
-                        best = scope;
-                    }
-                }
-            }
-        }
-
-        //
-        if (best != null && best.score > 0) {
-            UserNode ret = best.userNode;
-            if (ret != null) {
-                ret.owner.filterConfig.path = null;
-            }
-            return ret;
-        } else {
-            return getDefaultPath(null);
-        }
-    }
-
-    public UserNode resolvePath(UserNavigation navigation, UserNodeFilterConfig filterConfig, String path)
-            throws NullPointerException, UserPortalException, NavigationServiceException {
-        if (navigation == null) {
-            throw new NullPointerException("No null navigation accepted");
-        }
-        if (path == null) {
-            throw new NullPointerException("No null path accepted");
-        }
-
-        //
-        String[] segments = Utils.parsePath(path);
-
-        //
-        if (segments == null) {
-            return null;
-        }
-
-        // Create a filter as we need one for the path
-        if (filterConfig == null) {
-            filterConfig = UserNodeFilterConfig.builder().build();
-        } else {
-            filterConfig = UserNodeFilterConfig.builder(filterConfig).build();
-        }
-
-        // Restrict the filter with the path
-        filterConfig.path = segments;
-
-        //
-        MatchingScope scope = new MatchingScope(navigation, filterConfig, segments);
-        scope.resolve();
-
-        //
-        if (scope.score > 0) {
-          UserNode ret = scope.userNode;
-          if (ret != null && !StringUtils.equals(scope.userNode.getURI(), ret.getURI())) {
-            UserNode globalNode = getGlobalUserNode(filterConfig, navigation.getKey(), segments);
-            if (globalNode != null) {
-              return globalNode;
-            }
-          }
-          if (ret != null) {
-            ret.owner.filterConfig.path = null;
-          }
-          return ret;
-        }
-        return getGlobalUserNode(filterConfig, navigation.getKey(), segments);
-    }
-
-    private UserNode getGlobalUserNode(UserNodeFilterConfig filterConfig, SiteKey siteKey, String[] segments) {
-      if (siteKey.getType() != SiteType.PORTAL) {
-        return null;
-      }
-      UserNavigation globalNavigation = getNavigation(SiteKey.portal(this.service.getGlobalPortal()));
-      if (globalNavigation != null) {
-        MatchingScope globalScope = new MatchingScope(globalNavigation, filterConfig, segments);
-        globalScope.resolve();
-        if (globalScope.score > 0) {
-          UserNode globalNode = globalScope.userNode;
-          if (globalNode != null) {
-            globalNode.owner.filterConfig.path = null;
-          }
-          if (globalNode != null && StringUtils.equals(globalScope.userNode.getURI(), globalNode.getURI())) {
-            return globalNode;
+        // Filter node by node
+        for (UserNode node : root.getChildren()) {
+          if (node.context.accept(filter)) {
+            return node;
           }
         }
       }
+    }
+    return null;
+  }
+
+  public UserNode resolvePath(UserNodeFilterConfig filterConfig, String path) throws NullPointerException,
+                                                                              UserPortalException,
+                                                                              NavigationServiceException {
+    if (path == null) {
+      throw new NullPointerException("No null path accepted");
+    }
+
+    // Parse path
+    String[] segments = Utils.parsePath(path);
+
+    // Find the first navigation available or return null
+    if (segments == null) {
+      return getDefaultPath(filterConfig);
+    }
+
+    // Create a filter as we need one for the path
+    if (filterConfig == null) {
+      filterConfig = UserNodeFilterConfig.builder().build();
+    } else {
+      filterConfig = UserNodeFilterConfig.builder(filterConfig).build();
+    }
+
+    // Restrict the filter with path
+    filterConfig.path = segments;
+
+    // Get navigations
+    List<UserNavigation> navigations = getNavigations();
+
+    //
+    MatchingScope best = null;
+    for (UserNavigation navigation : navigations) {
+      MatchingScope scope = new MatchingScope(navigation, filterConfig, segments);
+      scope.resolve();
+      if (scope.score == segments.length) {
+        best = scope;
+        break;
+      } else {
+        if (best == null) {
+          best = scope;
+        } else {
+          if (scope.score > best.score) {
+            best = scope;
+          }
+        }
+      }
+    }
+
+    //
+    if (best != null && best.score > 0) {
+      UserNode ret = best.userNode;
+      if (ret != null) {
+        ret.owner.filterConfig.path = null;
+      }
+      return ret;
+    } else {
+      return getDefaultPath(null);
+    }
+  }
+
+  public UserNode resolvePath(UserNavigation navigation, UserNodeFilterConfig filterConfig, String path)
+                                                                                                         throws NullPointerException,
+                                                                                                         UserPortalException,
+                                                                                                         NavigationServiceException {
+    if (navigation == null) {
+      throw new NullPointerException("No null navigation accepted");
+    }
+    if (path == null) {
+      throw new NullPointerException("No null path accepted");
+    }
+
+    //
+    String[] segments = Utils.parsePath(path);
+
+    //
+    if (segments == null) {
       return null;
     }
+
+    // Create a filter as we need one for the path
+    if (filterConfig == null) {
+      filterConfig = UserNodeFilterConfig.builder().build();
+    } else {
+      filterConfig = UserNodeFilterConfig.builder(filterConfig).build();
+    }
+
+    // Restrict the filter with the path
+    filterConfig.path = segments;
+
+    //
+    MatchingScope scope = new MatchingScope(navigation, filterConfig, segments);
+    scope.resolve();
+
+    //
+    if (scope.score > 0) {
+      UserNode ret = scope.userNode;
+      if (ret != null && !StringUtils.equals(scope.userNode.getURI(), ret.getURI())) {
+        UserNode globalNode = getGlobalUserNode(filterConfig, navigation.getKey(), segments);
+        if (globalNode != null) {
+          return globalNode;
+        }
+      }
+      if (ret != null) {
+        ret.owner.filterConfig.path = null;
+      }
+      return ret;
+    }
+    return getGlobalUserNode(filterConfig, navigation.getKey(), segments);
+  }
+
+  private UserNode getGlobalUserNode(UserNodeFilterConfig filterConfig, SiteKey siteKey, String[] segments) {
+    if (siteKey.getType() != SiteType.PORTAL) {
+      return null;
+    }
+    UserNavigation globalNavigation = getNavigation(SiteKey.portal(this.service.getGlobalPortal()));
+    if (globalNavigation != null) {
+      MatchingScope globalScope = new MatchingScope(globalNavigation, filterConfig, segments);
+      globalScope.resolve();
+      if (globalScope.score > 0) {
+        UserNode globalNode = globalScope.userNode;
+        if (globalNode != null) {
+          globalNode.owner.filterConfig.path = null;
+        }
+        if (globalNode != null && StringUtils.equals(globalScope.userNode.getURI(), globalNode.getURI())) {
+          return globalNode;
+        }
+      }
+    }
+    return null;
+  }
 }
