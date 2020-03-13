@@ -18,6 +18,8 @@
 @primaryHoverBackgroundColor: darken(desaturate(spin(@primaryColor, 3.7152), 13.9064), 11.9608);
 @btnPrimaryDisableBackground: lighten(desaturate(spin(@primaryColor, 0.0714), 0.6494), 22.7451);
 
+@welcomePagesBackground: @secondaryBackground;
+
 @allPagesPrimaryColor: ~"--allPagesPrimaryColor";
 @allPagesPrimaryColorLight: ~"--allPagesPrimaryColorLight";
 @allPagesPrimaryColorLighter: ~"--allPagesPrimaryColorLighter";
@@ -37,6 +39,7 @@
 @allPagesUiSwitchOnColor: ~"--allPagesUiSwitchOnColor";
 @allPageBaseGreyColor: ~"--allPagesBaseGreyColor";
 @allPagesQuoteBorder: ~"--allPagesQuoteBorder";
+@allPagesWelcomePagesBackground: ~"--allPagesWelcomePagesBackground";
 
 :root {
     @{allPagesPrimaryColor}: @primaryColor;
@@ -58,4 +61,5 @@
     @{allPagesUiSwitchOnColor}: @primaryColor;
     @{allPageBaseGreyColor}: @greyColor ;
     @{allPagesQuoteBorder}: @greyColor ;
+    @{allPagesWelcomePagesBackground}: @welcomePagesBackground ;
 }
