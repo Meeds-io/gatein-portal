@@ -21,6 +21,11 @@
 
 <%@ page language="java" %>
 <%@ page contentType="text/html" %>
+
 <%
   response.sendRedirect(request.getContextPath()) ;
 %>
+
+<head>
+  <link id="brandingSkin" rel="stylesheet" type="text/css" href="/rest/v1/platform/branding/css">
+</head>
