@@ -599,23 +599,6 @@ public class SkinService extends AbstractResourceService implements Startable {
     return customPortalSkins;
   }
 
-  public static void main(String[] args) {
-    List<SkinConfig> customPortalSkins = new ArrayList<SkinConfig>();
-    SimpleSkin skin1 = new SimpleSkin(null, "aaaa", "aaa", "aaaaa");
-    customPortalSkins.add(skin1);
-    SimpleSkin skin2 = new SimpleSkin(null, "bbb", "bbb", "bbb", 90);
-    customPortalSkins.add(skin2);
-
-    Collections.sort(customPortalSkins, new Comparator<SkinConfig>() {
-      public int compare(SkinConfig o1, SkinConfig o2) {
-        return o1.getCSSPriority() - o2.getCSSPriority();
-      }
-    });
-    for (SkinConfig skinConfig : customPortalSkins) {
-      System.out.println(skinConfig.getCSSPath());
-    }
-  }
-
   /**
    * Return the map of portlet themes
    *

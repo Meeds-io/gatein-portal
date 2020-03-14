@@ -51,16 +51,13 @@
 
           <v-row>
             <v-col>
-              <exo-color-picker v-model="branding.themeColors.primaryColor" label="Primary color" />
+              <exo-color-picker v-model="branding.themeColors.primaryColor" :label="$t('themeColors.primaryColor.label')" />
             </v-col>
             <v-col>
-              <exo-color-picker v-model="branding.themeColors.primaryBackground" label="Primary background" />
+              <exo-color-picker v-model="branding.themeColors.secondaryColor" :label="$t('themeColors.secondaryColor.label')" />
             </v-col>
             <v-col>
-              <exo-color-picker v-model="branding.themeColors.secondaryColor" label="Secondary color" />
-            </v-col>
-            <v-col>
-              <exo-color-picker v-model="branding.themeColors.secondaryBackground" label="Secondary background" />
+              <exo-color-picker v-model="branding.themeColors.tertiaryColor" :label="$t('themeColors.tertiaryColor.label')" />
             </v-col>
           </v-row>
         </div>
@@ -85,7 +82,7 @@
           </div>
         </div>
         <div class="uiAction boxContent">
-          <button id="save" :disabled="!branding.companyName || !branding.companyName.trim()" class="btn btn-primate" type="button" @click="save">
+          <button id="save" :disabled="!branding.companyName || !branding.companyName.trim()" class="btn btn-primary" type="button" @click="save">
             {{ $t('save.label') }}
           </button>
           <button id="cancel" class="btn" type="button" @click="cancel">
@@ -121,7 +118,6 @@ export default {
           secondaryBackground: '#ffffff',
         },
       },
-      primaryColor: '#ffffff',
       color: null,
       defaultLogo: null,
       uploadInProgress: false,

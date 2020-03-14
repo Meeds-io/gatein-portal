@@ -1,11 +1,19 @@
 //put your custom CSS variables here (see variables.less for possible custom CSS variables)
 
-@primaryColor: #3f8487;
+@primaryColor: #578dc9;
 @primaryBackground: #f0f0f0;
-@secondaryColor: #000000;
-@secondaryBackground: #e25d5d;
-@tertiaryColor: @secondaryBackground;
-@greyColor: #999999;
+@secondaryColor: #476a9c;
+@secondaryColorDarken1: darken(@secondaryColor, 15%);
+@tertiaryColor: #578dc9;
+
+@greyColor: #e1e8ee;
+@borderColor: @greyColor;
+
+@greyColorLighten1: #a8b3c5;
+@offlineColor: @greyColorLighten1;
+@quoteBorder: @greyColorLighten1;
+@toolbarLightIconColor: @greyColorLighten1;
+@greyColorLighten1Opacity1: fade(@greyColorLighten1, 13%);
 
 @primaryColorLight: lighten(@primaryColor, 10%);
 @primaryColorLighter: lighten(@primaryColor, 18.5%);
@@ -18,7 +26,7 @@
 @primaryHoverBackgroundColor: darken(desaturate(spin(@primaryColor, 3.7152), 13.9064), 11.9608);
 @btnPrimaryDisableBackground: lighten(desaturate(spin(@primaryColor, 0.0714), 0.6494), 22.7451);
 
-@welcomePagesBackground: @secondaryBackground;
+@welcomePagesBackground: @secondaryColor;
 
 @allPagesPrimaryColor: ~"--allPagesPrimaryColor";
 @allPagesPrimaryColorLight: ~"--allPagesPrimaryColorLight";
@@ -31,15 +39,18 @@
 @allPagesPrimaryBackground: ~"--allPagesPrimaryBackground";
 @allPagesPrimaryDisableBackground: ~"--allPagesBtnPrimaryDisableBackground";
 @allPagesBtnPrimaryHoverBackgroundColor: ~"--allPagesBtnPrimaryHoverBackgroundColor";
-@allPagesSecondarySkinColor: ~"--allPagesSecondarySkinColor";
-@allPagesSecondaryBackground: ~"--allPagesSecondaryBackground";
 @allPagesSecondaryColor: ~"--allPagesSecondaryColor";
-@allPagesSecondaryColorDark: ~"--allPagesSecondaryColorDark";
+@allPagesSecondaryColorDarken1: ~"--allPagesSecondaryColorDarken1";
 @allPagesTertiaryColor: ~"--allPagesTertiaryColor";
 @allPagesUiSwitchOnColor: ~"--allPagesUiSwitchOnColor";
-@allPageBaseGreyColor: ~"--allPagesBaseGreyColor";
+@allPagesGreyColor: ~"--allPagesGreyColor";
 @allPagesQuoteBorder: ~"--allPagesQuoteBorder";
 @allPagesWelcomePagesBackground: ~"--allPagesWelcomePagesBackground";
+@allPagesBorderColor: ~"--allPagesBorderColor";
+@allPagesOfflineColor: ~"--allPagesOfflineColor";
+@allPagesToolbarLightIconColor: ~"--allPagesToolbarLightIconColor";
+@allPagesGreyColorLighten1: ~"--allPagesGreyColorLighten1";
+@allPagesGreyColorLighten1Opacity1: ~"--allPagesGreyColorLighten1Opacity1";
 
 :root {
     @{allPagesPrimaryColor}: @primaryColor;
@@ -53,13 +64,16 @@
     @{allPagesBtnPrimaryHoverBackgroundColor}: @primaryHoverBackgroundColor;
     @{allPagesPrimaryBackground}: @primaryBackground;
     @{allPagesPrimaryDisableBackground}: @btnPrimaryDisableBackground;
-    @{allPagesSecondarySkinColor}: @secondaryBackground;
-    @{allPagesSecondaryBackground}: @secondaryBackground;
     @{allPagesSecondaryColor}: @secondaryColor;
-    @{allPagesSecondaryColorDark}: darken(@secondaryColor, 15%);
+    @{allPagesSecondaryColorDarken1}: @secondaryColorDarken1;
     @{allPagesTertiaryColor}: @tertiaryColor;
     @{allPagesUiSwitchOnColor}: @primaryColor;
-    @{allPageBaseGreyColor}: @greyColor ;
-    @{allPagesQuoteBorder}: @greyColor ;
-    @{allPagesWelcomePagesBackground}: @welcomePagesBackground ;
+    @{allPagesGreyColor}: @greyColor;
+    @{allPagesQuoteBorder}: @quoteBorder;
+    @{allPagesBorderColor}: @borderColor;
+    @{allPagesWelcomePagesBackground}: @welcomePagesBackground;
+    @{allPagesOfflineColor}: @offlineColor;
+    @{allPagesToolbarLightIconColor}: @toolbarLightIconColor;
+    @{allPagesGreyColorLighten1}: @greyColorLighten1;
+    @{allPagesGreyColorLighten1Opacity1}: @greyColorLighten1Opacity1;
 }
