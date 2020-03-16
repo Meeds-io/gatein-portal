@@ -30,9 +30,11 @@ export default {
       navigationVisibilities: ['displayed'],
       navigations: [],
       embeddedTree: {
-        // users
-        'administration/newStaff': 'users',
-        'administration/management': 'users',
+        // users and spaces
+        'administration/newStaff': 'usersAndSpaces',
+        'administration/management': 'usersAndSpaces',
+        'spacesAdministration': 'usersAndSpaces',
+        'spacesTemplates': 'usersAndSpaces',
         // content
         'siteExplorer': 'content',
         'wcmAdmin': 'content',
@@ -45,22 +47,17 @@ export default {
         'rewardAdministration/kudosAdministration': 'reward',
         'rewardAdministration/walletAdministration': 'reward',
         'rewardAdministration/rewardAdministration': 'reward',
-        // search
-        'searchIndexing': 'search',
-        'search': 'search',
         // portal
         'portalnavigation': 'portal',
         'groupnavigation': 'portal',
         'administration/pageManagement': 'portal',
-        'branding': 'portal',
         'administration/registry': 'portal',
-        // spaces
-        'spacesAdministration': 'spaces',
-        'spacesTemplates': 'spaces',
+        // search
+        'searchIndexing': 'search',
+        'search': 'search',
         // other
         'appCenterAdminSetup': 'other',
         'notification': 'other',
-        'webconferencing': 'other',
       },
     };
   },

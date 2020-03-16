@@ -8,7 +8,7 @@
     <init-params>
       <value-param>
         <name>exo.branding.company.name</name>
-        <value>${exo.branding.company.name:}</value>
+        <value>${exo.branding.company.name:Digital Workplace}</value>
       </value-param>
       <value-param>
         <name>exo.branding.company.logo</name>
@@ -21,10 +21,8 @@
       <values-param>
         <name>exo.branding.theme.variables</name>
         <value>${exo.branding.theme.primaryColor:primaryColor:#578dc9}</value>
-        <value>${exo.branding.theme.primaryBackground:primaryBackground:#f0f0f0}</value>
-        <value>${exo.branding.theme.secondaryColor:secondaryColor:#000000}</value>
-        <value>${exo.branding.theme.secondaryBackground:secondaryBackground:#476a9c}</value>
-        <value>${exo.branding.theme.tertiaryColor:tertiaryColor:#385989}</value>
+        <value>${exo.branding.theme.secondaryColor:secondaryColor:#476a9c}</value>
+        <value>${exo.branding.theme.tertiaryColor:tertiaryColor:#578dc9}</value>
       </values-param>
     </init-params>
   </component>

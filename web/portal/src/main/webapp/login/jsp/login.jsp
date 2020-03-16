@@ -71,6 +71,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     <title><%=res.getString("UILoginForm.label.Signin")%></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="shortcut icon" type="image/x-icon" href="<%=contextPath%>/favicon.ico"/>
+    <link id="brandingSkin" rel="stylesheet" type="text/css" href="/rest/v1/platform/branding/css">
     <link rel="stylesheet" type="text/css"
           href="<%=contextPath%>/../eXoResources/skin/DefaultSkin/portal/webui/component/widget/UILoginForm/Stylesheet.css"/>
     <link rel="stylesheet" type="text/css"

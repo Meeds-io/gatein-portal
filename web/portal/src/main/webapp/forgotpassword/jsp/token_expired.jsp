@@ -58,6 +58,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= res.getString("gatein.forgotPassword.information") %></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link id="brandingSkin" rel="stylesheet" type="text/css" href="/rest/v1/platform/branding/css">
     <link rel="shortcut icon" type="image/x-icon"  href="<%=contextPath%>/favicon.ico" />
     <% for (SkinConfig skin : skins) {
         if ("CoreSkin".equals(skin.getModule()) || "CoreSkin1".equals(skin.getModule())) {%>

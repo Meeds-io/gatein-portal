@@ -2,9 +2,18 @@
 
 @primaryColor: #578dc9;
 @primaryBackground: #f0f0f0;
-@secondaryColor: #000000;
-@secondaryBackground: #476a9c;
-@tertiaryColor: #385989;
+@secondaryColor: #476a9c;
+@secondaryColorDarken1: darken(@secondaryColor, 15%);
+@tertiaryColor: #578dc9;
+
+@greyColor: #e1e8ee;
+@borderColor: @greyColor;
+
+@greyColorLighten1: #a8b3c5;
+@offlineColor: @greyColorLighten1;
+@quoteBorder: @greyColorLighten1;
+@toolbarLightIconColor: @greyColorLighten1;
+@greyColorLighten1Opacity1: fade(@greyColorLighten1, 13%);
 
 @primaryColorLight: lighten(@primaryColor, 10%);
 @primaryColorLighter: lighten(@primaryColor, 18.5%);
@@ -13,7 +22,14 @@
 @primaryDarkColor: darken(@primaryColor, 15%);
 @primaryDarkColorGradientEnd: darken(@primaryColor, 5%);
 @primaryDarkerColorGradientEnd: darken(@primaryColor, 15%);
-@switchOnColor: lighten(@primaryColor, 30%);
+
+@primaryHoverBackgroundColor: darken(desaturate(spin(@primaryColor, 3.7152), 13.9064), 11.9608);
+@btnPrimaryDisableBackground: lighten(desaturate(spin(@primaryColor, 0.0714), 0.6494), 22.7451);
+
+@welcomePagesBackground: @secondaryColor;
+
+@textColor: #333333;
+
 
 @allPagesPrimaryColor: ~"--allPagesPrimaryColor";
 @allPagesPrimaryColorLight: ~"--allPagesPrimaryColorLight";
@@ -24,27 +40,45 @@
 @allPagesPrimaryDarkColor: ~"--allPagesPrimaryDarkColor";
 @allPagesPrimaryDarkColorGradientEnd: ~"--allPagesPrimaryDarkColorGradientEnd";
 @allPagesPrimaryBackground: ~"--allPagesPrimaryBackground";
-@allPagesSecondarySkinColor: ~"--allPagesSecondarySkinColor";
-@allPagesSecondaryBackground: ~"--allPagesSecondaryBackground";
+@allPagesPrimaryDisableBackground: ~"--allPagesBtnPrimaryDisableBackground";
+@allPagesBtnPrimaryHoverBackgroundColor: ~"--allPagesBtnPrimaryHoverBackgroundColor";
 @allPagesSecondaryColor: ~"--allPagesSecondaryColor";
-@allPagesSecondaryColorDark: ~"--allPagesSecondaryColorDark";
+@allPagesSecondaryColorDarken1: ~"--allPagesSecondaryColorDarken1";
 @allPagesTertiaryColor: ~"--allPagesTertiaryColor";
 @allPagesUiSwitchOnColor: ~"--allPagesUiSwitchOnColor";
+@allPagesGreyColor: ~"--allPagesGreyColor";
+@allPagesQuoteBorder: ~"--allPagesQuoteBorder";
+@allPagesWelcomePagesBackground: ~"--allPagesWelcomePagesBackground";
+@allPagesBorderColor: ~"--allPagesBorderColor";
+@allPagesOfflineColor: ~"--allPagesOfflineColor";
+@allPagesToolbarLightIconColor: ~"--allPagesToolbarLightIconColor";
+@allPagesGreyColorLighten1: ~"--allPagesGreyColorLighten1";
+@allPagesGreyColorLighten1Opacity1: ~"--allPagesGreyColorLighten1Opacity1";
+@allPagesBaseTextColor: ~"--allPagesBaseTextColor";
 
 :root {
-  @{allPagesPrimaryColor}: @primaryColor;
-  @{allPagesPrimaryColorLight}: @primaryColorLight;
-  @{allPagesPrimaryColorLighter}: @primaryColorLighter;
-  @{allPagesPrimaryColorLighterGradientEnd}: @primaryColorLighterGradientEnd;
-  @{allPagesPrimaryDarkerColor}: @primaryDarkerColor;
-  @{allPagesPrimaryDarkerColorGradientEnd}: @primaryDarkerColorGradientEnd;
-  @{allPagesPrimaryDarkColor}: @primaryDarkColor;
-  @{allPagesPrimaryDarkColorGradientEnd}: @primaryDarkColorGradientEnd;
-  @{allPagesPrimaryBackground}: @primaryBackground;
-  @{allPagesSecondarySkinColor}: @secondaryBackground;
-  @{allPagesSecondaryBackground}: @secondaryBackground;
-  @{allPagesSecondaryColor}: @secondaryColor;
-  @{allPagesSecondaryColorDark}: darken(@secondaryColor, 15%);
-  @{allPagesTertiaryColor}: @tertiaryColor;
-  @{allPagesUiSwitchOnColor}: @switchOnColor;
+    @{allPagesPrimaryColor}: @primaryColor;
+    @{allPagesPrimaryColorLight}: @primaryColorLight;
+    @{allPagesPrimaryColorLighter}: @primaryColorLighter;
+    @{allPagesPrimaryColorLighterGradientEnd}: @primaryColorLighterGradientEnd;
+    @{allPagesPrimaryDarkerColor}: @primaryDarkerColor;
+    @{allPagesPrimaryDarkerColorGradientEnd}: @primaryDarkerColorGradientEnd;
+    @{allPagesPrimaryDarkColor}: @primaryDarkColor;
+    @{allPagesPrimaryDarkColorGradientEnd}: @primaryDarkColorGradientEnd;
+    @{allPagesBtnPrimaryHoverBackgroundColor}: @primaryHoverBackgroundColor;
+    @{allPagesPrimaryBackground}: @primaryBackground;
+    @{allPagesPrimaryDisableBackground}: @btnPrimaryDisableBackground;
+    @{allPagesSecondaryColor}: @secondaryColor;
+    @{allPagesSecondaryColorDarken1}: @secondaryColorDarken1;
+    @{allPagesTertiaryColor}: @tertiaryColor;
+    @{allPagesUiSwitchOnColor}: @primaryColor;
+    @{allPagesGreyColor}: @greyColor;
+    @{allPagesQuoteBorder}: @quoteBorder;
+    @{allPagesBorderColor}: @borderColor;
+    @{allPagesWelcomePagesBackground}: @welcomePagesBackground;
+    @{allPagesOfflineColor}: @offlineColor;
+    @{allPagesToolbarLightIconColor}: @toolbarLightIconColor;
+    @{allPagesGreyColorLighten1}: @greyColorLighten1;
+    @{allPagesGreyColorLighten1Opacity1}: @greyColorLighten1Opacity1;
+    @{allPagesBaseTextColor}: @textColor;
 }
