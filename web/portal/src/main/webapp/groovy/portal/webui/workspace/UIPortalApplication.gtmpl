@@ -1,4 +1,4 @@
-<!DOCTYPE html 
+<!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <%
@@ -6,7 +6,7 @@
   import java.util.Iterator;
   import java.util.ArrayList;
   import java.util.Enumeration;
-  import org.json.JSONArray;  
+  import org.json.JSONArray;
   import org.apache.commons.lang.StringUtils;
   import org.exoplatform.container.PortalContainer;
   import org.exoplatform.webui.core.UIComponent;
@@ -31,14 +31,14 @@
   if (country != null && country.length() > 0) {
     language += "_" + country;
   }
-  String docBase =  rcontext.getRequestContextPath() ;  
+  String docBase =  rcontext.getRequestContextPath() ;
   String skin = uicomponent.getSkin();
   def portalSkins = uicomponent.getPortalSkins();
   def portletSkins = uicomponent.getPortletSkins();
   def customSkins = uicomponent.getCustomSkins();
   def scriptsURLs = uicomponent.getScripts();
   def headerScripts = new LinkedList();
-  def jsConfig = uicomponent.getJSConfig(); 
+  def jsConfig = uicomponent.getJSConfig();
   def remoteScripts = new JSONArray();
   for (module in scriptsURLs.keySet()) {
     def url = !jsConfig.has("paths") ? null :
@@ -57,7 +57,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="$language" lang="$language" dir="$dir">
   <head id="head">
     <title><%=HTMLEntityEncoder.getInstance().encode(title)%></title>
-    
+
     <!-- Metadatas -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -99,7 +99,7 @@
     </script>
     <% for (url in headerScripts) { %>
       <script type="text/javascript" src="<%= url %>"></script>
-    <% } %>   
+    <% } %>
    <script type="text/javascript">
      eXo.env.addLoadedRemoteScripts(<%=remoteScripts%>);
      <% if (org.exoplatform.commons.utils.PropertyManager.isDevelopping()) { %>
@@ -135,7 +135,7 @@
      def headerElements = rcontext.getExtraMarkupHeadersAsStrings();
      if (headerElements != null) {
        for (element in headerElements) {
-         print(element);  
+         print(element);
        }
      }
    %>
@@ -179,6 +179,8 @@
  </head>
 
  <body style="height: 100%;" class="$bodyClasses">
+   <!-- Include extensible templates configured by Kernel configuration to be imported in the beginning of the body section of the Page -->
+   <% _ctx.includeTemplates("UIPortalApplication-Start-body") %>
    <div class="visible-tablet"></div>
    <div class="visible-tabletL"></div>
    <div class="visible-phone"></div>
