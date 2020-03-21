@@ -82,6 +82,7 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
 
   @GET
   @Path("/logo")
+  @Produces("image/png")
   @RolesAllowed("users")
   @ApiOperation(value = "Get Branding logo", httpMethod = "GET", response = Response.class)
   @ApiResponses(value = {
@@ -114,6 +115,8 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
     }
     CacheControl cc = new CacheControl();
     cc.setMaxAge(86400);
+    builder.type("image/png");
+    builder.tag(eTag);
     builder.cacheControl(cc);
     return builder.cacheControl(cc).build();
   }

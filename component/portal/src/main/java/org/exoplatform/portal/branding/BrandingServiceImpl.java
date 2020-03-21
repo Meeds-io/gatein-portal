@@ -260,26 +260,21 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   @Override
   public Logo getDefaultLogo() {
-    String logoPath = defaultConfiguredLogoPath;
-    if (StringUtils.isBlank(logoPath)) {
-      logoPath = BRANDING_DEFAULT_LOGO_PATH;
-    } else {
+    if (this.defaultLogo == null) {
+      String logoPath = defaultConfiguredLogoPath;
+      if (StringUtils.isBlank(logoPath)) {
+        logoPath = BRANDING_DEFAULT_LOGO_PATH;
+      }
       try {
         File file = new File(logoPath);
+        if (!file.exists()) {
+          file = new File(this.configurationManager.getResource(logoPath).getFile());
+        }
         if (file.exists()) {
           this.defaultLogo = new Logo(null, Files.readAllBytes(file.toPath()), file.length(), file.lastModified());
         }
-      } catch (IOException e) {
-        LOG.warn("The file of the default configured logo cannot be retrieved (" + logoPath + ")", e);
-      }
-    }
-
-    if (this.defaultLogo == null) {
-      try {
-        byte[] bytes = IOUtils.toByteArray(this.configurationManager.getInputStream(logoPath));
-        this.defaultLogo = new Logo(null, bytes, bytes.length, 0);
       } catch (Exception e) {
-        LOG.warn("The file of the default platform logo cannot be retrieved", e);
+        LOG.warn("The file of the default configured logo cannot be retrieved (" + logoPath + ")", e);
       }
     }
     return this.defaultLogo;
