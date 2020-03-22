@@ -27,6 +27,7 @@ import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.component.test.web.ServletContextImpl;
 import org.exoplatform.component.test.web.WebAppImpl;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.portal.resource.config.tasks.PortalSkinTask;
 import org.exoplatform.portal.resource.config.xml.SkinConfigParser;
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.test.mocks.servlet.MockServletRequest;
@@ -120,9 +121,9 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
     public void testPortalSkin() {
         String contextPath = mockServletContext.getContextPath();
 
-        SkinConfig portalSkin = skinService.getPortalSkin("CoreSkin", "TestSkin");
+        SkinConfig portalSkin = skinService.getPortalSkin(PortalSkinTask.DEFAULT_MODULE_NAME, "TestSkin");
         assertNotNull(portalSkin);
-        assertEquals("CoreSkin", portalSkin.getModule());
+        assertEquals(PortalSkinTask.DEFAULT_MODULE_NAME, portalSkin.getModule());
         assertEquals(contextPath + "/skin/core/Stylesheet.css", portalSkin.getCSSPath());
 
         portalSkin = skinService.getPortalSkin("Module2", "TestSkin");
@@ -152,7 +153,7 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
 
         SkinConfig portalSkin = array[0];
         assertNotNull(portalSkin);
-        assertEquals("CoreSkin", portalSkin.getModule());
+        assertEquals(PortalSkinTask.DEFAULT_MODULE_NAME, portalSkin.getModule());
         assertEquals(contextPath + "/skin/core/Stylesheet.css", portalSkin.getCSSPath());
 
         portalSkin = array[1];
@@ -179,7 +180,7 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
                                                  Set<Entry<SkinKey, SkinConfig>> skinConfigs) {
               Collection<SkinConfig> list = new HashSet<>();
               for (Entry<SkinKey, SkinConfig> entry : portalSkins) {
-                if (entry.getKey().getModule().equals("CoreSkin")) {
+                if (entry.getKey().getModule().equals(PortalSkinTask.DEFAULT_MODULE_NAME)) {
                   list.add(entry.getValue());
                 }
               }
@@ -192,7 +193,7 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
         SkinConfig[] arr = portalSkinConfigs.toArray(new SkinConfig[1]);
         SkinConfig portalSkin = arr[0];
         assertNotNull(portalSkin);
-        assertEquals("CoreSkin", portalSkin.getModule());
+        assertEquals(PortalSkinTask.DEFAULT_MODULE_NAME, portalSkin.getModule());
         assertEquals(contextPath + "/skin/core/Stylesheet.css", portalSkin.getCSSPath());
     }
 

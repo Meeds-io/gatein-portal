@@ -37,7 +37,7 @@ import org.w3c.dom.NodeList;
  */
 public class PortalSkinTask extends AbstractSkinModule implements SkinConfigTask {
 
-    private static final String DEFAULT_MODULE_NAME = "CoreSkin";
+    public static final String DEFAULT_MODULE_NAME = "Core";
 
     private String moduleName;
 

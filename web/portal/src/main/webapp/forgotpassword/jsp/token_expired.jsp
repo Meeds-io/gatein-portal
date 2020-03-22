@@ -29,6 +29,7 @@
 <%@ page import="java.util.Locale" %>
 <%@ page import="org.exoplatform.commons.utils.I18N" %>
 <%@ page import="org.exoplatform.portal.config.UserPortalConfigService" %>
+<%@ page import="org.exoplatform.portal.resource.config.tasks.PortalSkinTask" %>
 <%@ page language="java" %>
 <%
     PortalContainer portalContainer = PortalContainer.getCurrentInstance(session.getServletContext());
@@ -45,9 +46,8 @@
 
     UserPortalConfigService userPortalConfigService = portalContainer.getComponentInstanceOfType(UserPortalConfigService.class);
     String skinName = userPortalConfigService.getDefaultPortalSkinName();
-    Collection<SkinConfig> skins = skinService.getPortalSkins(skinName);
     String loginCssPath = skinService.getSkin("portal/login", skinName).getCSSPath();
-
+    String coreCssPath = skinService.getPortalSkin(PortalSkinTask.DEFAULT_MODULE_NAME, skinName).getCSSPath();
 
     response.setCharacterEncoding("UTF-8");
     response.setContentType("text/html; charset=UTF-8");
@@ -60,11 +60,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link id="brandingSkin" rel="stylesheet" type="text/css" href="/rest/v1/platform/branding/css">
     <link rel="shortcut icon" type="image/x-icon"  href="<%=contextPath%>/favicon.ico" />
-    <% for (SkinConfig skin : skins) {
-        if ("CoreSkin".equals(skin.getModule()) || "CoreSkin1".equals(skin.getModule())) {%>
-    <link href="<%=skin.getCSSPath()%>" rel="stylesheet" type="text/css" test="<%=skin.getModule()%>"/>
-    <%}%>
-    <%}%>
+    <link href="<%=coreCssPath%>" rel="stylesheet" type="text/css"/>
     <link href="<%=loginCssPath%>" rel="stylesheet" type="text/css"/>
 </head>
 <body class="modal-open">
