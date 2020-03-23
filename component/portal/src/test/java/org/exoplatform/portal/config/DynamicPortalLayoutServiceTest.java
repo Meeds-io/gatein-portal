@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import org.junit.Test;
 
@@ -34,6 +34,20 @@ public class DynamicPortalLayoutServiceTest {
     DynamicPortalLayoutService dynamicPortalLayoutService = mockDynamicLayoutService(false, true, true, false);
     assertNotNull(dynamicPortalLayoutService.getDynamicLayoutMatchers());
     assertEquals(0, dynamicPortalLayoutService.getDynamicLayoutMatchers().size());
+  }
+
+  @Test
+  public void testLayoutMatchersPriority() {
+    DynamicPortalLayoutService dynamicPortalLayoutService = mockDynamicLayoutService(false, true, true, false);
+    DynamicPortalLayoutMatcherPlugin matcher1 = new DynamicPortalLayoutMatcherPlugin(null);
+    matcher1.setName("matcher1");
+    DynamicPortalLayoutMatcherPlugin matcher2 = new DynamicPortalLayoutMatcherPlugin(null);
+    matcher1.setName("matcher2");
+    dynamicPortalLayoutService.addDynamicLayoutMatcher(matcher1);
+    dynamicPortalLayoutService.addDynamicLayoutMatcher(matcher2);
+    List<DynamicPortalLayoutMatcherPlugin> dynamicLayoutMatchers = dynamicPortalLayoutService.getDynamicLayoutMatchers();
+    assertEquals(matcher2, dynamicLayoutMatchers.get(0));
+    assertEquals(matcher1, dynamicLayoutMatchers.get(1));
   }
 
   @Test
