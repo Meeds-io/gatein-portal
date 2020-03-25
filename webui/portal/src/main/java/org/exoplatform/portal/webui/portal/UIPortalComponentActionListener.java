@@ -31,6 +31,7 @@ import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.CloneApplicationState;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.webui.application.PortletState;
 import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.container.UIComponentFactory;
@@ -469,7 +470,7 @@ public class UIPortalComponentActionListener {
 
             UIMaskWorkspace uiMaskWS = uiApp.getChildById(UIPortalApplication.UI_MASK_WS_ID);
             UIPortalForm portalForm = uiMaskWS.createUIComponent(UIPortalForm.class, null, "UIPortalForm");
-            portalForm.setEditingSiteKey(uiPortal.getSiteKey());
+            portalForm.setEditingSiteKey(SiteKey.portal(portalName));
             portalForm.setBindingBean();
             uiMaskWS.setWindowSize(700, -1);
             context.addUIComponentToUpdateByAjax(uiMaskWS);
