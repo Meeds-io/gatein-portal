@@ -49,6 +49,8 @@ public class DynamicPortalLayoutService implements Startable {
    */
   private Map<String, DynamicPortalLayoutMatcherPlugin> dynamicLayoutMatcherPlugins = new LinkedHashMap<>();
 
+  private List<DynamicPortalLayoutMatcherPlugin>        dynamicLayoutMatchers       = new ArrayList<>();
+
   public DynamicPortalLayoutService(ConfigurationManager configurationManager, DataStorage dataStorage, InitParams params) {
     this.dataStorage = dataStorage;
     this.configurationManager = configurationManager;
@@ -61,7 +63,7 @@ public class DynamicPortalLayoutService implements Startable {
 
   @Override
   public void start() {
-    for (DynamicPortalLayoutMatcherPlugin dynamicLayoutMatcherPlugin : dynamicLayoutMatcherPlugins.values()) {
+    for (DynamicPortalLayoutMatcherPlugin dynamicLayoutMatcherPlugin : getDynamicLayoutMatchers()) {
       dynamicLayoutMatcherPlugin.init(this.configurationManager);
     }
   }
@@ -94,13 +96,17 @@ public class DynamicPortalLayoutService implements Startable {
   }
 
   /**
-   * @return unmodifiable {@link Collection} of
+   * @return unmodifiable {@link List} of
    *         {@link DynamicPortalLayoutMatcherPlugin} ordered by
    *         {@link ComponentPlugin#getPriority()}). The returned elements are
    *         unique using {@link ComponentPlugin#getName()}).
    */
-  public Collection<DynamicPortalLayoutMatcherPlugin> getDynamicLayoutMatchers() {
-    return Collections.unmodifiableCollection(dynamicLayoutMatcherPlugins.values());
+  public List<DynamicPortalLayoutMatcherPlugin> getDynamicLayoutMatchers() {
+    if (dynamicLayoutMatchers.isEmpty()) {
+      dynamicLayoutMatchers.addAll(dynamicLayoutMatcherPlugins.values());
+      Collections.reverse(dynamicLayoutMatchers);
+    }
+    return Collections.unmodifiableList(dynamicLayoutMatchers);
   }
 
   /**
@@ -138,7 +144,7 @@ public class DynamicPortalLayoutService implements Startable {
       LOG.warn("Current portal site name is blank, thus return stored portal config");
       return storedPortalConfig;
     }
-    
+
     if (StringUtils.equals(currentPortalSiteName, siteKey.getName())) {
       return storedPortalConfig;
     }
@@ -148,7 +154,7 @@ public class DynamicPortalLayoutService implements Startable {
       return storedPortalConfig;
     }
 
-    for (DynamicPortalLayoutMatcherPlugin dynamicLayoutMatcherPlugin : dynamicLayoutMatcherPlugins.values()) {
+    for (DynamicPortalLayoutMatcherPlugin dynamicLayoutMatcherPlugin : getDynamicLayoutMatchers()) {
       PortalConfig dynamicPortalConfig = dynamicLayoutMatcherPlugin.getPortalConfigWithDynamicLayout(siteKey,
                                                                                                      storedPortalConfig,
                                                                                                      currentSitePortalConfig);
