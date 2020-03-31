@@ -83,6 +83,10 @@ export default {
         this.hamburgerMenu = false;
       }
     });
+    const extensions = extensionRegistry.loadExtensions('exo-hamburger-menu-navigation', 'exo-hamburger-menu-navigation-items');
+    if (extensions) {
+      extensions.forEach(contentDetail => delete contentDetail.loaded);
+    }
     this.refreshMenu();
   },
   mounted() {
