@@ -51,6 +51,8 @@ public class UIApplicationLifecycle extends Lifecycle<UIPortletApplication> {
                 super.processAction(uicomponent, context);
             else if (uiTarget != null)
                 uiTarget.processAction(context);
+            else
+                log.warn("Could not find UIComponent with ID {}", componentId);
         }
     }
 
