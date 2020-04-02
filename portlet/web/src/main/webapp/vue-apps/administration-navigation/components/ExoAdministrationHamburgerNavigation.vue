@@ -62,6 +62,9 @@ export default {
     };
   },
   computed:{
+    visibilityQueryParams() {
+      return this.navigationVisibilities.map(visibilityName => `visibility=${visibilityName}`).join('&');
+    },
     navigationTree() {
       const navigationTree = [];
       const navigationParentObjects = {};
