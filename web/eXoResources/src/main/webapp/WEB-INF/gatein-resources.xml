@@ -865,4 +865,13 @@
       <module>jquery</module>
     </depends>
   </module>
+
+  <module>
+    <name>echarts</name>
+    <script>
+      <minify>false</minify>
+      <path>/javascript/echarts.min.js</path>
+    </script>
+  </module>
+
 </gatein-resources>
