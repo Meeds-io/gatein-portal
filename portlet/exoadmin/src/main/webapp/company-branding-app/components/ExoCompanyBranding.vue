@@ -16,7 +16,7 @@
       <div class="logoForm boxContent">
         <h4>{{ $t('companyName.label') }}</h4>
         <div>
-          <input id="companyNameInput" v-model="branding.companyName" :placeholder="$t('companyName.placeholder')" type="text" name="formOp" value="">
+          <input id="companyNameInput" v-model="branding.companyName" :placeholder="$t('companyName.placeholder')" type="text" name="formOp" class="ignore-vuetify-classes" value="">
           <div class="info">{{ $t('companyName.input.hint') }}</div>
         </div> 
         <h4>
@@ -82,10 +82,10 @@
           </div>
         </div>
         <div class="uiAction boxContent">
-          <button id="save" :disabled="!branding.companyName || !branding.companyName.trim()" class="btn btn-primary" type="button" @click="save">
+          <button id="save" :disabled="!branding.companyName || !branding.companyName.trim()" class="btn btn-primary ignore-vuetify-classes" type="button" @click="save">
             {{ $t('save.label') }}
           </button>
-          <button id="cancel" class="btn" type="button" @click="cancel">
+          <button id="cancel" class="btn ignore-vuetify-classes" type="button" @click="cancel">
             {{ $t('cancel.label') }}
           </button>
         </div>
