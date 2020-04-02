@@ -75,7 +75,7 @@
     var extensions = [];
     var module = findModule(app);
 
-    if (!module && module.extensions.length === 0) {
+    if (!module || !module.extensions) {
       return [];
     }
     
