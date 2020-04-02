@@ -867,7 +867,7 @@
   </module>
 
   <module>
-    <name>eChart</name>
+    <name>echarts</name>
     <script>
       <minify>false</minify>
       <path>/javascript/echarts.min.js</path>
