@@ -878,4 +878,13 @@
     </script>
   </module>
 
+  <module>
+    <name>vueEllipsis</name>
+    <script>
+      <path>/javascript/vue-ellipsis.min.js</path>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
 </gatein-resources>
