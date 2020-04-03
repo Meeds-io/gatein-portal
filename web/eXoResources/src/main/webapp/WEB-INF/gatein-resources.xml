@@ -867,10 +867,14 @@
   </module>
 
   <module>
-    <name>echarts</name>
+    <name>eCharts</name>
     <script>
-      <minify>false</minify>
-      <path>/javascript/echarts.min.js</path>
+      <adapter>
+        (function() {
+        <include>/javascript/echarts.min.js</include>
+        return echarts;
+        })();
+      </adapter>
     </script>
   </module>
 
