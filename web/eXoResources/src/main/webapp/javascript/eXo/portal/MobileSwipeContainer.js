@@ -1,0 +1,105 @@
+$(document).ready(() => {
+  $(window).on( "touchstart", event => {
+    const touchStartEvent = event.changedTouches[0];
+    $('.UIMobileSwipeContainer').data('touchstart', {
+      x: touchStartEvent.clientX,
+      y: touchStartEvent.clientY,
+    });
+  });
+
+  $(window).on( "touchend", event => {
+    const touchStart = $('.UIMobileSwipeContainer').data('touchstart');
+    if (!touchStart) {
+      return;
+    }
+
+    const touchEndEvent = event.changedTouches[0];
+    const touchEnd = {
+      x: touchEndEvent.clientX,
+      y: touchEndEvent.clientY,
+    };
+
+    const minWidthToTriggerEvent = 10;
+
+    const offsetX = touchEnd.x - touchStart.x;
+    const offsetY = touchEnd.y - touchStart.y;
+    if (Math.abs(offsetY) < Math.abs(offsetX) * 0.5) {
+      if (touchEnd.x < (touchStart.x - minWidthToTriggerEvent)) {
+        $('.UIMobileSwipeContainer').trigger('swipeleft');
+
+        event.preventDefault();
+        event.stopPropagation();
+      } else if(touchEnd.x > (touchStart.x + minWidthToTriggerEvent)) {
+        $('.UIMobileSwipeContainer').trigger('swiperight');
+
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }
+  });
+
+  $('.UIMobileSwipeContainer').on('swipeleft', () => {
+    const $children = $('.UIMobileSwipeContainer .UIMobileSwipeChildContainer');
+    if ($children.length < 2) {
+      return;
+    }
+
+    const $active = $('.UIMobileSwipeContainer .UIMobileSwipeChildContainer.active');
+    if (!$active.length) {
+      $('.UIMobileSwipeContainer .UIMobileSwipeChildContainer').first().addClass('active');
+      return;
+    }
+
+    const $next = $active.next();
+    if (!$next.length) {
+      return;
+    }
+
+    $active.removeClass('active');
+    $next.addClass('active');
+
+    checkArrowsToDisplay();
+  });
+
+  $('.UIMobileSwipeContainer').on('swiperight', () => {
+    if ($('.UIMobileSwipeContainer .UIMobileSwipeChildContainer').length < 2) {
+      return;
+    }
+
+    const $active = $('.UIMobileSwipeContainer .UIMobileSwipeChildContainer.active');
+    if (!$active.length) {
+      $('.UIMobileSwipeContainer .UIMobileSwipeChildContainer').first().addClass('active');
+      return;
+    }
+
+    const $next = $active.prev();
+    if (!$next.length) {
+      return;
+    }
+
+    $active.removeClass('active');
+    $next.addClass('active');
+
+    checkArrowsToDisplay();
+  });
+
+  function checkArrowsToDisplay() {
+    const $active = $('.UIMobileSwipeContainer .UIMobileSwipeChildContainer.active');
+    if (!$active.length) {
+      return;
+    }
+
+    if ($active.next().length) {
+      $('.UIMobileSwipe.right').removeClass('hidden');
+    } else {
+      $('.UIMobileSwipe.right').addClass('hidden');
+    }
+
+    if ($active.prev().length) {
+      $('.UIMobileSwipe.left').removeClass('hidden');
+    } else {
+      $('.UIMobileSwipe.left').addClass('hidden');
+    }
+  }
+
+});
