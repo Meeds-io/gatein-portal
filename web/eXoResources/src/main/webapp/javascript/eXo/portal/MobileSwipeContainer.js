@@ -1,4 +1,13 @@
 $(document).ready(() => {
+
+  $('.UIMobileSwipe.left').off('click').on('click', () => {
+    $('.UIMobileSwipeContainer').trigger('swiperight');
+  })
+
+  $('.UIMobileSwipe.right').off('click').on('click', () => {
+    $('.UIMobileSwipeContainer').trigger('swipeleft');
+  })
+
   $(window).on( "touchstart", event => {
     const touchStartEvent = event.changedTouches[0];
     $('.UIMobileSwipeContainer').data('touchstart', {
