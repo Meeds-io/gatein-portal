@@ -73,10 +73,10 @@
 
           <% if (uicomponent.getChildren().size() > 1) { %>
             <div class="UIMobileSwipe mobile-visible hidden left">
-              <i class="uiIcon uiIconArrowRight"></i>
+              <i class="uiIcon fa fa-angle-double-right"></i>
             </div>
             <div class="UIMobileSwipe mobile-visible right">
-              <i class="uiIcon uiIconArrowLeft"></i>
+              <i class="uiIcon fa fa-angle-double-left"></i>
             </div>
           <% } %>
 					<%} else out.print("<div class='ProtectedContent'>"+_ctx.appRes("UIPortlet.label.protectedContent")+"</div>");%>
