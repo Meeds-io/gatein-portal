@@ -251,10 +251,13 @@
 	      break;
 	    default:
 	      // if it isn't fit to be showed down BUT is fit to to be showed up
-	      if ((eXo.core.Mouse.mouseyInClient + ctxMenuContainer.offsetHeight) > browserHeight
-	          && (intTop > ctxMenuContainer.offsetHeight)) {
-	        intTop -= ctxMenuContainer.offsetHeight;
+	      if ((eXo.core.Mouse.mouseyInClient + intTop) > browserHeight )
+          {
+              $(".uiRightClickPopupMenu").addClass("dropup");
 	      }
+		else {
+            $(".uiRightClickPopupMenu").removeClass("dropup");
+            	}
 	      break;
 	    }
 	
