@@ -256,7 +256,7 @@
               $(".uiRightClickPopupMenu").addClass("dropup");
 	      }
 		else {
-            $(".uiRightClickPopupMenu").addClass("dropup");
+            $(".uiRightClickPopupMenu").removeClass("dropup");
             	}
 	      break;
 	    }
