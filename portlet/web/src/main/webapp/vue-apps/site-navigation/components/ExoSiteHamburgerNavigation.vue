@@ -61,7 +61,10 @@ export default {
     },
   },
   created(){
-    fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/navigations/portal/${eXo.env.portal.portalName}?scope=${this.navigationScope}&${this.visibilityQueryParams}`)
+    fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/navigations/portal/${eXo.env.portal.portalName}?scope=${this.navigationScope}&${this.visibilityQueryParams}`, {
+      method: 'GET',
+      credentials: 'include',
+    })
       .then(resp => resp && resp.ok && resp.json())
       .then(data => this.navigations = data);
   },
