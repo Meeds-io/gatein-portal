@@ -67,7 +67,9 @@ export default {
       if (this.hamburgerMenu) {
         $('body').addClass('hide-scroll');
       } else {
-        $('body').removeClass('hide-scroll');
+        window.setTimeout(() => {
+          $('body').removeClass('hide-scroll');
+        }, 200); // eslint-disable-line no-magic-numbers
       }
       this.$nextTick().then(() => {
         $('.HamburgerNavigationMenu .v-overlay').click(() => {
