@@ -50,7 +50,7 @@
 				<div class="VIEW-CONTAINER VIEW-BLOCK">
 			<%} %>
 					<%if(hasAccessPermission) {%>
- 						<div>
+ 						<div class="UIIntermediateContainer">
 						  <div class="UIRowContainer <%=(portalMode != UIPortalApplication.NORMAL_MODE && uicomponent.getChildren().size() == 0) ? "EmptyContainer" : ""%>">
 								<%uicomponent.renderChildren();%>
 						  </div>
