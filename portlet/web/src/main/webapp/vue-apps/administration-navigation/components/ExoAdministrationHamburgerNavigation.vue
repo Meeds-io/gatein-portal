@@ -113,9 +113,12 @@ export default {
     },
   },
   created() {
-    fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/navigations/group?exclude=/spaces.*&${this.visibilityQueryParams}`)
+    fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/navigations/group?exclude=/spaces.*&${this.visibilityQueryParams}`, {
+      method: 'GET',
+      credentials: 'include',
+    })
       .then(resp => resp && resp.ok && resp.json())
-      .then(data => this.navigations = data);
+      .then(data => this.navigations = data || []);
   },
   methods: {
     mountSecondLevel(parentId) {

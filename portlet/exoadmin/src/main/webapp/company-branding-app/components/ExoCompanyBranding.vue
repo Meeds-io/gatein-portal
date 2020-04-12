@@ -284,7 +284,10 @@ export default {
       }).then(() => {
         // Check if the file has correctly been uploaded (progress=100) before refreshing the upload list
         const progressUrl = `${brandingConstants.PORTAL}/upload?action=progress&uploadId=${uploadId}`;
-        fetch(progressUrl)
+        fetch(progressUrl, {
+          method: 'GET',
+          credentials: 'include',
+        })
           .then(response => response.text())
           .then(responseText => {
             // TODO fix malformed json from upload service
