@@ -56,7 +56,7 @@
 				<div class="VIEW-CONTAINER VIEW-BLOCK">
 			<%} %> 
 					<%if(hasAccessPermission) {%>
- 						<div>
+            <div class="UIIntermediateContainer">
 						  <div class="UIRowContainer <%=(editMode != EditMode.NO_EDIT && uicomponent.getChildren().size() == 0) ? "EmptyContainer" : ""%>">
 								<%uicomponent.renderChildren();%>
 						  </div>
