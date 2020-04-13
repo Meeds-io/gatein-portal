@@ -59,6 +59,17 @@
     </depends>
   </module>
 
+  <!-- Base Javascripts for anonymous mode -->
+  <module>
+    <name>topbarLoading</name>
+    <script>
+      <path>/javascript/eXo/core/TopbarLoading.js</path>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
   <module>
     <name>portalRequest</name>
     <load-group>baseGRP</load-group>

@@ -66,7 +66,10 @@ export default {
       credentials: 'include',
     })
       .then(resp => resp && resp.ok && resp.json())
-      .then(data => this.navigations = data);
+      .then(data => this.navigations = data)
+      .finally(() => {
+        document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+      });
   },
 };
 </script>
