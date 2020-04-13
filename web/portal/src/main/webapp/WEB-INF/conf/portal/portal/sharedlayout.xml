@@ -89,6 +89,9 @@
         <show-info-bar>false</show-info-bar>
       </portlet-application>
     </container>
+    <container id="TopbarLoadingContainer" template="system:/groovy/portal/webui/container/UITopbarLoadingContainer.gtmpl">
+      <access-permissions>*:/platform/users</access-permissions>
+    </container>
   </container>
   <site-body />
   <container id="bottom-all-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">

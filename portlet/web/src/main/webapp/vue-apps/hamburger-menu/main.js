@@ -19,6 +19,8 @@ const vuetify = new Vuetify({
 const lang = eXo && eXo.env && eXo.env.portal && eXo.env.portal.language || 'en';
 const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portal.HamburgerMenu-${lang}.json`;
 
+document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
+
 export function init() {
   exoi18n.loadLanguageAsync(lang, url)
     .then(i18n => {

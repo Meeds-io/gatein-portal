@@ -92,6 +92,7 @@ export default {
     this.refreshMenu();
   },
   mounted() {
+    document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
     this.isMobile = !$('#HamburgerMenuVisibility').is(':visible');
     $(window).resize(() => {
       this.isMobile = !$('#HamburgerMenuVisibility').is(':visible');
@@ -99,47 +100,52 @@ export default {
   },
   methods: {
     refreshMenu() {
-      const extensions = extensionRegistry.loadExtensions('exo-hamburger-menu-navigation', 'exo-hamburger-menu-navigation-items');
-      if (extensions.length < eXo.portal.hamburgerMenuItems) {
-        return;
-      }
-      extensions.sort((a, b) => a.priority - b.priority);
-      this.contents = extensions;
-      const contentsToLoad = this.contents.filter(contentDetail => !contentDetail.loaded);
-      this.initializing = contentsToLoad.length;
-      const vuetify = this.vuetify;
-      contentsToLoad.forEach(contentDetail => {
-        if (!contentDetail.loaded) {
-          window.setTimeout(() => {
-            try {
-              if ($(`#${contentDetail.id}`).length) {
-                if (!this.vueChildInstances[contentDetail.id]) {
-                  const VueHamburgerMenuItem = Vue.extend(contentDetail.vueComponent);
-                  this.vueChildInstances[contentDetail.id] = new VueHamburgerMenuItem({
-                    i18n: new VueI18n({
-                      locale: this.$i18n.locale,
-                      messages: this.$i18n.messages,
-                    }),
-                    vuetify,
-                    el: `#${contentDetail.id}`,
-                  });
-                  this.vueChildInstances[contentDetail.id].$on('open-second-level', () => {
-                    window.setTimeout(() => {
-                      this.openSecondLevel(contentDetail);
-                    }, this.idleTimeToDisplaySecondLevel);
-                  });
-                  this.vueChildInstances[contentDetail.id].$on('close-second-level', () => {
-                    this.hideSecondLevel();
-                  });
-                }
-              }
-            } finally {
-              contentDetail.loaded = true;
-              this.initializing --;
-            }
-          }, this.idleTime);
+      document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
+      try {
+        const extensions = extensionRegistry.loadExtensions('exo-hamburger-menu-navigation', 'exo-hamburger-menu-navigation-items');
+        if (extensions.length < eXo.portal.hamburgerMenuItems) {
+          return;
         }
-      });
+        extensions.sort((a, b) => a.priority - b.priority);
+        this.contents = extensions;
+        const contentsToLoad = this.contents.filter(contentDetail => !contentDetail.loaded);
+        this.initializing = contentsToLoad.length;
+        const vuetify = this.vuetify;
+        contentsToLoad.forEach(contentDetail => {
+          if (!contentDetail.loaded) {
+            window.setTimeout(() => {
+              try {
+                if ($(`#${contentDetail.id}`).length) {
+                  if (!this.vueChildInstances[contentDetail.id]) {
+                    const VueHamburgerMenuItem = Vue.extend(contentDetail.vueComponent);
+                    this.vueChildInstances[contentDetail.id] = new VueHamburgerMenuItem({
+                      i18n: new VueI18n({
+                        locale: this.$i18n.locale,
+                        messages: this.$i18n.messages,
+                      }),
+                      vuetify,
+                      el: `#${contentDetail.id}`,
+                    });
+                    this.vueChildInstances[contentDetail.id].$on('open-second-level', () => {
+                      window.setTimeout(() => {
+                        this.openSecondLevel(contentDetail);
+                      }, this.idleTimeToDisplaySecondLevel);
+                    });
+                    this.vueChildInstances[contentDetail.id].$on('close-second-level', () => {
+                      this.hideSecondLevel();
+                    });
+                  }
+                }
+              } finally {
+                contentDetail.loaded = true;
+                this.initializing --;
+              }
+            }, this.idleTime);
+          }
+        });
+      } finally {
+        document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+      }
     },
     openSecondLevel(contentDetail) {
       if (!contentDetail.secondLevel || !this.vueChildInstances[contentDetail.id]) {
