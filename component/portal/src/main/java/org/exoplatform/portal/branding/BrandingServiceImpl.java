@@ -20,11 +20,11 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.picocontainer.Startable;
 
-import com.github.sommeri.less4j.*;
+import com.github.sommeri.less4j.Less4jException;
+import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
 
@@ -36,6 +36,7 @@ import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.commons.file.services.FileStorageException;
 import org.exoplatform.commons.utils.IOUtil;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.*;
 import org.exoplatform.services.log.ExoLogger;
@@ -66,7 +67,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   public static final String   LOGO_NAME                         = "logo.png";
 
-  public static final String   BRANDING_DEFAULT_LOGO_PATH        = "war:/../logo/DefaultLogo.png";
+  public static final String   BRANDING_DEFAULT_LOGO_PATH        = "/images/logo/DefaultLogo.png";
 
   public static final Context  BRANDING_CONTEXT                  = Context.GLOBAL.id("BRANDING");
 
@@ -267,11 +268,14 @@ public class BrandingServiceImpl implements BrandingService, Startable {
       }
       try {
         File file = new File(logoPath);
-        if (!file.exists()) {
-          file = new File(this.configurationManager.getResource(logoPath).getFile());
-        }
         if (file.exists()) {
           this.defaultLogo = new Logo(null, Files.readAllBytes(file.toPath()), file.length(), file.lastModified());
+        } else {
+          InputStream is = PortalContainer.getInstance().getPortalContext().getResourceAsStream(logoPath);
+          if (is != null) {
+            byte[] streamContentAsBytes = IOUtil.getStreamContentAsBytes(is);
+            this.defaultLogo = new Logo(null, streamContentAsBytes, streamContentAsBytes.length, System.currentTimeMillis());
+          }
         }
       } catch (Exception e) {
         LOG.warn("The file of the default configured logo cannot be retrieved (" + logoPath + ")", e);
