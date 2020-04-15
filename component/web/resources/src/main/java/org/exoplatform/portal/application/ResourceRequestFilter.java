@@ -42,6 +42,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.gatein.portal.controller.resource.ResourceRequestHandler;
+
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.web.AbstractFilter;
 import org.exoplatform.services.log.ExoLogger;
@@ -62,6 +64,8 @@ public class ResourceRequestFilter extends AbstractFilter {
     public static final String IF_MODIFIED_SINCE = "If-Modified-Since";
 
     public static final String LAST_MODIFIED = "Last-Modified";
+  
+    public static final String EXPIRES = "Expires";
 
     public void afterInit(FilterConfig filterConfig) {
         cfg = filterConfig;
@@ -177,6 +181,7 @@ public class ResourceRequestFilter extends AbstractFilter {
         //
         if (!PropertyManager.isDevelopping()) {
             httpResponse.addHeader("Cache-Control", "max-age=2592000,s-maxage=2592000");
+            httpResponse.setDateHeader(ResourceRequestFilter.EXPIRES, System.currentTimeMillis() + ResourceRequestHandler.MAX_AGE * 1000);
         } else {
             if (uri.endsWith(".jstmpl") || uri.endsWith(".js")) {
                 httpResponse.setHeader("Cache-Control", "no-cache");
