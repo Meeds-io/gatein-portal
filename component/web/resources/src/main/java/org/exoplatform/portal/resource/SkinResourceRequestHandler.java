@@ -31,6 +31,9 @@ public class SkinResourceRequestHandler extends WebRequestHandler {
     public static final String LAST_MODIFIED = "Last-Modified";
 
     /** . */
+    public static final String   EXPIRES           = "Expires";
+
+    /** . */
     private final SkinService skinService;
 
     public SkinResourceRequestHandler(SkinService skinService) {
@@ -92,6 +95,7 @@ public class SkinResourceRequestHandler extends WebRequestHandler {
 
                     long lastModified = skinService.getLastModified(context);
                     response.setDateHeader(LAST_MODIFIED, lastModified);
+                    response.setDateHeader(EXPIRES, System.currentTimeMillis() + 604800000L);
                 }
             };
 
