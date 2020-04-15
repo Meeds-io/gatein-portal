@@ -17,6 +17,7 @@
 package org.exoplatform.portal.branding;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Date;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
@@ -34,7 +35,10 @@ import io.swagger.annotations.*;
 @Api(tags = "/v1/platform/branding", value = "/v1/platform/branding", description = "Managing branding information")
 public class BrandingRestResourcesV1 implements ResourceContainer {
   private static final Log LOG = ExoLogger.getLogger(BrandingRestResourcesV1.class);
-  
+
+  // 3 days
+  private static final int CACHE_IN_MILLI_SECONDS = 3 * 86400 * 1000;
+
   private BrandingService brandingService;
 
   public BrandingRestResourcesV1(BrandingService brandingService) {
@@ -90,22 +94,17 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
           @ApiResponse(code = 404, message = "Branding logo not found"),
           @ApiResponse(code = 500, message = "Server error when retrieving branding logo") })
   public Response getBrandingLogo(@Context Request request,
-                                  @ApiParam(value = "'404' to return a 404 http code when no logo has been uploaded, no value to return the logo define in the configuration or the default logo") @QueryParam("defaultLogo") String defaultLogo) {
-    
+                                  @ApiParam(value = "The value of lastModified parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'") @QueryParam("lastModified") String lastModified) {
+
     Logo logo = brandingService.getLogo();
     if (logo == null) {
-      if("404".equals(defaultLogo)) {
-        throw new WebApplicationException(Response.Status.NOT_FOUND);
-      } else {
-        logo = brandingService.getDefaultLogo();
-        if(logo == null) {
-          throw new WebApplicationException(Response.Status.NOT_FOUND);
-        }
-      }
+      throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
+
     //
     long lastUpdated = logo.getUpdatedDate();
     EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
+
     //
     Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
     if (builder == null) {
@@ -117,6 +116,14 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
     cc.setMaxAge(86400);
     builder.type("image/png");
     builder.tag(eTag);
+    builder.lastModified(new Date(lastUpdated));
+    // If the query has a lastModified parameter, it means that the client
+    // will change the lastModified entry when it really changes
+    // Which means that we can cache the image in browser side
+    // for a long time
+    if (StringUtils.isNotBlank(lastModified)) {
+      builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
+    }
     builder.cacheControl(cc);
     return builder.cacheControl(cc).build();
   }
@@ -143,7 +150,6 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
           @ApiResponse(code = 404, message = "Branding default logo not found"),
           @ApiResponse(code = 500, message = "Server error when retrieving branding default logo") })
   public Response getBrandingDefaultLogo(@Context Request request) {
-
     Logo logo = brandingService.getDefaultLogo();
     if (logo == null) {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
