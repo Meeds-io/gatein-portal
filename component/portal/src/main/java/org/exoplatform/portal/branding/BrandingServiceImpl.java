@@ -73,6 +73,8 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   public static final Scope    BRANDING_SCOPE                    = Scope.APPLICATION.id("BRANDING");
 
+  public static final long     DEFAULT_LOGO_LAST_MODIFED         = System.currentTimeMillis();
+
   private SettingService       settingService;
 
   private FileService          fileService;
@@ -95,7 +97,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   private String               themeCSSContent                   = null;
   
-  private Logo                 defaultLogo                       = null;
+  private Logo                 logo                       = null;
 
   public BrandingServiceImpl(ConfigurationManager configurationManager,
                              SettingService settingService,
@@ -239,29 +241,30 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   @Override
   public Logo getLogo() {
-    Long imageId = getLogoId();
-    if (imageId != null) {
-      try {
-        FileItem fileItem = fileService.getFile(imageId);
-        if (fileItem != null) {
-          Logo logo = new Logo();
-          logo.setData(fileItem.getAsByte());
-          logo.setSize(fileItem.getFileInfo().getSize());
-          logo.setUpdatedDate(fileItem.getFileInfo().getUpdatedDate().getTime());
-
-          return logo;
+    if (this.logo == null) {
+      Long imageId = getLogoId();
+      if (imageId != null) {
+        try {
+          FileItem fileItem = fileService.getFile(imageId);
+          if (fileItem != null) {
+            Logo storedLogo = new Logo();
+            storedLogo.setData(fileItem.getAsByte());
+            storedLogo.setSize(fileItem.getFileInfo().getSize());
+            storedLogo.setUpdatedDate(fileItem.getFileInfo().getUpdatedDate().getTime());
+            this.logo = storedLogo;
+            return this.logo;
+          }
+        } catch (FileStorageException e) {
+          LOG.error("Error while retrieving branding logo", e);
         }
-      } catch (FileStorageException e) {
-        LOG.error("Error while retrieving branding logo", e);
       }
     }
-
-    return null;
+    return this.getDefaultLogo();
   }
 
   @Override
   public Logo getDefaultLogo() {
-    if (this.defaultLogo == null) {
+    if (this.logo == null) {
       String logoPath = defaultConfiguredLogoPath;
       if (StringUtils.isBlank(logoPath)) {
         logoPath = BRANDING_DEFAULT_LOGO_PATH;
@@ -269,19 +272,19 @@ public class BrandingServiceImpl implements BrandingService, Startable {
       try {
         File file = new File(logoPath);
         if (file.exists()) {
-          this.defaultLogo = new Logo(null, Files.readAllBytes(file.toPath()), file.length(), file.lastModified());
+          this.logo = new Logo(null, Files.readAllBytes(file.toPath()), file.length(), file.lastModified());
         } else {
           InputStream is = PortalContainer.getInstance().getPortalContext().getResourceAsStream(logoPath);
           if (is != null) {
             byte[] streamContentAsBytes = IOUtil.getStreamContentAsBytes(is);
-            this.defaultLogo = new Logo(null, streamContentAsBytes, streamContentAsBytes.length, System.currentTimeMillis());
+            this.logo = new Logo(null, streamContentAsBytes, streamContentAsBytes.length, DEFAULT_LOGO_LAST_MODIFED);
           }
         }
       } catch (Exception e) {
         LOG.warn("The file of the default configured logo cannot be retrieved (" + logoPath + ")", e);
       }
     }
-    return this.defaultLogo;
+    return this.logo;
   }
 
   @Override
@@ -302,6 +305,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
    */
   @Override
   public void updateLogo(Logo logo) {
+    this.logo = null;
     if (logo == null || ((logo.getData() == null || logo.getData().length <= 0) && StringUtils.isBlank(logo.getUploadId()))) {
       Long logoId = this.getLogoId();
       if (logoId != null) {
@@ -348,7 +352,6 @@ public class BrandingServiceImpl implements BrandingService, Startable {
                                   inputStream);
           fileService.updateFile(fileItem);
         }
-        this.defaultLogo = null;
       } catch (Exception e) {
         throw new IllegalStateException("Error while updating logo", e);
       }
