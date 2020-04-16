@@ -24,6 +24,7 @@
 package org.gatein.security.oauth.web;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -109,7 +110,7 @@ public abstract class OAuthProviderFilter<T extends AccessTokenContext> extends 
                 }
                 interactionState = getOauthProviderProcessor().processOAuthInteraction(httpRequest, httpResponse, scopeToUse);
             }
-        } catch (OAuthException ex) {
+        } catch (OAuthException | ExecutionException | InterruptedException ex) {
             log.warn("Error during OAuth flow with: " + ex.getMessage());
 
             // Save exception to session and redirect to portal. Exception will be processed later on portal side
@@ -119,7 +120,14 @@ public abstract class OAuthProviderFilter<T extends AccessTokenContext> extends 
         }
 
         if (InteractionState.State.FINISH.equals(interactionState.getState())) {
-            OAuthPrincipal<T> oauthPrincipal = getOAuthPrincipal(httpRequest, httpResponse, interactionState);
+            OAuthPrincipal<T> oauthPrincipal = null;
+            try {
+                oauthPrincipal = getOAuthPrincipal(httpRequest, httpResponse, interactionState);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
 
             if (oauthPrincipal != null) {
                 if (httpRequest.getRemoteUser() == null) {
@@ -211,5 +219,5 @@ public abstract class OAuthProviderFilter<T extends AccessTokenContext> extends 
 
     protected abstract void initInteraction(HttpServletRequest request, HttpServletResponse response);
 
-    protected abstract OAuthPrincipal<T> getOAuthPrincipal(HttpServletRequest request, HttpServletResponse response, InteractionState<T> interactionState);
+    protected abstract OAuthPrincipal<T> getOAuthPrincipal(HttpServletRequest request, HttpServletResponse response, InteractionState<T> interactionState) throws IOException, InterruptedException, ExecutionException;
 }

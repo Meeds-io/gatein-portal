@@ -21,6 +21,11 @@ package org.gatein.security.oauth.web.linkedin;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.github.scribejava.core.model.OAuthRequest;
+import com.github.scribejava.core.model.Response;
+import com.github.scribejava.core.model.Verb;
+import com.github.scribejava.core.oauth.OAuth20Service;
+import org.apache.commons.lang.StringUtils;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.security.oauth.exception.OAuthExceptionCode;
@@ -33,14 +38,12 @@ import org.gatein.security.oauth.web.OAuthProviderFilter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.scribe.builder.ServiceBuilder;
-import org.scribe.model.OAuthRequest;
-import org.scribe.model.Response;
-import org.scribe.model.Verb;
-import org.scribe.oauth.OAuthService;
+
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 public class LinkedInFilter extends OAuthProviderFilter<LinkedinAccessTokenContext> {
-    private static String URL_CURRENT_PROFILE_USER = "https://api.linkedin.com/v1/people/~:(id,first-name,last-name,email-address,public-profile-url,picture-url,picture-urls::(original))?format=json";
+    private static String URL_CURRENT_PROFILE_USER = "https://api.linkedin.com/v2/me:(id,first-name,last-name,email-address,public-profile-url,picture-url,picture-urls::(original))?format=json";
 
     @Override
     protected OAuthProviderType<LinkedinAccessTokenContext> getOAuthProvider() {
@@ -53,13 +56,13 @@ public class LinkedInFilter extends OAuthProviderFilter<LinkedinAccessTokenConte
     }
 
     @Override
-    protected OAuthPrincipal<LinkedinAccessTokenContext> getOAuthPrincipal(HttpServletRequest request, HttpServletResponse response, InteractionState<LinkedinAccessTokenContext> interactionState) {
+    protected OAuthPrincipal<LinkedinAccessTokenContext> getOAuthPrincipal(HttpServletRequest request, HttpServletResponse response, InteractionState<LinkedinAccessTokenContext> interactionState) throws IOException, ExecutionException, InterruptedException {
         LinkedinAccessTokenContext accessTokenContext = interactionState.getAccessTokenContext();
 
         OAuthRequest oauthRequest = new OAuthRequest(Verb.GET, URL_CURRENT_PROFILE_USER);
-        accessTokenContext.oauthService.signRequest(accessTokenContext.accessToken, oauthRequest);
-        Response oauthResponse = oauthRequest.send();
-        String body = oauthResponse.getBody();
+        accessTokenContext.oauth20Service.signRequest(accessTokenContext.accessToken, oauthRequest);
+        Response responses = accessTokenContext.oauth20Service.execute((OAuthRequest) request);
+        String body = responses.getBody();
 
         try {
             JSONObject json = new JSONObject(body);
