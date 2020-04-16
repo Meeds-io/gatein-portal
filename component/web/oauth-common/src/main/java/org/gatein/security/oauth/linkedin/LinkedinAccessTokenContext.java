@@ -19,22 +19,23 @@
 package org.gatein.security.oauth.linkedin;
 
 import java.io.Serializable;
+
+import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.github.scribejava.core.oauth.OAuth20Service;
 import org.gatein.security.oauth.spi.AccessTokenContext;
-import org.scribe.model.Token;
-import org.scribe.oauth.OAuthService;
 
 public class LinkedinAccessTokenContext extends AccessTokenContext implements Serializable {
 
-    public final Token accessToken;
-    public final transient OAuthService oauthService;
+    public final OAuth2AccessToken accessToken;
+    public final transient OAuth20Service oauth20Service;
 
-    public LinkedinAccessTokenContext(Token accessToken, OAuthService oAuthService) {
+    public LinkedinAccessTokenContext(OAuth2AccessToken accessToken, OAuth20Service oauth20Service) {
         this.accessToken = accessToken;
-        this.oauthService = oAuthService;
+        this.oauth20Service = oauth20Service;
     }
 
     @Override
     public String getAccessToken() {
-        return accessToken.getToken();
+        return accessToken.getAccessToken();
     }
 }

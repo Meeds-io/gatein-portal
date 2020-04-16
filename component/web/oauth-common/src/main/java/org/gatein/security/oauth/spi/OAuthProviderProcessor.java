@@ -24,6 +24,7 @@
 package org.gatein.security.oauth.spi;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,7 +56,7 @@ public interface OAuthProviderProcessor<T extends AccessTokenContext> {
      * which happens when user denied scope (authorization screen in web of given social network)
      */
     InteractionState<T> processOAuthInteraction(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws
-            IOException, OAuthException;
+            IOException, OAuthException, ExecutionException, InterruptedException;
 
 
     /**
@@ -70,7 +71,7 @@ public interface OAuthProviderProcessor<T extends AccessTokenContext> {
      * @throws OAuthException
      */
     InteractionState<T> processOAuthInteraction(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String scope) throws
-            IOException, OAuthException;
+            IOException, OAuthException, ExecutionException, InterruptedException;
 
 
     /**
