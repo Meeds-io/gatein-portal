@@ -6,7 +6,7 @@
     pt-0
     class="white">
     <v-row class="mx-0 settingsTitle">
-      <v-list-item class="settingsTitleWrapper" @click="navigateTo('settings')">
+      <v-list-item :href="settingsUrl" class="settingsTitleWrapper">
         <v-list-item-icon class="my-2 mr-6"><i class="uiIcon uiIconToolbarNavItem settingsIcon"></i></v-list-item-icon>
         <v-list-item-content class="subtitle-2 settingsTitleLabel">{{ this.$t('menu.settings.title') }}</v-list-item-content>
       </v-list-item>
@@ -21,6 +21,9 @@
 </template>
 <script>
 export default {
+  data : () => ({
+    settingsUrl : `${eXo.env.portal.context}/${eXo.env.portal.portalName}/settings`,
+  }),
   methods : {
     logOut() {
       eXo.portal.logout();
@@ -33,9 +36,6 @@ export default {
       if(document.getElementById('UIMaskWorkspace')) {
         window.ajaxGet(eXo.env.server.createPortalURL('UIPortal', 'AccountSettings', true));
       }
-    },
-    navigateTo(pagelink) {
-      location.href=`${ eXo.env.portal.context }/${ eXo.env.portal.portalName }/${ pagelink }` ;
     },
   }
 };
