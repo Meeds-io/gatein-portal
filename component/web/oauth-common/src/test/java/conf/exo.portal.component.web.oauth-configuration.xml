@@ -274,7 +274,7 @@
         </value-param>
         <value-param>
           <name>initOAuthURL</name>
-          <value>/oauth2/callback</value>
+          <value>/linkedinAuth</value>
         </value-param>
         <value-param>
           <name>friendlyName</name>

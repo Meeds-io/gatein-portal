@@ -19,6 +19,8 @@
 package org.gatein.security.oauth.linkedin;
 
 import java.io.IOException;
+import java.util.Random;
+import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,6 +51,8 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
     private final String redirectURL;
     private final String apiKey;
     private final String apiSecret;
+    private final String scope="r_liteprofile r_emailaddress w_member_social";
+    final String secretState = "secret" + new Random().nextInt(999_999);
 
     private final int chunkLength;
 
@@ -95,9 +99,14 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
 
         //See if we are a callback
         Token requestToken = (Token) session.getAttribute(OAuthConstants.ATTRIBUTE_LINKEDIN_REQUEST_TOKEN);
-        if (requestToken == null) {
+        if (requestToken== null) {
+            oAuth20Service=new ServiceBuilder(apiKey)
+                    .apiSecret(apiSecret)
+                    .defaultScope(scope) // replace with desired scope
+                    .callback(redirectURL)
+                    .build(LinkedInApi20.instance());
             //requestToken = oAuthService.getRequestToken();
-            String redirect = oAuth20Service.getAuthorizationUrl();
+            String redirect = oAuth20Service.getAuthorizationUrl(secretState);
             //oAuthService.getRequestToken();
             httpResponse.sendRedirect(redirect);
 
@@ -109,7 +118,6 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
 
             String verifierCode = httpRequest.getParameter("oauth_verifier");
             if(verifierCode != null) {
-                //Verifier verifier = new Verifier(verifierCode);
                 OAuth2AccessToken accessToken = oAuth20Service.getAccessToken(verifierCode);
                 LinkedinAccessTokenContext accessTokenContext = new LinkedinAccessTokenContext(accessToken, this.oAuth20Service);
                 return new InteractionState<LinkedinAccessTokenContext>(InteractionState.State.FINISH, accessTokenContext);

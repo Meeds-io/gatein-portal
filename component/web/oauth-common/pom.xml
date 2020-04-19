@@ -97,8 +97,12 @@
     <dependency>
       <groupId>com.github.scribejava</groupId>
       <artifactId>scribejava-apis</artifactId>
-      <version>6.9.0</version>
     </dependency>
+    <dependency>
+      <groupId>com.github.scribejava</groupId>
+      <artifactId>scribejava-core</artifactId>
+    </dependency>
+
     <!-- Google -->
     <dependency>
       <groupId>com.google.oauth-client</groupId>

@@ -255,7 +255,7 @@
         </value-param>
         <value-param>
           <name>filterMapping</name>
-          <value>/oauth2/callback</value>
+          <value>/linkedinAuth</value>
         </value-param>
       </init-params>
     </component-plugin>
@@ -422,7 +422,7 @@
         </value-param>
         <value-param>
           <name>initOAuthURL</name>
-          <value>/oauth2/callback</value>
+          <value>/linkedinAuth</value>
         </value-param>
         <value-param>
           <name>friendlyName</name>

@@ -43,7 +43,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public class LinkedInFilter extends OAuthProviderFilter<LinkedinAccessTokenContext> {
-    private static String URL_CURRENT_PROFILE_USER = "https://api.linkedin.com/v2/me:(id,first-name,last-name,email-address,public-profile-url,picture-url,picture-urls::(original))?format=json";
+    private static String URL_CURRENT_PROFILE_USER = "https://api.linkedin.com/v2/me:(id,first-name,last-name,email-address,public-profile-url,picture-url,picture-urls::(original))";
 
     @Override
     protected OAuthProviderType<LinkedinAccessTokenContext> getOAuthProvider() {
@@ -61,7 +61,9 @@ public class LinkedInFilter extends OAuthProviderFilter<LinkedinAccessTokenConte
 
         OAuthRequest oauthRequest = new OAuthRequest(Verb.GET, URL_CURRENT_PROFILE_USER);
         accessTokenContext.oauth20Service.signRequest(accessTokenContext.accessToken, oauthRequest);
-        Response responses = accessTokenContext.oauth20Service.execute((OAuthRequest) request);
+        oauthRequest.addHeader("x-li-format", "json");
+        oauthRequest.addHeader("Accept-Language", "ru-RU");
+        Response responses = accessTokenContext.oauth20Service.execute(oauthRequest);
         String body = responses.getBody();
 
         try {
