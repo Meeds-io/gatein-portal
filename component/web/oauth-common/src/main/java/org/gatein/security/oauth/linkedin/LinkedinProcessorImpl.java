@@ -29,7 +29,6 @@ import javax.servlet.http.HttpSession;
 import com.github.scribejava.apis.LinkedInApi20;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth2AccessToken;
-import com.github.scribejava.core.model.Token;
 import com.github.scribejava.core.oauth.OAuth20Service;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
@@ -42,7 +41,9 @@ import org.gatein.security.oauth.exception.OAuthExceptionCode;
 import org.gatein.security.oauth.spi.InteractionState;
 import org.gatein.security.oauth.spi.OAuthCodec;
 import org.gatein.security.oauth.utils.OAuthPersistenceUtils;
-
+import org.scribe.builder.api.LinkedInApi;
+import org.scribe.model.Token;
+import org.scribe.oauth.OAuthService;
 
 public class LinkedinProcessorImpl implements LinkedinProcessor {
 
@@ -52,11 +53,12 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
     private final String apiKey;
     private final String apiSecret;
     private final String scope="r_liteprofile r_emailaddress w_member_social";
-    final String secretState = "secret" + new Random().nextInt(999_999);
+    private final String secretState = "secret" + new Random().nextInt(999_999);
 
     private final int chunkLength;
 
     private OAuth20Service oAuth20Service;
+    private OAuthService oAuthService;
 
     public LinkedinProcessorImpl(ExoContainerContext context, InitParams params) {
         this.apiKey = params.getValueParam("apiKey").getValue();
@@ -91,6 +93,12 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
                                         .apiSecret(apiSecret)
                                         .callback(redirectURL)
                                         .build(LinkedInApi20.instance());
+        this.oAuthService = new org.scribe.builder.ServiceBuilder()
+                .provider(LinkedInApi.class)
+                .apiKey(apiKey)
+                .apiSecret(apiSecret)
+                .callback(redirectURL)
+                .build();
     }
 
     @Override
@@ -99,15 +107,15 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
 
         //See if we are a callback
         Token requestToken = (Token) session.getAttribute(OAuthConstants.ATTRIBUTE_LINKEDIN_REQUEST_TOKEN);
+        oAuth20Service=new ServiceBuilder(apiKey)
+                .apiSecret(apiSecret)
+                .defaultScope(scope) // replace with desired scope
+                .callback(redirectURL)
+                .build(LinkedInApi20.instance());
         if (requestToken== null) {
-            oAuth20Service=new ServiceBuilder(apiKey)
-                    .apiSecret(apiSecret)
-                    .defaultScope(scope) // replace with desired scope
-                    .callback(redirectURL)
-                    .build(LinkedInApi20.instance());
-            //requestToken = oAuthService.getRequestToken();
+            requestToken = oAuthService.getRequestToken();
             String redirect = oAuth20Service.getAuthorizationUrl(secretState);
-            //oAuthService.getRequestToken();
+            oAuthService.getRequestToken();
             httpResponse.sendRedirect(redirect);
 
             session.setAttribute(OAuthConstants.ATTRIBUTE_LINKEDIN_REQUEST_TOKEN, requestToken);
@@ -116,7 +124,7 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
         } else {
             session.removeAttribute(OAuthConstants.ATTRIBUTE_LINKEDIN_REQUEST_TOKEN);
 
-            String verifierCode = httpRequest.getParameter("oauth_verifier");
+            String verifierCode = httpRequest.getParameter("code");
             if(verifierCode != null) {
                 OAuth2AccessToken accessToken = oAuth20Service.getAccessToken(verifierCode);
                 LinkedinAccessTokenContext accessTokenContext = new LinkedinAccessTokenContext(accessToken, this.oAuth20Service);

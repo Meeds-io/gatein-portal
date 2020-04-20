@@ -120,14 +120,7 @@ public abstract class OAuthProviderFilter<T extends AccessTokenContext> extends 
         }
 
         if (InteractionState.State.FINISH.equals(interactionState.getState())) {
-            OAuthPrincipal<T> oauthPrincipal = null;
-            try {
-                oauthPrincipal = getOAuthPrincipal(httpRequest, httpResponse, interactionState);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
+            OAuthPrincipal<T> oauthPrincipal = getOAuthPrincipal(httpRequest, httpResponse, interactionState);
 
             if (oauthPrincipal != null) {
                 if (httpRequest.getRemoteUser() == null) {
@@ -219,5 +212,5 @@ public abstract class OAuthProviderFilter<T extends AccessTokenContext> extends 
 
     protected abstract void initInteraction(HttpServletRequest request, HttpServletResponse response);
 
-    protected abstract OAuthPrincipal<T> getOAuthPrincipal(HttpServletRequest request, HttpServletResponse response, InteractionState<T> interactionState) throws IOException, InterruptedException, ExecutionException;
+    protected abstract OAuthPrincipal<T> getOAuthPrincipal(HttpServletRequest request, HttpServletResponse response, InteractionState<T> interactionState);
 }
