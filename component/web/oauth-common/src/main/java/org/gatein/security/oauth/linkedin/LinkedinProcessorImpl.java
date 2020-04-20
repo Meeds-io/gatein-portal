@@ -20,7 +20,6 @@ package org.gatein.security.oauth.linkedin;
 
 import java.io.IOException;
 import java.util.Random;
-import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

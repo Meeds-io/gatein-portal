@@ -75,6 +75,7 @@
     <!-- to move to gatein-dep -->
     <version.scribejava-apis>6.9.0</version.scribejava-apis>
     <version.scribejava-core>6.9.0</version.scribejava-core>
+    <version.scribe>1.3.5</version.scribe>
 
     <!--
     Various log4j properties for unit tests, examples:
@@ -663,6 +664,11 @@
         <groupId>com.github.scribejava</groupId>
         <artifactId>scribejava-core</artifactId>
         <version>${version.scribejava-core}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.scribe</groupId>
+        <artifactId>scribe</artifactId>
+        <version>${version.scribe}</version>
       </dependency>
 
       <!-- GateIn CDI -->
