@@ -51,7 +51,7 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
     private final String redirectURL;
     private final String apiKey;
     private final String apiSecret;
-    private final String scope="r_liteprofile r_emailaddress w_member_social";
+    private final String scope = "r_liteprofile r_emailaddress w_member_social";
     private final String secretState = "secret" + new Random().nextInt(999_999);
 
     private final int chunkLength;
