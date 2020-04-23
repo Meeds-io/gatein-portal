@@ -111,7 +111,7 @@ public abstract class OAuthProviderFilter<T extends AccessTokenContext> extends 
                 interactionState = getOauthProviderProcessor().processOAuthInteraction(httpRequest, httpResponse, scopeToUse);
             }
         } catch (OAuthException | ExecutionException | InterruptedException ex) {
-            log.warn("Error during OAuth flow with: " + ex.getMessage());
+            log.error("Error during OAuth flow with: " + ex.getMessage(),ex);
 
             // Save exception to session and redirect to portal. Exception will be processed later on portal side
             session.setAttribute(OAuthConstants.ATTRIBUTE_EXCEPTION_OAUTH, ex);
