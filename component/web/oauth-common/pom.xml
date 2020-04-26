@@ -103,10 +103,6 @@
       <artifactId>scribejava-core</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.scribe</groupId>
-      <artifactId>scribe</artifactId>
-    </dependency>
 
     <!-- Google -->
     <dependency>
@@ -128,6 +124,11 @@
     <dependency>
       <groupId>com.google.apis</groupId>
       <artifactId>google-api-services-oauth2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-mockito</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

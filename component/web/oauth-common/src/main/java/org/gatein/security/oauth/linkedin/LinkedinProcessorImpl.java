@@ -25,10 +25,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.github.scribejava.apis.LinkedInApi;
 import com.github.scribejava.apis.LinkedInApi20;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.github.scribejava.core.model.Token;
 import com.github.scribejava.core.oauth.OAuth20Service;
+import com.github.scribejava.core.oauth.OAuthService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.organization.UserProfile;
@@ -40,9 +43,6 @@ import org.gatein.security.oauth.exception.OAuthExceptionCode;
 import org.gatein.security.oauth.spi.InteractionState;
 import org.gatein.security.oauth.spi.OAuthCodec;
 import org.gatein.security.oauth.utils.OAuthPersistenceUtils;
-import org.scribe.builder.api.LinkedInApi;
-import org.scribe.model.Token;
-import org.scribe.oauth.OAuthService;
 
 public class LinkedinProcessorImpl implements LinkedinProcessor {
 
@@ -88,40 +88,27 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
 
         this.chunkLength = OAuthPersistenceUtils.getChunkLength(params);
 
-        this.oAuth20Service = (OAuth20Service) new ServiceBuilder(apiKey)
+        this.oAuth20Service = new ServiceBuilder(apiKey)
                                         .apiSecret(apiSecret)
                                         .callback(redirectURL)
                                         .build(LinkedInApi20.instance());
-        this.oAuthService = new org.scribe.builder.ServiceBuilder()
-                .provider(LinkedInApi.class)
-                .apiKey(apiKey)
-                .apiSecret(apiSecret)
-                .callback(redirectURL)
-                .build();
+
     }
 
     @Override
     public InteractionState<LinkedinAccessTokenContext> processOAuthInteraction(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException, OAuthException, ExecutionException, InterruptedException {
-        HttpSession session = httpRequest.getSession();
 
         //See if we are a callback
-        Token requestToken = (Token) session.getAttribute(OAuthConstants.ATTRIBUTE_LINKEDIN_REQUEST_TOKEN);
         oAuth20Service=new ServiceBuilder(apiKey)
                 .apiSecret(apiSecret)
                 .defaultScope(scope) // replace with desired scope
                 .callback(redirectURL)
                 .build(LinkedInApi20.instance());
-        if (requestToken== null) {
-            requestToken = oAuthService.getRequestToken();
+        if (httpRequest.getParameter("code") == null) {
             String redirect = oAuth20Service.getAuthorizationUrl(secretState);
-            oAuthService.getRequestToken();
             httpResponse.sendRedirect(redirect);
-
-            session.setAttribute(OAuthConstants.ATTRIBUTE_LINKEDIN_REQUEST_TOKEN, requestToken);
-
             return new InteractionState<LinkedinAccessTokenContext>(InteractionState.State.AUTH, null);
         } else {
-            session.removeAttribute(OAuthConstants.ATTRIBUTE_LINKEDIN_REQUEST_TOKEN);
 
             String verifierCode = httpRequest.getParameter("code");
             if(verifierCode != null) {
