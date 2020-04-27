@@ -24,6 +24,8 @@ import java.net.URL;
 
 import javax.naming.InitialContext;
 
+import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
@@ -86,7 +88,18 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
     public PicketLinkIDMServiceImpl(ExoContainerContext exoContainerContext, InitParams initParams,
             HibernateService hibernateService, ConfigurationManager confManager,
             InitialContextInitializer dependency) throws Exception {
-        ValueParam config = initParams.getValueParam(PARAM_CONFIG_OPTION);
+
+        ValueParam config = null;
+
+        String directoryType = PropertyManager.getProperty("exo.ldap.type");
+        if(StringUtils.isNotBlank(directoryType)) {
+            config = initParams.getValueParam(PARAM_CONFIG_OPTION + "." + directoryType);
+        }
+
+        if(config == null) {
+            config = initParams.getValueParam(PARAM_CONFIG_OPTION);
+        }
+
         ValueParam jndiName = initParams.getValueParam(PARAM_JNDI_NAME_OPTION);
         ValueParam canExpireStructureCacheEntriesParam = initParams
                 .getValueParam(PARAM_SKIP_EXPIRATION_STRUCTURE_CACHE_ENTRIES);
@@ -123,6 +136,7 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
 
             this.configMD = JAXB2IdentityConfiguration.createConfigurationMetaData(confManager
                     .getInputStream(this.config));
+            //this.configMD.getIdentityStores().get(0).getSupportedIdentityTypes().get(0).getOption("ctxDN")
 
             identityConfiguration = new IdentityConfigurationImpl().configure(this.configMD);
 

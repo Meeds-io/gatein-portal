@@ -1,5 +1,6 @@
 package org.picketlink.idm.impl.store.ldap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.NotYetImplementedException;
 import org.picketlink.idm.impl.helper.Tools;
@@ -42,6 +43,15 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
     super(id);
   }
 
+  @Override
+  public void bootstrap(IdentityStoreConfigurationContext configurationContext) throws IdentityException {
+    super.bootstrap(configurationContext);
+
+    this.attributesMeta
+  }
+
+
+
   /**
    * retrieve the ID of the IdentityObject from LDAP according to the customer's
    * configuration (prevent problems when cn is not equal to the uid attribute )
@@ -69,7 +79,7 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
       for (IdentityObjectType possibleType : possibleTypes) {
         String[] typeCtxs = getTypeConfiguration(ctx, possibleType).getCtxDNs();
         for (String typeCtx : typeCtxs) {
-          if (Tools.dnEndsWith(dn, typeCtx)) {
+          if (StringUtils.isNotBlank(typeCtx) && Tools.dnEndsWith(dn, typeCtx)) {
             matches.add(possibleType);
             break;
           }
@@ -475,6 +485,15 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
     }
 
     return objects;
+  }
+
+  @Override
+  public List<SerializableSearchResult> searchIdentityObjects(IdentityStoreInvocationContext ctx, String[] entryCtxs, String filter, Object[] filterArgs, String[] returningAttributes, String searchScope, Control[] requestControls) throws NamingException, IdentityException {
+    String[] sanitizedEntryCtxs = entryCtxs;
+    if(entryCtxs != null && entryCtxs.length > 0) {
+      sanitizedEntryCtxs = Arrays.stream(entryCtxs).filter(StringUtils::isNotBlank).toArray(String[]::new);
+    }
+    return super.searchIdentityObjects(ctx, sanitizedEntryCtxs, filter, filterArgs, returningAttributes, searchScope, requestControls);
   }
 
   private void checkIOType(IdentityObjectType iot) throws IdentityException {
