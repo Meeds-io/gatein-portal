@@ -179,7 +179,7 @@
             <attributes>
               <attribute>
                 <name>firstName</name>
-                <mapping>cn</mapping>
+                <mapping>${exo.ldap.users.attributes.firstName.mapping:cn}</mapping>
                 <type>text</type>
                 <isRequired>false</isRequired>
                 <isMultivalued>false</isMultivalued>
@@ -187,7 +187,7 @@
               </attribute>
               <attribute>
                 <name>lastName</name>
-                <mapping>sn</mapping>
+                <mapping>${exo.ldap.users.attributes.lastName.mapping:sn}</mapping>
                 <type>text</type>
                 <isRequired>false</isRequired>
                 <isMultivalued>false</isMultivalued>
@@ -195,7 +195,7 @@
               </attribute>
               <attribute>
                 <name>email</name>
-                <mapping>mail</mapping>
+                <mapping>${exo.ldap.users.attributes.email.mapping:mail}</mapping>
                 <type>text</type>
                 <isRequired>false</isRequired>
                 <isMultivalued>false</isMultivalued>
@@ -214,7 +214,7 @@
               </option>
               <option>
                 <name>ctxDNs</name>
-                <value>${exo.ldap.users.base.dn.01:ou=users,dc=samples,dc=org}</value>
+                <value>${exo.ldap.users.base.dn.01:ou=users,dc=company,dc=org}</value>
                 <value>${exo.ldap.users.base.dn.02:}</value>
                 <value>${exo.ldap.users.base.dn.03:}</value>
                 <value>${exo.ldap.users.base.dn.04:}</value>
@@ -267,7 +267,7 @@
               </option>
               <option>
                 <name>ctxDNs</name>
-                <value>${exo.ldap.groups.base.dn.01:ou=groups,dc=samples,dc=org}</value>
+                <value>${exo.ldap.groups.base.dn.01:ou=groups,dc=company,dc=org}</value>
                 <value>${exo.ldap.groups.base.dn.02:}</value>
                 <value>${exo.ldap.groups.base.dn.03:}</value>
                 <value>${exo.ldap.groups.base.dn.04:}</value>
@@ -317,11 +317,11 @@
           </option>
           <option>
             <name>adminDN</name>
-            <value>${exo.ldap.admin.dn:cn=Directory Manager}</value>
+            <value>${exo.ldap.admin.dn:cn=admin}</value>
           </option>
           <option>
             <name>adminPassword</name>
-            <value>${exo.ldap.admin.password:password}</value>
+            <value>${exo.ldap.admin.password:}</value>
           </option>
           <option>
             <name>searchTimeLimit</name>

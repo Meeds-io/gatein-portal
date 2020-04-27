@@ -78,6 +78,10 @@
     <type>org.exoplatform.services.organization.idm.PicketLinkIDMServiceImpl</type>
     <init-params>
       <value-param>
+        <name>ldap.type</name>
+        <value>${exo.ldap.type:}</value>
+      </value-param>
+      <value-param>
         <name>config</name>
         <value>war:/conf/organization/picketlink-idm/picketlink-idm-config.xml</value>
 

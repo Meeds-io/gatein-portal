@@ -3,6 +3,7 @@ package org.picketlink.idm.impl.store.ldap;
 import org.apache.commons.lang3.StringUtils;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.NotYetImplementedException;
+import org.picketlink.idm.impl.configuration.ExoIdentityStoreConfigurationContext;
 import org.picketlink.idm.impl.helper.Tools;
 import org.picketlink.idm.impl.model.ldap.LDAPIdentityObjectImpl;
 import org.picketlink.idm.spi.configuration.IdentityStoreConfigurationContext;
@@ -45,12 +46,10 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
 
   @Override
   public void bootstrap(IdentityStoreConfigurationContext configurationContext) throws IdentityException {
-    super.bootstrap(configurationContext);
+    ExoIdentityStoreConfigurationContext exoIdentityStoreConfigurationContext = new ExoIdentityStoreConfigurationContext(configurationContext);
 
-    this.attributesMeta
+    super.bootstrap(exoIdentityStoreConfigurationContext);
   }
-
-
 
   /**
    * retrieve the ID of the IdentityObject from LDAP according to the customer's

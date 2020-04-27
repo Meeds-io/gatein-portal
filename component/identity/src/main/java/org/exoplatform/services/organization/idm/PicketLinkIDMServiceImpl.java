@@ -91,7 +91,11 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
 
         ValueParam config = null;
 
-        String directoryType = PropertyManager.getProperty("exo.ldap.type");
+        ValueParam directoryTypeValueParam = initParams.getValueParam("ldap.type");
+        String directoryType = null;
+        if(directoryTypeValueParam != null) {
+            directoryType = directoryTypeValueParam.getValue();
+        }
         if(StringUtils.isNotBlank(directoryType)) {
             config = initParams.getValueParam(PARAM_CONFIG_OPTION + "." + directoryType);
         }
