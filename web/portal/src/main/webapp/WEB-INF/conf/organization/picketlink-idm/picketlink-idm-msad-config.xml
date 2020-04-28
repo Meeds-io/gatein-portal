@@ -182,7 +182,7 @@
             <attributes>
               <attribute>
                 <name>firstName</name>
-                <mapping>${exo.ldap.users.attributes.firstName.mapping:cn}</mapping>
+                <mapping>${exo.ldap.users.attributes.firstName.mapping:givenName}</mapping>
                 <type>text</type>
                 <isRequired>false</isRequired>
                 <isMultivalued>false</isMultivalued>
@@ -209,11 +209,23 @@
             <options>
               <option>
                 <name>idAttributeName</name>
-                <value>${exo.ldap.users.id:uid}</value>
+                <value>${exo.ldap.users.id:sAMAccountName}</value>
               </option>
               <option>
                 <name>passwordAttributeName</name>
-                <value>${exo.ldap.users.password:userPassword}</value>
+                <value>${exo.ldap.users.password:unicodePwd}</value>
+              </option>
+              <option>
+                <name>enclosePasswordWith</name>
+                <value>"</value>
+              </option>
+              <option>
+                <name>passwordEncoding</name>
+                <value>UTF-16LE</value>
+              </option>
+              <option>
+                <name>passwordUpdateAttributeValues</name>
+                <value>userAccountControl=512</value>
               </option>
               <option>
                 <name>ctxDNs</name>
@@ -245,7 +257,7 @@
                 <value>objectClass=top</value>
                 <value>objectClass=inetOrgPerson</value>
                 <value>sn= </value>
-                <value>cn= </value>
+                <value>userAccountControl=514</value>
               </option>
             </options>
           </identity-object-type>
@@ -316,7 +328,8 @@
               <option>
                 <name>createEntryAttributeValues</name>
                 <value>objectClass=top</value>
-                <value>objectClass=groupOfNames</value>
+                <value>objectClass=group</value>
+                <value>groupType=8</value>
               </option>
             </options>
           </identity-object-type>
@@ -328,11 +341,15 @@
           </option>
           <option>
             <name>adminDN</name>
-            <value>${exo.ldap.admin.dn:cn=admin}</value>
+            <value>${exo.ldap.admin.dn:TEST\Administrator}</value>
           </option>
           <option>
             <name>adminPassword</name>
             <value>${exo.ldap.admin.password:}</value>
+          </option>
+          <option>
+            <name>authenticationMethod</name>
+            <value>simple</value>
           </option>
           <option>
             <name>searchTimeLimit</name>
@@ -340,7 +357,7 @@
           </option>
           <option>
             <name>createMissingContexts</name>
-            <value>true</value>
+            <value>false</value>
           </option>
           <option>
             <name>customJNDIConnectionParameters</name>

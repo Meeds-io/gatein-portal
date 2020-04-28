@@ -140,7 +140,6 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
 
             this.configMD = JAXB2IdentityConfiguration.createConfigurationMetaData(confManager
                     .getInputStream(this.config));
-            //this.configMD.getIdentityStores().get(0).getSupportedIdentityTypes().get(0).getOption("ctxDN")
 
             identityConfiguration = new IdentityConfigurationImpl().configure(this.configMD);
 
