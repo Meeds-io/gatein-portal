@@ -250,7 +250,7 @@
               </option>
               <option>
                 <name>allowCreateEntry</name>
-                <value>true</value>
+                <value>false</value>
               </option>
               <option>
                 <name>createEntryAttributeValues</name>
@@ -303,7 +303,7 @@
               </option>
               <option>
                 <name>allowCreateEntry</name>
-                <value>true</value>
+                <value>false</value>
               </option>
               <option>
                 <name>parentMembershipAttributeName</name>
