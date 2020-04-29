@@ -25,27 +25,6 @@
                 xsi:schemaLocation="urn:picketlink:idm:config:v1_0_0_ga identity-config.xsd">
   <realms>
     <realm>
-      <id>idm_realm_sample-portal</id>
-      <repository-id-ref>DefaultPortalRepository</repository-id-ref>
-      <identity-type-mappings>
-        <user-mapping>USER</user-mapping>
-      </identity-type-mappings>
-      <options>
-        <option>
-          <name>credentialEncoder.class</name>
-          <value>${exo.plidm.password.class:org.picketlink.idm.impl.credential.DatabaseReadingSaltEncoder}</value>
-        </option>
-        <option>
-          <name>credentialEncoder.hashAlgorithm</name>
-          <value>${exo.plidm.password.hash:SHA-256}</value>
-        </option>
-        <option>
-          <name>credentialEncoder.secureRandomAlgorithm</name>
-          <value>${exo.plidm.password.secureRandomAlgorithm:SHA1PRNG}</value>
-        </option>
-      </options>
-    </realm>
-    <realm>
       <id>idm_realm</id>
       <repository-id-ref>PortalRepository</repository-id-ref>
       <identity-type-mappings>
@@ -58,15 +37,15 @@
         </option>
         <option>
           <name>credentialEncoder.class</name>
-          <value>org.picketlink.idm.impl.credential.DatabaseReadingSaltEncoder</value>
+          <value>${exo.plidm.password.class:org.picketlink.idm.impl.credential.DatabaseReadingSaltEncoder}</value>
         </option>
         <option>
           <name>credentialEncoder.hashAlgorithm</name>
-          <value>${exo.ldap.users.password.encodingAlgorithm:SHA-256}</value>
+          <value>${exo.plidm.password.hash:SHA-256}</value>
         </option>
         <option>
           <name>credentialEncoder.secureRandomAlgorithm</name>
-          <value>SHA1PRNG</value>
+          <value>${exo.plidm.password.secureRandomAlgorithm:SHA1PRNG}</value>
         </option>
       </options>
     </realm>
