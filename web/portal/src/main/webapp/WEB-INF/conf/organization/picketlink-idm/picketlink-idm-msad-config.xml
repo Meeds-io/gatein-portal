@@ -233,16 +233,7 @@
               </option>
               <option>
                 <name>ctxDNs</name>
-                <value>${exo.ldap.users.base.dn.01:ou=users,dc=company,dc=org}</value>
-                <value>${exo.ldap.users.base.dn.02:}</value>
-                <value>${exo.ldap.users.base.dn.03:}</value>
-                <value>${exo.ldap.users.base.dn.04:}</value>
-                <value>${exo.ldap.users.base.dn.05:}</value>
-                <value>${exo.ldap.users.base.dn.06:}</value>
-                <value>${exo.ldap.users.base.dn.07:}</value>
-                <value>${exo.ldap.users.base.dn.08:}</value>
-                <value>${exo.ldap.users.base.dn.09:}</value>
-                <value>${exo.ldap.users.base.dn.10:}</value>
+                <value>${exo.ldap.users.base.dn:ou=users,dc=company,dc=org}</value>
               </option>
               <option>
                 <name>entrySearchFilter</name>
@@ -286,16 +277,7 @@
               </option>
               <option>
                 <name>ctxDNs</name>
-                <value>${exo.ldap.groups.base.dn.01:ou=groups,dc=company,dc=org}</value>
-                <value>${exo.ldap.groups.base.dn.02:}</value>
-                <value>${exo.ldap.groups.base.dn.03:}</value>
-                <value>${exo.ldap.groups.base.dn.04:}</value>
-                <value>${exo.ldap.groups.base.dn.05:}</value>
-                <value>${exo.ldap.groups.base.dn.06:}</value>
-                <value>${exo.ldap.groups.base.dn.07:}</value>
-                <value>${exo.ldap.groups.base.dn.08:}</value>
-                <value>${exo.ldap.groups.base.dn.09:}</value>
-                <value>${exo.ldap.groups.base.dn.10:}</value>
+                <value>${exo.ldap.groups.base.dn:ou=groups,dc=company,dc=org}</value>
               </option>
               <option>
                 <name>entrySearchFilter</name>

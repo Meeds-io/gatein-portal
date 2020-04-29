@@ -5,6 +5,7 @@ import org.exoplatform.commons.utils.PropertyManager;
 import org.picketlink.idm.impl.api.attribute.IdentityObjectAttributeMetaDataImpl;
 import org.picketlink.idm.impl.configuration.metadata.IdentityObjectTypeMetaDataImpl;
 import org.picketlink.idm.impl.configuration.metadata.IdentityStoreConfigurationMetaDataImpl;
+import org.picketlink.idm.impl.store.ldap.SimpleLDAPIdentityObjectTypeConfiguration;
 import org.picketlink.idm.spi.configuration.IdentityConfigurationContextRegistry;
 import org.picketlink.idm.spi.configuration.IdentityStoreConfigurationContext;
 import org.picketlink.idm.spi.configuration.metadata.IdentityConfigurationMetaData;
@@ -12,8 +13,8 @@ import org.picketlink.idm.spi.configuration.metadata.IdentityObjectAttributeMeta
 import org.picketlink.idm.spi.configuration.metadata.IdentityObjectTypeMetaData;
 import org.picketlink.idm.spi.configuration.metadata.IdentityStoreConfigurationMetaData;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class is a wrapper for PicketLink IdentityStoreConfigurationContext class.
@@ -26,6 +27,9 @@ import java.util.List;
  * ** exo.ldap.{users|groups}.attributes.custom.{name}.type: type of the LDAP attribute mapped with the custom attribute, can be "text" or "binary" (defaults to "text")
  * ** exo.ldap.{users|groups}.attributes.custom.{name}.isRequired: is the custom attribute mandatory ? (defaults to false)
  * ** exo.ldap.{users|groups}.attributes.custom.{name}.isMultivalued: is the custom attribute multi-valued ? (defaults to false)
+ * * convert ctxDNs to support semicolon-separated format:
+ * ** multiple <value> tags can still be used to define several DNs
+ * ** for each value, a semicolon-separated list of DNs can be used (for example "ou=users1,dc=company,dc=org;ou=users2,dc=company,dc=org")
  */
 public class ExoIdentityStoreConfigurationContext implements IdentityStoreConfigurationContext {
 
@@ -51,9 +55,12 @@ public class ExoIdentityStoreConfigurationContext implements IdentityStoreConfig
 
     List<IdentityObjectTypeMetaData> enrichedSupportedIdentityTypes = new ArrayList<>(supportedIdentityTypes.size());
     for (IdentityObjectTypeMetaData supportedIdentityType : supportedIdentityTypes) {
+      List<String> convertedCtxDNs = convertCtxDNs(supportedIdentityType);
+      if(convertedCtxDNs != null) {
+        supportedIdentityType.getOptions().put(SimpleLDAPIdentityObjectTypeConfiguration.CTX_DNS, convertedCtxDNs);
+      }
 
       List<IdentityObjectAttributeMetaData> enrichedAttributes = enrichAttributes(supportedIdentityType);
-
       ((IdentityObjectTypeMetaDataImpl) supportedIdentityType).setAttributes(enrichedAttributes);
 
       enrichedSupportedIdentityTypes.add(supportedIdentityType);
@@ -74,6 +81,9 @@ public class ExoIdentityStoreConfigurationContext implements IdentityStoreConfig
     }
 
     List<IdentityObjectAttributeMetaData> attributes = supportedIdentityType.getAttributes();
+    if(attributes == null) {
+      attributes = new ArrayList<>();
+    }
 
     String customAttributesNamesProperty = PropertyManager.getProperty(customNamesPropertyName);
     if(StringUtils.isNotBlank(customAttributesNamesProperty)) {
@@ -98,6 +108,24 @@ public class ExoIdentityStoreConfigurationContext implements IdentityStoreConfig
     }
 
     return attributes;
+  }
+
+  protected List<String> convertCtxDNs(IdentityObjectTypeMetaData supportedIdentityType) {
+    Map<String, List<String>> options = supportedIdentityType.getOptions();
+    if(options == null) {
+      return null;
+    }
+
+    List<String> ctxDNs = options.get(SimpleLDAPIdentityObjectTypeConfiguration.CTX_DNS);
+    if(ctxDNs == null) {
+      return null;
+    }
+
+    List<String> convertedCtxDNs = ctxDNs.stream()
+            .flatMap(ctxDN -> Arrays.stream(ctxDN.split(";")))
+            .collect(Collectors.toList());
+
+    return convertedCtxDNs;
   }
 
   @Override
