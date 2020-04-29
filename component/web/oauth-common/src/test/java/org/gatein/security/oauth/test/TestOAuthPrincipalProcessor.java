@@ -23,9 +23,6 @@
 
 package org.gatein.security.oauth.test;
 
-import com.github.scribejava.apis.LinkedInApi20;
-import com.github.scribejava.core.builder.ServiceBuilder;
-import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.oauth.OAuth20Service;
 import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.component.test.ConfigurationUnit;
@@ -36,6 +33,7 @@ import org.exoplatform.services.organization.User;
 import org.gatein.security.oauth.facebook.FacebookAccessTokenContext;
 import org.gatein.security.oauth.linkedin.LinkedInPrincipalProcessor;
 import org.gatein.security.oauth.linkedin.LinkedinAccessTokenContext;
+import org.gatein.security.oauth.linkedin.LinkedinProcessorImpl;
 import org.gatein.security.oauth.principal.DefaultPrincipalProcessor;
 import org.gatein.security.oauth.spi.*;
 
@@ -59,6 +57,7 @@ public class TestOAuthPrincipalProcessor extends AbstractKernelTest {
 
     private OAuthProviderTypeRegistry oAuthProviderTypeRegistry;
     private OAuth20Service oAuth20Service;
+    private LinkedinProcessorImpl linkedinProcessor;
 
     @Override
     protected void setUp() throws Exception {
@@ -119,7 +118,6 @@ public class TestOAuthPrincipalProcessor extends AbstractKernelTest {
 
     public void testprocessOAuthInteraction() throws IOException, ExecutionException, InterruptedException {
 
-        OAuth20Service oAuth20Service;
         String apiKey="86joj41np68x05";
         String apiSecret="B6Sz1fAUPGxRSraC";
         String scope = "r_liteprofile r_emailaddress w_member_social";
@@ -127,18 +125,20 @@ public class TestOAuthPrincipalProcessor extends AbstractKernelTest {
         String redirectURL = "http://127.0.0.1:8080/portal/linkedinAuth";
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getScheme()).thenReturn("http");
-        when(request.getServerName()).thenReturn("localhost");
+        when(request.getServerName()).thenReturn("127.0.0.1");
         when(request.getServerPort()).thenReturn(8080);
         when(request.getContextPath()).thenReturn("/portal");
+        when(request.getContextPath()).thenReturn("/linkedinAuth");
         HttpServletResponse response = mock(HttpServletResponse.class);
-        oAuth20Service=new ServiceBuilder(apiKey)
-                .apiSecret(apiSecret)
-                .defaultScope(scope)
-                .callback(redirectURL)
-                .build(LinkedInApi20.instance());
-        assertNull(request.getParameter("code"));
-        String redirect = oAuth20Service.getAuthorizationUrl(secretState);
-        assertEquals(redirect,"https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=86joj41np68x05&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Fportal%2FlinkedinAuth&scope=r_liteprofile%20r_emailaddress%20w_member_social&state=secret999999");
+        linkedinProcessor= new LinkedinProcessorImpl(apiKey, apiSecret, redirectURL,scope, 0);
+        linkedinProcessor.processOAuthInteraction(request,response);
+        String reponseType = linkedinProcessor.oAuth20Service.getResponseType();
+        assertEquals("code",reponseType);
+        String state= linkedinProcessor.processOAuthInteraction(request, response).getState().name();
+        assertEquals("AUTH",state);
+        String redirect = linkedinProcessor.oAuth20Service.getAuthorizationUrl(secretState);
+        assertEquals("https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=86joj41np68x05&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Fportal%2FlinkedinAuth&scope=r_liteprofile%20r_emailaddress%20w_member_social&state=secret999999",redirect);
+
 
     }
 }

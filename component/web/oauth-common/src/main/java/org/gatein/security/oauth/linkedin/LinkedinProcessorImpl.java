@@ -23,15 +23,11 @@ import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import com.github.scribejava.apis.LinkedInApi;
 import com.github.scribejava.apis.LinkedInApi20;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth2AccessToken;
-import com.github.scribejava.core.model.Token;
 import com.github.scribejava.core.oauth.OAuth20Service;
-import com.github.scribejava.core.oauth.OAuthService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.organization.UserProfile;
@@ -51,13 +47,12 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
     private final String redirectURL;
     private final String apiKey;
     private final String apiSecret;
-    private final String scope = "r_liteprofile r_emailaddress w_member_social";
+    private String scope = "r_liteprofile r_emailaddress w_member_social";
     private final String secretState = "secret" + new Random().nextInt(999_999);
 
     private final int chunkLength;
 
-    private OAuth20Service oAuth20Service;
-    private OAuthService oAuthService;
+    public OAuth20Service oAuth20Service;
 
     public LinkedinProcessorImpl(ExoContainerContext context, InitParams params) {
         this.apiKey = params.getValueParam("apiKey").getValue();
@@ -93,6 +88,20 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
                                         .callback(redirectURL)
                                         .build(LinkedInApi20.instance());
 
+    }
+
+    public LinkedinProcessorImpl(String apiKey, String apiSecret, String redirectURL, String scope, int chunkLength) {
+
+        this.apiSecret = apiSecret;
+        this.apiKey=apiKey;
+        this.scope=scope;
+        this.redirectURL=redirectURL;
+        this.chunkLength = chunkLength;
+        this.oAuth20Service= oAuth20Service=new ServiceBuilder(apiKey)
+                .apiSecret(apiSecret)
+                .defaultScope(scope)
+                .callback(redirectURL)
+                .build(LinkedInApi20.instance());
     }
 
     @Override
@@ -158,11 +167,9 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
     @Override
     public void saveAccessTokenAttributesToUserProfile(UserProfile userProfile, OAuthCodec codec, LinkedinAccessTokenContext accessToken) {
         String encodedAccessToken = codec.encodeString(accessToken.accessToken.getAccessToken());
-        String encodedAccessTokenSecret = codec.encodeString(accessToken.accessToken.getAccessToken());
         OAuthPersistenceUtils.saveLongAttribute(encodedAccessToken, userProfile, OAuthConstants.PROFILE_LINKEDIN_ACCESS_TOKEN,
                 false, chunkLength);
-        OAuthPersistenceUtils.saveLongAttribute(encodedAccessTokenSecret, userProfile, OAuthConstants.PROFILE_LINKEDIN_ACCESS_TOKEN_SECRET,
-                false, chunkLength);
+
     }
 
     @Override
