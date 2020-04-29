@@ -160,44 +160,10 @@
                 <key><string>/</string></key>
                 <value><string>root_type</string></value>
               </entry>
-
               <entry>
-                <key><string>/platform/*</string></key>
+                <key><string>${exo.ldap.groups.rootGroup:/platform/*}</string></key>
                 <value><string>GROUP</string></value>
               </entry>
-
-              <!-- Uncomment for sample LDAP configuration -->
-              <!--
-              <entry>
-                <key><string>/platform/*</string></key>
-                <value><string>platform_type</string></value>
-              </entry>
-              <entry>
-                <key><string>/organization/*</string></key>
-                <value><string>organization_type</string></value>
-              </entry>
-              -->
-
-
-              <!-- Uncomment for ACME LDAP example -->
-              <!--
-              <entry>
-                <key><string>/acme/roles/*</string></key>
-                <value><string>acme_roles_type</string></value>
-              </entry>
-              <entry>
-                <key><string>/acme/organization_units/*</string></key>
-                <value><string>acme_ou_type</string></value>
-              </entry>
-              -->
-
-              <!-- Uncomment for MSAD ReadOnly LDAP example -->
-              <!--
-              <entry>
-                <key><string>/acme/roles/*</string></key>
-                <value><string>msad_roles_type</string></value>
-              </entry>
-              -->
             </map>
           </field>
           <!-- If this option is used then each Membership created with MembrshipType that is
