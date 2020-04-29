@@ -43,6 +43,10 @@
           <name>credentialEncoder.hashAlgorithm</name>
           <value>${exo.plidm.password.hash:SHA-256}</value>
         </option>
+        <option>
+          <name>credentialEncoder.secureRandomAlgorithm</name>
+          <value>${exo.plidm.password.secureRandomAlgorithm:SHA1PRNG}</value>
+        </option>
       </options>
     </realm>
   </realms>

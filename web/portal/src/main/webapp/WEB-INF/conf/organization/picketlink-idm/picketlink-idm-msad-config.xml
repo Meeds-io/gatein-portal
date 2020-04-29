@@ -33,11 +33,15 @@
       <options>
         <option>
           <name>credentialEncoder.class</name>
-          <value>org.picketlink.idm.impl.credential.DatabaseReadingSaltEncoder</value>
+          <value>${exo.plidm.password.class:org.picketlink.idm.impl.credential.DatabaseReadingSaltEncoder}</value>
         </option>
         <option>
           <name>credentialEncoder.hashAlgorithm</name>
-          <value>SHA-256</value>
+          <value>${exo.plidm.password.hash:SHA-256}</value>
+        </option>
+        <option>
+          <name>credentialEncoder.secureRandomAlgorithm</name>
+          <value>${exo.plidm.password.secureRandomAlgorithm:SHA1PRNG}</value>
         </option>
       </options>
     </realm>
@@ -58,7 +62,7 @@
         </option>
         <option>
           <name>credentialEncoder.hashAlgorithm</name>
-          <value>SHA-256</value>
+          <value>${exo.ldap.users.password.encodingAlgorithm:SHA-256}</value>
         </option>
         <option>
           <name>credentialEncoder.secureRandomAlgorithm</name>
@@ -153,7 +157,7 @@
           </option>
           <option>
             <name>allowNotCaseSensitiveSearch</name>
-            <value>true</value>
+            <value>${exo.ldap.search.notCaseSensitive:true}</value>
           </option>
           <option>
             <name>isRealmAware</name>
@@ -209,11 +213,11 @@
             <options>
               <option>
                 <name>idAttributeName</name>
-                <value>${exo.ldap.users.id:sAMAccountName}</value>
+                <value>${exo.ldap.users.id.attributeName:sAMAccountName}</value>
               </option>
               <option>
                 <name>passwordAttributeName</name>
-                <value>${exo.ldap.users.password:unicodePwd}</value>
+                <value>${exo.ldap.users.password.attributeName:unicodePwd}</value>
               </option>
               <option>
                 <name>enclosePasswordWith</name>
@@ -375,7 +379,7 @@
           </option>
           <option>
             <name>allowNotCaseSensitiveSearch</name>
-            <value>true</value>
+            <value>${exo.ldap.search.notCaseSensitive:true}</value>
           </option>
         </options>
       </identity-store>
