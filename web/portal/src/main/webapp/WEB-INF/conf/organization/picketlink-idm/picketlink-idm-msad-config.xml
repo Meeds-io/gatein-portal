@@ -157,7 +157,7 @@
           </option>
           <option>
             <name>allowNotCaseSensitiveSearch</name>
-            <value>${exo.ldap.search.notCaseSensitive:true}</value>
+            <value>${exo.idm.search.notCaseSensitive:true}</value>
           </option>
           <option>
             <name>isRealmAware</name>
@@ -379,7 +379,7 @@
           </option>
           <option>
             <name>allowNotCaseSensitiveSearch</name>
-            <value>${exo.ldap.search.notCaseSensitive:true}</value>
+            <value>${exo.idm.search.notCaseSensitive:true}</value>
           </option>
         </options>
       </identity-store>
