@@ -43,9 +43,19 @@
                     <identity-store-id>PortalLDAPStore</identity-store-id>
                     <identity-object-types>
                         <identity-object-type>USER</identity-object-type>
-                        <identity-object-type>organization_hierarchy_type</identity-object-type>
+                        <identity-object-type>GROUP</identity-object-type>
                         <identity-object-type>role_hierarchy_type</identity-object-type>
                     </identity-object-types>
+                    <options>
+                        <option>
+                            <name>readOnly</name>
+                            <value>true</value>
+                        </option>
+                        <option>
+                            <name>mandatoryStoredObjects</name>
+                            <value>USER,</value>
+                        </option>
+                    </options>
                 </identity-store-mapping>
             </identity-store-mappings>
             <options>
@@ -182,7 +192,7 @@
                         </options>
                     </identity-object-type>
                     <identity-object-type>
-                      <name>organization_hierarchy_type</name>
+                      <name>GROUP</name>
                       <relationships>
                         <relationship>
                           <relationship-type-ref>JBOSS_IDENTITY_MEMBERSHIP</relationship-type-ref>
@@ -190,7 +200,7 @@
                         </relationship>
                         <relationship>
                           <relationship-type-ref>JBOSS_IDENTITY_MEMBERSHIP</relationship-type-ref>
-                          <identity-object-type-ref>organization_hierarchy_type</identity-object-type-ref>
+                          <identity-object-type-ref>GROUP</identity-object-type-ref>
                         </relationship>
                       </relationships>
                       <credentials/>

@@ -111,7 +111,7 @@
     <init-params>
       <value-param>
         <name>config</name>
-        <value>jar:/conf/picketlink/exo.portal.component.identity-picketlink-idm-ldap-as-external-config.xml
+        <value>jar:/conf/picketlink/exo.portal.component.identity-picketlink-idm-ldap-config-parameterized.xml
         </value>
       </value-param>
     </init-params>
@@ -145,15 +145,7 @@
                   <string>/organization_hierarchy/*</string>
                 </key>
                 <value>
-                  <string>GROUP</string>
-                </value>
-              </entry>
-              <entry>
-                <key>
-                  <string>/role_hierarchy/*</string>
-                </key>
-                <value>
-                  <string>role_hierarchy_type</string>
+                  <string>organization_hierarchy_type</string>
                 </value>
               </entry>
             </map>
@@ -162,9 +154,6 @@
             <collection type="java.util.ArrayList" item-type="java.lang.String">
               <value>
                 <string>/organization_hierarchy/*</string>
-              </value>
-              <value>
-                <string>/role_hierarchy/*</string>
               </value>
             </collection>
           </field>

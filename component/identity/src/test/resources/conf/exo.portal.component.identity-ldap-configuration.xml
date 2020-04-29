@@ -47,7 +47,7 @@
 		<init-params>
 			<value-param>
 				<name>config</name>
-				<value>jar:/conf/exo.portal.component.identity-picketlink-idm-ldap-config.xml</value>
+				<value>jar:/conf/picketlink/exo.portal.component.identity-picketlink-idm-ldap-config.xml</value>
 			</value-param>
         </init-params>
 	</component>
@@ -80,7 +80,7 @@
                       <string>/organization_hierarchy/*</string>
                     </key>
                     <value>
-                      <string>organization_hierarchy_type</string>
+                      <string>GROUP</string>
                     </value>
                   </entry>
                 </map>
