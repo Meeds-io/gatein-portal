@@ -202,7 +202,7 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
     try {
       // If parent simply look for all its members
       if (parent) {
-        if (typeConfig.getParentMembershipAttributeName() != null) {
+        if (StringUtils.isNotBlank(typeConfig.getParentMembershipAttributeName())) {
           Name jndiName = new CompositeName().add(ldapIO.getDn());
           Attributes attrs = ldapContext.getAttributes(jndiName);
           Attribute member = attrs.get(typeConfig.getParentMembershipAttributeName());
@@ -247,7 +247,7 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
         }
         // if not parent then all parent entries need to be found
       } else {
-        if (typeConfig.getChildMembershipAttributeName() == null) {
+        if (StringUtils.isBlank(typeConfig.getChildMembershipAttributeName())) {
           if (ldapIO != null) {
             objects.addAll(findRelatedIdentityObjects(ctx, identity, ldapIO, criteria, true));
           }
