@@ -24,6 +24,7 @@
 package org.gatein.security.oauth.web;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -109,8 +110,8 @@ public abstract class OAuthProviderFilter<T extends AccessTokenContext> extends 
                 }
                 interactionState = getOauthProviderProcessor().processOAuthInteraction(httpRequest, httpResponse, scopeToUse);
             }
-        } catch (OAuthException ex) {
-            log.warn("Error during OAuth flow with: " + ex.getMessage());
+        } catch (OAuthException | ExecutionException | InterruptedException ex) {
+            log.error("Error during OAuth flow with: " + ex.getMessage(),ex);
 
             // Save exception to session and redirect to portal. Exception will be processed later on portal side
             session.setAttribute(OAuthConstants.ATTRIBUTE_EXCEPTION_OAUTH, ex);

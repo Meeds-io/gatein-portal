@@ -19,9 +19,15 @@
 package org.gatein.security.oauth.linkedin;
 
 import java.io.IOException;
+import java.util.Random;
+import java.util.concurrent.ExecutionException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+
+import com.github.scribejava.apis.LinkedInApi20;
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.github.scribejava.core.oauth.OAuth20Service;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.organization.UserProfile;
@@ -33,11 +39,6 @@ import org.gatein.security.oauth.exception.OAuthExceptionCode;
 import org.gatein.security.oauth.spi.InteractionState;
 import org.gatein.security.oauth.spi.OAuthCodec;
 import org.gatein.security.oauth.utils.OAuthPersistenceUtils;
-import org.scribe.builder.ServiceBuilder;
-import org.scribe.builder.api.LinkedInApi;
-import org.scribe.model.Token;
-import org.scribe.model.Verifier;
-import org.scribe.oauth.OAuthService;
 
 public class LinkedinProcessorImpl implements LinkedinProcessor {
 
@@ -46,10 +47,12 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
     private final String redirectURL;
     private final String apiKey;
     private final String apiSecret;
+    private String scope = "r_liteprofile r_emailaddress w_member_social";
+    private final String secretState = "secret" + new Random().nextInt(999_999);
 
     private final int chunkLength;
 
-    private OAuthService oAuthService;
+    public OAuth20Service oAuth20Service;
 
     public LinkedinProcessorImpl(ExoContainerContext context, InitParams params) {
         this.apiKey = params.getValueParam("apiKey").getValue();
@@ -80,37 +83,46 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
 
         this.chunkLength = OAuthPersistenceUtils.getChunkLength(params);
 
-        this.oAuthService = new ServiceBuilder()
-                                        .provider(LinkedInApi.class)
-                                        .apiKey(apiKey)
+        this.oAuth20Service = new ServiceBuilder(apiKey)
                                         .apiSecret(apiSecret)
                                         .callback(redirectURL)
-                                        .build();
+                                        .build(LinkedInApi20.instance());
+
+    }
+
+    public LinkedinProcessorImpl(String apiKey, String apiSecret, String redirectURL, String scope, int chunkLength) {
+
+        this.apiSecret = apiSecret;
+        this.apiKey=apiKey;
+        this.scope=scope;
+        this.redirectURL=redirectURL;
+        this.chunkLength = chunkLength;
+        this.oAuth20Service= oAuth20Service=new ServiceBuilder(apiKey)
+                .apiSecret(apiSecret)
+                .defaultScope(scope)
+                .callback(redirectURL)
+                .build(LinkedInApi20.instance());
     }
 
     @Override
-    public InteractionState<LinkedinAccessTokenContext> processOAuthInteraction(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException, OAuthException {
-        HttpSession session = httpRequest.getSession();
+    public InteractionState<LinkedinAccessTokenContext> processOAuthInteraction(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException, OAuthException, ExecutionException, InterruptedException {
 
         //See if we are a callback
-        Token requestToken = (Token) session.getAttribute(OAuthConstants.ATTRIBUTE_LINKEDIN_REQUEST_TOKEN);
-        if (requestToken == null) {
-            requestToken = oAuthService.getRequestToken();
-            String redirect = oAuthService.getAuthorizationUrl(requestToken);
-            oAuthService.getRequestToken();
+        oAuth20Service=new ServiceBuilder(apiKey)
+                .apiSecret(apiSecret)
+                .defaultScope(scope) // replace with desired scope
+                .callback(redirectURL)
+                .build(LinkedInApi20.instance());
+        if (httpRequest.getParameter("code") == null) {
+            String redirect = oAuth20Service.getAuthorizationUrl(secretState);
             httpResponse.sendRedirect(redirect);
-
-            session.setAttribute(OAuthConstants.ATTRIBUTE_LINKEDIN_REQUEST_TOKEN, requestToken);
-
             return new InteractionState<LinkedinAccessTokenContext>(InteractionState.State.AUTH, null);
         } else {
-            session.removeAttribute(OAuthConstants.ATTRIBUTE_LINKEDIN_REQUEST_TOKEN);
 
-            String verifierCode = httpRequest.getParameter("oauth_verifier");
+            String verifierCode = httpRequest.getParameter("code");
             if(verifierCode != null) {
-                Verifier verifier = new Verifier(verifierCode);
-                Token accessToken = oAuthService.getAccessToken(requestToken, verifier);
-                LinkedinAccessTokenContext accessTokenContext = new LinkedinAccessTokenContext(accessToken, this.oAuthService);
+                OAuth2AccessToken accessToken = oAuth20Service.getAccessToken(verifierCode);
+                LinkedinAccessTokenContext accessTokenContext = new LinkedinAccessTokenContext(accessToken, this.oAuth20Service);
                 return new InteractionState<LinkedinAccessTokenContext>(InteractionState.State.FINISH, accessTokenContext);
             } else {
                 String oauthProblem = httpRequest.getParameter("oauth_problem");
@@ -123,22 +135,18 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
     }
 
     @Override
-    public InteractionState<LinkedinAccessTokenContext> processOAuthInteraction(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String scope) throws IOException, OAuthException {
+    public InteractionState<LinkedinAccessTokenContext> processOAuthInteraction(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String scope) throws IOException, OAuthException, ExecutionException, InterruptedException {
         if(scope != null) {
-            this.oAuthService = new ServiceBuilder()
-                    .provider(LinkedInApi.class)
-                    .apiKey(apiKey)
+            this.oAuth20Service = new ServiceBuilder(apiKey)
                     .apiSecret(apiSecret)
-                    .scope(scope)
+                    .defaultScope(scope)
                     .callback(redirectURL)
-                    .build();
+                    .build(LinkedInApi20.instance());
         } else {
-            this.oAuthService = new ServiceBuilder()
-                    .provider(LinkedInApi.class)
-                    .apiKey(apiKey)
+            this.oAuth20Service = new ServiceBuilder(apiKey)
                     .apiSecret(apiSecret)
                     .callback(redirectURL)
-                    .build();
+                    .build(LinkedInApi20.instance());
         }
         return this.processOAuthInteraction(httpRequest, httpResponse);
     }
@@ -158,12 +166,10 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
 
     @Override
     public void saveAccessTokenAttributesToUserProfile(UserProfile userProfile, OAuthCodec codec, LinkedinAccessTokenContext accessToken) {
-        String encodedAccessToken = codec.encodeString(accessToken.accessToken.getToken());
-        String encodedAccessTokenSecret = codec.encodeString(accessToken.accessToken.getSecret());
+        String encodedAccessToken = codec.encodeString(accessToken.accessToken.getAccessToken());
         OAuthPersistenceUtils.saveLongAttribute(encodedAccessToken, userProfile, OAuthConstants.PROFILE_LINKEDIN_ACCESS_TOKEN,
                 false, chunkLength);
-        OAuthPersistenceUtils.saveLongAttribute(encodedAccessTokenSecret, userProfile, OAuthConstants.PROFILE_LINKEDIN_ACCESS_TOKEN_SECRET,
-                false, chunkLength);
+
     }
 
     @Override
@@ -176,8 +182,8 @@ public class LinkedinProcessorImpl implements LinkedinProcessor {
         if(decodedAccessToken == null || decodedAccessTokenSecret == null) {
             return null;
         } else {
-            Token token = new Token(decodedAccessToken, decodedAccessTokenSecret);
-            return new LinkedinAccessTokenContext(token, oAuthService);
+            OAuth2AccessToken token = new OAuth2AccessToken(decodedAccessToken, decodedAccessTokenSecret);
+            return new LinkedinAccessTokenContext(token, oAuth20Service);
         }
     }
 
