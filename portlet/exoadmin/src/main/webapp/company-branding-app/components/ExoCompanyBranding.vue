@@ -119,31 +119,25 @@ export default {
         },
       },
       color: null,
-      defaultLogo: null,
       uploadInProgress: false,
       uploadProgress: 0,
       maxFileSize: 2097152,
-      informationLoaded: false
     };
   },
   computed: {
-    logoPreview: function() {
-      if(this.informationLoaded) {
-        if(this.branding.logo.data == null || !this.branding.logo.data.length) {
-          if(this.defaultLogo != null) {
-            return this.convertImageDataAsSrc(this.defaultLogo);
-          } else {
-            return `${brandingConstants.HOMEICON}`;
-          }
-        } else if(Array.isArray(this.branding.logo.data)) {
-          return this.convertImageDataAsSrc(this.branding.logo.data);
-        } else {
-          return this.branding.logo.data;
-        }
+    logoPreview() {
+      if (!this.branding || !this.branding.logo || !this.branding.logo.data) {
+        return brandingConstants.HOMEICON;
+      }
+
+      if(Array.isArray(this.branding.logo.data)) {
+        return this.convertImageDataAsSrc(this.branding.logo.data);
+      } else {
+        return this.branding.logo.data;
       }
     },
-    removeLogoButtonDisplayed: function() {
-      return this.branding.logo.uploadId || this.branding.logo.data != null && this.branding.logo.data.length > 0;
+    removeLogoButtonDisplayed() {
+      return this.branding.logo.uploadId || this.branding.logo.id;
     }
   },
   created() {
@@ -197,6 +191,9 @@ export default {
 
       const reader = new FileReader();
       reader.onload = (e) => {
+        if (!this.branding.logo.defaultData) {
+          this.branding.logo.defaultData = this.branding.logo.data;
+        }
         this.branding.logo.data = e.target.result;
       };
       reader.readAsDataURL(files[0]);
@@ -225,7 +222,7 @@ export default {
       this.cleanMessage();
       if(this.branding.logo.uploadId && !this.isLogoFileExtensionValid(this.branding.logo)) {
         this.$el.querySelector('#mustpng').style.display = 'block';
-        this.branding.logo.data = [];
+        this.branding.logo.data = this.branding.logo.defaultData;
         this.branding.logo.uploadId = null;
         return;
       }
@@ -236,22 +233,8 @@ export default {
       document.location.href = brandingConstants.PORTAL;
     },
     initBrandingInformation() {
-      this.informationLoaded = false;
-      const brandingInformationPromise = brandingServices.getBrandingInformation().then(data => {
-        this.branding.companyName = data.companyName;
-        this.branding.topBarTheme = data.topBarTheme;
-        if(data.logo) {
-          this.branding.logo = data.logo;
-        }
-        Object.assign(this.branding.themeColors, data.themeColors);
-      });
-
-      const defaultLogoPromise = brandingServices.getBrandingDefaultLogo().then(data => {
-        this.defaultLogo = data;
-      });
-
-      Promise.all([brandingInformationPromise, defaultLogoPromise]).then(() => {
-        this.informationLoaded = true;
+      brandingServices.getBrandingInformation().then(data => {
+        this.branding = data;
       });
     },
     cleanMessage() {
@@ -265,6 +248,9 @@ export default {
       const MAX_RANDOM_NUMBER = 100000;
       const uploadId = Math.round(Math.random() * MAX_RANDOM_NUMBER); 
       this.branding.logo.uploadId = uploadId;
+      if (!this.branding.logo.defaultData) {
+        this.branding.logo.defaultData = this.branding.logo.data;
+      }
       this.branding.logo.data = data;
 
       const maxProgress = 100;
@@ -317,8 +303,7 @@ export default {
     },
     removeLogo() {
       this.branding.logo.uploadId = null;
-      this.branding.logo.data = [];
-      this.branding.logo.size = 0;
+      this.branding.logo.data = this.branding.logo.defaultData;
     }
   }
 };

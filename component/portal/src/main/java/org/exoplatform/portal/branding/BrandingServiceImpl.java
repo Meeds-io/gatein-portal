@@ -20,11 +20,11 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.picocontainer.Startable;
 
-import com.github.sommeri.less4j.*;
+import com.github.sommeri.less4j.Less4jException;
+import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
 
@@ -36,6 +36,7 @@ import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.commons.file.services.FileStorageException;
 import org.exoplatform.commons.utils.IOUtil;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.*;
 import org.exoplatform.services.log.ExoLogger;
@@ -66,11 +67,13 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   public static final String   LOGO_NAME                         = "logo.png";
 
-  public static final String   BRANDING_DEFAULT_LOGO_PATH        = "war:/../logo/DefaultLogo.png";
+  public static final String   BRANDING_DEFAULT_LOGO_PATH        = "/images/logo/DefaultLogo.png";
 
   public static final Context  BRANDING_CONTEXT                  = Context.GLOBAL.id("BRANDING");
 
   public static final Scope    BRANDING_SCOPE                    = Scope.APPLICATION.id("BRANDING");
+
+  public static final long     DEFAULT_LOGO_LAST_MODIFED         = System.currentTimeMillis();
 
   private SettingService       settingService;
 
@@ -94,7 +97,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   private String               themeCSSContent                   = null;
   
-  private Logo                 defaultLogo                       = null;
+  private Logo                 logo                       = null;
 
   public BrandingServiceImpl(ConfigurationManager configurationManager,
                              SettingService settingService,
@@ -238,46 +241,50 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   @Override
   public Logo getLogo() {
-    Long imageId = getLogoId();
-    if (imageId != null) {
-      try {
-        FileItem fileItem = fileService.getFile(imageId);
-        if (fileItem != null) {
-          Logo logo = new Logo();
-          logo.setData(fileItem.getAsByte());
-          logo.setSize(fileItem.getFileInfo().getSize());
-          logo.setUpdatedDate(fileItem.getFileInfo().getUpdatedDate().getTime());
-
-          return logo;
+    if (this.logo == null) {
+      Long imageId = getLogoId();
+      if (imageId != null) {
+        try {
+          FileItem fileItem = fileService.getFile(imageId);
+          if (fileItem != null) {
+            Logo storedLogo = new Logo();
+            storedLogo.setData(fileItem.getAsByte());
+            storedLogo.setSize(fileItem.getFileInfo().getSize());
+            storedLogo.setUpdatedDate(fileItem.getFileInfo().getUpdatedDate().getTime());
+            this.logo = storedLogo;
+            return this.logo;
+          }
+        } catch (FileStorageException e) {
+          LOG.error("Error while retrieving branding logo", e);
         }
-      } catch (FileStorageException e) {
-        LOG.error("Error while retrieving branding logo", e);
       }
     }
-
-    return null;
+    return this.getDefaultLogo();
   }
 
   @Override
   public Logo getDefaultLogo() {
-    if (this.defaultLogo == null) {
+    if (this.logo == null) {
       String logoPath = defaultConfiguredLogoPath;
       if (StringUtils.isBlank(logoPath)) {
         logoPath = BRANDING_DEFAULT_LOGO_PATH;
       }
       try {
         File file = new File(logoPath);
-        if (!file.exists()) {
-          file = new File(this.configurationManager.getResource(logoPath).getFile());
-        }
         if (file.exists()) {
-          this.defaultLogo = new Logo(null, Files.readAllBytes(file.toPath()), file.length(), file.lastModified());
+          this.logo = new Logo(null, Files.readAllBytes(file.toPath()), file.length(), file.lastModified());
+        } else {
+          InputStream is = PortalContainer.getInstance().getPortalContext().getResourceAsStream(logoPath);
+          if (is != null) {
+            byte[] streamContentAsBytes = IOUtil.getStreamContentAsBytes(is);
+            this.logo = new Logo(null, streamContentAsBytes, streamContentAsBytes.length, DEFAULT_LOGO_LAST_MODIFED);
+          }
         }
       } catch (Exception e) {
         LOG.warn("The file of the default configured logo cannot be retrieved (" + logoPath + ")", e);
       }
     }
-    return this.defaultLogo;
+    return this.logo;
   }
 
   @Override
@@ -298,6 +305,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
    */
   @Override
   public void updateLogo(Logo logo) {
+    this.logo = null;
     if (logo == null || ((logo.getData() == null || logo.getData().length <= 0) && StringUtils.isBlank(logo.getUploadId()))) {
       Long logoId = this.getLogoId();
       if (logoId != null) {
@@ -344,7 +352,6 @@ public class BrandingServiceImpl implements BrandingService, Startable {
                                   inputStream);
           fileService.updateFile(fileItem);
         }
-        this.defaultLogo = null;
       } catch (Exception e) {
         throw new IllegalStateException("Error while updating logo", e);
       }

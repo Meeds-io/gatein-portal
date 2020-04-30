@@ -48,6 +48,8 @@ import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.WebRequestHandler;
 import org.exoplatform.web.controller.QualifiedName;
+
+import org.apache.commons.lang3.StringUtils;
 import org.gatein.common.io.IOTools;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -78,7 +80,7 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
     /** . */
     public static final String VERSION;
 
-    private static final long MAX_AGE;
+    public static final long MAX_AGE;
 
     static {
         // Detecting version from maven properties
@@ -110,9 +112,9 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
         log.info("Use version \"" + version + "\" for resource serving");
         VERSION = version;
 
-        long seconds = 86400;
+        long seconds = 604800L;
         String propValue = PropertyManager.getProperty("gatein.assets.script.max-age");
-        if (propValue != null) {
+        if (StringUtils.isNotBlank(propValue)) {
             try {
                 seconds = Long.valueOf(propValue);
             } catch (NumberFormatException e) {
@@ -208,6 +210,7 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
                 response.setCharacterEncoding("UTF-8");
 
                 response.setHeader("Cache-Control", "max-age=" + MAX_AGE + ",s-maxage=" + MAX_AGE);
+                response.setDateHeader(ResourceRequestFilter.EXPIRES, System.currentTimeMillis() + MAX_AGE * 1000);
 
                 // Set content length
                 response.setContentLength(resolved.bytes.length);

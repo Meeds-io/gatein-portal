@@ -98,13 +98,13 @@ $(document).ready(() => {
       return;
     }
 
-    if ($active.next().length) {
+    if ($active.next().length && $active.next().hasClass('UIMobileSwipeChildContainer')) {
       $('.UIMobileSwipe.right').removeClass('hidden');
     } else {
       $('.UIMobileSwipe.right').addClass('hidden');
     }
 
-    if ($active.prev().length) {
+    if ($active.prev().length && $active.prev().hasClass('UIMobileSwipeChildContainer')) {
       $('.UIMobileSwipe.left').removeClass('hidden');
     } else {
       $('.UIMobileSwipe.left').addClass('hidden');
