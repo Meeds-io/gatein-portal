@@ -353,10 +353,6 @@ public class UIPortal extends UIContainer {
                 tokenService.deleteToken(token);
             }
 
-            String portalName = prContext.getPortalOwner();
-            NodeURL createURL = prContext.createURL(NodeURL.TYPE);
-            createURL.setResource(new NavigationResource(SiteType.PORTAL, portalName, null));
-
             LogoutControl.wantLogout();
             Cookie cookie = new Cookie(LoginServlet.COOKIE_NAME, "");
             cookie.setPath(req.getContextPath());
@@ -368,7 +364,7 @@ public class UIPortal extends UIContainer {
             oauthCookie.setMaxAge(0);
             prContext.getResponse().addCookie(oauthCookie);
 
-            prContext.sendRedirect(createURL.toString());
+            prContext.sendRedirect("/");
         }
 
         private String getTokenCookie(HttpServletRequest req) {
