@@ -7,7 +7,6 @@ let config = {
   // can use multiple entry
   entry: {
     hamburgerMenu: './src/main/webapp/vue-apps/hamburger-menu/main.js',
-    siteHamburgerMenu: './src/main/webapp/vue-apps/site-navigation/main.js',
     administrationHamburgerMenu: './src/main/webapp/vue-apps/administration-navigation/main.js',
     userHamburgerMenu: './src/main/webapp/vue-apps/user-navigation/main.js',
   },
