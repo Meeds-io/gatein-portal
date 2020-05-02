@@ -24,7 +24,12 @@ import java.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.picocontainer.Startable;
 
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.utils.LazyPageList;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -51,6 +56,10 @@ import org.exoplatform.services.resources.LocaleConfigService;
  */
 public class UserPortalConfigService implements Startable {
 
+  private static final Scope      HOME_PAGE_URI_PREFERENCE_SCOPE = Scope.PORTAL.id("HOME");
+
+  private static final String     HOME_PAGE_URI_PREFERENCE_KEY   = "HOME_PAGE_URI";
+
   public static final String      DEFAULT_GLOBAL_PORTAL       = "global";
 
   public static final String      DEFAULT_GROUP_SITE_TEMPLATE = "group";
@@ -62,6 +71,8 @@ public class UserPortalConfigService implements Startable {
     UserACL userACL_;
 
     OrganizationService orgService_;
+
+    private SettingService          settingService;
 
     private NewPortalConfigListener newPortalConfigListener_;
 
@@ -98,7 +109,7 @@ public class UserPortalConfigService implements Startable {
 
     public UserPortalConfigService(UserACL userACL, DataStorage storage, OrganizationService orgService,
             NavigationService navService, DescriptionService descriptionService, PageService pageService,
-            InitParams params)
+            SettingService settingService, InitParams params)
             throws Exception {
 
         //
@@ -130,6 +141,7 @@ public class UserPortalConfigService implements Startable {
         //
         this.storage_ = storage;
         this.orgService_ = orgService;
+        this.settingService = settingService;
         this.userACL_ = userACL;
         this.navService = navService;
         this.pageService = pageService;
@@ -599,6 +611,39 @@ public class UserPortalConfigService implements Startable {
 
     public String getDefaultPortal() {
         return newPortalConfigListener_.getDefaultPortal();
+    }
+
+    /**
+     * @param username user name
+     * @return User home page uri preference
+     */
+    public String getUserHomePage(String username) {
+      SettingValue<?> homePageSettingValue = settingService.get(Context.USER.id(username),
+                                                                HOME_PAGE_URI_PREFERENCE_SCOPE,
+                                                                HOME_PAGE_URI_PREFERENCE_KEY);
+      if (homePageSettingValue != null && homePageSettingValue.getValue() != null) {
+        return homePageSettingValue.getValue().toString();
+      }
+      return PropertyManager.getProperty("exo.portal.user.defaultHome");
+    }
+
+    /**
+     * Stores user default home page
+     * 
+     * @param username user name
+     * @param uri URI to consider as default page of user
+     */
+    public void saveUserHomePage(String username, String uri) {
+      if (StringUtils.isBlank(uri)) {
+        settingService.remove(Context.USER.id(username),
+                              HOME_PAGE_URI_PREFERENCE_SCOPE,
+                              HOME_PAGE_URI_PREFERENCE_KEY);
+      } else {
+        settingService.set(Context.USER.id(username),
+                           HOME_PAGE_URI_PREFERENCE_SCOPE,
+                           HOME_PAGE_URI_PREFERENCE_KEY,
+                           SettingValue.create(uri));
+      }
     }
 
     /**

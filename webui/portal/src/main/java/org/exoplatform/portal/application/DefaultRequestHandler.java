@@ -23,6 +23,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.container.*;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.mop.SiteKey;
@@ -57,24 +59,34 @@ public class DefaultRequestHandler extends WebRequestHandler {
 
     @Override
     public boolean execute(ControllerContext context) throws Exception {
-        String defaultPortal = configService.getDefaultPortal();
-        List<String> allPortalNames = configService.getAllPortalNames();
-        boolean emptyPortalList = allPortalNames == null || allPortalNames.isEmpty();
-        boolean canAccessDefaultPortal = allPortalNames != null && allPortalNames.contains(defaultPortal);
-        if (!emptyPortalList && !canAccessDefaultPortal) {
-          defaultPortal = allPortalNames.get(0);
-        } else if (emptyPortalList) {
-          HttpServletResponse resp = context.getResponse();
-          String currentPortalContainerName = PortalContainer.getCurrentPortalContainerName();
-          resp.sendRedirect("/" + currentPortalContainerName + "/login");
-          return true;
+        String defaultUri = null;
+
+        String currentUser = context.getRequest().getRemoteUser();
+        if (StringUtils.isNotBlank(currentUser)) {
+          defaultUri = configService.getUserHomePage(currentUser);
         }
 
-        PortalURLContext urlContext = new PortalURLContext(context, SiteKey.portal(defaultPortal));
-        NodeURL url = urlFactory.newURL(NodeURL.TYPE, urlContext);
-        String s = url.setResource(new NavigationResource(SiteType.PORTAL, defaultPortal, "")).toString();
+        if (StringUtils.isBlank(defaultUri)) {
+          String defaultPortal = configService.getDefaultPortal();
+          List<String> allPortalNames = configService.getAllPortalNames();
+          boolean emptyPortalList = allPortalNames == null || allPortalNames.isEmpty();
+          boolean canAccessDefaultPortal = allPortalNames != null && allPortalNames.contains(defaultPortal);
+          if (!emptyPortalList && !canAccessDefaultPortal) {
+            defaultPortal = allPortalNames.get(0);
+          } else if (emptyPortalList) {
+            HttpServletResponse resp = context.getResponse();
+            String currentPortalContainerName = PortalContainer.getCurrentPortalContainerName();
+            resp.sendRedirect("/" + currentPortalContainerName + "/login");
+            return true;
+          }
+
+          PortalURLContext urlContext = new PortalURLContext(context, SiteKey.portal(defaultPortal));
+          NodeURL url = urlFactory.newURL(NodeURL.TYPE, urlContext);
+          defaultUri = url.setResource(new NavigationResource(SiteType.PORTAL, defaultPortal, "")).toString();
+        }
+
         HttpServletResponse resp = context.getResponse();
-        resp.sendRedirect(resp.encodeRedirectURL(s));
+        resp.sendRedirect(resp.encodeRedirectURL(defaultUri));
         return true;
     }
 
