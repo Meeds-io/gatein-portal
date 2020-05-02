@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 import java.util.Arrays;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
@@ -37,12 +38,14 @@ public class DefaultRequestHandlerTest {
     UserPortalConfigService portalConfigService = mock(UserPortalConfigService.class);
     ControllerContext context = mock(ControllerContext.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
+    HttpServletRequest request = mock(HttpServletRequest.class);
 
     try {
       String defaultSite = "site2";
       when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
       when(portalConfigService.getAllPortalNames()).thenReturn(Arrays.asList("site1", defaultSite));
       when(context.getResponse()).thenReturn(response);
+      when(context.getRequest()).thenReturn(request);
 
       doAnswer(invocation -> {
         @SuppressWarnings("unchecked")
@@ -92,18 +95,52 @@ public class DefaultRequestHandlerTest {
   }
 
   @Test
+  public void testGetUserDefaultUri() {
+    URLFactoryService urlFactory = mock(URLFactoryService.class);
+    UserPortalConfigService portalConfigService = mock(UserPortalConfigService.class);
+    ControllerContext context = mock(ControllerContext.class);
+    HttpServletResponse response = mock(HttpServletResponse.class);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+
+    try {
+      String defaultSite = "site2";
+      when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
+      when(portalConfigService.getAllPortalNames()).thenReturn(Arrays.asList("site1", defaultSite));
+      when(context.getResponse()).thenReturn(response);
+      when(context.getRequest()).thenReturn(request);
+      when(request.getRemoteUser()).thenReturn("user");
+      when(portalConfigService.getUserHomePage(eq("user"))).thenReturn("/portal/home");
+
+      when(response.encodeRedirectURL(anyString())).thenAnswer(new Answer<String>() {
+        public String answer(InvocationOnMock invocation) {
+          return invocation.getArgumentAt(0, String.class);
+        }
+      });
+
+      DefaultRequestHandler defaultRequestHandler = new DefaultRequestHandler(portalConfigService, urlFactory);
+      defaultRequestHandler.execute(context);
+      verify(response).sendRedirect(eq("/portal/home"));
+    } catch (Exception e) {
+      LOG.error("Error while executing method", e);
+      fail(e.getMessage());
+    }
+  }
+
+  @Test
   public void testGetNonDefaultSite() {
     URLFactoryService urlFactory = mock(URLFactoryService.class);
     NodeURL url = mock(NodeURL.class);
     UserPortalConfigService portalConfigService = mock(UserPortalConfigService.class);
     ControllerContext context = mock(ControllerContext.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
+    HttpServletRequest request = mock(HttpServletRequest.class);
 
     try {
       String defaultSite = "site2";
       when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
       when(portalConfigService.getAllPortalNames()).thenReturn(Arrays.asList("site1"));
       when(context.getResponse()).thenReturn(response);
+      when(context.getRequest()).thenReturn(request);
 
       doAnswer(invocation -> {
         @SuppressWarnings("unchecked")
@@ -158,12 +195,14 @@ public class DefaultRequestHandlerTest {
     UserPortalConfigService portalConfigService = mock(UserPortalConfigService.class);
     ControllerContext context = mock(ControllerContext.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
+    HttpServletRequest request = mock(HttpServletRequest.class);
 
     try {
       String defaultSite = "site2";
       when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
       when(portalConfigService.getAllPortalNames()).thenReturn(Arrays.asList());
       when(context.getResponse()).thenReturn(response);
+      when(context.getRequest()).thenReturn(request);
 
       when(response.encodeRedirectURL(anyString())).thenAnswer(new Answer<String>() {
         public String answer(InvocationOnMock invocation) {
