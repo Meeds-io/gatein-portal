@@ -47,7 +47,7 @@
 		<init-params>
 			<value-param>
 				<name>config</name>
-				<value>jar:/conf/exo.portal.component.identity-picketlink-idm-ldap-user-only-config.xml</value>
+				<value>jar:/conf/picketlink/exo.portal.component.identity-picketlink-idm-ldap-user-only-config.xml</value>
 			</value-param>
         </init-params>
 	</component>

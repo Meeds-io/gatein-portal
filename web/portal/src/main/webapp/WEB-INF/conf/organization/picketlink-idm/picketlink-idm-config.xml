@@ -43,6 +43,10 @@
           <name>credentialEncoder.hashAlgorithm</name>
           <value>${exo.plidm.password.hash:SHA-256}</value>
         </option>
+        <option>
+          <name>credentialEncoder.secureRandomAlgorithm</name>
+          <value>${exo.plidm.password.secureRandomAlgorithm:SHA1PRNG}</value>
+        </option>
       </options>
     </realm>
   </realms>
@@ -100,7 +104,7 @@
           </option>
           <option>
             <name>allowNotCaseSensitiveSearch</name>
-            <value>true</value>
+            <value>${exo.idm.search.notCaseSensitive:true}</value>
           </option>
           <option>
             <name>isRealmAware</name>

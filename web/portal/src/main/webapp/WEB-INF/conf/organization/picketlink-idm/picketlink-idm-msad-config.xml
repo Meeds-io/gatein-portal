@@ -25,23 +25,6 @@
                 xsi:schemaLocation="urn:picketlink:idm:config:v1_0_0_ga identity-config.xsd">
   <realms>
     <realm>
-      <id>idm_realm_sample-portal</id>
-      <repository-id-ref>DefaultPortalRepository</repository-id-ref>
-      <identity-type-mappings>
-        <user-mapping>USER</user-mapping>
-      </identity-type-mappings>
-      <options>
-        <option>
-          <name>credentialEncoder.class</name>
-          <value>org.picketlink.idm.impl.credential.DatabaseReadingSaltEncoder</value>
-        </option>
-        <option>
-          <name>credentialEncoder.hashAlgorithm</name>
-          <value>SHA-256</value>
-        </option>
-      </options>
-    </realm>
-    <realm>
       <id>idm_realm</id>
       <repository-id-ref>PortalRepository</repository-id-ref>
       <identity-type-mappings>
@@ -54,15 +37,15 @@
         </option>
         <option>
           <name>credentialEncoder.class</name>
-          <value>org.picketlink.idm.impl.credential.DatabaseReadingSaltEncoder</value>
+          <value>${exo.plidm.password.class:org.picketlink.idm.impl.credential.DatabaseReadingSaltEncoder}</value>
         </option>
         <option>
           <name>credentialEncoder.hashAlgorithm</name>
-          <value>SHA-256</value>
+          <value>${exo.plidm.password.hash:SHA-256}</value>
         </option>
         <option>
           <name>credentialEncoder.secureRandomAlgorithm</name>
-          <value>SHA1PRNG</value>
+          <value>${exo.plidm.password.secureRandomAlgorithm:SHA1PRNG}</value>
         </option>
       </options>
     </realm>
@@ -79,17 +62,19 @@
           <identity-store-id>PortalLDAPStore</identity-store-id>
           <identity-object-types>
             <identity-object-type>USER</identity-object-type>
-            <identity-object-type>platform_type</identity-object-type>
-            <identity-object-type>organization_type</identity-object-type>
+            <identity-object-type>GROUP</identity-object-type>
           </identity-object-types>
-          <options/>
+          <options>
+            <option>
+              <name>readOnly</name>
+              <value>true</value>
+            </option>
+            <option>
+              <name>mandatoryStoredObjects</name>
+              <value>USER,</value>
+            </option>
+          </options>
         </identity-store-mapping>
-        <options>
-          <option>
-            <name>mandatoryStoredObjects</name>
-            <value>USER,</value>
-          </option>
-        </options>
       </identity-store-mappings>
       <options>
         <option>
@@ -151,7 +136,7 @@
           </option>
           <option>
             <name>allowNotCaseSensitiveSearch</name>
-            <value>true</value>
+            <value>${exo.idm.search.notCaseSensitive:true}</value>
           </option>
           <option>
             <name>isRealmAware</name>
@@ -180,7 +165,7 @@
             <attributes>
               <attribute>
                 <name>firstName</name>
-                <mapping>cn</mapping>
+                <mapping>${exo.ldap.users.attributes.firstName.mapping:givenName}</mapping>
                 <type>text</type>
                 <isRequired>false</isRequired>
                 <isMultivalued>false</isMultivalued>
@@ -188,7 +173,7 @@
               </attribute>
               <attribute>
                 <name>lastName</name>
-                <mapping>sn</mapping>
+                <mapping>${exo.ldap.users.attributes.lastName.mapping:sn}</mapping>
                 <type>text</type>
                 <isRequired>false</isRequired>
                 <isMultivalued>false</isMultivalued>
@@ -196,7 +181,7 @@
               </attribute>
               <attribute>
                 <name>email</name>
-                <mapping>mail</mapping>
+                <mapping>${exo.ldap.users.attributes.email.mapping:mail}</mapping>
                 <type>text</type>
                 <isRequired>false</isRequired>
                 <isMultivalued>false</isMultivalued>
@@ -207,31 +192,51 @@
             <options>
               <option>
                 <name>idAttributeName</name>
-                <value>uid</value>
+                <value>${exo.ldap.users.id.attributeName:sAMAccountName}</value>
               </option>
               <option>
                 <name>passwordAttributeName</name>
-                <value>userPassword</value>
+                <value>${exo.ldap.users.password.attributeName:unicodePwd}</value>
+              </option>
+              <option>
+                <name>enclosePasswordWith</name>
+                <value>"</value>
+              </option>
+              <option>
+                <name>passwordEncoding</name>
+                <value>UTF-16LE</value>
+              </option>
+              <option>
+                <name>passwordUpdateAttributeValues</name>
+                <value>userAccountControl=512</value>
               </option>
               <option>
                 <name>ctxDNs</name>
-                <value>ou=People,o=portal,o=gatein,dc=example,dc=com</value>
+                <value>${exo.ldap.users.base.dn:ou=users,dc=company,dc=org}</value>
+              </option>
+              <option>
+                <name>entrySearchFilter</name>
+                <value>${exo.ldap.users.filter:}</value>
+              </option>
+              <option>
+                <name>entrySearchScope</name>
+                <value>${exo.ldap.users.search.scope:subtree}</value>
               </option>
               <option>
                 <name>allowCreateEntry</name>
-                <value>true</value>
+                <value>false</value>
               </option>
               <option>
                 <name>createEntryAttributeValues</name>
                 <value>objectClass=top</value>
                 <value>objectClass=inetOrgPerson</value>
                 <value>sn= </value>
-                <value>cn= </value>
+                <value>userAccountControl=514</value>
               </option>
             </options>
           </identity-object-type>
           <identity-object-type>
-            <name>platform_type</name>
+            <name>GROUP</name>
             <relationships>
               <relationship>
                 <relationship-type-ref>JBOSS_IDENTITY_MEMBERSHIP</relationship-type-ref>
@@ -239,7 +244,7 @@
               </relationship>
               <relationship>
                 <relationship-type-ref>JBOSS_IDENTITY_MEMBERSHIP</relationship-type-ref>
-                <identity-object-type-ref>platform_type</identity-object-type-ref>
+                <identity-object-type-ref>GROUP</identity-object-type-ref>
               </relationship>
             </relationships>
             <credentials/>
@@ -247,27 +252,39 @@
             <options>
               <option>
                 <name>idAttributeName</name>
-                <value>cn</value>
+                <value>${exo.ldap.groups.id:cn}</value>
               </option>
               <option>
                 <name>ctxDNs</name>
-                <value>ou=Platform,o=portal,o=gatein,dc=example,dc=com</value>
+                <value>${exo.ldap.groups.base.dn:ou=groups,dc=company,dc=org}</value>
               </option>
-              <!--<option>-->
-              <!--<name>entrySearchFilter</name>-->
-              <!--<value></value>-->
-              <!--</option>-->
+              <option>
+                <name>entrySearchFilter</name>
+                <value>${exo.ldap.groups.filter:}</value>
+              </option>
+              <option>
+                <name>entrySearchScope</name>
+                <value>${exo.ldap.groups.search.scope:subtree}</value>
+              </option>
               <option>
                 <name>allowCreateEntry</name>
-                <value>true</value>
+                <value>false</value>
               </option>
               <option>
                 <name>parentMembershipAttributeName</name>
-                <value>member</value>
+                <value>${exo.ldap.groups.parentMembershipAttributeName:member}</value>
               </option>
               <option>
                 <name>isParentMembershipAttributeDN</name>
-                <value>true</value>
+                <value>${exo.ldap.groups.isParentMembershipAttributeDN:true}</value>
+              </option>
+              <option>
+                <name>childMembershipAttributeName</name>
+                <value>${exo.ldap.groups.childMembershipAttributeName:}</value>
+              </option>
+              <option>
+                <name>childMembershipAttributeDN</name>
+                <value>${exo.ldap.groups.childMembershipAttributeDN:}</value>
               </option>
               <option>
                 <name>allowEmptyMemberships</name>
@@ -276,57 +293,8 @@
               <option>
                 <name>createEntryAttributeValues</name>
                 <value>objectClass=top</value>
-                <value>objectClass=groupOfNames</value>
-              </option>
-            </options>
-          </identity-object-type>
-          <identity-object-type>
-            <name>organization_type</name>
-            <relationships>
-              <relationship>
-                <relationship-type-ref>JBOSS_IDENTITY_MEMBERSHIP</relationship-type-ref>
-                <identity-object-type-ref>USER</identity-object-type-ref>
-              </relationship>
-              <relationship>
-                <relationship-type-ref>JBOSS_IDENTITY_MEMBERSHIP</relationship-type-ref>
-                <identity-object-type-ref>organization_type</identity-object-type-ref>
-              </relationship>
-            </relationships>
-            <credentials/>
-            <attributes/>
-            <options>
-              <option>
-                <name>idAttributeName</name>
-                <value>cn</value>
-              </option>
-              <option>
-                <name>ctxDNs</name>
-                <value>ou=Organization,o=portal,o=gatein,dc=example,dc=com</value>
-              </option>
-              <!--<option>-->
-              <!--<name>entrySearchFilter</name>-->
-              <!--<value></value>-->
-              <!--</option>-->
-              <option>
-                <name>allowCreateEntry</name>
-                <value>true</value>
-              </option>
-              <option>
-                <name>parentMembershipAttributeName</name>
-                <value>member</value>
-              </option>
-              <option>
-                <name>isParentMembershipAttributeDN</name>
-                <value>true</value>
-              </option>
-              <option>
-                <name>allowEmptyMemberships</name>
-                <value>true</value>
-              </option>
-              <option>
-                <name>createEntryAttributeValues</name>
-                <value>objectClass=top</value>
-                <value>objectClass=groupOfNames</value>
+                <value>objectClass=group</value>
+                <value>groupType=8</value>
               </option>
             </options>
           </identity-object-type>
@@ -334,36 +302,31 @@
         <options>
           <option>
             <name>providerURL</name>
-            <value>ldap://localhost:1389</value>
+            <value>${exo.ldap.url:ldap://localhost:1389}</value>
           </option>
           <option>
             <name>adminDN</name>
-            <value>cn=Directory Manager</value>
+            <value>${exo.ldap.admin.dn:TEST\Administrator}</value>
           </option>
           <option>
             <name>adminPassword</name>
-            <value>password</value>
+            <value>${exo.ldap.admin.password:}</value>
+          </option>
+          <option>
+            <name>authenticationMethod</name>
+            <value>simple</value>
           </option>
           <option>
             <name>searchTimeLimit</name>
-            <value>10000</value>
+            <value>${exo.ldap.search.timelimit:10000}</value>
           </option>
           <option>
             <name>createMissingContexts</name>
-            <value>true</value>
-          </option>
-          <option>
-            <name>customJNDIConnectionParameters</name>
-            <value>com.sun.jndi.ldap.connect.pool=true</value>
-          </option>
-          <option>
-            <name>customSystemProperties</name>
-            <value>com.sun.jndi.ldap.connect.pool.maxsize=300000</value>
-            <value>com.sun.jndi.ldap.connect.pool.protocol=plain ssl</value>
+            <value>false</value>
           </option>
           <option>
             <name>allowNotCaseSensitiveSearch</name>
-            <value>true</value>
+            <value>${exo.idm.search.notCaseSensitive:true}</value>
           </option>
         </options>
       </identity-store>

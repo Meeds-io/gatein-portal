@@ -1,7 +1,9 @@
 package org.picketlink.idm.impl.store.ldap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.NotYetImplementedException;
+import org.picketlink.idm.impl.configuration.ExoIdentityStoreConfigurationContext;
 import org.picketlink.idm.impl.helper.Tools;
 import org.picketlink.idm.impl.model.ldap.LDAPIdentityObjectImpl;
 import org.picketlink.idm.spi.configuration.IdentityStoreConfigurationContext;
@@ -42,6 +44,13 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
     super(id);
   }
 
+  @Override
+  public void bootstrap(IdentityStoreConfigurationContext configurationContext) throws IdentityException {
+    ExoIdentityStoreConfigurationContext exoIdentityStoreConfigurationContext = new ExoIdentityStoreConfigurationContext(configurationContext);
+
+    super.bootstrap(exoIdentityStoreConfigurationContext);
+  }
+
   /**
    * retrieve the ID of the IdentityObject from LDAP according to the customer's
    * configuration (prevent problems when cn is not equal to the uid attribute )
@@ -69,7 +78,7 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
       for (IdentityObjectType possibleType : possibleTypes) {
         String[] typeCtxs = getTypeConfiguration(ctx, possibleType).getCtxDNs();
         for (String typeCtx : typeCtxs) {
-          if (Tools.dnEndsWith(dn, typeCtx)) {
+          if (StringUtils.isNotBlank(typeCtx) && Tools.dnEndsWith(dn, typeCtx)) {
             matches.add(possibleType);
             break;
           }
@@ -193,7 +202,7 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
     try {
       // If parent simply look for all its members
       if (parent) {
-        if (typeConfig.getParentMembershipAttributeName() != null) {
+        if (StringUtils.isNotBlank(typeConfig.getParentMembershipAttributeName())) {
           Name jndiName = new CompositeName().add(ldapIO.getDn());
           Attributes attrs = ldapContext.getAttributes(jndiName);
           Attribute member = attrs.get(typeConfig.getParentMembershipAttributeName());
@@ -238,7 +247,7 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
         }
         // if not parent then all parent entries need to be found
       } else {
-        if (typeConfig.getChildMembershipAttributeName() == null) {
+        if (StringUtils.isBlank(typeConfig.getChildMembershipAttributeName())) {
           if (ldapIO != null) {
             objects.addAll(findRelatedIdentityObjects(ctx, identity, ldapIO, criteria, true));
           }
@@ -475,6 +484,15 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
     }
 
     return objects;
+  }
+
+  @Override
+  public List<SerializableSearchResult> searchIdentityObjects(IdentityStoreInvocationContext ctx, String[] entryCtxs, String filter, Object[] filterArgs, String[] returningAttributes, String searchScope, Control[] requestControls) throws NamingException, IdentityException {
+    String[] sanitizedEntryCtxs = entryCtxs;
+    if(entryCtxs != null && entryCtxs.length > 0) {
+      sanitizedEntryCtxs = Arrays.stream(entryCtxs).filter(StringUtils::isNotBlank).toArray(String[]::new);
+    }
+    return super.searchIdentityObjects(ctx, sanitizedEntryCtxs, filter, filterArgs, returningAttributes, searchScope, requestControls);
   }
 
   private void checkIOType(IdentityObjectType iot) throws IdentityException {
