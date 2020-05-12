@@ -44,44 +44,47 @@ public class NavigationRest implements ResourceContainer {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Gets a specific setting value", httpMethod = "GET", response = Response.class, notes = "This returns the requested site navigations")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Request fulfilled"),
-      @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 404, message = "Setting does not exist"),
-      @ApiResponse(code = 500, message = "Internal server error") })
+  @ApiOperation(
+      value = "Gets navigations of one or multiple site navigations",
+      httpMethod = "GET",
+      response = Response.class,
+      notes = "This returns the requested site navigations"
+  )
+  @ApiResponses(
+      value = {
+          @ApiResponse(code = 200, message = "Request fulfilled"),
+          @ApiResponse(code = 400, message = "Invalid query input"),
+          @ApiResponse(code = 404, message = "Navigation does not exist"),
+          @ApiResponse(code = 500, message = "Internal server error")
+      }
+  )
   public Response getSiteTypeNavigations(@Context HttpServletRequest request,
-                                         @ApiParam(value = "Portal site type, possible values: PORTAL, GROUP or USER", required = true) @PathParam("siteType") String siteTypeName,
-                                         @ApiParam(value = "Site names regex to exclude from results", required = false) @QueryParam("exclude") String excludedSiteName,
-                                         @ApiParam(value = "Scope of navigations tree to retrieve, possible values: ALL, CHILDREN, GRANDCHILDREN, SINGLE", defaultValue = "ALL", required = false) @QueryParam("scope") String scopeName,
-                                         @ApiParam(value = "Multivalued visibilities of navigation nodes to retrieve, possible values: DISPLAYED, HIDDEN, SYSTEM or TEMPORAL. If empty, all visibilities will be used.", defaultValue = "All possible values combined", required = false) @QueryParam("visibility") List<String> visibilityNames) {
+                                         @ApiParam(
+                                             value = "Portal site type, possible values: PORTAL, GROUP or USER",
+                                             required = true
+                                         ) @PathParam("siteType") String siteTypeName,
+                                         @ApiParam(
+                                             value = "Site names regex to exclude from results",
+                                             required = false
+                                         ) @QueryParam("exclude") String excludedSiteName,
+                                         @ApiParam(value = "Portal site name", required = true) @QueryParam(
+                                           "siteName"
+                                         ) String siteName,
+                                         @ApiParam(
+                                             value = "Scope of navigations tree to retrieve, possible values: ALL, CHILDREN, GRANDCHILDREN, SINGLE",
+                                             defaultValue = "ALL",
+                                             required = false
+                                         ) @QueryParam("scope") String scopeName,
+                                         @ApiParam(
+                                             value = "Multivalued visibilities of navigation nodes to retrieve, possible values: DISPLAYED, HIDDEN, SYSTEM or TEMPORAL. If empty, all visibilities will be used.",
+                                             defaultValue = "All possible values combined",
+                                             required = false
+                                         ) @QueryParam("visibility") List<String> visibilityNames) {
     if (StringUtils.isBlank(siteTypeName)) {
       return Response.status(400).build();
     }
 
-    return getNavigations(request, siteTypeName, null, excludedSiteName, scopeName, visibilityNames);
-  }
-
-  @Path("/{siteType}/{siteName}")
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
-  @ApiOperation(value = "Gets a specific setting value", httpMethod = "GET", response = Response.class, notes = "This returns the requested site navigations")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Request fulfilled"),
-      @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 404, message = "Setting does not exist"),
-      @ApiResponse(code = 500, message = "Internal server error") })
-  public Response getSiteNavigations(@Context HttpServletRequest request,
-                                     @ApiParam(value = "Portal site type, possible values: PORTAL, GROUP or USER", required = true) @PathParam("siteType") String siteTypeName,
-                                     @ApiParam(value = "Portal site name", required = true) @PathParam("siteName") String siteName,
-                                     @ApiParam(value = "Scope of navigations tree to retrieve, possible values: ALL, CHILDREN, GRANDCHILDREN, SINGLE", defaultValue = "ALL", required = false) @QueryParam("scope") String scopeName,
-                                     @ApiParam(value = "Multivalued visibilities of navigation nodes to retrieve, possible values: DISPLAYED, HIDDEN, SYSTEM or TEMPORAL. If empty, all visibilities will be used.", defaultValue = "All possible values combined", required = false) @QueryParam("visibility") List<String> visibilityNames) {
-    if (StringUtils.isBlank(siteTypeName) || StringUtils.isBlank(siteName)) {
-      return Response.status(400).build();
-    }
-
-    return getNavigations(request, siteTypeName, siteName, null, scopeName, visibilityNames);
+    return getNavigations(request, siteTypeName, siteName, excludedSiteName, scopeName, visibilityNames);
   }
 
   private Response getNavigations(HttpServletRequest request,
@@ -208,6 +211,9 @@ public class NavigationRest implements ResourceContainer {
         break;
       case "GRANDCHILDREN":
         scope = Scope.GRANDCHILDREN;
+        break;
+      case "ALL":
+        scope = Scope.ALL;
         break;
       default:
         throw new IllegalStateException("Bad scope name: " + scopeName);

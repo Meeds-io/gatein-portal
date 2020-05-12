@@ -37,16 +37,12 @@
   				<div class="UITableColumnContainer" style="margin: 0px auto; $style">
   					<div class="TRContainer clearfix UITopBarContainerItemsParent">
   						<% 
-  					    String positionClass = "pull-left";
   					    for(uiChild in uicomponent.getChildren()) {
-                  if ("MiddleToolBar".equals(uiChild.id)) {
-                    positionClass = "pull-right";
-                  }
-                %>
-  							<div class="UITopBarContainerItem ${uiChild.id}TDContainer <%=positionClass%>">
+              %>
+  							<div class="UITopBarContainerItem ${uiChild.id}TDContainer">
                   <% uicomponent.renderUIComponent(uiChild) %>
                 </div>
-  						<% } %>
+    					<% } %>
   				 </div>
   				</div>
   				<%}%>
