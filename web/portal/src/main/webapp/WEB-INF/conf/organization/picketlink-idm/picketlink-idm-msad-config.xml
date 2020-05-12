@@ -325,20 +325,6 @@
             <value>false</value>
           </option>
           <option>
-            <name>customJNDIConnectionParameters</name>
-            <value>com.sun.jndi.ldap.connect.pool=${exo.ldap.connection.pool:true}</value>
-          </option>
-          <option>
-            <name>customSystemProperties</name>
-            <value>com.sun.jndi.ldap.connect.pool.authentication=${exo.ldap.connection.pool.authentication:none simple}</value>
-            <value>com.sun.jndi.ldap.connect.pool.debug=${exo.ldap.connection.pool.debug:}</value>
-            <value>com.sun.jndi.ldap.connect.pool.initsize=${exo.ldap.connection.pool.initsize:1}</value>
-            <value>com.sun.jndi.ldap.connect.pool.maxsize=${exo.ldap.connection.pool.maxsize:300000}</value>
-            <value>com.sun.jndi.ldap.connect.pool.prefsize=${exo.ldap.connection.pool.prefsize:}</value>
-            <value>com.sun.jndi.ldap.connect.pool.protocol=${exo.ldap.connection.pool.protocol:plain ssl}</value>
-            <value>com.sun.jndi.ldap.connect.pool.timeout=${exo.ldap.connection.pool.timeout:}</value>
-          </option>
-          <option>
             <name>allowNotCaseSensitiveSearch</name>
             <value>${exo.idm.search.notCaseSensitive:true}</value>
           </option>
