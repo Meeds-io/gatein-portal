@@ -20,16 +20,24 @@ import java.util.stream.Collectors;
  * This class is a wrapper for PicketLink IdentityStoreConfigurationContext class.
  * It allows to change/enrich the default configuration dynamically at startup.
  * It is used to:
- * * add custom attributes for users and groups defined by properties:
- * ** exo.ldap.users.attributes.custom.names: comma-separated list of names of new custom attributes for users
- * ** exo.ldap.groups.attributes.custom.names: comma-separated list of names of new custom attributes for groups
- * ** exo.ldap.{users|groups}.attributes.custom.{name}.mapping: name of the LDAP attribute mapped with the custom attribute (defaults to the attribute name)
- * ** exo.ldap.{users|groups}.attributes.custom.{name}.type: type of the LDAP attribute mapped with the custom attribute, can be "text" or "binary" (defaults to "text")
- * ** exo.ldap.{users|groups}.attributes.custom.{name}.isRequired: is the custom attribute mandatory ? (defaults to false)
- * ** exo.ldap.{users|groups}.attributes.custom.{name}.isMultivalued: is the custom attribute multi-valued ? (defaults to false)
- * * convert ctxDNs to support semicolon-separated format:
- * ** multiple <value> tags can still be used to define several DNs
- * ** for each value, a semicolon-separated list of DNs can be used (for example "ou=users1,dc=company,dc=org;ou=users2,dc=company,dc=org")
+ * <ul>
+ *   <li>add custom attributes for users and groups defined by properties:
+ *     <ul>
+ *       <li>exo.ldap.users.attributes.custom.names: comma-separated list of names of new custom attributes for users</li>
+ *       <li>exo.ldap.groups.attributes.custom.names: comma-separated list of names of new custom attributes for groups</li>
+ *       <li>exo.ldap.{users|groups}.attributes.custom.{name}.mapping: name of the LDAP attribute mapped with the custom attribute (defaults to the attribute name)</li>
+ *       <li>exo.ldap.{users|groups}.attributes.custom.{name}.type: type of the LDAP attribute mapped with the custom attribute, can be "text" or "binary" (defaults to "text")</li>
+ *       <li>exo.ldap.{users|groups}.attributes.custom.{name}.isRequired: is the custom attribute mandatory ? (defaults to false)</li>
+ *       <li>exo.ldap.{users|groups}.attributes.custom.{name}.isMultivalued: is the custom attribute multi-valued ? (defaults to false)</li>
+ *     </ul>
+ *   </li>
+ *   <li>convert ctxDNs to support semicolon-separated format:
+ *     <ul>
+ *       <li>multiple {@literal <value>} tags can still be used to define several DNs</li>
+ *       <li>for each value, a semicolon-separated list of DNs can be used (for example "ou=users1,dc=company,dc=org;ou=users2,dc=company,dc=org")</li>
+ *     </ul>
+ *   </li>
+ * </ul>
  */
 public class ExoIdentityStoreConfigurationContext implements IdentityStoreConfigurationContext {
 
