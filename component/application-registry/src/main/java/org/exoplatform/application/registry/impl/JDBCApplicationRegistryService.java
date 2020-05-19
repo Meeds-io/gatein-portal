@@ -23,6 +23,7 @@ import java.util.*;
 import org.gatein.common.i18n.LocalizedString;
 import org.gatein.mop.api.content.ContentType;
 import org.gatein.pc.api.PortletInvoker;
+import org.gatein.pc.api.PortletInvokerException;
 import org.gatein.pc.api.info.MetaInfo;
 import org.gatein.pc.api.info.PortletInfo;
 import org.picocontainer.Startable;
@@ -209,6 +210,43 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
       permissionDAO.deletePermissions(ApplicationEntity.class.getName(), appEntity.getId());
       appDAO.delete(appEntity);
     }
+  }
+
+  @Override
+  public Collection<ApplicationCategory> detectPortletsFromWars() throws PortletInvokerException {
+    ExoContainer manager = ExoContainerContext.getCurrentContainer();
+    PortletInvoker portletInvoker = (PortletInvoker) manager.getComponentInstance(PortletInvoker.class);
+    Set<org.gatein.pc.api.Portlet> portlets = portletInvoker.getPortlets();
+    Map<String, ApplicationCategory> categoriesMap = new HashMap<>();
+
+    for (org.gatein.pc.api.Portlet portlet : portlets) {
+      PortletInfo info = portlet.getInfo();
+      String categoryName = info.getApplicationName().trim();
+      String portletName = info.getName();
+      String contentId = categoryName + "/" + portletName;
+
+      ApplicationCategory category = categoriesMap.get(categoryName);
+      if (category == null) {
+        category = new ApplicationCategory();
+        category.setName(categoryName);
+        category.setDisplayName(categoryName);
+        category.setApplications(new ArrayList<>());
+      }
+
+      Application application = new Application();
+      application.setApplicationName(portletName);
+      application.setCategoryName(categoryName);
+      application.setType(ApplicationType.PORTLET);
+      application.setContentId(contentId);
+      application.setId(contentId);
+      LocalizedString descriptionLS = info.getMeta().getMetaValue(MetaInfo.DESCRIPTION);
+      if (descriptionLS != null) {
+        application.setDescription(getLocalizedStringValue(descriptionLS, portletName));
+      }
+      category.getApplications().add(application);
+    }
+
+    return categoriesMap.values();
   }
 
   public void importAllPortlets() throws Exception {
