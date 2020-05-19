@@ -163,5 +163,7 @@ public interface ApplicationRegistryService {
      * @return {@link Collection} of {@link ApplicationCategory}
      * @throws PortletInvokerException
      */
-    Collection<ApplicationCategory> detectPortletsFromWars() throws PortletInvokerException;
+    default Collection<ApplicationCategory> detectPortletsFromWars() throws PortletInvokerException {
+      throw new UnsupportedOperationException();
+    }
 }

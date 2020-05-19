@@ -61,7 +61,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
 
   private String                             anyOfAdminGroup;
 
-  private List<ApplicationCategoriesPlugins> plugins;
+  private List<ApplicationCategoriesPlugins> plugins                       = new ArrayList<>();
 
   private static final String                INTERNAL_PORTLET_TAG          = "gatein_internal";
 
@@ -231,6 +231,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
         category.setName(categoryName);
         category.setDisplayName(categoryName);
         category.setApplications(new ArrayList<>());
+        categoriesMap.put(categoryName, category);
       }
 
       Application application = new Application();
@@ -242,6 +243,10 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
       LocalizedString descriptionLS = info.getMeta().getMetaValue(MetaInfo.DESCRIPTION);
       if (descriptionLS != null) {
         application.setDescription(getLocalizedStringValue(descriptionLS, portletName));
+      }
+      LocalizedString displayNameLS = portlet.getInfo().getMeta().getMetaValue(MetaInfo.DISPLAY_NAME);
+      if (displayNameLS != null) {
+        application.setDisplayName(getLocalizedStringValue(displayNameLS, portletName));
       }
       category.getApplications().add(application);
     }
@@ -511,10 +516,9 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     if (plugins != null) {
       RequestLifeCycle.begin(ExoContainerContext.getCurrentContainer());
       try {
-        if (this.getApplicationCategories().size() < 1) {
-          for (ApplicationCategoriesPlugins plugin : plugins) {
-            plugin.run();
-          }
+        boolean firstStartup = this.getApplicationCategories().isEmpty();
+        for (ApplicationCategoriesPlugins plugin : plugins) {
+          plugin.run(firstStartup);
         }
       } catch (Exception e) {
         log.error(e.getMessage(), e);
@@ -588,12 +592,31 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     return getApplications(category, null, appTypes);
   }
 
-  public void initListener(ComponentPlugin com) {
-    if (com instanceof ApplicationCategoriesPlugins) {
-      if (plugins == null) {
-        plugins = new ArrayList<ApplicationCategoriesPlugins>();
+  public void initListener(ComponentPlugin plugin) {
+    if (plugin instanceof ApplicationCategoriesPlugins) {
+      ApplicationCategoriesPlugins categoriesPlugin = (ApplicationCategoriesPlugins) plugin;
+      if (categoriesPlugin.isMerge()) {
+        List<ApplicationCategory> categories = categoriesPlugin.getCategories();
+        if (categories != null && !categories.isEmpty()) {
+          Iterator<ApplicationCategory> categoriesIterator = categories.iterator();
+          while (categoriesIterator.hasNext()) {
+            ApplicationCategory category = categoriesIterator.next();
+            ApplicationCategory existingCategory = plugins.stream()
+                                                          .map(ApplicationCategoriesPlugins::getCategories)
+                                                          .flatMap(List::stream)
+                                                          .filter(configuredCategory -> {
+                                                            return configuredCategory.getName().equals(category.getName());
+                                                          })
+                                                          .findFirst()
+                                                          .orElse(null);
+            if (existingCategory != null) {
+              existingCategory.getApplications().addAll(category.getApplications());
+              categoriesIterator.remove();
+            }
+          }
+        }
       }
-      plugins.add((ApplicationCategoriesPlugins) com);
+      plugins.add(categoriesPlugin);
     }
   }
 }
