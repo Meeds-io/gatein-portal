@@ -254,7 +254,7 @@
 	    var object = UIMaskLayer.object;
 	    var blockContainer = UIMaskLayer.blockContainer;
 	    var position = UIMaskLayer.position;
-	    object.style.position = "absolute";
+	    object.style.position = "fixed";
 	
 	    var left;
 	    var top;
@@ -294,7 +294,7 @@
 	    default:
 	      // By default, the mask layer always displays at the center
 	      left = (blockContainer.offsetWidth - object.offsetWidth) / 2;
-	      top = (browserHeight - object.offsetHeight) / 2 + topPos;
+	      top = browserHeight / 2 - object.offsetHeight / 2;
 	    }
 	
 	    if ((top + object.offsetHeight) > topPos + $(window).height()) {
@@ -321,7 +321,7 @@
             var object = UIMaskLayer.object;
             var blockContainer = UIMaskLayer.blockContainer;
             var position = UIMaskLayer.position;
-            object.style.position = "absolute";
+            object.style.position = "fixed";
 
             var left;
 
