@@ -4,6 +4,7 @@ import java.lang.reflect.*;
 import java.security.Principal;
 import java.util.Map;
 
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 
 import org.exoplatform.commons.utils.ListAccess;
@@ -64,6 +65,14 @@ public abstract class BaseRestServicesTestCase extends AbstractKernelTest {
 
   private void unregistry(Class<?> resourceClass) {
     binder.removeResource(resourceClass);
+  }
+
+  protected ContainerResponse getResponse(String method, String restPath, String input) throws Exception {
+    byte[] jsonData = input.getBytes("UTF-8");
+    MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
+    headers.putSingle("content-type", "application/json");
+    headers.putSingle("content-length", "" + jsonData.length);
+    return launcher.service(method, restPath, "", headers, jsonData, null);
   }
 
   protected <T> T createProxy(Class<T> type, final Map<String, Object> result) {

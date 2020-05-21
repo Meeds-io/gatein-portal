@@ -132,6 +132,11 @@
   </component>
 
   <component>
+    <key>org.exoplatform.services.organization.search.UserSearchService</key>
+    <type>org.exoplatform.services.organization.search.UserSearchServiceImpl</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.services.listener.ListenerService</key>
     <type>org.exoplatform.services.listener.ListenerService</type>
   </component>

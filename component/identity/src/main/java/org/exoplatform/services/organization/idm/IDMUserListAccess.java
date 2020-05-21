@@ -64,6 +64,8 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
     private boolean isDBOnly;
 
     private boolean loadUserAttributes;
+  
+    private int totalSize = -1;
 
     public IDMUserListAccess(UserQueryBuilder userQueryBuilder, int pageSize, boolean countAll, boolean isDBOnly, boolean loadUserAttributes, UserStatus userStatus) {
         this.userQueryBuilder = userQueryBuilder;
@@ -158,6 +160,10 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
             Tools.logMethodIn(log, LogLevel.TRACE, "getSize", null);
         }
 
+        if(totalSize >= 0) {
+          return totalSize;
+        }
+
         int result;
         if (size < 0) {
             if (fullResults != null) {
@@ -190,6 +196,7 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
             Tools.logMethodOut(log, LogLevel.TRACE, "getSize", result);
         }
 
+        totalSize = result;
         return result;
 
     }
