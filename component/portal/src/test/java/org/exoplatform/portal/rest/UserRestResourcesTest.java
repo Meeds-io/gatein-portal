@@ -1,19 +1,22 @@
 package org.exoplatform.portal.rest;
 
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.json.JSONObject;
+import org.mockito.Mockito;
+
+import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.rest.services.BaseRestServicesTestCase;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.UserHandler;
+import org.exoplatform.services.organization.*;
 import org.exoplatform.services.organization.idm.UserImpl;
+import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.services.rest.impl.*;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
@@ -55,6 +58,12 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
 
     getContainer().registerComponentInstance("org.exoplatform.services.organization.OrganizationService", organizationService);
     getContainer().registerComponentInstance("org.exoplatform.portal.config.UserACL", userACL);
+
+    ResourceBundleService resourceBundleService = container.getComponentInstanceOfType(ResourceBundleService.class);
+    if (resourceBundleService == null) {
+      resourceBundleService = Mockito.mock(ResourceBundleService.class);
+      container.registerComponentInstance(resourceBundleService);
+    }
   }
 
   @Override
@@ -66,7 +75,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
 
   public void testUnauthorizedNotSameUser() throws Exception {
     // Given
-    String path = getPath(USER_1);
+    String path = getChangePasswordPath(USER_1);
     String currentPassword = "currentPassword";
     String newPassword = "newPassword";
     MockHttpServletRequest httpRequest = getChangePasswordRequest(path, currentPassword, newPassword);
@@ -90,7 +99,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
 
   public void testAdminAuthorizedToChangePassword() throws Exception {
     // Given
-    String path = getPath(USER_1);
+    String path = getChangePasswordPath(USER_1);
     String currentPassword = "currentPassword";
     String newPassword = "newPassword";
     MockHttpServletRequest httpRequest = getChangePasswordRequest(path, currentPassword, newPassword);
@@ -114,9 +123,9 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     assertNull(resp.getEntity());
   }
 
-  public void testUserNotFoundError() throws Exception {
+  public void testChangePasswordUserNotFoundError() throws Exception {
     // Given
-    String path = getPath(USER_2);
+    String path = getChangePasswordPath(USER_2);
     String currentPassword = "currentPassword";
     String newPassword = "newPassword";
     MockHttpServletRequest httpRequest = getChangePasswordRequest(path, currentPassword, newPassword);
@@ -146,7 +155,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
 
   public void testSameUserWrongPassword() throws Exception {
     // Given
-    String path = getPath(USER_1);
+    String path = getChangePasswordPath(USER_1);
     String currentPassword = "currentPassword";
     String newPassword = "newPassword";
     MockHttpServletRequest httpRequest = getChangePasswordRequest(path, currentPassword, newPassword);
@@ -174,7 +183,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
 
   public void testSameUserAuthorizedToChangePassword() throws Exception {
     // Given
-    String path = getPath(USER_1);
+    String path = getChangePasswordPath(USER_1);
     String currentPassword = "currentPassword";
     String newPassword = "newPassword";
     MockHttpServletRequest httpRequest = getChangePasswordRequest(path, currentPassword, newPassword);
@@ -194,6 +203,192 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
 
     // Then
     assertEquals(String.valueOf(resp.getEntity()), 204, resp.getStatus());
+  }
+
+  public void testCreateUser() throws Exception {
+    when(userHandler.findUserByName(eq(USER_2), any())).thenReturn(null);
+    @SuppressWarnings("unchecked")
+    ListAccess<User> listAccess = mock(ListAccess.class);
+    when(userHandler.findUsersByQuery(any(), any())).thenReturn(listAccess);
+    when(listAccess.getSize()).thenReturn(0);
+    UserImpl user = new UserImpl(USER_2);
+    when(userHandler.createUserInstance(eq(USER_2))).thenReturn(user);
+
+    startSessionAs(USER_1);
+
+    JSONObject data = new JSONObject();
+
+    ContainerResponse response = getResponse("POST", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertNotNull(response.getEntity());
+    assertEquals(response.getEntity().toString(), 400, response.getStatus());
+
+    data.put("userName", "");
+    data.put("lastName", USER_2);
+    data.put("firstName", USER_2);
+    data.put("password", "password");
+    data.put("email", USER_2 + "@example.com");
+    response = getResponse("POST", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertNotNull(response.getEntity());
+    assertEquals(response.getEntity().toString(), 400, response.getStatus());
+
+    data.put("userName", USER_2);
+    data.put("lastName", "");
+    data.put("firstName", USER_2);
+    data.put("password", "password");
+    data.put("email", USER_2 + "@example.com");
+    response = getResponse("POST", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertNotNull(response.getEntity());
+    assertEquals(response.getEntity().toString(), 400, response.getStatus());
+
+    data.put("userName", USER_2);
+    data.put("lastName", USER_2);
+    data.put("firstName", "");
+    data.put("password", "password");
+    data.put("email", USER_2 + "@example.com");
+    response = getResponse("POST", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertNotNull(response.getEntity());
+    assertEquals(response.getEntity().toString(), 400, response.getStatus());
+
+    data.put("userName", USER_2);
+    data.put("lastName", USER_2);
+    data.put("firstName", USER_2);
+    data.put("password", "");
+    data.put("email", USER_2 + "@example.com");
+    response = getResponse("POST", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertNotNull(response.getEntity());
+    assertEquals(response.getEntity().toString(), 400, response.getStatus());
+
+    data.put("userName", USER_2);
+    data.put("lastName", USER_2);
+    data.put("firstName", USER_2);
+    data.put("password", "password");
+    data.put("email", "");
+    response = getResponse("POST", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertNotNull(response.getEntity());
+    assertEquals(response.getEntity().toString(), 400, response.getStatus());
+
+    verify(userHandler, atMost(0)).createUser(any(User.class), anyBoolean());
+
+    data.put("userName", USER_2);
+    data.put("lastName", USER_2);
+    data.put("firstName", USER_2);
+    data.put("password", "password");
+    data.put("email", USER_2 + "@example.com");
+    response = getResponse("POST", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertNull(response.getEntity());
+    assertEquals(204, response.getStatus());
+
+    verify(userHandler, atLeast(1)).createUser(eq(user), eq(true));
+  }
+
+  public void testUpdateUser() throws Exception {
+    when(userHandler.findUserByName(eq(USER_2), any())).thenReturn(null);
+    @SuppressWarnings("unchecked")
+    ListAccess<User> listAccess = mock(ListAccess.class);
+    when(userHandler.findUsersByQuery(any(), any())).thenReturn(listAccess);
+    when(listAccess.getSize()).thenReturn(0);
+
+    String email = USER_2 + "@example.com";
+    UserImpl user = new UserImpl(USER_2);
+    user.setEmail(email);
+    user.setFirstName(USER_2);
+    user.setLastName(USER_2);
+    user.setEnabled(false);
+
+    startSessionAs(USER_1);
+    
+    JSONObject data = new JSONObject();
+
+    ContainerResponse response = getResponse("PUT", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertEquals(404, response.getStatus());
+
+    data.put("userName", USER_2);
+    data.put("lastName", USER_2);
+    data.put("firstName", USER_2);
+    data.put("password", "");
+    data.put("email", email);
+    response = getResponse("PUT", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertEquals(404, response.getStatus());
+
+    when(userHandler.findUserByName(eq(USER_2), any())).thenReturn(user);
+    data.put("userName", USER_2);
+    data.put("lastName", "");
+    data.put("firstName", USER_2);
+    data.put("password", "password");
+    data.put("email", email);
+    response = getResponse("PUT", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertNotNull(response.getEntity());
+    assertEquals(response.getEntity().toString(), 400, response.getStatus());
+
+    data.put("userName", USER_2);
+    data.put("lastName", USER_2);
+    data.put("firstName", "");
+    data.put("password", "password");
+    data.put("email", email);
+    response = getResponse("PUT", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertNotNull(response.getEntity());
+    assertEquals(response.getEntity().toString(), 400, response.getStatus());
+
+    data.put("userName", USER_2);
+    data.put("lastName", USER_2);
+    data.put("firstName", USER_2);
+    data.put("password", "");
+    data.put("email", email);
+    response = getResponse("PUT", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertNull(response.getEntity());
+    assertEquals(204, response.getStatus());
+
+    data.put("userName", USER_2);
+    data.put("lastName", USER_2);
+    data.put("firstName", USER_2);
+    data.put("password", "password");
+    data.put("email", "");
+    response = getResponse("PUT", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertNotNull(response.getEntity());
+    assertEquals(response.getEntity().toString(), 400, response.getStatus());
+
+    verify(userHandler, atMost(0)).saveUser(any(User.class), anyBoolean());
+    verify(userHandler, atMost(0)).setEnabled(anyString(), anyBoolean(), anyBoolean());
+
+    data.put("userName", USER_2);
+    data.put("lastName", USER_2);
+    data.put("firstName", USER_2);
+    data.put("password", "password");
+    data.put("email", email);
+    response = getResponse("PUT", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertNull(response.getEntity());
+    assertEquals(204, response.getStatus());
+
+    verify(userHandler, atLeast(1)).saveUser(eq(user), eq(true));
+    verify(userHandler, atMost(0)).setEnabled(anyString(), anyBoolean(), anyBoolean());
+    
+    data.put("userName", USER_2);
+    data.put("lastName", USER_2);
+    data.put("firstName", USER_2);
+    data.put("password", "");
+    data.put("email", email);
+    data.put("enabled", true);
+    response = getResponse("PUT", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertNull(response.getEntity());
+    assertEquals(204, response.getStatus());
+
+    verify(userHandler, atMost(1)).saveUser(eq(user), eq(true));
+    verify(userHandler, atLeast(1)).setEnabled(anyString(), anyBoolean(), anyBoolean());
   }
 
   private void startSessionAs(String username) {
@@ -224,7 +419,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     return headers;
   }
 
-  private String getPath(String username) {
+  private String getChangePasswordPath(String username) {
     return "/v1/users/" + username + "/changePassword";
   }
 }

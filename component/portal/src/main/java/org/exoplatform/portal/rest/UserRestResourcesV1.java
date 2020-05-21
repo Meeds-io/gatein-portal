@@ -1,17 +1,19 @@
 package org.exoplatform.portal.rest;
 
-import java.util.Collection;
-import java.util.regex.Pattern;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import org.apache.commons.lang3.StringUtils;
 
-import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.organization.*;
+import org.exoplatform.services.organization.search.UserSearchService;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
 
@@ -21,69 +23,330 @@ import io.swagger.jaxrs.PATCH;
 @Path("v1/users")
 public class UserRestResourcesV1 implements ResourceContainer {
 
-  public static final String  PASSWORD_UNKNOWN_ERROR_CODE            = "PASSWORD_UNKNOWN_ERROR";
+  public static final int                DEFAULT_LIMIT                  = 10;
 
-  public static final String  PASSWORD_REGEX_ERROR_CODE              = "PASSWORD_REGEX_ERROR";
+  public static final String             PASSWORD_UNKNOWN_ERROR_CODE    = "PASSWORD_UNKNOWN_ERROR";
 
-  public static final String  PASSWORD_MAX_LENGTH_ERROR_CODE         = "PASSWORD_MAX_LENGTH";
+  public static final String             USER_NOT_FOUND_ERROR_CODE      = "USER_NOT_FOUND";
 
-  public static final String  PASSWORD_MIN_LENGTH_ERROR_CODE         = "PASSWORD_MIN_LENGTH";
+  public static final String             WRONG_USER_PASSWORD_ERROR_CODE = "WRONG_USER_PASSWORD";
 
-  public static final String  PASSWORD_CUSTOM_VALIDATOR_MIN          = "gatein.validators.password.length.min";
+  public static final UserFieldValidator USERNAME_VALIDATOR             = new UserFieldValidator("usermame", true);
 
-  public static final String  PASSWORD_CUSTOM_VALIDATOR_MAX          = "gatein.validators.password.length.max";
+  public static final UserFieldValidator EMAIL_VALIDATOR                = new UserFieldValidator("emailAddress", false);
 
-  public static final String  PASSWORD_CUSTOM_VALIDATOR_REGEXP       = "gatein.validators.password.regexp";
+  public static final UserFieldValidator LASTNAME_VALIDATOR             = new UserFieldValidator("lastName", false);
 
-  public static final String  PASSWORD_CUSTOM_VALIDATOR_REGEXP_ERROR = "gatein.validators.password.format.message";
+  public static final UserFieldValidator FIRSTNAME_VALIDATOR            = new UserFieldValidator("firstName", false);
 
-  public static final String  USER_NOT_FOUND_ERROR_CODE              = "USER_NOT_FOUND";
+  public static final UserFieldValidator PASSWORD_VALIDATOR             = new UserFieldValidator("password", false, 8, 255);
 
-  public static final String  WRONG_USER_PASSWORD_ERROR_CODE         = "WRONG_USER_PASSWORD";
+  private OrganizationService            organizationService;
 
-  private OrganizationService organizationService;
+  private UserSearchService              userSearchService;
 
-  private UserACL             userACL;
+  private UserACL                        userACL;
 
-  public UserRestResourcesV1(OrganizationService organizationService, UserACL userACL) {
+  public UserRestResourcesV1(OrganizationService organizationService,
+                             UserSearchService userSearchService,
+                             UserACL userACL) {
     this.organizationService = organizationService;
+    this.userSearchService = userSearchService;
     this.userACL = userACL;
   }
 
-  /**
-   * Get all groups, filter by name if exists.
-   *
-   * @return List of groups in json format.
-   * @throws Exception
-   */
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("administrators")
+  @ApiOperation(
+      value = "Gets all users",
+      httpMethod = "GET",
+      response = Response.class
+  )
+  @ApiResponses(
+      value = {
+          @ApiResponse(code = 200, message = "Request fulfilled"),
+          @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
+      }
+  )
+  public Response getUsers(
+                           @ApiParam(
+                               value = "User name information to filter, ex: user name, last name, first name or full name",
+                               required = false
+                           ) @QueryParam("q") String q,
+                           @ApiParam(value = "User status : ANY, ENABLED or DISABLED", required = false, defaultValue = "ANY") @QueryParam("status") String status,
+                           @ApiParam(value = "Offset", required = false, defaultValue = "0") @QueryParam(
+                             "offset"
+                           ) int offset,
+                           @ApiParam(value = "Limit", required = false, defaultValue = "10") @QueryParam(
+                             "limit"
+                           ) int limit,
+                           @ApiParam(value = "Returning the number of users found or not", defaultValue = "false") @QueryParam(
+                             "returnSize"
+                           ) boolean returnSize) throws Exception {
+
+    offset = offset > 0 ? offset : 0;
+    limit = limit > 0 ? limit : DEFAULT_LIMIT;
+
+    UserStatus userStatus = StringUtils.isBlank(status) ||
+        StringUtils.equalsIgnoreCase("ALL", status) ||
+        StringUtils.equalsIgnoreCase("ANY", status) ? UserStatus.ANY : UserStatus.valueOf(status.toUpperCase());
+
+    User[] users;
+    int totalSize = 0;
+    if (StringUtils.isBlank(q)) {
+      ListAccess<User> allUsersListAccess = organizationService.getUserHandler().findAllUsers(userStatus);
+      totalSize = allUsersListAccess.getSize();
+      int limitToFetch = limit;
+      if (totalSize < (offset + limitToFetch)) {
+        limitToFetch = totalSize - offset;
+      }
+      if (limitToFetch <= 0) {
+        users = new User[0];
+      } else {
+        users = allUsersListAccess.load(offset, limitToFetch);
+        if (!returnSize) {
+          totalSize = 0;
+        }
+      }
+    } else {
+      ListAccess<User> usersListAccess = userSearchService.searchUsers(q, userStatus);
+      totalSize = usersListAccess.getSize();
+      int limitToFetch = limit;
+      if (totalSize < (offset + limitToFetch)) {
+        limitToFetch = totalSize - offset;
+      }
+      if (limitToFetch <= 0) {
+        users = new User[0];
+      } else {
+        users = usersListAccess.load(offset, limitToFetch);
+        if (!returnSize) {
+          totalSize = 0;
+        }
+      }
+    }
+    List<UserRestEntity> userEntities = Arrays.stream(users)
+                                              .map(this::toEntity)
+                                              .collect(Collectors.toList());
+    CollectionEntity<UserRestEntity> result = new CollectionEntity<>(userEntities,
+                                                                     offset,
+                                                                     limit,
+                                                                     totalSize);
+    return Response.ok(result).build();
+  }
+
+  @POST
+  @RolesAllowed("administrators")
+  @ApiOperation(
+      value = "Create new user",
+      httpMethod = "GET",
+      response = Response.class
+  )
+  @ApiResponses(
+      value = {
+          @ApiResponse(code = 200, message = "Request fulfilled"),
+          @ApiResponse(code = 400, message = "Invalid query input"),
+          @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
+      }
+  )
+  public Response createUser(@Context HttpServletRequest request, UserRestEntity userEntity) throws Exception {
+    if (userEntity == null) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("empty user object").build();
+    }
+
+    String userName = userEntity.getUserName();
+    String email = userEntity.getEmail();
+    String firstName = userEntity.getFirstName();
+    String lastName = userEntity.getLastName();
+    String password = userEntity.getPassword();
+
+    Locale locale = request == null ? Locale.ENGLISH : request.getLocale();
+
+    String errorMessage = USERNAME_VALIDATOR.validate(locale, userName);
+    if (StringUtils.isNotBlank(errorMessage)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("USERNAME:" + errorMessage).build();
+    }
+
+    errorMessage = PASSWORD_VALIDATOR.validate(locale, password);
+    if (StringUtils.isNotBlank(errorMessage)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("PASSWORD:" + errorMessage).build();
+    }
+
+    errorMessage = LASTNAME_VALIDATOR.validate(locale, lastName);
+    if (StringUtils.isNotBlank(errorMessage)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("LASTNAME:" + errorMessage).build();
+    }
+
+    errorMessage = FIRSTNAME_VALIDATOR.validate(locale, firstName);
+    if (StringUtils.isNotBlank(errorMessage)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("FIRSTNAME:" + errorMessage).build();
+    }
+
+    errorMessage = EMAIL_VALIDATOR.validate(locale, email);
+    if (StringUtils.isNotBlank(errorMessage)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("EMAIL:" + errorMessage).build();
+    }
+
+    User user = organizationService.getUserHandler().findUserByName(userName, UserStatus.ANY);
+    if (user != null) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("USERNAME:ALREADY_EXISTS").build();
+    }
+
+    // Check if mail address is already used
+    Query query = new Query();
+    query.setEmail(email);
+    if (organizationService.getUserHandler().findUsersByQuery(query, UserStatus.ANY).getSize() > 0) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("EMAIL:ALREADY_EXISTS").build();
+    }
+
+    user = organizationService.getUserHandler().createUserInstance(userName);
+    user.setEmail(email);
+    user.setFirstName(firstName);
+    user.setLastName(lastName);
+    user.setPassword(password);
+    organizationService.getUserHandler().createUser(user, true);
+
+    if (!user.isEnabled()) {
+      organizationService.getUserHandler().setEnabled(userName, false, true);
+    }
+
+    return Response.noContent().build();
+  }
+
+  @PUT
+  @RolesAllowed("administrators")
+  @ApiOperation(
+      value = "Update an existing user",
+      httpMethod = "GET",
+      response = Response.class
+  )
+  @ApiResponses(
+      value = {
+          @ApiResponse(code = 200, message = "Request fulfilled"),
+          @ApiResponse(code = 400, message = "Invalid query input"),
+          @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
+      }
+  )
+  public Response updateUser(@Context HttpServletRequest request, UserRestEntity userEntity) throws Exception {
+    if (userEntity == null) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("empty user object").build();
+    }
+
+    String userName = userEntity.getUserName();
+    String email = userEntity.getEmail();
+    String firstName = userEntity.getFirstName();
+    String lastName = userEntity.getLastName();
+    String password = userEntity.getPassword();
+    boolean enabled = userEntity.isEnabled();
+
+    Locale locale = request == null ? Locale.ENGLISH : request.getLocale();
+
+    if (StringUtils.isNotBlank(password)) {
+      String errorMessage = PASSWORD_VALIDATOR.validate(locale, password);
+      if (StringUtils.isNotBlank(errorMessage)) {
+        return Response.status(Response.Status.BAD_REQUEST).entity("PASSWORD:" + errorMessage).build();
+      }
+    }
+
+    User user = organizationService.getUserHandler().findUserByName(userName, UserStatus.ANY);
+    if (user == null) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    String errorMessage = LASTNAME_VALIDATOR.validate(locale, lastName);
+    if (StringUtils.isNotBlank(errorMessage)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("LASTNAME:" + errorMessage).build();
+    }
+
+    errorMessage = FIRSTNAME_VALIDATOR.validate(locale, firstName);
+    if (StringUtils.isNotBlank(errorMessage)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("FIRSTNAME:" + errorMessage).build();
+    }
+
+    errorMessage = EMAIL_VALIDATOR.validate(locale, email);
+    if (StringUtils.isNotBlank(errorMessage)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("EMAIL:" + errorMessage).build();
+    }
+
+    // Check if mail address is already used
+    Query query = new Query();
+    query.setEmail(email);
+    if (!StringUtils.equals(user.getEmail(), email)
+        && organizationService.getUserHandler().findUsersByQuery(query, UserStatus.ANY).getSize() > 0) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("EMAIL:ALREADY_EXISTS").build();
+    }
+
+    if (StringUtils.isNotBlank(password)
+        || !StringUtils.equals(email, user.getEmail())
+        || !StringUtils.equals(lastName, user.getLastName())
+        || !StringUtils.equals(firstName, user.getFirstName())) {
+      user.setEmail(email);
+      user.setFirstName(firstName);
+      user.setLastName(lastName);
+      user.setPassword(password);
+      organizationService.getUserHandler().saveUser(user, true);
+    }
+
+    if (user.isEnabled() != enabled) {
+      organizationService.getUserHandler().setEnabled(userName, enabled, true);
+    }
+
+    return Response.noContent().build();
+  }
+
+  @DELETE
+  @RolesAllowed("administrators")
+  @Path("{id}")
+  @ApiOperation(value = "Deletes a user identified by its id", httpMethod = "DELETE", response = Response.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(code = 204, message = "Request fulfilled"),
+          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
+          @ApiResponse(code = 404, message = "User not found"),
+          @ApiResponse(code = 500, message = "Internal server error"),
+      }
+  )
+  public Response deleteUser(@ApiParam(value = "User name identifier", required = true) @PathParam(
+    "id"
+  ) String userName) throws Exception {
+    User user = organizationService.getUserHandler().findUserByName(userName);
+    if (user == null) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    organizationService.getUserHandler().removeUser(userName, true);
+    return Response.noContent().build();
+  }
+
   @GET
   @RolesAllowed("users")
   @Path("{id}")
-  @ApiOperation(value = "Gets user", httpMethod = "GET", response = Response.class, notes = "This returns the list of groups containing the given search text, only if the authenticated user is a spaces administrator")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Request fulfilled"),
-      @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-      @ApiResponse(code = 404, message = "User not found"),
-      @ApiResponse(code = 500, message = "Internal server error") })
-  public Response getUser(@Context UriInfo uriInfo, @PathParam("id") String id) throws Exception {
+  @ApiOperation(value = "Gets a user identified by its id", httpMethod = "GET", response = Response.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(code = 200, message = "Request fulfilled"),
+          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
+          @ApiResponse(code = 404, message = "User not found"),
+          @ApiResponse(code = 500, message = "Internal server error"),
+      }
+  )
+  public Response getUser(@Context UriInfo uriInfo,
+                          @ApiParam(value = "User name identifier", required = true) @PathParam(
+                            "id"
+                          ) String id) throws Exception {
 
     if (!userACL.isSuperUser() && !userACL.isUserInGroup(userACL.getAdminGroups())
         && !ConversationState.getCurrent().getIdentity().getUserId().equals(id)) {
-      throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+      return Response.status(Response.Status.UNAUTHORIZED).build();
     }
 
     User user = organizationService.getUserHandler().findUserByName(id);
 
     if (user == null) {
-      throw new WebApplicationException(Response.Status.NOT_FOUND);
+      return Response.status(Response.Status.NOT_FOUND).build();
     }
 
-    UserRestEntity userRestEntity = new UserRestEntity(user.getUserName(),
-                                                       user.getFirstName(),
-                                                       user.getLastName(),
-                                                       user.getDisplayName(),
-                                                       user.getEmail(),
-                                                       false);
+    UserRestEntity userRestEntity = toEntity(user);
 
     Collection<Membership> memberships = organizationService.getMembershipHandler().findMembershipsByUser(id);
     if (memberships != null) {
@@ -99,14 +362,25 @@ public class UserRestResourcesV1 implements ResourceContainer {
   @RolesAllowed("users")
   @Path("{id}/changePassword")
   @ApiOperation(value = "Changes user password", httpMethod = "POST", response = Response.class)
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Request fulfilled"),
-      @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-      @ApiResponse(code = 404, message = "User not found"),
-      @ApiResponse(code = 500, message = "Internal server error") })
-  public Response changePassword(@ApiParam(value = "username to change his password", required = true) @PathParam("id") String username,
-                                 @ApiParam(value = "Current user password", required = true) @FormParam("currentPassword") String currentPassword,
-                                 @ApiParam(value = "New user password", required = true) @FormParam("newPassword") String newPassword) {
+  @ApiResponses(
+      value = {
+          @ApiResponse(code = 200, message = "Request fulfilled"),
+          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
+          @ApiResponse(code = 404, message = "User not found"),
+          @ApiResponse(code = 500, message = "Internal server error")
+      }
+  )
+  public Response changePassword(
+                                 @Context HttpServletRequest request,
+                                 @ApiParam(value = "username to change his password", required = true) @PathParam(
+                                   "id"
+                                 ) String username,
+                                 @ApiParam(value = "Current user password", required = true) @FormParam(
+                                   "currentPassword"
+                                 ) String currentPassword,
+                                 @ApiParam(value = "New user password", required = true) @FormParam(
+                                   "newPassword"
+                                 ) String newPassword) {
     boolean isAdmin = userACL.isSuperUser() || userACL.isUserInGroup(userACL.getAdminGroups());
     boolean isSameUser = ConversationState.getCurrent().getIdentity().getUserId().equals(username);
     if (!isAdmin && !isSameUser) {
@@ -124,7 +398,9 @@ public class UserRestResourcesV1 implements ResourceContainer {
         return Response.serverError().entity(WRONG_USER_PASSWORD_ERROR_CODE).build();
       }
 
-      String errorMessage = checkCustomPasswordValidators(newPassword);
+      Locale locale = request.getLocale();
+
+      String errorMessage = PASSWORD_VALIDATOR.validate(locale, newPassword);
       if (StringUtils.isNotBlank(errorMessage)) {
         return Response.serverError().entity(errorMessage).build();
       }
@@ -138,20 +414,78 @@ public class UserRestResourcesV1 implements ResourceContainer {
     }
   }
 
-  private String checkCustomPasswordValidators(String newPassword) {
-    String minLengthString = PropertyManager.getProperty(PASSWORD_CUSTOM_VALIDATOR_MIN);
-    if (StringUtils.isNotBlank(minLengthString) && newPassword.length() < Integer.parseInt(minLengthString)) {
-      return PASSWORD_MIN_LENGTH_ERROR_CODE + ":" + minLengthString;
+  @GET
+  @Path("{id}/memberships")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("administrators")
+  @ApiOperation(
+      value = "Gets User memberships list",
+      httpMethod = "GET",
+      response = Response.class
+  )
+  @ApiResponses(
+      value = {
+          @ApiResponse(code = 200, message = "Request fulfilled"),
+          @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
+      }
+  )
+  public Response getUserMemberships(
+                                     @ApiParam(value = "User name identifier", required = true) @PathParam(
+                                       "id"
+                                     ) String userName,
+                                     @ApiParam(value = "Offset", required = false, defaultValue = "0") @QueryParam(
+                                       "offset"
+                                     ) int offset,
+                                     @ApiParam(value = "Limit", required = false, defaultValue = "10") @QueryParam(
+                                       "limit"
+                                     ) int limit,
+                                     @ApiParam(value = "Returning the number of users found or not", defaultValue = "false") @QueryParam(
+                                       "returnSize"
+                                     ) boolean returnSize) throws Exception {
+
+    offset = offset > 0 ? offset : 0;
+    limit = limit > 0 ? limit : DEFAULT_LIMIT;
+
+    User user = organizationService.getUserHandler().findUserByName(userName);
+    if (user == null) {
+      return Response.status(Response.Status.NOT_FOUND).build();
     }
-    String maxLengthString = PropertyManager.getProperty(PASSWORD_CUSTOM_VALIDATOR_MAX);
-    if (StringUtils.isNotBlank(maxLengthString) && newPassword.length() > Integer.parseInt(maxLengthString)) {
-      return PASSWORD_MAX_LENGTH_ERROR_CODE + ":" + maxLengthString;
+
+    ListAccess<Membership> membershipsByUser = organizationService.getMembershipHandler().findAllMembershipsByUser(user);
+    int totalSize = membershipsByUser.getSize();
+    Membership[] memberships;
+    int limitToFetch = limit;
+    if (totalSize < (offset + limitToFetch)) {
+      limitToFetch = totalSize - offset;
     }
-    String passwordRegex = PropertyManager.getProperty(PASSWORD_CUSTOM_VALIDATOR_REGEXP);
-    if (StringUtils.isNotBlank(passwordRegex) && !Pattern.matches(passwordRegex, passwordRegex)) {
-      String passwordRegexError = PropertyManager.getProperty(PASSWORD_CUSTOM_VALIDATOR_REGEXP_ERROR);
-      return PASSWORD_REGEX_ERROR_CODE + ":" + passwordRegexError;
+    List<MembershipRestEntity> membershipEntities = new ArrayList<>();
+    if (limitToFetch > 0) {
+      memberships = membershipsByUser.load(offset, limitToFetch);
+      for (Membership membership : memberships) {
+        Group group = organizationService.getGroupHandler().findGroupById(membership.getGroupId());
+        membershipEntities.add(new MembershipRestEntity(membership.getId(),
+                                                        membership.getMembershipType(),
+                                                        membership.getGroupId(),
+                                                        group.getLabel(),
+                                                        userName,
+                                                        null));
+      }
+      if (!returnSize) {
+        totalSize = 0;
+      }
     }
-    return null;
+
+    return Response.ok(new CollectionEntity<>(membershipEntities, offset, limit, totalSize)).build();
   }
+
+  private UserRestEntity toEntity(User user) {
+    return new UserRestEntity(user.getUserName(),
+                              user.getFirstName(),
+                              user.getLastName(),
+                              user.getDisplayName(),
+                              user.getEmail(),
+                              user.isEnabled(),
+                              false);
+  }
+
 }

@@ -1,7 +1,5 @@
 package org.exoplatform.portal.rest;
 
-import java.util.List;
-
 public class UserRestEntity {
   private String userName;
 
@@ -13,14 +11,22 @@ public class UserRestEntity {
 
   private String email;
 
+  private String password;
+
+  private boolean enabled;
+
   private boolean platformAdministrator;
 
-  public UserRestEntity(String userName, String firstName, String lastName, String fullName, String email, boolean platformAdministrator) {
+  public UserRestEntity() {
+  }
+
+  public UserRestEntity(String userName, String firstName, String lastName, String fullName, String email, boolean enabled, boolean platformAdministrator) {
     this.userName = userName;
     this.firstName = firstName;
     this.lastName = lastName;
     this.fullName = fullName;
     this.email = email;
+    this.enabled = enabled;
     this.platformAdministrator = platformAdministrator;
   }
 
@@ -38,6 +44,14 @@ public class UserRestEntity {
 
   public void setFirstName(String firstName) {
     this.firstName = firstName;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
   }
 
   public String getLastName() {
@@ -66,6 +80,14 @@ public class UserRestEntity {
 
   public boolean isPlatformAdministrator() {
     return platformAdministrator;
+  }
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 
   public void setPlatformAdministrator(boolean platformAdministrator) {

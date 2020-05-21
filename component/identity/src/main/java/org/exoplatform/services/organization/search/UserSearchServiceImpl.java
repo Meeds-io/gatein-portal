@@ -3,9 +3,7 @@ package org.exoplatform.services.organization.search;
 import org.apache.commons.lang.StringUtils;
 
 import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.Query;
-import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.*;
 
 public class UserSearchServiceImpl implements UserSearchService {
 
@@ -16,9 +14,12 @@ public class UserSearchServiceImpl implements UserSearchService {
   }
 
   @Override
-  public ListAccess<User> searchUsers(String keyword) throws Exception {
+  public ListAccess<User> searchUsers(String keyword, UserStatus userStatus) throws Exception {
+    if (userStatus == null) {
+      userStatus = UserStatus.ANY;
+    }
     if (StringUtils.isEmpty(keyword)) {
-      return organizationService.getUserHandler().findAllUsers();
+      return organizationService.getUserHandler().findAllUsers(userStatus);
     } else {
       Query query = new Query();
       if (keyword.indexOf("*") < 0) {
@@ -29,8 +30,7 @@ public class UserSearchServiceImpl implements UserSearchService {
       }
       keyword = keyword.replace('?', '_');
       query.setUserName(keyword);
-      return organizationService.getUserHandler().findUsersByQuery(query);
+      return organizationService.getUserHandler().findUsersByQuery(query, userStatus);
     }
   }
-
 }
