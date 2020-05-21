@@ -21,6 +21,8 @@ package org.exoplatform.application.registry;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
@@ -34,24 +36,53 @@ public class ApplicationCategoriesPlugins extends BaseComponentPlugin {
 
     private ApplicationRegistryService pdcService_;
 
-    private List<?> configs;
+    private List<ApplicationCategory> categories;
+
+    private boolean merge;
 
     public ApplicationCategoriesPlugins(ApplicationRegistryService pdcService, ConfigurationManager cmanager, InitParams params)
             throws Exception {
-        configs = params.getObjectParamValues(ApplicationCategory.class);
+        categories = params.getObjectParamValues(ApplicationCategory.class);
+        if (params.containsKey("merge")) {
+          merge = StringUtils.equalsIgnoreCase("true", params.getValueParam("merge").getValue());
+        }
         cmanager_ = cmanager;
         pdcService_ = pdcService;
     }
 
+    public boolean isMerge() {
+      return merge;
+    }
+
+    public void setMerge(boolean merge) {
+      this.merge = merge;
+    }
+
     public void run() throws Exception {
-        if (configs == null)
+      run(false);
+    }
+
+    public List<ApplicationCategory> getCategories() {
+      return categories;
+    }
+
+    public void run(boolean firstStartup) throws Exception {
+        if (categories == null || (!firstStartup && !merge))
             return;
-        for (Object ele : configs) {
-            ApplicationCategory category = (ApplicationCategory) ele;
-            pdcService_.save(category);
+        for (ApplicationCategory category : categories) {
+            ApplicationCategory storedCategory = pdcService_.getApplicationCategory(category.getName());
             List<Application> apps = category.getApplications();
-            for (Application app : apps)
+            // Recreate category when starting server if deleted by UI for categories of type 'merge = true'
+            if (!merge || storedCategory == null) {
+              pdcService_.save(category);
+            }
+
+            // Avoid to reimport applications when deleted by UI in case of 'merge = true'
+            if (firstStartup || storedCategory == null) {
+              for (Application app : apps) {
                 pdcService_.save(category, app);
+              }
+            }
         }
     }
 }

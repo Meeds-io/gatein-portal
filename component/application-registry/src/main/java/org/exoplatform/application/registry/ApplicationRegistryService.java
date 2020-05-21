@@ -19,8 +19,9 @@
 
 package org.exoplatform.application.registry;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+
+import org.gatein.pc.api.PortletInvokerException;
 
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.portal.config.model.ApplicationType;
@@ -157,4 +158,12 @@ public interface ApplicationRegistryService {
      * If Application've already existed, it'll be ignored
      */
     void importAllPortlets() throws Exception;
+
+    /**
+     * @return {@link Collection} of {@link ApplicationCategory}
+     * @throws PortletInvokerException
+     */
+    default Collection<ApplicationCategory> detectPortletsFromWars() throws PortletInvokerException {
+      throw new UnsupportedOperationException();
+    }
 }

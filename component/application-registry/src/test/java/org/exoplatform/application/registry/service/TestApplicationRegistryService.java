@@ -22,9 +22,13 @@ package org.exoplatform.application.registry.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.picocontainer.Startable;
+
 import org.exoplatform.application.registry.*;
 import org.exoplatform.component.test.*;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.configuration.ConfigurationManager;
+import org.exoplatform.container.xml.*;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.services.organization.*;
 
@@ -56,12 +60,15 @@ public class TestApplicationRegistryService extends AbstractKernelTest {
 
   protected ApplicationRegistryService service_;
 
+  protected ConfigurationManager       configurationManager;
+
   protected OrganizationService        orgService;
 
   @Override
   protected void setUp() throws Exception {
     PortalContainer portalContainer = PortalContainer.getInstance();
     service_ = portalContainer.getComponentInstanceOfType(ApplicationRegistryService.class);
+    configurationManager = portalContainer.getComponentInstanceOfType(ConfigurationManager.class);
     begin();
   }
 
@@ -134,6 +141,31 @@ public class TestApplicationRegistryService extends AbstractKernelTest {
     assertEquals(2, returnCategories.size());
     assertEquals(2, returnCategories.get(0).getApplications().size());
     assertEquals(2, returnCategories.get(1).getApplications().size());
+  }
+
+  public void testImportApplicationCategoryOnStartup() throws Exception {
+    String categoryName = "categoryNameMerge";
+
+    InitParams params = new InitParams();
+    ObjectParameter categoryParameter = new ObjectParameter();
+    categoryParameter.setName("category");
+    ApplicationCategory category = createAppCategory(categoryName, "categoryDescription");
+    categoryParameter.setObject(category);
+    params.addParameter(categoryParameter);
+    ValueParam mergeParam = new ValueParam();
+    mergeParam.setName("merge");
+    mergeParam.setValue("true");
+    params.addParameter(mergeParam);
+
+    ApplicationCategoriesPlugins plugins = new ApplicationCategoriesPlugins(service_, configurationManager, params);
+    service_.initListener(plugins);
+    startService();
+    ApplicationCategory storedCategory = service_.getApplicationCategory(categoryName);
+    assertNotNull(storedCategory);
+  }
+
+  private void startService() {
+    ((Startable) service_).start();
   }
 
   private ApplicationCategory createAppCategory(String categoryName, String categoryDes) {
