@@ -31,10 +31,10 @@ export default {
       navigations: [],
       embeddedTree: {
         // users and spaces
-        'administration/newStaff': 'usersAndSpaces',
-        'administration/management': 'usersAndSpaces',
+        'usersManagement': 'usersAndSpaces',
+        'groupsManagement': 'usersAndSpaces',
+        'membershipsManagement': 'usersAndSpaces',
         'spacesAdministration': 'usersAndSpaces',
-        'spacesTemplates': 'usersAndSpaces',
         // content
         'siteExplorer': 'content',
         'wcmAdmin': 'content',
@@ -55,9 +55,6 @@ export default {
         // search
         'searchIndexing': 'search',
         'search': 'search',
-        // other
-        'appCenterAdminSetup': 'other',
-        'notification': 'other',
       },
     };
   },
