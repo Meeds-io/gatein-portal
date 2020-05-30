@@ -391,12 +391,6 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     verify(userHandler, atLeast(1)).setEnabled(anyString(), anyBoolean(), anyBoolean());
   }
 
-  private void startSessionAs(String username) {
-    Identity identity = new Identity(username);
-    ConversationState state = new ConversationState(identity);
-    ConversationState.setCurrent(state);
-  }
-
   private MockHttpServletRequest getChangePasswordRequest(String path, String currentPassword, String newPassword) {
     byte[] formData = getChangePasswordData(currentPassword, newPassword);
     ByteArrayInputStream dataInputStream = new ByteArrayInputStream(formData);

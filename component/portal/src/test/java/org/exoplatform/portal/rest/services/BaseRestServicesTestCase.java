@@ -12,6 +12,8 @@ import org.exoplatform.component.test.*;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.services.rest.impl.*;
 import org.exoplatform.services.rest.tools.ResourceLauncher;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.test.mock.MockPrincipal;
 
 @ConfiguredBy({
@@ -88,6 +90,12 @@ public abstract class BaseRestServicesTestCase extends AbstractKernelTest {
                                         }
                                       });
     return type.cast(o);
+  }
+
+  protected void startSessionAs(String username) {
+    Identity identity = new Identity(username);
+    ConversationState state = new ConversationState(identity);
+    ConversationState.setCurrent(state);
   }
 
   protected static interface Invoker {
