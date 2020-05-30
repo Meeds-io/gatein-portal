@@ -29,6 +29,10 @@
   </component>
 
   <component>
+    <type>org.exoplatform.portal.rest.MembershipTypeRestResourcesV1</type>
+  </component>
+
+  <component>
     <type>org.exoplatform.portal.rest.GroupRestResourcesV1</type>
   </component>
 

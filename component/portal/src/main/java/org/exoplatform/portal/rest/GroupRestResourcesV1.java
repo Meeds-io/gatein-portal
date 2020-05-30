@@ -34,19 +34,12 @@ public class GroupRestResourcesV1 implements ResourceContainer {
     this.groupSearchService = groupSearchService;
   }
 
-  /**
-   * Get all groups, filter by name if exists.
-   *
-   * @param q value that an group's name match
-   * @return List of groups in json format.
-   * @throws Exception
-   */
   @GET
   @RolesAllowed("administrators")
   @ApiOperation(value = "Gets groups",
           httpMethod = "GET",
           response = Response.class,
-          notes = "This returns the list of groups containing the given search text, only if the authenticated user is a spaces administrator")
+          notes = "This returns the list of groups containing the given search text")
   @ApiResponses(value = {
           @ApiResponse(code = 200, message = "Request fulfilled"),
           @ApiResponse (code = 401, message = "User not authorized to call this endpoint"),
@@ -63,7 +56,7 @@ public class GroupRestResourcesV1 implements ResourceContainer {
     int size = groupSearchService.searchGroups(q).getSize();
     limit = limit < size ? limit : size;
     Group[] groups = groupSearchService.searchGroups(q).load(offset, limit);
-    List<String> listAllGroups = new LinkedList(Arrays.asList(groups));
+    List<Group> listAllGroups = Arrays.asList(groups);
     return Response.ok(listAllGroups, MediaType.APPLICATION_JSON).build();
   }
 }
