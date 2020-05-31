@@ -1,4 +1,4 @@
-package org.exoplatform.portal.rest;
+package org.exoplatform.portal.rest.model;
 
 public class UserRestEntity {
   private String userName;

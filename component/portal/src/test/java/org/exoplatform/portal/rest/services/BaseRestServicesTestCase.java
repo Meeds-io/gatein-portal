@@ -92,7 +92,7 @@ public abstract class BaseRestServicesTestCase extends AbstractKernelTest {
     return type.cast(o);
   }
 
-  protected void startSessionAs(String username) {
+  protected void startUserSession(String username) {
     Identity identity = new Identity(username);
     ConversationState state = new ConversationState(identity);
     ConversationState.setCurrent(state);

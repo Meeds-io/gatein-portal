@@ -19,20 +19,18 @@
 
 package org.exoplatform.services.organization.idm;
 
-import java.io.Serializable;
 import java.util.*;
 
-import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.services.organization.Group;
+import org.apache.commons.lang3.StringUtils;
 import org.gatein.common.logging.LogLevel;
 import org.picketlink.idm.api.*;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.IdentitySearchCriteriaImpl;
 import org.picketlink.idm.impl.api.SimpleAttribute;
 
+import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.services.organization.*;
-
-import static org.picketlink.idm.impl.store.hibernate.PatchedHibernateIdentityStoreImpl.ALL_GROUPS_TYPE;
+import org.exoplatform.services.organization.Group;
 
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
@@ -396,92 +394,24 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
     }
 
+    @Override
+    public ListAccess<Group> findGroupChildren(Group parent, String keyword) throws Exception {
+      if (log.isTraceEnabled()) {
+        Tools.logMethodIn(log, LogLevel.TRACE, "findGroupChildren", null);
+      }
+      IdentitySearchCriteria identitySearchCriteria = new IdentitySearchCriteriaImpl();
+      if (StringUtils.isNotBlank(keyword)) {
+        identitySearchCriteria.nameFilter("*" + keyword + "*");
+      }
+      return new IDMGroupTreeListAccess(this, parent, service_, identitySearchCriteria);
+    }
+
     public Collection<Group> findGroups(Group parent) throws Exception {
         if (log.isTraceEnabled()) {
             Tools.logMethodIn(log, LogLevel.TRACE, "findGroups", new Object[] { "parent", parent });
         }
 
-        org.picketlink.idm.api.Group jbidGroup = null;
-
-        if (parent == null) {
-            jbidGroup = getRootGroup();
-        } else {
-            try {
-                String plGroupName = getPLIDMGroupName(parent.getGroupName());
-
-                jbidGroup = getIdentitySession().getPersistenceManager().findGroup(plGroupName,
-                        orgService.getConfiguration().getGroupType(parent.getParentId()));
-            } catch (Exception e) {
-                // TODO:
-                handleException("Identity operation error: ", e);
-            }
-        }
-
-        if (jbidGroup == null) {
-            return Collections.emptyList();
-        }
-
-        Set<org.picketlink.idm.api.Group> plGroups = new HashSet<org.picketlink.idm.api.Group>();
-
-        try {
-            orgService.flush();
-
-            plGroups.addAll(getIdentitySession().getRelationshipManager().findAssociatedGroups(jbidGroup, null, true, false));
-        } catch (Exception e) {
-            // TODO:
-            handleException("Identity operation error: ", e);
-        }
-
-        // Get members of all types mapped below the parent group id path.
-        if (orgService.getConfiguration().isForceMembershipOfMappedTypes()) {
-
-            String id = parent != null ? parent.getId() : "/";
-
-            for (String type : orgService.getConfiguration().getTypes(id)) {
-                try {
-                    plGroups.addAll(getIdentitySession().getPersistenceManager().findGroup(type));
-                } catch (Exception e) {
-                    // TODO:
-                    handleException("Identity operation error: ", e);
-                }
-            }
-        }
-
-        Set<Group> exoGroups = new HashSet<Group>();
-
-        org.picketlink.idm.api.Group root = getRootGroup();
-
-        for (org.picketlink.idm.api.Group group : plGroups) {
-            if (!group.equals(root)) {
-                Group g = convertGroup(group);
-
-                // If membership of mapped types is forced then we need to exclude those that are not direct child
-                if (orgService.getConfiguration().isForceMembershipOfMappedTypes()) {
-                    String id = g.getParentId();
-                    if ((parent == null && id == null) || (parent != null && id != null && id.equals(parent.getId()))
-                            || (parent == null && id != null && id.equals("/"))) {
-                        exoGroups.add(g);
-                        continue;
-                    }
-                } else {
-                    exoGroups.add(g);
-                }
-            }
-        }
-
-        // UI has hardcoded casts to List
-        List results = new LinkedList<Group>(exoGroups);
-
-        if (orgService.getConfiguration().isSortGroups()) {
-            Collections.sort(results);
-        }
-
-        if (log.isTraceEnabled()) {
-            Tools.logMethodOut(log, LogLevel.TRACE, "findGroups", results);
-        }
-
-        return results;
-
+        return getChildrenGroups(parent, null);
     }
 
     public Collection<Group> findGroupsOfUser(String user) throws Exception {
@@ -591,7 +521,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
             Tools.logMethodIn(log, LogLevel.TRACE, "findGroupsByKeyword", null);
         }
         IdentitySearchCriteria identitySearchCriteria = new IdentitySearchCriteriaImpl().nameFilter("*" + keyword + "*");
-        return new IDMGroupListAccess(identitySearchCriteria);
+        return new IDMGroupListAccess(this, service_, identitySearchCriteria);
     }
 
     private void preSave(Group group, boolean isNew) throws Exception {
@@ -616,6 +546,86 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         for (GroupEventListener listener : listeners_) {
             listener.postDelete(group);
         }
+    }
+
+    public List<Group> getChildrenGroups(Group parent, IdentitySearchCriteria identitySearchCriteria) throws Exception {
+      org.picketlink.idm.api.Group jbidGroup = getPLIDMGroup(parent);
+      if (jbidGroup == null) {
+          return Collections.emptyList();
+      }
+
+      Set<org.picketlink.idm.api.Group> plGroups = new HashSet<org.picketlink.idm.api.Group>();
+      try {
+          orgService.flush();
+          plGroups.addAll(getIdentitySession().getRelationshipManager().findAssociatedGroups(jbidGroup, null, true, false, identitySearchCriteria));
+      } catch (Exception e) {
+          handleException("Identity operation error: ", e);
+      }
+
+      // Get members of all types mapped below the parent group id path.
+      if (orgService.getConfiguration().isForceMembershipOfMappedTypes()) {
+          String id = parent != null ? parent.getId() : "/";
+          for (String type : orgService.getConfiguration().getTypes(id)) {
+              try {
+                  plGroups.addAll(getIdentitySession().getPersistenceManager().findGroup(type, identitySearchCriteria));
+              } catch (Exception e) {
+                  // TODO:
+                  handleException("Identity operation error: ", e);
+              }
+          }
+      }
+
+      Set<Group> exoGroups = new HashSet<Group>();
+
+      org.picketlink.idm.api.Group root = getRootGroup();
+      for (org.picketlink.idm.api.Group group : plGroups) {
+          if (!group.equals(root)) {
+              Group g = convertGroup(group);
+
+              // If membership of mapped types is forced then we need to exclude those that are not direct child
+              if (orgService.getConfiguration().isForceMembershipOfMappedTypes()) {
+                  String id = g.getParentId();
+                  if ((parent == null && id == null) || (parent != null && id != null && id.equals(parent.getId()))
+                          || (parent == null && id != null && id.equals("/"))) {
+                      exoGroups.add(g);
+                      continue;
+                  }
+              } else {
+                  exoGroups.add(g);
+              }
+          }
+      }
+
+      // UI has hardcoded casts to List
+      List results = new LinkedList<Group>(exoGroups);
+
+      if (orgService.getConfiguration().isSortGroups()) {
+          Collections.sort(results);
+      }
+
+      if (log.isTraceEnabled()) {
+          Tools.logMethodOut(log, LogLevel.TRACE, "findGroups", results);
+      }
+      return results;
+    }
+
+    public org.picketlink.idm.api.Group getPLIDMGroup(Group group) throws Exception {
+      org.picketlink.idm.api.Group jbidGroup = null;
+
+      if (group == null) {
+          jbidGroup = getRootGroup();
+      } else {
+          try {
+              String plGroupName = getPLIDMGroupName(group.getGroupName());
+
+              jbidGroup = getIdentitySession().getPersistenceManager().findGroup(plGroupName,
+                      orgService.getConfiguration().getGroupType(group.getParentId()));
+          } catch (Exception e) {
+              // TODO:
+              handleException("Identity operation error: ", e);
+          }
+      }
+      return jbidGroup;
     }
 
     public Group convertGroup(org.picketlink.idm.api.Group jbidGroup) throws Exception {
@@ -909,55 +919,4 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         return orgService.getConfiguration().getGtnGroupName(plidmGroupName);
     }
 
-    public class IDMGroupListAccess implements ListAccess<Group>, Serializable {
-
-        private final IdentitySearchCriteria identitySearchCriteria;
-
-        public IDMGroupListAccess(IdentitySearchCriteria identitySearchCriteria) {
-            this.identitySearchCriteria = identitySearchCriteria;
-        }
-
-        public Group[] load(int index, int length) throws Exception {
-            if (log.isTraceEnabled()) {
-                Tools.logMethodIn(log, LogLevel.TRACE, "load", new Object[] { "index", index, "length", length });
-            }
-            if(length == 0) {
-                return new Group[0];
-            }
-            //As test suppose, we should throw exception when try to load more element than size
-            int totalSize = this.getSize();
-            if(index + length > totalSize) {
-                throw new IllegalArgumentException("Try to get more than groups can retrieve");
-            }
-            Collection<org.picketlink.idm.api.Group> groups = listQuery(index, length);
-            Group[] exoGroups = new Group[length];
-            int i = 0;
-            for (org.picketlink.idm.api.Group group : groups) {
-                exoGroups[i++] = convertGroup(group);
-            }
-            if (log.isTraceEnabled()) {
-                Tools.logMethodOut(log, LogLevel.TRACE, "load", exoGroups);
-            }
-            return exoGroups;
-        }
-
-        public int getSize() throws Exception {
-            if (log.isTraceEnabled()) {
-                Tools.logMethodIn(log, LogLevel.TRACE, "getSize", null);
-            }
-            int result = service_.getIdentitySession().getPersistenceManager().findGroup(ALL_GROUPS_TYPE, identitySearchCriteria).size();
-            // should check count
-            if (log.isTraceEnabled()) {
-                Tools.logMethodOut(log, LogLevel.TRACE, "getSize", result);
-            }
-
-            return result;
-
-        }
-
-        private List<org.picketlink.idm.api.Group> listQuery(int index, int length) throws Exception {
-            identitySearchCriteria.page(index, length);
-            return (List<org.picketlink.idm.api.Group>) service_.getIdentitySession().getPersistenceManager().findGroup(ALL_GROUPS_TYPE, identitySearchCriteria);
-        }
-    }
 }

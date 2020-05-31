@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
@@ -340,6 +341,19 @@ public class AbstractTestOrganizationService {
          * find all child group in groupParent Expect result: 2 child group: group1, group2
          */
         assertEquals("Expect number of child group in parent group is: ", 2, groupHandler_.findGroups(groupParent).size());
+
+        ListAccess<Group> groupChildrenListAccess = groupHandler_.findGroupChildren(groupParent, null);
+        assertEquals("Expect number of child group in parent group is: ", 2, groupChildrenListAccess.getSize());
+        Group[] childrenGroup = groupChildrenListAccess.load(0, 2);
+        assertEquals("Expect number of child group in parent group is: ", 2, childrenGroup.length);
+        childrenGroup = groupChildrenListAccess.load(1, 1);
+        assertEquals("Expect number of child group in parent group is: ", 1, childrenGroup.length);
+
+        groupChildrenListAccess = groupHandler_.findGroupChildren(groupParent, "1");
+        assertEquals("Expect number of child group in parent group with search term '1' is: ", 1, groupChildrenListAccess.getSize());
+        childrenGroup = groupChildrenListAccess.load(0, 1);
+        assertEquals("Expect number of child group in parent group with search term '1' is: ", 1, childrenGroup.length);
+
         /* Remove a child group */
         groupHandler_.removeGroup(groupHandler_.findGroupById(groupChild1.getId()), true);
         assertNull("Expect child group has been removed: ", groupHandler_.findGroupById(groupChild1.getId()));
