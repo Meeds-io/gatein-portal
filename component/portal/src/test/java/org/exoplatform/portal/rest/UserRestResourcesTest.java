@@ -83,7 +83,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     EnvironmentContext envctx = new EnvironmentContext();
     envctx.put(HttpServletRequest.class, httpRequest);
 
-    startSessionAs(USER_2);
+    startUserSession(USER_2);
 
     // When
     ContainerResponse resp = launcher.service("PATCH",
@@ -107,7 +107,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     EnvironmentContext envctx = new EnvironmentContext();
     envctx.put(HttpServletRequest.class, httpRequest);
 
-    startSessionAs(USER_2);
+    startUserSession(USER_2);
     when(userACL.isUserInGroup(eq("admins"))).thenReturn(true);
 
     // When
@@ -133,7 +133,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     EnvironmentContext envctx = new EnvironmentContext();
     envctx.put(HttpServletRequest.class, httpRequest);
 
-    startSessionAs(USER_2);
+    startUserSession(USER_2);
     when(userACL.isUserInGroup(eq("admins"))).thenReturn(true);
 
     // When
@@ -162,7 +162,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     EnvironmentContext envctx = new EnvironmentContext();
     envctx.put(HttpServletRequest.class, httpRequest);
 
-    startSessionAs(USER_1);
+    startUserSession(USER_1);
 
     // When
     ContainerResponse resp = launcher.service("PATCH",
@@ -190,7 +190,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     EnvironmentContext envctx = new EnvironmentContext();
     envctx.put(HttpServletRequest.class, httpRequest);
 
-    startSessionAs(USER_1);
+    startUserSession(USER_1);
 
     // When
     when(userHandler.authenticate(USER_1, currentPassword)).thenReturn(true);
@@ -214,7 +214,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     UserImpl user = new UserImpl(USER_2);
     when(userHandler.createUserInstance(eq(USER_2))).thenReturn(user);
 
-    startSessionAs(USER_1);
+    startUserSession(USER_1);
 
     JSONObject data = new JSONObject();
 
@@ -302,7 +302,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     user.setLastName(USER_2);
     user.setEnabled(false);
 
-    startSessionAs(USER_1);
+    startUserSession(USER_1);
     
     JSONObject data = new JSONObject();
 

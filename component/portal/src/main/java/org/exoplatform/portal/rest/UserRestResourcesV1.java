@@ -12,6 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.portal.rest.model.MembershipRestEntity;
+import org.exoplatform.portal.rest.model.UserRestEntity;
 import org.exoplatform.services.organization.*;
 import org.exoplatform.services.organization.search.UserSearchService;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -426,6 +428,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
   @ApiResponses(
       value = {
           @ApiResponse(code = 200, message = "Request fulfilled"),
+          @ApiResponse(code = 404, message = "User not found"),
           @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
       }
   )
@@ -436,7 +439,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
                                      @ApiParam(value = "Offset", required = false, defaultValue = "0") @QueryParam(
                                        "offset"
                                      ) int offset,
-                                     @ApiParam(value = "Limit", required = false, defaultValue = "10") @QueryParam(
+                                     @ApiParam(value = "Limit", required = false, defaultValue = "20") @QueryParam(
                                        "limit"
                                      ) int limit,
                                      @ApiParam(value = "Returning the number of users found or not", defaultValue = "false") @QueryParam(
@@ -463,12 +466,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
       memberships = membershipsByUser.load(offset, limitToFetch);
       for (Membership membership : memberships) {
         Group group = organizationService.getGroupHandler().findGroupById(membership.getGroupId());
-        membershipEntities.add(new MembershipRestEntity(membership.getId(),
-                                                        membership.getMembershipType(),
-                                                        membership.getGroupId(),
-                                                        group.getLabel(),
-                                                        userName,
-                                                        null));
+        membershipEntities.add(new MembershipRestEntity(membership, group, user));
       }
       if (!returnSize) {
         totalSize = 0;

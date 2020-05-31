@@ -42,7 +42,7 @@ public class MembershipTypeRestResourcesTest extends BaseRestServicesTestCase {
     getContainer().unregisterComponent(OrganizationService.class);
     getContainer().registerComponentInstance("org.exoplatform.services.organization.OrganizationService", organizationService);
 
-    startSessionAs("testuser");
+    startUserSession("testuser");
   }
 
   @Override
