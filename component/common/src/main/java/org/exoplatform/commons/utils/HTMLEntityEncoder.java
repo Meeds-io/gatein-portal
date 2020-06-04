@@ -101,6 +101,8 @@ public class HTMLEntityEncoder extends EntityEncoder {
         //
         int to = off + len;
 
+        boolean isPreviousHighSurrogate = false;
+
         // Perform lookup char by char
         for (int current = off; current < to; current++) {
             char c = chars[current];
@@ -114,8 +116,31 @@ public class HTMLEntityEncoder extends EntityEncoder {
 
             String hex;
 
+            if(Character.isHighSurrogate(c)) {
+                isPreviousHighSurrogate = true;
+
+                // Append the previous chars if any
+                writer.append(chars, previous, current - previous);
+
+                // Update the previous pointer
+                previous = current + 1;
+            } else if(Character.isLowSurrogate(c)) {
+                // if previous char was not a high surrogate, ignores the low surrogate
+                if(isPreviousHighSurrogate) {
+                    // Get code point of high and low surrogates
+                    replacement = Integer.toHexString(Character.codePointAt(chars, current - 1, current + 1));
+
+                    // Append the replaced entity
+                    writer.append("&#x").append(replacement).append(';');
+
+                    // Update the previous pointer
+                    previous = current + 1;
+                }
+
+                isPreviousHighSurrogate = false;
+            }
             // Do we have a replacement
-            if ((replacement = lookupEntityName(c)) != null) {
+            else if ((replacement = lookupEntityName(c)) != null) {
                 // We lazy create the result
 
                 // Append the previous chars if any
@@ -126,6 +151,8 @@ public class HTMLEntityEncoder extends EntityEncoder {
 
                 // Update the previous pointer
                 previous = current + 1;
+
+                isPreviousHighSurrogate = false;
             } else if ((hex = lookupHexEntityNumber(c)) != null) {
                 // We lazy create the result
 
@@ -137,6 +164,10 @@ public class HTMLEntityEncoder extends EntityEncoder {
 
                 // Update the previous pointer
                 previous = current + 1;
+
+                isPreviousHighSurrogate = false;
+            } else {
+                isPreviousHighSurrogate = false;
             }
         }
 
