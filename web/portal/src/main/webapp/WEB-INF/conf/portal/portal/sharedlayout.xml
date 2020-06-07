@@ -40,16 +40,13 @@
         <factory-id>addonContainer</factory-id>
       </container>
     </container>
-    <container id="NavigationToolbarPortlet" template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
-      <portlet-application>
-        <portlet>
-          <application-ref>social-vue-portlet</application-ref>
-          <portlet-ref>TopBarLogo</portlet-ref>
-        </portlet>
-        <title>TopBar Logo</title>
-        <access-permissions>*:/platform/users</access-permissions>
-        <show-info-bar>false</show-info-bar>
-      </portlet-application>
+    <container id="top-bar-logo-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
+      <name>top-bar-logo-container</name>
+      <factory-id>addonContainer</factory-id>
+    </container>
+    <container id="right-topNavigation-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
+      <name>right-topNavigation-container</name>
+      <factory-id>addonContainer</factory-id>
     </container>
     <container id="right-topNavigation-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
       <name>right-topNavigation-container</name>
