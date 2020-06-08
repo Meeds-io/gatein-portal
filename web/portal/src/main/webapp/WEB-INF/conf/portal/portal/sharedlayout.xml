@@ -57,15 +57,10 @@
       <access-permissions>*:/platform/users</access-permissions>
       <factory-id>addonContainer</factory-id>
     </container>
-    <container id="SearchPortlet" template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
-      <portlet-application>
-        <portlet>
-          <application-ref>unified-search</application-ref>
-          <portlet-ref>QuicksearchPortlet</portlet-ref>
-        </portlet>
-        <access-permissions>*:/platform/users</access-permissions>
-        <show-info-bar>false</show-info-bar>
-      </portlet-application>
+    <container id="SearchPortlet" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
+      <name>SearchPortlet</name>
+      <access-permissions>*:/platform/users</access-permissions>
+      <factory-id>addonContainer</factory-id>
     </container>
     <container id="middle-topNavigation-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
       <name>middle-topNavigation-container</name>
