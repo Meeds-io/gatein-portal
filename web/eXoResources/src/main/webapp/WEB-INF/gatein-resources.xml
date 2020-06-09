@@ -900,6 +900,16 @@
   </module>
 
   <module>
+    <name>bodyScrollListener</name>
+    <script>
+      <path>/javascript/eXo/portal/BodyScrollListener.js</path>
+    </script>
+    <depends>
+      <module>jquery</module>
+    </depends>
+  </module>
+
+  <module>
     <name>mobileSwipeContainer</name>
     <script>
       <path>/javascript/eXo/portal/MobileSwipeContainer.js</path>
