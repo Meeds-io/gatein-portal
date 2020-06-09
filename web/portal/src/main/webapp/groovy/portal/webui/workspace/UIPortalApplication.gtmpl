@@ -171,6 +171,7 @@
          stylesheet.insertRule("html[dir='rtl'] .skipHidden { right: 10000px !important;}", stylesheet.cssRules.length);
        }
      }
+     require(['SHARED/bodyScrollListener']);
    </script>
    <!-- /508 Compliancy -->
 
