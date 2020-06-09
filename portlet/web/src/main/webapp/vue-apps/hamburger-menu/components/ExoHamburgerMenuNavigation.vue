@@ -8,7 +8,6 @@
         <v-icon size="24">fa-bars</v-icon>
       </div>
     </a>
-    <v-divider vertical />
     <v-navigation-drawer
       id="HamburgerMenuNavigation"
       v-model="hamburgerMenu"
