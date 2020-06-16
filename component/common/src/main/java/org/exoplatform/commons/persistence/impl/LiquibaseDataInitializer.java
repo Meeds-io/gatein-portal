@@ -22,6 +22,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -144,6 +145,8 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
     try {
       database = DatabaseFactory.getInstance()
               .findCorrectDatabaseImplementation(new JdbcConnection(datasource.getConnection()));
+      // Adding "RANK" in data base reserved words as a workaround until Liquibase metadata reserved keywords update.
+      database.addReservedWords(Arrays.asList("RANK"));
       Liquibase liquibase = new Liquibase(changelogsPath, new ClassLoaderResourceAccessor(), database);
       liquibase.update(liquibaseContexts);
     } catch (SQLException e) {
