@@ -3,8 +3,8 @@
     color="transaprent"
     class="HamburgerNavigationMenu"
     flat>
-    <a class="HamburgerNavigationMenuLink">
-      <div class="px-5 py-3" @click="openOrHideMenu()">
+    <a class="HamburgerNavigationMenuLink" @click="openOrHideMenu()">
+      <div class="px-5 py-3">
         <v-icon size="24">fa-bars</v-icon>
       </div>
     </a>
