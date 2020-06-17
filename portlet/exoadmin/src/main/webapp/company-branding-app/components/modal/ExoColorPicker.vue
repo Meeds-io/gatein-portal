@@ -5,11 +5,14 @@
     color="white"
     width="290px">
     <template v-slot:activator="{ on }">
-      <v-text-field
-        v-model="value"
-        :label="label"
-        readonly
-        v-on="on" />
+      <div class="themeColor">
+        <div :style="{ backgroundColor: value}" class="colorSelected" v-on="on">
+        </div>
+        <div class="infoOfTheme">
+          <p class="labelColor">{{ label }} {{ $t('branding.color.label') }}</p>
+          <label :title="$t('branding.message.edit.label')" class="colorCode" rel="tooltip" data-placement="bottom" v-on="on">{{ value }}</label>
+        </div>
+      </div>
     </template>
     <v-color-picker
       v-model="value"

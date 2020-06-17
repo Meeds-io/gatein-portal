@@ -39,13 +39,9 @@ describe('ExoCompanyBranding.test.js', () => {
 
     // When
     const companyNameInput = cmp.find('#companyNameInput');
-    const topBarThemeLightInput = cmp.find('#navigationStyle').find('input[value=Light]');
-    const topBarThemeDarkInput = cmp.find('#navigationStyle').find('input[value=Dark]');
 
     // Then
     expect(companyNameInput.element.value).toBe('My Company');
-    expect(topBarThemeLightInput.element.checked).toBe(true);
-    expect(topBarThemeDarkInput.element.checked).toBe(false);
   });
 
   it('should disable Save button when Company name field is empty', () => {
