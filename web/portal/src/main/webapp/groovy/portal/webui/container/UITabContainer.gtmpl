@@ -44,7 +44,10 @@
 <div id="$id">
   <div class="VuetifyApp">
                       	<div id="tab$id">
-    							      <v-tabs>
+                      	    <% if(modeState == 0){ %>
+                            	<header v-if="isDocTab" ><div class="header"><%=_ctx.appRes("homepage.documents")%></div></header>
+                            <%}%>
+    						<v-tabs v-model="tab">
             <%
 	           if(modeState > 0){
 	             jsmanager.require("SHARED/portalDragDrop", "portalDragDrop").addScripts("portalDragDrop.init(['UIContainer']);");
@@ -59,7 +62,7 @@
                    title = _ctx.appRes("UITabContainer.tab") + String.valueOf(counter);
                                    uiChild.setTitle(title);
                 }
-                else title = ExpressionUtil.getExpressionValue(res, title);
+                else title = _ctx.appRes("homepage.documents.tab." + title);
                 String selectTab = uicomponent.event("SelectTab", tabId);
                 String tabState = uicomponent.getTabState(uiChild, uicomponent);
                 title = HTMLEntityEncoder.getInstance().encode(title);
@@ -142,8 +145,14 @@
     			data () {
     			    return {
     			      tab: null,
+    			      isDocTab : false
     			    }
     			},
+    			mounted() {
+                    if (document.getElementById('tab$id').closest("#DocumentsContainer") !== null) {
+                    	this.isDocTab = true;
+                    }
+                 }
     		})
     	});
 </script>
