@@ -39,7 +39,7 @@
   
   String id = uicomponent.getId();  
   def modeState = Util.getUIPortalApplication().getModeState();
-  def header = uicomponent.getTitle() != null ? ExpressionUtil.getExpressionValue(res, uicomponent.getTitle()) : null;
+  def header = uicomponent.getTitle() != null ? _ctx.appRes(uicomponent.getTitle()) : null;
 %>
 <% if(children != null && children.size() > 0) { %>
 <div id="$id">
@@ -63,7 +63,7 @@
                    title = _ctx.appRes("UITabContainer.tab") + String.valueOf(counter);
                                    uiChild.setTitle(title);
                 }
-                else title = ExpressionUtil.getExpressionValue(res, title);
+                else title = _ctx.appRes(title);
                 String selectTab = uicomponent.event("SelectTab", tabId);
                 String tabState = uicomponent.getTabState(uiChild, uicomponent);
                 title = HTMLEntityEncoder.getInstance().encode(title);
