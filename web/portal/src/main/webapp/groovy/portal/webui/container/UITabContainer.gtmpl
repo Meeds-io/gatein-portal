@@ -39,13 +39,14 @@
   
   String id = uicomponent.getId();  
   def modeState = Util.getUIPortalApplication().getModeState();
+  def header = uicomponent.getTitle() != null ? ExpressionUtil.getExpressionValue(res, uicomponent.getTitle()) : null;
 %>
 <% if(children != null && children.size() > 0) { %>
 <div id="$id">
   <div class="VuetifyApp">
                       	<div id="tab$id">
-                      	    <% if(modeState == 0){ %>
-                            	<header v-if="isDocTab" ><div class="header"><%=_ctx.appRes("homepage.documents")%></div></header>
+                      	    <% if(modeState == 0 && header != null){ %>
+                            	<header ><div class="header">$header</div></header>
                             <%}%>
     						<v-tabs v-model="tab">
             <%
@@ -62,7 +63,7 @@
                    title = _ctx.appRes("UITabContainer.tab") + String.valueOf(counter);
                                    uiChild.setTitle(title);
                 }
-                else title = _ctx.appRes("homepage.documents.tab." + title);
+                else title = ExpressionUtil.getExpressionValue(res, title);
                 String selectTab = uicomponent.event("SelectTab", tabId);
                 String tabState = uicomponent.getTabState(uiChild, uicomponent);
                 title = HTMLEntityEncoder.getInstance().encode(title);
@@ -145,14 +146,8 @@
     			data () {
     			    return {
     			      tab: null,
-    			      isDocTab : false
     			    }
-    			},
-    			mounted() {
-                    if (document.getElementById('tab$id').closest("#DocumentsContainer") !== null) {
-                    	this.isDocTab = true;
-                    }
-                 }
+    			}
     		})
     	});
 </script>
