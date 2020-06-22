@@ -39,10 +39,16 @@
   
   String id = uicomponent.getId();  
   def modeState = Util.getUIPortalApplication().getModeState();
+  def header = uicomponent.getTitle() != null ? _ctx.appRes(uicomponent.getTitle()) : null;
 %>
 <% if(children != null && children.size() > 0) { %>
-<div class="uiTabContainer" id="$id">
-  <ul class="nav nav-tabs">
+<div id="$id">
+  <div class="VuetifyApp">
+                      	<div id="tab$id">
+                      	    <% if(modeState == 0 && header != null){ %>
+                            	<header ><div class="header">$header</div></header>
+                            <%}%>
+    						<v-tabs v-model="tab">
             <%
 	           if(modeState > 0){
 	             jsmanager.require("SHARED/portalDragDrop", "portalDragDrop").addScripts("portalDragDrop.init(['UIContainer']);");
@@ -57,12 +63,12 @@
                    title = _ctx.appRes("UITabContainer.tab") + String.valueOf(counter);
                                    uiChild.setTitle(title);
                 }
-                else title = ExpressionUtil.getExpressionValue(res, title);
+                else title = _ctx.appRes(title);
                 String selectTab = uicomponent.event("SelectTab", tabId);
                 String tabState = uicomponent.getTabState(uiChild, uicomponent);
                 title = HTMLEntityEncoder.getInstance().encode(title);
             %>
-                <li class="<%=status%>">                      
+                <v-tab>
                    <%
                      if(modeState > 0){                                
                        String actionLink = uicomponent.event("EditContainer", "$uiChild.id") - "javascript:";
@@ -90,9 +96,9 @@
 								  <% /*End Popup Menu*/ %>
 								  </div>															                              
                    <%} else {%>
-                       <a data-toggle="tab" data-target="#$tabId-tab" onclick="<%= selectTab %>"><%=title%></a>
+                       <a class="tabsTitle"><%=title%></a>
                    <%} %>           
-                </li>       
+                </v-tab>
             <%
                 counter++;
               }
@@ -104,7 +110,7 @@
                   <span class="uiIconLightGray uiIconSimplePlusMini"></span>
                </li>
             <% } %>  
-  </ul>                 
+  </v-tabs>
   <% 
      String style = "";
      String width = uicomponent.getWidth();
@@ -114,19 +120,34 @@
      if(height != null) style += "height: "+height+"px;"
      if(style.length() > 0) style += "\"";
   %>            
-  <div class="tab-content" $style> 
+  <v-tabs-items v-model="tab">
     <%
       
       for(uiChild in uicomponent.getChildren()) {
         String active = "";
         if(uiChild.isRendered()) active = "in active";
     %>
-        <div id="$uiChild.id-tab" class="tab-pane fade $active">
+        <v-tab-item eager>
             <% uicomponent.renderUIComponent(uiChild);%>        
-        </div>
+        </v-tab-item>
     <%
       }
     %>
+  </v-tabs-items>
   </div>
 </div>
 <% } %>
+
+<script type="text/javascript">
+	require(['SHARED/vuetify'], function(vuetify){
+    		new Vue({
+    			el: `#tab$id`,
+    			vuetify: new Vuetify(),
+    			data () {
+    			    return {
+    			      tab: null,
+    			    }
+    			}
+    		})
+    	});
+</script>
