@@ -65,7 +65,7 @@
           <a href="javascript:void(0)" class="linkBack" @click="showLogo = true"><i class="fas fa-undo-alt"></i>{{ $t('back.label') }}</a>
         </div>
         <hr class="theme">
-        <div class="boxContent labelTheme">
+        <div class="boxContent themeLabel">
           <h4>
             {{ $t('themeColors.label') }}
           </h4>

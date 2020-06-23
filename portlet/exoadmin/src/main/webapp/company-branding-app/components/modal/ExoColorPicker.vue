@@ -8,7 +8,7 @@
       <div class="themeColor">
         <div :style="{ backgroundColor: value}" class="colorSelected" v-on="on">
         </div>
-        <div class="detailsTheme">
+        <div class="themeDetails">
           <p class="labelColor">{{ label }} {{ $t('branding.color.label') }}</p>
           <label :title="$t('branding.message.edit.label')" class="colorCode" rel="tooltip" data-placement="bottom" v-on="on">{{ value }}</label>
         </div>
