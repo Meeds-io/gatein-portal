@@ -29,7 +29,7 @@
             <div id="previewLogo" class="previewLogo">
               <div class="btnAction">
                 <i v-if="removeLogoButtonDisplayed" :title="$t('branding.message.restore.logo')" class="fas fa-trash-alt iconDelete" rel="tooltip" data-placement="bottom" @click="removeLogo"></i>
-                <i v-else :title="$t('branding.message.change.logo')" class="uiIconEdit iconEdit" rel="tooltip" data-placement="bottom" @click="editLogo"></i>
+                <i v-else :title="$t('branding.message.change.logo')" class="uiIconEdit iconEdit" rel="tooltip" data-placement="bottom" @click="showLogo = false"></i>
               </div>
               <div>
                 <img id="previewLogoImg" :src="logoPreview" class="previewImg">
@@ -62,7 +62,7 @@
           </div>
         </div>
         <div v-if="!showLogo" class="button_back">
-          <a href="javascript:void(0)" class="linkBack" @click="ignorer"><i class="fas fa-undo-alt"></i>{{ $t('back.label') }}</a>
+          <a href="javascript:void(0)" class="linkBack" @click="showLogo = true"><i class="fas fa-undo-alt"></i>{{ $t('back.label') }}</a>
         </div>
         <hr class="lastSeparation">
         <div class="boxContent labelTheme">
@@ -169,17 +169,11 @@ export default {
     }.bind(this));
   },
   methods: {
-    ignorer(){
-      this.showLogo = true;
-    },
     convertImageDataAsSrc(imageData) {
       let binary = '';
       const bytes = new Uint8Array(imageData);
       bytes.forEach(byte => binary += String.fromCharCode(byte));
       return `data:image/png;base64,${btoa(binary)}`;
-    },
-    editLogo(){
-      this.showLogo = false;
     },
     onFileChange(e) {
       const files = e.target.files || e.dataTransfer.files;
