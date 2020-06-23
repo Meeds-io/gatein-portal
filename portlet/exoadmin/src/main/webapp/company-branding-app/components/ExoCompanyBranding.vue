@@ -14,42 +14,63 @@
         <i class="uiIconWarning"></i>{{ $t('info.savenotok.label') }}
       </div>
       <div class="logoForm boxContent">
-        <h4>{{ $t('companyName.label') }}</h4>
+        <h4 class="labelStyle">{{ $t('companyName.label') }}</h4>
         <div>
-          <input id="companyNameInput" v-model="branding.companyName" :placeholder="$t('companyName.placeholder')" type="text" name="formOp" class="ignore-vuetify-classes" value="">
-          <div class="info">{{ $t('companyName.input.hint') }}</div>
-        </div> 
-        <h4>
+          <div class="info"><p>{{ $t('companyName.input.hint') }}</p></div>
+          <input id="companyNameInput" :title="$t('branding.message.edit.label')" v-model="branding.companyName" :placeholder="$t('companyName.placeholder')" type="text" name="formOp" class="ignore-vuetify-classes inputCompany" rel="tooltip" data-placement="bottom" value="">
+        </div>
+        <hr class="logo">
+        <h4 class="styleSelectLogo">
           {{ $t('selectlogo.label') }}
         </h4>
+        <div class="info labelLocation"><p>{{ $t('noteselectlogo.label') }}</p></div>
         <div class="clearfix">
-          <div class="pull-left">
+          <div v-show="showLogo" class="pull-left">
+            <div id="previewLogo" class="previewLogo">
+              <div class="btnAction">
+                <i v-if="removeLogoButtonDisplayed" :title="$t('branding.message.restore.logo')" class="fas fa-trash-alt iconDelete" rel="tooltip" data-placement="bottom" @click="removeLogo"></i>
+                <i v-else :title="$t('branding.message.change.logo')" class="uiIconEdit iconEdit" rel="tooltip" data-placement="bottom" @click="showLogo = false"></i>
+              </div>
+              <div>
+                <img id="previewLogoImg" :src="logoPreview" class="previewImg">
+              </div>
+            </div>
+          </div>
+          <div v-show="!showLogo" class="pull-left">
             <div class="fileDrop">
               <div ref="dropFileBox" class="dropZone">
-                <label class="dropMsg" for="attachLogo">
-                  <i class="uiIcon attachFileIcon"></i> {{ $t('attachment') }}
-                </label>
+                <div>
+                  <div class="attachment">
+                    <i class="uiIconTemplate uiIcon32x32LightGray colorIcon"></i>
+                    <label>{{ $t('branding.drop.attachment') }}</label>
+                  </div>
+                  <div class="option">
+                    <hr class="optionStyle">
+                    <label class="labelValue">{{ $t('branding.or.attachment') }}</label>
+                    <hr class="closeOption">
+                  </div>
+                  <div class="upload">
+                    <label for="attachLogo" class="iconUpload"><i class="fas fa-download uiIcon32x32LightGray"></i></label>
+                    <label class="dropMsg" for="attachLogo">
+                      {{ $t('branding.select.attachment') }}
+                    </label>
+                  </div>
+                </div>
                 <input id="attachLogo" type="file" class="attachFile" name="file" @change="onFileChange">
               </div>
             </div>
-            <div class="info">{{ $t('noteselectlogo.label') }}</div>
-          </div>
-          <div class="pull-left">
-            <div id="previewLogo" class="previewLogo">
-              <a v-if="removeLogoButtonDisplayed" :title="$t('delete.label')" class="removeButton" @click="removeLogo"><i class="uiIconRemove"></i></a>
-              <img id="previewLogoImg" :src="logoPreview" alt="">
-            </div>
-            <div v-if="uploadInProgress" :class="[uploadProgress === 100 ? 'upload-completed': '']" class="progress progress-striped pull-left">
-              <div :style="'width:' + uploadProgress + '%'" class="bar">{{ uploadProgress }}%</div>
-            </div>
           </div>
         </div>
-        <div class="themeStyle boxContent">
+        <div v-if="!showLogo" class="button_back">
+          <a href="javascript:void(0)" class="linkBack" @click="showLogo = true"><i class="fas fa-undo-alt"></i>{{ $t('back.label') }}</a>
+        </div>
+        <hr class="theme">
+        <div class="boxContent themeLabel">
           <h4>
             {{ $t('themeColors.label') }}
           </h4>
 
-          <v-row>
+          <v-row class="colorsBlock">
             <v-col>
               <exo-color-picker v-model="branding.themeColors.primaryColor" :label="$t('themeColors.primaryColor.label')" />
             </v-col>
@@ -61,32 +82,12 @@
             </v-col>
           </v-row>
         </div>
-        <div class="navigationStyle boxContent">
-          <h4>
-            {{ $t('selectstyle.label') }}
-          </h4>
-  
-          <div id="navigationStyle" class="btn-group uiDropdownWithIcon">
-            <div class="control-group">
-              <label class="uiRadio">
-                <input v-model="branding.topBarTheme" class="radio" type="radio" value="Dark" @change="changePreviewStyle"> <span>{{ $t('style.dark.label') }}</span>
-              </label>
-              <label class="uiRadio">
-                <input v-model="branding.topBarTheme" class="radio" type="radio" value="Light" @change="changePreviewStyle"> <span>{{ $t('style.light.label') }}</span>
-              </label>
-            </div>
-          </div>
-        </div>    
-        <div class="preview boxContent">
-          <div id="StylePreview">
-          </div>
-        </div>
         <div class="uiAction boxContent">
-          <button id="save" :disabled="!branding.companyName || !branding.companyName.trim()" class="btn btn-primary ignore-vuetify-classes" type="button" @click="save">
-            {{ $t('save.label') }}
-          </button>
           <button id="cancel" class="btn ignore-vuetify-classes" type="button" @click="cancel">
             {{ $t('cancel.label') }}
+          </button>
+          <button id="save" :disabled="!branding.companyName || !branding.companyName.trim()" class="btn btn-primary ignore-vuetify-classes" type="button" @click="save">
+            {{ $t('save.label') }}
           </button>
         </div>
       </div>
@@ -102,6 +103,7 @@ import axios from 'axios';
 export default {
   data(){
     return {
+      showLogo: true,
       branding: {
         id: null,
         companyName: null,
@@ -243,10 +245,10 @@ export default {
       this.$el.querySelector('#toobigfile').style.display = 'none';
     },
     uploadFile(data) {
-      const formData = new FormData();               
+      const formData = new FormData();
       formData.append('file', data);
       const MAX_RANDOM_NUMBER = 100000;
-      const uploadId = Math.round(Math.random() * MAX_RANDOM_NUMBER); 
+      const uploadId = Math.round(Math.random() * MAX_RANDOM_NUMBER);
       this.branding.logo.uploadId = uploadId;
       if (!this.branding.logo.defaultData) {
         this.branding.logo.defaultData = this.branding.logo.data;
@@ -291,14 +293,11 @@ export default {
               self.uploadInProgress = false;
             } else {
               self.uploadProgress = maxProgress;
-              self.$el.querySelector('.upload-completed').addEventListener('transitionend', function(e) {
-                if(e.propertyName === 'visibility') {
-                  self.uploadInProgress = false;
-                  self.uploadProgress = 0;
-                }
-              }, true);
             }
           });
+      });
+      this.$nextTick(() => {
+        this.showLogo = true;
       });
     },
     removeLogo() {
