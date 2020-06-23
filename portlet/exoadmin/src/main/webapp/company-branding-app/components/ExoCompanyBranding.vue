@@ -19,7 +19,7 @@
           <div class="info"><p>{{ $t('companyName.input.hint') }}</p></div>
           <input id="companyNameInput" :title="$t('branding.message.edit.label')" v-model="branding.companyName" :placeholder="$t('companyName.placeholder')" type="text" name="formOp" class="ignore-vuetify-classes inputCompany" rel="tooltip" data-placement="bottom" value="">
         </div>
-        <hr class="separation">
+        <hr class="logo">
         <h4 class="styleSelectLogo">
           {{ $t('selectlogo.label') }}
         </h4>
@@ -40,16 +40,16 @@
             <div class="fileDrop">
               <div ref="dropFileBox" class="dropZone">
                 <div>
-                  <div class="firstBlockOfDropAttachment">
+                  <div class="attachment">
                     <i class="uiIconTemplate uiIcon32x32LightGray colorIcon"></i>
                     <label>{{ $t('branding.drop.attachment') }}</label>
                   </div>
-                  <div class="blockOr">
-                    <hr class="firstSeparation">
+                  <div class="option">
+                    <hr class="optionStyle">
                     <label class="labelValue">{{ $t('branding.or.attachment') }}</label>
-                    <hr class="lastSeparationBlockOR">
+                    <hr class="closeOption">
                   </div>
-                  <div class="lastBlock">
+                  <div class="upload">
                     <label for="attachLogo" class="iconUpload"><i class="fas fa-download uiIcon32x32LightGray"></i></label>
                     <label class="dropMsg" for="attachLogo">
                       {{ $t('branding.select.attachment') }}
@@ -64,7 +64,7 @@
         <div v-if="!showLogo" class="button_back">
           <a href="javascript:void(0)" class="linkBack" @click="showLogo = true"><i class="fas fa-undo-alt"></i>{{ $t('back.label') }}</a>
         </div>
-        <hr class="lastSeparation">
+        <hr class="theme">
         <div class="boxContent labelTheme">
           <h4>
             {{ $t('themeColors.label') }}
