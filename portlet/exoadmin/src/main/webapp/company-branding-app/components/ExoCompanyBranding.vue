@@ -65,7 +65,7 @@
           <a href="javascript:void(0)" class="linkBack" @click="ignorer"><i class="fas fa-undo-alt"></i>{{ $t('back.label') }}</a>
         </div>
         <hr class="lastSeparation">
-        <div class="themeStyle boxContent labelTheme">
+        <div class="boxContent labelTheme">
           <h4>
             {{ $t('themeColors.label') }}
           </h4>
