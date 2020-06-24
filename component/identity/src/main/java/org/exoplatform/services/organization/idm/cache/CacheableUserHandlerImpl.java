@@ -145,9 +145,14 @@ public class CacheableUserHandlerImpl extends UserDAOImpl {
    * {@inheritDoc}
    */
   public User setEnabled(String userName, boolean enabled, boolean broadcast) throws Exception {
-    User result = super.setEnabled(userName, enabled, broadcast);
-    userCache.remove(userName);
-    return result;
+    disableCacheInThread.set(true);
+    try {
+      User result = super.setEnabled(userName, enabled, broadcast);
+      userCache.remove(userName);
+      return result;
+    } finally {
+      disableCacheInThread.set(false);
+    }
   }
 
   /**
