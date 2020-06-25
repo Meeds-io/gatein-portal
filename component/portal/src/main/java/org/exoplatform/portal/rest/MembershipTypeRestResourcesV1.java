@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.impl.MembershipTypeImpl;
@@ -23,8 +24,11 @@ public class MembershipTypeRestResourcesV1 implements ResourceContainer {
 
   private OrganizationService organizationService;
 
-  public MembershipTypeRestResourcesV1(OrganizationService organizationService) {
+  private UserACL             userACL;
+
+  public MembershipTypeRestResourcesV1(OrganizationService organizationService, UserACL userACL) {
     this.organizationService = organizationService;
+    this.userACL = userACL;
   }
 
   @GET
@@ -142,6 +146,12 @@ public class MembershipTypeRestResourcesV1 implements ResourceContainer {
   ) String membershipType) throws Exception {
     if (StringUtils.isBlank(membershipType)) {
       return Response.status(Response.Status.BAD_REQUEST).entity("NAME:MANDATORY").build();
+    }
+    if ((userACL.getMandatoryMSTypes() != null && userACL.getMandatoryMSTypes().contains(membershipType))
+        || StringUtils.equals(userACL.getMakableMT(), membershipType)) {
+      return Response.status(Response.Status.BAD_REQUEST)
+                     .entity("MandatoryMembershipType")
+                     .build();
     }
     if (organizationService.getMembershipTypeHandler().findMembershipType(membershipType) == null) {
       return Response.status(Response.Status.NOT_FOUND)

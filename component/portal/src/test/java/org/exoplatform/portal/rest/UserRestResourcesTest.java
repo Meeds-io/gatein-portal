@@ -45,10 +45,10 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     userACL = mock(UserACL.class);
 
     when(organizationService.getUserHandler()).thenReturn(userHandler);
-    when(userHandler.findUserByName(USER_2)).thenReturn(null);
+    when(userHandler.findUserByName(eq(USER_2), any(UserStatus.class))).thenReturn(null);
 
     UserImpl user = new UserImpl(USER_1);
-    when(userHandler.findUserByName(USER_1)).thenReturn(user);
+    when(userHandler.findUserByName(eq(USER_1), any(UserStatus.class))).thenReturn(user);
 
     when(userACL.isSuperUser()).thenReturn(false);
     when(userACL.getAdminGroups()).thenReturn("admins");
@@ -295,12 +295,19 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     when(userHandler.findUsersByQuery(any(), any())).thenReturn(listAccess);
     when(listAccess.getSize()).thenReturn(0);
 
-    String email = USER_2 + "@example.com";
-    UserImpl user = new UserImpl(USER_2);
-    user.setEmail(email);
-    user.setFirstName(USER_2);
-    user.setLastName(USER_2);
-    user.setEnabled(false);
+    String email2 = USER_2 + "@example.com";
+    UserImpl user2 = new UserImpl(USER_2);
+    user2.setEmail(email2);
+    user2.setFirstName(USER_2);
+    user2.setLastName(USER_2);
+    user2.setEnabled(false);
+
+    String email1 = USER_1 + "@example.com";
+    UserImpl user1 = new UserImpl(USER_1);
+    user1.setEmail(email1);
+    user1.setFirstName(USER_1);
+    user1.setLastName(USER_1);
+    user1.setEnabled(true);
 
     startUserSession(USER_1);
     
@@ -314,17 +321,17 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     data.put("lastName", USER_2);
     data.put("firstName", USER_2);
     data.put("password", "");
-    data.put("email", email);
+    data.put("email", email2);
     response = getResponse("PUT", "/v1/users", data.toString());
     assertNotNull(response);
     assertEquals(404, response.getStatus());
 
-    when(userHandler.findUserByName(eq(USER_2), any())).thenReturn(user);
+    when(userHandler.findUserByName(eq(USER_2), any())).thenReturn(user2);
     data.put("userName", USER_2);
     data.put("lastName", "");
     data.put("firstName", USER_2);
     data.put("password", "password");
-    data.put("email", email);
+    data.put("email", email2);
     response = getResponse("PUT", "/v1/users", data.toString());
     assertNotNull(response);
     assertNotNull(response.getEntity());
@@ -334,7 +341,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     data.put("lastName", USER_2);
     data.put("firstName", "");
     data.put("password", "password");
-    data.put("email", email);
+    data.put("email", email2);
     response = getResponse("PUT", "/v1/users", data.toString());
     assertNotNull(response);
     assertNotNull(response.getEntity());
@@ -344,21 +351,25 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     data.put("lastName", USER_2);
     data.put("firstName", USER_2);
     data.put("password", "");
-    data.put("email", email);
+    data.put("email", email2);
     response = getResponse("PUT", "/v1/users", data.toString());
     assertNotNull(response);
     assertNull(response.getEntity());
     assertEquals(204, response.getStatus());
 
-    data.put("userName", USER_2);
-    data.put("lastName", USER_2);
-    data.put("firstName", USER_2);
-    data.put("password", "password");
-    data.put("email", "");
+    when(userHandler.findUserByName(eq(USER_1), any())).thenReturn(user1);
+    data.put("userName", USER_1);
+    data.put("lastName", USER_1);
+    data.put("firstName", USER_1);
+    data.put("password", "");
+    data.put("enabled", false);
+    data.put("email", email1);
     response = getResponse("PUT", "/v1/users", data.toString());
     assertNotNull(response);
     assertNotNull(response.getEntity());
-    assertEquals(response.getEntity().toString(), 400, response.getStatus());
+    assertEquals(400, response.getStatus());
+    assertNotNull(response.getEntity());
+    assertEquals("SelfDisable", response.getEntity().toString());
 
     verify(userHandler, atMost(0)).saveUser(any(User.class), anyBoolean());
     verify(userHandler, atMost(0)).setEnabled(anyString(), anyBoolean(), anyBoolean());
@@ -367,28 +378,88 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     data.put("lastName", USER_2);
     data.put("firstName", USER_2);
     data.put("password", "password");
-    data.put("email", email);
+    data.put("email", email2);
     response = getResponse("PUT", "/v1/users", data.toString());
     assertNotNull(response);
     assertNull(response.getEntity());
     assertEquals(204, response.getStatus());
 
-    verify(userHandler, atLeast(1)).saveUser(eq(user), eq(true));
+    verify(userHandler, atLeast(1)).saveUser(eq(user2), eq(true));
     verify(userHandler, atMost(0)).setEnabled(anyString(), anyBoolean(), anyBoolean());
     
     data.put("userName", USER_2);
     data.put("lastName", USER_2);
     data.put("firstName", USER_2);
     data.put("password", "");
-    data.put("email", email);
+    data.put("email", email2);
     data.put("enabled", true);
     response = getResponse("PUT", "/v1/users", data.toString());
     assertNotNull(response);
     assertNull(response.getEntity());
     assertEquals(204, response.getStatus());
 
-    verify(userHandler, atMost(1)).saveUser(eq(user), eq(true));
+    verify(userHandler, atMost(1)).saveUser(eq(user2), eq(true));
     verify(userHandler, atLeast(1)).setEnabled(anyString(), anyBoolean(), anyBoolean());
+
+    user2.setEnabled(true);
+    when(userACL.getSuperUser()).thenReturn(USER_2);
+
+    data.put("userName", USER_2);
+    data.put("lastName", USER_2);
+    data.put("firstName", USER_2);
+    data.put("password", "");
+    data.put("enabled", false);
+    data.put("email", email2);
+    response = getResponse("PUT", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertEquals(400, response.getStatus());
+    assertNotNull(response.getEntity());
+    assertEquals("DisableSuperUser", response.getEntity().toString());
+  }
+
+  public void testDeleteUser() throws Exception {
+    String email2 = USER_2 + "@example.com";
+    UserImpl user2 = new UserImpl(USER_2);
+    user2.setEmail(email2);
+    user2.setFirstName(USER_2);
+    user2.setLastName(USER_2);
+    user2.setEnabled(false);
+    when(userHandler.findUserByName(eq(USER_2), any())).thenReturn(user2);
+
+    String email1 = USER_1 + "@example.com";
+    UserImpl user1 = new UserImpl(USER_1);
+    user1.setEmail(email1);
+    user1.setFirstName(USER_1);
+    user1.setLastName(USER_1);
+    user1.setEnabled(true);
+    when(userHandler.findUserByName(eq(USER_1), any())).thenReturn(user1);
+
+    startUserSession(USER_1);
+
+    ContainerResponse response = launcher.service("DELETE", "/v1/users/NOT_FOUND", "", null, null, null);
+    assertNotNull(response);
+    assertEquals(404, response.getStatus());
+
+    verify(userHandler, atMost(0)).removeUser(anyString(), anyBoolean());
+
+    response = launcher.service("DELETE", "/v1/users/" + USER_1, "", null, null, null);
+    assertNotNull(response);
+    assertEquals(400, response.getStatus());
+    assertEquals("SelfDelete", response.getEntity());
+
+    verify(userHandler, atMost(0)).removeUser(anyString(), anyBoolean());
+
+    response = launcher.service("DELETE", "/v1/users/" + USER_2, "", null, null, null);
+    assertNotNull(response);
+    assertEquals(204, response.getStatus());
+
+    verify(userHandler, atLeastOnce()).removeUser(anyString(), anyBoolean());
+
+    when(userACL.getSuperUser()).thenReturn(USER_2);
+    response = launcher.service("DELETE", "/v1/users/" + USER_2, "", null, null, null);
+    assertNotNull(response);
+    assertEquals(400, response.getStatus());
+    assertEquals("DeleteSuperUser", response.getEntity());
   }
 
   private MockHttpServletRequest getChangePasswordRequest(String path, String currentPassword, String newPassword) {

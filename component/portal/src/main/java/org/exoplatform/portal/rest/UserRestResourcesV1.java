@@ -290,6 +290,15 @@ public class UserRestResourcesV1 implements ResourceContainer {
     }
 
     if (user.isEnabled() != enabled) {
+      if (!enabled) {
+        String currentUsername = getCurrentUsername();
+        if (StringUtils.equals(currentUsername, user.getUserName())) {
+          return Response.status(Response.Status.BAD_REQUEST).entity("SelfDisable").build();
+        }
+        if (StringUtils.equals(userACL.getSuperUser(), user.getUserName())) {
+          return Response.status(Response.Status.BAD_REQUEST).entity("DisableSuperUser").build();
+        }
+      }
       organizationService.getUserHandler().setEnabled(userName, enabled, true);
     }
 
@@ -311,11 +320,17 @@ public class UserRestResourcesV1 implements ResourceContainer {
   public Response deleteUser(@ApiParam(value = "User name identifier", required = true) @PathParam(
     "id"
   ) String userName) throws Exception {
-    User user = organizationService.getUserHandler().findUserByName(userName);
+    User user = organizationService.getUserHandler().findUserByName(userName, UserStatus.ANY);
     if (user == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
-
+    String currentUsername = getCurrentUsername();
+    if (StringUtils.equals(currentUsername, user.getUserName())) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("SelfDelete").build();
+    }
+    if (StringUtils.equals(userACL.getSuperUser(), user.getUserName())) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("DeleteSuperUser").build();
+    }
     organizationService.getUserHandler().removeUser(userName, true);
     return Response.noContent().build();
   }
@@ -342,7 +357,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
       return Response.status(Response.Status.UNAUTHORIZED).build();
     }
 
-    User user = organizationService.getUserHandler().findUserByName(id);
+    User user = organizationService.getUserHandler().findUserByName(id, UserStatus.ANY);
 
     if (user == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
@@ -391,7 +406,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
 
     try {
       UserHandler userHandler = organizationService.getUserHandler();
-      User user = userHandler.findUserByName(username);
+      User user = userHandler.findUserByName(username, UserStatus.ANY);
       if (user == null) {
         return Response.serverError().entity(USER_NOT_FOUND_ERROR_CODE).build();
       }
@@ -449,7 +464,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
     offset = offset > 0 ? offset : 0;
     limit = limit > 0 ? limit : DEFAULT_LIMIT;
 
-    User user = organizationService.getUserHandler().findUserByName(userName);
+    User user = organizationService.getUserHandler().findUserByName(userName, UserStatus.ANY);
     if (user == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
@@ -484,6 +499,17 @@ public class UserRestResourcesV1 implements ResourceContainer {
                               user.getEmail(),
                               user.isEnabled(),
                               false);
+  }
+
+  public static String getCurrentUsername() {
+    org.exoplatform.services.security.Identity currentIdentity =
+                                                               ConversationState.getCurrent() == null ? null
+                                                                                                      : ConversationState.getCurrent()
+                                                                                                                         .getIdentity();
+    if (currentIdentity == null) {
+      return null;
+    }
+    return currentIdentity.getUserId();
   }
 
 }

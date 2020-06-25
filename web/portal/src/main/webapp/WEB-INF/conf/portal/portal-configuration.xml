@@ -80,6 +80,7 @@
         <description>Membership type that can not be deleted.</description>
         <value>*</value>
         <value>member</value>
+        <value>manager</value>
       </values-param>
     </init-params>
   </component>
