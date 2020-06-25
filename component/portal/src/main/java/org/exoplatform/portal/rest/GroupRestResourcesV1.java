@@ -10,6 +10,7 @@ import javax.ws.rs.core.*;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.rest.model.GroupRestEntity;
 import org.exoplatform.portal.rest.model.MembershipRestEntity;
 import org.exoplatform.services.organization.*;
@@ -31,9 +32,12 @@ public class GroupRestResourcesV1 implements ResourceContainer {
 
   private OrganizationService organizationService;
 
-  public GroupRestResourcesV1(OrganizationService organizationService, GroupSearchService groupSearchService) {
+  private UserACL             userACL;
+
+  public GroupRestResourcesV1(OrganizationService organizationService, GroupSearchService groupSearchService, UserACL userACL) {
     this.organizationService = organizationService;
     this.groupSearchService = groupSearchService;
+    this.userACL = userACL;
   }
 
   @GET
@@ -261,6 +265,9 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   ) String groupId) throws Exception {
     if (StringUtils.isBlank(groupId)) {
       return Response.status(Response.Status.BAD_REQUEST).entity("ID:MANDATORY").build();
+    }
+    if (userACL.getMandatoryGroups() != null && userACL.getMandatoryGroups().contains(groupId)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("MandatoryGroup").build();
     }
     Group group = organizationService.getGroupHandler().findGroupById(groupId);
     if (group == null) {
