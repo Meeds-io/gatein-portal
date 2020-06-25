@@ -15,6 +15,8 @@ import org.exoplatform.services.rest.impl.ContainerResponse;
 
 public class MembershipTypeRestResourcesTest extends BaseRestServicesTestCase {
 
+  private static final String MANDATORY_MS_TYPE = "manager";
+
   private static final String MEMBERSHIP_TYPE_1 = "mt1";
 
   private static final String MEMBERSHIP_TYPE_2 = "mt2";
@@ -94,6 +96,11 @@ public class MembershipTypeRestResourcesTest extends BaseRestServicesTestCase {
     ContainerResponse response = launcher.service("DELETE", "/v1/membershipTypes/NOT_EXISTING", "", null, null, null);
     assertNotNull(response);
     assertEquals(404, response.getStatus());
+
+    response = launcher.service("DELETE", "/v1/membershipTypes/" + MANDATORY_MS_TYPE, "", null, null, null);
+    assertNotNull(response);
+    assertEquals(400, response.getStatus());
+    assertEquals("MandatoryMembershipType", response.getEntity());
 
     response = launcher.service("DELETE", "/v1/membershipTypes/" + MEMBERSHIP_TYPE_1, "", null, null, null);
     assertNotNull(response);
