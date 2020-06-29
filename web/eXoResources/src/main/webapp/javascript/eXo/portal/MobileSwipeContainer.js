@@ -67,6 +67,7 @@ $(document).ready(() => {
     $active.removeClass('active');
     $next.addClass('active');
 
+    resetScroll();
     checkArrowsToDisplay();
   });
 
@@ -89,8 +90,13 @@ $(document).ready(() => {
     $active.removeClass('active');
     $next.addClass('active');
 
+    resetScroll();
     checkArrowsToDisplay();
   });
+
+  function resetScroll() {
+    $(window).scrollTop(0);
+  }
 
   function checkArrowsToDisplay() {
     const $active = $('.UIMobileSwipeContainer .UIMobileSwipeChildContainer.active');
