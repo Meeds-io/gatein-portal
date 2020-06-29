@@ -76,25 +76,34 @@
                        String moveRightAction = uicomponent.event("MoveRight", tabId);
                    %>
                   <a data-toggle="tab" data-target="#$tabId-tab" onclick="<%= selectTab %>"><%=title%></a>
-                  <div class="dropdown" style="display: inline-block">
-								    <a data-toggle="dropdown" class="dropdown-toggle">
-											<i class="uiIconArrowDown uiIconWhite"></i>
-										</a>
-										<% /*Begin Popup Menu*/ %>
-                    <ul class="dropdown-menu" role="menu">
-                    <% if (!tabState.equals(org.exoplatform.portal.webui.container.UITabContainer.FIRST_TAB)) {%>
-                        <li>
-                           <a class="OptionItem" href="javascript:void(0);" onclick="$moveLeftAction"><%= _ctx.appRes("UITabContainer.label.moveLeft") %></a>
-                        </li>
-                    <% } %>
-									  <% if (!tabState.equals(org.exoplatform.portal.webui.container.UITabContainer.LAST_TAB)) { %>                                                    
-                       <li>
-                          <a class="OptionItem" href="javascript:void(0);" onclick="$moveRightAction"><%= _ctx.appRes("UITabContainer.label.moveRight") %></a>
-                       </li>
-                    <% } %>																	
-                    </ul>		                   												
-								  <% /*End Popup Menu*/ %>
-								  </div>															                              
+                 <v-menu
+                    v-custom-click-outside="closeDropDownList"
+                    bottom
+                    left
+                    >
+                    <template v-slot:activator="{ on, attrs }">
+                       <v-btn
+                          icon
+                          class="align-self-center mr-4"
+                          v-bind="attrs"
+                          v-on="on"
+                          >
+                          <v-icon>mdi-menu-down</v-icon>
+                       </v-btn>
+                    </template>
+                    <v-list>
+                       <% if (!tabState.equals(org.exoplatform.portal.webui.container.UITabContainer.FIRST_TAB)) {%>
+                       <v-list-item onclick="$moveLeftAction" style="cursor: pointer;">
+                          <%= _ctx.appRes("UITabContainer.label.moveLeft") %>
+                       </v-list-item>
+                       <% } %>
+                       <% if (!tabState.equals(org.exoplatform.portal.webui.container.UITabContainer.LAST_TAB)) { %>
+                       <v-list-item onclick="$moveRightAction" style="cursor: pointer;">
+                          <%= _ctx.appRes("UITabContainer.label.moveRight") %>
+                       </v-list-item>
+                       <% } %>
+                    </v-list>
+                 </v-menu>
                    <%} else {%>
                        <a class="tabsTitle"><%=title%></a>
                    <%} %>           
@@ -140,6 +149,19 @@
 
 <script type="text/javascript">
 	require(['SHARED/vuetify'], function(vuetify){
+    		  Vue.directive('custom-click-outside', {
+                bind: function (el, binding, vnode) {
+                  window.event = function (event) {
+                    if (!(el === event.target || el.contains(event.target))) {
+                      vnode.context[binding.expression](event);
+                    }
+                  };
+                  document.body.addEventListener('click', window.event);
+                },
+                unbind: function (el) {
+                  document.body.removeEventListener('click', window.event);
+                }
+              });
     		new Vue({
     			el: `#tab$id`,
     			vuetify: new Vuetify(),
@@ -147,7 +169,15 @@
     			    return {
     			      tab: null,
     			    }
-    			}
+    			},
+                methods: {
+                  closeDropDownList() {
+                    const array = document.getElementsByClassName("menuable__content__active");
+                    for (let i = 0; i < array.length; i++) {
+                      array.item(i).style.display = "none";
+                    }
+                  }
+                }
     		})
     	});
 </script>
