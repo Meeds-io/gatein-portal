@@ -19,6 +19,10 @@
 
 package org.exoplatform.portal.webui.page;
 
+import org.apache.commons.lang3.StringUtils;
+
+import org.exoplatform.portal.application.PortalRequestContext;
+import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.core.UIComponentDecorator;
 
@@ -40,5 +44,14 @@ public class UISiteBody extends UIComponentDecorator {
 
     public void setStorageId(String storageId) {
         this.storageId = storageId;
+    }
+
+    public String getSiteClass() {
+      String portalOwner = ((PortalRequestContext) PortalRequestContext.getCurrentInstance()).getPortalOwner();
+      if (StringUtils.isBlank(portalOwner)) {
+        return "";
+      } else {
+        return portalOwner.toUpperCase() + "Site";
+      }
     }
 }

@@ -43,6 +43,8 @@ public class UIPageBody extends UIComponentDecorator {
 
     private String storageId;
 
+    private String pageName;
+
     /** . */
     private final Logger log = LoggerFactory.getLogger(UIPageBody.class);
 
@@ -66,6 +68,10 @@ public class UIPageBody extends UIComponentDecorator {
         setId("UIPageBody");
     }
 
+    public String getPageName() {
+      return pageName;
+    }
+
     public void setPageBody(UserNode pageNode, UIPortal uiPortal) throws Exception {
         WebuiRequestContext context = Util.getPortalRequestContext();
         uiPortal.setMaximizedUIComponent(null);
@@ -78,6 +84,7 @@ public class UIPageBody extends UIComponentDecorator {
         }
 
         setUIComponent(uiPage);
+        pageName = uiPage.getName();
         if (uiPage.isShowMaxWindow()) {
             uiPortal.setMaximizedUIComponent(uiPage);
         } else {

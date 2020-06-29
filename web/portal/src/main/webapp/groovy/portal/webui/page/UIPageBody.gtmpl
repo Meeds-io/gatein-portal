@@ -15,9 +15,10 @@
 	if (uiPortalApp.getComponentTab() == ComponentTab.APPLICATIONS) {
 		jsManager.require("SHARED/portalDragDrop", "portalDragDrop").addScripts("portalDragDrop.init(['UIPageBody']);");
 	}
+  String pageName = uicomponent.getPageName();
 %>
 <a name="skipContent" id="skipContent" tabindex="-1"></a>
-<div class="UIPageBody" id="${uicomponent.id}">		
+<div class="UIPageBody $pageName" id="${uicomponent.id}">		
 	<div class="UIComponent UIComponentBlock">
 	<%if (editLevel == EditLevel.EDIT_SITE && editMode == EditMode.BLOCK) {%>
 	
