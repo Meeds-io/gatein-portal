@@ -4,8 +4,9 @@
 
 	UIPortalApplication uiPortalApp = _ctx.getRequestContext().getUIApplication();
 	EditMode editMode = uiPortalApp.getEditMode();
+  String siteClass = uicomponent.getSiteClass();
 %>
-<div class="UISiteBody" id="${uicomponent.id}">
+<div class="UISiteBody $siteClass" id="${uicomponent.id}">
 	<div class="UIComponent UIComponentBlock">
 	<%if (editMode == EditMode.BLOCK) {%>
 		<div class="LAYOUT-BLOCK LAYOUT-SITEBODY DragControlArea PageLayoutDecorator">
