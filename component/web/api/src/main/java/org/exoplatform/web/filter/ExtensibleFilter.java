@@ -30,6 +30,12 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import org.exoplatform.container.*;
+import org.exoplatform.container.component.ComponentRequestLifecycle;
+import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+
 
 /**
  * This class allows the rest of the platform to define new filters thanks to the external plugins.
@@ -37,6 +43,8 @@ import javax.servlet.ServletResponse;
  * Created by The eXo Platform SAS Author : Nicolas Filotto nicolas.filotto@exoplatform.com 25 sept. 2009
  */
 public class ExtensibleFilter {
+
+    private static final Log LOG = ExoLogger.getLogger(ExtensibleFilter.class);
 
     /**
      * List of all the sub filters
@@ -86,12 +94,37 @@ public class ExtensibleFilter {
         }
 
         public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException {
-            while (filters.hasNext()) {
+            PortalContainer exoContainer = PortalContainer.getInstanceIfPresent();
+            if (exoContainer != null) {
+              ExoContainerContext.setCurrentContainer(exoContainer);
+              RequestLifeCycle.begin(exoContainer);
+            }
+            try {
+              while (filters.hasNext()) {
                 FilterDefinition filterDef = filters.next();
                 if (filterDef.getMapping().match(path)) {
-                    filterDef.getFilter().doFilter(request, response, this);
-                    return;
+                  filterDef.getFilter().doFilter(request, response, this);
+                  return;
                 }
+              }
+            } finally {
+              if (exoContainer != null) {
+                RequestLifeCycle.end();
+                List<ComponentRequestLifecycle> transactionalServices = exoContainer.getComponentInstancesOfType(ComponentRequestLifecycle.class);
+                for (ComponentRequestLifecycle service : transactionalServices) {
+                  if (service.isStarted(exoContainer)) {
+                    if (LOG.isDebugEnabled()) {
+                      LOG.debug("The service {} didn't called endRequest. Commit transaction anyway.",
+                                service.getClass().getName());
+                    }
+                    service.endRequest(exoContainer);
+                    if (service.isStarted(exoContainer)) {
+                      LOG.error("The service {} didn't ended properly even after calling endRequest",
+                                service.getClass().getName());
+                    }
+                  }
+                }
+              }
             }
             parentChain.doFilter(request, response);
         }
