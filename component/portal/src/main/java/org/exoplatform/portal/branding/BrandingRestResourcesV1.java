@@ -68,7 +68,7 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   }
   
   @PUT
-  @RolesAllowed({"administrators","professional"})
+  @RolesAllowed("administrators")
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "Update Branding information", httpMethod = "POST", response = Response.class)
   @ApiResponses(value = {
