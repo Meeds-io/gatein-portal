@@ -125,7 +125,7 @@ public class ExoHibernateIdentityStoreSessionImpl implements IdentityStoreSessio
 
   public boolean isTransactionActive() {
     if (lazyStartOfHibernateTransaction) {
-      return hibernateTxStatus.get() != null;
+      return hibernateTxStatus.get() != null && hibernateTxStatus.get();
     } else {
       return isHibernateTransactionActive();
     }
