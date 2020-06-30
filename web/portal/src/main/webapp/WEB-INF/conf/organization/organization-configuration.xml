@@ -163,22 +163,6 @@
                 <value>
                   <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
                     <field name="name">
-                      <string>professional</string>
-                    </field>
-                    <field name="parentId">
-                      <string>/platform</string>
-                    </field>
-                    <field name="description">
-                      <string>the /platform/professional group</string>
-                    </field>
-                    <field name="label">
-                      <string>Professional administrators</string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field name="name">
                       <string>organization</string>
                     </field>
                     <field name="parentId">

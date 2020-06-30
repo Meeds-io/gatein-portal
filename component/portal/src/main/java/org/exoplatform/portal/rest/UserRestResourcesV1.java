@@ -59,7 +59,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed({"administrators","professional"})
+  @RolesAllowed("administrators")
   @ApiOperation(
       value = "Gets all users",
       httpMethod = "GET",
@@ -138,7 +138,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
   }
 
   @POST
-  @RolesAllowed({"administrators","professional"})
+  @RolesAllowed("administrators")
   @ApiOperation(
       value = "Create new user",
       httpMethod = "GET",
@@ -216,7 +216,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
   }
 
   @PUT
-  @RolesAllowed({"administrators","professional"})
+  @RolesAllowed("administrators")
   @ApiOperation(
       value = "Update an existing user",
       httpMethod = "GET",
@@ -306,7 +306,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
   }
 
   @DELETE
-  @RolesAllowed({"administrators","professional"})
+  @RolesAllowed("administrators")
   @Path("{id}")
   @ApiOperation(value = "Deletes a user identified by its id", httpMethod = "DELETE", response = Response.class)
   @ApiResponses(
@@ -434,7 +434,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
   @GET
   @Path("{id}/memberships")
   @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed({"administrators","professional"})
+  @RolesAllowed("administrators")
   @ApiOperation(
       value = "Gets User memberships list",
       httpMethod = "GET",
