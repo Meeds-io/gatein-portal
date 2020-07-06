@@ -101,7 +101,7 @@ export default {
             label: this.$t(`menu.administration.navigation.${key}`),
             children: [nav],
           };
-          navigationTree.push(navigationParentObjects[key]);
+          navigationTree.unshift(navigationParentObjects[key]);
         }
       });
       return navigationTree;
