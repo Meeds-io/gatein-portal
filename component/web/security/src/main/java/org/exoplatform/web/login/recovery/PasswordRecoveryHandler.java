@@ -31,6 +31,7 @@ import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.UserStatus;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.LocalePolicy;
+import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.exception.MessageException;
 import org.exoplatform.webui.form.UIFormInput;
 import org.exoplatform.webui.form.UIFormStringInput;
@@ -91,7 +92,6 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
         PortalContainer container = PortalContainer.getCurrentInstance(req.getServletContext());
         ServletContext servletContext = container.getPortalContext();
         Validator validator = new PasswordPolicyValidator();
-        UIFormInput uiFormInput = new UIFormStringInput("password", "password", req.getParameter("password"));
 
         Locale requestLocale = null;
         String lang = context.getParameter(LANG);
@@ -140,7 +140,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
                     message = message.replace("{0}", username);
                     errors.add(message);
                 } else {
-                  if (!expected(validator,uiFormInput)) {
+                  if (!expected(validator,password)) {
                         errors.add(PropertyManager.getProperty("gatein.validators.passwordpolicy.format.message"));
                     }
                     if (!password.equals(confirmPass)) {
@@ -236,6 +236,15 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
         return currentLocale.get();
     }
 
+    public boolean expected(Validator validator, final String input) {
+        UIFormInput uiInput = new MockUIFormImput() {
+            public Object getValue() throws Exception {
+                return input;
+            }
+        };
+        return expected(validator, uiInput);
+    }
+
     public boolean expected(Validator validator, UIFormInput uiInput) {
       try {
         validator.validate(uiInput);
@@ -244,6 +253,32 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
         return false;
       } catch (Exception e) {
         throw new RuntimeException(e);
+      }
+    }
+
+    private static class MockUIFormImput extends UIComponent implements UIFormInput {
+      public String getBindingField() {
+        return null;
+      }
+      public String getLabel() {
+        return null;
+      }
+      public UIFormInput addValidator(Class clazz, Object... params) throws Exception {
+        return null;
+      }
+      public List getValidators() {
+        return null;
+      }
+      public Object getValue() throws Exception {
+        return null;
+      }
+      public UIFormInput setValue(Object value) throws Exception {
+        return null;
+      }
+      public Class getTypeValue() {
+        return null;
+      }
+      public void reset() {
       }
     }
 
