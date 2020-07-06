@@ -21,6 +21,7 @@ package org.exoplatform.web.login.recovery;
 
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.localization.LocaleContextInfoUtils;
@@ -30,6 +31,11 @@ import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.UserStatus;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.LocalePolicy;
+import org.exoplatform.webui.exception.MessageException;
+import org.exoplatform.webui.form.UIFormInput;
+import org.exoplatform.webui.form.UIFormStringInput;
+import org.exoplatform.webui.form.validator.PasswordPolicyValidator;
+import org.exoplatform.webui.form.validator.Validator;
 
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -84,6 +90,8 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
         HttpServletResponse res = context.getResponse();
         PortalContainer container = PortalContainer.getCurrentInstance(req.getServletContext());
         ServletContext servletContext = container.getPortalContext();
+        Validator validator = new PasswordPolicyValidator();
+        UIFormInput uiFormInput = new UIFormStringInput("password", "password", req.getParameter("password"));
 
         Locale requestLocale = null;
         String lang = context.getParameter(LANG);
@@ -132,11 +140,8 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
                     message = message.replace("{0}", username);
                     errors.add(message);
                 } else {
-                    if (password == null || password.isEmpty() || password.length() < 6 || password.length() > 30) {
-                        errors.add(bundle.getString("gatein.forgotPassword.invalidPassword"));
-                    }
-                    if (confirmPass == null || confirmPass.length() < 6 || confirmPass.length() > 30) {
-                        errors.add(bundle.getString("gatein.forgotPassword.invalidConfirmPassword"));
+                  if (!expected(validator,uiFormInput)) {
+                        errors.add(PropertyManager.getProperty("gatein.validators.passwordpolicy.format.message"));
                     }
                     if (!password.equals(confirmPass)) {
                         errors.add(bundle.getString("gatein.forgotPassword.confirmPasswordNotMatch"));
@@ -229,6 +234,17 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
 
     public static Locale getCurrentLocale() {
         return currentLocale.get();
+    }
+
+    public boolean expected(Validator validator, UIFormInput uiInput) {
+      try {
+        validator.validate(uiInput);
+        return true;
+      } catch (MessageException e) {
+        return false;
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
     }
 
     //TODO: how to reuse some method from LocalizationLifecycle
