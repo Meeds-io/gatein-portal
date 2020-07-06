@@ -53,9 +53,6 @@ export default {
         'groupnavigation': 'portal',
         'administration/pageManagement': 'portal',
         'administration/registry': 'portal',
-        // search
-        'searchIndexing': 'search',
-        'search': 'search',
       },
     };
   },
