@@ -31,12 +31,6 @@ import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.UserStatus;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.LocalePolicy;
-import org.exoplatform.webui.core.UIComponent;
-import org.exoplatform.webui.exception.MessageException;
-import org.exoplatform.webui.form.UIFormInput;
-import org.exoplatform.webui.form.UIFormStringInput;
-import org.exoplatform.webui.form.validator.PasswordPolicyValidator;
-import org.exoplatform.webui.form.validator.Validator;
 
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -62,6 +56,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * @author <a href="mailto:tuyennt@exoplatform.com">Tuyen Nguyen The</a>.
@@ -91,7 +86,9 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
         HttpServletResponse res = context.getResponse();
         PortalContainer container = PortalContainer.getCurrentInstance(req.getServletContext());
         ServletContext servletContext = container.getPortalContext();
-        Validator validator = new PasswordPolicyValidator();
+        Pattern customPasswordPattern = Pattern.compile(PropertyManager.getProperty("gatein.validators.passwordpolicy.regexp"));
+        int customPasswordMaxlength = Integer.parseInt(PropertyManager.getProperty("gatein.validators.passwordpolicy.length.max"));
+        int customPasswordMinlength = Integer.parseInt(PropertyManager.getProperty("gatein.validators.passwordpolicy.length.min"));
 
         Locale requestLocale = null;
         String lang = context.getParameter(LANG);
@@ -131,6 +128,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
                 String password = req.getParameter("password");
                 String confirmPass = req.getParameter("password2");
 
+
                 List<String> errors = new ArrayList<String>();
                 String success = "";
 
@@ -140,7 +138,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
                     message = message.replace("{0}", username);
                     errors.add(message);
                 } else {
-                  if (!expected(validator,password)) {
+                  if (!customPasswordPattern.matcher(password).matches() || customPasswordMaxlength < password.length() || customPasswordMinlength > password.length() ) {
                         errors.add(PropertyManager.getProperty("gatein.validators.passwordpolicy.format.message"));
                     }
                     if (!password.equals(confirmPass)) {
@@ -234,52 +232,6 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
 
     public static Locale getCurrentLocale() {
         return currentLocale.get();
-    }
-
-    public boolean expected(Validator validator, final String input) {
-        UIFormInput uiInput = new MockUIFormImput() {
-            public Object getValue() throws Exception {
-                return input;
-            }
-        };
-        return expected(validator, uiInput);
-    }
-
-    public boolean expected(Validator validator, UIFormInput uiInput) {
-      try {
-        validator.validate(uiInput);
-        return true;
-      } catch (MessageException e) {
-        return false;
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-    private static class MockUIFormImput extends UIComponent implements UIFormInput {
-      public String getBindingField() {
-        return null;
-      }
-      public String getLabel() {
-        return null;
-      }
-      public UIFormInput addValidator(Class clazz, Object... params) throws Exception {
-        return null;
-      }
-      public List getValidators() {
-        return null;
-      }
-      public Object getValue() throws Exception {
-        return null;
-      }
-      public UIFormInput setValue(Object value) throws Exception {
-        return null;
-      }
-      public Class getTypeValue() {
-        return null;
-      }
-      public void reset() {
-      }
     }
 
     //TODO: how to reuse some method from LocalizationLifecycle
