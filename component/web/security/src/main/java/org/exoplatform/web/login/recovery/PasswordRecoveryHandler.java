@@ -138,7 +138,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
                     message = message.replace("{0}", username);
                     errors.add(message);
                 } else {
-                  if (!customPasswordPattern.matcher(password).matches() || customPasswordMaxlength < password.length() || customPasswordMinlength > password.length() ) {
+                  if (password == null || !customPasswordPattern.matcher(password).matches() || customPasswordMaxlength < password.length() || customPasswordMinlength > password.length() ) {
                         errors.add(PropertyManager.getProperty("gatein.validators.passwordpolicy.format.message"));
                     }
                     if (!password.equals(confirmPass)) {
