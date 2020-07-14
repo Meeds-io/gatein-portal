@@ -21,6 +21,7 @@ package org.exoplatform.web.login.recovery;
 
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.localization.LocaleContextInfoUtils;
@@ -55,6 +56,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * @author <a href="mailto:tuyennt@exoplatform.com">Tuyen Nguyen The</a>.
@@ -84,6 +86,9 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
         HttpServletResponse res = context.getResponse();
         PortalContainer container = PortalContainer.getCurrentInstance(req.getServletContext());
         ServletContext servletContext = container.getPortalContext();
+        Pattern customPasswordPattern = Pattern.compile(PropertyManager.getProperty("gatein.validators.passwordpolicy.regexp"));
+        int customPasswordMaxlength = Integer.parseInt(PropertyManager.getProperty("gatein.validators.passwordpolicy.length.max"));
+        int customPasswordMinlength = Integer.parseInt(PropertyManager.getProperty("gatein.validators.passwordpolicy.length.min"));
 
         Locale requestLocale = null;
         String lang = context.getParameter(LANG);
@@ -123,6 +128,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
                 String password = req.getParameter("password");
                 String confirmPass = req.getParameter("password2");
 
+
                 List<String> errors = new ArrayList<String>();
                 String success = "";
 
@@ -132,11 +138,8 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
                     message = message.replace("{0}", username);
                     errors.add(message);
                 } else {
-                    if (password == null || password.isEmpty() || password.length() < 6 || password.length() > 30) {
-                        errors.add(bundle.getString("gatein.forgotPassword.invalidPassword"));
-                    }
-                    if (confirmPass == null || confirmPass.length() < 6 || confirmPass.length() > 30) {
-                        errors.add(bundle.getString("gatein.forgotPassword.invalidConfirmPassword"));
+                  if (password == null || !customPasswordPattern.matcher(password).matches() || customPasswordMaxlength < password.length() || customPasswordMinlength > password.length() ) {
+                        errors.add(PropertyManager.getProperty("gatein.validators.passwordpolicy.format.message"));
                     }
                     if (!password.equals(confirmPass)) {
                         errors.add(bundle.getString("gatein.forgotPassword.confirmPasswordNotMatch"));
