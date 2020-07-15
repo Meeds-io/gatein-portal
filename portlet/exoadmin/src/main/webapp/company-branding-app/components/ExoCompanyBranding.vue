@@ -183,11 +183,19 @@ export default {
 
       if(!this.isLogoFileExtensionValid(files[0])) {
         this.$el.querySelector('#mustpng').style.display = 'block';
+        setTimeout(function () {
+          this.cleanMessage();
+        },// eslint-disable-next-line no-magic-numbers
+        5000);
         return;
       }
 
       if(!this.isLogoFileSizeValid(files[0])) {
         this.$el.querySelector('#toobigfile').style.display = 'block';
+        setTimeout(function () {
+          this.cleanMessage();
+        },// eslint-disable-next-line no-magic-numbers
+        5000);
         return;
       }
 
@@ -290,6 +298,10 @@ export default {
             if(!responseObject.upload[uploadId] || !responseObject.upload[uploadId].percent ||
               responseObject.upload[uploadId].percent !== maxProgress.toString()) {
               self.$el.querySelector('#savenotok').style.display = 'block';
+              setTimeout(function () {
+                this.cleanMessage();
+              },// eslint-disable-next-line no-magic-numbers
+              5000);
               self.uploadInProgress = false;
             } else {
               self.uploadProgress = maxProgress;
