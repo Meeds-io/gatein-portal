@@ -195,8 +195,11 @@ public class GroupRestResourcesV1 implements ResourceContainer {
     if (group == null) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Group object is required").build();
     }
-    if (StringUtils.isBlank(group.getGroupName()) || !isValid) {
+    if (StringUtils.isBlank(group.getGroupName())) {
       return Response.status(Response.Status.BAD_REQUEST).entity("NAME:MANDATORY").build();
+    }
+    if (!isValid) {
+      return Response.status(Response.Status.PRECONDITION_FAILED).entity("NAME:PRECONDITION FAILED").build();
     }
     if (StringUtils.isBlank(group.getLabel())) {
       return Response.status(Response.Status.BAD_REQUEST).entity("LABEL:MANDATORY").build();
