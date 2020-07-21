@@ -30,19 +30,22 @@ public class UserFieldValidator {
 
   private boolean                      usernameValidation = false;
 
+  private boolean                      personalNameValidation = false;
+
   private String                       field              = null;
 
   private String                       pattern            = null;
 
   private String                       formatMessage      = null;
 
-  public UserFieldValidator(String field, boolean usernameValidation) {
-    this(field, usernameValidation, DEFAULT_MIN_LENGTH, DEFAULT_MAX_LENGTH);
+  public UserFieldValidator(String field, boolean usernameValidation, boolean personalNameValidation) {
+    this(field, usernameValidation, personalNameValidation, DEFAULT_MIN_LENGTH, DEFAULT_MAX_LENGTH);
   }
 
-  public UserFieldValidator(String field, boolean usernameValidation, int defaultMin, int defaultMax) {
+  public UserFieldValidator(String field, boolean usernameValidation, boolean personalNameValidation, int defaultMin, int defaultMax) {
     this.field = field;
     this.usernameValidation = usernameValidation;
+    this.personalNameValidation = personalNameValidation;
 
     String prefixedKey = KEY_PREFIX + field;
 
@@ -83,6 +86,14 @@ public class UserFieldValidator {
       } else {
         String label = getFieldLabel(locale);
         return getLabel(locale, "ExpressionValidator.msg.value-invalid", label, pattern);
+      }
+    } else if (personalNameValidation) {
+      for (int i = 0; i < buff.length - 1; i++) {
+        char c = buff[i];
+        if (!Character.isLetter(c) && !Character.isSpaceChar(c) && !(c == '\'') && !(c == '-')) {
+          String label = getFieldLabel(locale);
+          return getLabel(locale, "PersonalNameValidator.msg.Invalid-char", label);
+        }
       }
     } else if (usernameValidation) {
       if (!Character.isLowerCase(buff[0])) {

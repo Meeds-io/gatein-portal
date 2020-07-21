@@ -27,11 +27,11 @@ public class UserFieldValidatorTest {
 
   @Test
   public void testValidateFieldLength() {
-    UserFieldValidator fieldValidator = new UserFieldValidator("field", false);
+    UserFieldValidator fieldValidator = new UserFieldValidator("field", false,false);
     assertNull(fieldValidator.validate(Locale.ENGLISH, "123"));
     assertNotNull(fieldValidator.validate(Locale.ENGLISH, null));
 
-    fieldValidator = new UserFieldValidator("field", false, 8, 10);
+    fieldValidator = new UserFieldValidator("field", false,false, 8, 10);
     assertNotNull(fieldValidator.validate(Locale.ENGLISH, "1234567"));
     assertNull(fieldValidator.validate(Locale.ENGLISH, "12345678"));
     assertNotNull(fieldValidator.validate(Locale.ENGLISH, "12345678901"));
@@ -40,7 +40,7 @@ public class UserFieldValidatorTest {
 
   @Test
   public void testValidateUsername() {
-    UserFieldValidator fieldValidator = new UserFieldValidator("field", true);
+    UserFieldValidator fieldValidator = new UserFieldValidator("field", true,false);
     assertNotNull(fieldValidator.validate(Locale.ENGLISH, "123"));
     assertNotNull(fieldValidator.validate(Locale.ENGLISH, "1aa"));
     assertNotNull(fieldValidator.validate(Locale.ENGLISH, "aaA"));
@@ -52,13 +52,13 @@ public class UserFieldValidatorTest {
     System.setProperty("gatein.validators.fieldregexp.regexp", "[1-9]*");
 
     try {
-      UserFieldValidator fieldValidator = new UserFieldValidator("fieldregexp", false);
+      UserFieldValidator fieldValidator = new UserFieldValidator("fieldregexp", false,false);
       assertNull(fieldValidator.validate(Locale.ENGLISH, "123"));
       assertNotNull(fieldValidator.validate(Locale.ENGLISH, "1aa"));
 
       String message = "FORMAT_MESSAGE";
       System.setProperty("gatein.validators.fieldregexp.format.message", message);
-      fieldValidator = new UserFieldValidator("fieldregexp", false);
+      fieldValidator = new UserFieldValidator("fieldregexp", false,false);
       assertEquals(message, fieldValidator.validate(Locale.ENGLISH, "1aa"));
     } finally {
       System.setProperty("gatein.validators.fieldregexp.regexp", "");
