@@ -199,7 +199,7 @@ public class GroupRestResourcesV1 implements ResourceContainer {
       return Response.status(Response.Status.BAD_REQUEST).entity("NAME:MANDATORY").build();
     }
     if (!isValid) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("NAME INVALID").build();
+      return Response.status(Response.Status.BAD_REQUEST).entity("NAME:INVALID").build();
     }
     if (StringUtils.isBlank(group.getLabel())) {
       return Response.status(Response.Status.BAD_REQUEST).entity("LABEL:MANDATORY").build();
