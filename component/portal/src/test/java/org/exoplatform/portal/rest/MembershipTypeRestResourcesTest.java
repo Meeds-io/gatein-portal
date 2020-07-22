@@ -21,6 +21,8 @@ public class MembershipTypeRestResourcesTest extends BaseRestServicesTestCase {
 
   private static final String MEMBERSHIP_TYPE_2 = "mt2";
 
+  private static final String MEMBERSHIP_TYPE_3 = "mt3";
+
   protected Class<?> getComponentClass() {
     return MembershipTypeRestResourcesV1.class;
   }
@@ -68,6 +70,12 @@ public class MembershipTypeRestResourcesTest extends BaseRestServicesTestCase {
     assertNotNull(response.getEntity());
 
     data.put("name", "NEW_MEMBERSHIP_TYPE");
+    response = getResponse("POST", "/v1/membershipTypes", data.toString());
+    assertNotNull(response);
+    assertEquals(400, response.getStatus());
+
+    data.put("name", MEMBERSHIP_TYPE_3);
+    data.put("description","desc");
     response = getResponse("POST", "/v1/membershipTypes", data.toString());
     assertNotNull(response);
     assertEquals(204, response.getStatus());
