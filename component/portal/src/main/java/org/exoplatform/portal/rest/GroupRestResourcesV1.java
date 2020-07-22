@@ -1,6 +1,8 @@
 package org.exoplatform.portal.rest;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
@@ -186,11 +188,18 @@ public class GroupRestResourcesV1 implements ResourceContainer {
       }
   )
   public Response createGroup(GroupImpl group) throws Exception {
+    String regex = "^[a-zA-Z0-9-_]+$";
+    Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(group.getGroupName());
+    boolean isValid =  matcher.matches();
     if (group == null) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Group object is required").build();
     }
     if (StringUtils.isBlank(group.getGroupName())) {
       return Response.status(Response.Status.BAD_REQUEST).entity("NAME:MANDATORY").build();
+    }
+    if (!isValid) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("NAME:INVALID").build();
     }
     if (StringUtils.isBlank(group.getLabel())) {
       return Response.status(Response.Status.BAD_REQUEST).entity("LABEL:MANDATORY").build();
