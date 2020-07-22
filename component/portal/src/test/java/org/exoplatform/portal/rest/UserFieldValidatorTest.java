@@ -48,6 +48,18 @@ public class UserFieldValidatorTest {
   }
 
   @Test
+  public void testValidatePersonalName() {
+    UserFieldValidator fieldValidator = new UserFieldValidator("field", false, true);
+    assertNotNull(fieldValidator.validate(Locale.ENGLISH, "123"));
+    assertNotNull(fieldValidator.validate(Locale.ENGLISH, "1aa"));
+    assertNotNull(fieldValidator.validate(Locale.ENGLISH, "&aa"));
+    assertNotNull(fieldValidator.validate(Locale.ENGLISH, "a@a"));
+    assertNull(fieldValidator.validate(Locale.ENGLISH, "aaa bb"));
+    assertNull(fieldValidator.validate(Locale.ENGLISH, "aaa-bb"));
+    assertNull(fieldValidator.validate(Locale.ENGLISH, "aaa'bb"));
+  }
+
+  @Test
   public void testValidateFieldRegex() {
     System.setProperty("gatein.validators.fieldregexp.regexp", "[1-9]*");
 

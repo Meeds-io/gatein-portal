@@ -90,7 +90,9 @@ public class UserFieldValidator {
     } else if (personalNameValidation) {
       for (int i = 0; i < buff.length - 1; i++) {
         char c = buff[i];
-        if (!Character.isLetter(c) && !Character.isSpaceChar(c) && !(c == '\'') && !(c == '-')) {
+        if (Character.isLetter(c) || Character.isSpaceChar(c) || c == '\'' || c == '-') {
+          continue;
+        } else {
           String label = getFieldLabel(locale);
           return getLabel(locale, "PersonalNameValidator.msg.Invalid-char", label);
         }
