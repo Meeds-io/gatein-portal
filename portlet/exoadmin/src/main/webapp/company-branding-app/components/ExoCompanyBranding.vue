@@ -27,12 +27,14 @@
         <div class="clearfix">
           <div v-show="showLogo" class="pull-left">
             <div id="previewLogo" class="previewLogo">
-              <div class="btnAction">
-                <i v-if="removeLogoButtonDisplayed" :title="$t('branding.message.restore.logo')" class="fas fa-trash-alt iconDelete" rel="tooltip" data-placement="bottom" @click="removeLogo"></i>
-                <i v-else :title="$t('branding.message.change.logo')" class="uiIconEdit iconEdit" rel="tooltip" data-placement="bottom" @click="showLogo = false"></i>
-              </div>
               <div class="logoPreviewImage">
                 <img id="previewLogoImg" :src="logoPreview" class="previewImg">
+              </div>
+              <div class="btnActionContainer">
+                <div class="btnAction">
+                  <i v-if="removeLogoButtonDisplayed" :title="$t('branding.message.restore.logo')" class="fas fa-trash-alt iconDelete" rel="tooltip" data-placement="bottom" @click="removeLogo"></i>
+                  <i v-else :title="$t('branding.message.change.logo')" class="uiIconEdit iconEdit" rel="tooltip" data-placement="bottom" @click="showLogo = false"></i>
+                </div>
               </div>
             </div>
           </div>
