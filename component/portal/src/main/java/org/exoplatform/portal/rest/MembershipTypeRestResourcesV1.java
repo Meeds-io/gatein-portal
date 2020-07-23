@@ -76,6 +76,13 @@ public class MembershipTypeRestResourcesV1 implements ResourceContainer {
     }
     if (StringUtils.isBlank(membershipType.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).entity("NAME:MANDATORY").build();
+    } else if (membershipType.getName().length() > 30 || membershipType.getName().length()<3) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("NAME:LENGTH_INVALID").build();
+    }
+    if (StringUtils.isBlank(membershipType.getDescription())) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("DESCRIPTION:MANDATORY").build();
+    } else if (membershipType.getDescription().length() > 255 || membershipType.getDescription().length()<3) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("DESCRIPTION:LENGTH_INVALID").build();
     }
     if (organizationService.getMembershipTypeHandler().findMembershipType(membershipType.getName()) != null) {
       return Response.status(Response.Status.BAD_REQUEST)
