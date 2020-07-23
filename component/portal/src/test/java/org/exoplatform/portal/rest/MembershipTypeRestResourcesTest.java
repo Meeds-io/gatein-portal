@@ -21,6 +21,16 @@ public class MembershipTypeRestResourcesTest extends BaseRestServicesTestCase {
 
   private static final String MEMBERSHIP_TYPE_2 = "mt2";
 
+  private static final String MEMBERSHIP_TYPE_3 = "mt3";
+
+  private static final String MEMBERSHIP_TYPE_4 = "mt";
+
+  private static final String MEMBERSHIP_TYPE_5 = "aaaaaa aaaaaaaaaaaa aaaaaaaaaaa";
+
+  private static final String MEMBERSHIP_TYPE_6 = "mt6";
+
+  private static final String MEMBERSHIP_TYPE_7 = "mt7";
+
   protected Class<?> getComponentClass() {
     return MembershipTypeRestResourcesV1.class;
   }
@@ -70,7 +80,42 @@ public class MembershipTypeRestResourcesTest extends BaseRestServicesTestCase {
     data.put("name", "NEW_MEMBERSHIP_TYPE");
     response = getResponse("POST", "/v1/membershipTypes", data.toString());
     assertNotNull(response);
+    assertEquals(400, response.getStatus());
+
+    data.put("name", MEMBERSHIP_TYPE_3);
+    data.put("description","desc");
+    response = getResponse("POST", "/v1/membershipTypes", data.toString());
+    assertNotNull(response);
     assertEquals(204, response.getStatus());
+
+    // if the role name < 3
+    data.put("name", MEMBERSHIP_TYPE_4);
+    data.put("description","desc");
+    response = getResponse("POST", "/v1/membershipTypes", data.toString());
+    assertNotNull(response);
+    assertEquals(400, response.getStatus());
+
+    // if the role name > 30
+    data.put("name", MEMBERSHIP_TYPE_5);
+    data.put("description","desc");
+    response = getResponse("POST", "/v1/membershipTypes", data.toString());
+    assertNotNull(response);
+    assertEquals(400, response.getStatus());
+
+    // if the role description < 3
+    data.put("name", MEMBERSHIP_TYPE_6);
+    data.put("description","de");
+    response = getResponse("POST", "/v1/membershipTypes", data.toString());
+    assertNotNull(response);
+    assertEquals(400, response.getStatus());
+
+    // if the role description > 255
+    String desc = "aaaaaa aaaaaaaaaaaa aaaaaaaaaa aaaaaaaaaaaaaaa aaaaaaaaaaaaaaa aaaaaaaaaaaa aaaaaaaaaaaaa aaaaaaaaaaaaaaaaa aaaaaaaaaaa aaaaaaaa aaa aa aaa aaa aaaaa aaa aaaa aaaaa aaaaaaaaaa aaaaaaaaaaaa aaaaaaaaaaaaa aaaa aaaaaa aaaa aaaaa aaaaaa aaaaaaaaaaa aaaaaaaaaa a";
+    data.put("name", MEMBERSHIP_TYPE_7);
+    data.put("description",desc);
+    response = getResponse("POST", "/v1/membershipTypes", data.toString());
+    assertNotNull(response);
+    assertEquals(400, response.getStatus());
   }
 
   public void testUpdateMembershipType() throws Exception {
