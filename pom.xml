@@ -39,14 +39,14 @@
   <properties>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
-    <org.exoplatform.depmgt.version>17.x-SNAPSHOT</org.exoplatform.depmgt.version>
-    <org.exoplatform.kernel.version>6.0.x-SNAPSHOT</org.exoplatform.kernel.version>
-    <org.exoplatform.core.version>6.0.x-SNAPSHOT</org.exoplatform.core.version>
-    <org.exoplatform.ws.version>6.0.x-SNAPSHOT</org.exoplatform.ws.version>
-    <org.exoplatform.gatein.sso.version>6.0.x-SNAPSHOT</org.exoplatform.gatein.sso.version>
-    <org.exoplatform.gatein.wci.version>6.0.x-SNAPSHOT</org.exoplatform.gatein.wci.version>
-    <org.exoplatform.gatein.pc.version>6.0.x-SNAPSHOT</org.exoplatform.gatein.pc.version>
-    <org.exoplatform.gatein.dep.version>2.0.x-SNAPSHOT</org.exoplatform.gatein.dep.version>
+    <org.exoplatform.depmgt.version>17.0-RC04</org.exoplatform.depmgt.version>
+    <org.exoplatform.kernel.version>6.0.0-RC04</org.exoplatform.kernel.version>
+    <org.exoplatform.core.version>6.0.0-RC04</org.exoplatform.core.version>
+    <org.exoplatform.ws.version>6.0.0-RC04</org.exoplatform.ws.version>
+    <org.exoplatform.gatein.sso.version>6.0.0-RC04</org.exoplatform.gatein.sso.version>
+    <org.exoplatform.gatein.wci.version>6.0.0-RC04</org.exoplatform.gatein.wci.version>
+    <org.exoplatform.gatein.pc.version>6.0.0-RC04</org.exoplatform.gatein.pc.version>
+    <org.exoplatform.gatein.dep.version>2.0.0-RC04</org.exoplatform.gatein.dep.version>
     <org.exoplatform.framework.junit.version>1.2.4-GA</org.exoplatform.framework.junit.version>
     <nl.captcha.simplecaptcha.version>1.1.1.Final-gatein-4</nl.captcha.simplecaptcha.version>
     <org.gatein.api.version>1.0.1.Final</org.gatein.api.version>
