@@ -179,6 +179,7 @@ export default {
     },
     onFileChange(e) {
       const files = e.target.files || e.dataTransfer.files;
+      const self = this;
       if (!files.length) {
         return;
       }
@@ -186,7 +187,7 @@ export default {
       if(!this.isLogoFileExtensionValid(files[0])) {
         this.$el.querySelector('#mustpng').style.display = 'block';
         setTimeout(function () {
-          this.cleanMessage();
+          self.cleanMessage();
         },// eslint-disable-next-line no-magic-numbers
         5000);
         return;
@@ -195,7 +196,7 @@ export default {
       if(!this.isLogoFileSizeValid(files[0])) {
         this.$el.querySelector('#toobigfile').style.display = 'block';
         setTimeout(function () {
-          this.cleanMessage();
+          self.cleanMessage();
         },// eslint-disable-next-line no-magic-numbers
         5000);
         return;
@@ -301,7 +302,7 @@ export default {
               responseObject.upload[uploadId].percent !== maxProgress.toString()) {
               self.$el.querySelector('#savenotok').style.display = 'block';
               setTimeout(function () {
-                this.cleanMessage();
+                self.cleanMessage();
               },// eslint-disable-next-line no-magic-numbers
               5000);
               self.uploadInProgress = false;
