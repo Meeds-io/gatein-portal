@@ -129,6 +129,50 @@
       </value-param>
     </init-params>
   </component>
+  
+  <component>
+    <key>org.gatein.security.oauth.openid.OpenIdProcessor</key>
+    <type>org.gatein.security.oauth.openid.OpenIdProcessorImpl</type>
+    <init-params>
+      <value-param>
+        <name>clientId</name>
+        <value>${gatein.oauth.openid.clientId}</value>
+      </value-param>
+      <value-param>
+        <name>clientSecret</name>
+        <value>${gatein.oauth.openid.clientSecret}</value>
+      </value-param>
+      <!-- URL to redirect from OpenId during Openid authentication -->
+      <value-param>
+        <name>redirectURL</name>
+        <value>${gatein.oauth.openid.redirectURL}</value>
+      </value-param>
+      <value-param>
+        <name>scope</name>
+        <value>openid email profile</value>
+      </value-param>
+      <value-param>
+        <name>accessType</name>
+        <value>${gatein.oauth.openid.accessType}</value>
+      </value-param>
+      <value-param>
+        <name>authenticationURL</name>
+        <value>${gatein.oauth.openid.authenticationURL}</value>
+      </value-param>
+      <value-param>
+        <name>accessTokenURL</name>
+        <value>${gatein.oauth.openid.accessTokenURL}</value>
+      </value-param>
+      <value-param>
+        <name>tokenInfoURL</name>
+        <value>${gatein.oauth.openid.tokenInfoURL}</value>
+      </value-param>
+      <value-param>
+        <name>userInfoURL</name>
+        <value>${gatein.oauth.openid.userInfoURL}</value>
+      </value-param>
+    </init-params>
+  </component>
 
   <component>
     <key>org.gatein.security.oauth.webapi.OAuthFilterIntegrator</key>
@@ -256,6 +300,33 @@
         <value-param>
           <name>filterMapping</name>
           <value>/linkedinAuth</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+  
+  <external-component-plugins>
+    <target-component>org.gatein.security.oauth.webapi.OAuthFilterIntegrator</target-component>
+    <component-plugin>
+      <name>OpenIdFilter</name>
+      <set-method>addPlugin</set-method>
+      <type>org.gatein.security.oauth.webapi.OAuthFilterIntegratorPlugin</type>
+      <init-params>
+        <value-param>
+          <name>providerKey</name>
+          <value>OPENID</value>
+        </value-param>
+        <value-param>
+          <name>filterClass</name>
+          <value>org.gatein.security.oauth.web.openid.OpenIdFilter</value>
+        </value-param>
+        <value-param>
+          <name>enabled</name>
+          <value>${gatein.oauth.openid.enabled:false}</value>
+        </value-param>
+        <value-param>
+          <name>filterMapping</name>
+          <value>/openidAuth</value>
         </value-param>
       </init-params>
     </component-plugin>
@@ -466,6 +537,45 @@
         <value-param>
           <name>friendlyName</name>
           <value>Google+</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+  
+  <external-component-plugins>
+    <target-component>org.gatein.security.oauth.spi.OAuthProviderTypeRegistry</target-component>
+    <component-plugin>
+      <name>OpenIdOauthProvider</name>
+      <set-method>addPlugin</set-method>
+      <type>org.gatein.security.oauth.registry.OauthProviderTypeRegistryPlugin</type>
+      <init-params>
+        <value-param>
+          <name>key</name>
+          <value>OPENID</value>
+        </value-param>
+        <value-param>
+          <name>enabled</name>
+          <value>${gatein.oauth.openid.enabled}</value>
+        </value-param>
+        <value-param>
+          <name>userNameAttributeName</name>
+          <value>user.social-info.openid.userName</value>
+        </value-param>
+        <value-param>
+          <name>oauthProviderProcessorClass</name>
+          <value>org.gatein.security.oauth.openid.OpenIdProcessor</value>
+        </value-param>
+        <value-param>
+          <name>principalProcessorClass</name>
+          <value>org.gatein.security.oauth.openid.OpenIdPrincipalProcessor</value>
+        </value-param>
+        <value-param>
+          <name>initOAuthURL</name>
+          <value>/openidAuth</value>
+        </value-param>
+        <value-param>
+          <name>friendlyName</name>
+          <value>OpenId</value>
         </value-param>
       </init-params>
     </component-plugin>
