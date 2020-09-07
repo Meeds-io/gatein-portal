@@ -23,6 +23,7 @@ import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.ListAccessImpl;
 import org.exoplatform.commons.utils.ListenerStack;
 import org.exoplatform.services.organization.*;
+import org.exoplatform.services.organization.impl.MembershipTypeImpl;
 import org.gatein.common.logging.LogLevel;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.RoleType;
@@ -713,6 +714,53 @@ public class MembershipDAOImpl extends AbstractDAOImpl implements MembershipHand
 
         return null;
     }
+
+    @Override
+    public List<MembershipType> findMembershipTypesByGroup(String groupId) throws Exception{
+        if (log.isTraceEnabled()) {
+            Tools.logMethodIn(log, LogLevel.TRACE, "findMembershipTypesByGroup", new Object[] { "group", groupId});
+        }
+
+        String plGroupName = getPLIDMGroupName(getGroupNameFromId(groupId));
+
+        String groupKey = getIdentitySession().getPersistenceManager().createGroupKey(plGroupName, getGroupTypeFromId(groupId));
+
+        org.picketlink.idm.api.Group gtnGroup = service_.getIdentitySession().getPersistenceManager().findGroupByKey(groupKey);
+
+        if (gtnGroup == null) {
+            log.log(LogLevel.ERROR, "Internal ERROR. Cannot obtain group: " + groupId);
+            return new ArrayList<>();
+        }
+
+        orgService.flush();
+
+        Collection<RoleType> roleTypes = new HashSet();
+
+        try {
+            roleTypes = getIdentitySession().getRoleManager().findGroupRoleTypes(gtnGroup);
+        } catch (Exception e) {
+            handleException("Identity operation error: ", e);
+        }
+
+        if (log.isTraceEnabled()) {
+            Tools.logMethodOut(log, LogLevel.TRACE, "findMembershipTypesByGroup", roleTypes);
+        }
+
+        List<MembershipType> membershipTypes = new ArrayList<>();
+        if (roleTypes != null && !roleTypes.isEmpty()) {
+            for(RoleType roleType : roleTypes) {
+                MembershipTypeImpl mt = new MembershipTypeImpl(roleType.getName(), null, null);
+                membershipTypes.add(mt);
+            }
+        }
+
+        if (log.isTraceEnabled()) {
+            Tools.logMethodOut(log, LogLevel.TRACE, "findMembershipTypesByGroup", membershipTypes);
+        }
+
+        return membershipTypes;
+    }
+
 
     private void preSave(Membership membership, boolean isNew) throws Exception {
         for (int i = 0; i < listeners_.size(); i++) {
