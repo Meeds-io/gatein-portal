@@ -716,7 +716,7 @@ public class MembershipDAOImpl extends AbstractDAOImpl implements MembershipHand
     }
 
     @Override
-    public List<MembershipType> findMembershipTypesByGroup (String groupId) throws Exception{
+    public List<MembershipType> findMembershipTypesByGroup(String groupId) throws Exception{
         if (log.isTraceEnabled()) {
             Tools.logMethodIn(log, LogLevel.TRACE, "findMembershipTypesByGroup", new Object[] { "group", groupId});
         }
