@@ -408,6 +408,68 @@ public class GroupRestResourcesV1 implements ResourceContainer {
     return Response.noContent().build();
   }
 
+  @POST
+  @Path("memberships/bulk")
+  @RolesAllowed("administrators")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @ApiOperation(
+          value = "Creates new memberships",
+          httpMethod = "POST",
+          response = Response.class,
+          consumes = MediaType.APPLICATION_JSON
+  )
+  @ApiResponses(
+          value = {
+                  @ApiResponse(code = 204, message = "Request fulfilled"),
+                  @ApiResponse(code = 400, message = "Bad request"),
+                  @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
+                  @ApiResponse(code = 500, message = "Internal server error")
+          }
+  )
+  public Response createMultipleMembership(List<MembershipImpl> memberships) throws Exception {
+    for (MembershipImpl membership : memberships) {
+      if (membership == null) {
+        return Response.status(Response.Status.BAD_REQUEST).entity("Membership object is required").build();
+      }
+      if (StringUtils.isBlank(membership.getGroupId())) {
+        return Response.status(Response.Status.BAD_REQUEST).entity("GROUP_ID:MANDATORY").build();
+      }
+      if (StringUtils.isBlank(membership.getUserName())) {
+        return Response.status(Response.Status.BAD_REQUEST).entity("USER:MANDATORY").build();
+      }
+      if (StringUtils.isBlank(membership.getMembershipType())) {
+        return Response.status(Response.Status.BAD_REQUEST).entity("MEMBERSHIP_TYPE:MANDATORY").build();
+      }
+      if (organizationService.getMembershipHandler().findMembership(membership.getId()) != null) {
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("MEMBERSHIP:ALREADY_EXISTS")
+                .build();
+      }
+      User user = organizationService.getUserHandler().findUserByName(membership.getUserName(), UserStatus.ANY);
+      if (user == null) {
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("USER:NOT_FOUND")
+                .build();
+      }
+      Group group = organizationService.getGroupHandler().findGroupById(membership.getGroupId());
+      if (group == null) {
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("GROUP:NOT_FOUND")
+                .build();
+      }
+      MembershipType membershipType = organizationService.getMembershipTypeHandler()
+              .findMembershipType(membership.getMembershipType());
+      if (membershipType == null) {
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("MEMBERSHIP_TYPE:NOT_FOUND")
+                .build();
+      }
+
+      organizationService.getMembershipHandler().linkMembership(user, group, membershipType, true);
+    }
+    return Response.noContent().build();
+  }
+
   @PUT
   @Path("memberships")
   @RolesAllowed("administrators")
