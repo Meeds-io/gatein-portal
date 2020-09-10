@@ -413,7 +413,7 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   @RolesAllowed("administrators")
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(
-          value = "Creates a new membership",
+          value = "Creates new memberships",
           httpMethod = "POST",
           response = Response.class,
           consumes = MediaType.APPLICATION_JSON
