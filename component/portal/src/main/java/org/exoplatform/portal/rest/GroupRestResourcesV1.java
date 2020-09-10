@@ -409,7 +409,7 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   }
 
   @POST
-  @Path("multiMemberships")
+  @Path("memberships/bulk")
   @RolesAllowed("administrators")
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(
