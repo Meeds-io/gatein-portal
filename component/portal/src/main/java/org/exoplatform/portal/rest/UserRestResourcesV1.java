@@ -33,7 +33,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
 
   public static final String             WRONG_USER_PASSWORD_ERROR_CODE = "WRONG_USER_PASSWORD";
 
-  public static final UserFieldValidator USERNAME_VALIDATOR             = new UserFieldValidator("usermame", true, false);
+  public static final UserFieldValidator USERNAME_VALIDATOR             = new UserFieldValidator("userName", true, false);
 
   public static final UserFieldValidator EMAIL_VALIDATOR                = new UserFieldValidator("emailAddress", false, false);
 
