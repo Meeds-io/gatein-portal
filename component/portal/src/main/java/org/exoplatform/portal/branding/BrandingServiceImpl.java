@@ -264,7 +264,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   @Override
   public Logo getDefaultLogo() {
-    if (this.logo == null) {
+    if (this.logo == null || this.logo.getData() == null) {
       String logoPath = defaultConfiguredLogoPath;
       if (StringUtils.isBlank(logoPath)) {
         logoPath = BRANDING_DEFAULT_LOGO_PATH;
