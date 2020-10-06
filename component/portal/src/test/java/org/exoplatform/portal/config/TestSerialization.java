@@ -36,7 +36,7 @@ public class TestSerialization extends AbstractGateInTest {
 
     /** . */
     private final ContainerData container = new ContainerData("foo01", "foo02", "foo03", "foo04", "foo05", "foo06", "foo07",
-            "foo08", "foo09", "foo10", Collections.singletonList("foo11"), Collections.singletonList("foo11"),
+            "foo08", "foo09", "foo10", "foo11", "foo12", Collections.singletonList("foo11"), Collections.singletonList("foo11"),
             Collections.singletonList("foo11"), Collections.<ComponentData> singletonList(body));
 
     public void testNavigationKey() throws Exception {
@@ -85,9 +85,26 @@ public class TestSerialization extends AbstractGateInTest {
     }
 
     public void testPage() throws Exception {
-        PageData obj = new PageData("foo01", "foo02", "foo03", "foo04", "foo05", "foo06", "foo07", "foo08", "foo09", "foo10",
-                Collections.singletonList("foo11"), Arrays.<ComponentData> asList(body), "foo12", "foo13", "foo14", true,
-                Collections.singletonList("foo11"), Collections.singletonList("foo11"));
+    PageData obj = new PageData("foo01",
+                                "foo02",
+                                "foo03",
+                                "foo04",
+                                "foo05",
+                                "foo06",
+                                "foo07",
+                                "foo08",
+                                "foo09",
+                                "foo10",
+                                "foo11",
+                                "foo12",
+                                Collections.singletonList("foo13"),
+                                Arrays.<ComponentData> asList(body),
+                                "foo14",
+                                "foo15",
+                                "foo16",
+                                true,
+                                Collections.singletonList("foo13"),
+                                Collections.singletonList("foo13"));
         PageData clone = IOTools.clone(obj);
         assertEquals(obj.getStorageId(), clone.getStorageId());
         assertEquals(obj.getStorageName(), clone.getStorageName());

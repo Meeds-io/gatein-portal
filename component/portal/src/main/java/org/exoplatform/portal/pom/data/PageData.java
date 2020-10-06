@@ -51,6 +51,49 @@ public class PageData extends ContainerData {
         this.showMaxWindow = showMaxWindow;
     }
 
+    public PageData(String storageId,
+                    String id,
+                    String name,
+                    String icon,
+                    String template,
+                    String factoryId,
+                    String title,
+                    String description,
+                    String width,
+                    String height,
+                    String cssClass,
+                    String profiles,
+                    List<String> accessPermissions,
+                    List<ComponentData> children,
+                    String ownerType,
+                    String ownerId,
+                    String editPermission,
+                    boolean showMaxWindow,
+                    List<String> moveAppsPermissions,
+                    List<String> moveContainersPermissions) {
+      super(storageId,
+            id,
+            name,
+            icon,
+            template,
+            factoryId,
+            title,
+            description,
+            width,
+            height,
+            cssClass,
+            profiles,
+            accessPermissions,
+            moveContainersPermissions,
+            moveContainersPermissions,
+            children);
+
+        //
+        this.key = new PageKey(ownerType, ownerId, name);
+        this.editPermission = editPermission;
+        this.showMaxWindow = showMaxWindow;
+    }
+
     public PageKey getKey() {
         return key;
     }

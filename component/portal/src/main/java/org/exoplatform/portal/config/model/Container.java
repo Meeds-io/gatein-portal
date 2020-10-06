@@ -21,6 +21,10 @@ package org.exoplatform.portal.config.model;
 
 import java.util.*;
 
+import org.apache.commons.lang3.StringUtils;
+
+import org.exoplatform.commons.utils.Tools;
+import org.exoplatform.container.ExoContainer;
 import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.*;
 
@@ -54,6 +58,10 @@ public class Container extends ModelObject implements Cloneable {
   protected String                 width;
 
   protected String                 height;
+
+  protected String                 cssClass;
+
+  protected String                 profiles;
 
   // Here to please jibx binding but not used anymore
   protected String                 decorator;
@@ -100,6 +108,8 @@ public class Container extends ModelObject implements Cloneable {
     this.description = data.getDescription();
     this.width = data.getWidth();
     this.height = data.getHeight();
+    this.cssClass = data.getCssClass();
+    this.profiles = data.getProfiles();
     this.accessPermissions = data.getAccessPermissions().toArray(new String[data.getAccessPermissions().size()]);
     List<String> permisssions = data.getMoveAppsPermissions();
     this.moveAppsPermissions = permisssions != null ? permisssions.toArray(new String[permisssions.size()]) : null;
@@ -229,6 +239,22 @@ public class Container extends ModelObject implements Cloneable {
     // Here to please jibx binding but not used anymore
   }
 
+  public String getCssClass() {
+    return cssClass;
+  }
+
+  public void setCssClass(String cssClass) {
+    this.cssClass = cssClass;
+  }
+
+  public String getProfiles() {
+    return profiles;
+  }
+
+  public void setProfiles(String profiles) {
+    this.profiles = profiles;
+  }
+
   @Override
   public ContainerData build() {
     List<ComponentData> children = buildChildren();
@@ -242,6 +268,8 @@ public class Container extends ModelObject implements Cloneable {
                              description,
                              width,
                              height,
+                             cssClass,
+                             profiles,
                              Utils.safeImmutableList(accessPermissions),
                              Utils.safeImmutableList(moveAppsPermissions),
                              Utils.safeImmutableList(moveContainersPermissions),
@@ -268,12 +296,23 @@ public class Container extends ModelObject implements Cloneable {
   }
 
   protected List<ComponentData> buildChildren() {
-    if (children != null && children.size() > 0) {
-      ArrayList<ComponentData> dataChildren = new ArrayList<ComponentData>(children.size());
+    if (children != null && !children.isEmpty()) {
+      ArrayList<ComponentData> dataChildren = new ArrayList<>();
       for (int i = 0; i < children.size(); i++) {
         ModelObject node = children.get(i);
+        if (node instanceof Container) {
+          String nodeProfiles = ((Container) node).getProfiles();
+          if (StringUtils.isNotBlank(nodeProfiles)) {
+            Set<String> activeProfiles = Tools.parseCommaList(nodeProfiles);
+            activeProfiles.retainAll(ExoContainer.getProfiles());
+            if (activeProfiles.isEmpty()) {
+              continue;
+            }
+          }
+        }
         ModelData data = node.build();
-        dataChildren.add((ComponentData) data);
+        ComponentData componentData = (ComponentData) data;
+        dataChildren.add(componentData);
       }
       return Collections.unmodifiableList(dataChildren);
     } else {

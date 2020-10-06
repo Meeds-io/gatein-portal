@@ -46,6 +46,12 @@ public class MappedAttributes {
     public static final Key<String> FACTORY_ID = Key.create("factory-id", ValueType.STRING);
 
     /** . */
+    public static final Key<String> CSS_CLASS = Key.create("css-class", ValueType.STRING);
+
+    /** . */
+    public static final Key<String> PROFILES = Key.create("profiles", ValueType.STRING);
+
+    /** . */
     public static final Key<Integer> PRIORITY = Key.create("priority", ValueType.INTEGER);
 
     /** . */

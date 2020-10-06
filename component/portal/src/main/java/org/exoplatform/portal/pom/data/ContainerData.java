@@ -57,6 +57,12 @@ public class ContainerData extends ComponentData {
     private final String height;
 
     /** . */
+    private final String cssClass;
+
+    /** . */
+    private final String profiles;
+
+    /** . */
     private final List<String> accessPermissions;
 
     private final List<String> moveAppsPermissions;
@@ -70,6 +76,40 @@ public class ContainerData extends ComponentData {
             String title, String description, String width, String height, List<String> accessPermissions,
             List<String> moveAppsPermissions, List<String> moveContainersPermissions,
             List<ComponentData> children) {
+    this(storageId,
+         id,
+         name,
+         icon,
+         template,
+         factoryId,
+         title,
+         description,
+         width,
+         height,
+         null,
+         null,
+         accessPermissions,
+         moveAppsPermissions,
+         moveContainersPermissions,
+         children);
+    }
+
+    public ContainerData(String storageId,
+                         String id,
+                         String name,
+                         String icon,
+                         String template,
+                         String factoryId,
+                         String title,
+                         String description,
+                         String width,
+                         String height,
+                         String cssClass,
+                         String profiles,
+                         List<String> accessPermissions,
+                         List<String> moveAppsPermissions,
+                         List<String> moveContainersPermissions,
+                         List<ComponentData> children) {
         super(storageId, null);
 
         //
@@ -82,6 +122,8 @@ public class ContainerData extends ComponentData {
         this.description = description;
         this.width = width;
         this.height = height;
+        this.cssClass = cssClass;
+        this.profiles = profiles;
         this.accessPermissions = accessPermissions;
         this.moveAppsPermissions = moveAppsPermissions;
         this.moveContainersPermissions = moveContainersPermissions;
@@ -145,4 +187,13 @@ public class ContainerData extends ComponentData {
     public List<String> getMoveContainersPermissions() {
         return moveContainersPermissions;
     }
+  
+    public String getCssClass() {
+      return cssClass;
+    }
+
+    public String getProfiles() {
+      return profiles;
+    }
+
 }

@@ -25,6 +25,8 @@
 		 jsManager.require("SHARED/portal", "portal").require("SHARED/toggleContainer", "toggleContainer").addScripts("toggleContainer.addContainer('"+uicomponent.id+"', '" + uicomponent.width + "');");
 	}
 
+  String uiComponentClass = uicomponent.getCssClass() == null ? "" : uicomponent.getCssClass();
+
 	if (uiPortalApp.isEditing())
 	{
 		// JavascriptManager jsManager = rcontext.getJavascriptManager();
@@ -32,14 +34,14 @@
 				.addScripts("portalDragDrop.init(['UIContainer']);")
 				.addScripts("portal.UIPortal.initMouseHover('" + uicomponent.id + "');");
 %>
-<div class="UIContainer UITableColumnContainer UISwitchingContainer EdittingContainer<%=uicomponent.getPermissionClasses()%>"
+<div class="UIContainer UITableColumnContainer UISwitchingContainer <%=uiComponentClass%> EdittingContainer<%=uicomponent.getPermissionClasses()%>"
 				id="${uicomponent.id}">
 <%
 	}
 	else
 	{
 %>
-<div class="UIContainer UITableColumnContainer UISwitchingContainer <%=hasAccessPermission?"":"ProtectedContainer"%>" id="${uicomponent.id}">
+<div class="UIContainer UITableColumnContainer UISwitchingContainer <%=uiComponentClass%> <%=hasAccessPermission?"":"ProtectedContainer"%>" id="${uicomponent.id}">
 <%
 	}
 %>

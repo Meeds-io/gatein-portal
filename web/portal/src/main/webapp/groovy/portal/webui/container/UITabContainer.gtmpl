@@ -37,12 +37,14 @@
     }
   }
   
+  String uiComponentClass = uicomponent.getCssClass() == null ? "" : uicomponent.getCssClass();
+
   String id = uicomponent.getId();  
   def modeState = Util.getUIPortalApplication().getModeState();
   def header = uicomponent.getTitle() != null ? _ctx.appRes(uicomponent.getTitle()) : null;
 %>
 <% if(children != null && children.size() > 0) { %>
-<div id="$id">
+<div id="$id" class="<%=uiComponentClass%>">
   <div class="VuetifyApp">
                       	<div id="tab$id">
                       	    <% if(modeState == 0 && header != null){ %>

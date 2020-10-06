@@ -18,6 +18,8 @@
 		uicomponent.setId(componentId.substring("UIContainer-".length()));
 	}
 
+  String uiComponentClass = uicomponent.getCssClass() == null ? "" : uicomponent.getCssClass();
+
 	if (uiPortalApp.isEditing())
 	{
 	   JavascriptManager jsManager = rcontext.getJavascriptManager();
@@ -25,14 +27,14 @@
 	  				.addScripts("portalDragDrop.init(['UIContainer']);")
 	  				.addScripts("portal.UIPortal.initMouseHover('" + uicomponent.id + "');");
 %>
-<div class="UIContainer UIColumnContainer EdittingContainer <%=hasAccessPermission?"": "ProtectedContainer"%>"
+<div class="UIContainer UIColumnContainer EdittingContainer <%=uiComponentClass%> <%=hasAccessPermission?"": "ProtectedContainer"%>"
 				id="${uicomponent.id}">
 <%
   }
   else
   {
 %>
-<div class="UIContainer UITableColumnContainer UIResponsiveTableThreeColumnContainer <%=hasAccessPermission?"":"ProtectedContainer"%>" id="${uicomponent.id}">
+<div class="UIContainer UITableColumnContainer UIResponsiveTableThreeColumnContainer <%=uiComponentClass%> <%=hasAccessPermission?"":"ProtectedContainer"%>" id="${uicomponent.id}">
 <%
   }
 %>

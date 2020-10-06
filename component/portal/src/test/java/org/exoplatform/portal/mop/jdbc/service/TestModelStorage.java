@@ -216,19 +216,37 @@ public class TestModelStorage extends TestDataStorage {
     assertTrue(pConfig.getPortalLayout().getChildren() != null
         && pConfig.getPortalLayout().getChildren().size() == 0);
   }
-  
+
+  public void testGetPageChildrenFilteredByProfiles() throws Exception {
+    Page page = storage_.getPage("portal::test::test6");
+    assertNotNull(page.getChildren());
+    assertEquals(1, page.getChildren().size());
+    Container container = (Container) page.getChildren().get(0);
+
+    assertEquals("test", container.getProfiles());
+  }
+
+  public void testGetContainerClass() throws Exception {
+    Page page = storage_.getPage("portal::test::test6");
+    assertNotNull(page.getChildren());
+    assertEquals(1, page.getChildren().size());
+    Container container = (Container) page.getChildren().get(0);
+
+    assertEquals("testClass1 testClass2", container.getCssClass());
+  }
+
   public void testNullPreferenceValue() throws Exception {
     Page page = storage_.getPage("portal::test::test4");
     Application<Portlet> app = (Application<Portlet>) page.getChildren().get(0);
     PersistentApplicationState<Portlet> state = (PersistentApplicationState) app.getState();
-
+    
     //
     Portlet prefs = storage_.load(state, ApplicationType.PORTLET);
-
+    
     //
     prefs.setValue("template", null);
     storage_.save(state, prefs);
-
+    
     //
     prefs = storage_.load(state, ApplicationType.PORTLET);
     assertNotNull(prefs);

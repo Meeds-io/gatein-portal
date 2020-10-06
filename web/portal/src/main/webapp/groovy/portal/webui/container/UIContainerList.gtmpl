@@ -4,11 +4,13 @@
 	def categories = uicomponent.getCategories();
 	def selectedCategory = uicomponent.getSelectedCategory();
 	
+  String uiComponentClass = uicomponent.getCssClass() == null ? "" : uicomponent.getCssClass();
+
 	def rcontext = _ctx.getRequestContext();
 	JavascriptManager jsManager = rcontext.getJavascriptManager();
 	jsManager.require("SHARED/portalDragDrop", "portalDragDrop").addScripts("portalDragDrop.init(['DragObjectPortlet']);");
 %>	
-<div class="uiContainerList" id="$uicomponent.id">
+<div class="uiContainerList <%=uiComponentClass%>" id="$uicomponent.id">
 	<div class="accordion verticalTabStyle1">
  		<% 
  			String cTab, cName, description, displayName;
