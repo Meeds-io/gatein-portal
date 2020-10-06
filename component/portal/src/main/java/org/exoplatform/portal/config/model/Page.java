@@ -143,7 +143,7 @@ public class Page extends Container {
     @Override
     public PageData build() {
         List<ComponentData> children = buildChildren();
-        return new PageData(storageId, id, name, icon, template, factoryId, title, description, width, height,
+        return new PageData(storageId, id, name, icon, template, factoryId, title, description, width, height, cssClass, profiles,
                 Utils.safeImmutableList(accessPermissions), children, ownerType, ownerId, editPermission, showMaxWindow,
                 Utils.safeImmutableList(moveAppsPermissions), Utils.safeImmutableList(moveContainersPermissions));
     }

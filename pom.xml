@@ -824,7 +824,7 @@
               </property>
               <property>
                 <name>exo.profiles</name>
-                <value>${surefire.exo.profiles}</value>
+                <value>${surefire.exo.profiles},test</value>
               </property>
             </systemProperties>
           </configuration>

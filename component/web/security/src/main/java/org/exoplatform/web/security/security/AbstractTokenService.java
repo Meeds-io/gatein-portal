@@ -45,7 +45,6 @@ import org.gatein.common.util.Base64;
 import org.gatein.common.util.Base64.EncodingOption;
 import org.gatein.wci.security.Credentials;
 import org.picocontainer.Startable;
-import sun.misc.Request;
 
 /**
  * Created by The eXo Platform SAS Author : liem.nguyen ncliam@gmail.com Jun 5, 2009

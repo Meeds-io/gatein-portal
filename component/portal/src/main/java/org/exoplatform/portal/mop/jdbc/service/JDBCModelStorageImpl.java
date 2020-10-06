@@ -424,26 +424,26 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
                                                                        entity.getId(),
                                                                        PermissionEntity.TYPE.MOVE_CONTAINER);
 
-    PageData pageData =
-                      new PageData("page_" + entity.getId(),
-                                   null,
-                                   entity.getName(),
-                                   null,
-                                   null,
-                                   null,
-                                   null,
-                                   null,
-                                   null,
-                                   null,
-                                   Collections.<String> emptyList(),
-                                   buildChildren(pageBody),
-                                   entity.getOwnerType().getName(),
-                                   entity.getOwnerId(),
-                                   null,
-                                   false,
-                                   buildPermission(moveApps),
-                                   buildPermission(moveContainers));
-    return pageData;
+    return new PageData("page_" + entity.getId(),
+                        null,
+                        entity.getName(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        Collections.<String> emptyList(),
+                        buildChildren(pageBody),
+                        entity.getOwnerType().getName(),
+                        entity.getOwnerId(),
+                        null,
+                        false,
+                        buildPermission(moveApps),
+                        buildPermission(moveContainers));
   }
 
   private Map<Long, WindowEntity> queryWindow(JSONArray jsonBody) {
@@ -643,7 +643,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
             BodyData body = new BodyData(String.valueOf(id), BodyType.PAGE);
             results.add(body);
           } else {
-            results.add(buildContainer(containers.get(id), jsonComponent, containers, windows));
+            results.add(buildContainer(containers.get(id), jsonComponent, attrs, containers, windows));
           }
           break;
         case WINDOW:
@@ -703,6 +703,7 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
 
   private ContainerData buildContainer(ContainerEntity entity,
                                        JSONObject jsonComponent,
+                                       JSONObject attrs,
                                        Map<Long, ContainerEntity> containers,
                                        Map<Long, WindowEntity> windows) {
     List<ComponentData> children = buildChildren((JSONArray) jsonComponent.get("children"), containers, windows);
@@ -719,6 +720,17 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
                                                                   entity.getId(),
                                                                   PermissionEntity.TYPE.MOVE_CONTAINER);
 
+    String cssClass = null;
+    String profiles = null;
+    if (attrs != null) {
+      if (attrs.containsKey(MappedAttributes.CSS_CLASS.getName())) {
+        cssClass = (String) attrs.get(MappedAttributes.CSS_CLASS.getName());
+      }
+      if (attrs.containsKey(MappedAttributes.PROFILES.getName())) {
+        profiles = (String) attrs.get(MappedAttributes.PROFILES.getName());
+      }
+    }
+
     return new ContainerData(String.valueOf(entity.getId()),
                              entity.getWebuiId(),
                              entity.getName(),
@@ -729,6 +741,8 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
                              entity.getDescription(),
                              entity.getWidth(),
                              entity.getHeight(),
+                             cssClass,
+                             profiles,
                              buildPermission(access),
                              buildPermission(moveApps),
                              buildPermission(moveConts),
@@ -766,6 +780,20 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
     dst.setTemplate(src.getTemplate());
     dst.setTitle(src.getTitle());
     dst.setWidth(src.getWidth());
+
+    boolean hasProfiles = StringUtils.isNotBlank(src.getProfiles());
+    boolean hasCssClass = StringUtils.isNotBlank(src.getCssClass());
+    if (hasProfiles || hasCssClass) {
+      JSONObject properties = new JSONObject();
+      if (hasProfiles) {
+        properties.put(MappedAttributes.PROFILES.getName(), src.getProfiles());
+      }
+      if (hasCssClass) {
+        properties.put(MappedAttributes.CSS_CLASS.getName(), src.getCssClass());
+      }
+      dst.setProperties(properties.toJSONString());
+    }
+
     return dst;
   }
 

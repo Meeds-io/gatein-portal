@@ -42,6 +42,10 @@ public class UIContainer extends UIPortalComponent {
 
     protected String description;
 
+    protected String cssClass;
+
+    protected String profiles;
+
     protected String[] moveContainersPermissions;
 
     protected String[] moveAppsPermissions;
@@ -73,6 +77,21 @@ public class UIContainer extends UIPortalComponent {
         this.description = desc;
     }
 
+    public String getCssClass() {
+      return cssClass;
+    }
+
+    public void setCssClass(String cssClass) {
+      this.cssClass = cssClass;
+    }
+
+    public String getProfiles() {
+      return profiles;
+    }
+
+    public void setProfiles(String profiles) {
+      this.profiles = profiles;
+    }
 
     public String[] getMoveContainersPermissions() {
         return moveContainersPermissions;

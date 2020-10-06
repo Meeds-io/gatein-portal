@@ -12,11 +12,13 @@
 	
 	if(!uiPortalApp.isEditing() && !hasPermission) return;
 	
+  String uiComponentClass = uicomponent.getCssClass() == null ? "" : uicomponent.getCssClass();
+
 	JavascriptManager jsmanager = rcontext.getJavascriptManager();
 	jsmanager.require("SHARED/portal", "portal").
 	addScripts("portal.UIPortal.initMouseHover('" + uicomponent.id + "');");
 %>
-<div id="UITopBarContainerParent">
+<div id="UITopBarContainerParent" class="<%=uiComponentClass%>">
   <div class="UIContainer UITopBarContainer <%=uiPortalApp.isEditing()?"EdittingContainer":""%> <%=hasPermission?"": "ProtectedContainer"%>" id="${uicomponent.id}">
   	<div class="NormalContainerBlock">
   	<%

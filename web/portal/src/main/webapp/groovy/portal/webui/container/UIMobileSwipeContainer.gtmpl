@@ -20,6 +20,8 @@
 	if(uiComponentHeight != null) cssStyle += "height: "+uiComponentHeight+";"
 	if(cssStyle.length() > 0) cssStyle += "\"";
 	
+  String uiComponentClass = uicomponent.getCssClass() == null ? "" : uicomponent.getCssClass();
+
 	/** Trim the prefix UIContainer- if any, this hardcoded part is needed to update nested container via Ajax */
 	String componentId = uicomponent.getId();
 	if(componentId.startsWith("UIContainer-")){
@@ -34,14 +36,14 @@
          .require("SHARED/portal", "portal")
          .addScripts("portal.UIPortal.initMouseHover('" + uicomponent.id + "');");
 %>  
-<div class="UIContainer EdittingContainer<%=uicomponent.getPermissionClasses()%> UIMobileSwipeContainer"
+<div class="UIContainer <%=uiComponentClass%> EdittingContainer<%=uicomponent.getPermissionClasses()%> UIMobileSwipeContainer"
 				id="${uicomponent.id}" ${cssStyle}>
 <%
   }
   else
   {   
 %>
-<div class="UIContainer <%=hasAccessPermission?"": "ProtectedContainer"%> UIMobileSwipeContainer" id="${uicomponent.id}" ${cssStyle}>
+<div class="UIContainer <%=uiComponentClass%> <%=hasAccessPermission?"": "ProtectedContainer"%> UIMobileSwipeContainer" id="${uicomponent.id}" ${cssStyle}>
 <%
   }
 %>

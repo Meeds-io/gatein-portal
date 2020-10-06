@@ -61,6 +61,8 @@
     <value name="description" field="description" usage="optional"/>
     <value name="width" usage="optional" field="width" style="attribute"/>
     <value name="height" usage="optional" field="height" style="attribute"/>
+    <value name="cssClass" field="cssClass" usage="optional" style="attribute"/>
+    <value name="profiles" field="profiles" usage="optional" style="attribute"/>
     <value name="move-apps-permissions" field="moveAppsPermissions" usage="optional" default="Everyone" serializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.serializePermissions"
           deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions"/>
     <value name="move-containers-permissions" field="moveContainersPermissions" usage="optional" default="Everyone" serializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.serializePermissions"
