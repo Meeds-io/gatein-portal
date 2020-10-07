@@ -51,13 +51,17 @@
 		<%} else {%>
 			<div class="VIEW-CONTAINER VIEW-BLOCK">
 		<%} %>
-				<%if(hasAccessPermission) {%>
-          <div class="UIIntermediateContainer">
-					<div class="UIRowContainer <%=(portalMode != UIPortalApplication.NORMAL_MODE && uicomponent.getChildren().size() == 0) ? "EmptyContainer" : ""%>">
-							<%uicomponent.renderChildren();%>
-					</div>
-				  </div>
-					<%} else out.print("<div class='ProtectedContent'>"+_ctx.appRes("UIPortlet.label.protectedContent")+"</div>");%>
+        <div class="UIIntermediateContainer">
+          <%if(hasAccessPermission) {%>
+            <div id="${uicomponent.id}Children" class="UIRowContainer <%=(editMode != EditMode.NO_EDIT && uicomponent.getChildren().size() == 0) ? "EmptyContainer" : ""%>">
+                <%uicomponent.renderChildren();%>
+            </div>
+          <% } else { %>
+            <div id="${uicomponent.id}Children" class="ProtectedContent">
+              <%=_ctx.appRes("UIPortlet.label.protectedContent")%>
+            </div>
+          <% } %>
+        </div>
 			</div>
 
 		<%if(portalMode != UIPortalApplication.NORMAL_MODE){%>
