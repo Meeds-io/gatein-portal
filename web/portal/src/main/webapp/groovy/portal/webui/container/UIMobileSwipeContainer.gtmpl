@@ -56,7 +56,7 @@
 			<div class="VIEW-CONTAINER VIEW-BLOCK">
 		<%} %>
 				<%if(hasAccessPermission) {%>
-					<div class="UIRowContainer <%=(editMode != EditMode.NO_EDIT && uicomponent.getChildren().size() == 0) ? "EmptyContainer" : ""%> UIMobileSwipeParentContainer">
+					<div id="${uicomponent.id}Children" class="UIRowContainer <%=(editMode != EditMode.NO_EDIT && uicomponent.getChildren().size() == 0) ? "EmptyContainer" : ""%> UIMobileSwipeParentContainer">
              <%
                 String active = "active";
                 for(uiChild in uicomponent.getChildren()) {
@@ -81,7 +81,11 @@
               <i class="uiIcon fa fa-angle-double-left"></i>
             </div>
           <% } %>
-					<%} else out.print("<div class='ProtectedContent'>"+_ctx.appRes("UIPortlet.label.protectedContent")+"</div>");%>
+        <% } else { %>
+          <div id="${uicomponent.id}Children" class="ProtectedContent">
+            <%=_ctx.appRes("UIPortlet.label.protectedContent")%>
+          </div>
+        <% } %>
 			</div>
 
 		<%if (editMode != EditMode.NO_EDIT) {%>

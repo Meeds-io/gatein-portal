@@ -60,7 +60,7 @@
 			<div>
 				<%if(hasAccessPermission) {%>
 				<div class="UITableColumn UISwitchingColumn" style="display:table; width:100%; margin: 0 auto; $style">
-					<div class="TRContainer" style="display:table-row">
+					<div id="${uicomponent.id}Children" class="TRContainer" style="display:table-row">
 					<% for(uiChild in uicomponent.getChildren()) {%>
 						<div class="${uiChild.id}TDContainer TDContainer SwitchingContainer" <% if(uiChild.getWidth()) { %> width="<%= uiChild.getWidth(); %>" <% } %> style="vertical-align: top" ><% uicomponent.renderUIComponent(uiChild) %></div>
 					<% } %>

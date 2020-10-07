@@ -55,13 +55,17 @@
 			<div>
 				<%if(hasAccessPermission) {%>		
 				<table class="UITableColumn" style="margin: 0px auto; $style">
-					<tr class="TRContainer">
+          <tr id="${uicomponent.id}Children" class="TRContainer">
 						<% for(uiChild in uicomponent.getChildren()) {%>
 							<td class="${uiChild.id}TDContainer TDContainer" <% if(uiChild.getWidth()) { %> width="<%= uiChild.getWidth(); %>" <% } %>><% uicomponent.renderUIComponent(uiChild) %></td>
 						<% } %>
 				 </tr>
 				</table>
-				<%} else {print "<div class='ProtectedContent'>"+_ctx.appRes("UIPortlet.label.protectedContent")+"</div>";}%>
+        <% } else { %>
+          <div id="${uicomponent.id}Children" class="ProtectedContent">
+            <%=_ctx.appRes("UIPortlet.label.protectedContent")%>
+          </div>
+        <% } %>
 			</div>		
 		</div>
 		<%/*Debug On IE	-----For DND */%>

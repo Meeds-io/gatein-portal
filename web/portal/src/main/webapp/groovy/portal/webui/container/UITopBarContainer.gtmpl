@@ -37,7 +37,7 @@
   			<div>
   				<%if(hasPermission) {%>
   				<div class="UITableColumnContainer" style="margin: 0px auto; $style">
-  					<div class="TRContainer clearfix UITopBarContainerItemsParent">
+  					<div id="${uicomponent.id}Children" class="TRContainer clearfix UITopBarContainerItemsParent">
   						<% 
   					    for(uiChild in uicomponent.getChildren()) {
               %>
