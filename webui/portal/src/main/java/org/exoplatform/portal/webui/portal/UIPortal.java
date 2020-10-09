@@ -19,13 +19,14 @@
 
 package org.exoplatform.portal.webui.portal;
 
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.account.UIAccountSetting;
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.model.PortalProperties;
-import org.exoplatform.portal.config.model.PortalRedirect;
-import org.exoplatform.portal.config.model.Properties;
+import org.exoplatform.portal.config.DataStorage;
+import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserNode;
 import org.exoplatform.portal.webui.container.UIContainer;
@@ -41,6 +42,7 @@ import org.exoplatform.portal.webui.portal.UIPortalComponentActionListener.ShowL
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.portal.webui.workspace.UIMaskWorkspace;
 import org.exoplatform.portal.webui.workspace.UIPortalApplication;
+import org.exoplatform.services.listener.*;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.web.application.JavascriptManager;
@@ -102,6 +104,12 @@ public class UIPortal extends UIContainer {
     private ArrayList<PortalRedirect> portalRedirects;
 
     private boolean useDynamicLayout;
+
+    public UIPortal() {
+      // Listen to storage to update cached pages when updated
+      ListenerService listenerService = ExoContainerContext.getService(ListenerService.class);
+      listenerService.addListener(DataStorage.PAGE_UPDATED, new RefreshUIPageListener());
+    }
 
     public boolean isUseDynamicLayout() {
       return useDynamicLayout;
@@ -445,5 +453,24 @@ public class UIPortal extends UIContainer {
                 child.setRendered(headerAndFooterRendered);
             }
         }
+    }
+
+    @Asynchronous
+    public class RefreshUIPageListener extends Listener<DataStorage, Page> {
+      @Override
+      public void onEvent(org.exoplatform.services.listener.Event<DataStorage, Page> event) throws Exception {
+        Page page = event.getData();
+        if (page == null) {
+          return;
+        }
+        PageKey pageKey = page.getPageKey();
+        if (pageKey == null) {
+          return;
+        }
+        String pageReference = pageKey.format();
+        if (all_UIPages != null && all_UIPages.containsKey(pageReference)) {
+          all_UIPages.remove(pageReference);
+        }
+      }
     }
 }
