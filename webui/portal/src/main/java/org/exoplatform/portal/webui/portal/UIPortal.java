@@ -108,7 +108,7 @@ public class UIPortal extends UIContainer {
     public UIPortal() {
       // Listen to storage to update cached pages when updated
       ListenerService listenerService = ExoContainerContext.getService(ListenerService.class);
-      listenerService.addListener(DataStorage.PAGE_UPDATED, new RefresUIPageListener());
+      listenerService.addListener(DataStorage.PAGE_UPDATED, new RefreshUIPageListener());
     }
 
     public boolean isUseDynamicLayout() {
@@ -456,7 +456,7 @@ public class UIPortal extends UIContainer {
     }
 
     @Asynchronous
-    public class RefresUIPageListener extends Listener<DataStorage, Page> {
+    public class RefreshUIPageListener extends Listener<DataStorage, Page> {
       @Override
       public void onEvent(org.exoplatform.services.listener.Event<DataStorage, Page> event) throws Exception {
         Page page = event.getData();
