@@ -1,0 +1,82 @@
+<%
+import java.util.HashMap;
+import org.gatein.portal.controller.resource.ResourceRequestHandler;
+
+def rcontext = _ctx.getRequestContext() ;
+
+/* Loading Manifest and Service Worker configuration script at top of the head */
+def version = ResourceRequestHandler.VERSION;
+%>
+    <link rel="manifest" href="/portal/manifest.json">
+
+    <link rel="apple-touch-icon" href="/digital-workplace/skin/images/eXo.png">
+
+    <script type="text/javascript">
+      function registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/portal/service-worker.js?v=<%=version%>',{
+            scope: '/',
+          }).then(function(reg){
+              console.debug('Service worker registered');
+            }).catch(function(e) {
+              console.debug('Error registering service worker!', e);
+            });
+        } else {
+          console.debug("Navigator doesn't support serviceWorker!");
+        }
+      }
+      registerServiceWorker();
+    </script>
+
+<%
+/* Loading needed Fonts files in top of the page as a 'preload' resource to include it in response when using HTTP/2 */
+%>
+
+<%
+/* Loading needed stylesheets in top of the page as a 'preload' resource to include it in response when using HTTP/2 */
+
+def portalSkins = uicomponent.getPortalSkins();
+def portletSkins = uicomponent.getPortletSkins();
+def customSkins = uicomponent.getCustomSkins();
+%>
+
+  <link id="brandingSkin" rel="preload" as="style" type="text/css" href="/portal/rest/v1/platform/branding/css">
+
+<% for (skinConfig in portalSkins) {
+     def url = skinConfig.createURL(rcontext.controllerContext);
+     url.setOrientation(orientation); %>
+  <link rel="preload" href= "$url" as="style" type="text/css" />
+<% } %>
+<% for (portletSkin in portletSkins) {
+     def url = portletSkin.createURL(rcontext.controllerContext);
+     url.setOrientation(orientation); %>
+  <link rel="preload" href= "$url" as="style" type="text/css" />
+<% } %>
+<% for (customSkin in customSkins) {
+     def url = customSkin.createURL(rcontext.controllerContext);
+     url.setOrientation(orientation); %>
+  <link rel="preload" href= "$url" as="style" type="text/css" />
+<% } %>
+<%
+def jsManager = rcontext.getJavascriptManager();
+
+def jsConfig = uicomponent.getJSConfig();
+def jsConfigPaths = jsConfig.get("paths");
+
+def scriptsIdsMap = jsManager.getPageScripts();
+def scriptsIds = scriptsIdsMap.keySet();
+def scriptPaths = new HashMap();
+for (scriptsId in scriptsIds) {
+  def isRemote = scriptsIdsMap.get(scriptsId) || !jsConfigPaths.has(scriptsId);
+  def scriptPath = isRemote ? scriptsId : (jsConfigPaths.get(scriptsId) + ".js");
+  scriptPaths.put(scriptPath, isRemote);
+}
+
+for (scriptPath in scriptPaths.keySet()) {
+  def isRemote = scriptPaths.get(scriptPath);
+%>
+  <!-- $scriptPath -->
+  <link rel="preload" href= "$scriptPath" as="script" type="text/javascript" <%=isRemote ? "crossorigin" : "" %>/>
+<%
+}
+%>
