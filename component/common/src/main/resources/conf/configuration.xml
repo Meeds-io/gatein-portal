@@ -54,12 +54,12 @@
       <properties-param profiles="cluster">
         <name>JGroupsProperties</name>
         <description>Jgroups configuration</description>
-        <property name="exo.service.cluster.jgroups.config" value="jar:/conf/jgroups/jgroups-service-udp.xml" />
+        <property name="exo.service.cluster.jgroups.config" value="jar:/conf/jgroups/jgroups-service-tcp.xml" />
       </properties-param>
-      <properties-param profiles="cluster-jgroups-tcp">
+      <properties-param profiles="cluster-jgroups-udp">
         <name>JGroupsProperties</name>
         <description>Jgroups configuration</description>
-        <property name="exo.service.cluster.jgroups.config" value="jar:/conf/jgroups/jgroups-service-tcp.xml" />
+        <property name="exo.service.cluster.jgroups.config" value="jar:/conf/jgroups/jgroups-service-udp.xml" />
       </properties-param>
     </init-params>
   </component>
