@@ -19,24 +19,18 @@
 
 package org.exoplatform.web.application;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
+
+import java.util.*;
+
+import org.apache.commons.lang3.StringUtils;
 import org.gatein.portal.controller.resource.ResourceId;
 import org.gatein.portal.controller.resource.ResourceScope;
-import org.gatein.portal.controller.resource.script.FetchMap;
-import org.gatein.portal.controller.resource.script.FetchMode;
-import org.gatein.portal.controller.resource.script.ScriptResource;
+import org.gatein.portal.controller.resource.script.*;
+import org.gatein.portal.controller.resource.script.Module;
 
 /**
  * Created by The eXo Platform SAS Mar 27, 2007
@@ -50,6 +44,8 @@ public class JavascriptManager {
     /** . */
     private Set<String> extendedScriptURLs = new LinkedHashSet<String>();
 
+    private JavascriptConfigService javascriptConfigService;
+    
     /** . */
     private StringBuilder scripts = new StringBuilder();
 
@@ -94,9 +90,7 @@ public class JavascriptManager {
             throw new IllegalArgumentException("name can't be null");
         }
         ResourceId id = new ResourceId(scope, name);
-        ExoContainer container = ExoContainerContext.getCurrentContainer();
-        JavascriptConfigService service = (JavascriptConfigService) container
-                .getComponentInstanceOfType(JavascriptConfigService.class);
+        JavascriptConfigService service = getJavascriptConfigService();
         ScriptResource resource = service.getResource(id);
         if (resource != null) {
             if (FetchMode.IMMEDIATE.equals(resource.getFetchMode())) {
@@ -183,6 +177,52 @@ public class JavascriptManager {
         return callback.toString();
     }
 
+    /**
+     * Return a map of JS resource ids (required to be load for current page) and boolean:
+     * true if that script should be push on the header before html.
+     * false if that script should be load lazily after html has been loaded <br>
+     *
+     * JS resources always contains SHARED/bootstrap required to be loaded eagerly
+     * and optionally (by configuration) contains: portal js, portlet js, and resouces registered to be load
+     * through JavascriptManager
+     *
+     * @return
+     */
+     public Map<String, Boolean> getPageScripts() {
+        JavascriptConfigService service = getJavascriptConfigService();
+        FetchMap<ResourceId> pageResourceIds = new FetchMap<>();
+        Set<String> noAlias = requireJS.getNoAlias();
+        for (String module : noAlias) {
+          String[] moduleParts = StringUtils.split(module, "/");
+          ResourceId resourceId = new ResourceId(ResourceScope.valueOf(moduleParts[0]),
+                                                 StringUtils.join(moduleParts, "/", 1, moduleParts.length));
+          pageResourceIds.add(resourceId);
+        }
+
+        Map<ScriptResource, FetchMode> resolvedPageResources = service.resolveIds(pageResourceIds);
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        for (ScriptResource rs : resolvedPageResources.keySet()) {
+          ResourceId id = rs.getId();
+          Set<ResourceId> dependencies = service.getResource(id).getClosure();
+
+          boolean isRemote = !rs.isEmpty() && rs.getModules().get(0) instanceof Module.Remote;
+          result.put(id.toString(), isRemote);
+
+          for (ResourceId dependencyId : dependencies) {
+            ScriptResource dependencyResource = service.getResource(dependencyId);
+            if (dependencyResource != null) {
+              boolean isDependencyRemote = !dependencyResource.isEmpty() && dependencyResource.getModules().get(0) instanceof Module.Remote;
+              result.put(dependencyId.toString(), isDependencyRemote);
+            }
+          }
+        }
+        for (String url : getExtendedScriptURLs()) {
+          result.put(url, true);
+        }
+        return result;
+    }
+
     public RequireJS require(String moduleId) {
         return require(moduleId, null);
     }
@@ -197,5 +237,12 @@ public class JavascriptManager {
 
     public String generateUUID() {
         return "uniq-" + UUID.randomUUID().toString();
+    }
+
+    public JavascriptConfigService getJavascriptConfigService() {
+      if (javascriptConfigService == null) {
+        javascriptConfigService = ExoContainerContext.getService(JavascriptConfigService.class);
+      }
+      return javascriptConfigService;
     }
 }
