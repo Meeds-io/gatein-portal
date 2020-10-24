@@ -9,7 +9,6 @@
       </div>
     </a>
     <v-navigation-drawer
-      v-if="hamburgerMenuInitialized"
       id="HamburgerMenuNavigation"
       v-model="hamburgerMenu"
       :hide-overlay="initializing"
