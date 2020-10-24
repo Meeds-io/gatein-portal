@@ -1,6 +1,6 @@
 importScripts('/eXoResources/javascript/workbox-5.1.4/workbox-sw.js');
 
-const cachePrefix = 'meeds-pwa-resources';
+const cachePrefix = 'pwa-resources';
 
 workbox.setConfig({
   debug: true,
@@ -68,46 +68,70 @@ workbox.routing.registerRoute(
 );
 
 workbox.routing.registerRoute(
-    new RegExp('.*/$'),
-    new workbox.strategies.CacheFirst({
-      cacheName: `${cachePrefix}-dom`,
-    }),
-);
-
-workbox.routing.registerRoute(
-    new RegExp('.*/portal$'),
-    new workbox.strategies.CacheFirst({
-      cacheName: `${cachePrefix}-dom`,
-    }),
-);
-
-workbox.routing.registerRoute(
-    new RegExp('.*/portal/dw.*'),
-    new workbox.strategies.NetworkFirst({
-      cacheName: `${cachePrefix}-dom`,
-    }),
-);
-
-workbox.routing.registerRoute(
-  new RegExp('.*/rest/v1/platform/branding/css'),
-  new workbox.strategies.NetworkFirst({
+  new RegExp('.*/rest/v1/platform/branding/css.*'),
+  new workbox.strategies.CacheFirst({
     cacheName: `${cachePrefix}-css`,
   }),
 );
 
 workbox.routing.registerRoute(
-  new RegExp('.*/rest/v1/navigations/.*'),
-  new workbox.strategies.NetworkFirst({
-    cacheName: `${cachePrefix}-navigations`,
+  new RegExp('.*/dom-cache.*'),
+  new workbox.strategies.CacheOnly({
+    cacheName: `${cachePrefix}-dom`,
   }),
 );
 
-workbox.routing.registerRoute(
-  new RegExp('.*/rest/.*'),
-  new workbox.strategies.NetworkFirst({
-    cacheName: `${cachePrefix}-rest`,
-  }),
-);
+const cacheableDOM = new workbox.cacheableResponse.CacheableResponse({
+  statuses: [200],
+  headers: {
+    'Content-Type': ['text/html;charset=UTF-8', 'text/html'],
+  },
+});
+
+const handleDOMResponse = (event) => {
+  return fetch(event.request)
+    .then((response) => {
+      if (cacheable.isResponseCacheable(response)) {
+        return response.text()
+          .then(html => {
+          });
+      }
+      return response;
+    });
+};
+
+const domMatcher = ({url, request, event}) => {
+  const pathname = url.pathname;
+  return (pathname.indexOf('/dw') > 0 || pathname.indexOf('/g:') > 0)
+         && pathname.indexOf('/rest/') < 0
+         && pathname.indexOf('.js') < 0
+         && pathname.indexOf('.css') < 0;
+};
+
+const domHandler = async ({url, request, event, params}) => {
+  const response = await fetch(request);
+  let html = await response.text();
+
+  const cacheableDOMs = [...html.matchAll(/<v-cacheable-dom-app([ \t\r\n]*)cache-id="(.*)"([ \t\r\n]*)(\/>|>[ \t\r\n]*<\/v-cacheable-dom-app>)/g)];
+  if(cacheableDOMs.length) {
+    const domCache = await self.caches.open(`${cachePrefix}-dom`);
+    for (let index in cacheableDOMs) {
+      const cacheableDOM = cacheableDOMs[index];
+      const domToReplace = cacheableDOM[0];
+      const appId = cacheableDOM[2];
+      const domCacheEntry = await domCache.match(`/dom-cache?id=${appId}`);
+      if (domCacheEntry) {
+        const htmlAppPart = await domCacheEntry.text();
+        html = html.replace(domToReplace, htmlAppPart);
+      }
+    }
+  }
+  return new Response(html, {
+    headers: {'content-type': 'text/html'},
+  });
+};
+
+workbox.routing.registerRoute(domMatcher, domHandler);
 
 workbox.core.skipWaiting();
 workbox.core.clientsClaim();
