@@ -32,11 +32,5 @@
       <label>Home</label>
       <page-reference>portal::@owner@::homepage</page-reference>
     </node>
-    <node>
-      <name>register</name>
-      <label>Register</label>
-      <visibility>SYSTEM</visibility>
-      <page-reference>portal::@owner@::register</page-reference>
-    </node>
   </page-nodes>
 </node-navigation>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd" xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+
+  <component>
+    <key>PWAConfigurationProperties</key>
+    <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
+    <init-params>
+      <properties-param>
+        <name>PWAConfigurationProperties</name>
+        <description>PWA configuration properties</description>
+        <property name="pwa.service.worker.enabled" value="${pwa.service.worker.enabled:true}" />
+        <property name="pwa.service.worker.path" value="${pwa.service.worker.path:war:/conf/pwa/service-worker.js}" />
+        <property name="pwa.manifest.enabled" value="${pwa.manifest.enabled:true}" />
+        <property name="pwa.manifest.path" value="${pwa.manifest.path:war:/conf/pwa/manifest.json}" />
+      </properties-param>
+    </init-params>
+  </component>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.groovyscript.text.TemplateService</target-component>
+    <component-plugin>
+      <name>UIPortalApplication-Start-head</name>
+      <set-method>addTemplateExtension</set-method>
+      <type>org.exoplatform.groovyscript.text.TemplateExtensionPlugin</type>
+      <init-params>
+        <values-param>
+          <name>templates</name>
+          <description>A template that will be imported in head of pages
+                    to define caching strategies of resources using Service Worker,
+                    preload resources and Manifest definition</description>
+          <value>war:/groovy/portal/webui/workspace/UIPortalPWAHead.gtmpl</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+</configuration>
