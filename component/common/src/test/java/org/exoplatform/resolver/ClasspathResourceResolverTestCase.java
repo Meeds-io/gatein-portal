@@ -41,7 +41,7 @@ public class ClasspathResourceResolverTestCase extends TestCase {
         InputStream in = resolver.getInputStream("classpath:org/exoplatform/resolver/foo.gtmpl");
         assertNotNull(in);
         String content = new String(IOTools.getBytes(in));
-        assertEquals("hello", content);
+        assertEquals("hello", content.replaceAll("(?s)<!--.*?-->", "").trim());
 
         in = null;
         content = null;
@@ -49,6 +49,6 @@ public class ClasspathResourceResolverTestCase extends TestCase {
         in = resolver.getInputStream("classpath:/org/exoplatform/resolver/foo.gtmpl");
         assertNotNull(in);
         content = new String(IOTools.getBytes(in));
-        assertEquals("hello", content);
+        assertEquals("hello", content.replaceAll("(?s)<!--.*?-->", "").trim());
     }
 }
