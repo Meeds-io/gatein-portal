@@ -40,6 +40,7 @@ export default {
     return {
       initializing: false,
       hamburgerMenu: false,
+      hamburgerMenuInitialized: false,
       secondLevel: false,
       openedSecondLevel: null,
       contents: [],
@@ -62,19 +63,26 @@ export default {
     },
   },
   watch: {
+    hamburgerMenuInitialized() {
+      this.refreshMenu();
+    },
     hamburgerMenu() {
       if (this.hamburgerMenu) {
+        if (!this.hamburgerMenuInitialized) {
+          this.hamburgerMenuInitialized = true;
+        }
         $('body').addClass('hide-scroll');
+
+        window.setTimeout(() => {
+          $('.HamburgerNavigationMenu .v-overlay').click(() => {
+            this.hamburgerMenu = false;
+          });
+        }, 200); // eslint-disable-line no-magic-numbers
       } else {
         window.setTimeout(() => {
           $('body').removeClass('hide-scroll');
         }, 200); // eslint-disable-line no-magic-numbers
       }
-      this.$nextTick().then(() => {
-        $('.HamburgerNavigationMenu .v-overlay').click(() => {
-          this.hamburgerMenu = false;
-        });
-      });
     },
   },
   created() {
@@ -113,8 +121,8 @@ export default {
         contentsToLoad.forEach(contentDetail => {
           if (!contentDetail.loaded) {
             window.setTimeout(() => {
-              try {
-                if ($(`#${contentDetail.id}`).length) {
+              if ($(`#${contentDetail.id}`).length) {
+                try {
                   if (!this.vueChildInstances[contentDetail.id]) {
                     const VueHamburgerMenuItem = Vue.extend(contentDetail.vueComponent);
                     this.vueChildInstances[contentDetail.id] = new VueHamburgerMenuItem({
@@ -134,10 +142,10 @@ export default {
                       this.hideSecondLevel();
                     });
                   }
+                } finally {
+                  contentDetail.loaded = true;
+                  this.initializing --;
                 }
-              } finally {
-                contentDetail.loaded = true;
-                this.initializing --;
               }
             }, this.idleTime);
           }
