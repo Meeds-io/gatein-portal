@@ -87,6 +87,18 @@ public class RequireJS {
         this.scripts.append(scripts);
         return this;
     }
+  
+    public Map<String, String> getDepends() {
+      return depends;
+    }
+
+    public Set<String> getNoAlias() {
+      return noAlias;
+    }
+
+    public StringBuilder getScripts() {
+      return scripts;
+    }
 
     @Override
     public String toString() {
