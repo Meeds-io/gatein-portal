@@ -10,27 +10,38 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.gatein.portal.controller.resource.ResourceRequestHandler;
+
 import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.web.AbstractHttpServlet;
+import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 public class ServiceWorkerServlet extends AbstractHttpServlet {
 
-  private static final long              serialVersionUID             = 3739991860557358896L;
+  private static final String            EXTENDED_SERVICE_WORKER_PARTS_VARIABLE = "@extended-service-worker-parts@";
 
-  private static final Log               LOG                          = ExoLogger.getLogger(ServiceWorkerServlet.class);
+  private static final String            DEVELOPMENT_VARIABLE                   = "@development@";
 
-  private static final String            SERVICE_WORKER_ENABLED_PARAM = "pwa.service.worker.enabled";
+  private static final String            ASSETS_VERSION_VARIABLE                = "@assets-version@";
 
-  private static final String            SERVICE_WORKER_PATH_PARAM    = "pwa.service.worker.path";
+  private static final String            SITE_NAME_VARIABLE                     = "@site-name@";
 
-  private static AtomicBoolean           serviceWorkerEnabled         = new AtomicBoolean(true);
+  private static final long              serialVersionUID                       = 3739991860557358896L;
 
-  private static AtomicReference<String> serviceWorkerContent         = new AtomicReference<>();
+  private static final Log               LOG                                    = ExoLogger.getLogger(ServiceWorkerServlet.class);
+
+  private static final String            SERVICE_WORKER_ENABLED_PARAM           = "pwa.service.worker.enabled";
+
+  private static final String            SERVICE_WORKER_PATH_PARAM              = "pwa.service.worker.path";
+
+  private static AtomicBoolean           serviceWorkerEnabled                   = new AtomicBoolean(true);
+
+  private static AtomicReference<String> serviceWorkerContent                   = new AtomicReference<>();
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -55,6 +66,7 @@ public class ServiceWorkerServlet extends AbstractHttpServlet {
         URL resourceURL = configurationManager.getResource(serviceWorkerPath);
         String filePath = resourceURL.getPath();
         String content = IOUtil.getFileContentAsString(filePath, "UTF-8");
+        content = replaceVariables(content);
         serviceWorkerContent.set(content);
       } catch (Exception e) {
         LOG.warn("Can't find service worker path: {}", serviceWorkerPath);
@@ -79,6 +91,18 @@ public class ServiceWorkerServlet extends AbstractHttpServlet {
       LOG.warn("Error retrieving service worker content", e);
       resp.setStatus(500);
     }
+  }
+
+  private String replaceVariables(String content) {
+    UserPortalConfigService portalConfigService = PortalContainer.getInstance()
+                                                                 .getComponentInstanceOfType(UserPortalConfigService.class);
+    String defaultSite = portalConfigService.getDefaultPortal();
+
+    content = content.replaceAll(SITE_NAME_VARIABLE, defaultSite);
+    content = content.replaceAll(ASSETS_VERSION_VARIABLE, ResourceRequestHandler.VERSION);
+    content = content.replaceAll(DEVELOPMENT_VARIABLE, String.valueOf(PropertyManager.isDevelopping()));
+    content = content.replaceAll(EXTENDED_SERVICE_WORKER_PARTS_VARIABLE, "");
+    return content;
   }
 
 }

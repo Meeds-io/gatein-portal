@@ -14,13 +14,13 @@ def version = ResourceRequestHandler.VERSION;
     <script type="text/javascript">
       function registerServiceWorker() {
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('/portal/service-worker.js?v=<%=version%>',{
+          navigator.serviceWorker.register('/portal/service-worker.js',{
             scope: '/',
           }).then(function(reg){
-              console.debug('Service worker registered');
-            }).catch(function(e) {
-              console.debug('Error registering service worker!', e);
-            });
+            reg.update();
+          }).catch(function(e) {
+            console.debug('Error registering service worker!', e);
+          });
         } else {
           console.debug("Navigator doesn't support serviceWorker!");
         }
