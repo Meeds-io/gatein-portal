@@ -51,33 +51,35 @@ workbox.routing.registerRoute(
   }),
 );
 
-workbox.routing.registerRoute(
-  new RegExp('.*\\.css($|\\?.*|\\#.*)'),
-  new workbox.strategies.CacheFirst({
-    cacheName: cssCacheName,
-  }),
-);
+if (!development) {
+  workbox.routing.registerRoute(
+    new RegExp('.*\\.js($|\\?.*|\\#.*)'),
+    new workbox.strategies.CacheFirst({
+      cacheName: jsCacheName,
+    }),
+  );
 
-workbox.routing.registerRoute(
-  new RegExp('.*/rest/v1/platform/branding/css.*'),
-  new workbox.strategies.StaleWhileRevalidate({
-    cacheName: cssCacheName,
-  }),
-);
+  workbox.routing.registerRoute(
+    new RegExp('.*/rest/v1/platform/branding/css.*'),
+    new workbox.strategies.StaleWhileRevalidate({
+      cacheName: cssCacheName,
+    }),
+  );
 
-workbox.routing.registerRoute(
-  new RegExp('.*\\.js($|\\?.*|\\#.*)'),
-  new workbox.strategies.CacheFirst({
-    cacheName: jsCacheName,
-  }),
-);
+  workbox.routing.registerRoute(
+    new RegExp('.*\\.css($|\\?.*|\\#.*)'),
+    new workbox.strategies.CacheFirst({
+      cacheName: cssCacheName,
+    }),
+  );
 
-workbox.routing.registerRoute(
-  new RegExp('.*/i18n/bundle/.*\\.json'),
-  new workbox.strategies.CacheFirst({
-    cacheName: bundleCacheName,
-  }),
-);
+  workbox.routing.registerRoute(
+    new RegExp('.*/i18n/bundle/.*\\.json'),
+    new workbox.strategies.CacheFirst({
+      cacheName: bundleCacheName,
+    }),
+  );
+}
 
 workbox.routing.registerRoute(
   new RegExp('.*\\.(?:png|jpg|jpeg|svg|gif|ico)'),
@@ -107,13 +109,6 @@ workbox.routing.registerRoute(
   }),
 );
 
-const cacheableDOM = new workbox.cacheableResponse.CacheableResponse({
-  statuses: [200],
-  headers: {
-    'Content-Type': ['text/html;charset=UTF-8', 'text/html'],
-  },
-});
-
 const handleDOMResponse = (event) => {
   return fetch(event.request)
     .then((response) => {
@@ -140,8 +135,13 @@ const domMatcher = ({url, request, event}) => {
 
 const domHandler = async ({url, request, event, params}) => {
   const response = await fetch(request);
-  let html = await response.text();
+  if (response.status !== 200
+      || !response.headers.has('content-type')
+      || !response.headers.get('content-type').includes('text/html')) {
+    return response;
+  }
 
+  let html = await response.text();
   try {
     const cacheableDOMs = [...html.matchAll(/<v-cacheable-dom-app([ \t\r\n]*)cache-id="(.*)"([ \t\r\n]*)(\/>|>[ \t\r\n]*<\/v-cacheable-dom-app>)/g)];
     if(cacheableDOMs.length) {
