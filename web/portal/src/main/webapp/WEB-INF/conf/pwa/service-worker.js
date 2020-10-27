@@ -51,33 +51,35 @@ workbox.routing.registerRoute(
   }),
 );
 
-workbox.routing.registerRoute(
-  new RegExp('.*\\.css($|\\?.*|\\#.*)'),
-  new workbox.strategies.CacheFirst({
-    cacheName: cssCacheName,
-  }),
-);
+if (!development) {
+  workbox.routing.registerRoute(
+    new RegExp('.*\\.js($|\\?.*|\\#.*)'),
+    new workbox.strategies.CacheFirst({
+      cacheName: jsCacheName,
+    }),
+  );
 
-workbox.routing.registerRoute(
-  new RegExp('.*/rest/v1/platform/branding/css.*'),
-  new workbox.strategies.StaleWhileRevalidate({
-    cacheName: cssCacheName,
-  }),
-);
+  workbox.routing.registerRoute(
+    new RegExp('.*/rest/v1/platform/branding/css.*'),
+    new workbox.strategies.StaleWhileRevalidate({
+      cacheName: cssCacheName,
+    }),
+  );
 
-workbox.routing.registerRoute(
-  new RegExp('.*\\.js($|\\?.*|\\#.*)'),
-  new workbox.strategies.CacheFirst({
-    cacheName: jsCacheName,
-  }),
-);
+  workbox.routing.registerRoute(
+    new RegExp('.*\\.css($|\\?.*|\\#.*)'),
+    new workbox.strategies.CacheFirst({
+      cacheName: cssCacheName,
+    }),
+  );
 
-workbox.routing.registerRoute(
-  new RegExp('.*/i18n/bundle/.*\\.json'),
-  new workbox.strategies.CacheFirst({
-    cacheName: bundleCacheName,
-  }),
-);
+  workbox.routing.registerRoute(
+    new RegExp('.*/i18n/bundle/.*\\.json'),
+    new workbox.strategies.CacheFirst({
+      cacheName: bundleCacheName,
+    }),
+  );
+}
 
 workbox.routing.registerRoute(
   new RegExp('.*\\.(?:png|jpg|jpeg|svg|gif|ico)'),
