@@ -496,7 +496,11 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     }
     appEntity.setDescription(application.getDescription());
     appEntity.setDisplayName(application.getDisplayName());
-    appEntity.setType(application.getType().getName());
+    if(application.getType() != null) {
+      appEntity.setType(application.getType().getName());
+    } else {
+      appEntity.setType(ApplicationType.PORTLET.getName());
+    }
     if (application.getModifiedDate() != null) {
       appEntity.setModifiedDate(application.getModifiedDate().getTime());
     }
