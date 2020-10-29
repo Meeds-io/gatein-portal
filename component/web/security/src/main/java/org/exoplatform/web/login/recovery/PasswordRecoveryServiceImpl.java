@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.exoplatform.container.xml.InitParams;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.wci.security.Credentials;
@@ -57,15 +58,32 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     private final ResourceBundleService bundleService;
     private final RemindPasswordTokenService remindPasswordTokenService;
     private final WebAppController webController;
+    
+    
+    private String changePasswordConnectorName;
+    private Map<String,ChangePasswordConnector> changePasswordConnectorMap;
 
-    public PasswordRecoveryServiceImpl(OrganizationService orgService, MailService mailService, ResourceBundleService bundleService, RemindPasswordTokenService remindPasswordTokenService, WebAppController controller) {
+    public PasswordRecoveryServiceImpl(InitParams initParams, OrganizationService orgService, MailService mailService,
+                                       ResourceBundleService bundleService, RemindPasswordTokenService remindPasswordTokenService, WebAppController controller) {
         this.orgService = orgService;
         this.mailService = mailService;
         this.bundleService = bundleService;
         this.remindPasswordTokenService = remindPasswordTokenService;
         this.webController = controller;
+        this.changePasswordConnectorMap=new HashMap<>();
+        this.changePasswordConnectorName = initParams.getValueParam("changePasswordConnector").getValue();
+    
+    
     }
 
+    @Override
+    public void addConnector(ChangePasswordConnector connector) {
+        if (!this.changePasswordConnectorMap.containsKey(connector.getName())) {
+            changePasswordConnectorMap.put(connector.getName(),connector);
+        }
+    }
+    
+    
     @Override
     public Credentials verifyToken(String tokenId) {
         Token token = remindPasswordTokenService.getToken(tokenId);
@@ -78,10 +96,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     @Override
     public boolean changePass(final String tokenId, final String username, final String password) {
         try {
-            User user = orgService.getUserHandler().findUserByName(username);
-            user.setPassword(password);
-            orgService.getUserHandler().saveUser(user, true);
-
+            this.changePasswordConnectorMap.get(this.changePasswordConnectorName).changePassword(username,password);
             try {
                 remindPasswordTokenService.deleteToken(tokenId);
             } catch (Exception ex) {
