@@ -22,9 +22,12 @@ package org.exoplatform.portal.webui.workspace;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.commons.utils.Safe;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.Constants;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.application.RequestNavigationData;
+import org.exoplatform.portal.branding.BrandingRestResourcesV1;
+import org.exoplatform.portal.branding.BrandingService;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.model.Container;
@@ -577,6 +580,13 @@ public class UIPortalApplication extends UIApplication {
             skins.add(skinConfig);
         }
         return skins;
+    }
+
+    public String getBrandingUrl() {
+      BrandingService brandingService = getApplicationComponent(BrandingService.class);
+      long lastUpdatedTime = brandingService.getLastUpdatedTime();
+      return "/" + PortalContainer.getCurrentPortalContainerName() + "/" + PortalContainer.getCurrentRestContextName()
+          + "/v1/platform/branding/css?v=" + lastUpdatedTime;
     }
 
     private Set<SkinConfig> getPortalPortletSkins() {

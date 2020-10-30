@@ -38,7 +38,7 @@ const cachesWhiteList = [
   manifestCacheName];
 
 workbox.routing.registerRoute(
-  new RegExp('.*manifest.json$'),
+  new RegExp('.*manifest.json.*'),
   new workbox.strategies.CacheFirst({
     cacheName: manifestCacheName,
   }),
@@ -61,7 +61,7 @@ if (!development) {
 
   workbox.routing.registerRoute(
     new RegExp('.*/rest/v1/platform/branding/css.*'),
-    new workbox.strategies.StaleWhileRevalidate({
+    new workbox.strategies.CacheFirst({
       cacheName: cssCacheName,
     }),
   );
@@ -135,9 +135,10 @@ const domMatcher = ({url, request, event}) => {
 
 const domHandler = async ({url, request, event, params}) => {
   const response = await fetch(request);
+  const headers = response.headers;
   if (response.status !== 200
-      || !response.headers.has('content-type')
-      || !response.headers.get('content-type').includes('text/html')) {
+      || !headers.has('content-type')
+      || !headers.get('content-type').includes('text/html')) {
     return response;
   }
 
@@ -161,7 +162,8 @@ const domHandler = async ({url, request, event, params}) => {
     console.error('Error while treating DOM caches of URL', url, e);
   }
   return new Response(html, {
-    headers: {'content-type': 'text/html;charset=UTF-8'},
+    headers: response.headers,
+    status: response.status,
   });
 };
 

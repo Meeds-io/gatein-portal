@@ -7,7 +7,7 @@ def rcontext = _ctx.getRequestContext() ;
 /* Loading Manifest and Service Worker configuration script at top of the head */
 def version = ResourceRequestHandler.VERSION;
 %>
-    <link rel="manifest" href="/portal/manifest.json">
+    <link rel="manifest" href="/portal/manifest.json?v=<%=version%>">
 
     <link rel="apple-touch-icon" href="/digital-workplace/skin/images/eXo.png">
 
@@ -31,40 +31,36 @@ def version = ResourceRequestHandler.VERSION;
 <%
 /* Loading needed Fonts files in top of the page as a 'preload' resource to include it in response when using HTTP/2 */
 %>
-
-<%
-/* Loading needed stylesheets in top of the page as a 'preload' resource to include it in response when using HTTP/2 */
-
-def portalSkins = uicomponent.getPortalSkins();
-def portletSkins = uicomponent.getPortletSkins();
-def customSkins = uicomponent.getCustomSkins();
-%>
-
-  <link id="brandingSkin" rel="preload" as="style" type="text/css" href="/portal/rest/v1/platform/branding/css">
-
   <!-- Fonts Preload -->
   <link rel="preload" href="/eXoSkin/skin/fonts/vuetify/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/eXoSkin/skin/fonts/vuetify/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/eXoSkin/skin/fonts/vuetify/materialdesignicons-webfont.woff2?v=3.9.97" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/eXoSkin/skin/fonts/Ionic/ionicons.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="/eXoSkin/skin/fonts/PLF-FONT-ICONS.ttf?-m9uidt" as="font" type="font/ttf" crossorigin>
-
-<% for (skinConfig in portalSkins) {
+<%
+// Loading needed stylesheets in top of the page as a 'preload' resource to include it in response
+%>
+  <link rel="preload" as="style" type="text/css" href="<%=uicomponent.getBrandingUrl()%>">
+<%
+// Loading needed stylesheets in top of the page as a 'preload' resource to include it in response
+def portalSkins = uicomponent.getPortalSkins();
+def portletSkins = uicomponent.getPortletSkins();
+def customSkins = uicomponent.getCustomSkins();
+   for (skinConfig in portalSkins) {
      def url = skinConfig.createURL(rcontext.controllerContext);
      url.setOrientation(orientation); %>
   <link rel="preload" href= "$url" as="style" type="text/css" />
-<% } %>
-<% for (portletSkin in portletSkins) {
+<% }
+   for (portletSkin in portletSkins) {
      def url = portletSkin.createURL(rcontext.controllerContext);
      url.setOrientation(orientation); %>
   <link rel="preload" href= "$url" as="style" type="text/css" />
-<% } %>
-<% for (customSkin in customSkins) {
+<% }
+   for (customSkin in customSkins) {
      def url = customSkin.createURL(rcontext.controllerContext);
      url.setOrientation(orientation); %>
   <link rel="preload" href= "$url" as="style" type="text/css" />
-<% } %>
-<%
+<% }
 def jsManager = rcontext.getJavascriptManager();
 
 def jsConfig = uicomponent.getJSConfig();
@@ -82,8 +78,5 @@ for (scriptsId in scriptsIds) {
 for (scriptPath in scriptPaths.keySet()) {
   def isRemote = scriptPaths.get(scriptPath);
 %>
-  <!-- $scriptPath -->
   <link rel="preload" href= "$scriptPath" as="script" type="text/javascript" <%=isRemote ? "crossorigin" : "" %>/>
-<%
-}
-%>
+<% } %>
