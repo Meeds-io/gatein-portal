@@ -15,6 +15,8 @@ public class Branding implements Serializable {
 
   private Map<String, String> themeColors      = new HashMap<>();
 
+  private long                lastUpdatedTime;
+
   public Branding() {
   }
 
@@ -48,6 +50,14 @@ public class Branding implements Serializable {
 
   public void setThemeColors(Map<String, String> themeColors) {
     this.themeColors = themeColors;
+  }
+
+  public long getLastUpdatedTime() {
+    return lastUpdatedTime;
+  }
+
+  public void setLastUpdatedTime(long lastUpdatedTime) {
+    this.lastUpdatedTime = lastUpdatedTime;
   }
 
   @Override

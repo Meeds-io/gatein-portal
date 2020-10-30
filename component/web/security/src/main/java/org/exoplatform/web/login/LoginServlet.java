@@ -198,7 +198,7 @@ public class LoginServlet extends AbstractHttpServlet {
                     }
 
                     // Handle remember me
-                    String rememberme = req.getParameter("rememberme");
+                    String rememberme = req.getParameter(COOKIE_NAME);
                     if ("true".equals(rememberme)) {
                         // Create token for credentials
                         CookieTokenService tokenService = AbstractTokenService.getInstance(CookieTokenService.class);
@@ -208,7 +208,7 @@ public class LoginServlet extends AbstractHttpServlet {
                                     + " for it and set it up " + "in the next response");
                         }
                         Cookie cookie = new Cookie(COOKIE_NAME, cookieToken);
-                        cookie.setPath(req.getContextPath());
+                        cookie.setPath("/");
                         cookie.setHttpOnly(true);
                         cookie.setMaxAge((int) tokenService.getValidityTime());
                         resp.addCookie(cookie);
@@ -220,7 +220,7 @@ public class LoginServlet extends AbstractHttpServlet {
                             CookieTokenService tokenService = AbstractTokenService.getInstance(CookieTokenService.class);
                             String cookieToken = tokenService.createToken(credentials);
                             Cookie cookie = new Cookie(OAUTH_COOKIE_NAME, cookieToken);
-                            cookie.setPath(req.getContextPath());
+                            cookie.setPath("/");
                             cookie.setMaxAge((int) tokenService.getValidityTime());
                             resp.addCookie(cookie);
 

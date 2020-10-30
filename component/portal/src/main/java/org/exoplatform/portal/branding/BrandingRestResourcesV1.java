@@ -36,8 +36,8 @@ import io.swagger.annotations.*;
 public class BrandingRestResourcesV1 implements ResourceContainer {
   private static final Log LOG = ExoLogger.getLogger(BrandingRestResourcesV1.class);
 
-  // 3 days
-  private static final int CACHE_IN_MILLI_SECONDS = 3 * 86400 * 1000;
+  // 1 year
+  private static final int CACHE_IN_MILLI_SECONDS = 365 * 86400 * 1000;
 
   private BrandingService brandingService;
 
@@ -136,9 +136,33 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
       @ApiResponse(code = 304, message = "Branding css not modified"),
       @ApiResponse(code = 500, message = "Server error when retrieving branding css")
   })
-  public Response getBrandingCSS(@Context Request request) {
-    String themeCSS = brandingService.getThemeCSSContent();
-    return Response.ok(themeCSS, "text/css").build();
+  public Response getBrandingCSS(@Context Request request,
+                                 @ApiParam(value = "The value of lastModified parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'") @QueryParam("v") String lastModified) {
+    //
+    long lastUpdated = brandingService.getLastUpdatedTime();
+    EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
+
+    //
+    Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
+    if (builder == null) {
+      String themeCSS = brandingService.getThemeCSSContent();
+      builder = Response.ok(themeCSS, "text/css");
+      builder.tag(eTag);
+    }
+    CacheControl cc = new CacheControl();
+    cc.setMaxAge(86400);
+    builder.type("text/css");
+    builder.tag(eTag);
+    builder.lastModified(new Date(lastUpdated));
+    if (StringUtils.isNotBlank(lastModified)) {
+      builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
+    }
+    // If the query has a lastModified parameter, it means that the client
+    // will change the lastModified entry when it really changes
+    // Which means that we can cache the image in browser side
+    // for a long time
+    builder.cacheControl(cc);
+    return builder.cacheControl(cc).build();
   }
 
   @GET

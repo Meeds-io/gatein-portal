@@ -191,9 +191,26 @@ public class JavascriptManager {
      public Map<String, Boolean> getPageScripts() {
         JavascriptConfigService service = getJavascriptConfigService();
         FetchMap<ResourceId> pageResourceIds = new FetchMap<>();
+
+        Set<ResourceId> permanentResources = resourceIds.keySet();
+        for (ResourceId resourceId : permanentResources) {
+          pageResourceIds.add(resourceId);
+        }
+
+        Map<String, Boolean> result = new LinkedHashMap<>();
+
         Set<String> noAlias = requireJS.getNoAlias();
-        for (String module : noAlias) {
-          String[] moduleParts = StringUtils.split(module, "/");
+        for (String moduleId : noAlias) {
+          String[] moduleParts = StringUtils.split(moduleId, "/");
+          ResourceId resourceId = new ResourceId(ResourceScope.valueOf(moduleParts[0]),
+                                                 StringUtils.join(moduleParts, "/", 1, moduleParts.length));
+          pageResourceIds.add(resourceId);
+        }
+
+        Set<String> modulesWithAlias = requireJS.getDepends().keySet();
+        for (String moduleAlias : modulesWithAlias) {
+          String moduleId = requireJS.getDepends().get(moduleAlias);
+          String[] moduleParts = StringUtils.split(moduleId, "/");
           ResourceId resourceId = new ResourceId(ResourceScope.valueOf(moduleParts[0]),
                                                  StringUtils.join(moduleParts, "/", 1, moduleParts.length));
           pageResourceIds.add(resourceId);
@@ -201,7 +218,6 @@ public class JavascriptManager {
 
         Map<ScriptResource, FetchMode> resolvedPageResources = service.resolveIds(pageResourceIds);
 
-        Map<String, Boolean> result = new LinkedHashMap<>();
         for (ScriptResource rs : resolvedPageResources.keySet()) {
           ResourceId id = rs.getId();
           Set<ResourceId> dependencies = service.getResource(id).getClosure();
