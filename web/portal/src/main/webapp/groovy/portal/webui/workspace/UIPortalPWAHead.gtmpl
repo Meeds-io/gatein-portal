@@ -4,11 +4,8 @@ import org.gatein.portal.controller.resource.ResourceRequestHandler;
 
 def rcontext = _ctx.getRequestContext() ;
 
-/* Loading Manifest and Service Worker configuration script at top of the head */
-def version = ResourceRequestHandler.VERSION;
+/* Loading Service Worker configuration script at top of the head */
 %>
-    <link rel="manifest" href="/portal/manifest.json?v=<%=version%>">
-
     <link rel="apple-touch-icon" href="/digital-workplace/skin/images/eXo.png">
 
     <script type="text/javascript">

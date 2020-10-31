@@ -22,7 +22,6 @@ const cssCacheName = `${cachePrefix}-css-${assetsVersion}`;
 const jsCacheName = `${cachePrefix}-js-${assetsVersion}`;
 const fontCacheName = `${cachePrefix}-font-${assetsVersion}`;
 const bundleCacheName = `${cachePrefix}-bundle-${assetsVersion}`;
-const manifestCacheName = `${cachePrefix}-manifest-${assetsVersion}`;
 
 const imageCacheName = `${cachePrefix}-image`;
 const domCacheName = `${cachePrefix}-dom`;
@@ -34,15 +33,7 @@ const cachesWhiteList = [
   cssCacheName,
   jsCacheName,
   fontCacheName,
-  bundleCacheName,
-  manifestCacheName];
-
-workbox.routing.registerRoute(
-  new RegExp('.*manifest.json.*'),
-  new workbox.strategies.CacheFirst({
-    cacheName: manifestCacheName,
-  }),
-);
+  bundleCacheName];
 
 workbox.routing.registerRoute(
   new RegExp('.*\\.(ttf|woff|woff2|otf|otf|ttc)($|\\?.*|\\#.*)'),

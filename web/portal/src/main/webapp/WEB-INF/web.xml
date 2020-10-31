@@ -263,11 +263,6 @@
     <servlet-class>org.exoplatform.web.pwa.ServiceWorkerServlet</servlet-class>
   </servlet>
 
-  <servlet>
-    <servlet-name>ManifestServlet</servlet-name>
-    <servlet-class>org.exoplatform.web.pwa.ManifestServlet</servlet-class>
-  </servlet>
-
   <!--  =================================================================  -->
 
   <servlet-mapping>
@@ -277,11 +272,6 @@
   <servlet-mapping>
     <servlet-name>LoginServlet</servlet-name>
     <url-pattern>/dologin</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>ManifestServlet</servlet-name>
-    <url-pattern>/manifest.json</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
