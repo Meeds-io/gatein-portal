@@ -112,9 +112,6 @@ export default {
     // eslint-disable-next-line no-magic-numbers
     window.setTimeout(this.retrieveAdministrationMenu, 1000);
   },
-  mounted() {
-    document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
-  },
   methods: {
     retrieveAdministrationMenu() {
       if (this.navigations.length) {
