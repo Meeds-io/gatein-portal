@@ -155,27 +155,25 @@ public class EntityManagerService implements ComponentRequestLifecycle {
 
   void closeEntityManager() {
     EntityManager em = getEntityManager();
-    EntityTransaction tx = null;
-    try {
-      tx = em.getTransaction();
-      if (tx.isActive()) {
-        tx.commit();
-      }
-    } catch (RuntimeException ex) {
+    if (em != null) {
+      EntityTransaction tx = null;
       try {
-        if (tx != null && tx.isActive()) {
-          tx.rollback();
+        tx = em.getTransaction();
+        if (tx.isActive()) {
+          // Rollback transaction when it's marked as RollbackOnly
+          if (tx.getRollbackOnly()) {
+            tx.rollback();
+          } else {
+            tx.commit();
+          }
         }
-      } catch (RuntimeException rbEx) {
-        LOGGER.error("Could not roll back transaction", rbEx);
-      }
-      throw ex;
-    } finally {
-      em.close();
-      instance.set(null);
+      } finally {
+        instance.remove();
+        em.close();
 
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Ended a request lifecycle of {} component service", EntityManagerService.class.getName());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Ended a request lifecycle of {} component service", EntityManagerService.class.getName());
+        }
       }
     }
   }

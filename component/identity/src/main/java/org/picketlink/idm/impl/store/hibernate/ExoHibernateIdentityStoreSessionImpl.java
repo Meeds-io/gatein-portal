@@ -1,6 +1,7 @@
 package org.picketlink.idm.impl.store.hibernate;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.spi.store.IdentityStoreSession;
 
@@ -147,7 +148,12 @@ public class ExoHibernateIdentityStoreSessionImpl implements IdentityStoreSessio
       log.log(Level.FINER, "Going to start Hibernate transaction");
     }
 
-    sessionFactory.getCurrentSession().getTransaction().begin();
+    Transaction transaction = sessionFactory.getCurrentSession().getTransaction();
+    // Start a new transaction only no currently active one,
+    // Else, we will have a "nested transaction not supported" exception
+    if (!transaction.isActive()) {
+      transaction.begin();
+    }
   }
 
   private void commitHibernateTransaction() {
