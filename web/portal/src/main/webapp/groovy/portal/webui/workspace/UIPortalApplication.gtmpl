@@ -61,6 +61,8 @@
     <!-- Metadatas -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="theme-color" content="#578dc9"/>
+
     <% if (portal.viewport != null) { %>
       <meta name="viewport" content = "${portal.viewport}"/>
     <% } %>
@@ -73,10 +75,12 @@
     <%   } %>
     <% } %>
 
+    <% _ctx.includeTemplates("UIPortalApplication-Start-head") %>
+
     <link rel="shortcut icon" type="image/x-icon"  href="<%=docBase%>/favicon.ico" />
 
     <!-- Styles -->
-    <link id="brandingSkin" rel="stylesheet" type="text/css" href="/rest/v1/platform/branding/css">
+    <link id="brandingSkin" rel="stylesheet" type="text/css" href="<%=uicomponent.getBrandingUrl()%>">
     <% for (skinConfig in portalSkins) {
          def url = skinConfig.createURL(rcontext.controllerContext);
          url.setOrientation(orientation); %>
@@ -97,9 +101,11 @@
     <script type="text/javascript">
       var require = <%=jsConfig%>;
     </script>
+
     <% for (url in headerScripts) { %>
       <script type="text/javascript" src="<%= url %>"></script>
     <% } %>
+
    <script type="text/javascript">
      eXo.env.addLoadedRemoteScripts(<%=remoteScripts%>);
      <% if (org.exoplatform.commons.utils.PropertyManager.isDevelopping()) { %>

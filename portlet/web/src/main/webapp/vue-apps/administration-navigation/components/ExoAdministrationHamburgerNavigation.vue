@@ -108,18 +108,24 @@ export default {
     },
   },
   created() {
-    fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/navigations/group?exclude=/spaces.*&${this.visibilityQueryParams}`, {
-      method: 'GET',
-      credentials: 'include',
-    })
-      .then(resp => resp && resp.ok && resp.json())
-      .then(data => this.navigations = data || [])
-      .finally(() => {
-        document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
-      });
+    // Differ retrieving data from server
+    // eslint-disable-next-line no-magic-numbers
+    window.setTimeout(this.retrieveAdministrationMenu, 1000);
   },
   methods: {
+    retrieveAdministrationMenu() {
+      if (this.navigations.length) {
+        return;
+      }
+      return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/navigations/group?exclude=/spaces.*&${this.visibilityQueryParams}`, {
+        method: 'GET',
+        credentials: 'include',
+      })
+        .then(resp => resp && resp.ok && resp.json())
+        .then(data => this.navigations = data || []);
+    },
     mountSecondLevel(parentId) {
+      this.retrieveAdministrationMenu();
       const VueHamburgerMenuItem = Vue.extend({
         data: () => {
           return {

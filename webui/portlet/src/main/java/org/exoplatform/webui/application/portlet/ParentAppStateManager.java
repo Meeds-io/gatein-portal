@@ -37,7 +37,10 @@ public class ParentAppStateManager extends StateManager {
 
     @SuppressWarnings("unused")
     public void storeUIRootComponent(WebuiRequestContext context) throws Exception {
-        WebuiRequestContext pcontext = (WebuiRequestContext) context.getParentAppRequestContext();
+        WebuiRequestContext pcontext = context;
+        while (pcontext.getParentAppRequestContext() != null) {
+          pcontext = (WebuiRequestContext) context.getParentAppRequestContext();
+        }
         pcontext.getStateManager().storeUIRootComponent(context);
     }
 

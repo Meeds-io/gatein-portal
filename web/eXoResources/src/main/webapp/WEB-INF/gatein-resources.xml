@@ -62,6 +62,7 @@
   <!-- Base Javascripts for anonymous mode -->
   <module>
     <name>topbarLoading</name>
+    <load-group>baseGRP</load-group>
     <script>
       <path>/javascript/eXo/core/TopbarLoading.js</path>
     </script>
@@ -901,6 +902,7 @@
 
   <module>
     <name>bodyScrollListener</name>
+    <load-group>baseGRP</load-group>
     <script>
       <path>/javascript/eXo/portal/BodyScrollListener.js</path>
     </script>
