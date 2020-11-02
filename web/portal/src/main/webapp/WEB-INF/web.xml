@@ -257,7 +257,12 @@
     <servlet-class>org.gatein.wci.api.GateInServlet</servlet-class>
     <load-on-startup>0</load-on-startup>
   </servlet>
-  
+
+  <servlet>
+    <servlet-name>ServiceWorkerServlet</servlet-name>
+    <servlet-class>org.exoplatform.web.pwa.ServiceWorkerServlet</servlet-class>
+  </servlet>
+
   <!--  =================================================================  -->
 
   <servlet-mapping>
@@ -267,6 +272,11 @@
   <servlet-mapping>
     <servlet-name>LoginServlet</servlet-name>
     <url-pattern>/dologin</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>ServiceWorkerServlet</servlet-name>
+    <url-pattern>/service-worker.js</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

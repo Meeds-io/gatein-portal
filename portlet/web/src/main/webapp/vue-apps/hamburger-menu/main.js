@@ -26,6 +26,9 @@ export function init() {
     .then(i18n => {
       // init Vue app when locale ressources are ready
       new Vue({
+        mounted() {
+          document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+        },
         template: '<exo-hamburger-menu-navigation></exo-hamburger-menu-navigation>',
         i18n,
         vuetify,

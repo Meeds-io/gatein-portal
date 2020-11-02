@@ -63,6 +63,8 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   public static final String   BRANDING_LOGO_ID_SETTING_KEY      = "exo.branding.company.id";
 
+  public static final String   BRANDING_LAST_UPDATED_TIME_KEY    = "branding.lastUpdatedTime";
+
   public static final String   FILE_API_NAME_SPACE               = "CompanyBranding";
 
   public static final String   LOGO_NAME                         = "logo.png";
@@ -73,7 +75,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   public static final Scope    BRANDING_SCOPE                    = Scope.APPLICATION.id("BRANDING");
 
-  public static final long     DEFAULT_LOGO_LAST_MODIFED         = System.currentTimeMillis();
+  public static final long     DEFAULT_LAST_MODIFED              = System.currentTimeMillis();
 
   private SettingService       settingService;
 
@@ -128,44 +130,6 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   }
 
   /**
-   * Load init params
-   * 
-   * @param initParams
-   * @throws Exception
-   */
-  private void loadInitParams(InitParams initParams) {
-    if (initParams != null) {
-      ValueParam companyNameParam = initParams.getValueParam(BRANDING_COMPANY_NAME_INIT_PARAM);
-      if (companyNameParam != null) {
-        this.defaultCompanyName = companyNameParam.getValue();
-      }
-
-      ValueParam logoParam = initParams.getValueParam(BRANDING_LOGO_INIT_PARAM);
-      if (logoParam != null) {
-        this.defaultConfiguredLogoPath = logoParam.getValue();
-      }
-
-      ValueParam lessFileParam = initParams.getValueParam(BRANDING_THEME_LESS_PATH);
-      if (lessFileParam != null) {
-        this.lessFilePath = lessFileParam.getValue();
-      }
-
-      ValuesParam lessVariablesParam = initParams.getValuesParam(BRANDING_THEME_VARIABLES);
-      if (lessVariablesParam != null) {
-        List<String> variables = lessVariablesParam.getValues();
-        this.themeVariables = new HashMap<>();
-        for (String themeVariable : variables) {
-          if (StringUtils.isBlank(themeVariable) || !themeVariable.contains(":")) {
-            continue;
-          }
-          String[] themeVariablesPart = themeVariable.split(":");
-          this.themeVariables.put(themeVariablesPart[0], themeVariablesPart[1]);
-        }
-      }
-    }
-  }
-
-  /**
    * Get all the branding information
    * 
    * @return The branding object containing all information
@@ -177,21 +141,29 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     branding.setTopBarTheme(getTopBarTheme());
     branding.setLogo(getLogo());
     branding.setThemeColors(getThemeColors());
+    branding.setLastUpdatedTime(getLastUpdatedTime());
     return branding;
   }
 
-  /**
-   * Update the branding information Missing information in the branding object
-   * are not updated.
-   * 
-   * @param branding The new branding information
-   */
+  @Override
+  public long getLastUpdatedTime() {
+    SettingValue<?> lastUpdatedTime = settingService.get(Context.GLOBAL, Scope.GLOBAL, BRANDING_LAST_UPDATED_TIME_KEY);
+    if (lastUpdatedTime == null || lastUpdatedTime.getValue() == null) {
+      return DEFAULT_LAST_MODIFED;
+    }
+    return Long.parseLong(lastUpdatedTime.getValue().toString());
+  }
+
   @Override
   public void updateBrandingInformation(Branding branding) {
-    updateCompanyName(branding.getCompanyName());
-    updateTopBarTheme(branding.getTopBarTheme());
-    updateLogo(branding.getLogo());
-    updateThemeColors(branding.getThemeColors());
+    try {
+      updateCompanyName(branding.getCompanyName(), false);
+      updateTopBarTheme(branding.getTopBarTheme(), false);
+      updateLogo(branding.getLogo(), false);
+      updateThemeColors(branding.getThemeColors(), false);
+    } finally {
+      updateLastUpdatedTime(System.currentTimeMillis());
+    }
   }
 
   @Override
@@ -208,11 +180,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   @Override
   public void updateCompanyName(String companyName) {
-    if (StringUtils.isEmpty(companyName)) {
-      settingService.remove(Context.GLOBAL, Scope.GLOBAL, BRANDING_COMPANY_NAME_SETTING_KEY);
-    } else {
-      settingService.set(Context.GLOBAL, Scope.GLOBAL, BRANDING_COMPANY_NAME_SETTING_KEY, SettingValue.create(companyName));
-    }
+    updateCompanyName(companyName, true);
   }
 
   @Override
@@ -277,7 +245,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
           InputStream is = PortalContainer.getInstance().getPortalContext().getResourceAsStream(logoPath);
           if (is != null) {
             byte[] streamContentAsBytes = IOUtil.getStreamContentAsBytes(is);
-            this.logo = new Logo(null, streamContentAsBytes, streamContentAsBytes.length, DEFAULT_LOGO_LAST_MODIFED);
+            this.logo = new Logo(null, streamContentAsBytes, streamContentAsBytes.length, DEFAULT_LAST_MODIFED);
           }
         }
       } catch (Exception e) {
@@ -289,22 +257,130 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   @Override
   public void updateTopBarTheme(String topBarTheme) {
+    updateTopBarTheme(topBarTheme, true);
+  }
+
+  @Override
+  public void updateLastUpdatedTime(long lastUpdatedTimestamp) {
+    if (lastUpdatedTimestamp <= 0) {
+      settingService.remove(Context.GLOBAL, Scope.GLOBAL, BRANDING_LAST_UPDATED_TIME_KEY);
+    } else {
+      settingService.set(Context.GLOBAL, Scope.GLOBAL, BRANDING_LAST_UPDATED_TIME_KEY, SettingValue.create(lastUpdatedTimestamp));
+    }
+  }
+
+  @Override
+  public void updateLogo(Logo logo) {
+    updateLogo(logo, true);
+  }
+
+  @Override
+  public void updateThemeColors(Map<String, String> themeColors) {
+    updateThemeColors(themeColors, true);
+  }
+
+  @Override
+  public Map<String, String> getThemeColors() {
+    if (themeVariables == null || themeVariables.isEmpty()) {
+      return Collections.emptyMap();
+    }
+
+    Map<String, String> themeColors = new HashMap<>();
+    Set<String> variables = themeVariables.keySet();
+    for (String themeVariable : variables) {
+      SettingValue<?> storedColorValue = settingService.get(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable);
+      String colorValue = storedColorValue == null
+          || storedColorValue.getValue() == null ? themeVariables.get(themeVariable) : storedColorValue.getValue().toString();
+      if (StringUtils.isNotBlank(colorValue)) {
+        themeColors.put(themeVariable, colorValue);
+      }
+    }
+    return themeColors;
+  }
+
+  /**
+   * Load init params
+   * 
+   * @param initParams
+   * @throws Exception
+   */
+  private void loadInitParams(InitParams initParams) {
+    if (initParams != null) {
+      ValueParam companyNameParam = initParams.getValueParam(BRANDING_COMPANY_NAME_INIT_PARAM);
+      if (companyNameParam != null) {
+        this.defaultCompanyName = companyNameParam.getValue();
+      }
+
+      ValueParam logoParam = initParams.getValueParam(BRANDING_LOGO_INIT_PARAM);
+      if (logoParam != null) {
+        this.defaultConfiguredLogoPath = logoParam.getValue();
+      }
+
+      ValueParam lessFileParam = initParams.getValueParam(BRANDING_THEME_LESS_PATH);
+      if (lessFileParam != null) {
+        this.lessFilePath = lessFileParam.getValue();
+      }
+
+      ValuesParam lessVariablesParam = initParams.getValuesParam(BRANDING_THEME_VARIABLES);
+      if (lessVariablesParam != null) {
+        List<String> variables = lessVariablesParam.getValues();
+        this.themeVariables = new HashMap<>();
+        for (String themeVariable : variables) {
+          if (StringUtils.isBlank(themeVariable) || !themeVariable.contains(":")) {
+            continue;
+          }
+          String[] themeVariablesPart = themeVariable.split(":");
+          this.themeVariables.put(themeVariablesPart[0], themeVariablesPart[1]);
+        }
+      }
+    }
+  }
+
+  private void updateTopBarTheme(String topBarTheme, boolean updateLastUpdatedTime) {
     if (StringUtils.isBlank(topBarTheme)) {
       settingService.remove(Context.GLOBAL, Scope.GLOBAL, BRANDING_TOPBAR_THEME_SETTING_KEY);
     } else {
       settingService.set(Context.GLOBAL, Scope.GLOBAL, BRANDING_TOPBAR_THEME_SETTING_KEY, SettingValue.create(topBarTheme));
     }
+    if (updateLastUpdatedTime) {
+      updateLastUpdatedTime(System.currentTimeMillis());
+    }
   }
 
-  /**
-   * Update branding logo. If the logo object contains the image data, they are
-   * used, otherwise if the uploadId exists it is used to retrieve the uploaded
-   * resource. If there is no data, nor uploadId, the logo is deleted.
-   * 
-   * @param logo The logo object
-   */
-  @Override
-  public void updateLogo(Logo logo) {
+  private void updateCompanyName(String companyName, boolean updateLastUpdatedTime) {
+    if (StringUtils.isEmpty(companyName)) {
+      settingService.remove(Context.GLOBAL, Scope.GLOBAL, BRANDING_COMPANY_NAME_SETTING_KEY);
+    } else {
+      settingService.set(Context.GLOBAL, Scope.GLOBAL, BRANDING_COMPANY_NAME_SETTING_KEY, SettingValue.create(companyName));
+    }
+    if (updateLastUpdatedTime) {
+      updateLastUpdatedTime(System.currentTimeMillis());
+    }
+  }
+
+  private void updateThemeColors(Map<String, String> themeColors, boolean updateLastUpdatedTime) {
+    if (themeVariables == null || themeVariables.isEmpty()) {
+      return;
+    }
+
+    Set<String> variables = themeVariables.keySet();
+    for (String themeVariable : variables) {
+      if (themeColors != null && themeColors.get(themeVariable) != null) {
+        String themeColor = themeColors.get(themeVariable);
+        settingService.set(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable, SettingValue.create(themeColor));
+      } else {
+        settingService.remove(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable);
+      }
+    }
+
+    // Refresh Theme
+    computeThemeCSS();
+    if (updateLastUpdatedTime) {
+      updateLastUpdatedTime(System.currentTimeMillis());
+    }
+  }
+
+  private void updateLogo(Logo logo, boolean updateLastUpdatedTime) {
     this.logo = null;
     if (logo == null || ((logo.getData() == null || logo.getData().length <= 0) && StringUtils.isBlank(logo.getUploadId()))) {
       Long logoId = this.getLogoId();
@@ -356,43 +432,9 @@ public class BrandingServiceImpl implements BrandingService, Startable {
         throw new IllegalStateException("Error while updating logo", e);
       }
     }
-  }
-
-  private Map<String, String> getThemeColors() {
-    if (themeVariables == null || themeVariables.isEmpty()) {
-      return Collections.emptyMap();
+    if (updateLastUpdatedTime) {
+      updateLastUpdatedTime(System.currentTimeMillis());
     }
-
-    Map<String, String> themeColors = new HashMap<>();
-    Set<String> variables = themeVariables.keySet();
-    for (String themeVariable : variables) {
-      SettingValue<?> storedColorValue = settingService.get(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable);
-      String colorValue = storedColorValue == null
-          || storedColorValue.getValue() == null ? themeVariables.get(themeVariable) : storedColorValue.getValue().toString();
-      if (StringUtils.isNotBlank(colorValue)) {
-        themeColors.put(themeVariable, colorValue);
-      }
-    }
-    return themeColors;
-  }
-
-  private void updateThemeColors(Map<String, String> themeColors) {
-    if (themeVariables == null || themeVariables.isEmpty()) {
-      return;
-    }
-
-    Set<String> variables = themeVariables.keySet();
-    for (String themeVariable : variables) {
-      if (themeColors != null && themeColors.get(themeVariable) != null) {
-        String themeColor = themeColors.get(themeVariable);
-        settingService.set(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable, SettingValue.create(themeColor));
-      } else {
-        settingService.remove(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable);
-      }
-    }
-
-    // Refresh Theme
-    computeThemeCSS();
   }
 
   private String computeThemeCSS() {

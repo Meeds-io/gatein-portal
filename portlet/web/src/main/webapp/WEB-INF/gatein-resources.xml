@@ -54,6 +54,9 @@
         <as>$</as>
       </depends>
       <depends>
+        <module>HamburgerMenu</module>
+      </depends>
+      <depends>
         <module>extensionRegistry</module>
       </depends>
     </module>
@@ -81,6 +84,9 @@
       <depends>
         <module>jquery</module>
         <as>$</as>
+      </depends>
+      <depends>
+        <module>HamburgerMenu</module>
       </depends>
       <depends>
         <module>extensionRegistry</module>

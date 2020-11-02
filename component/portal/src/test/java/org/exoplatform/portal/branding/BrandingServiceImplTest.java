@@ -241,7 +241,7 @@ public class BrandingServiceImplTest {
     brandingService.updateBrandingInformation(newBranding);
 
     // Then
-    verify(settingService, times(4)).set(settingContext.capture(), settingScope.capture(), settingKey.capture(), settingValue.capture());
+    verify(settingService, times(5)).set(settingContext.capture(), settingScope.capture(), settingKey.capture(), settingValue.capture());
     verify(settingService, times(1)).remove(eq(BrandingServiceImpl.BRANDING_CONTEXT), eq(BrandingServiceImpl.BRANDING_SCOPE), eq("secondaryColor"));
     verify(settingService, times(1)).remove(eq(BrandingServiceImpl.BRANDING_CONTEXT), eq(BrandingServiceImpl.BRANDING_SCOPE), eq("secondaryBackground"));
 
@@ -314,7 +314,7 @@ public class BrandingServiceImplTest {
     brandingService.updateBrandingInformation(newBranding);
 
     // Then
-    verify(settingService, times(1)).set(settingContextArgumentCaptor.capture(), settingScopeArgumentCaptor.capture(), settingKeyArgumentCaptor.capture(), settingValueArgumentCaptor.capture());
+    verify(settingService, times(2)).set(settingContextArgumentCaptor.capture(), settingScopeArgumentCaptor.capture(), settingKeyArgumentCaptor.capture(), settingValueArgumentCaptor.capture());
     verify(fileService, times(1)).writeFile(fileItemArgumentCaptor.capture());
     List<Context> contexts = settingContextArgumentCaptor.getAllValues();
     List<Scope> scopes = settingScopeArgumentCaptor.getAllValues();
@@ -370,7 +370,7 @@ public class BrandingServiceImplTest {
     brandingService.updateBrandingInformation(newBranding);
 
     // Then
-    verify(settingService, times(1)).set(settingContextArgumentCaptor.capture(), settingScopeArgumentCaptor.capture(), settingKeyArgumentCaptor.capture(), settingValueArgumentCaptor.capture());
+    verify(settingService, times(2)).set(settingContextArgumentCaptor.capture(), settingScopeArgumentCaptor.capture(), settingKeyArgumentCaptor.capture(), settingValueArgumentCaptor.capture());
     verify(fileService, times(1)).writeFile(fileItemArgumentCaptor.capture());
     List<Context> contexts = settingContextArgumentCaptor.getAllValues();
     List<Scope> scopes = settingScopeArgumentCaptor.getAllValues();
