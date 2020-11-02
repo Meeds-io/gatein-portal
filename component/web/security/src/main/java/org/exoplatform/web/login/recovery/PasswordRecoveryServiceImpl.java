@@ -34,6 +34,7 @@ import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.commons.utils.MailUtils;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.Constants;
+import org.exoplatform.portal.branding.BrandingService;
 import org.exoplatform.services.mail.MailService;
 import org.exoplatform.services.mail.Message;
 import org.exoplatform.services.organization.*;
@@ -56,14 +57,16 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     private final MailService mailService;
     private final ResourceBundleService bundleService;
     private final RemindPasswordTokenService remindPasswordTokenService;
+    private final BrandingService brandingService;
     private final WebAppController webController;
 
-    public PasswordRecoveryServiceImpl(OrganizationService orgService, MailService mailService, ResourceBundleService bundleService, RemindPasswordTokenService remindPasswordTokenService, WebAppController controller) {
+    public PasswordRecoveryServiceImpl(OrganizationService orgService, MailService mailService, ResourceBundleService bundleService, RemindPasswordTokenService remindPasswordTokenService, WebAppController controller, BrandingService brandingService) {
         this.orgService = orgService;
         this.mailService = mailService;
         this.bundleService = bundleService;
         this.remindPasswordTokenService = remindPasswordTokenService;
         this.webController = controller;
+        this.brandingService = brandingService;
     }
 
     @Override
@@ -94,6 +97,64 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
             return false;
         }
     }
+    
+    @Override
+    public boolean sendOnboardingEmail(User user, Locale defaultLocale, StringBuilder url) {
+        if (user == null) {
+            throw new IllegalArgumentException("User or Locale must not be null");
+        }
+
+        Locale locale = getLocaleOfUser(user.getUserName(), defaultLocale);
+
+        ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
+
+        Credentials credentials = new Credentials(user.getUserName(), "");
+        String tokenId = remindPasswordTokenService.createToken(credentials);
+
+        url.append("/on-boarding");
+        url.append("?lang=" + I18N.toTagIdentifier(locale));
+        url.append("?token=" + tokenId);
+        String emailBody = buildOnboardingEmailBody(user, bundle, url.toString());
+        String emailSubject = bundle.getString("onboarding.email.header") + " " + brandingService.getCompanyName();
+
+        String senderName = MailUtils.getSenderName();
+        String from = MailUtils.getSenderEmail();
+        if (senderName != null && !senderName.trim().isEmpty()) {
+            from = senderName + " <" + from + ">";
+        }
+
+        Message message = new Message();
+        message.setFrom(from);
+        message.setTo(user.getEmail());
+        message.setSubject(emailSubject);
+        message.setBody(emailBody);
+        message.setMimeType("text/html");
+
+        try {
+            mailService.sendMessage(message);
+        } catch (Exception ex) {
+            log.error("Failure to send onboarding email", ex);
+            return false;
+        }
+
+        return true;
+    }
+    
+    private String buildOnboardingEmailBody(User user, ResourceBundle bundle, String link) {
+      String content;
+      InputStream input = this.getClass().getClassLoader().getResourceAsStream("conf/onBoarding_email_template.html");
+      if (input == null) {
+          content = "";
+      } else {
+          content = resolveLanguage(input, bundle);
+      }
+
+      content = content.replaceAll("\\$\\{USER_DISPLAY_NAME\\}", user.getDisplayName());
+      content = content.replaceAll("\\$\\{COMPANY_NAME\\}", brandingService.getCompanyName());
+      content = content.replaceAll("\\$\\{RESET_PASSWORD_LINK\\}", link);
+
+      return content;
+  }
 
     @Override
     public boolean sendRecoverPasswordEmail(User user, Locale defaultLocale, HttpServletRequest req) {
@@ -124,7 +185,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         url.append(container.getPortalContext().getContextPath());
         url.append(router.render(params));
 
-        String emailBody = buildEmailBody(user, bundle, url.toString());
+        String emailBody = buildRecoverEmailBody(user, bundle, url.toString());
         String emailSubject = getEmailSubject(user, bundle);
 
         String senderName = MailUtils.getSenderName();
@@ -161,7 +222,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         }
     }
 
-    private String buildEmailBody(User user, ResourceBundle bundle, String link) {
+    private String buildRecoverEmailBody(User user, ResourceBundle bundle, String link) {
         String content;
         InputStream input = this.getClass().getClassLoader().getResourceAsStream("conf/forgot_password_email_template.html");
         if (input == null) {
