@@ -10,8 +10,6 @@
         <description>PWA configuration properties</description>
         <property name="pwa.service.worker.enabled" value="${pwa.service.worker.enabled:true}" />
         <property name="pwa.service.worker.path" value="${pwa.service.worker.path:war:/conf/pwa/service-worker.js}" />
-        <property name="pwa.manifest.enabled" value="${pwa.manifest.enabled:true}" />
-        <property name="pwa.manifest.path" value="${pwa.manifest.path:war:/conf/pwa/manifest.json}" />
       </properties-param>
     </init-params>
   </component>
