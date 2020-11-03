@@ -37,7 +37,7 @@ export default {
         'spacesAdministration': 'usersAndSpaces',
         // Documents
         'editors': 'documents',
-        'cloudDrive': 'documents',
+        'cloudStorage': 'documents',
         // content
         'siteExplorer': 'content',
         'wcmAdmin': 'content',
