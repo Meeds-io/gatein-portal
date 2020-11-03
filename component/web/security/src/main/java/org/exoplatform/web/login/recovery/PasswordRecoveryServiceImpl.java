@@ -68,7 +68,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
 
     
     public PasswordRecoveryServiceImpl(InitParams initParams, OrganizationService orgService, MailService mailService,
-                                       ResourceBundleService bundleService, RemindPasswordTokenService remindPasswordTokenService, WebAppController controller) {
+                                       ResourceBundleService bundleService, RemindPasswordTokenService remindPasswordTokenService, WebAppController controller, BrandingService brandingService) {
         this.orgService = orgService;
         this.mailService = mailService;
         this.bundleService = bundleService;
