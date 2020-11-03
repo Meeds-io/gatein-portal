@@ -111,7 +111,8 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
 
         Credentials credentials = new Credentials(user.getUserName(), "");
         String tokenId = remindPasswordTokenService.createToken(credentials);
-        StringBuilder redirectUrl = url;
+        StringBuilder redirectUrl = new StringBuilder();
+        redirectUrl.append(url);
         redirectUrl.append("/" + OnboardingHandler.NAME);
         redirectUrl.append("?lang=" + I18N.toTagIdentifier(locale));
         redirectUrl.append("&token=" + tokenId);
