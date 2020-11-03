@@ -111,11 +111,11 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
 
         Credentials credentials = new Credentials(user.getUserName(), "");
         String tokenId = remindPasswordTokenService.createToken(credentials);
-
-        url.append("/" + OnboardingHandler.NAME);
-        url.append("?lang=" + I18N.toTagIdentifier(locale));
-        url.append("&token=" + tokenId);
-        String emailBody = buildOnboardingEmailBody(user, bundle, url.toString());
+        StringBuilder redirectUrl = url;
+        redirectUrl.append("/" + OnboardingHandler.NAME);
+        redirectUrl.append("?lang=" + I18N.toTagIdentifier(locale));
+        redirectUrl.append("&token=" + tokenId);
+        String emailBody = buildOnboardingEmailBody(user, bundle, redirectUrl.toString());
         String emailSubject = bundle.getString("onboarding.email.header") + " " + brandingService.getCompanyName();
 
         String senderName = MailUtils.getSenderName();
