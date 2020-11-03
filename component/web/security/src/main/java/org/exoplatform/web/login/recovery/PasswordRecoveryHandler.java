@@ -190,7 +190,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
 
                     //
                     if (u != null) {
-                        if (service.sendRecoverPasswordEmail(u, Locale.ENGLISH, req)) {
+                        if (service.sendRecoverPasswordEmail(u, getCurrentLocale(), req)) {
                             req.setAttribute("success", bundle.getString("gatein.forgotPassword.emailSendSuccessful"));
                             user = "";
                         } else {

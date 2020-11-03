@@ -31,7 +31,9 @@ import java.util.Locale;
  * @author <a href="mailto:tuyennt@exoplatform.com">Tuyen Nguyen The</a>.
  */
 public interface PasswordRecoveryService {
-    Credentials verifyToken(String tokenId);
+  void addConnector(ChangePasswordConnector connector);
+  
+  Credentials verifyToken(String tokenId);
     boolean changePass(final String tokenId, final String username, final String password);
     public boolean sendRecoverPasswordEmail(User user, Locale defaultLocale, HttpServletRequest req);
     public boolean sendOnboardingEmail(User user, Locale defaultLocale, StringBuilder url);

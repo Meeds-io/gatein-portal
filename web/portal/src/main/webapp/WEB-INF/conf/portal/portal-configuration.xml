@@ -84,12 +84,7 @@
       </values-param>
     </init-params>
   </component>
-
-  <component>
-    <key>org.exoplatform.web.login.recovery.PasswordRecoveryService</key>
-    <type>org.exoplatform.web.login.recovery.PasswordRecoveryServiceImpl</type>
-  </component>
-
+  
   <component>
     <key>org.exoplatform.portal.mop.navigation.NavigationService</key>
     <type>org.exoplatform.portal.mop.navigation.NavigationServiceWrapper</type>

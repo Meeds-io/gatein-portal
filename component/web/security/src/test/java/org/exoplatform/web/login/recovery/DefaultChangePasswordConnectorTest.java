@@ -1,0 +1,124 @@
+package org.exoplatform.web.login.recovery;
+
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.idm.PicketLinkIDMService;
+import org.exoplatform.services.organization.idm.UserDAOImpl;
+import org.exoplatform.services.organization.idm.UserImpl;
+import org.exoplatform.services.organization.idm.externalstore.PicketLinkIDMExternalStoreService;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+
+@RunWith(MockitoJUnitRunner.class)
+public class DefaultChangePasswordConnectorTest {
+  
+  @Mock
+  OrganizationService organizationService;
+  
+  @Mock
+  PicketLinkIDMService picketLinkIDMService;
+  @Mock
+  PicketLinkIDMExternalStoreService picketLinkIDMExternalStoreService;
+  
+  @Test
+  public void testChangePasswordFromInternalStore() throws Exception {
+    User userTest = new UserImpl("utest");
+    userTest.setFirstName("User");
+    userTest.setLastName("Test");
+    userTest.setEmail("user.test@acme.com");
+    userTest.setPassword("P@ssword123");
+    userTest.setOriginatingStore(OrganizationService.INTERNAL_STORE);
+    
+    UserDAOImpl userHandler = Mockito.mock(UserDAOImpl.class);
+    Mockito.when(userHandler.findUserByName(userTest.getUserName())).thenReturn(userTest);
+    Mockito.when(organizationService.getUserHandler()).thenReturn(userHandler);
+    InitParams initParams = new InitParams();
+  
+    DefaultChangePasswordConnector defaultChangePasswordConnector =
+        new DefaultChangePasswordConnector(initParams,organizationService, picketLinkIDMService, picketLinkIDMExternalStoreService);
+    
+    String newPassword="newPassword";
+    defaultChangePasswordConnector.changePassword(userTest.getUserName(),newPassword);
+  
+    ArgumentCaptor<User> argument = ArgumentCaptor.forClass(User.class);
+    Mockito.verify(userHandler).saveUser(argument.capture(),Mockito.anyBoolean());
+    Assert.assertEquals(newPassword, argument.getValue().getPassword());
+  
+    Mockito.verify(userHandler, Mockito.times(1)).saveUser(Mockito.any(),Mockito.anyBoolean());
+    
+  }
+  
+  @Test
+  public void testChangePasswordFromExternalStoreAndNotAllowed() throws Exception {
+    User userTest = new UserImpl("utest");
+    userTest.setFirstName("User");
+    userTest.setLastName("Test");
+    userTest.setEmail("user.test@acme.com");
+    userTest.setPassword("P@ssword123");
+    userTest.setOriginatingStore(OrganizationService.EXTERNAL_STORE);
+    
+    UserDAOImpl userHandler = Mockito.mock(UserDAOImpl.class);
+    Mockito.when(userHandler.findUserByName(userTest.getUserName())).thenReturn(userTest);
+    Mockito.when(organizationService.getUserHandler()).thenReturn(userHandler);
+  
+    InitParams initParams = new InitParams();
+    ValueParam valueParam = new ValueParam();
+    valueParam.setName("allowChangeExternalPassword");
+    valueParam.setValue("false");
+    initParams.addParameter(valueParam);
+  
+    DefaultChangePasswordConnector defaultChangePasswordConnector = new DefaultChangePasswordConnector(initParams,
+                                                                                                       organizationService, picketLinkIDMService, picketLinkIDMExternalStoreService);
+    String newPassword="newPassword";
+    try {
+      defaultChangePasswordConnector.changePassword(userTest.getUserName(), newPassword);
+    } catch (Exception e) {
+    
+    }
+  
+    //if user is from external store and change password is not allowed for external store
+    // we should not save his password
+    Mockito.verify(userHandler, Mockito.times(0)).saveUser(Mockito.any(),Mockito.anyBoolean());
+  
+  }
+//
+//  @Test
+//  public void testChangePasswordFromExternalStoreAndAllowed() throws Exception {
+//    User userTest = new UserImpl("utest");
+//    userTest.setFirstName("User");
+//    userTest.setLastName("Test");
+//    userTest.setEmail("user.test@acme.com");
+//    userTest.setPassword("P@ssword123");
+//    userTest.setOriginatingStore(OrganizationService.EXTERNAL_STORE);
+//
+//    UserDAOImpl userHandler = Mockito.mock(UserDAOImpl.class);
+//    Mockito.when(userHandler.findUserByName(userTest.getUserName())).thenReturn(userTest);
+//    Mockito.when(organizationService.getUserHandler()).thenReturn(userHandler);
+//
+//    InitParams initParams = new InitParams();
+//    ValueParam valueParam = new ValueParam();
+//    valueParam.setName("allowChangeExternalPassword");
+//    valueParam.setValue("true");
+//
+//
+//    initParams.addParameter(valueParam);
+//
+//    DefaultChangePasswordConnector defaultChangePasswordConnector = new DefaultChangePasswordConnector(initParams,
+//                                                                             organizationService);
+//    Mockito.mock(DefaultChangePasswordConnector.class);
+//    Mockito.when(DefaultChangePasswordConnector.changePassword(Mockito.anyString(),Mockito.anyString())).thenReturn()
+//    String newPassword="newPassword";
+//    defaultChangePasswordConnector.changePassword(userTest.getUserName(),newPassword);
+//
+//    //if user is from external store and change password is allowed for external store
+//    // we should save his password
+    
+//  }
+}
