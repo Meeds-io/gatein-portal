@@ -37,6 +37,15 @@
       <type>org.exoplatform.web.login.recovery.PasswordRecoveryHandler</type>
     </component-plugin>
   </external-component-plugins>
+  
+  <external-component-plugins>
+    <target-component>org.exoplatform.web.WebAppController</target-component>
+    <component-plugin>
+      <name>OnboardingHandler</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.web.login.onboarding.OnboardingHandler</type>
+    </component-plugin>
+  </external-component-plugins>
 
   <external-component-plugins>
     <target-component>org.exoplatform.services.rest.impl.RequestHandlerImpl</target-component>

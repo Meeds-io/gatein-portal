@@ -43,6 +43,7 @@ import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.controller.router.Router;
+import org.exoplatform.web.login.onboarding.OnboardingHandler;
 import org.exoplatform.web.security.Token;
 import org.exoplatform.web.security.security.RemindPasswordTokenService;
 
@@ -111,9 +112,9 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         Credentials credentials = new Credentials(user.getUserName(), "");
         String tokenId = remindPasswordTokenService.createToken(credentials);
 
-        url.append("/on-boarding");
+        url.append("/" + OnboardingHandler.NAME);
         url.append("?lang=" + I18N.toTagIdentifier(locale));
-        url.append("?token=" + tokenId);
+        url.append("&token=" + tokenId);
         String emailBody = buildOnboardingEmailBody(user, bundle, url.toString());
         String emailSubject = bundle.getString("onboarding.email.header") + " " + brandingService.getCompanyName();
 
