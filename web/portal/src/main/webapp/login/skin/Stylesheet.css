@@ -18,8 +18,58 @@
  */
 
 body {
-    background: #EBEBEB;
-    padding-top: 110px;
+  background-color: #ffffff;
+  font-family: Helvetica, arial, sans-serif;
+  color: var(--allPagesBaseTextColor, #333333);
+}
+
+#WelcomeContent{
+   text-align: center;
+   font-family: Helvetica, arial, sans-serif;
+   font-size: 25px;
+}
+
+.uiOnBoard {
+    display: block;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    width: 420px;
+    color: var(--allPagesPrimaryColor, #578dc9);
+}
+
+.uiLogin {
+  background-color: var(--allPagesPrimaryColor, @primaryColor);
+}
+
+.logoImage {
+  width: 150px;
+  bottom:0;
+  right:0;
+  position: fixed;
+}
+
+.uiLogin .loginContainer {
+  background-color: var(--allPagesPrimaryColor, @primaryColor);
+}
+
+.uiLogin .loginContent .loginButton .button:hover {
+  background: #ffdb00;
+  color:#00000;
+}
+
+.uiLogin .loginContent .loginButton .button {
+  background: #ffdb00;
+  color:#00000;
+}
+
+.uiLogin .loginContent {
+    padding: 20px 0;
+}
+
+.uiLogin .uiLoginCondition {
+    padding: 20px;
+    color: #ffffff;
 }
 
 #login-footer {

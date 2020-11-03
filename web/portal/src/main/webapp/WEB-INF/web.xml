@@ -253,6 +253,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>onBoardServlet</servlet-name>
+    <servlet-class>org.exoplatform.web.login.OnBoardUserServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>GateInServlet</servlet-name>
     <servlet-class>org.gatein.wci.api.GateInServlet</servlet-class>
     <load-on-startup>0</load-on-startup>
@@ -260,6 +265,10 @@
   
   <!--  =================================================================  -->
 
+  <servlet-mapping>
+    <servlet-name>onBoardServlet</servlet-name>
+    <url-pattern>/onboard</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>LoginServlet</servlet-name>
     <url-pattern>/login</url-pattern>
