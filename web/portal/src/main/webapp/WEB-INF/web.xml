@@ -272,7 +272,7 @@
 
   <servlet-mapping>
     <servlet-name>onBoardServlet</servlet-name>
-    <url-pattern>/onboard</url-pattern>
+    <url-pattern>/on-boarding</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>LoginServlet</servlet-name>

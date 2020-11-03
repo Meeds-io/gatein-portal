@@ -122,7 +122,7 @@
   </head>
   <body>
   	<div class="loginBGLight"><span></span></div>
-  	<p id="WelcomeContent"><%=res.getString("portal.login.welcomeTo")%> <%= logoTitle%></p>
+  	<p id="WelcomeContent"><%=res.getString("portal.login.welcomeTo")%>  <%=logoTitle%>!</p>
     <div class="uiLogin">
      <div class="uiLoginCondition">
       <p><%=res.getString("portal.login.Hello")%></p>
@@ -159,7 +159,7 @@
 
                 <div class="userCredentials">
                   <span class="iconUser"></span>
-                  <input  tabindex="1" id="username" name="username" type="text" placeholder="<%=res.getString("portal.login.Username")%>" onblur="this.placeholder = '<%=res.getString("portal.login.Username.blur")%>'" onfocus="this.placeholder = ''">
+                  <input disabled="disabled" tabindex="1" id="username" name="username" type="text" placeholder="<%=res.getString("portal.login.Username")%>" onblur="this.placeholder = '<%=res.getString("portal.login.Username.blur")%>'" onfocus="this.placeholder = ''">
                 </div>
                 <div class="userCredentials">
                   <span class="iconPswrd"></span>
@@ -212,8 +212,8 @@
       </div>
     	</div>
     </div>
-    <div class="logoImage">
-      <img src="/logo/Logo.png"/>
+    <div class="logoImageContent">
+      <img src="/portal/logo/Logo.png" class="logoImage"/>
     </div>
   </body>
 </html>
