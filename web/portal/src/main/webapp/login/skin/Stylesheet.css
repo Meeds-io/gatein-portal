@@ -19,31 +19,54 @@
 
 
 body {
-  background-color: #ffffff;
-  font-family: Helvetica, arial, sans-serif;
-  color: var(--allPagesBaseTextColor, #333333);
+	background-color: #ffffff;
+	font-family: Helvetica, arial, sans-serif;
+	color: var(--allPagesBaseTextColor, #333333);
 }
 
-#WelcomeContent{
-   text-align: center;
-   font-family: Helvetica, arial, sans-serif;
-   font-size: 25px;
-   color: var(--allPagesPrimaryColor, @primaryColor);
-}
-
-.uiOnBoard {
-    display: block;
-    left: 50%;
-    position: absolute;
-    top: 50%;
-    width: 420px;
-    color: var(--allPagesPrimaryColor, #578dc9);
+.welcomeContent {
+	text-align: center;
+	font-family: Helvetica, arial, sans-serif;
+	font-size: 25px;
+	color: var(--allPagesPrimaryColor, @primaryColor);
 }
 
 .uiLogin {
-  background-color: var(--allPagesPrimaryColor, @primaryColor);
-  border-radius: 8px;
-  top: 55%;
+	background-color: var(--allPagesPrimaryColor, @primaryColor);
+	border-radius: 8px;
+	top: 55%;
+}
+
+.uiLogin .uiLoginCondition {
+    padding: 20px;
+    color: #ffffff;
+}
+
+.uiLogin .loginContainer {
+	background-color: var(--allPagesPrimaryColor, @primaryColor);
+}
+
+.uiLogin .loginContainer .loginContent {
+    padding: 20px 0;
+}
+
+.uiLogin .loginContainer .capatchaMessage {
+	color: #ffffff;
+}
+
+.uiLogin .loginContainer .loginButton .button {
+  background: #ffdb00;
+  color: #000000;
+  font-weight: bold;
+}
+
+.uiLogin .loginContainer .loginButton .button:hover {
+  background: #ffdb00;
+  color:#000000;
+}
+
+p.capatchaMessage {
+    color: #ffffff;
 }
 
 .logoImageContent {
@@ -53,36 +76,8 @@ body {
   position: fixed;
 }
 
-img.logoImage {
+.logoImageContent img {
   width: 150px;
-}
-
-.uiLogin .loginContainer {
-  background-color: var(--allPagesPrimaryColor, @primaryColor);
-}
-
-.uiLogin .loginContent .loginButton .button:hover {
-  background: #ffdb00;
-  color:#000000;
-}
-
-.uiLogin .loginContent .loginButton .button {
-  background: #ffdb00;
-  color: #000000;
-  font-weight: bold;
-}
-
-.uiLogin .loginContent {
-    padding: 20px 0;
-}
-
-.uiLogin .uiLoginCondition {
-    padding: 20px;
-    color: #ffffff;
-}
-
-p.capatchaMessage {
-    color: #ffffff;
 }
 
 #login-footer {

@@ -40,4 +40,5 @@ public interface PasswordRecoveryService {
 
     // EXOGTN-2114 Workaround for Java 8 Backward compatibility.
     String getPasswordRecoverURL(String tokenId, String lang);
+    String getOnboardingURL(String tokenId, String lang);
 }
