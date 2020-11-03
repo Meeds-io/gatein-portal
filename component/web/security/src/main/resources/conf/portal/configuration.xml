@@ -27,8 +27,38 @@
   <component>
     <key>org.exoplatform.web.login.recovery.PasswordRecoveryService</key>
     <type>org.exoplatform.web.login.recovery.PasswordRecoveryServiceImpl</type>
+    <init-params>
+      <value-param>
+        <name>changePasswordConnector</name> <!-- Max number of mails to send in the configured period of time -->
+        <value>${exo.portal.changePasswordConnector:DefaultChangePasswordConnector}</value>
+      </value-param>
+    </init-params>
   </component>
-
+  
+  
+  <external-component-plugins>
+    <target-component>org.exoplatform.web.login.recovery.PasswordRecoveryService</target-component>
+    <component-plugin>
+      <name>DefaultChangePasswordConnector</name>
+      <set-method>addConnector</set-method>
+      <type>org.exoplatform.web.login.recovery.DefaultChangePasswordConnector</type>
+      <init-params>
+        <value-param>
+          <name>allowChangeExternalPassword</name> <!-- Max number of mails to send in the configured period of time -->
+          <value>${exo.portal.allow.change.external.password:false}</value>
+        </value-param>
+        <value-param>
+          <name>ldapWriteUser</name> <!-- Max number of mails to send in the configured period of time -->
+          <value>${exo.ldap.admin.writer.dn}</value>
+        </value-param>
+        <value-param>
+          <name>ldapWritePwd</name> <!-- Max number of mails to send in the configured period of time -->
+          <value>${exo.ldap.admin.writer.password}</value>
+        </value-param>k
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+  
   <external-component-plugins>
     <target-component>org.exoplatform.web.WebAppController</target-component>
     <component-plugin>
