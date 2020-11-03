@@ -143,7 +143,7 @@
 						</div>
 						<p class="capatchaMessage"><%=res.getString("onboarding.login.capatcha")%></p>
 						<div id="UIPortalLoginFormAction" class="loginButton">
-							<button class="button" type="submit" disabled="disabled"><%=res.getString("onboarding.login.save")%></button>
+							<button class="button" type="submit"><%=res.getString("onboarding.login.save")%></button>
 						</div>
 						<input type="hidden" name="action" value="resetPassword"/>
 					</form>
