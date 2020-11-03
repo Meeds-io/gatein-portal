@@ -17,9 +17,72 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+
 body {
-    background: #EBEBEB;
-    padding-top: 110px;
+  background-color: #ffffff;
+  font-family: Helvetica, arial, sans-serif;
+  color: var(--allPagesBaseTextColor, #333333);
+}
+
+#WelcomeContent{
+   text-align: center;
+   font-family: Helvetica, arial, sans-serif;
+   font-size: 25px;
+   color: var(--allPagesPrimaryColor, @primaryColor);
+}
+
+.uiOnBoard {
+    display: block;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    width: 420px;
+    color: var(--allPagesPrimaryColor, #578dc9);
+}
+
+.uiLogin {
+  background-color: var(--allPagesPrimaryColor, @primaryColor);
+  border-radius: 8px;
+  top: 55%;
+}
+
+.logoImageContent {
+  bottom:0;
+  padding: 10px;
+  right:0;
+  position: fixed;
+}
+
+img.logoImage {
+  width: 150px;
+}
+
+.uiLogin .loginContainer {
+  background-color: var(--allPagesPrimaryColor, @primaryColor);
+}
+
+.uiLogin .loginContent .loginButton .button:hover {
+  background: #ffdb00;
+  color:#000000;
+}
+
+.uiLogin .loginContent .loginButton .button {
+  background: #ffdb00;
+  color: #000000;
+  font-weight: bold;
+}
+
+.uiLogin .loginContent {
+    padding: 20px 0;
+}
+
+.uiLogin .uiLoginCondition {
+    padding: 20px;
+    color: #ffffff;
+}
+
+p.capatchaMessage {
+    color: #ffffff;
 }
 
 #login-footer {
