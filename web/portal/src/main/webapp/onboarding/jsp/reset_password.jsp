@@ -114,11 +114,9 @@
 					<% if (errors.size() > 0) { %>
 					<div class="alertForm">
 						<div class="alert alert-error mgT0 mgB20">
-							<ul>
-								<% for (String error : errors) { %>
-								<li><i class="uiIconError"></i><span><%=error%></span></li>
-								<%}%>
-							</ul>
+              <% for (String error : errors) { %>
+                <i class="uiIconError"></i><span><%=error%></span><br/>
+              <%}%>
 						</div>
 					</div>
 					<%} else if (success != null && !success.isEmpty()) {%>
