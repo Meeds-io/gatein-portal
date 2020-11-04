@@ -34,13 +34,17 @@ body {
 .uiLogin {
 	background-color: var(--allPagesPrimaryColor, @primaryColor);
 	border-radius: 8px;
-	top: 52%;
+  	transform: translate(-50%, 20px);
+	top: 0%;
+}
+.uiLogin .welcomeContent {
+    	color: #ffffff;
 }
 
 .uiLogin .uiLoginCondition {
-    padding: 0 20px 0;
-    font-size: 13px;
-    color: #ffffff;
+    	padding: 0 20px 0;
+    	font-size: 13px;
+    	color: #ffffff;
 }
 
 .uiLogin .loginContainer {

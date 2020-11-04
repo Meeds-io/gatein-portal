@@ -100,8 +100,9 @@
   </head>
   <body>
 	<div class="loginBGLight"><span></span></div>
-  	<p class="welcomeContent"><%=res.getString("onboarding.login.welcomeTo")%>  <%=companyName%>!</p>
+
     <div class="uiLogin">
+		<p class="welcomeContent"><%=res.getString("onboarding.login.welcomeTo")%>  <%=companyName%>!</p>
 		<div class="uiLoginCondition">
 			<p><%=res.getString("onboarding.login.hello")%>  <%=fullUsername%>,</p>
 			<p><%=res.getString("onboarding.login.loginText")%>  <%=username%></p>
