@@ -17,9 +17,88 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+
 body {
-    background: #EBEBEB;
-    padding-top: 110px;
+	background-color: #ffffff;
+	font-family: Helvetica, arial, sans-serif;
+	color: var(--allPagesBaseTextColor, #333333);
+}
+
+.welcomeContent {
+	text-align: center;
+	font-family: Helvetica, arial, sans-serif;
+	font-size: 25px;
+	color: var(--allPagesPrimaryColor, @primaryColor);
+}
+
+.uiLogin {
+	background-color: var(--allPagesPrimaryColor, @primaryColor);
+	border-radius: 8px;
+  	transform: translate(-50%, 20px);
+	top: 0%;
+}
+.uiLogin .welcomeContent {
+    	color: #ffffff;
+}
+
+.uiLogin .uiLoginCondition {
+    	padding: 0 20px 0;
+    	font-size: 13px;
+    	color: #ffffff;
+}
+
+.uiLogin .loginContainer {
+	background-color: var(--allPagesPrimaryColor, @primaryColor);
+}
+
+.uiLogin .loginContainer .loginContent {
+    padding: 0;
+}
+
+.uiLogin .loginContainer .capatchaMessage {
+	color: #ffffff;
+}
+
+.uiLogin .loginContainer .loginButton .button[disabled]{
+  background: #ffdb00;
+  color: #000000;
+  font-weight: bold;
+}
+
+.uiLogin .loginContainer .loginButton .button{
+  background: #ffdb00;
+  color: #000000;
+  font-weight: bold;
+}
+
+.uiLogin .loginContainer .loginButton .button:hover {
+  background: #ffdb00;
+  color:#000000;
+  font-weight: bold;
+}
+
+p.capatchaMessage {
+  color: #ffffff;
+}
+
+.alertForm {
+   color: #ffffff;
+}
+.passwordCondition {
+   color: #ffffff;
+   font-size: 8px;
+   margin-top: 0px;
+}
+
+.logoImageContent {
+  bottom:0;
+  padding: 10px;
+  right:0;
+  position: fixed;
+}
+
+.logoImageContent img {
+  width: 130px;
 }
 
 #login-footer {

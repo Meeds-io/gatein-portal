@@ -19,20 +19,33 @@
 
 package org.exoplatform.web.login.onboarding;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.portlet.PortletException;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletSession;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import nl.captcha.text.producer.DefaultTextProducer;
+import nl.captcha.text.renderer.DefaultWordRenderer;
+import org.apache.tools.ant.taskdefs.condition.Http;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.wci.security.Credentials;
@@ -50,7 +63,14 @@ import org.exoplatform.web.WebRequestHandler;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.login.recovery.PasswordRecoveryServiceImpl;
 
+import nl.captcha.Captcha;
+import nl.captcha.servlet.CaptchaServletUtil;
+
+
+
 public class OnboardingHandler extends WebRequestHandler {
+    private static final QualifiedName SERVER_CAPTCHA = QualifiedName.create("gtn", "serveCaptcha");
+    
     protected static Logger log = LoggerFactory.getLogger(OnboardingHandler.class);
 
 
@@ -63,7 +83,13 @@ public class OnboardingHandler extends WebRequestHandler {
     public static final String REQ_PARAM_ACTION = "action";
 
     private static final ThreadLocal<Locale> currentLocale = new ThreadLocal<Locale>();
-
+    
+    
+    protected int _width = 200;
+    
+    protected int _height = 50;
+    
+    
     @Override
     public String getHandlerName() {
         return NAME;
@@ -96,9 +122,15 @@ public class OnboardingHandler extends WebRequestHandler {
         ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
 
         String token = context.getParameter(TOKEN);
-
+    
+        String serveCaptcha=context.getParameter(SERVER_CAPTCHA);
+        
         String requestAction = req.getParameter(REQ_PARAM_ACTION);
 
+        if ("true".equals(serveCaptcha)) {
+            return serveCaptchaImage(req,res);
+        }
+        
         if (token != null && !token.isEmpty()) {
             String tokenId = context.getParameter(TOKEN);
 
@@ -114,10 +146,15 @@ public class OnboardingHandler extends WebRequestHandler {
                 String reqUser = req.getParameter("username");
                 String password = req.getParameter("password");
                 String confirmPass = req.getParameter("password2");
-
+                String captcha = req.getParameter("captcha");
 
                 List<String> errors = new ArrayList<String>();
                 String success = "";
+                
+                if (captcha == null || !isValid(req.getSession(), captcha)) {
+                    String message = bundle.getString("gatein.forgotPassword.captchaError");
+                    errors.add(message);
+                }
 
                 if (reqUser == null || !reqUser.equals(username)) {
                     // Username is changed
@@ -132,6 +169,9 @@ public class OnboardingHandler extends WebRequestHandler {
                         errors.add(bundle.getString("gatein.forgotPassword.confirmPasswordNotMatch"));
                     }
                 }
+    
+                // Invalidate the capcha
+                req.getSession().removeAttribute(NAME);
 
                 //
                 if (errors.isEmpty()) {
@@ -151,12 +191,21 @@ public class OnboardingHandler extends WebRequestHandler {
 
             req.setAttribute("tokenId", tokenId);
             req.setAttribute("username", escapeXssCharacters(username));
-
+    
+            
+            String random = "&v=" + Calendar.getInstance().getTimeInMillis();
+    
+    
             return dispatch("/onboarding/jsp/reset_password.jsp", servletContext, req, res);
         }
         return false;
     }
-
+    
+    private boolean isValid(HttpSession session, String captchaValue) {
+        Captcha captcha = (Captcha) session.getAttribute(NAME);
+        return ((captcha != null) && (captcha.isCorrect(captchaValue)));
+    }
+    
     protected boolean dispatch(String path, ServletContext context, HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         RequestDispatcher dispatcher = context.getRequestDispatcher(path);
         if (dispatcher != null) {
@@ -212,5 +261,43 @@ public class OnboardingHandler extends WebRequestHandler {
                                     .replace("'","&#x27;")
                                     .replace("/","&#x2F;");
         return message;
+    }
+    
+    
+    public boolean serveCaptchaImage(HttpServletRequest req, HttpServletResponse resp) throws PortletException,
+                                                                                            java.io.IOException {
+        HttpSession session = req.getSession();
+        Captcha captcha;
+        if (session.getAttribute(NAME) == null) {
+            List<java.awt.Font> textFonts = Arrays.asList(
+                new Font("Arial", Font.BOLD, 40),
+                new Font("Courier", Font.BOLD, 40));
+            captcha = new Captcha.Builder(_width, _height)
+                .addText(new DefaultTextProducer(5),
+                         new DefaultWordRenderer(Color.WHITE, textFonts))
+                .gimp()
+                .addNoise()
+                .addBackground()
+                .build();
+            
+            session.setAttribute(NAME, captcha);
+            writeImage(resp, captcha.getImage());
+            
+        }
+        
+        captcha = (Captcha) session.getAttribute(NAME);
+        writeImage(resp, captcha.getImage());
+    
+        return true;
+    }
+    
+    public static void writeImage(HttpServletResponse response, BufferedImage bi) {
+        response.setHeader("Cache-Control", "private,no-cache,no-store");
+        response.setContentType("image/png"); // PNGs allow for transparency. JPGs do not.
+        try {
+            CaptchaServletUtil.writeImage(response.getOutputStream(), bi);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }

@@ -1,22 +1,20 @@
 <%--
+    Copyright (C) 2020 eXo Platform SAS.
 
-    Copyright (C) 2009 eXo Platform SAS.
-    
     This is free software; you can redistribute it and/or modify it
     under the terms of the GNU Lesser General Public License as
     published by the Free Software Foundation; either version 2.1 of
     the License, or (at your option) any later version.
-    
+
     This software is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     Lesser General Public License for more details.
-    
+
     You should have received a copy of the GNU Lesser General Public
     License along with this software; if not, write to the Free
     Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
     02110-1301 USA, or see the FSF site: http://www.fsf.org.
-
 --%>
 
 <%@ page import="org.exoplatform.container.PortalContainer"%>
@@ -35,9 +33,13 @@
 <%@ page import="org.exoplatform.commons.utils.I18N" %>
 <%@ page import="org.exoplatform.portal.config.UserPortalConfigService" %>
 <%@ page import="org.exoplatform.portal.resource.config.tasks.PortalSkinTask" %>
+<%@ page import="org.exoplatform.portal.branding.BrandingService"%>
+<%@ page import="org.exoplatform.services.organization.OrganizationService" %>
+<%@ page import="org.exoplatform.services.organization.User"%>
 <%@ page language="java" %>
 <%
-    PortalContainer portalContainer = PortalContainer.getCurrentInstance(session.getServletContext());
+
+	PortalContainer portalContainer = PortalContainer.getCurrentInstance(session.getServletContext());
     ResourceBundleService service = portalContainer.getComponentInstanceOfType(ResourceBundleService.class);
     Locale locale = (Locale)request.getAttribute("request_locale");
     if (locale == null) {
@@ -59,9 +61,13 @@
 
     String password = (String)request.getAttribute("password");
     String password2 = (String)request.getAttribute("password2");
+	
+	OrganizationService organizationService = portalContainer.getComponentInstanceOfType(OrganizationService.class);
+	User user = organizationService.getUserHandler().findUserByName(username);
+	String fullUsername = user.getDisplayName();
 
     PasswordRecoveryService passRecoveryServ = portalContainer.getComponentInstanceOfType(PasswordRecoveryService.class);
-    String forgotPasswordPath = passRecoveryServ.getPasswordRecoverURL(tokenId, I18N.toTagIdentifier(locale));
+    String onboardingPasswordPath = passRecoveryServ.getOnboardingURL(tokenId, I18N.toTagIdentifier(locale));
 
 
     List<String> errors = (List<String>)request.getAttribute("errors");
@@ -69,96 +75,103 @@
     if (errors == null) {
         errors = new ArrayList<String>();
     }
+	
+	BrandingService brandingService = portalContainer.getComponentInstanceOfType(BrandingService.class);
+	String companyName = brandingService.getCompanyName();
 
     response.setCharacterEncoding("UTF-8");
-    response.setContentType("text/html; charset=UTF-8");
+    response.setContentType("text/html; charset=UTF-8");  
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
+  <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%=res.getString("gatein.forgotPassword.changePass")%></title>
+    <title><%=res.getString("onboarding.changePass.title")%></title>
     <%if (success != null && !success.isEmpty()) {%>
         <meta http-equiv="refresh" content="5; url=<%=contextPath+ "/login"%>" />
     <%}%>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="shortcut icon" type="image/x-icon"  href="<%=contextPath%>/favicon.ico" />
     <link id="brandingSkin" rel="stylesheet" type="text/css" href="/rest/v1/platform/branding/css">
-    <link href="<%=coreCssPath%>" rel="stylesheet" type="text/css"/>
     <link href="<%=loginCssPath%>" rel="stylesheet" type="text/css"/>
+	<link rel="stylesheet" type="text/css" href="<%=contextPath%>/login/skin/Stylesheet.css"/>
     <script type="text/javascript" src="/eXoResources/javascript/jquery-3.2.1.js"></script>
     <script type="text/javascript" src="/eXoResources/javascript/eXo/webui/FormValidation.js"></script>
-</head>
-<body class="modal-open">
-<div class="uiPopupWrapper">
-    <div class="UIPopupWindow uiPopup uiForgotPassword UIDragObject NormalStyle">
-        <div class="popupHeader ClearFix">
-            <span class="popupTitle center"><%=res.getString("gatein.forgotPassword.changePass")%></span>
-        </div>
-        <div class="popupContent">
-            <% if (errors.size() > 0) { %>
-            <div class="alertForm">
-                <div class="alert alert-error mgT0 mgB20">
-                    <ul>
-                        <% for (String error : errors) { %>
-                        <li><i class="uiIconError"></i><span><%=error%></span></li>
-                        <%}%>
-                    </ul>
-                </div>
-            </div>
-            <%} else if (success != null && !success.isEmpty()) {%>
-            <div class="alertForm">
-                <div class="alert alert-success">
-                    <i class="uiIconSuccess"></i><%=success%>
-                </div>
-            </div>
-            <%}%>
-            <form name="registerForm" action="<%= contextPath + forgotPasswordPath %>" method="post" style="margin: 0px;" autocomplete="off">
-                <div class="content">
-                    <div class="form-horizontal">
-                        <div class="control-group">
-                            <label class="control-label"><%=res.getString("portal.login.Username")%>:</label>
-                            <div class="controls">
-                                <input class="username" data-validation="require" name="username" type="text" value="<%=username%>" readonly="readonly" />
-                            </div>
-                        </div>
+  </head>
+  <body>
+	<div class="loginBGLight"><span></span></div>
 
-                        <div class="control-group">
-                            <label class="control-label"><%=res.getString("gatein.forgotPassword.newPassword")%>:</label>
-                            <div class="controls">
-                                <input class="password" data-validation="require" name="password" type="password" autocomplete="off" value="<%=(password != null ? password : "")%>" /><span class="star">*</span>
-                            </div>
+    <div class="uiLogin">
+		<p class="welcomeContent"><%=res.getString("onboarding.login.welcomeTo")%>  <%=companyName%>!</p>
+		<div class="uiLoginCondition">
+			<p><%=res.getString("onboarding.login.hello")%>  <%=fullUsername%>,</p>
+			<p><%=res.getString("onboarding.login.loginText")%>  <%=username%></p>
+			<p><%=res.getString("onboarding.login.condition")%></p>
+			<p><%=res.getString("onboarding.login.allowCreatePassword")%></p>
+		</div>
+    	<div class="loginContainer">
+			<div class="loginContent">
+				<div class="centerLoginContent">
+					<% if (errors.size() > 0) { %>
+					<div class="alertForm">
+						<div class="alert alert-error mgT0 mgB20">
+              <% for (String error : errors) { %>
+                <i class="uiIconError"></i><span><%=error%></span><br/>
+              <%}%>
+						</div>
+					</div>
+					<%} else if (success != null && !success.isEmpty()) {%>
+					<div class="alertForm">
+						<div class="alert alert-success">
+							<i class="uiIconSuccess"></i><%=success%>
+						</div>
+					</div>
+					<%}%>
+					<form name="registerForm" action="<%= contextPath + onboardingPasswordPath %>" method="post" style="margin: 0px;">
+						<div class="userCredentials">
+							<span class="iconUser"></span>
+							<input class="username" data-validation="require" name="username" type="text" value="<%=username%>" readonly="readonly" />
+						</div>
+						<div class="userCredentials">
+						  <span class="iconPswrd"></span>
+						  <input data-validation="require" type="password" name="password" autocomplete="off" value="<%=(password != null ? password : "")%>"  placeholder="<%=res.getString("portal.login.Password")%>" onblur="this.placeholder = '<%=res.getString("portal.login.Password")%>'" onfocus="this.placeholder = ''">
+						</div>
+						<p class="passwordCondition"><i class="uiIconInfo"></i><%=res.getString("onboarding.login.passwordCondition")%></p>
+						<div class="userCredentials">
+						  <span class="iconPswrd"></span>
+						   <input data-validation="require" type="password" name="password2" autocomplete="off" value="<%=(password2 != null ? password2 : "")%>"  placeholder="<%=res.getString("onboarding.login.confirmPassword")%>" onblur="this.placeholder = '<%=res.getString("onboarding.login.confirmPassword")%>'" onfocus="this.placeholder = ''">
+						</div>
+						<div id="captcha">
+						  <img src="/portal/on-boarding?serveCaptcha=true" alt="Captcha image for visual validation">
+						  <br/>
+						  <input data-validation="require" name="captcha" type="text" id="inputCaptcha"  placeholder="<%=res.getString("onboarding.login.captcha")%>" onblur="this.placeholder = '<%=res.getString("onboarding.login.captcha")%>'" onfocus="this.placeholder = ''">
                         </div>
-                        <div class="control-group">
-                            <label class="control-label"><%=res.getString("gatein.forgotPassword.confirmNewPassword")%></label>
-                            <div class="controls">
-                                <input class="password" data-validation="require" name="password2" type="password" autocomplete="off" value="<%=(password2 != null ? password2 : "")%>" /><span class="star">*</span>
-                            </div>
-                        </div>
-                        <input type="hidden" name="action" value="resetPassword"/>
-                    </div>
-                </div>
-                <div id="UIPortalLoginFormAction" class="uiAction">
-                    <button type="submit" class="btn btn-primary disabled" disabled="disabled"><%=res.getString("gatein.forgotPassword.save")%></button>
-                    <a href="<%=contextPath+ "/login"%>" class="btn ActionButton LightBlueStyle"><%=res.getString("gatein.forgotPassword.close")%></a>
-                </div>
-            </form>
-        </div>
+						<div id="UIPortalLoginFormAction" class="loginButton">
+							<button class="button" type="submit" disabled="disabled"><%=res.getString("onboarding.login.save")%></button>
+						</div>
+						<input type="hidden" name="action" value="resetPassword"/>
+					</form>
+					<%/*End form*/%>
+				</div>
+			</div>
+    	</div>
     </div>
-</div>
-<script type="text/javascript">
-  var $form = $('form[name="registerForm"]');
-  $form.on('formValidate', function(e, valid) {
-    var $btnSubmit = $form.find('.btn[type="submit"]');
-    if (valid) {            
-      $btnSubmit.attr('disabled', false).removeClass('disabled');
-    } else {
-      $btnSubmit.attr('disabled', true).addClass('disabled');
-    }
-  });
-  $form.find('input[type="text"], input[type="password"]').on('keyup', function() {
-    $form.validate();
-  });
-</script>
-</body>
+    <div class="logoImageContent">
+      <img src="/portal/logo/Logo.png" class="logoImage"/>
+    </div>
+	<script type="text/javascript">
+	  var $form = $('form[name="registerForm"]');
+	  $form.on('formValidate', function(e, valid) {
+		var $btnSubmit = $form.find('.button[type="submit"]');
+		if (valid) {            
+		  $btnSubmit.attr('disabled', false).removeClass('disabled');
+		} else {
+		  $btnSubmit.attr('disabled', true).addClass('disabled');
+		}
+	  });
+	  $form.find('input[type="text"], input[type="password"]').on('keyup', function() {
+		$form.validate();
+	  });
+	</script>
+  </body>
 </html>
