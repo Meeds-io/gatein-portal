@@ -135,6 +135,7 @@
 						  <span class="iconPswrd"></span>
 						  <input data-validation="require" type="password" name="password" autocomplete="off" value="<%=(password != null ? password : "")%>"  placeholder="<%=res.getString("portal.login.Password")%>" onblur="this.placeholder = '<%=res.getString("portal.login.Password")%>'" onfocus="this.placeholder = ''">
 						</div>
+						<p class="passwordCondition"><i class="uiIconInfo"></i><%=res.getString("onboarding.login.passwordCondition")%></p>
 						<div class="userCredentials">
 						  <span class="iconPswrd"></span>
 						   <input data-validation="require" type="password" name="password2" autocomplete="off" value="<%=(password2 != null ? password2 : "")%>"  placeholder="<%=res.getString("onboarding.login.confirmPassword")%>" onblur="this.placeholder = '<%=res.getString("onboarding.login.confirmPassword")%>'" onfocus="this.placeholder = ''">
@@ -143,7 +144,7 @@
 						  <img src="/portal/on-boarding?serveCaptcha=true" alt="Captcha image for visual validation">
 						  <br/>
 						  <input data-validation="require" name="captcha" type="text" id="inputCaptcha"  placeholder="<%=res.getString("onboarding.login.captcha")%>" onblur="this.placeholder = '<%=res.getString("onboarding.login.captcha")%>'" onfocus="this.placeholder = ''">
-            </div>
+                        </div>
 						<div id="UIPortalLoginFormAction" class="loginButton">
 							<button class="button" type="submit" disabled="disabled"><%=res.getString("onboarding.login.save")%></button>
 						</div>

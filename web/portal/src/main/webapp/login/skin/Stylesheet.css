@@ -34,11 +34,12 @@ body {
 .uiLogin {
 	background-color: var(--allPagesPrimaryColor, @primaryColor);
 	border-radius: 8px;
-	top: 55%;
+	top: 52%;
 }
 
 .uiLogin .uiLoginCondition {
-    padding: 20px;
+    padding: 0 20px 0;
+    font-size: 13px;
     color: #ffffff;
 }
 
@@ -47,14 +48,20 @@ body {
 }
 
 .uiLogin .loginContainer .loginContent {
-    padding: 20px 0;
+    padding: 0;
 }
 
 .uiLogin .loginContainer .capatchaMessage {
 	color: #ffffff;
 }
 
-.uiLogin .loginContainer .loginButton .button {
+.uiLogin .loginContainer .loginButton .button[disabled]{
+  background: #ffdb00;
+  color: #000000;
+  font-weight: bold;
+}
+
+.uiLogin .loginContainer .loginButton .button{
   background: #ffdb00;
   color: #000000;
   font-weight: bold;
@@ -63,10 +70,20 @@ body {
 .uiLogin .loginContainer .loginButton .button:hover {
   background: #ffdb00;
   color:#000000;
+  font-weight: bold;
 }
 
 p.capatchaMessage {
-    color: #ffffff;
+  color: #ffffff;
+}
+
+.alertForm {
+   color: #ffffff;
+}
+.passwordCondition {
+   color: #ffffff;
+   font-size: 8px;
+   margin-top: 0px;
 }
 
 .logoImageContent {
@@ -77,7 +94,7 @@ p.capatchaMessage {
 }
 
 .logoImageContent img {
-  width: 150px;
+  width: 130px;
 }
 
 #login-footer {
