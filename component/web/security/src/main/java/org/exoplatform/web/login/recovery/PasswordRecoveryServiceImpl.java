@@ -293,6 +293,20 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     protected String getEmailSubject(User user, ResourceBundle bundle) {
         return bundle.getString("gatein.forgotPassword.email.subject");
     }
+    
+    @Override
+    public String getOnboardingURL(String tokenId, String lang) {
+        Router router = webController.getRouter();
+        Map<QualifiedName, String> params = new HashMap<>();
+        params.put(WebAppController.HANDLER_PARAM, OnboardingHandler.NAME);
+        if (tokenId != null) {
+          params.put(OnboardingHandler.TOKEN, tokenId);
+        }
+        if (lang != null) {
+          params.put(OnboardingHandler.LANG, lang);
+        }
+        return router.render(params);
+    }
 
     @Override
     public String getPasswordRecoverURL(String tokenId, String lang) {
