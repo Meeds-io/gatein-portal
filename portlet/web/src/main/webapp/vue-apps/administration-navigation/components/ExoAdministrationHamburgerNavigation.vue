@@ -35,10 +35,12 @@ export default {
         'groupsManagement': 'usersAndSpaces',
         'membershipsManagement': 'usersAndSpaces',
         'spacesAdministration': 'usersAndSpaces',
+        // Documents
+        'editors': 'documents',
+        'cloudStorage': 'documents',
         // content
         'siteExplorer': 'content',
         'wcmAdmin': 'content',
-        'editors': 'content',
         // gamification
         'hook_management': 'gamification',
         'gamification/rules': 'gamification',
