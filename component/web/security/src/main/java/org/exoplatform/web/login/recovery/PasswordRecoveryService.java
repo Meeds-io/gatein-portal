@@ -32,13 +32,19 @@ import java.util.Locale;
  */
 public interface PasswordRecoveryService {
   void addConnector(ChangePasswordConnector connector);
-  
-  Credentials verifyToken(String tokenId);
-    boolean changePass(final String tokenId, final String username, final String password);
-    public boolean sendRecoverPasswordEmail(User user, Locale defaultLocale, HttpServletRequest req);
-    public boolean sendOnboardingEmail(User user, Locale defaultLocale, StringBuilder url);
 
-    // EXOGTN-2114 Workaround for Java 8 Backward compatibility.
-    String getPasswordRecoverURL(String tokenId, String lang);
-    String getOnboardingURL(String tokenId, String lang);
+  Credentials verifyToken(String tokenId);
+
+  boolean changePass(final String tokenId, final String username, final String password);
+
+  public boolean sendRecoverPasswordEmail(User user, Locale defaultLocale, HttpServletRequest req);
+
+  public boolean sendOnboardingEmail(User user, Locale defaultLocale, StringBuilder url);
+  
+  public boolean allowChangePassword(String username) throws Exception;
+
+  // EXOGTN-2114 Workaround for Java 8 Backward compatibility.
+  String getPasswordRecoverURL(String tokenId, String lang);
+
+  String getOnboardingURL(String tokenId, String lang);
 }

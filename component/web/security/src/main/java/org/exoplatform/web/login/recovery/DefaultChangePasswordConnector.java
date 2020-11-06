@@ -1,12 +1,14 @@
 package org.exoplatform.web.login.recovery;
 
-import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.container.xml.ValueParam;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.User;
-import org.exoplatform.services.organization.idm.PicketLinkIDMService;
-import org.exoplatform.services.organization.idm.PicketLinkIDMServiceImpl;
-import org.exoplatform.services.organization.idm.externalstore.PicketLinkIDMExternalStoreService;
+import java.util.Hashtable;
+
+import javax.naming.Context;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.ModificationItem;
+
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.portal.idm.impl.repository.ExoFallbackIdentityStoreRepository;
@@ -18,19 +20,16 @@ import org.picketlink.idm.spi.configuration.metadata.IdentityConfigurationMetaDa
 import org.picketlink.idm.spi.configuration.metadata.IdentityObjectTypeMetaData;
 import org.picketlink.idm.spi.configuration.metadata.IdentityStoreConfigurationMetaData;
 import org.picketlink.idm.spi.model.IdentityObject;
-import org.picketlink.idm.spi.model.IdentityObjectType;
 import org.picketlink.idm.spi.repository.IdentityStoreRepository;
 import org.picketlink.idm.spi.store.IdentityStoreInvocationContext;
-import sun.awt.geom.AreaOp;
 
-import javax.naming.Context;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.BasicAttribute;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
-import javax.naming.directory.ModificationItem;
-import java.io.UnsupportedEncodingException;
-import java.util.Hashtable;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.idm.PicketLinkIDMService;
+import org.exoplatform.services.organization.idm.PicketLinkIDMServiceImpl;
+import org.exoplatform.services.organization.idm.externalstore.PicketLinkIDMExternalStoreService;
 
 public class DefaultChangePasswordConnector extends ChangePasswordConnector {
   
@@ -56,6 +55,14 @@ public class DefaultChangePasswordConnector extends ChangePasswordConnector {
     this.ldapWriteUser=initParams.getValueParam("ldapWriteUser") !=null ?
                        initParams.getValueParam("ldapWriteUser").getValue() : "";
     this.ldapWritePwd=initParams.getValueParam("ldapWritePwd") !=null ?initParams.getValueParam("ldapWritePwd").getValue() : "";
+  }
+  
+  /**
+   * @return the allowChangeExternalPassword
+   */
+  @Override
+  public boolean isAllowChangeExternalPassword() {
+    return allowChangeExternalPassword;
   }
   
   @Override
