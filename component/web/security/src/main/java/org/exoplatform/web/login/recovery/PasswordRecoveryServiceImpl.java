@@ -96,7 +96,13 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         }
         return token.getPayload();
     }
-
+    
+    @Override
+    public boolean allowChangePassword(String username) throws Exception {
+      User user = orgService.getUserHandler().findUserByName(username);//To be changed later by checking internal store information from social user profile
+      return user != null && (user.isInternalStore() || this.changePasswordConnectorMap.get(this.changePasswordConnectorName).isAllowChangeExternalPassword());
+    }
+    
     @Override
     public boolean changePass(final String tokenId, final String username, final String password) {
         try {
