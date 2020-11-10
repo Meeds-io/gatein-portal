@@ -121,12 +121,10 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     }
     
     @Override
-    public boolean sendOnboardingEmail(User user, Locale defaultLocale, StringBuilder url) {
+    public boolean sendOnboardingEmail(User user, Locale locale, StringBuilder url) {
         if (user == null) {
             throw new IllegalArgumentException("User or Locale must not be null");
         }
-
-        Locale locale = getLocaleOfUser(user.getUserName(), defaultLocale);
 
         ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
 
