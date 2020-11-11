@@ -31,7 +31,7 @@
   <div class="selectFileFrame clearfix" style="display: none;">		
 		<div class="fileNameLabel"></div>
 		<div class="removeFile pull-right" >
-			<a href="#" class="actionIcon" rel="tooltip" data-placement="bottom" title="<%= _ctx.appRes("UIFormUploadInput.label.remove"); %>">
+			<a href="#" class="actionIcon" rel="tooltip" data-placement="bottom" title="<%= _ctx.appRes("UIFormUploadInput.label.remove"); %>" onclick="removePreview()">
 				<i class="uiIconDelete uiIconLightGray" ></i>
 			</a>
 		</div>
@@ -44,6 +44,11 @@
 		</html>
 	</iframe>
 </div>
+</script>
+<script>
+removePreview = function(){
+  document.getElementById("previewLinkIcon").style.display = "none";
+}
 </script>
 <div class="uploadButton">
 	<label class="btn"><%=_ctx.appRes("UIFormUploadInput.label.SelectFile")%></label> 
