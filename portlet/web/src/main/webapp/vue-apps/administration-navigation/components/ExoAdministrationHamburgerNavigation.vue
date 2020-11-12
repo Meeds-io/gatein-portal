@@ -38,6 +38,7 @@ export default {
         // Documents
         'editors': 'documents',
         'cloudStorage': 'documents',
+        'transferRules': 'documents',
         // content
         'siteExplorer': 'content',
         'wcmAdmin': 'content',
