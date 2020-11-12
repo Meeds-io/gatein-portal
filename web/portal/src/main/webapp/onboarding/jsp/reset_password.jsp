@@ -36,6 +36,7 @@
 <%@ page import="org.exoplatform.portal.branding.BrandingService"%>
 <%@ page import="org.exoplatform.services.organization.OrganizationService" %>
 <%@ page import="org.exoplatform.services.organization.User"%>
+<%@ page import="org.exoplatform.commons.utils.PropertyManager"%>
 <%@ page language="java" %>
 <%
 
@@ -80,7 +81,10 @@
 	String companyName = brandingService.getCompanyName();
 
     response.setCharacterEncoding("UTF-8");
-    response.setContentType("text/html; charset=UTF-8");  
+    response.setContentType("text/html; charset=UTF-8");
+
+
+    String passwordCondition = PropertyManager.getProperty("gatein.validators.passwordpolicy.format.message");
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -136,7 +140,7 @@
 						  <span class="iconPswrd"></span>
 						  <input data-validation="require" type="password" name="password" autocomplete="off" value="<%=(password != null ? password : "")%>"  placeholder="<%=res.getString("portal.login.Password")%>" onblur="this.placeholder = '<%=res.getString("portal.login.Password")%>'" onfocus="this.placeholder = ''">
 						</div>
-						<p class="passwordCondition"><i class="uiIconInfo"></i><%=res.getString("onboarding.login.passwordCondition")%></p>
+						<p class="passwordCondition"><i class="uiIconInfo"></i><%=passwordCondition%></p>
 						<div class="userCredentials">
 						  <span class="iconPswrd"></span>
 						   <input data-validation="require" type="password" name="password2" autocomplete="off" value="<%=(password2 != null ? password2 : "")%>"  placeholder="<%=res.getString("onboarding.login.confirmPassword")%>" onblur="this.placeholder = '<%=res.getString("onboarding.login.confirmPassword")%>'" onfocus="this.placeholder = ''">
