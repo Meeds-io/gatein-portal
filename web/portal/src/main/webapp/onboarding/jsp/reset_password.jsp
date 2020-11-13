@@ -20,16 +20,11 @@
 <%@ page import="org.exoplatform.container.PortalContainer"%>
 <%@ page import="org.exoplatform.services.resources.ResourceBundleService"%>
 <%@ page import="org.exoplatform.portal.resource.SkinService"%>
-<%@ page import="java.util.ResourceBundle"%>
 <%@ page import="org.exoplatform.services.organization.User"%>
 <%@ page import="org.exoplatform.services.organization.impl.UserImpl" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="org.exoplatform.web.controller.QualifiedName" %>
 <%@ page import="org.exoplatform.web.login.recovery.PasswordRecoveryService" %>
 <%@ page import="org.exoplatform.portal.resource.SkinConfig" %>
-<%@ page import="java.util.Collection" %>
-<%@ page import="java.util.Locale" %>
 <%@ page import="org.exoplatform.commons.utils.I18N" %>
 <%@ page import="org.exoplatform.portal.config.UserPortalConfigService" %>
 <%@ page import="org.exoplatform.portal.resource.config.tasks.PortalSkinTask" %>
@@ -37,6 +32,7 @@
 <%@ page import="org.exoplatform.services.organization.OrganizationService" %>
 <%@ page import="org.exoplatform.services.organization.User"%>
 <%@ page import="org.exoplatform.commons.utils.PropertyManager"%>
+<%@ page import="java.util.*" %>
 <%@ page language="java" %>
 <%
 
@@ -79,7 +75,10 @@
 	
 	BrandingService brandingService = portalContainer.getComponentInstanceOfType(BrandingService.class);
 	String companyName = brandingService.getCompanyName();
-
+	byte[] bytes = brandingService.getLogo().getData();
+	byte[] encodedBytes = Base64.getEncoder().encode(bytes);
+	String encoded = new String(encodedBytes, "UTF-8");
+	encoded = "data:image/png;base64," + encoded;
     response.setCharacterEncoding("UTF-8");
     response.setContentType("text/html; charset=UTF-8");
 
@@ -98,7 +97,8 @@
     <link rel="shortcut icon" type="image/x-icon"  href="<%=contextPath%>/favicon.ico" />
     <link id="brandingSkin" rel="stylesheet" type="text/css" href="/rest/v1/platform/branding/css">
     <link href="<%=loginCssPath%>" rel="stylesheet" type="text/css"/>
-	<link rel="stylesheet" type="text/css" href="<%=contextPath%>/login/skin/Onboarding.css"/>
+    <link rel="stylesheet" type="text/css" href="<%=contextPath%>/login/skin/Stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="<%=contextPath%>/login/skin/onboarding.css"/>
     <script type="text/javascript" src="/eXoResources/javascript/jquery-3.2.1.js"></script>
     <script type="text/javascript" src="/eXoResources/javascript/eXo/webui/FormValidation.js"></script>
   </head>
@@ -109,7 +109,7 @@
 		<p class="welcomeContent"><%=companyName%>!</p>
 		<div class="uiLoginCondition">
 			<p><%=res.getString("onboarding.login.hello")%>  <%=fullUsername%>,</p>
-			<p><%=res.getString("onboarding.login.loginText")%><span style="font-weight: bold;"> <%=username%><span></p>
+			<p><%=res.getString("onboarding.login.loginText")%><span class="username"> <%=username%><span></p>
 			<p><%=res.getString("onboarding.login.condition")%></p>
 			<p><%=res.getString("onboarding.login.allowCreatePassword")%></p>
 		</div>
@@ -125,7 +125,7 @@
 						</div>
 					</div>
 					<%}%>
-					<form name="registerForm" action="<%= contextPath + onboardingPasswordPath %>" method="post" style="margin: 0px;">
+					<form name="registerForm" action="<%= contextPath + onboardingPasswordPath %>" method="post">
 						<div class="userCredentials">
 							<span class="iconUser"></span>
 							<input class="username" data-validation="require" name="username" type="text" value="<%=username%>" readonly="readonly" />
@@ -133,7 +133,7 @@
 						<div class="userCredentials">
 						  <span class="iconPswrd"></span>
 						  <input data-validation="require" type="password" name="password" id="password" autocomplete="off" value="<%=(password != null ? password : "")%>"  placeholder="<%=res.getString("portal.login.Password")%>" onblur="this.placeholder = '<%=res.getString("portal.login.Password")%>'" onfocus="this.placeholder = ''">
-					      <i class="uiIconError passwordFormat" style="margin-left: -25px;display: none"></i>
+					      <i class="uiIconError passwordFormat"></i>
 						</div>
 						<p class="passwordCondition"><i class="uiIconInfo"></i><%=passwordCondition != null ? passwordCondition : res.getString("onboarding.login.passwordCondition")%></p>
 						<div class="userCredentials">
@@ -162,7 +162,7 @@
 		<div class="alertSuccessMessage confirmPwdSuccess hidden"><%=res.getString("onboarding.login.passwordsMatch")%></div>
     </div>
     <div class="logoImageContent">
-      <img src="/portal/logo/Logo.png" class="logoImage"/>
+      <img src="<%=encoded%>" class="logoImage"/>
     </div>
 	<script type="text/javascript">
 	  var $form = $('form[name="registerForm"]');
@@ -184,6 +184,7 @@
 			  $('.uiLogin .passwordFormat').show();
 			  $('.uiLogin .confirmPwdError').hide();
 			  $('.uiLogin .confirmPwdSuccess').hide();
+			  $('.uiIconGreenChecker').hide();
 		  }
 	  });
 	  $("#password").focus(function () {
