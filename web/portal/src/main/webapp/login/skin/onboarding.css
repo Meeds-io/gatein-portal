@@ -32,23 +32,28 @@
     padding: 10px;
     background-color: #6CCDB0;;
     color: #3C806A;
-    margin-top: 40px;
     border-radius: 8px;
     border: 2px solid #3C806A;
     text-align: center;
+    margin-top: 30px;
+    margin-right: 25px;
+    margin-left: 25px;
 }
 .alertErrorMessage {
     padding: 10px;
     background-color: #DFA3A3;
     color: #C6595B;
-    margin-top: 40px;
     border-radius: 8px;
     border: 2px solid #C6595B;
     text-align: center;
+    margin-top: 30px;
+    margin-right: 25px;
+    margin-left: 25px;
 }
 
 .uiLogin {
-    height: 85%;
+    height: 80%;
+    width: 35%;
 }
 .uiLogin .uiIconGreenChecker {
     background: url(/eXoSkin/skin/images/themes/default/Icons/skinIcons/16x16/GreenCheckerIcon.gif) no-repeat left top;
@@ -70,11 +75,12 @@
 .uiLogin .uiLoginCondition p{
     display: inline-block;
     width: 100%;
-    margin-top: 10px;
-    margin-bottom: 10px;
 }
 .uiLogin .uiLoginCondition .username{
     font-weight: bold;
+}
+.uiLogin .loginContainer {
+    padding-top: 8%;
 }
 
 .uiLogin .loginContainer .loginContent input{
@@ -98,24 +104,30 @@
 }
 
 .uiLogin .loginContainer .loginButton .button[disabled]{
-    background: #FBCD38;
+    background: var(--allPagesSecondaryColor, @secondaryColorDefault);
     font-weight: bold;
+    color: #ffffff;
     width: -webkit-fill-available;
 }
 
 .uiLogin .loginContainer .loginButton .button{
-    background: #FBCD38;
+    background: var(--allPagesSecondaryColor, @secondaryColorDefault);
     font-weight: bold;
+    color: #ffffff;
     width: -webkit-fill-available;
+}
+.uiLogin .loginContainer .loginButton .button:hover {
+    background: var(--allPagesSecondaryColor, @secondaryColorDefault);
+    color: #ffffff;
 }
 .passwordCondition {
     color: #ffffff;
-    font-size: 9px;
+    font-size: 12px;
     margin-top: 0px;
 }
 .captchaCondition {
     color: #ffffff;
-    font-size: 11px;
+    font-size: 12px;
     margin-top: 0px;
 }
 #inputCaptcha {

@@ -110,10 +110,8 @@
     <div class="uiLogin">
 		<p class="welcomeContent"><%=companyName%>!</p>
 		<div class="uiLoginCondition">
-			<p><%=res.getString("onboarding.login.hello")%>  <%=fullUsername%>,</p>
-			<p><%=res.getString("onboarding.login.loginText")%><span class="username"> <%=username%><span></p>
 			<p><%=res.getString("onboarding.login.condition")%></p>
-			<p><%=res.getString("onboarding.login.allowCreatePassword")%></p>
+			<p><%=res.getString("onboarding.login.finalizeCreateAccount")%></p>
 		</div>
     	<div class="loginContainer">
 			<div class="loginContent">
