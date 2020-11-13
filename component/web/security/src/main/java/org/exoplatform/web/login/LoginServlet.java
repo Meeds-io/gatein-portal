@@ -34,6 +34,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+
+import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
@@ -42,12 +44,15 @@ import org.exoplatform.container.web.AbstractHttpServlet;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.Query;
 import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.web.security.AuthenticationRegistry;
 import org.exoplatform.web.security.security.AbstractTokenService;
 import org.exoplatform.web.security.security.CookieTokenService;
 import org.exoplatform.web.security.sso.SSOHelper;
+
 import org.gatein.wci.ServletContainer;
 import org.gatein.wci.ServletContainerFactory;
 import org.gatein.wci.authentication.*;
@@ -171,6 +176,24 @@ public class LoginServlet extends AbstractHttpServlet {
         int status;
         if (req.getRemoteUser() == null) {
             if (username != null && password != null) {
+                // email authentication
+                if (username.contains("@")) {
+                  OrganizationService organizationService = getContainer().getComponentInstanceOfType(OrganizationService.class);
+                  UserHandler userHandler = organizationService.getUserHandler();
+                  if (userHandler != null) {
+                    Query emailQuery = new Query();
+                    emailQuery.setEmail(username);
+                    ListAccess<User> users;
+                    try {
+                      users = userHandler.findUsersByQuery(emailQuery);
+                      if (users != null && users.getSize() > 0) {
+                        username = users.load(0, 1)[0].getUserName();
+                      }
+                    } catch (Exception e) {
+                      log.error("Can not get users by email", e);
+                    }
+                  }
+                }
                 Credentials credentials = new Credentials(username, password);
                 ServletContainer container = ServletContainerFactory.getServletContainer();
 
