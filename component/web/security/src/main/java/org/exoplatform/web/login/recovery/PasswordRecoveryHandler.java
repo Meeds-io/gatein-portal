@@ -139,7 +139,8 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
                     errors.add(message);
                 } else {
                   if (password == null || !customPasswordPattern.matcher(password).matches() || customPasswordMaxlength < password.length() || customPasswordMinlength > password.length() ) {
-                        errors.add(PropertyManager.getProperty("gatein.validators.passwordpolicy.format.message"));
+                        String passwordpolicyProperty = PropertyManager.getProperty("gatein.validators.passwordpolicy.format.message");
+                        errors.add(passwordpolicyProperty != null ? passwordpolicyProperty : bundle.getString("onboarding.login.passwordCondition"));
                     }
                     if (!password.equals(confirmPass)) {
                         errors.add(bundle.getString("gatein.forgotPassword.confirmPasswordNotMatch"));
