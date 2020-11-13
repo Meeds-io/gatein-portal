@@ -75,10 +75,12 @@
 	
 	BrandingService brandingService = portalContainer.getComponentInstanceOfType(BrandingService.class);
 	String companyName = brandingService.getCompanyName();
-	byte[] bytes = brandingService.getLogo().getData();
-	byte[] encodedBytes = Base64.getEncoder().encode(bytes);
-	String encoded = new String(encodedBytes, "UTF-8");
-	encoded = "data:image/png;base64," + encoded;
+	String logo = "";
+	if (brandingService.getLogo() != null) {
+		byte[] logoData = brandingService.getLogo().getData();
+		byte[] encodedLogoData = Base64.getEncoder().encode(logoData);
+		logo= "data:image/png;base64," + new String(encodedLogoData, "UTF-8");
+	}
     response.setCharacterEncoding("UTF-8");
     response.setContentType("text/html; charset=UTF-8");
 
@@ -91,7 +93,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%=res.getString("onboarding.changePass.title")%></title>
     <%if (success != null && !success.isEmpty()) {%>
-        <meta http-equiv="refresh" content="1; url=<%=contextPath+ "/login"%>" />
+        <meta http-equiv="refresh" content="0; url=<%=contextPath+ "/login"%>" />
     <%}%>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="shortcut icon" type="image/x-icon"  href="<%=contextPath%>/favicon.ico" />
@@ -162,7 +164,7 @@
 		<div class="alertSuccessMessage confirmPwdSuccess hidden"><%=res.getString("onboarding.login.passwordsMatch")%></div>
     </div>
     <div class="logoImageContent">
-      <img src="<%=encoded%>" class="logoImage"/>
+      <img src="<%=logo%>" class="logoImage"/>
     </div>
 	<script type="text/javascript">
 	  var $form = $('form[name="registerForm"]');
