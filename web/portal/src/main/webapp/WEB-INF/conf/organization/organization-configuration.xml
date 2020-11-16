@@ -147,6 +147,22 @@
                 <value>
                   <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
                     <field name="name">
+                      <string>externals</string>
+                    </field>
+                    <field name="parentId">
+                      <string>/platform</string>
+                    </field>
+                    <field name="description">
+                      <string>the /platform/externals group</string>
+                    </field>
+                    <field name="label">
+                      <string>Externals</string>
+                    </field>
+                  </object>
+                </value>
+                <value>
+                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                    <field name="name">
                       <string>guests</string>
                     </field>
                     <field name="parentId">

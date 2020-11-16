@@ -26,15 +26,15 @@
     id="ParentSiteContainer"
     template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
 
-  <access-permissions>*:/platform/users</access-permissions>
+  <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
   <container id="UITopBarContainer" template="system:/groovy/portal/webui/container/UITopBarContainer.gtmpl">
-    <access-permissions>*:/platform/users</access-permissions>
+    <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
     <container id="left-topNavigation-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl" attribute="">
       <name>left-topNavigation-container</name>
       <factory-id>addonContainer</factory-id>
     </container>
     <container id="HamburgerMenuContainer" template="system:/groovy/portal/webui/container/UIHamburgerMenuContainer.gtmpl">
-      <access-permissions>*:/platform/users</access-permissions>
+      <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
       <container id="hamburger-menu-items-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
         <name>hamburger-menu-items-container</name>
         <factory-id>addonContainer</factory-id>
@@ -54,12 +54,12 @@
     </container>
     <container id="MiddleToolBar" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
       <name>MiddleToolBar</name>
-      <access-permissions>*:/platform/users</access-permissions>
+      <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
       <factory-id>addonContainer</factory-id>
     </container>
     <container id="SearchPortlet" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
       <name>SearchPortlet</name>
-      <access-permissions>*:/platform/users</access-permissions>
+      <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
       <factory-id>addonContainer</factory-id>
     </container>
     <container id="middle-topNavigation-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
@@ -68,12 +68,12 @@
     </container>
     <container id="AppCenterAppLauncherPortlet" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
       <name>AppCenterAppLauncherPortlet</name>
-      <access-permissions>*:/platform/users</access-permissions>
+      <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
       <factory-id>addonContainer</factory-id>
     </container>
     <container id="NotificationTopBar" template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
       <name>NotificationTopBar</name>
-      <access-permissions>*:/platform/users</access-permissions>
+      <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
       <factory-id>addonContainer</factory-id>
     </container>
     <container id="DrawerAdminToolBarPortlet" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
@@ -82,7 +82,7 @@
       <factory-id>addonContainer</factory-id>
     </container>
     <container id="TopbarLoadingContainer" template="system:/groovy/portal/webui/container/UITopbarLoadingContainer.gtmpl">
-      <access-permissions>*:/platform/users</access-permissions>
+      <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
     </container>
   </container>
   <site-body />
