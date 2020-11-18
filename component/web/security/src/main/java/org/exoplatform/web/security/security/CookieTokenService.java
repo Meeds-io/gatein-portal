@@ -89,7 +89,11 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
     /** . */
     public static final String LIFECYCLE_NAME = "lifecycle-name";
     public static final String HASH_SERVICE_INIT_PARAM = "hash.service";
-
+    public static final String ONBOARD_TOKEN="onboard";
+    public static final String FORGOT_PASSWORD_TOKEN="forgot-password";
+    public static final String EXTERNAL_REGISTRATION_TOKEN="external-registration";
+    public static final String SEPARATOR_CHAR="#";
+    
     private GateInTokenStore tokenStore;
 
     /**
@@ -100,6 +104,8 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
     private SaltedHashService saltedHashService;
 
     private final Logger log = LoggerFactory.getLogger(CookieTokenService.class);
+    
+    
 
     public CookieTokenService(InitParams initParams, GateInTokenStore tokenStore, CodecInitializer codecInitializer)
             throws TokenServiceInitializationException {
@@ -127,8 +133,12 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
         this.tokenStore.cleanLegacy();
         super.start();
     }
-
+    
     public String createToken(final Credentials credentials) {
+        return createToken(credentials,"");
+    }
+    
+    public String createToken(final Credentials credentials, String type) {
         if (validityMillis < 0) {
             throw new IllegalArgumentException();
         }
@@ -142,7 +152,7 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
             String id = nextRandom();
             cookieTokenString = new CookieToken(id, randomString).toString();
 
-            String hashedRandomString = hashToken(randomString);
+            String hashedRandomString = hashToken(type+SEPARATOR_CHAR+randomString);
             long expirationTimeMillis = System.currentTimeMillis() + validityMillis;
 
             /* the symmetric encryption happens here */
@@ -165,14 +175,15 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
     }
 
     @Override
-    public GateInToken getToken(String cookieTokenString) {
+    public GateInToken getToken(String cookieTokenString, String tokenType) {
         try {
             CookieToken token = new CookieToken(cookieTokenString);
 
             GateInTokenStore.TokenData encryptedToken = tokenStore.getToken(token.getId());
             if (encryptedToken != null) {
                 try {
-                    if (saltedHashService.validate(token.getRandomString(), encryptedToken.hash)) {
+                    String tokenRandomString=tokenType+SEPARATOR_CHAR+token.getRandomString();
+                    if (saltedHashService.validate(tokenRandomString, encryptedToken.hash)) {
                         Credentials encryptedCredentials = encryptedToken.payload;
                         Credentials decryptedCredentials = new Credentials(encryptedCredentials.getUsername(),
                                     codec.decode(encryptedCredentials.getPassword()));
@@ -188,11 +199,20 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
         }
         return null;
     }
-
+    
+    @Override
+    public GateInToken getToken(String id) {
+        return getToken(id,"");
+    }
+    
     @Override
     public GateInToken deleteToken(String cookieTokenString) {
+        return deleteToken(cookieTokenString,"");
+    }
+    @Override
+    public GateInToken deleteToken(String cookieTokenString, String tokenType) {
         try {
-            GateInToken result = this.getToken(cookieTokenString);
+            GateInToken result = this.getToken(cookieTokenString,tokenType);
             if (result != null) {
                 CookieToken token = new CookieToken(cookieTokenString);
                 tokenStore.deleteToken(token.getId());

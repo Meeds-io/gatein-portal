@@ -46,6 +46,7 @@ import javax.servlet.http.HttpSession;
 import nl.captcha.text.producer.DefaultTextProducer;
 import nl.captcha.text.renderer.DefaultWordRenderer;
 import org.apache.tools.ant.taskdefs.condition.Http;
+import org.exoplatform.web.security.security.RemindPasswordTokenService;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.wci.security.Credentials;
@@ -120,6 +121,7 @@ public class OnboardingHandler extends WebRequestHandler {
         PasswordRecoveryServiceImpl service = getService(PasswordRecoveryServiceImpl.class);
         ResourceBundleService bundleService = getService(ResourceBundleService.class);
         ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
+        RemindPasswordTokenService remindPasswordTokenService= getService(RemindPasswordTokenService.class);
 
         String token = context.getParameter(TOKEN);
     
@@ -135,7 +137,7 @@ public class OnboardingHandler extends WebRequestHandler {
             String tokenId = context.getParameter(TOKEN);
 
             //. Check tokenID is expired or not
-            Credentials credentials = service.verifyToken(tokenId);
+            Credentials credentials = service.verifyToken(tokenId,remindPasswordTokenService.ONBOARD_TOKEN);
             if (credentials == null) {
                 //. TokenId is expired
                 return dispatch("/onboarding/jsp/token_expired.jsp", servletContext, req, res);
