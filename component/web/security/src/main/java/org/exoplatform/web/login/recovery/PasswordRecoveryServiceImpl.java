@@ -217,7 +217,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         try {
             mailService.sendMessage(message);
         } catch (Exception ex) {
-            log.error("Failure to send onboarding email", ex);
+            log.error("Failure to send external user email", ex);
             return false;
         }
 
