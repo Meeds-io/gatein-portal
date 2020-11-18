@@ -43,7 +43,9 @@ public interface PasswordRecoveryService {
   public boolean sendRecoverPasswordEmail(User user, Locale defaultLocale, HttpServletRequest req);
 
   public boolean sendOnboardingEmail(User user, Locale defaultLocale, StringBuilder url);
-  
+
+  public boolean sendEmailForExternalUser(String sender, String email, Locale locale, String space, StringBuilder url) throws Exception;
+
   public boolean allowChangePassword(String username) throws Exception;
 
   // EXOGTN-2114 Workaround for Java 8 Backward compatibility.

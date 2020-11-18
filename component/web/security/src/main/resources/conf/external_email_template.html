@@ -1,0 +1,55 @@
+<table width="80%" align="center" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <!-- begin top-->
+                <tr bgcolor="#f5f5f5" >
+                    <td height="44" valign="middle" align="center" bgcolor="#d6d6d6" style="color: #476a98; border-bottom: 1px solid #ccc;">
+                        <h2 style="margin: 0;padding: 0; font-size: 16px;font-family: 'Helvetica', 'Arial', sans-serif;">${SENDER_DISPLAY_NAME} &{external.email.header} ${COMPANY_NAME} : ${SPACE_DISPLAY_NAME}</h2>
+                    </td>
+                </tr>
+                <!--end top-->
+
+                <!--begin body-->
+                <tr align="center">
+                    <td align="center" style="padding: 25px 0 25px">
+                        <table width="90%" cellpadding="0" cellspacing="0" >
+                            <tr>
+                                <td align="left" style="line-height: 18px;font-size: 14px;color:#333;font-family: 'Helvetica', 'Arial', sans-serif;">
+                                    <p style="margin: 0 0 10px 0;line-height: 40px;font-size: 17px;text-transform: capitalize">&{external.email.hello},</p>
+                                    <p style="margin: 0 0 30px 0;line-height:22px">&{external.email.invitedBy} ${SENDER_DISPLAY_NAME} &{external.email.toJoint}</p>
+
+
+                                    <p style="margin: 0 0 5px 0;line-height:22px">&{external.email.allowedTo}</p>
+                                        <p style="margin: 0 0 5px 0;line-height:22px">- &{external.email.joinWorking}</p>
+                                        <p style="margin: 0 0 5px 0;line-height:22px">- &{external.email.centralizedKnowledge}</p>
+                                        <p style="margin: 0 0 5px 0;line-height:22px">- &{external.email.exchangeWith}</p>
+                                        <p style="margin: 0 0 10px 0;line-height:22px">- &{external.email.organizeMeeting}</p>
+                                    <table width="100%" cellpadding="0" cellspacing="0" style="font-size: inherit;color: #333333;">
+                                        <tr>
+                                            <td>
+                                                <p style="margin-bottom: 0px">&{external.email.accessLink}: <a href="${EXTERNAL_REGISTRATION_LINK}" style="text-decoration: none;color: #fff;border-radius: 3px;padding: 4px 14px;background-color: #578dc9;display: inline-table;">&{external.email.create}</a></p>
+                                                <sub style="color: #a8b3c5;line-height:22px">&{external.email.note}</sub>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <p style="margin: 10px 0 10px 0;line-height:22px">&{external.email.bye}</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!--end body-->
+
+                <!-- begin footer-->
+                <tr>
+                    <td height="38" valign="middle" align="center" bgcolor="#578dc9" style="color:#fff;font-family: 'Helvetica', 'Arial', sans-serif;border-radius: 4px;">
+                        <h2 style="color: #fff;margin: 0;padding: 0; font-size: 16px;">&{external.email.footer}</h2>
+                    </td>
+                </tr>
+                <!--end footer-->
+
+            </table>
+        </td>
+    </tr>
+</table>
