@@ -191,7 +191,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
 
         Credentials credentials = new Credentials(email, "");
-        String tokenId = remindPasswordTokenService.createToken(credentials);
+        String tokenId = remindPasswordTokenService.createToken(credentials, remindPasswordTokenService.EXTERNAL_REGISTRATION_TOKEN);
         StringBuilder redirectUrl = new StringBuilder();
         redirectUrl.append(url);
         redirectUrl.append("/external-registration");
