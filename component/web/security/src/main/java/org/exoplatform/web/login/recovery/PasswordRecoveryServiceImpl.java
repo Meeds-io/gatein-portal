@@ -197,7 +197,6 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         redirectUrl.append("/external-registration");
         redirectUrl.append("?lang=" + I18N.toTagIdentifier(locale));
         redirectUrl.append("&token=" + tokenId);
-        redirectUrl.append("&email=" + email);
 
         String emailBody = buildExternalEmailBody(senderFullName, space, redirectUrl.toString(), bundle);
         String emailSubject = senderFullName + " " + bundle.getString("external.email.subject") + " " + brandingService.getCompanyName() + " : " + space;
