@@ -93,4 +93,32 @@ public class TestTransientTokenService extends AbstractTokenServiceTest<Transien
 
         service.deleteToken(tokenId1);
     }
+    
+    @Override
+    public void testGetTokenWithType() throws Exception {
+        //TransientTokenService have no type for token
+    }
+    
+    @Override
+    public void testGetAllTokenWithType() throws Exception {
+        //TransientTokenService have no type for token
+    }
+    
+    @Override
+    public void testSizeWithType() throws Exception {
+        //TransientTokenService have no type for token
+    
+    }
+    
+    @Override
+    public void testDeleteTokenWithType() throws Exception {
+        //TransientTokenService have no type for token
+    
+    }
+    
+    @Override
+    public void testCleanExpiredTokensWithType() throws Exception {
+        //TransientTokenService have no type for token
+    
+    }
 }

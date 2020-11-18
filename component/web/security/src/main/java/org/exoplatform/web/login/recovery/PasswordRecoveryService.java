@@ -33,8 +33,11 @@ import java.util.Locale;
 public interface PasswordRecoveryService {
   void addConnector(ChangePasswordConnector connector);
 
+  Credentials verifyToken(String tokenId, String type);
+  
   Credentials verifyToken(String tokenId);
-
+  
+  
   boolean changePass(final String tokenId, final String username, final String password);
 
   public boolean sendRecoverPasswordEmail(User user, Locale defaultLocale, HttpServletRequest req);

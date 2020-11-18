@@ -31,6 +31,7 @@ import org.exoplatform.web.security.security.CookieTokenService;
 
 @ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/tokenservice-configuration.xml") })
 public abstract class AbstractCookieTokenServiceTest extends AbstractTokenServiceTest<CookieTokenService> {
+    public String type="testType";
 
     @Override
     public void testGetToken() throws Exception {
@@ -77,6 +78,53 @@ public abstract class AbstractCookieTokenServiceTest extends AbstractTokenServic
         assertEquals(0, service.size());
 
         service.deleteToken(tokenId1);
+    }
+    
+    @Override
+    public void testGetTokenWithType() throws Exception {
+        String tokenId = service.createToken(new Credentials("root", "gtn"),type);
+        assertEquals(service.getValidityTime(), 2);
+        
+        GateInToken token = service.getToken(tokenId,type);
+        assertEquals(token.getPayload().getUsername(), "root");
+        assertEquals(token.getPayload().getPassword(), "gtn");
+        service.deleteToken(tokenId,type);
+    }
+    
+    @Override
+    public void testGetAllTokenWithType() throws Exception {
+        /* Do nothing there is no CookieTokenService.getAllTokens(); */
+    }
+    
+    @Override
+    public void testSizeWithType() throws Exception {
+        String token = service.createToken(new Credentials("root", "gtn"),type);
+        assertEquals(service.size(), 1);
+        service.deleteToken(token,type);
+    }
+    
+    @Override
+    public void testDeleteTokenWithType() throws Exception {
+        String tokenId = service.createToken(new Credentials("root", "gtn"),type);
+        GateInToken deletedToken = service.deleteToken(tokenId,type);
+        assertNotNull(deletedToken);
+        assertNotSame(service.getToken(tokenId,type), deletedToken);
+        assertNull(service.getToken(tokenId,type));
+        assertEquals(0, service.size());
+        service.deleteToken(tokenId,type);
+    }
+    
+    @Override
+    public void testCleanExpiredTokensWithType() throws Exception {
+        assertEquals(2, service.getValidityTime());
+        String tokenId1 = service.createToken(new Credentials("user1", "gtn"),type);
+        assertEquals(1, service.size());
+        
+        Thread.sleep(2100);
+        service.cleanExpiredTokens();
+        assertEquals(0, service.size());
+        
+        service.deleteToken(tokenId1,type);
     }
 
 }

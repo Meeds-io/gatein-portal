@@ -192,9 +192,13 @@ public abstract class AbstractTokenService<T extends Token, K> implements Starta
     }
 
     public abstract T getToken(K id);
-
+    
+    public abstract T getToken(K id, String tokenType);
+    
+    
     public abstract T deleteToken(K id);
-
+    
+    public abstract T deleteToken(K id, String tokenType);
     /**
      * Decode a key from its string representation.
      *

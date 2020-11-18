@@ -89,12 +89,17 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     
     
     @Override
-    public Credentials verifyToken(String tokenId) {
-        Token token = remindPasswordTokenService.getToken(tokenId);
+    public Credentials verifyToken(String tokenId, String type) {
+        Token token = remindPasswordTokenService.getToken(tokenId,type);
         if (token == null || token.isExpired()) {
             return null;
         }
         return token.getPayload();
+    }
+    
+    @Override
+    public Credentials verifyToken(String tokenId) {
+        return verifyToken(tokenId,"");
     }
     
     @Override
@@ -129,7 +134,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
 
         Credentials credentials = new Credentials(user.getUserName(), "");
-        String tokenId = remindPasswordTokenService.createToken(credentials);
+        String tokenId = remindPasswordTokenService.createToken(credentials, remindPasswordTokenService.ONBOARD_TOKEN);
         StringBuilder redirectUrl = new StringBuilder();
         redirectUrl.append(url);
         redirectUrl.append("/" + OnboardingHandler.NAME);
@@ -190,7 +195,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
 
         Credentials credentials = new Credentials(user.getUserName(), "");
-        String tokenId = remindPasswordTokenService.createToken(credentials);
+        String tokenId = remindPasswordTokenService.createToken(credentials,remindPasswordTokenService.FORGOT_PASSWORD_TOKEN);
 
         Router router = webController.getRouter();
         Map<QualifiedName, String> params = new HashMap<>();
