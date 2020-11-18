@@ -108,7 +108,7 @@
 	<div class="loginBGLight"><span></span></div>
 
     <div class="uiLogin">
-		<p class="welcomeContent"><%=companyName%>!</p>
+		<p class="welcomeContent"><%=companyName%></p>
 		<div class="uiLoginCondition">
 			<p><%=res.getString("onboarding.login.condition")%></p>
 			<p><%=res.getString("onboarding.login.finalizeCreateAccount")%></p>
@@ -157,7 +157,6 @@
 				</div>
 			</div>
     	</div>
-		<div class="alertErrorMessage passwordFormat hidden"><%=res.getString("onboarding.login.wrongPasswordFormat")%></div>
 		<div class="alertErrorMessage confirmPwdError hidden"><%=res.getString("onboarding.login.passwordsNotMatch")%></div>
 		<div class="alertSuccessMessage confirmPwdSuccess hidden"><%=res.getString("onboarding.login.passwordsMatch")%></div>
     </div>
@@ -177,25 +176,19 @@
 	  $form.find('input[type="text"], input[type="password"]').on('keyup', function() {
 		$form.validate();
 	  });
-	  $("#password").blur(function () {
-		  var pattern = /((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20})/g;
-		  if ($('#password').val() != "" && !pattern.test($('#password').val())) {
-			  $('.userCredentials .passwordFormat').show();
-			  $('.uiLogin .passwordFormat').show();
-			  $('.uiLogin .confirmPwdError').hide();
-			  $('.uiLogin .confirmPwdSuccess').hide();
-			  $('.uiIconGreenChecker').hide();
-		  }
-	  });
+
 	  $("#password").focus(function () {
-		  $('.userCredentials .passwordFormat').hide();
-		  $('.uiLogin .passwordFormat').hide();
 		  $('.uiLogin .confirmPwdError').hide();
 		  $('.uiLogin .confirmPwdSuccess').hide();
 	  });
+	  $("#password").blur(function () {
+		  if ($('#password').val() != $('#confirm_password').val()) {
+			  $('.uiLogin .confirmPwdError').show();
+		  }
+	  });
 
 	  $("#confirm_password").blur(function () {
-		  if ($('#password').val() != $('#confirm_password').val() && $('.uiLogin .passwordFormat').is(":hidden")) {
+		  if ($('#password').val() != $('#confirm_password').val()) {
 			  $('.uiLogin .confirmPwdError').show();
 		  }
 	  });

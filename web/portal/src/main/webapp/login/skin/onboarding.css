@@ -35,8 +35,9 @@
     border-radius: 8px;
     border: 2px solid #3C806A;
     text-align: center;
-    margin : 30px 25px 0px 25px;
+    margin: 30px 25px 0px 25px;
 }
+
 .alertErrorMessage {
     padding: 10px;
     background-color: #DFA3A3;
@@ -44,13 +45,27 @@
     border-radius: 8px;
     border: 2px solid #C6595B;
     text-align: center;
-    margin : 30px 25px 0px 25px;
+    margin: 30px 25px 0px 25px;
 }
 
 .uiLogin {
-    height: 80%;
+    height: 520px;
     width: 35%;
 }
+
+@media ( min-width: 1024px) and (max-width: 1399px) {
+
+    .uiLogin {
+        width: 50%;
+    }
+}
+
+@media ( max-width: 1024px) {
+    .uiLogin {
+        width: 90%;
+    }
+}
+
 .uiLogin .uiIconGreenChecker {
     background: url(/eXoSkin/skin/images/themes/default/Icons/skinIcons/16x16/GreenCheckerIcon.gif) no-repeat left top;
     position: absolute;
@@ -59,6 +74,7 @@
     width: 24px;
     height: 24px;
 }
+
 .uiLogin .welcomeContent {
     color: #ffffff;
     margin-top: 40px;
@@ -68,67 +84,106 @@
 .uiLogin .uiLoginCondition {
     font-size: 17px;
 }
-.uiLogin .uiLoginCondition p{
+
+.uiLogin .uiLoginCondition p {
     display: inline-block;
     width: 100%;
 }
-.uiLogin .uiLoginCondition .username{
+
+.uiLogin .uiLoginCondition .username {
     font-weight: bold;
 }
+
 .uiLogin .loginContainer {
     padding-top: 8%;
 }
 
-.uiLogin .loginContainer .loginContent input{
+.uiLogin .loginContainer .loginContent input {
     width: -webkit-fill-available;
 }
+
 .uiLogin .loginContainer .loginContent input.username {
     background-color: #E2E9EE;
     cursor: default;
 }
-.uiLogin .loginContainer .loginContent input.username:focus{
+
+.uiLogin .loginContainer .loginContent input.username:focus {
     background-color: #E2E9EE;
     cursor: default;
     border-color: rgb(225, 232, 238);
 }
+
 .uiLogin .loginContent .userCredentials .iconUser, .uiLogin .loginContent .userCredentials .iconPswrd {
     left: initial;
 }
+
 .uiLogin .loginContent .userCredentials .passwordFormat {
     margin-left: -25px;
     display: none;
 }
 
-.uiLogin .loginContainer .loginButton .button[disabled]{
+.uiLogin .loginContainer .loginButton .button[disabled] {
     background: var(--allPagesSecondaryColor, @secondaryColorDefault);
     font-weight: bold;
     color: #ffffff;
     width: -webkit-fill-available;
 }
 
-.uiLogin .loginContainer .loginButton .button{
+.uiLogin .loginContainer .loginButton .button {
     background: var(--allPagesSecondaryColor, @secondaryColorDefault);
     font-weight: bold;
     color: #ffffff;
     width: -webkit-fill-available;
 }
+
 .uiLogin .loginContainer .loginButton .button:hover {
     background: var(--allPagesSecondaryColor, @secondaryColorDefault);
     color: #ffffff;
 }
+
 .passwordCondition {
     color: #ffffff;
     font-size: 12px;
     margin-top: 0px;
 }
+
 .captchaCondition {
     color: #ffffff;
     font-size: 12px;
     margin-top: 0px;
 }
+
 #inputCaptcha {
     padding-left: 15px;
 }
+
+.logoImageContent {
+    bottom: 40px;
+    right: 40px;
+    position: fixed;
+}
+
 .logoImageContent img {
-    width: 160px;
+    width: 150px;
+}
+
+@media ( max-width: 1024px) {
+    .uiLogin .uiLoginCondition p {
+        margin: 0px;
+    }
+
+    .uiLogin .loginContainer {
+        padding-top: 0px;
+    }
+
+    .logoImageContent {
+        bottom: 0px;
+        right: 0px;
+    }
+}
+
+@media ( max-width: 700px) {
+    .logoImageContent {
+        display: none;
+    }
 }
