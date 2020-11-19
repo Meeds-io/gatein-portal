@@ -51,4 +51,14 @@ public abstract class AbstractTokenServiceTest<S extends AbstractTokenService<?,
     public abstract void testDeleteToken() throws Exception;
 
     public abstract void testCleanExpiredTokens() throws Exception;
+    
+    public abstract void testGetTokenWithType() throws Exception;
+    
+    public abstract void testGetAllTokenWithType() throws Exception;
+    
+    public abstract void testSizeWithType() throws Exception;
+    
+    public abstract void testDeleteTokenWithType() throws Exception;
+    
+    public abstract void testCleanExpiredTokensWithType() throws Exception;
 }

@@ -50,20 +50,29 @@ public class TransientTokenService extends PlainTokenService<GateInToken, String
     }
 
     @Override
-    public GateInToken getToken(String id) {
+    public GateInToken getToken(String id, String type) {
         return tokens.get(id);
+    }
+    
+    @Override
+    public GateInToken getToken(String id) {
+        return getToken(id,"");
     }
 
     @Override
     protected String decodeKey(String stringKey) {
         return stringKey;
     }
-
+    
     @Override
-    public GateInToken deleteToken(String id) {
+    public GateInToken deleteToken(String id,String tokenType) {
         GateInToken token = tokens.get(id);
         tokens.remove(id);
         return token;
+    }
+    @Override
+    public GateInToken deleteToken(String id) {
+        return deleteToken(id,"");
     }
 
     @Override

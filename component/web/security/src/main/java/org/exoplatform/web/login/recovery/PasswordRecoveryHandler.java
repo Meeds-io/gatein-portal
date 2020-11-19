@@ -32,6 +32,7 @@ import org.exoplatform.services.organization.UserStatus;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.LocalePolicy;
 
+import org.exoplatform.web.security.security.RemindPasswordTokenService;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 
@@ -104,6 +105,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
 
         PasswordRecoveryServiceImpl service = getService(PasswordRecoveryServiceImpl.class);
         ResourceBundleService bundleService = getService(ResourceBundleService.class);
+        RemindPasswordTokenService remindPasswordTokenService= getService(RemindPasswordTokenService.class);
         OrganizationService orgService = getService(OrganizationService.class);
         ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
 
@@ -116,7 +118,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
             String tokenId = context.getParameter(TOKEN);
 
             //. Check tokenID is expired or not
-            Credentials credentials = service.verifyToken(tokenId);
+            Credentials credentials = service.verifyToken(tokenId,remindPasswordTokenService.FORGOT_PASSWORD_TOKEN);
             if (credentials == null) {
                 //. TokenId is expired
                 return dispatch("/forgotpassword/jsp/token_expired.jsp", servletContext, req, res);
