@@ -53,8 +53,6 @@
         <transport cluster="${exo.cluster.partition.name}-async-services" node-name="${exo.cluster.node.name}"  stack="stack"
                    executor="infinispan-transport" total-order-executor="infinispan-cached" remote-command-executor="infinispan-cached" />
         <replicated-cache-configuration  mode="ASYNC" name="default" statistics="true">
-            <locking isolation="READ_COMMITTED" concurrency-level="500" striping="false" write-skew="false"/>
-            <transaction locking="PESSIMISTIC" mode="NON_XA" transaction-manager-lookup="org.exoplatform.services.transaction.infinispan.JBossStandaloneJTAManagerLookup" />
             <eviction size="${exo.cache.async.eviction.maxEntries:1000000}" strategy="LIRS" thread-policy="DEFAULT"/>
             <state-transfer enabled="${exo.cache.async.cluster.statetransfer.fetchinmemorystate:false}" />
             <expiration interval="${exo.cache.async.expiration.wakeupinterval:120000}"/>
