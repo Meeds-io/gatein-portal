@@ -127,7 +127,7 @@ public class UIForgetPassword extends UIForm {
             // Create token
             RemindPasswordTokenService tokenService = uiForm.getApplicationComponent(RemindPasswordTokenService.class);
             Credentials credentials = new Credentials(user.getUserName(), "");
-            tokenId = tokenService.createToken(credentials);
+            tokenId = tokenService.createToken(credentials,tokenService.FORGOT_PASSWORD_TOKEN);
 
             String portalName = URLEncoder.encode(Util.getUIPortal().getName(), "UTF-8");
 

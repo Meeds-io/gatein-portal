@@ -45,6 +45,11 @@ public class SimpleGeneratorCookieTokenService extends CookieTokenService {
         super(replaceHashService(initParams), tokenStore, codecInitializer);
     }
 
+    
+    public void resetCounter() {
+        counter=0;
+        noRandom=0;
+    }
     /**
      * @param initParams
      * @return
