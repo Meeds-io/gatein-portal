@@ -17,11 +17,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+body {
+	background-color: #ffffff;
+	font-family: Helvetica, arial, sans-serif;
+	color: var(--allPagesBaseTextColor, #333333);
+} 
+ 
 .hidden {
     display: none;
 }
 
 .welcomeContent {
+	text-align: center;
     padding: 0 20px 0;
     font-family: Helvetica, arial, sans-serif;
     font-size: 25px;
@@ -51,6 +58,10 @@
 .uiLogin {
     height: 520px;
     width: 35%;
+    background-color: var(--allPagesPrimaryColor, @primaryColor);
+    border-radius: 8px;
+    transform: translate(-50%, 20px);
+    top: 0%;
 }
 
 @media ( min-width: 1024px) and (max-width: 1399px) {
@@ -83,6 +94,8 @@
 
 .uiLogin .uiLoginCondition {
     font-size: 17px;
+    padding: 0 20px 0;
+    color: #ffffff;
 }
 
 .uiLogin .uiLoginCondition p {
@@ -96,6 +109,15 @@
 
 .uiLogin .loginContainer {
     padding-top: 8%;
+	background-color: var(--allPagesPrimaryColor, @primaryColor);
+}
+
+.uiLogin .loginContainer .loginContent {
+    padding: 0;
+}
+
+.uiLogin .loginContainer .capatchaMessage {
+	color: #ffffff;
 }
 
 .uiLogin .loginContainer .loginContent input {
@@ -155,6 +177,10 @@
 
 #inputCaptcha {
     padding-left: 15px;
+}
+
+.alertForm {
+   color: #ffffff;
 }
 
 .logoImageContent {
