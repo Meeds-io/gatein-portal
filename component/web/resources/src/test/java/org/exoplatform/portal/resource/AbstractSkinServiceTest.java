@@ -142,6 +142,25 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
         assertEquals(contextPath + "/skin/module1/Stylesheet.css", portalSkin.getCSSPath());
     }
 
+    public void testRemovePortalSkin() {
+      String skinName = "TestSkin";
+      String module = "ToDeletePortalSkin";
+      String cssPath = mockServletContext.getContextPath() + "/skin/core/Stylesheet.css";
+
+      SkinConfig portalSkin = skinService.getPortalSkin(module, skinName);
+      assertNull(portalSkin);
+
+      skinService.addPortalSkin(module, skinName, cssPath);
+
+      portalSkin = skinService.getPortalSkin(module, skinName);
+      assertNotNull(portalSkin);
+      assertEquals(cssPath, portalSkin.getCSSPath());
+
+      skinService.removePortalSkin(module, skinName);
+      portalSkin = skinService.getPortalSkin(module, skinName);
+      assertNull(portalSkin);
+    }
+
     public void testPortalSkinAndPriority() {
         Collection<SkinConfig> portalSkinConfigs = skinService.getPortalSkins("TestSkin");
         String contextPath = mockServletContext.getContextPath();
