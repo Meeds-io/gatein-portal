@@ -182,6 +182,8 @@ public class OnboardingHandler extends WebRequestHandler {
                         success = bundle.getString("gatein.forgotPassword.resetPasswordSuccess");
                         password = "";
                         confirmPass = "";
+                        String currentPortalContainerName = PortalContainer.getCurrentPortalContainerName();
+                        res.sendRedirect("/" + currentPortalContainerName + "/login");
                     } else {
                         errors.add(bundle.getString("gatein.forgotPassword.resetPasswordFailure"));
                     }

@@ -20,16 +20,11 @@
 <%@ page import="org.exoplatform.container.PortalContainer"%>
 <%@ page import="org.exoplatform.services.resources.ResourceBundleService"%>
 <%@ page import="org.exoplatform.portal.resource.SkinService"%>
-<%@ page import="java.util.ResourceBundle"%>
 <%@ page import="org.exoplatform.services.organization.User"%>
 <%@ page import="org.exoplatform.services.organization.impl.UserImpl" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="org.exoplatform.web.controller.QualifiedName" %>
 <%@ page import="org.exoplatform.web.login.recovery.PasswordRecoveryService" %>
 <%@ page import="org.exoplatform.portal.resource.SkinConfig" %>
-<%@ page import="java.util.Collection" %>
-<%@ page import="java.util.Locale" %>
 <%@ page import="org.exoplatform.commons.utils.I18N" %>
 <%@ page import="org.exoplatform.portal.config.UserPortalConfigService" %>
 <%@ page import="org.exoplatform.portal.resource.config.tasks.PortalSkinTask" %>
@@ -37,6 +32,7 @@
 <%@ page import="org.exoplatform.services.organization.OrganizationService" %>
 <%@ page import="org.exoplatform.services.organization.User"%>
 <%@ page import="org.exoplatform.commons.utils.PropertyManager"%>
+<%@ page import="java.util.*" %>
 <%@ page language="java" %>
 <%
 
@@ -79,7 +75,12 @@
 	
 	BrandingService brandingService = portalContainer.getComponentInstanceOfType(BrandingService.class);
 	String companyName = brandingService.getCompanyName();
-
+	String logo = "";
+	if (brandingService.getLogo() != null) {
+		byte[] logoData = brandingService.getLogo().getData();
+		byte[] encodedLogoData = Base64.getEncoder().encode(logoData);
+		logo= "data:image/png;base64," + new String(encodedLogoData, "UTF-8");
+	}
     response.setCharacterEncoding("UTF-8");
     response.setContentType("text/html; charset=UTF-8");
 
@@ -92,13 +93,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%=res.getString("onboarding.changePass.title")%></title>
     <%if (success != null && !success.isEmpty()) {%>
-        <meta http-equiv="refresh" content="5; url=<%=contextPath+ "/login"%>" />
+        <meta http-equiv="refresh" content="0; url=<%=contextPath+ "/login"%>" />
     <%}%>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="shortcut icon" type="image/x-icon"  href="<%=contextPath%>/favicon.ico" />
     <link id="brandingSkin" rel="stylesheet" type="text/css" href="/rest/v1/platform/branding/css">
     <link href="<%=loginCssPath%>" rel="stylesheet" type="text/css"/>
-	<link rel="stylesheet" type="text/css" href="<%=contextPath%>/login/skin/Stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="<%=contextPath%>/login/skin/onboarding.css"/>
     <script type="text/javascript" src="/eXoResources/javascript/jquery-3.2.1.js"></script>
     <script type="text/javascript" src="/eXoResources/javascript/eXo/webui/FormValidation.js"></script>
   </head>
@@ -106,12 +107,10 @@
 	<div class="loginBGLight"><span></span></div>
 
     <div class="uiLogin">
-		<p class="welcomeContent"><%=res.getString("onboarding.login.welcomeTo")%>  <%=companyName%>!</p>
+		<p class="welcomeContent"><%=companyName%></p>
 		<div class="uiLoginCondition">
-			<p><%=res.getString("onboarding.login.hello")%>  <%=fullUsername%>,</p>
-			<p><%=res.getString("onboarding.login.loginText")%>  <%=username%></p>
 			<p><%=res.getString("onboarding.login.condition")%></p>
-			<p><%=res.getString("onboarding.login.allowCreatePassword")%></p>
+			<p><%=res.getString("onboarding.login.finalizeCreateAccount")%></p>
 		</div>
     	<div class="loginContainer">
 			<div class="loginContent">
@@ -124,32 +123,30 @@
               <%}%>
 						</div>
 					</div>
-					<%} else if (success != null && !success.isEmpty()) {%>
-					<div class="alertForm">
-						<div class="alert alert-success">
-							<i class="uiIconSuccess"></i><%=success%>
-						</div>
-					</div>
 					<%}%>
-					<form name="registerForm" action="<%= contextPath + onboardingPasswordPath %>" method="post" style="margin: 0px;">
+					<form name="registerForm" action="<%= contextPath + onboardingPasswordPath %>" method="post">
 						<div class="userCredentials">
 							<span class="iconUser"></span>
 							<input class="username" data-validation="require" name="username" type="text" value="<%=username%>" readonly="readonly" />
 						</div>
 						<div class="userCredentials">
 						  <span class="iconPswrd"></span>
-						  <input data-validation="require" type="password" name="password" autocomplete="off" value="<%=(password != null ? password : "")%>"  placeholder="<%=res.getString("portal.login.Password")%>" onblur="this.placeholder = '<%=res.getString("portal.login.Password")%>'" onfocus="this.placeholder = ''">
+						  <input data-validation="require" type="password" name="password" id="password" autocomplete="off" value="<%=(password != null ? password : "")%>"  placeholder="<%=res.getString("portal.login.Password")%>" onblur="this.placeholder = '<%=res.getString("portal.login.Password")%>'" onfocus="this.placeholder = ''">
+					      <i class="uiIconError passwordFormat"></i>
 						</div>
 						<p class="passwordCondition"><i class="uiIconInfo"></i><%=passwordCondition != null ? passwordCondition : res.getString("onboarding.login.passwordCondition")%></p>
 						<div class="userCredentials">
 						  <span class="iconPswrd"></span>
-						   <input data-validation="require" type="password" name="password2" autocomplete="off" value="<%=(password2 != null ? password2 : "")%>"  placeholder="<%=res.getString("onboarding.login.confirmPassword")%>" onblur="this.placeholder = '<%=res.getString("onboarding.login.confirmPassword")%>'" onfocus="this.placeholder = ''">
+						   <input data-validation="require" type="password" name="password2" id="confirm_password" autocomplete="off" value="<%=(password2 != null ? password2 : "")%>"  placeholder="<%=res.getString("onboarding.login.confirmPassword")%>" onblur="this.placeholder = '<%=res.getString("onboarding.login.confirmPassword")%>'" onfocus="this.placeholder = ''">
 						</div>
+						<% if (success == null || success.isEmpty()) {%>
+						<p class="captchaCondition"></i><%=res.getString("onboarding.login.captchaCondition")%></p>
 						<div id="captcha">
-						  <img src="/portal/on-boarding?serveCaptcha=true" alt="Captcha image for visual validation">
-						  <br/>
-						  <input data-validation="require" name="captcha" type="text" id="inputCaptcha"  placeholder="<%=res.getString("onboarding.login.captcha")%>" onblur="this.placeholder = '<%=res.getString("onboarding.login.captcha")%>'" onfocus="this.placeholder = ''">
-                        </div>
+							<img src="/portal/on-boarding?serveCaptcha=true" alt="Captcha image for visual validation">
+							<br/>
+							<input data-validation="require" name="captcha" type="text" id="inputCaptcha"  placeholder="<%=res.getString("onboarding.login.captcha")%>" onblur="this.placeholder = '<%=res.getString("onboarding.login.captcha")%>'" onfocus="this.placeholder = ''">
+						</div>
+						<%}%>
 						<div id="UIPortalLoginFormAction" class="loginButton">
 							<button class="button" type="submit" disabled="disabled"><%=res.getString("onboarding.login.save")%></button>
 						</div>
@@ -159,9 +156,11 @@
 				</div>
 			</div>
     	</div>
+		<div class="alertErrorMessage confirmPwdError hidden"><%=res.getString("onboarding.login.passwordsNotMatch")%></div>
+		<div class="alertSuccessMessage confirmPwdSuccess hidden"><%=res.getString("onboarding.login.passwordsMatch")%></div>
     </div>
     <div class="logoImageContent">
-      <img src="/portal/logo/Logo.png" class="logoImage"/>
+      <img src="<%=logo%>" class="logoImage"/>
     </div>
 	<script type="text/javascript">
 	  var $form = $('form[name="registerForm"]');
@@ -175,6 +174,35 @@
 	  });
 	  $form.find('input[type="text"], input[type="password"]').on('keyup', function() {
 		$form.validate();
+	  });
+
+	  $("#password").focus(function () {
+		  $('.uiLogin .confirmPwdError').hide();
+		  $('.uiLogin .confirmPwdSuccess').hide();
+	  });
+	  $("#password").blur(function () {
+		  if ($('#password').val() != $('#confirm_password').val()) {
+			  $('.uiLogin .confirmPwdError').show();
+		  }
+	  });
+
+	  $("#confirm_password").blur(function () {
+		  if ($('#password').val() != $('#confirm_password').val()) {
+			  $('.uiLogin .confirmPwdError').show();
+		  }
+	  });
+	  $("#confirm_password").focus(function () {
+		  $('.uiLogin .confirmPwdError').hide();
+	  });
+
+	  $('#confirm_password').on('keyup', function () {
+		  if (($('#password').val() == $('#confirm_password').val()) && $('.uiLogin .passwordFormat').is(":hidden")) {
+			  $('#confirm_password').after('<i class="uiIconGreenChecker"></i>');
+			  $('.uiLogin .confirmPwdSuccess').show();
+		  } else {
+			  $('.uiIconGreenChecker').remove();
+			  $('.uiLogin .confirmPwdSuccess').hide();
+		  }
 	  });
 	</script>
   </body>
