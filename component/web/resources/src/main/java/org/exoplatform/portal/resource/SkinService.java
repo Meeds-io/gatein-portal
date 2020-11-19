@@ -743,6 +743,45 @@ public class SkinService extends AbstractResourceService implements Startable {
   }
 
   /**
+   * Remove a Skin from the service as well as its cache
+   *
+   * @param module
+   * @param skinName
+   */
+  public void removePortalSkin(String module, String skinName) {
+    SkinKey key;
+    if (StringUtils.isBlank(skinName)) {
+      key = new SkinKey(module, getDefaultSkin());
+    } else {
+      key = new SkinKey(module, skinName);
+    }
+
+    removePortalSkin(key);
+  }
+
+  /**
+   * Remove a Skin mapped to the <code>key</code>
+   *
+   * @param key key whose mapping skin is to be removed from the service
+   */
+  public void removePortalSkin(SkinKey key) {
+    if (key == null) {
+      return;
+    }
+
+    SkinConfig remove = null;
+    if (key.getModule().startsWith(CUSTOM_MODULE_ID)) {
+      remove = customPortalSkins_.remove(key);
+    } else {
+      remove = portalSkins_.remove(key);
+    }
+
+    if (remove != null) {
+      invalidateCachedSkin(remove.getCSSPath());
+    }
+  }
+
+  /**
    * @deprecated This is deprecated as its name was not clear. Use
    *             {@link #removeSkins(List)} instead
    */
