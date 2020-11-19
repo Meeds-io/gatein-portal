@@ -57,23 +57,16 @@ body {
 
 .uiLogin {
     height: 520px;
-    width: 35%;
+    width: 522px;
     background-color: var(--allPagesPrimaryColor, @primaryColor);
     border-radius: 8px;
     transform: translate(-50%, 20px);
     top: 0%;
 }
 
-@media ( min-width: 1024px) and (max-width: 1399px) {
-
+@media ( max-width: 900px) {
     .uiLogin {
-        width: 50%;
-    }
-}
-
-@media ( max-width: 1024px) {
-    .uiLogin {
-        width: 90%;
+        width: 290px;
     }
 }
 
@@ -108,7 +101,6 @@ body {
 }
 
 .uiLogin .loginContainer {
-    padding-top: 8%;
 	background-color: var(--allPagesPrimaryColor, @primaryColor);
 }
 
