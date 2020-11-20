@@ -27,6 +27,7 @@ body {
 }
 
 .uiLogin {
+    height: 520px;
     width: 522px;
     background-color: var(--allPagesPrimaryColor, @primaryColor);
     border-radius: 8px;
@@ -85,6 +86,7 @@ body {
 
 .uiLogin .loginContainer .loginContent input{
     width: -webkit-fill-available;
+    width: -moz-available;
 }
 
 .uiLogin .loginContent .userCredentials .iconUser, .uiLogin .loginContent .userCredentials .iconPswrd {
@@ -100,6 +102,7 @@ body {
     font-weight: bold;
     color: #ffffff;
     width: -webkit-fill-available;
+    width: -moz-available;
 }
 
 .uiLogin .loginContainer .loginButton .button{
@@ -107,6 +110,7 @@ body {
     font-weight: bold;
     color: #ffffff;
     width: -webkit-fill-available;
+    width: -moz-available;
 }
 .uiLogin .loginContainer .loginButton .button:hover {
     background: var(--allPagesSecondaryColor, @secondaryColorDefault);
@@ -144,7 +148,7 @@ p.capatchaMessage {
 }
 
 .logoImageContent {
-    bottom: 40px;
+    bottom: 18px;
     right: 40px;
     position: fixed;
 }
@@ -165,4 +169,20 @@ p.capatchaMessage {
         bottom: 0px;
         right: 0px;
     }
+
+    .uiLogin .uiIconGreenChecker {
+        bottom: 10px;
+    }
+}
+
+@media ( max-width: 400px) {
+
+    .logoImageContent {
+      right: 20px;
+    }
+
+    .logoImageContent img {
+      width: 110px;
+    }
+
 }
