@@ -183,6 +183,65 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
   }
 
     @Override
+    public boolean sendEmailForExternalUser(String sender, String email, Locale locale, String space, StringBuilder url) throws Exception {
+
+        UserHandler uHandler = orgService.getUserHandler();
+        String senderFullName = uHandler.findUserByName(sender).getDisplayName();
+
+        ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
+
+        Credentials credentials = new Credentials(email, "");
+        String tokenId = remindPasswordTokenService.createToken(credentials, remindPasswordTokenService.EXTERNAL_REGISTRATION_TOKEN);
+        StringBuilder redirectUrl = new StringBuilder();
+        redirectUrl.append(url);
+        redirectUrl.append("/external-registration");
+        redirectUrl.append("?lang=" + I18N.toTagIdentifier(locale));
+        redirectUrl.append("&token=" + tokenId);
+
+        String emailBody = buildExternalEmailBody(senderFullName, space, redirectUrl.toString(), bundle);
+        String emailSubject = senderFullName + " " + bundle.getString("external.email.subject") + " " + brandingService.getCompanyName() + " : " + space;
+
+        String senderName = MailUtils.getSenderName();
+        String from = MailUtils.getSenderEmail();
+        if (senderName != null && !senderName.trim().isEmpty()) {
+            from = senderName + " <" + from + ">";
+        }
+
+        Message message = new Message();
+        message.setFrom(from);
+        message.setTo(email);
+        message.setSubject(emailSubject);
+        message.setBody(emailBody);
+        message.setMimeType("text/html");
+
+        try {
+            mailService.sendMessage(message);
+        } catch (Exception ex) {
+            log.error("Failure to send external user email", ex);
+            return false;
+        }
+
+        return true;
+    }
+
+    private String buildExternalEmailBody(String sender, String space, String link, ResourceBundle bundle) {
+        String content;
+        InputStream input = this.getClass().getClassLoader().getResourceAsStream("conf/external_email_template.html");
+        if (input == null) {
+            content = "";
+        } else {
+            content = resolveLanguage(input, bundle);
+        }
+
+        content = content.replaceAll("\\$\\{SENDER_DISPLAY_NAME\\}", sender);
+        content = content.replaceAll("\\$\\{COMPANY_NAME\\}", brandingService.getCompanyName());
+        content = content.replaceAll("\\$\\{SPACE_DISPLAY_NAME\\}", space);
+        content = content.replaceAll("\\$\\{EXTERNAL_REGISTRATION_LINK\\}", link);
+
+        return content;
+    }
+
+    @Override
     public boolean sendRecoverPasswordEmail(User user, Locale defaultLocale, HttpServletRequest req) {
         if (user == null) {
             throw new IllegalArgumentException("User or Locale must not be null");
