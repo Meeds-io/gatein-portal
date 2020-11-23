@@ -76,7 +76,8 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
     public static final String EXTERNALS_GROUP = "/platform/externals";
 
     private static final ThreadLocal<Locale> currentLocale = new ThreadLocal<Locale>();
-
+    
+    private static final String MEMBER  = "member";
 
     protected int _width = 250;
 
@@ -186,11 +187,10 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
                       user.setEmail(email);
                     }
                     try {
-                        organizationService.getUserHandler().createUser(user, true);// Broadcast user creaton event
+                        organizationService.getUserHandler().createUser(user, true);// Broadcast user creation event
                         Group group = organizationService.getGroupHandler().findGroupById(EXTERNALS_GROUP);
                         if (organizationService.getMembershipTypeHandler() != null) {
-                            organizationService.getMembershipHandler().removeMembershipByUser(user.getUserName(), true);//waiting listener
-                            organizationService.getMembershipHandler().linkMembership(user, group, organizationService.getMembershipTypeHandler().findMembershipType("member"), true);
+                            organizationService.getMembershipHandler().linkMembership(user, group, organizationService.getMembershipTypeHandler().findMembershipType(MEMBER), true);
                         }
                     } catch (Exception e) {
                         errors.add(bundle.getString("gatein.registration.fail.create.user"));
