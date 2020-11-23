@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.web.login.externalRegistration.ExternalRegistrationHandler;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.wci.security.Credentials;
@@ -142,7 +143,6 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         redirectUrl.append("&token=" + tokenId);
         String emailBody = buildOnboardingEmailBody(user, bundle, redirectUrl.toString());
         String emailSubject = bundle.getString("onboarding.email.header") + " " + brandingService.getCompanyName();
-
         String senderName = MailUtils.getSenderName();
         String from = MailUtils.getSenderEmail();
         if (senderName != null && !senderName.trim().isEmpty()) {
@@ -165,7 +165,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
 
         return true;
     }
-    
+
     private String buildOnboardingEmailBody(User user, ResourceBundle bundle, String link) {
       String content;
       InputStream input = this.getClass().getClassLoader().getResourceAsStream("conf/onBoarding_email_template.html");
@@ -372,6 +372,20 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         }
         if (lang != null) {
           params.put(OnboardingHandler.LANG, lang);
+        }
+        return router.render(params);
+    }
+
+    @Override
+    public String getExternalRegistrationURL(String tokenId, String lang) {
+        Router router = webController.getRouter();
+        Map<QualifiedName, String> params = new HashMap<>();
+        params.put(WebAppController.HANDLER_PARAM, ExternalRegistrationHandler.NAME);
+        if (tokenId != null) {
+          params.put(ExternalRegistrationHandler.TOKEN, tokenId);
+        }
+        if (lang != null) {
+          params.put(ExternalRegistrationHandler.LANG, lang);
         }
         return router.render(params);
     }
