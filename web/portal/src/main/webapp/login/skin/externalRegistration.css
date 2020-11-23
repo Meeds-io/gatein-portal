@@ -167,7 +167,7 @@ p.capatchaMessage {
 
     .logoImageContent {
         bottom: 0px;
-        right: 0px;
+        right: 20px;
     }
 
     .uiLogin .uiIconGreenChecker {
@@ -183,6 +183,13 @@ p.capatchaMessage {
 
     .logoImageContent img {
       width: 110px;
+    }
+
+    .uiLogin .loginContent {
+        padding: 1px 0;
+    }
+    .uiLogin .welcomeContent {
+        padding: 3px 20px 0;
     }
 
 }
