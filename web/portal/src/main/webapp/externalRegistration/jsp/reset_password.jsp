@@ -29,6 +29,7 @@
 <%@ page import="org.exoplatform.portal.branding.BrandingService"%>
 <%@ page import="org.exoplatform.services.organization.OrganizationService" %>
 <%@ page import="org.exoplatform.commons.utils.PropertyManager"%>
+<%@ page import="org.gatein.portal.controller.resource.ResourceRequestHandler" %>
 <%@ page import="java.util.*" %>
 <%@ page language="java" %>
 <%
@@ -46,9 +47,9 @@
 
     UserPortalConfigService userPortalConfigService = portalContainer.getComponentInstanceOfType(UserPortalConfigService.class);
     String skinName = userPortalConfigService.getDefaultPortalSkinName();
-    String loginCssPath = skinService.getSkin("portal/login", skinName).getCSSPath(); 
-    String coreCssPath = skinService.getPortalSkin(PortalSkinTask.DEFAULT_MODULE_NAME, skinName).getCSSPath();
-
+    String loginCssPath = skinService.getSkin("portal/login", skinName).getCSSPath()+"?v="+ResourceRequestHandler.VERSION;
+    String brandingCss = "/rest/v1/platform/branding/css?v="+ResourceRequestHandler.VERSION;
+    String externalRegistrationCss = contextPath+"/login/skin/externalRegistration.css?v="+ResourceRequestHandler.VERSION;
     String tokenId = (String)request.getAttribute("tokenId");
 
     String password = (String)request.getAttribute("password");
@@ -86,9 +87,9 @@
     <title><%=res.getString("external.registration.title")%></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="shortcut icon" type="image/x-icon"  href="<%=contextPath%>/favicon.ico" />
-    <link id="brandingSkin" rel="stylesheet" type="text/css" href="/rest/v1/platform/branding/css">
+    <link id="brandingSkin" rel="stylesheet" type="text/css" href="<%=brandingCss%>">
     <link href="<%=loginCssPath%>" rel="stylesheet" type="text/css"/>
-	<link rel="stylesheet" type="text/css" href="<%=contextPath%>/login/skin/externalRegistration.css"/>
+    <link rel="stylesheet" type="text/css" href="<%=externalRegistrationCss%>"/>
     <script type="text/javascript" src="/eXoResources/javascript/jquery-3.2.1.js"></script>
     <script type="text/javascript" src="/eXoResources/javascript/eXo/webui/FormValidation.js"></script>
   </head>
