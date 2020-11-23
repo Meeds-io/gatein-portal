@@ -31,6 +31,8 @@
 <%@ page import="org.exoplatform.commons.utils.I18N" %>
 <%@ page import="org.exoplatform.portal.config.UserPortalConfigService" %>
 <%@ page import="org.exoplatform.portal.resource.config.tasks.PortalSkinTask" %>
+<%@ page import="org.gatein.portal.controller.resource.ResourceRequestHandler" %>
+
 <%@ page language="java" %>
 <%
     PortalContainer portalContainer = PortalContainer.getCurrentInstance(session.getServletContext());
@@ -45,8 +47,9 @@
     UserPortalConfigService userPortalConfigService = portalContainer.getComponentInstanceOfType(UserPortalConfigService.class);
     SkinService skinService = portalContainer.getComponentInstanceOfType(SkinService.class);
     String skinName = userPortalConfigService.getDefaultPortalSkinName();
-    String loginCssPath = skinService.getSkin("portal/login", skinName).getCSSPath();
-    String coreCssPath = skinService.getPortalSkin(PortalSkinTask.DEFAULT_MODULE_NAME, skinName).getCSSPath();
+    String loginCssPath = skinService.getSkin("portal/login", skinName).getCSSPath()+"?v="+ResourceRequestHandler.VERSION;
+    String coreCssPath = skinService.getPortalSkin(PortalSkinTask.DEFAULT_MODULE_NAME, skinName).getCSSPath()+"?v="+ResourceRequestHandler.VERSION;
+    String brandingCss = "/rest/v1/platform/branding/css?v="+ResourceRequestHandler.VERSION;
 
     String username = (String)request.getAttribute("username");
     String error = (String)request.getAttribute("error");
@@ -71,7 +74,7 @@
     <title><%=res.getString("gatein.forgotPassword.title")%></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="shortcut icon" type="image/x-icon"  href="<%=contextPath%>/favicon.ico" />
-    <link id="brandingSkin" rel="stylesheet" type="text/css" href="/rest/v1/platform/branding/css">
+    <link id="brandingSkin" rel="stylesheet" type="text/css" href="<%=brandingCss%>">
     <link href="<%=coreCssPath%>" rel="stylesheet" type="text/css"/>
     <link href="<%=loginCssPath%>" rel="stylesheet" type="text/css"/>
     <script type="text/javascript" src="/eXoResources/javascript/jquery-3.2.1.js"></script>

@@ -30,6 +30,8 @@
 <%@ page import="org.exoplatform.commons.utils.I18N" %>
 <%@ page import="org.exoplatform.portal.config.UserPortalConfigService" %>
 <%@ page import="org.exoplatform.portal.resource.config.tasks.PortalSkinTask" %>
+<%@ page import="org.gatein.portal.controller.resource.ResourceRequestHandler" %>
+
 <%@ page language="java" %>
 <%
     PortalContainer portalContainer = PortalContainer.getCurrentInstance(session.getServletContext());
@@ -46,8 +48,9 @@
 
     UserPortalConfigService userPortalConfigService = portalContainer.getComponentInstanceOfType(UserPortalConfigService.class);
     String skinName = userPortalConfigService.getDefaultPortalSkinName();
-    String loginCssPath = skinService.getSkin("portal/login", skinName).getCSSPath();
-    String coreCssPath = skinService.getPortalSkin(PortalSkinTask.DEFAULT_MODULE_NAME, skinName).getCSSPath();
+    String loginCssPath = skinService.getSkin("portal/login", skinName).getCSSPath()+"?v="+ResourceRequestHandler.VERSION;
+    String coreCssPath = skinService.getPortalSkin(PortalSkinTask.DEFAULT_MODULE_NAME, skinName).getCSSPath()+"?v="+ResourceRequestHandler.VERSION;
+    String brandingCss = "/rest/v1/platform/branding/css?v="+ResourceRequestHandler.VERSION;
 
     response.setCharacterEncoding("UTF-8");
     response.setContentType("text/html; charset=UTF-8");
@@ -58,7 +61,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= res.getString("gatein.forgotPassword.information") %></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link id="brandingSkin" rel="stylesheet" type="text/css" href="/rest/v1/platform/branding/css">
+    <link id="brandingSkin" rel="stylesheet" type="text/css" href="<%=brandingCss%>">
     <link rel="shortcut icon" type="image/x-icon"  href="<%=contextPath%>/favicon.ico" />
     <link href="<%=coreCssPath%>" rel="stylesheet" type="text/css"/>
     <link href="<%=loginCssPath%>" rel="stylesheet" type="text/css"/>
