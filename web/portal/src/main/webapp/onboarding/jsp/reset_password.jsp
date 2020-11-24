@@ -129,24 +129,24 @@
 					<form name="registerForm" action="<%= contextPath + onboardingPasswordPath %>" method="post">
 						<div class="userCredentials">
 							<span class="iconUser"></span>
-							<input class="username" data-validation="require" name="username" type="text" value="<%=username%>" readonly="readonly" />
+							<input class="username" data-validation="require" name="username" type="text" value="<%=username%>" readonly="readonly">
 						</div>
 						<div class="userCredentials">
 						  <span class="iconPswrd"></span>
-						  <input data-validation="require" type="password" name="password" id="password" autocomplete="off" value="<%=(password != null ? password : "")%>"  placeholder="<%=res.getString("portal.login.Password")%>" onblur="this.placeholder = '<%=res.getString("portal.login.Password")%>'" onfocus="this.placeholder = ''">
+						  <input data-validation="require" type="password" name="password" id="password" autocomplete="off" value="<%=(password != null ? password : "")%>"  placeholder="<%=res.getString("portal.login.Password")%>">
 					      <i class="uiIconError passwordFormat"></i>
 						</div>
 						<p class="passwordCondition"><i class="uiIconInfo"></i><%=passwordCondition != null ? passwordCondition : res.getString("onboarding.login.passwordCondition")%></p>
 						<div class="userCredentials">
 						  <span class="iconPswrd"></span>
-						   <input data-validation="require" type="password" name="password2" id="confirm_password" autocomplete="off" value="<%=(password2 != null ? password2 : "")%>"  placeholder="<%=res.getString("onboarding.login.confirmPassword")%>" onblur="this.placeholder = '<%=res.getString("onboarding.login.confirmPassword")%>'" onfocus="this.placeholder = ''">
+						   <input data-validation="require" type="password" name="password2" id="confirm_password" autocomplete="off" value="<%=(password2 != null ? password2 : "")%>"  placeholder="<%=res.getString("onboarding.login.confirmPassword")%>">
 						</div>
 						<% if (success == null || success.isEmpty()) {%>
 						<p class="captchaCondition"></i><%=res.getString("onboarding.login.captchaCondition")%></p>
 						<div id="captcha">
 							<img src="/portal/on-boarding?serveCaptcha=true" alt="Captcha image for visual validation">
 							<br/>
-							<input data-validation="require" name="captcha" type="text" id="inputCaptcha"  placeholder="<%=res.getString("onboarding.login.captcha")%>" onblur="this.placeholder = '<%=res.getString("onboarding.login.captcha")%>'" onfocus="this.placeholder = ''">
+							<input data-validation="require" name="captcha" type="text" id="inputCaptcha"  placeholder="<%=res.getString("onboarding.login.captcha")%>">
 						</div>
 						<%}%>
 						<div id="UIPortalLoginFormAction" class="loginButton">
