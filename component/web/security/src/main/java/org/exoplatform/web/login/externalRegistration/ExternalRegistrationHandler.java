@@ -190,6 +190,7 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
                         organizationService.getUserHandler().createUser(user, true);// Broadcast user creation event
                         Group group = organizationService.getGroupHandler().findGroupById(EXTERNALS_GROUP);
                         if (organizationService.getMembershipTypeHandler() != null) {
+                            organizationService.getMembershipHandler().removeMembershipByUser(user.getUserName(), true);
                             organizationService.getMembershipHandler().linkMembership(user, group, organizationService.getMembershipTypeHandler().findMembershipType(MEMBER), true);
                         }
                     } catch (Exception e) {
