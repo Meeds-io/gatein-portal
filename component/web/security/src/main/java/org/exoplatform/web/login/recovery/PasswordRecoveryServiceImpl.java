@@ -110,11 +110,11 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     }
     
     @Override
-    public boolean changePass(final String tokenId, final String username, final String password) {
+    public boolean changePass(final String tokenId,final String tokenType, final String username, final String password) {
         try {
             this.changePasswordConnectorMap.get(this.changePasswordConnectorName).changePassword(username,password);
             try {
-                remindPasswordTokenService.deleteToken(tokenId);
+                remindPasswordTokenService.deleteToken(tokenId, tokenType);
             } catch (Exception ex) {
                 log.warn("Can not delete token: " + tokenId, ex);
             }
