@@ -328,6 +328,10 @@
             <name>allowNotCaseSensitiveSearch</name>
             <value>${exo.idm.search.notCaseSensitive:true}</value>
           </option>
+          <option>
+            <name>pagedResultsExtensionSize</name>
+            <value>${exo.ldap.search.resultlimit:1000}</value>
+          </option>
         </options>
       </identity-store>
     </identity-stores>
