@@ -118,28 +118,28 @@
             <form name="registerForm" action="<%= contextPath + externalRegistrationURLPath %>" method="post">
               <div class="userCredentials">
                 <span class="iconUser"></span>
-                <input class="username" data-validation="require" name="firstName" type="text" value="<%=(firstName != null ? firstName : "")%>"  placeholder="<%=res.getString("external.registration.firstName")%>" onblur="this.placeholder = '<%=res.getString("external.registration.firstName")%>'" onfocus="this.placeholder = ''"/>
+                <input class="username" data-validation="require" name="firstName" type="text" value="<%=(firstName != null ? firstName : "")%>"  placeholder="<%=res.getString("external.registration.firstName")%>">
               </div>
               <div class="userCredentials">
                 <span class="iconUser"></span>
-                <input class="username" data-validation="require" name="lastName" type="text" value="<%=(lastName != null ? lastName : "")%>" placeholder="<%=res.getString("external.registration.lastName")%>" onblur="this.placeholder = '<%=res.getString("external.registration.lastName")%>'" onfocus="this.placeholder = ''"/>
+                <input class="username" data-validation="require" name="lastName" type="text" value="<%=(lastName != null ? lastName : "")%>" placeholder="<%=res.getString("external.registration.lastName")%>">
               </div>
               <div class="userCredentials">
                 <span class="iconPswrd"></span>
-                <input data-validation="require" id="password" type="password" name="password" autocomplete="off" value="<%=(password != null ? password : "")%>"  placeholder="<%=res.getString("portal.login.Password")%>" onblur="this.placeholder = '<%=res.getString("portal.login.Password")%>'" onfocus="this.placeholder = ''">
+                <input data-validation="require" id="password" type="password" name="password" autocomplete="off" value="<%=(password != null ? password : "")%>"  placeholder="<%=res.getString("portal.login.Password")%>">
               </div>
               <p class="passwordCondition">
                 <i class="uiIconInfo"></i><%=passwordCondition != null ? passwordCondition : res.getString("external.registration.passwordCondition")%>
               </p>
               <div class="userCredentials">
                 <span class="iconPswrd"></span>
-                <input data-validation="require" id="confirm_password" type="password" name="password2" autocomplete="off" value="<%=(password2 != null ? password2 : "")%>"  placeholder="<%=res.getString("external.registration.confirmPassword")%>" onblur="this.placeholder = '<%=res.getString("external.registration.confirmPassword")%>'" onfocus="this.placeholder = ''">
+                <input data-validation="require" id="confirm_password" type="password" name="password2" autocomplete="off" value="<%=(password2 != null ? password2 : "")%>"  placeholder="<%=res.getString("external.registration.confirmPassword")%>">
               </div>
               <p class="captchaCondition"></i><%=res.getString("external.registration.captchaCondition")%></p>
               <div id="captcha">
                 <img src="/portal/external-registration?serveCaptcha=true" alt="Captcha image for visual validation">
 				<br/>
-                <input data-validation="require" name="captcha" type="text" id="inputCaptcha"  placeholder="<%=res.getString("external.registration.captcha")%>" onblur="this.placeholder = '<%=res.getString("external.registration.captcha")%>'" onfocus="this.placeholder = ''">
+                <input data-validation="require" name="captcha" type="text" id="inputCaptcha"  placeholder="<%=res.getString("external.registration.captcha")%>">
               </div>
               <div id="UIPortalLoginFormAction" class="loginButton">
                 <button class="button" type="submit" disabled="disabled"><%=res.getString("external.registration.confirm")%></button>
