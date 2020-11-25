@@ -40,22 +40,6 @@
     <key>CacheConfigurationProperties</key>
     <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
     <init-params>
-      <properties-param>
-        <name>CacheManagementProperties</name>
-        <description>Filter used to notify caches</description>
-        <property name="exo.cache.config.template" value="jar:/conf/cache/infinispan/local/cache-config.xml" />
-      </properties-param>
-      <properties-param profiles="cluster">
-        <name>CacheManagementProperties</name>
-        <description>Filter used to notify caches</description>
-        <property name="exo.cache.config.template" value="jar:/conf/cache/infinispan/cluster/cache-config.xml" />
-        <property name="exo.cache.async.config.template" value="jar:/conf/cache/infinispan/cluster/cache-async-config.xml" />
-      </properties-param>
-      <properties-param profiles="cluster">
-        <name>JGroupsProperties</name>
-        <description>Jgroups configuration</description>
-        <property name="exo.service.cluster.jgroups.config" value="jar:/conf/jgroups/jgroups-service-tcp.xml" />
-      </properties-param>
       <properties-param profiles="cluster-jgroups-udp">
         <name>JGroupsProperties</name>
         <description>Jgroups configuration</description>

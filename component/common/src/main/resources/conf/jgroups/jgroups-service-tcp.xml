@@ -69,7 +69,7 @@
   <MERGE2
       max_interval="${exo.service.cluster.jgroups.merge2.max_interval:100000}"
       min_interval="${exo.service.cluster.jgroups.merge2.min_interval:20000}" />
-  <FD_SOCK />
+  <FD_SOCK start_port="${exo.service.cluster.jgroups.fd_sock.start_port:7900}" />
   <FD
       timeout="${exo.service.cluster.jgroups.fd.timeout:10000}"
       max_tries="${exo.service.cluster.jgroups.fd.max_tries:5}" />

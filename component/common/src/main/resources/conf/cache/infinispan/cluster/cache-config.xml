@@ -36,7 +36,7 @@
   </threads>
 
   <jgroups transport="org.infinispan.remoting.transport.jgroups.JGroupsTransport">
-    <stack-file name="stack" path="${exo.service.cluster.jgroups.config}"/>
+    <stack-file name="stack" path="${exo.service.cluster.jgroups.config:jar:/conf/jgroups/jgroups-service-tcp.xml}"/>
   </jgroups>
 
   <cache-container name="template" default-cache="default" async-executor="infinispan-async" expiration-executor="infinispan-expiration"   listener-executor="infinispan-listener"
