@@ -178,7 +178,7 @@ public class OnboardingHandler extends WebRequestHandler {
 
                 //
                 if (errors.isEmpty()) {
-                    if (service.changePass(tokenId, username, password)) {
+                    if (service.changePass(tokenId, remindPasswordTokenService.ONBOARD_TOKEN, username, password)) {
                         success = bundle.getString("gatein.forgotPassword.resetPasswordSuccess");
                         password = "";
                         confirmPass = "";

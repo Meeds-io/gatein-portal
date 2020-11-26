@@ -38,7 +38,7 @@ public interface PasswordRecoveryService {
   Credentials verifyToken(String tokenId);
   
   
-  boolean changePass(final String tokenId, final String username, final String password);
+  boolean changePass(final String tokenId,final String tokenType, final String username, final String password);
 
   public boolean sendRecoverPasswordEmail(User user, Locale defaultLocale, HttpServletRequest req);
 
