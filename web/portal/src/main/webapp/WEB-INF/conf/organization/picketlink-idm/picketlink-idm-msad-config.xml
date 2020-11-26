@@ -334,7 +334,7 @@
           </option>
           <option>
             <name>pagedResultsExtensionSupported</name>
-            <value>${exo.ldap.search.pagedResult.enabled:false}</value>
+            <value>${exo.ldap.search.pagedResult.enabled:true}</value>
           </option>
         </options>
       </identity-store>
