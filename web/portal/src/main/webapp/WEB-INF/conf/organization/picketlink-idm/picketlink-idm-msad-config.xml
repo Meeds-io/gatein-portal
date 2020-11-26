@@ -332,6 +332,10 @@
             <name>pagedResultsExtensionSize</name>
             <value>${exo.ldap.search.resultlimit:1000}</value>
           </option>
+          <option>
+            <name>pagedResultsExtensionSupported</name>
+            <value>${exo.ldap.search.pagedResult.enabled:true}</value>
+          </option>
         </options>
       </identity-store>
     </identity-stores>
