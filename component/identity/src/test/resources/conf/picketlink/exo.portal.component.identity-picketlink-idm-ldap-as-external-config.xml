@@ -348,6 +348,14 @@
                         <name>allowNotCaseSensitiveSearch</name>
                         <value>true</value>
                     </option>
+                    <option>
+                        <name>pagedResultsExtensionSize</name>
+                        <value>10</value>
+                    </option>
+                    <option>
+                        <name>pagedResultsExtensionSupported</name>
+                        <value>true</value>
+                    </option>
                 </options>
             </identity-store>
         </identity-stores>

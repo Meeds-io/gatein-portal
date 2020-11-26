@@ -457,6 +457,41 @@ public class TestPLIDMExternalStoreImportService extends AbstractKernelTest {
       }
     }
   }
+  
+  public void testLargeImportUsers() throws Exception {
+    assertEquals("Initial listenerAddUser invocation count must be 0", 0, listenerAddUser.get());
+    assertEquals("Initial listenerModifyUser invocation count must be 0", 0, listenerModifyUser.get());
+    assertEquals("Initial listenerDeleteUser invocation count must be 0", 0, listenerDeleteUser.get());
+    
+    // Make sure that an LDAP group is created to import user memberships
+    createLDAPGroup("Admin");
+    //import large number of user (more than page size configured to 10)
+    openDSService.populateLDIFFile("ldap/ldap/test-100-users-opends.ldif");
+    // Wait 10 second until operation finishes on LDAP Store
+  
+    Thread.sleep(2000);
+    
+    externalStoreImportService.importModifiedEntitiesOfTypeToQueue(IDMEntityType.USER);
+    
+    assertEquals("Queue size should be greater than 0 to import all users", 111, queueService.countAll());
+    externalStoreImportService.processQueueEntries();
+    assertEquals("Queue should be purged once processed.", 0, queueService.countAll());
+    int initialUsersSize = organizationService.getUserHandler().findAllUsers().getSize();
+    assertEquals("The listener 'user creation' should be triggered as many as external users count.",
+                 initialUsersSize,
+                 listenerAddUser.get());
+    assertEquals("The listener 'user modification' shouldn't be triggered.", 0, listenerModifyUser.get());
+    assertEquals("The listener 'user deletion' shouldn't be triggered.", 0, listenerDeleteUser.get());
+    
+    ListAccess<User> allUsersListAccess = organizationService.getUserHandler().findAllUsers();
+    assertEquals("The internal created users count should be equal to external users count.",
+                 initialUsersSize,
+                 allUsersListAccess.getSize());
+    assertEquals("The internal created users count should be equal to external users count.",
+                 initialUsersSize,
+                 allUsersListAccess.load(0, allUsersListAccess.getSize()).length);
+    
+  }
 
   private void removeGroupTree(Group group) throws Exception {
     Collection<Group> groups = organizationService.getGroupHandler().findGroups(group);
