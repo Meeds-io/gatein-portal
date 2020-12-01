@@ -44,7 +44,7 @@ public interface PasswordRecoveryService {
 
   public boolean sendOnboardingEmail(User user, Locale defaultLocale, StringBuilder url);
 
-  public boolean sendEmailForExternalUser(String sender, String email, Locale locale, String space, StringBuilder url) throws Exception;
+  public String sendEmailForExternalUser(String sender, String email, Locale locale, String space, StringBuilder url) throws Exception;
 
   public boolean allowChangePassword(String username) throws Exception;
 

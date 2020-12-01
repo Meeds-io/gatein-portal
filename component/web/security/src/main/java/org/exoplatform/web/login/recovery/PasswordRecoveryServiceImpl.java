@@ -183,7 +183,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
   }
 
     @Override
-    public boolean sendEmailForExternalUser(String sender, String email, Locale locale, String space, StringBuilder url) throws Exception {
+    public String sendEmailForExternalUser(String sender, String email, Locale locale, String space, StringBuilder url) throws Exception {
 
         UserHandler uHandler = orgService.getUserHandler();
         String senderFullName = uHandler.findUserByName(sender).getDisplayName();
@@ -218,10 +218,10 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
             mailService.sendMessage(message);
         } catch (Exception ex) {
             log.error("Failure to send external user email", ex);
-            return false;
+            return "";
         }
 
-        return true;
+        return tokenId;
     }
 
     private String buildExternalEmailBody(String sender, String space, String link, ResourceBundle bundle) {
