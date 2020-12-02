@@ -75,6 +75,7 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
     public static final String REQ_PARAM_ACTION = "action";
     public static final String EXTERNALS_GROUP = "/platform/externals";
     public static final String LOGIN = "/login";
+    public static final String USERS_GROUP = "/platform/users";
 
     private static final ThreadLocal<Locale> currentLocale = new ThreadLocal<Locale>();
     
@@ -198,7 +199,10 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
                         organizationService.getUserHandler().createUser(user, true);// Broadcast user creation event
                         Group group = organizationService.getGroupHandler().findGroupById(EXTERNALS_GROUP);
                         if (organizationService.getMembershipTypeHandler() != null) {
-                            organizationService.getMembershipHandler().removeMembershipByUser(user.getUserName(), true);
+                            Collection<Membership>  usersMemberhips = organizationService.getMembershipHandler().findMembershipsByUserAndGroup(user.getUserName(), USERS_GROUP);
+                            for (Membership usersMemberhip : usersMemberhips) {
+                              organizationService.getMembershipHandler().removeMembership(usersMemberhip.getId(), true);
+                            }
                             organizationService.getMembershipHandler().linkMembership(user, group, organizationService.getMembershipTypeHandler().findMembershipType(MEMBER), true);
                             service.sendExternalConfirmationAccountEmail(randomUserName, locale, url);
                         }
