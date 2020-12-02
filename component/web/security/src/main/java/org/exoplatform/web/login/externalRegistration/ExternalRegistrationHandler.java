@@ -74,6 +74,7 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
 
     public static final String REQ_PARAM_ACTION = "action";
     public static final String EXTERNALS_GROUP = "/platform/externals";
+    public static final String LOGIN = "/login";
 
     private static final ThreadLocal<Locale> currentLocale = new ThreadLocal<Locale>();
     
@@ -110,6 +111,13 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
         }
         currentLocale.set(locale);
         req.setAttribute("request_locale", locale);
+
+        StringBuilder url = new StringBuilder();
+        url.append(req.getScheme()).append("://").append(req.getServerName());
+        if (req.getServerPort() != 80 && req.getServerPort() != 443) {
+            url.append(':').append(req.getServerPort());
+        }
+        url.append(container.getPortalContext().getContextPath());
 
         PasswordRecoveryServiceImpl service = getService(PasswordRecoveryServiceImpl.class);
         ResourceBundleService bundleService = getService(ResourceBundleService.class);
@@ -192,12 +200,13 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
                         if (organizationService.getMembershipTypeHandler() != null) {
                             organizationService.getMembershipHandler().removeMembershipByUser(user.getUserName(), true);
                             organizationService.getMembershipHandler().linkMembership(user, group, organizationService.getMembershipTypeHandler().findMembershipType(MEMBER), true);
+                            service.sendExternalConfirmationAccountEmail(randomUserName, locale, url);
                         }
                     } catch (Exception e) {
                         errors.add(bundle.getString("gatein.registration.fail.create.user"));
                         return false;
                     }
-                    res.sendRedirect("/" + currentPortalContainerName + "/login");
+                    res.sendRedirect("/" + currentPortalContainerName + LOGIN);
                     return true;
                 }
                 req.setAttribute("password", password);
@@ -210,7 +219,7 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
             Query query = new Query();
             query.setEmail(email);
             if (organizationService.getUserHandler().findUsersByQuery(query, UserStatus.ANY).getSize() > 0) {
-              res.sendRedirect("/" + currentPortalContainerName + "/login");
+              res.sendRedirect("/" + currentPortalContainerName + LOGIN);
               return true;
             }
             return dispatch("/externalRegistration/jsp/reset_password.jsp", servletContext, req, res);
