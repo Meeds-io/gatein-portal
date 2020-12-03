@@ -183,7 +183,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
   }
 
     @Override
-    public String sendEmailForExternalUser(String sender, String email, Locale locale, String space, StringBuilder url) throws Exception {
+    public String sendExternalRegisterEmail(String sender, String email, Locale locale, String space, StringBuilder url) throws Exception {
 
         UserHandler uHandler = orgService.getUserHandler();
         String senderFullName = uHandler.findUserByName(sender).getDisplayName();
