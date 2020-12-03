@@ -48,6 +48,8 @@ public interface PasswordRecoveryService {
 
   public boolean sendExternalConfirmationAccountEmail(String sender, Locale locale, StringBuilder url) throws Exception;
 
+  public boolean sendExternalConfirmationAccountEmail(String sender, Locale locale, StringBuilder url) throws Exception;
+
   public boolean allowChangePassword(String username) throws Exception;
 
   // EXOGTN-2114 Workaround for Java 8 Backward compatibility.
