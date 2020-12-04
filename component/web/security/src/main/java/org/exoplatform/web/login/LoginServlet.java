@@ -171,7 +171,15 @@ public class LoginServlet extends AbstractHttpServlet {
 
         String username = req.getParameter("username");
         String password = req.getParameter("password");
-
+        ServletContext servletContext = getServletContext();
+        final String portalContextPath = servletContext.getContextPath();
+        HttpServletRequest wrappedRequest = new HttpServletRequestWrapper(req) {
+          @Override
+          public String getContextPath() {
+            return portalContextPath;
+          }
+        };
+        StringBuilder loginPath = new StringBuilder("/login/jsp/login.jsp");
         //
         int status;
         if (req.getRemoteUser() == null) {
@@ -189,6 +197,12 @@ public class LoginServlet extends AbstractHttpServlet {
                       if (users != null && users.getSize() > 0) {
                         username = users.load(0, 1)[0].getUserName();
                       }
+                    } catch (RuntimeException e) {
+                      log.error("Can not login with an email associated to many users");
+                      req.setAttribute("org.gatein.portal.manyUsersWithSameEmail.error", "whatever");
+                      resp.setContentType("text/html; charset=UTF-8");
+                      getServletContext().getRequestDispatcher(loginPath.toString()).include(wrappedRequest, resp);
+                      return;
                     } catch (Exception e) {
                       log.error("Can not get users by email", e);
                     }
@@ -299,14 +313,6 @@ public class LoginServlet extends AbstractHttpServlet {
 
             String disabledUser = (String)req.getAttribute(FilterDisabledLoginModule.DISABLED_USER_NAME);
             boolean meetDisabledUser = disabledUser != null;
-            ServletContext servletContext = getServletContext();
-            final String portalContextPath = servletContext.getContextPath();
-            HttpServletRequest wrappedRequest = new HttpServletRequestWrapper(req) {
-              @Override
-              public String getContextPath() {
-                return portalContextPath;
-              }
-            };
             if(ssoHelper.skipJSPRedirection() && meetDisabledUser) {
                 resp.setContentType("text/html; charset=UTF-8");
                 getServletContext().getRequestDispatcher("/login/jsp/disabled.jsp").include(wrappedRequest, resp);
@@ -318,7 +324,6 @@ public class LoginServlet extends AbstractHttpServlet {
                 }
                 resp.sendRedirect(ssoRedirectUrl);
             } else {
-                StringBuilder loginPath = new StringBuilder("/login/jsp/login.jsp");
                 if (meetDisabledUser) {
                     String errorData = meetDisabledUser ? new LoginError(LoginError.DISABLED_USER_ERROR, disabledUser).toString() : "";
                     loginPath.append("?").append(LoginError.ERROR_PARAM).append("=").append(URLEncoder.encode(errorData, "UTF-8"));
