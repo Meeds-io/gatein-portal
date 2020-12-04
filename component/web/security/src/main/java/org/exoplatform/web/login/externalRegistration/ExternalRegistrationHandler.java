@@ -210,7 +210,7 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
                         errors.add(bundle.getString("gatein.registration.fail.create.user"));
                         return false;
                     }
-                    res.sendRedirect("/" + currentPortalContainerName + LOGIN);
+                    res.sendRedirect("/" + currentPortalContainerName + LOGIN + "?email=" + email);
                     return true;
                 }
                 req.setAttribute("password", password);
