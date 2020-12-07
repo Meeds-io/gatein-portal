@@ -46,6 +46,7 @@ import javax.servlet.http.HttpSession;
 import nl.captcha.text.producer.DefaultTextProducer;
 import nl.captcha.text.renderer.DefaultWordRenderer;
 import org.apache.tools.ant.taskdefs.condition.Http;
+import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.web.security.security.RemindPasswordTokenService;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -71,7 +72,7 @@ import nl.captcha.servlet.CaptchaServletUtil;
 
 public class OnboardingHandler extends WebRequestHandler {
     private static final QualifiedName SERVER_CAPTCHA = QualifiedName.create("gtn", "serveCaptcha");
-    
+
     protected static Logger log = LoggerFactory.getLogger(OnboardingHandler.class);
 
 
@@ -84,13 +85,13 @@ public class OnboardingHandler extends WebRequestHandler {
     public static final String REQ_PARAM_ACTION = "action";
 
     private static final ThreadLocal<Locale> currentLocale = new ThreadLocal<Locale>();
-    
-    
+
+
     protected int _width = 200;
-    
+
     protected int _height = 50;
-    
-    
+
+
     @Override
     public String getHandlerName() {
         return NAME;
@@ -119,20 +120,21 @@ public class OnboardingHandler extends WebRequestHandler {
         req.setAttribute("request_locale", locale);
 
         PasswordRecoveryServiceImpl service = getService(PasswordRecoveryServiceImpl.class);
+        OrganizationService organizationService = getService(OrganizationService.class);
         ResourceBundleService bundleService = getService(ResourceBundleService.class);
         ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
         RemindPasswordTokenService remindPasswordTokenService= getService(RemindPasswordTokenService.class);
 
         String token = context.getParameter(TOKEN);
-    
+
         String serveCaptcha=context.getParameter(SERVER_CAPTCHA);
-        
+
         String requestAction = req.getParameter(REQ_PARAM_ACTION);
 
         if ("true".equals(serveCaptcha)) {
             return serveCaptchaImage(req,res);
         }
-        
+
         if (token != null && !token.isEmpty()) {
             String tokenId = context.getParameter(TOKEN);
 
@@ -152,7 +154,7 @@ public class OnboardingHandler extends WebRequestHandler {
 
                 List<String> errors = new ArrayList<String>();
                 String success = "";
-                
+
                 if (captcha == null || !isValid(req.getSession(), captcha)) {
                     String message = bundle.getString("gatein.forgotPassword.captchaError");
                     errors.add(message);
@@ -172,7 +174,7 @@ public class OnboardingHandler extends WebRequestHandler {
                         errors.add(bundle.getString("gatein.forgotPassword.confirmPasswordNotMatch"));
                     }
                 }
-    
+
                 // Invalidate the capcha
                 req.getSession().removeAttribute(NAME);
 
@@ -183,7 +185,7 @@ public class OnboardingHandler extends WebRequestHandler {
                         password = "";
                         confirmPass = "";
                         String currentPortalContainerName = PortalContainer.getCurrentPortalContainerName();
-                        res.sendRedirect("/" + currentPortalContainerName + "/login");
+                        res.sendRedirect("/" + currentPortalContainerName + "/login?email=" + organizationService.getUserHandler().findUserByName(username).getEmail());
                     } else {
                         errors.add(bundle.getString("gatein.forgotPassword.resetPasswordFailure"));
                     }
