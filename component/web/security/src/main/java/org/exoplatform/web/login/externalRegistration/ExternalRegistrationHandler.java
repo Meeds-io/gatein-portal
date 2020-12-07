@@ -210,7 +210,7 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
                         errors.add(bundle.getString("gatein.registration.fail.create.user"));
                         return false;
                     }
-                    res.sendRedirect("/" + currentPortalContainerName + LOGIN);
+                    res.sendRedirect("/" + currentPortalContainerName + LOGIN + "?email=" + email);
                     return true;
                 }
                 req.setAttribute("password", password);
@@ -223,7 +223,7 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
             Query query = new Query();
             query.setEmail(email);
             if (organizationService.getUserHandler().findUsersByQuery(query, UserStatus.ANY).getSize() > 0) {
-              res.sendRedirect("/" + currentPortalContainerName + LOGIN);
+              res.sendRedirect("/" + currentPortalContainerName + LOGIN + "?email=" + email);
               return true;
             }
             return dispatch("/externalRegistration/jsp/reset_password.jsp", servletContext, req, res);
