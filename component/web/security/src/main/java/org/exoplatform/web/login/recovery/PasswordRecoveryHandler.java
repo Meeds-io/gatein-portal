@@ -183,10 +183,10 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
                     try {
                         u = findUser(orgService, user);
                         if (u == null) {
-                            req.setAttribute("error", bundle.getString("gatein.forgotPassword.userNotExist"));
+                            req.setAttribute("success", bundle.getString("gatein.forgotPassword.userNotExist"));
                         }
                     } catch (DisabledUserException e) {
-                        req.setAttribute("error", bundle.getString("gatein.forgotPassword.userDisabled"));
+                        req.setAttribute("success", bundle.getString("gatein.forgotPassword.userDisabled"));
                         u = null;
                     } catch (Exception ex) {
                         req.setAttribute("error", bundle.getString("gatein.forgotPassword.loadUserError"));
