@@ -181,7 +181,7 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
                 if (errors.isEmpty()) {
                     String username = generateExternalRegistrationUsername(reqFirstName, reqLastName);
                     String randomUserName = username;
-                    // Check if user name already existed
+                    // Check if user name already existed (with identity manager, need to move the handler to social)
                     while (organizationService.getUserHandler().findUserByName(randomUserName, UserStatus.ANY) != null) {
                         Random rand = new Random();
                         int num = rand.nextInt(89) + 10;// range between 10 and 99.
@@ -207,8 +207,14 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
                             service.sendExternalConfirmationAccountEmail(randomUserName, locale, url);
                         }
                     } catch (Exception e) {
-                        errors.add(bundle.getString("gatein.registration.fail.create.user"));
-                        return false;
+                        errors.add(bundle.getString("external.registration.fail.create.user"));
+                        req.setAttribute("password", password);
+                        req.setAttribute("password2", confirmPass);
+                        req.setAttribute("firstName", reqFirstName);
+                        req.setAttribute("lastName", reqLastName);
+                        req.setAttribute("errors", errors);
+                        req.setAttribute("tokenId", tokenId);
+                        return dispatch("/externalRegistration/jsp/reset_password.jsp", servletContext, req, res);
                     }
                     res.sendRedirect("/" + currentPortalContainerName + LOGIN + "?email=" + email);
                     return true;
