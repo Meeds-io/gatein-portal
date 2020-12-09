@@ -55,6 +55,8 @@
     
     var component = new Component(componentName, componentOptions);
     module.components.push(component);
+
+    document.dispatchEvent(new CustomEvent(`component-${app}-${componentName}-updated`));
   }
   
   function registerExtension(app, extensionType, extensionContent) {
@@ -62,6 +64,8 @@
     
     var extension = new Extension(extensionType, extensionContent);
     module.extensions.push(extension);
+
+    document.dispatchEvent(new CustomEvent(`extension-${app}-${extensionType}-updated`));
   }
   
   function loadComponents(app) {
