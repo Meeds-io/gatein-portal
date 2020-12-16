@@ -94,7 +94,7 @@ public class SkinService extends AbstractResourceService implements Startable {
 
   public static final String                                     DEFAULT_SKIN_PARAM_NAME = "skin.default";
 
-  private static final String                                    DEFAULT_SKIN            = "Default";
+  private static final String                                    DEFAULT_SKIN            = "Enterprise";
 
   public static final String                                     CUSTOM_MODULE_ID        = "customModule";
 
