@@ -48,7 +48,7 @@ export default {
         'gamification/domains': 'gamification',
         // data loss prevention
         'transferRules': 'dataLossPrevention',
-        'quarantine': 'dataLossPrevention',
+        'dlp-quarantine': 'dataLossPrevention',
         // rewards
         'rewardAdministration/kudosAdministration': 'reward',
         'rewardAdministration/walletAdministration': 'reward',
