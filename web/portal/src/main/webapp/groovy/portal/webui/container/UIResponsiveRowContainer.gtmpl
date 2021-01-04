@@ -55,7 +55,7 @@
       <%} %> 
           <div class="UIIntermediateContainer">
             <%if(hasAccessPermission) {%>
-              <div id="${uicomponent.id}Children" class="UIRowContainer <%=(editMode != EditMode.NO_EDIT && uicomponent.getChildren().size() == 0) ? "EmptyContainer" : ""%>">
+              <div id="${uicomponent.id}Children" class="UIRowContainer <%=(portalMode != UIPortalApplication.NORMAL_MODE && uicomponent.getChildren().size() == 0) ? "EmptyContainer" : ""%>">
                   <%uicomponent.renderChildren();%>
               </div>
             <% } else { %>
