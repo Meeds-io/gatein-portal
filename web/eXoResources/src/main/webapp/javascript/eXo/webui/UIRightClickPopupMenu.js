@@ -38,7 +38,7 @@
 	     */
 	    this.disableContextMenu(menu.parent());
 	
-	    menu.find('.UIRightPopupMenuContainer, .uiRightPopupMenuContainer').on('click', 'div.MenuItem a, .menuItem a', eXo.webui.UIRightClickPopupMenu.prepareObjectIdEvt);
+	    menu.find('.UIRightPopupMenuContainer, .uiRightPopupMenuContainer').unbind('click').on('click', 'div.MenuItem a, .menuItem a', eXo.webui.UIRightClickPopupMenu.prepareObjectIdEvt);
 	  },
 	  /**
 	   * Hide and disable mouse down event of context menu object
