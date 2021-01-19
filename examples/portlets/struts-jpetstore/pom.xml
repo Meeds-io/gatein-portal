@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.exoplatform.gatein.portal.examples.portlets</groupId>
     <artifactId>parent</artifactId>
-    <version>6.2.x-SNAPSHOT</version>
+    <version>6.2.0-19012021</version>
   </parent>
 
   <artifactId>struts-jpetstore</artifactId>
