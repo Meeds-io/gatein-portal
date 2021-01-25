@@ -18,6 +18,8 @@ public class UserFieldValidator {
 
   private static final int             MAX_FIELD_LENGTH   = 255;
 
+  public static final String           DEFAULT_MAIL_REGEX = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
   private static final String          KEY_PREFIX         = "gatein.validators.";
 
   private static final String          ALLOWED_SYMBOLS    = "'_', '.'";
@@ -31,6 +33,8 @@ public class UserFieldValidator {
   private boolean                      usernameValidation = false;
 
   private boolean                      personalNameValidation = false;
+
+  private boolean                      emailValidation    = false;
 
   private String                       field              = null;
 
@@ -46,11 +50,16 @@ public class UserFieldValidator {
     this.field = field;
     this.usernameValidation = usernameValidation;
     this.personalNameValidation = personalNameValidation;
+    this.emailValidation = StringUtils.contains(this.field, "email");
 
     String prefixedKey = KEY_PREFIX + field;
 
     pattern = PropertyManager.getProperty(prefixedKey + ".regexp");
     formatMessage = PropertyManager.getProperty(prefixedKey + ".format.message");
+
+    if (this.emailValidation && StringUtils.isBlank(pattern)) {
+      pattern = DEFAULT_MAIL_REGEX;
+    }
 
     String minProperty = PropertyManager.getProperty(prefixedKey + ".length.min");
     String maxProperty = PropertyManager.getProperty(prefixedKey + ".length.max");
@@ -83,6 +92,8 @@ public class UserFieldValidator {
     if (StringUtils.isNotBlank(pattern) && !Pattern.matches(pattern, value)) {
       if (StringUtils.isNotBlank(formatMessage)) {
         return formatMessage;
+      } else if (emailValidation) {
+        return getLabel(locale, "EmailAddressValidator.msg.Invalid-input");
       } else {
         String label = getFieldLabel(locale);
         return getLabel(locale, "ExpressionValidator.msg.value-invalid", label, pattern);
@@ -135,6 +146,18 @@ public class UserFieldValidator {
 
   public String getField() {
     return field;
+  }
+
+  public boolean isEmailValidation() {
+    return emailValidation;
+  }
+
+  public boolean isPersonalNameValidation() {
+    return personalNameValidation;
+  }
+
+  public boolean isUsernameValidation() {
+    return usernameValidation;
   }
 
   private String getFieldLabel(Locale locale) {
