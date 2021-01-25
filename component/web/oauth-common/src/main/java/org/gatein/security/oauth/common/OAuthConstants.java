@@ -131,6 +131,9 @@ public class OAuthConstants {
     
     public static final String PROFILE_OPEN_ID_ACCESS_TOKEN = "user.social-info.openid.accessToken";
     
+    public static final String PROFILE_OPEN_ID_ACCESS_TOKEN_SECRET = "user.social-info.openid.accessTokenSecret";
+    
+    
     // Session (or AuthenticationRegistry) attributes
     
     public static final String ATTRIBUTE_AUTHENTICATED_OAUTH_PRINCIPAL = "_authenticatedOAuthPrincipal";
