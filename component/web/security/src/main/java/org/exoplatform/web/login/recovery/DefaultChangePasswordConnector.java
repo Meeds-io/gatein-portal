@@ -9,8 +9,8 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.ModificationItem;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.gatein.portal.idm.impl.repository.ExoFallbackIdentityStoreRepository;
 import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.impl.api.session.IdentitySessionImpl;
@@ -37,7 +37,10 @@ public class DefaultChangePasswordConnector extends ChangePasswordConnector {
   private PicketLinkIDMService picketLinkIDMService;
   private PicketLinkIDMExternalStoreService picketLinkIDMExternalStoreService;
   
-  protected static Logger log = LoggerFactory.getLogger(DefaultChangePasswordConnector.class);
+  public final static String LOG_SERVICE_NAME = "changePassword";
+  
+  
+  protected static Log log = ExoLogger.getLogger(DefaultChangePasswordConnector.class);
   
   private boolean allowChangeExternalPassword;
   
@@ -82,7 +85,7 @@ public class DefaultChangePasswordConnector extends ChangePasswordConnector {
     
     String ldapUrl="";
     String passwordAttribute="";
-    
+    long startTime = System.currentTimeMillis();
     IdentityConfigurationMetaData config = ((PicketLinkIDMServiceImpl)picketLinkIDMService).getConfigMD();
     IdentityStoreConfigurationMetaData identityStoreConfig =
         config.getIdentityStores().stream().filter(identityStoreConfigurationMetaData -> identityStoreConfigurationMetaData.getId().equals("PortalLDAPStore")).findFirst().orElse(null);
@@ -126,6 +129,9 @@ public class DefaultChangePasswordConnector extends ChangePasswordConnector {
       }
       mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, mod0);
       ctx.modifyAttributes(userDN, mods);
+      long totalTime = System.currentTimeMillis() - startTime;
+      log.info("service={} operation={} parameters=\"user:{}\" status=ok duration_ms={}",
+               LOG_SERVICE_NAME, "changeExternalPassword", user.getUserName(), totalTime);
     }
     catch(Exception e) {
       log.error("Unable to change password by ldap for "+user.getUserName(),e);
@@ -185,7 +191,12 @@ public class DefaultChangePasswordConnector extends ChangePasswordConnector {
   }
   
   private void changeInternalPassword(User user, String password) throws Exception {
+    long startTime = System.currentTimeMillis();
     user.setPassword(password);
     organizationService.getUserHandler().saveUser(user, true);
+    long totalTime = System.currentTimeMillis() - startTime;
+  
+    log.info("service={} operation={} parameters=\"user:{}\" status=ok duration_ms={}",
+             LOG_SERVICE_NAME, "changeInternalPassword", user.getUserName(), totalTime);
   }
 }
