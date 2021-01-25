@@ -41,6 +41,7 @@ import com.google.api.services.oauth2.model.Userinfo;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.UserImpl;
 import org.gatein.security.oauth.common.OAuthConstants;
+import org.gatein.security.oauth.openid.OpenIdAccessTokenContext;
 import org.gatein.security.oauth.spi.OAuthProviderType;
 import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.security.oauth.exception.OAuthExceptionCode;
@@ -49,6 +50,8 @@ import org.gatein.security.oauth.facebook.FacebookAccessTokenContext;
 import org.gatein.security.oauth.google.GoogleAccessTokenContext;
 import org.gatein.security.oauth.social.FacebookPrincipal;
 import org.gatein.security.oauth.twitter.TwitterAccessTokenContext;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Various util methods
@@ -97,7 +100,31 @@ public class OAuthUtils {
         return new OAuthPrincipal<GoogleAccessTokenContext>(username, userInfo.getGivenName(), userInfo.getFamilyName(), userInfo.getName(), userInfo.getEmail(),
                 userInfo.getPicture(), accessToken, googleProviderType);
     }
-
+    
+    public static OAuthPrincipal<OpenIdAccessTokenContext> convertOpenIdInfoToOAuthPrincipal(JSONObject userInfo,
+                                                                                             OpenIdAccessTokenContext accessToken,
+                                                                                             OAuthProviderType<OpenIdAccessTokenContext> openIdProviderType) {
+        try {
+            // Assume that username is first part of email
+            String email = userInfo.getString(OAuthConstants.EMAIL_ATTRIBUTE);
+            String username = email != null ? email.substring(0, email.indexOf('@')) : userInfo.getString("given_name");
+            return new OAuthPrincipal<OpenIdAccessTokenContext>(username,
+                                                                userInfo.getString(OAuthConstants.GIVEN_NAME_ATTRIBUTE),
+                                                                userInfo.getString(OAuthConstants.FAMILY_NAME_ATTRIBUTE),
+                                                                userInfo.getString(OAuthConstants.NAME_ATTRIBUTE),
+                                                                userInfo.getString(OAuthConstants.EMAIL_ATTRIBUTE),
+                                                                userInfo.has(OAuthConstants.PICTURE_ATTRIBUTE) ?
+                                                                userInfo.getString(OAuthConstants.PICTURE_ATTRIBUTE) : null,
+                                                                accessToken,
+                                                                openIdProviderType);
+        } catch (JSONException jsonException) {
+            throw new OAuthException(OAuthExceptionCode.ACCESS_TOKEN_ERROR,
+                                     "Error during user info reading: response format is ko");
+        }
+    }
+    
+    
+    
     public static User convertOAuthPrincipalToGateInUser(OAuthPrincipal principal) {
         User gateinUser = new UserImpl(OAuthUtils.refineUserName(principal.getUserName()));
         gateinUser.setFirstName(principal.getFirstName());
