@@ -60,6 +60,18 @@ public class UserFieldValidatorTest {
   }
 
   @Test
+  public void testValidateEmail() {
+    UserFieldValidator fieldValidator = new UserFieldValidator("email", false, false);
+    assertNotNull(fieldValidator.validate(Locale.ENGLISH, ""));
+    assertNotNull(fieldValidator.validate(Locale.ENGLISH, "WRONG_FORMAT"));
+    assertNotNull(fieldValidator.validate(Locale.ENGLISH, "WRONG_FORMAT@"));
+    assertNotNull(fieldValidator.validate(Locale.ENGLISH, "WRONG_FORMAT@test"));
+    assertNotNull(fieldValidator.validate(Locale.ENGLISH, "@test.com"));
+    assertNull(fieldValidator.validate(Locale.ENGLISH, "GOOD_FORMAT@test.com"));
+    assertNull(fieldValidator.validate(Locale.ENGLISH, "GOOD_FORMAT@test.test"));
+  }
+
+  @Test
   public void testValidateFieldRegex() {
     System.setProperty("gatein.validators.fieldregexp.regexp", "[1-9]*");
 
