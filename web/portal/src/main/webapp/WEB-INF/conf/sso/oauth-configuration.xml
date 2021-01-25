@@ -136,16 +136,16 @@
     <init-params>
       <value-param>
         <name>clientId</name>
-        <value>${gatein.oauth.openid.clientId}</value>
+        <value>${exo.oauth.openid.clientId}</value>
       </value-param>
       <value-param>
         <name>clientSecret</name>
-        <value>${gatein.oauth.openid.clientSecret}</value>
+        <value>${exo.oauth.openid.clientSecret}</value>
       </value-param>
       <!-- URL to redirect from OpenId during Openid authentication -->
       <value-param>
         <name>redirectURL</name>
-        <value>${gatein.oauth.openid.redirectURL}</value>
+        <value>${exo.oauth.openid.redirectURL}</value>
       </value-param>
       <value-param>
         <name>scope</name>
@@ -153,23 +153,23 @@
       </value-param>
       <value-param>
         <name>accessType</name>
-        <value>${gatein.oauth.openid.accessType}</value>
+        <value>${exo.oauth.openid.accessType}</value>
       </value-param>
       <value-param>
         <name>authenticationURL</name>
-        <value>${gatein.oauth.openid.authenticationURL}</value>
+        <value>${exo.oauth.openid.authenticationURL}</value>
       </value-param>
       <value-param>
         <name>accessTokenURL</name>
-        <value>${gatein.oauth.openid.accessTokenURL}</value>
+        <value>${exo.oauth.openid.accessTokenURL}</value>
       </value-param>
       <value-param>
         <name>tokenInfoURL</name>
-        <value>${gatein.oauth.openid.tokenInfoURL}</value>
+        <value>${exo.oauth.openid.tokenInfoURL}</value>
       </value-param>
       <value-param>
         <name>userInfoURL</name>
-        <value>${gatein.oauth.openid.userInfoURL}</value>
+        <value>${exo.oauth.openid.userInfoURL}</value>
       </value-param>
     </init-params>
   </component>
