@@ -49,5 +49,9 @@ mixPageConfigs.addSelectItemOption(new SelectItemOption("mixPage.TwoColumnsOneRo
 mixPageConfigs.addSelectItemOption(new SelectItemOption("mixPage.OneRowTwoColumnsLayout", "one-row-two-columns", "OneRowTwoColumnsLayout"));
 mixPageConfigs.addSelectItemOption(new SelectItemOption("mixPage.ThreeRowsTwoColumnsLayout", "three-rows-two-columns", "ThreeRowsTwoColumnsLayout"));
 
+SelectItemCategory analyticsPageConfigs = new SelectItemCategory("analyticsPageConfigs") ;
+categories.add(analyticsPageConfigs);
+analyticsPageConfigs.addSelectItemOption(new SelectItemOption("analyticsPage.AnalyticsLayout", "analytics", "AnalyticsLayout"));
+
 return categories;
 
