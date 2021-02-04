@@ -35,80 +35,83 @@ public class SelectItemCategory<T> {
     /**
      * The name of the category
      */
-    private String name_;
+    private String name;
 
     /**
      * The label of the category
      */
-    private String label_;
+    private String label;
 
     /**
      * The list of SelectItemOption that this category contains
      */
-    private List<SelectItemOption<T>> options_;
+    private List<SelectItemOption<T>> options;
 
     /**
      * Whether this category is selected
      */
-    protected boolean selected_ = false;
+    protected boolean selected = false;
+
+    public SelectItemCategory() {
+    }
 
     public SelectItemCategory(String name) {
-        this.name_ = name;
+        this.name = name;
     }
 
     public SelectItemCategory(String name, boolean selected) {
-        this.name_ = name;
-        label_ = name;
-        this.selected_ = selected;
+        this.name = name;
+        label = name;
+        this.selected = selected;
     }
 
     public void setLabel(String label) {
-        label_ = label;
+      this.label = label;
     }
 
     public String getLabel() {
-        return label_;
+        return label;
     }
 
     public String getName() {
-        return name_;
+        return name;
     }
 
     public void setName(String name) {
-        name_ = name;
+      this.name = name;
     }
 
     public boolean isSelected() {
-        return selected_;
+        return selected;
     }
 
     public void setSelected(boolean b) {
-        selected_ = b;
+        selected = b;
     }
 
     public List<SelectItemOption<T>> getSelectItemOptions() {
-        return options_;
+        return options;
     }
 
     public void setSelectItemOptions(List<SelectItemOption<T>> options) {
-        this.options_ = options;
+        this.options = options;
     }
 
     public SelectItemCategory<T> addSelectItemOption(SelectItemOption<T> option) {
-        if (options_ == null) {
-            options_ = new ArrayList<SelectItemOption<T>>();
+        if (options == null) {
+            options = new ArrayList<>();
         }
-        options_.add(option);
+        options.add(option);
         return this;
     }
 
     public SelectItemOption<T> getSelectedItemOption() {
-        if (options_ == null)
+        if (options == null)
             return null;
-        for (SelectItemOption<T> item : options_) {
+        for (SelectItemOption<T> item : options) {
             if (item.isSelected())
                 return item;
         }
-        return options_.get(0);
+        return options.get(0);
     }
 }

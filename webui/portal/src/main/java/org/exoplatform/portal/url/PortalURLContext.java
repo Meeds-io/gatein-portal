@@ -26,9 +26,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.exoplatform.commons.utils.I18N;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.application.PortalRequestHandler;
+import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.WebAppController;
@@ -45,6 +48,10 @@ import org.gatein.common.io.UndeclaredIOException;
 public class PortalURLContext implements URLContext {
 
     private static final char REPLACEMENT_CHAR = '\ufffd';
+
+    private static volatile String  globalSite;
+
+    private static volatile String  defaultSite;
 
     /** . */
     private final ControllerContext controllerContext;
@@ -136,7 +143,7 @@ public class PortalURLContext implements URLContext {
         Map<QualifiedName, String> parameters = new HashMap<QualifiedName, String>();
         parameters.put(WebAppController.HANDLER_PARAM, "portal");
         parameters.put(PortalRequestHandler.REQUEST_SITE_TYPE, siteKey.getTypeName());
-        parameters.put(PortalRequestHandler.REQUEST_SITE_NAME, siteKey.getName());
+        parameters.put(PortalRequestHandler.REQUEST_SITE_NAME, getSiteName(siteKey.getName()));
 
         //
         String lang = "";
@@ -151,7 +158,11 @@ public class PortalURLContext implements URLContext {
             String parameterValue = url.getParameterValue(parameterName);
             if (parameterValue != null) {
                 // XSS issue PLF-8071
-                parameterValue = parameterValue.replaceAll("&", "&amp;");
+                if (PortalRequestHandler.REQUEST_SITE_NAME.equals(parameterName)) {
+                  parameterValue = getSiteName(parameterValue);
+                } else {
+                  parameterValue = parameterValue.replaceAll("&", "&amp;");
+                }
                 parameters.put(parameterName, parameterValue);
             }
         }
@@ -210,5 +221,30 @@ public class PortalURLContext implements URLContext {
         }
     }
 
+    public static String getSiteName(String siteName) {
+      if (StringUtils.equals(siteName, getGlobalSite())) {
+        return getDefaultSite();
+      }
+      return siteName;
+    }
 
+    public static String getGlobalSite() {
+      if (globalSite == null) {
+        UserPortalConfigService portalConfigService = ExoContainerContext.getService(UserPortalConfigService.class);
+        if (portalConfigService != null) {
+          globalSite = portalConfigService.getGlobalPortal();
+        }
+      }
+      return globalSite;
+    }
+
+    public static String getDefaultSite() {
+      if (defaultSite == null) {
+        UserPortalConfigService portalConfigService = ExoContainerContext.getService(UserPortalConfigService.class);
+        if (portalConfigService != null) {
+          defaultSite = portalConfigService.getDefaultPortal();
+        }
+      }
+      return defaultSite;
+    }
 }

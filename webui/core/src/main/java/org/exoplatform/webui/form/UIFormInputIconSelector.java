@@ -294,7 +294,7 @@ public class UIFormInputIconSelector extends UIFormInputBase<String> {
         }
 
         public IconCategory addIcon(String icon) {
-            value_.add(icon);
+            this.value.add(icon);
             return this;
         }
 
