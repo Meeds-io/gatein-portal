@@ -617,8 +617,17 @@ public class PortalRequestContext extends WebuiRequestContext {
     }
 
     public final void sendRedirect(String url) throws IOException {
-        setResponseComplete(true);
-        response_.sendRedirect(url);
+      setResponseComplete(true);
+      if (url.contains(portalConfigService.getGlobalPortal())) {
+        String globalSiteURI = "/" + PortalContainer.getCurrentPortalContainerName() + "/" + portalConfigService.getGlobalPortal();
+        if (url.startsWith(globalSiteURI)) {
+          String defaultSiteURI = "/" + PortalContainer.getCurrentPortalContainerName() + "/"
+              + portalConfigService.getDefaultPortal();
+          url = url.replace(globalSiteURI, defaultSiteURI);
+          log.warn("An URI was sent with global site name, it will be replaced by default site to avoid returning HTTP 404");
+        }
+      }
+      response_.sendRedirect(url);
     }
     
  

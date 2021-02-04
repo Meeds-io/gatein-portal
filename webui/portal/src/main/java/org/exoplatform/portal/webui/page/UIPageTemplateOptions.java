@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.page.PageTemplateService;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.InitParams;
 import org.exoplatform.webui.config.Param;
@@ -37,18 +38,15 @@ import org.exoplatform.webui.form.UIFormInputItemSelector;
 /**
  * Created by The eXo Platform SARL Author : Nguyen Viet Chung nguyenchung136@yahoo.com Aug 10, 2006
  */
-@ComponentConfig(template = "system:/groovy/portal/webui/page/UIPageTemplateOptions.gtmpl", initParams = @ParamConfig(name = "PageLayout", value = "system:/WEB-INF/conf/uiconf/portal/webui/page/PageConfigOptions.groovy"))
+@ComponentConfig(template = "system:/groovy/portal/webui/page/UIPageTemplateOptions.gtmpl")
 public class UIPageTemplateOptions extends UIFormInputItemSelector<String> {
 
     private SelectItemOption<String> selectedItemOption_ = null;
 
-    public UIPageTemplateOptions(InitParams initParams) throws Exception {
+    public UIPageTemplateOptions() throws Exception {
         super("UIPageTemplateOptions", null, String.class);
-        if (initParams == null)
-            return;
-        WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
-        Param param = initParams.getParam("PageLayout");
-        categories_ = (List<SelectItemCategory<String>>) param.getFreshObject(context);
+        PageTemplateService pageTemplateService = getApplicationComponent(PageTemplateService.class);
+        categories_ = pageTemplateService.getPageTemplateCategories();
         selectedItemOption_ = getDefaultItemOption();
         List<SelectItemOption<String>> itemOptions = new ArrayList<SelectItemOption<String>>();
 

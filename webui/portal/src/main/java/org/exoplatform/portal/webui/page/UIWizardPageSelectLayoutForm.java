@@ -32,7 +32,7 @@ import org.exoplatform.webui.form.UIForm;
         @ComponentConfig(lifecycle = UIFormLifecycle.class
         // template = "system:/groovy/webui/form/UIFormTabPane.gtmpl"
         ),
-        @ComponentConfig(id = "PageTemplateOption", type = UIPageTemplateOptions.class, template = "system:/groovy/portal/webui/page/UIWizardPageSelectLayoutForm.gtmpl", initParams = @ParamConfig(name = "PageLayout", value = "system:/WEB-INF/conf/uiconf/portal/webui/page/PageConfigOptions.groovy")) })
+        @ComponentConfig(id = "PageTemplateOption", type = UIPageTemplateOptions.class, template = "system:/groovy/portal/webui/page/UIWizardPageSelectLayoutForm.gtmpl") })
 public class UIWizardPageSelectLayoutForm extends UIForm {
 
     @SuppressWarnings("unchecked")

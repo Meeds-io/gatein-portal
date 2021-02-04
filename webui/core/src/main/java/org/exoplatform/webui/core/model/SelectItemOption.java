@@ -35,27 +35,27 @@ public class SelectItemOption<T> {
     /**
      * The label of the item
      */
-    protected String label_;
+    protected String label;
 
     /**
      * THe value of the item
      */
-    protected T value_;
+    protected T value;
 
     /**
      * The icon url of the item
      */
-    protected String icon_;
+    protected String icon;
 
     /**
      * Whether this item is selected
      */
-    protected boolean selected_ = false;
+    protected boolean selected = false;
 
     /**
      * A description of the item
      */
-    protected String description_;
+    protected String description;
 
     public SelectItemOption() {
     }
@@ -65,15 +65,15 @@ public class SelectItemOption<T> {
     }
 
     public SelectItemOption(String label, T value, String desc, String icon) {
-        label_ = label;
-        value_ = value;
-        description_ = desc;
-        icon_ = icon;
+        this.label = label;
+        this.value = value;
+        this.description = desc;
+        this.icon = icon;
     }
 
     public SelectItemOption(String label, T value, String desc, String icon, boolean selected) {
         this(label, value, desc, icon);
-        selected_ = selected;
+        this.selected = selected;
     }
 
     public SelectItemOption(String label, T value) {
@@ -85,43 +85,43 @@ public class SelectItemOption<T> {
     }
 
     public String getLabel() {
-        return label_;
+        return label;
     }
 
     public void setLabel(String s) {
-        label_ = s;
+      this.label = s;
     }
 
     public T getValue() {
-        return value_;
+        return value;
     }
 
     public void setValue(T s) {
-        value_ = s;
+      this.value = s;
     }
 
     public String getDescription() {
-        return description_;
+        return description;
     }
 
     public void setDescription(String s) {
-        description_ = s;
+      this.description = s;
     }
 
     public boolean isSelected() {
-        return selected_;
+        return selected;
     }
 
     public void setSelected(boolean b) {
-        selected_ = b;
+      this.selected = b;
     }
 
     public String getIcon() {
-        return icon_;
+        return icon;
     }
 
     public void setIcon(String icon) {
-        this.icon_ = icon;
+        this.icon = icon;
     }
 
 }
