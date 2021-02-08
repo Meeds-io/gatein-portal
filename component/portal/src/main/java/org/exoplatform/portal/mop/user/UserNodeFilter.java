@@ -106,8 +106,7 @@ class UserNodeFilter implements NodeFilter {
         } else {
             if (visibility == Visibility.SYSTEM) {
                 if (config.authorizationMode == UserNodeFilterConfig.AUTH_READ_WRITE) {
-                    String userName = userPortal.userName;
-                    if (!acl.getSuperUser().equals(userName)) {
+                    if (!canWrite(state)) {
                         return false;
                     }
                 } else {
