@@ -32,4 +32,5 @@ $(document).ready(() => {
   $(window).resize(controlBodyScrollClass);
   controlBodyScrollClass();
   document.addEventListener('displayTopBarLoading', controlBodyScrollClass);
+  document.addEventListener('hideTopBarLoading', controlBodyScrollClass);
 })
