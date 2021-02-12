@@ -62,7 +62,7 @@
           <identity-store-id>PortalLDAPStore</identity-store-id>
           <identity-object-types>
             <identity-object-type>USER</identity-object-type>
-            <identity-object-type>GROUP</identity-object-type>
+            <identity-object-type>LDAP_MAPPED_GROUP</identity-object-type>
           </identity-object-types>
           <options>
             <option>
@@ -236,7 +236,7 @@
             </options>
           </identity-object-type>
           <identity-object-type>
-            <name>GROUP</name>
+            <name>LDAP_MAPPED_GROUP</name>
             <relationships>
               <relationship>
                 <relationship-type-ref>JBOSS_IDENTITY_MEMBERSHIP</relationship-type-ref>
@@ -244,7 +244,7 @@
               </relationship>
               <relationship>
                 <relationship-type-ref>JBOSS_IDENTITY_MEMBERSHIP</relationship-type-ref>
-                <identity-object-type-ref>GROUP</identity-object-type-ref>
+                <identity-object-type-ref>LDAP_MAPPED_GROUP</identity-object-type-ref>
               </relationship>
             </relationships>
             <credentials/>
