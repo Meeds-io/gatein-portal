@@ -160,9 +160,17 @@
                 <key><string>/</string></key>
                 <value><string>root_type</string></value>
               </entry>
+              <!-- exo.group.platform.identity.type will define the identity type of groups under /platform group.
+                Before meeds 1.0 , the value was '.platform' , starting meeds 1.0 the value is GROUP -->
               <entry>
-                <key><string>${exo.ldap.groups.rootGroup:/platform/*}</string></key>
-                <value><string>GROUP</string></value>
+                <key><string>/platform/*</string></key>
+                <value><string>${exo.group.platform.identity.type:GROUP}</string></value>
+              </entry>
+              <!-- exo.ldap.groups.rootGroup is the group under which all LDAP/AD groups will be imported
+                   exo.ldap.groups.identity.type is the identity type for groups imported from LDAP/AD-->
+              <entry>
+                <key><string>${exo.ldap.groups.rootGroup:/ldap-groups/*}</string></key>
+                <value><string>${exo.ldap.groups.identity.type:LDAP_MAPPED_GROUP}</string></value>
               </entry>
             </map>
           </field>
