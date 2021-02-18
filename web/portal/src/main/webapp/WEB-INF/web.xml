@@ -263,9 +263,31 @@
     <servlet-name>ServiceWorkerServlet</servlet-name>
     <servlet-class>org.exoplatform.web.pwa.ServiceWorkerServlet</servlet-class>
   </servlet>
-
+  
+  <servlet>
+    <servlet-name>accountSetup</servlet-name>
+    <servlet-class>org.exoplatform.account.setup.web.AccountSetup</servlet-class>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>accountSetupViewServlet</servlet-name>
+    <servlet-class>org.exoplatform.account.setup.web.AccountSetupViewServlet</servlet-class>
+  </servlet>
+  
+  
   <!--  =================================================================  -->
-
+  
+  <servlet-mapping>
+    <servlet-name>accountSetup</servlet-name>
+    <url-pattern>/accountSetupAction</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>accountSetupViewServlet</servlet-name>
+    <url-pattern>/accountSetup</url-pattern>
+  </servlet-mapping>
+  
+  
   <servlet-mapping>
     <servlet-name>LoginServlet</servlet-name>
     <url-pattern>/login</url-pattern>
