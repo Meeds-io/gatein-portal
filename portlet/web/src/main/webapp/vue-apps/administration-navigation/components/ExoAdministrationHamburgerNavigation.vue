@@ -61,7 +61,7 @@ export default {
       },
     };
   },
-  computed:{
+  computed: {
     visibilityQueryParams() {
       return this.navigationVisibilities.map(visibilityName => `visibility=${visibilityName}`).join('&');
     },

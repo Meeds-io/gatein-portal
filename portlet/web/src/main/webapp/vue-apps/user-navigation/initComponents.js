@@ -4,7 +4,7 @@ const components = {
   'exo-user-hamburger-navigation': ExoUserHamburgerNavigation,
 };
 
-for(const key in components) {
+for (const key in components) {
   Vue.component(key, components[key]);
 }
 

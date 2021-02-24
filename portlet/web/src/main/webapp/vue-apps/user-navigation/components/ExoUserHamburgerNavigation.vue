@@ -21,19 +21,19 @@
 </template>
 <script>
 export default {
-  data : () => ({
-    settingsUrl : `${eXo.env.portal.context}/${eXo.env.portal.portalName}/settings`,
+  data: () => ({
+    settingsUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/settings`,
   }),
-  methods : {
+  methods: {
     logOut() {
       eXo.portal.logout();
     },
     changeLanguage() {
-      if(document.getElementById('UIMaskWorkspace')) {
+      if (document.getElementById('UIMaskWorkspace')) {
         window.ajaxGet(eXo.env.server.createPortalURL('UIPortal', 'ChangeLanguage', true));}
     },
     accountSettings() {
-      if(document.getElementById('UIMaskWorkspace')) {
+      if (document.getElementById('UIMaskWorkspace')) {
         window.ajaxGet(eXo.env.server.createPortalURL('UIPortal', 'AccountSettings', true));
       }
     },
