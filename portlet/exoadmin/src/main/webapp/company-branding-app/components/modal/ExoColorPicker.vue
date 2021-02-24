@@ -6,11 +6,19 @@
     width="290px">
     <template v-slot:activator="{ on }">
       <div class="themeColor">
-        <div :style="{ backgroundColor: value}" class="colorSelected" v-on="on">
+        <div
+          :style="{ backgroundColor: value}"
+          class="colorSelected"
+          v-on="on">
         </div>
         <div class="themeDetails">
           <p class="labelColor">{{ label }} {{ $t('branding.color.label') }}</p>
-          <label :title="$t('branding.message.edit.label')" class="colorCode" rel="tooltip" data-placement="bottom" v-on="on">{{ value }}</label>
+          <label
+            :title="$t('branding.message.edit.label')"
+            class="colorCode"
+            rel="tooltip"
+            data-placement="bottom"
+            v-on="on">{{ value }}</label>
         </div>
       </div>
     </template>
@@ -21,10 +29,20 @@
       show-swatches />
     <v-row class="mx-0 white">
       <v-col class="center">
-        <v-btn text color="primary" @click="cancel">Cancel</v-btn>
+        <v-btn
+          text
+          color="primary"
+          @click="cancel">
+          Cancel
+        </v-btn>
       </v-col>
       <v-col class="center">
-        <v-btn text color="primary" @click="save">OK</v-btn>
+        <v-btn
+          text
+          color="primary"
+          @click="save">
+          OK
+        </v-btn>
       </v-col>
     </v-row>
   </v-dialog>

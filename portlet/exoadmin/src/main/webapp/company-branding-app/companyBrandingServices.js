@@ -25,7 +25,7 @@ export function getBrandingDefaultLogo() {
     method: 'GET',
     credentials: 'include',
   }).then(resp => {
-    if(resp.ok) {
+    if (resp.ok) {
       return resp.arrayBuffer();
     } else {
       return null;

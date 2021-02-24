@@ -20,16 +20,22 @@
       max-width="100vw"
       max-height="100vh"
       height="100vh">
-      <v-row class="HamburgerMenuLevelsParent fill-height" no-gutters @mouseleave="hideSecondLevel()">
+      <v-row
+        class="HamburgerMenuLevelsParent fill-height"
+        no-gutters
+        @mouseleave="hideSecondLevel()">
         <div :class="secondLevel && 'd-none d-sm-block'" class="HamburgerMenuFirstLevelParent border-box-sizing">
           <v-flex v-for="contentDetail in contents" :key="contentDetail.id">
             <div :id="contentDetail.id"></div>
           </v-flex>
         </div>
-        <div v-show="secondLevel" :class="secondLevel && 'open'" class="HamburgerMenuSecondLevelParent border-box-sizing">
+        <div
+          v-show="secondLevel"
+          :class="secondLevel && 'open'"
+          class="HamburgerMenuSecondLevelParent border-box-sizing">
           <div id="HamburgerMenuSecondLevel"></div>
         </div>
-        <span id="HamburgerMenuVisibility" class="d-none d-sm-block" />
+        <span id="HamburgerMenuVisibility" class="d-none d-sm-block"></span>
       </v-row>
     </v-navigation-drawer>
   </v-app>
