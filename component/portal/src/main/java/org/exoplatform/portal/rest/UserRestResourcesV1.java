@@ -492,7 +492,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
   }
 
   @GET
-  @Path("checkIsSuperUser")
+  @Path("isSuperUser")
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("administrators")
   @ApiOperation(
@@ -506,52 +506,8 @@ public class UserRestResourcesV1 implements ResourceContainer {
           @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
       }
   )
-  public Response checkIsSuperUser() {
+  public Response isSuperUser() {
     return Response.ok().entity("{\"isSuperUser\":\"" + userACL.isSuperUser() + "\"}").build();
-  }
-
-  @PUT
-  @Path("saveUserStatus")
-  @RolesAllowed("administrators")
-  @ApiOperation(
-      value = "Update an existing user status",
-      httpMethod = "PUT",
-      response = Response.class
-  )
-  @ApiResponses(
-      value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 400, message = "Invalid query input"),
-          @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
-      }
-  )
-  public Response updateUserStatus(@Context HttpServletRequest request, UserRestEntity userEntity) throws Exception {
-    if (userEntity == null) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("empty user object").build();
-    }
-
-    String userName = userEntity.getUserName();
-    boolean enabled = userEntity.isEnabled();
-
-    User user = organizationService.getUserHandler().findUserByName(userName, UserStatus.ANY);
-    if (user == null) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-    }
-
-    if (user.isEnabled() != enabled) {
-      if (!enabled) {
-        String currentUsername = getCurrentUsername();
-        if (StringUtils.equals(currentUsername, user.getUserName())) {
-          return Response.status(Response.Status.BAD_REQUEST).entity("SelfDisable").build();
-        }
-        if (StringUtils.equals(userACL.getSuperUser(), user.getUserName())) {
-          return Response.status(Response.Status.BAD_REQUEST).entity("DisableSuperUser").build();
-        }
-      }
-      organizationService.getUserHandler().setEnabled(userName, enabled, true);
-    }
-
-    return Response.noContent().build();
   }
 
   private UserRestEntity toEntity(User user) {
