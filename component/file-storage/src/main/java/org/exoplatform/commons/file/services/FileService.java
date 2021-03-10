@@ -4,6 +4,7 @@ import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.model.FileItem;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
@@ -61,4 +62,27 @@ public interface FileService {
    * @return file Info
    */
   public FileInfo deleteFile(long id);
+  
+  /**
+   * Get the files info of the given checksum
+   *
+   * @param checksum files checksum
+   * @return list file info
+   * @throws Exception
+   */
+  default public List<FileInfo> getFileInfoListByChecksum(String checksum) throws Exception {
+    throw new UnsupportedOperationException();
+  }
+  
+  /**
+   * Get the files (info + binary) of the given checksum
+   *
+   * @param checksum files checksum
+   * @return list fileItem
+   * @throws FileStorageException signals that an I/O exception of some sort has
+   *           occurred.
+   */
+  default public List<FileItem> getFilesByChecksum(String checksum) throws FileStorageException {
+    throw new UnsupportedOperationException();
+  }
 }
