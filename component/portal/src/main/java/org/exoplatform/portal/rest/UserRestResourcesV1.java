@@ -517,7 +517,9 @@ public class UserRestResourcesV1 implements ResourceContainer {
                               user.getDisplayName(),
                               user.getEmail(),
                               user.isEnabled(),
-                              false);
+                              false,
+                              user.isInternalStore(),
+                              String.valueOf(user.getCreatedDate().getTime()));
   }
 
   public static String getCurrentUsername() {

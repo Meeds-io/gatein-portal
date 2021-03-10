@@ -13,6 +13,10 @@ public class UserRestEntity {
 
   private String password;
 
+  private boolean isInternal;
+
+  private String createdDate;
+
   private boolean enabled;
 
   private boolean platformAdministrator;
@@ -20,14 +24,17 @@ public class UserRestEntity {
   public UserRestEntity() {
   }
 
-  public UserRestEntity(String userName, String firstName, String lastName, String fullName, String email, boolean enabled, boolean platformAdministrator) {
+  public UserRestEntity(String userName, String firstName, String lastName, String fullName, String email, boolean enabled, boolean platformAdministrator, boolean isInternal, String createdDate) {
     this.userName = userName;
     this.firstName = firstName;
     this.lastName = lastName;
     this.fullName = fullName;
     this.email = email;
     this.enabled = enabled;
+    this.enabled = enabled;
     this.platformAdministrator = platformAdministrator;
+    this.isInternal = isInternal;
+    this.createdDate = createdDate;
   }
 
   public String getUserName() {
@@ -70,6 +77,10 @@ public class UserRestEntity {
     this.fullName = fullName;
   }
 
+  public boolean getIsInternal() { return isInternal; }
+
+  public void setIsInternal(boolean isInternal) { this.isInternal = isInternal; }
+
   public String getEmail() {
     return email;
   }
@@ -77,6 +88,10 @@ public class UserRestEntity {
   public void setEmail(String email) {
     this.email = email;
   }
+
+  public String getCreatedDate() { return createdDate; }
+
+  public void setCreatedDate(String createdDate) { this.createdDate = createdDate; }
 
   public boolean isPlatformAdministrator() {
     return platformAdministrator;
