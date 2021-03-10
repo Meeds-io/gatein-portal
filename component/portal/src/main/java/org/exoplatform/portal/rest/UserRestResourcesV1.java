@@ -491,6 +491,25 @@ public class UserRestResourcesV1 implements ResourceContainer {
     return Response.ok(new CollectionEntity<>(membershipEntities, offset, limit, totalSize)).build();
   }
 
+  @GET
+  @Path("isSuperUser")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("administrators")
+  @ApiOperation(
+      value = "Check if current user is a superUser",
+      httpMethod = "GET",
+      response = Response.class
+  )
+  @ApiResponses(
+      value = {
+          @ApiResponse(code = 200, message = "Request fulfilled"),
+          @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
+      }
+  )
+  public Response isSuperUser() {
+    return Response.ok().entity("{\"isSuperUser\":\"" + userACL.isSuperUser() + "\"}").build();
+  }
+
   private UserRestEntity toEntity(User user) {
     return new UserRestEntity(user.getUserName(),
                               user.getFirstName(),
