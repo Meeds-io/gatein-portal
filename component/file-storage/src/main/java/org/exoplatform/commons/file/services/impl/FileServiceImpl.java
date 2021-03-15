@@ -1,6 +1,7 @@
 package org.exoplatform.commons.file.services.impl;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.file.model.NameSpace;
 import org.exoplatform.commons.file.resource.BinaryProvider;
@@ -15,6 +16,8 @@ import org.exoplatform.services.log.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * File Service which stores the file metadata in a database, and uses a
@@ -40,6 +43,11 @@ public class FileServiceImpl implements FileService {
   @Override
   public FileInfo getFileInfo(long id){
     return dataStorage.getFileInfo(id);
+  }
+  
+  @Override
+  public List<FileInfo> getFileInfoListByChecksum(String checksum){
+    return dataStorage.getFileInfoListByChecksum(checksum);
   }
 
   @Override
@@ -114,6 +122,25 @@ public class FileServiceImpl implements FileService {
       fileInfo.setDeleted(true);
     }
     return dataStorage.updateFileInfo(fileInfo);
+  }
+  
+  @Override
+  public List<FileItem> getFilesByChecksum(String checksum) throws FileStorageException {
+    List<FileItem> fileItemList = new ArrayList<FileItem>();
+    List<FileInfo> fileInfoList = getFileInfoListByChecksum(checksum);
+
+    try {
+      for (FileInfo fileInfo : fileInfoList) {
+        FileItem fileItem = new FileItem(fileInfo, null);
+        InputStream inputStream = binaryProvider.getStream(fileInfo.getChecksum());
+        fileItem.setInputStream(inputStream);
+        fileItemList.add(fileItem);
+      }
+    } catch (Exception e) {
+      throw new FileStorageException("Cannot get File Item CHECKSUM=" + checksum, e);
+    }
+
+    return fileItemList;
   }
 
   /* Manage two phase commit :file storage and datasource */
