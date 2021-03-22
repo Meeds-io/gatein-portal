@@ -111,6 +111,12 @@
      <% if (org.exoplatform.commons.utils.PropertyManager.isDevelopping()) { %>
           eXo.developing = true ;
      <% } %>
+     eXo.env.addLoadedRemoteScripts(<%=remoteScripts%>);
+   </script>
+   <script type="text/javascript" id="portalBaseVars">
+     <% if (org.exoplatform.commons.utils.PropertyManager.isDevelopping()) { %>
+        eXo.developing = true ;
+     <% } %>
      eXo.env.portal.context = "<%=docBase%>";
      eXo.env.portal.accessMode = "<%= rcontext.getAccessPath() == 0 ? "public" : "private" %>";
      eXo.env.portal.portalName = "<%=rcontext.getPortalOwner()%>";
@@ -138,6 +144,7 @@
      eXo.session.canKeepState = $canKeepState;
      eXo.session.isOpen = <%=uicomponent.isSessionOpen()%> ;
      eXo.session.itvTime = ${session.getMaxInactiveInterval()} ;
+     window.loadHTMLTime = Date.now();
    </script>
    <%
      def headerElements = rcontext.getExtraMarkupHeadersAsStrings();
