@@ -22,9 +22,8 @@ package org.exoplatform.portal.webui.workspace;
 import java.lang.reflect.Method;
 
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserACL;
-import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
@@ -63,6 +62,7 @@ public class UIMainActionListener {
             UIPortalApplication uiApp = Util.getUIPortalApplication();
             UIPortal uiPortal = Util.getUIPortal();
             UIWorkingWorkspace uiWorkingWS = uiApp.getChildById(UIPortalApplication.UI_WORKING_WS_ID);
+            UserPortalConfigService userPortalConfigService = uiApp.getApplicationComponent(UserPortalConfigService.class);
 
             UserNavigation currNav = uiPortal.getUserNavigation();
             if (currNav == null) {
@@ -75,9 +75,17 @@ public class UIMainActionListener {
                 return;
             }
 
+            UserNodeFilterConfig filterConfig = createFilterConfig();
             // Should renew the selectedNode. Don't reuse the cached selectedNode
             UserNode selectedNode = Util.getUIPortal().getSelectedUserNode();
-            UserNodeFilterConfig filterConfig = createFilterConfig();
+            // if the current navigation belongs to the Global site, we switch to the current site root navigation
+            if (PortalConfig.PORTAL_TYPE.equals(selectedNode.getNavigation().getKey().getType().getName())
+              && userPortalConfigService.getGlobalPortal().equalsIgnoreCase(selectedNode.getNavigation().getKey().getName())) {
+                PortalRequestContext prc = Util.getPortalRequestContext();
+                UserPortal userPortal = prc.getUserPortalConfig().getUserPortal();
+                UserNode rootNode = userPortal.getNode(currNav, Scope.CHILDREN, filterConfig, null);
+                selectedNode = rootNode.getChildrenSize() > 0 ? rootNode.getChild(0) : selectedNode;
+            }
             UserNode resolvedNode = resolveNode(selectedNode, filterConfig);
             if (resolvedNode == null) {
                 resolvedNode = resolveNode(selectedNode, null);
