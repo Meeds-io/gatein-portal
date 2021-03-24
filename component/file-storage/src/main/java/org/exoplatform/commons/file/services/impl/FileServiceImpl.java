@@ -178,12 +178,8 @@ public class FileServiceImpl implements FileService {
             binaryProvider.put(fileInfo.getChecksum(), inputStream);
             created = true;
           }
-          if (binaryProvider.exists(fileInfo.getChecksum())) {
-            createdFileInfoEntity = dataStorage.create(fileInfo, nameSpace);
-            return createdFileInfoEntity;
-          } else {
-            throw new FileStorageException("Error while writing file " + fileInfo.getName());
-          }
+          createdFileInfoEntity = dataStorage.create(fileInfo, nameSpace);
+          return createdFileInfoEntity;
         } catch (Exception e) {
           try {
             if (created) {
