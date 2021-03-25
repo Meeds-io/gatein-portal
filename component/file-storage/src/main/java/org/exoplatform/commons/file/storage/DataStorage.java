@@ -53,7 +53,16 @@ public class DataStorage {
     FileInfoEntity fileInfoEntity = fileInfoDAO.find(id);
     return convertFileEntityToFileInfo(fileInfoEntity);
   }
-
+  
+  public List<FileInfo> getFileInfoListByChecksum(String checksum) {
+    List<FileInfoEntity> result = fileInfoDAO.findFilesByChecksum(checksum);
+    List<FileInfo> fileInfoList = new ArrayList<FileInfo>();
+    for (FileInfoEntity fileInfoEntity : result) {
+      fileInfoList.add(convertFileEntityToFileInfo(fileInfoEntity));
+    }
+    return fileInfoList;
+  }
+  
   public List<FileInfo> getAllFilesInfo(int offset, int limit) {
     List<FileInfoEntity> result = fileInfoDAO.findAllByPage(offset, limit);
     List<FileInfo> listFilesInfo = new ArrayList<FileInfo>();

@@ -17,7 +17,17 @@
         <h4 class="labelStyle">{{ $t('companyName.label') }}</h4>
         <div>
           <div class="info"><p>{{ $t('companyName.input.hint') }}</p></div>
-          <input id="companyNameInput" :title="$t('branding.message.edit.label')" v-model="branding.companyName" :placeholder="$t('companyName.placeholder')" type="text" name="formOp" class="ignore-vuetify-classes inputCompany" rel="tooltip" data-placement="bottom" value="">
+          <input
+            id="companyNameInput"
+            :title="$t('branding.message.edit.label')"
+            v-model="branding.companyName"
+            :placeholder="$t('companyName.placeholder')"
+            type="text"
+            name="formOp"
+            class="ignore-vuetify-classes inputCompany"
+            rel="tooltip"
+            data-placement="bottom"
+            value="">
         </div>
         <hr class="logo">
         <h4 class="styleSelectLogo">
@@ -28,12 +38,27 @@
           <div v-show="showLogo" class="pull-left">
             <div id="previewLogo" class="previewLogo">
               <div class="logoPreviewImage">
-                <img id="previewLogoImg" :src="logoPreview" class="previewImg">
+                <img
+                  id="previewLogoImg"
+                  :src="logoPreview"
+                  class="previewImg">
               </div>
               <div class="btnActionContainer">
                 <div class="btnAction">
-                  <i v-if="removeLogoButtonDisplayed" :title="$t('branding.message.restore.logo')" class="fas fa-trash-alt iconDelete" rel="tooltip" data-placement="bottom" @click="removeLogo"></i>
-                  <i v-else :title="$t('branding.message.change.logo')" class="uiIconEdit iconEdit" rel="tooltip" data-placement="bottom" @click="showLogo = false"></i>
+                  <i
+                    v-if="removeLogoButtonDisplayed"
+                    :title="$t('branding.message.restore.logo')"
+                    class="fas fa-trash-alt iconDelete"
+                    rel="tooltip"
+                    data-placement="bottom"
+                    @click="removeLogo"></i>
+                  <i
+                    v-else
+                    :title="$t('branding.message.change.logo')"
+                    class="uiIconEdit iconEdit"
+                    rel="tooltip"
+                    data-placement="bottom"
+                    @click="showLogo = false"></i>
                 </div>
               </div>
             </div>
@@ -58,13 +83,21 @@
                     </label>
                   </div>
                 </div>
-                <input id="attachLogo" type="file" class="attachFile" name="file" @change="onFileChange">
+                <input
+                  id="attachLogo"
+                  type="file"
+                  class="attachFile"
+                  name="file"
+                  @change="onFileChange">
               </div>
             </div>
           </div>
         </div>
         <div v-if="!showLogo" class="button_back">
-          <a href="javascript:void(0)" class="linkBack" @click="showLogo = true"><i class="fas fa-undo-alt"></i>{{ $t('back.label') }}</a>
+          <a
+            href="javascript:void(0)"
+            class="linkBack"
+            @click="showLogo = true"><i class="fas fa-undo-alt"></i>{{ $t('back.label') }}</a>
         </div>
         <hr class="theme">
         <div class="boxContent themeLabel">
@@ -85,10 +118,19 @@
           </v-row>
         </div>
         <div class="uiAction boxContent">
-          <button id="cancel" class="btn ignore-vuetify-classes" type="button" @click="cancel">
+          <button
+            id="cancel"
+            class="btn ignore-vuetify-classes"
+            type="button"
+            @click="cancel">
             {{ $t('cancel.label') }}
           </button>
-          <button id="save" :disabled="!branding.companyName || !branding.companyName.trim()" class="btn btn-primary ignore-vuetify-classes" type="button" @click="save">
+          <button
+            id="save"
+            :disabled="!branding.companyName || !branding.companyName.trim()"
+            class="btn btn-primary ignore-vuetify-classes"
+            type="button"
+            @click="save">
             {{ $t('save.label') }}
           </button>
         </div>
@@ -134,7 +176,7 @@ export default {
         return brandingConstants.HOMEICON;
       }
 
-      if(Array.isArray(this.branding.logo.data)) {
+      if (Array.isArray(this.branding.logo.data)) {
         return this.convertImageDataAsSrc(this.branding.logo.data);
       } else {
         return this.branding.logo.data;
@@ -184,7 +226,7 @@ export default {
         return;
       }
 
-      if(!this.isLogoFileExtensionValid(files[0])) {
+      if (!this.isLogoFileExtensionValid(files[0])) {
         this.$el.querySelector('#mustpng').style.display = 'block';
         setTimeout(function () {
           self.cleanMessage();
@@ -193,7 +235,7 @@ export default {
         return;
       }
 
-      if(!this.isLogoFileSizeValid(files[0])) {
+      if (!this.isLogoFileSizeValid(files[0])) {
         this.$el.querySelector('#toobigfile').style.display = 'block';
         setTimeout(function () {
           self.cleanMessage();
@@ -227,13 +269,13 @@ export default {
     },
     changePreviewStyle() {
       const topBarPreviewContainer = document.querySelector('#StylePreview #UIToolbarContainer');
-      if(topBarPreviewContainer) {
+      if (topBarPreviewContainer) {
         topBarPreviewContainer.setAttribute('class', `UIContainer UIToolbarContainer UIToolbarContainer${this.branding.topBarTheme}`);
       }
     },
     save() {
       this.cleanMessage();
-      if(this.branding.logo.uploadId && !this.isLogoFileExtensionValid(this.branding.logo)) {
+      if (this.branding.logo.uploadId && !this.isLogoFileExtensionValid(this.branding.logo)) {
         this.$el.querySelector('#mustpng').style.display = 'block';
         this.branding.logo.data = this.branding.logo.defaultData;
         this.branding.logo.uploadId = null;
@@ -298,7 +340,7 @@ export default {
               return;
             }
 
-            if(!responseObject.upload[uploadId] || !responseObject.upload[uploadId].percent ||
+            if (!responseObject.upload[uploadId] || !responseObject.upload[uploadId].percent ||
               responseObject.upload[uploadId].percent !== maxProgress.toString()) {
               self.$el.querySelector('#savenotok').style.display = 'block';
               setTimeout(function () {

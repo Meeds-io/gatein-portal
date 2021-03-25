@@ -71,6 +71,8 @@ public class UserACL {
     private PortalACLPlugin portalACLPlugin;
 
     private String adminGroups;
+    
+    private String dlpGroups;
 
     private String adminMSType;
 
@@ -96,6 +98,12 @@ public class UserACL {
         ValueParam adminGroupsParam = params.getValueParam("portal.administrator.groups");
         if (adminGroupsParam != null) {
             setAdminGroups(adminGroupsParam.getValue());
+        }
+        
+        // get dlp group value
+        ValueParam dlpGroupsParam = params.getValueParam("portal.dlp.groups");
+        if (dlpGroupsParam != null) {
+            setDlpGroups(dlpGroupsParam.getValue());
         }
 
         // tam.nguyen get administrator member type
@@ -189,9 +197,17 @@ public class UserACL {
     public void setAdminGroups(String adminGroups) {
         this.adminGroups = adminGroups;
     }
-
+    
     public String getAdminGroups() {
         return adminGroups;
+    }
+    
+    public void setDlpGroups(String dlpGroups) {
+      this.dlpGroups = dlpGroups;
+    }
+    
+    public String getDlpGroups() {
+      return dlpGroups;
     }
 
     public void setAdminMSType(String adminMSType) {

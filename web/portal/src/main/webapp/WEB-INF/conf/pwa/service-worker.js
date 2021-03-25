@@ -6,7 +6,7 @@ const siteName = '@site-name@';
 const development = @development@;
 
 workbox.setConfig({
-  debug: development,
+  debug: false,
   modulePathPrefix: '/eXoResources/javascript/workbox-5.1.4/'
 });
 
