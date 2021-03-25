@@ -425,10 +425,10 @@ public class TestPLIDMExternalStoreImportService extends AbstractKernelTest {
       externalStoreImportService.processQueueEntries();
       assertEquals("Queue must be purged once deletion is processed on internal store", 0, queueService.countAll());
       allUsersListAccess = organizationService.getUserHandler().findAllUsers();
-      assertEquals("Internal suers size should equals to initialUsersSize once two users are deleted",
+      assertEquals("Internal users size should equals to initialUsersSize once two users are deleted",
                    initialUsersSize,
                    allUsersListAccess.getSize());
-      assertEquals("Internal suers size should equals to initialUsersSize once two users are deleted",
+      assertEquals("Internal users size should equals to initialUsersSize once two users are deleted",
                    initialUsersSize,
                    allUsersListAccess.load(0, allUsersListAccess.getSize()).length);
       assertEquals("The listener 'user creation' shouldn't be triggered once a deletion is made on internal store",
@@ -448,6 +448,40 @@ public class TestPLIDMExternalStoreImportService extends AbstractKernelTest {
       assertEquals("The user 'jduke10' membership in Group '/role_hierarchy/Admin' should have been deleted",
                    initialMembershipsCount,
                    memberships.size());
+
+
+
+      // Add users 'jduke12' and 'jduke13'
+      openDSService.populateLDIFFile("ldap/ldap/test-user-disable-opends.ldif");
+      // Wait 1 second until operation finishes on LDAP Store
+      Thread.sleep(1000);
+      externalStoreImportService.importModifiedEntitiesOfTypeToQueue(IDMEntityType.USER);
+      assertEquals("Users creation should have been detected.", 2, queueService.countAll());
+      externalStoreImportService.processQueueEntries();
+      allUsersListAccess = organizationService.getUserHandler().findAllUsers();
+
+      assertEquals("Internal users size should equals to initialUsersSize because users were disabled and were not deleted",
+              initialUsersSize + 2,
+              allUsersListAccess.getSize());
+
+      externalStoreImportService.setDeleteMissingEntriesFromInternalStore(false);
+      // Test disable users when users deleted from external store
+      openDSService.cleanUpDN("uid=jdukeX,ou=People,o=test,dc=portal,dc=example,dc=com");
+      openDSService.cleanUpDN("uid=jdukeY,ou=People,o=test,dc=portal,dc=example,dc=com");
+      // Wait 1 second until operation finishes on LDAP Store
+      Thread.sleep(1000);
+      externalStoreImportService.checkEntitiesToDeleteIntoQueue(IDMEntityType.USER);
+      assertEquals("Users deletion should have been detected.", 2, queueService.countAll());
+      externalStoreImportService.processQueueEntries();
+
+      allUsersListAccess = organizationService.getUserHandler().findAllUsers(UserStatus.ANY);
+
+      assertEquals("Internal users size should equals to initialUsersSize because users were disabled and were not deleted",
+              initialUsersSize + 2,
+              allUsersListAccess.getSize());
+      assertNotNull(organizationService.getUserHandler().findUserByName("jdukeX", UserStatus.DISABLED));
+      assertNotNull(organizationService.getUserHandler().findUserByName("jdukeY", UserStatus.DISABLED));
+
     } finally {
       if (externalStoreService.getEntity(IDMEntityType.USER, "jduke10") != null) {
         openDSService.cleanUpDN("uid=jduke10,ou=People,o=test,dc=portal,dc=example,dc=com");
