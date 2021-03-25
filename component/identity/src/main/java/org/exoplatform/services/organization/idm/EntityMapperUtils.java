@@ -121,6 +121,21 @@ public class EntityMapperUtils {
       changed |= checkIfChanged && !Objects.equals(organizationId, user.getOrganizationId());
       user.setOrganizationId(organizationId);
     }
+    if (attrs.containsKey(USER_ENABLED)) {
+      // used when populating User from AD ; it returns numbers : 512 = enbaled, 514 = disabled
+      String status = attrs.get(USER_ENABLED).getValue().toString();
+
+      // used when populating User from the platform ; it return true or false
+      // if it is from AD it always returns false since it is a number .
+      Boolean enabled = Boolean.parseBoolean(attrs.get(USER_ENABLED).getValue().toString()) ;
+
+      if (status.equals("512")  )
+      {
+        enabled = true;
+      }
+      changed |= checkIfChanged && !Objects.equals(enabled, user.isEnabled());
+      ((UserImpl) user).setEnabled(enabled);
+    }
     if (user instanceof UserImpl && attrs.containsKey(ORIGINATING_STORE)) {
       UserImpl userImpl = (UserImpl) user;
       userImpl.setOriginatingStore(attrs.get(ORIGINATING_STORE).getValue().toString());

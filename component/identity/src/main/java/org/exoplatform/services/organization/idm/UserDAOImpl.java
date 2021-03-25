@@ -702,6 +702,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
     if (user.getLastName() != null) {
       attributes.add(new SimpleAttribute(USER_LAST_NAME, user.getLastName()));
     }
+      attributes.add(new SimpleAttribute(USER_ENABLED,  Boolean.toString((((UserImpl) user).isEnabled()))));
 
     // TODO: GTNPORTAL-2358 Change once displayName will be available as part of
     // Organization API
@@ -796,9 +797,6 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
       return;
     } else {
       EntityMapperUtils.populateUser(user, attrs);
-      if (attrs.containsKey(USER_ENABLED) && disableUserActived()) {
-        ((UserImpl) user).setEnabled(Boolean.parseBoolean(attrs.get(USER_ENABLED).getValue().toString()));
-      }
       if (attrs.containsKey(USER_PASSWORD)) {
         user.setPassword(attrs.get(USER_PASSWORD).getValue().toString());
       }
