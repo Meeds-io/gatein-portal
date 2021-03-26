@@ -59,6 +59,11 @@
 				<description>Cron expression used to schedule the job that will process periodically data injected in queue (Default value = every minute)</description>
 				<value>${exo.idm.externalStore.queue.processing.cronExpression:0 */1 * ? * *}</value>
 			</value-param>
+			<value-param>
+				<name>exo.idm.externalStore.entries.missing.delete</name>
+				<description>If TRUE delete users if they are not present in external store, otherwise disable them (Default : delete users)</description>
+				<value>${exo.idm.externalStore.entries.missing.delete:true}</value>
+			</value-param>
 		</init-params>
 	</component>
 
