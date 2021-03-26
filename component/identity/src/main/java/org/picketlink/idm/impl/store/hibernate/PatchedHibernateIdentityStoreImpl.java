@@ -793,7 +793,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
                   //Nothing
                }
                /** Begin eXo customization : PLF-7270**/
-               if (entry.getValue() == null || entry.getValue().length == 0) {
+               if ((entry.getValue() == null || entry.getValue().length == 0) && mappedAttributeName!= "enabled") {
                   i++;
                   String attrTableJoinName = "attrs" + i;
                   String attrParamName = "attr" + i;
