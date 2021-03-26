@@ -315,7 +315,7 @@ public class PicketLinkIDMExternalStoreService implements IDMExternalStoreServic
         return true;
       }
     } else {
-      if (idmUser == null) {
+      if (idmUser == null || !user.isEnabled()) { // user is present inside eXo DB but not on external store, or user is present in both stores and is disabled
         return true;
       }
     }
