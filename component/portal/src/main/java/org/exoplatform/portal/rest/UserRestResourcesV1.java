@@ -510,6 +510,28 @@ public class UserRestResourcesV1 implements ResourceContainer {
     return Response.ok().entity("{\"isSuperUser\":\"" + userACL.isSuperUser() + "\"}").build();
   }
 
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("isSynchronizedUserAllowedToChangePassword")
+  @RolesAllowed("users")
+  @ApiOperation(value = "Check if synchronized user is allowed to change his password",
+      httpMethod = "GET",
+      response = Response.class,
+      notes = "This can only be done by the logged in user.")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 500, message = "Internal server error due to data encoding")})
+  public Response isSynchronizedUserAllowedToChangePassword(@Context UriInfo uriInfo) throws Exception {
+
+    String userId = ConversationState.getCurrent().getIdentity().getUserId();
+    User user = organizationService.getUserHandler().findUserByName(userId, UserStatus.ANY);
+    if (user == null) {
+      throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    }
+    boolean allowChangePassword = Boolean.valueOf(System.getProperty("exo.portal.allow.change.external.password").toString()) || user.isInternalStore();
+    return Response.ok().entity("{\"isSynchronizedUserAllowedToChangePassword\":\"" + allowChangePassword + "\"}").build();
+  }
+
   private UserRestEntity toEntity(User user) {
     return new UserRestEntity(user.getUserName(),
                               user.getFirstName(),
