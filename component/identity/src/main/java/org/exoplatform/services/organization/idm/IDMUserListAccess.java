@@ -100,11 +100,11 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
         if (fullResults == null) {
             users = listQuery(index, length);
 
-            if ((this.userStatus == UserStatus.ENABLED || this.userStatus == UserStatus.DISABLED) && !isDBOnly) {
+            if ((this.userStatus == UserStatus.ENABLED || this.userStatus == UserStatus.DISABLED)) {
                 users = filterUserByStatus(users, this.userStatus, index, length);
             }
         } else {
-            if ((this.userStatus == UserStatus.ENABLED || this.userStatus == UserStatus.DISABLED) && !isDBOnly) {
+            if ((this.userStatus == UserStatus.ENABLED || this.userStatus == UserStatus.DISABLED)) {
                 //Need to check all returned users is enabled
                 users = filterUserByStatus(fullResults, this.userStatus, index, length);
             } else{
@@ -179,7 +179,7 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
               } else {
                 fullResults = listQuery(0, 0);
 
-                if ((this.userStatus == UserStatus.ENABLED || this.userStatus == UserStatus.DISABLED) && !isDBOnly) {
+                if ((this.userStatus == UserStatus.ENABLED || this.userStatus == UserStatus.DISABLED)) {
                   result = filterUserByStatus(fullResults, this.userStatus, 0, fullResults.size()).size();
                 } else {
                   result = fullResults.size();
@@ -222,7 +222,7 @@ public class IDMUserListAccess implements ListAccess<User>, Serializable {
             while (iterator.hasNext() && result.size() < length) {
               org.picketlink.idm.api.User user = iterator.next();
                 Attribute attr = getIDMService().getIdentitySession().getAttributesManager().getAttribute(user.getKey(), EntityMapperUtils.USER_ENABLED);
-                if ((userStatus == UserStatus.ENABLED && attr == null) || (userStatus == UserStatus.DISABLED && attr != null && attr.getValue().toString().equals("false"))) {
+                if ((userStatus == UserStatus.ENABLED && attr == null) || (userStatus == UserStatus.DISABLED && attr != null && attr.getValue().toString().equals("false"))|| (userStatus == UserStatus.ENABLED && attr != null && attr.getValue().toString().equals("true"))) {
                     // Check if we have to get a subset of real fullResults or from results returned by a query
                     if(this.fullResults == fullResults) {
                       if (offset >= index) {

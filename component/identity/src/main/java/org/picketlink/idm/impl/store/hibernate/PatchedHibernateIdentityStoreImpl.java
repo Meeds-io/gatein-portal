@@ -3256,54 +3256,39 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
                //Nothing
             }
 
-            // If the attribute key is enable, consider its absence as it was equals to true
-            if (entry.getKey().equals(EntityMapperUtils.USER_ENABLED) &&  entry.getValue() != null && entry.getValue().length == 0) {
-               if(presentAttrs.containsKey(mappedAttributeName)){
-                  toRemove.add(object);
-               }
-              continue;
-            }
-
-
             if (mappedAttributeName == null)
             {
                toRemove.add(object);
                break;
             }
+            if (!mappedAttributeName.equals("enabled")) {
+               if (presentAttrs.containsKey(mappedAttributeName)) {
+                  Set<String> given = new HashSet<String>(Arrays.asList(entry.getValue()));
 
-            if (presentAttrs.containsKey(mappedAttributeName))
-            {
-               Set<String> given = new HashSet<String>(Arrays.asList(entry.getValue()));
+                  Collection present = presentAttrs.get(mappedAttributeName);
 
-               Collection present = presentAttrs.get(mappedAttributeName);
+                  for (String s : given) {
+                     String regex = Tools.wildcardToRegex(s);
 
-               for (String s : given)
-               {
-                  String regex = Tools.wildcardToRegex(s);
+                     boolean matches = false;
 
-                  boolean matches = false;
+                     for (Object o : present) {
+                        if (o.toString().matches(regex)) {
+                           matches = true;
+                        }
+                     }
 
-                  for (Object o : present)
-                  {
-                     if (o.toString().matches(regex))
-                     {
-                        matches = true;
+                     if (!matches) {
+                        toRemove.add(object);
+                        break;
                      }
                   }
 
-                  if (!matches)
-                  {
-                     toRemove.add(object);
-                     break;
-                  }
+               } else {
+                  toRemove.add(object);
+                  break;
+
                }
-
-            }
-            else
-            {
-               toRemove.add(object);
-               break;
-
             }
          }
       }
