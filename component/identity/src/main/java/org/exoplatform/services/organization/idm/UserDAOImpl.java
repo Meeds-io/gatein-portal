@@ -702,7 +702,8 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
     if (user.getLastName() != null) {
       attributes.add(new SimpleAttribute(USER_LAST_NAME, user.getLastName()));
     }
-      attributes.add(new SimpleAttribute(USER_ENABLED,  Boolean.toString((((UserImpl) user).isEnabled()))));
+    attributes.add(new SimpleAttribute(USER_ENABLED,  Boolean.toString(user.isEnabled())));
+
 
     // TODO: GTNPORTAL-2358 Change once displayName will be available as part of
     // Organization API
