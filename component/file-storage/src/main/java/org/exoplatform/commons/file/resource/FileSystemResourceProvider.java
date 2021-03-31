@@ -131,13 +131,17 @@ public class FileSystemResourceProvider implements BinaryProvider {
   public InputStream getStream(String name) {
     try {
       return new FileInputStream(getFile(name));
-    } catch (IOException e) {
+      
+    } catch (FileNotFoundException fileNotFoundException) {
       try {
-        log.error("Unable to read binary content from disk for file " + getFile(name).getPath() + ". The binary content is not "
-                      + "accessible, it was removed, or may have been quarantined by an antivirus.",e);
+        log.warn("Unable to read binary content from disk for file " + getFile(name).getPath() + ". The binary content is not "
+                      + "accessible, it was removed, or may have been quarantined by an antivirus.");
       } catch (IOException ioException) {
         log.error("Unable to get file object for name " + name, ioException);
       }
+    }
+    catch (IOException ioException) {
+      log.error("Unable to get file object for name " + name, ioException);
     }
     return null;
   }
