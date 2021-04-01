@@ -26,7 +26,6 @@
     id="ParentSiteContainer"
     template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
 
-  <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
   <container id="UITopBarContainer" template="system:/groovy/portal/webui/container/UITopBarContainer.gtmpl">
     <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
     <container id="left-topNavigation-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl" attribute="">
