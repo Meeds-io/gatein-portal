@@ -205,6 +205,54 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     assertEquals(String.valueOf(resp.getEntity()), 204, resp.getStatus());
   }
 
+  public void testIsInternalUserAllowedToChangePassword() throws Exception {
+    // The property exo.portal.allow.change.external.password isn't displayed (null)
+    // Given
+    startUserSession(USER_1);
+
+    // When
+    ContainerResponse resp = launcher.service("GET",
+                                              "/v1/users/isSynchronizedUserAllowedToChangePassword",
+                                              "",
+                                              null,
+                                              null,
+                                              null);
+
+    // Then
+    assertEquals(String.valueOf(resp.getEntity()), 200, resp.getStatus());
+    assertTrue(String.valueOf(resp.getEntity()).contains("true"));
+    //Check the fail case
+    assertNull(System.getProperty("exo.portal.allow.change.external.password"));
+
+    // The property exo.portal.allow.change.external.password is true
+    //When
+    System.setProperty("exo.portal.allow.change.external.password", "true");
+    resp = launcher.service("GET",
+                            "/v1/users/isSynchronizedUserAllowedToChangePassword",
+                            "",
+                            null,
+                            null,
+                            null);
+
+    // Then
+    assertEquals(String.valueOf(resp.getEntity()), 200, resp.getStatus());
+    assertTrue(String.valueOf(resp.getEntity()).contains("true"));
+
+    // The property exo.portal.allow.change.external.password is false
+    //When
+    System.setProperty("exo.portal.allow.change.external.password", "false");
+    resp = launcher.service("GET",
+                            "/v1/users/isSynchronizedUserAllowedToChangePassword",
+                            "",
+                            null,
+                            null,
+                            null);
+
+    // Then
+    assertEquals(String.valueOf(resp.getEntity()), 200, resp.getStatus());
+    assertTrue(String.valueOf(resp.getEntity()).contains("true"));
+  }
+
   public void testCreateUser() throws Exception {
     when(userHandler.findUserByName(eq(USER_2), any())).thenReturn(null);
     @SuppressWarnings("unchecked")
