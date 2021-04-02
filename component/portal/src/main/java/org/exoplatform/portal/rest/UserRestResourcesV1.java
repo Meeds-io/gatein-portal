@@ -528,7 +528,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
     if (user == null) {
       throw new WebApplicationException(Response.Status.BAD_REQUEST);
     }
-    boolean allowChangePassword = Boolean.valueOf(System.getProperty("exo.portal.allow.change.external.password").toString()) || user.isInternalStore();
+    boolean allowChangePassword = user.isInternalStore() || (System.getProperty("exo.portal.allow.change.external.password") != null && Boolean.valueOf(System.getProperty("exo.portal.allow.change.external.password").toString()));
     return Response.ok().entity("{\"isSynchronizedUserAllowedToChangePassword\":\"" + allowChangePassword + "\"}").build();
   }
 
