@@ -11,6 +11,7 @@
     <v-navigation-drawer
       id="HamburgerMenuNavigation"
       v-model="hamburgerMenu"
+      :right="$vuetify.rtl"
       :hide-overlay="initializing"
       :style="hamburgerMenuStyle"
       :width="drawerWidth"
@@ -54,10 +55,7 @@ export default {
       idleTime: 20,
       isMobile: false,
       idleTimeToDisplaySecondLevel: 20,
-      vuetify: new Vuetify({
-        dark: true,
-        iconfont: 'mdi',
-      }),
+      vuetify: new Vuetify(eXo.env.portal.vuetifyPreset),
     };
   },
   computed: {

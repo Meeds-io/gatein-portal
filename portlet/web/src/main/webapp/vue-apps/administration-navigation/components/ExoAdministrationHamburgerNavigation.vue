@@ -22,10 +22,7 @@
 export default {
   data() {
     return {
-      vuetify: new Vuetify({
-        dark: true,
-        iconfont: 'mdi',
-      }),
+      vuetify: new Vuetify(eXo.env.portal.vuetifyPreset),
       navigationScope: 'ALL',
       navigationVisibilities: ['displayed'],
       navigations: [],

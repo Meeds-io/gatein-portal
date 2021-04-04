@@ -281,21 +281,21 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
         String resource = "/orientation/file.css";
         SkinURL skinURL = newSimpleSkin(resource).createURL(controllerCtx);
         String uri = skinURL.toString();
-        String css = "aaa;/*orientation=lt*/bbb;/*orientation=rt*/\n"
-                + " aaa; /* orientation=lt */ bbb; /* orientation=rt */ \n"
-                + "{aaa;bbb;/*orientation=lt*/ccc;ddd;/*orientation=rt*/}\n"
-                + "{aaa;/*orientation=lt*/bbb;}{ccc;/*orientation=rt*/ddd;}";
+        String css = "aaa;/*orientation=lt*/;\nbbb;/*orientation=rt*/\n"
+                + " aaa; /* orientation=lt */;\n bbb; /* orientation=rt */ \n"
+                + "{aaa;bbb;/*orientation=lt*/ccc;\nddd;/*orientation=rt*/}\n"
+                + "{aaa;/*orientation=lt*/\nbbb;}{ccc;\n/*orientation=rt*/ddd;}";
 
         resResolver.addResource(resource, css);
 
-        assertEquals("aaa;\n" + "aaa;\n" + "{aaa;bbb;/*orientation=lt*/ccc;}\n" + "{aaa;/*orientation=lt*/bbb;}{ddd;}",
-                skinService.getCSS(newControllerContext(getRouter(), uri), false));
+        assertEquals("aaa;/*orientation=lt*/;aaa; /* orientation=lt */;{aaa;bbb;/*orientation=lt*/ccc;{aaa;/*orientation=lt*/bbb;}{ccc;",
+                     skinService.getCSS(newControllerContext(getRouter(), uri), false).replaceAll("\n", ""));
 
         skinURL.setOrientation(Orientation.RT);
         uri = skinURL.toString();
-        assertEquals("bbb;/*orientation=rt*/\n" + " bbb; /* orientation=rt */\n" + "{aaa;ccc;ddd;/*orientation=rt*/}\n"
-                + "{bbb;}{ccc;/*orientation=rt*/ddd;}", skinService.getCSS(newControllerContext(getRouter(), uri), false));
-    }
+        assertEquals("bbb;/*orientation=rt*/bbb; /* orientation=rt */ddd;/*orientation=rt*/}bbb;}{ccc;/*orientation=rt*/ddd;}",
+                     skinService.getCSS(newControllerContext(getRouter(), uri), false).replaceAll("\n", ""));
+      }
 
     public void testBackgroundURL() throws Exception {
         String resource = "/background/url/file.css";
