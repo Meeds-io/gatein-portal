@@ -71,7 +71,7 @@ public class UpdateLoginTimeListener extends Listener<ConversationRegistry, Conv
       }
 
       user.setLastLoginTime(Calendar.getInstance().getTime());
-      userHandler.saveUser(user, false);
+      userHandler.saveUser(user, true);
     } catch (Exception e) {
       LOG.error("Error while updating the last login time for user {}", userId, e);
     } finally {
