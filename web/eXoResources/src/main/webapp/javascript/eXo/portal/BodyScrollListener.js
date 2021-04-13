@@ -15,11 +15,33 @@ $(document).ready(() => {
       document.head.append(styleElement);
     }
 
-    const scrollbarWidth = parseInt(window.innerWidth - document.body.offsetWidth);
-    styleElement.textContent = `
-    .hide-scroll.with-scroll {
-      margin-right: ${scrollbarWidth}px !important;
-    }`;
+    if (window.scrollbars.visible) {
+      const scrollbarWidth = parseFloat(window.innerWidth - document.body.getBoundingClientRect().width);
+      const isScrollBarOnLeft = document.body.getBoundingClientRect().left > 0;
+      if (isScrollBarOnLeft) {
+        styleElement.textContent = `
+          @media (min-width: 768px) {
+            .hide-scroll.with-scroll {
+              margin-left: ${scrollbarWidth}px !important;
+            }
+            .hide-scroll.with-scroll #UITopBarContainer {
+              width: calc(100% - ${scrollbarWidth}px);
+              right: 0;
+            }
+          }`;
+      } else {
+        styleElement.textContent = `
+          @media (min-width: 768px) {
+            .hide-scroll.with-scroll {
+              margin-right: ${scrollbarWidth}px !important;
+            }
+            .hide-scroll.with-scroll #UITopBarContainer {
+              width: calc(100% - ${scrollbarWidth}px);
+              left: 0;
+            }
+          }`;
+      }
+    }
 
     if ($('body').height() > ($(window).height() + 1)) {
       $('body').addClass('with-scroll');

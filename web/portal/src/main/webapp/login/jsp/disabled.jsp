@@ -27,6 +27,9 @@
 <%@ page import="org.gatein.security.oauth.spi.OAuthProviderTypeRegistry"%>
 <%@ page import="java.util.ResourceBundle"%>
 <%@ page import="org.gatein.common.text.EntityEncoder"%>
+<%@ page import="org.exoplatform.services.resources.LocaleConfigService"%>
+<%@ page import="org.exoplatform.services.resources.LocaleConfig"%>
+<%@ page import="org.exoplatform.services.resources.Orientation"%>
 <%@ page language="java"%>
 <%
   String contextPath = request.getContextPath() ;
@@ -40,12 +43,17 @@
 
   response.setCharacterEncoding("UTF-8");
   response.setContentType("text/html; charset=UTF-8");
+
+  String browserLanguage = request.getLocale() == null ? "en" : request.getLocale().getLanguage();
+  LocaleConfigService localeConfigService = portalContainer.getComponentInstanceOfType(LocaleConfigService.class);
+  LocaleConfig localeConfig = localeConfigService.getLocaleConfig(browserLanguage);
+  String direction = localeConfig == null || localeConfig.getOrientation() != Orientation.RT ? "ltr" : "rtl";
 %>
 <!DOCTYPE html
 PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<%=browserLanguage%>" lang="<%=browserLanguage%>" dir="<%=direction%>">
 <head>
   <title><%=res.getString("UILoginForm.label.Signin")%></title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>

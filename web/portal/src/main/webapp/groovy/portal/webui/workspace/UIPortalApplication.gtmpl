@@ -116,7 +116,8 @@
      eXo.env.portal.portalName = "<%=rcontext.getPortalOwner()%>";
      eXo.env.portal.containerName = "<%=PortalContainer.getInstance().getName()%>";
      eXo.env.portal.userName='<%= userName %>';
-     eXo.env.portal.language='<%= language %>'
+     eXo.env.portal.language='<%= language %>';
+     eXo.env.portal.orientation='<%= orientation == Orientation.RT ? "rtl" : "ltr" %>';
      eXo.env.portal.selectedNodeUri = '<%= selectedNodeUri %>';
      eXo.env.portal.previousURI = '<%= previousURI %>';
      eXo.env.portal.rest = '<%= PortalContainer.getCurrentRestContextName() %>';

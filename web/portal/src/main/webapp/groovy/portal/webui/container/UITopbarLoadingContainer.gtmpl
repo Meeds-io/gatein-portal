@@ -3,7 +3,7 @@
     require(['SHARED/topbarLoading']);
   </script>
   <div data-app="true"
-    class="v-application v-application--is-ltr transparent theme--light"
+    class="v-application <%= isRT ? "v-application--is-rtl" : "v-application--is-ltr" %> transparent theme--light"
     id="vuetify-apps">
     <div role="progressbar" aria-valuemin="0" aria-valuemax="100"
       class="v-progress-linear v-progress-linear--rounded theme--light"

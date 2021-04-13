@@ -11,10 +11,7 @@ const url = `${brandingConstants.PORTAL}/${brandingConstants.PORTAL_REST}/i18n/b
 Vue.directive('exo-tooltip', companyBrandingDirectives.tooltip);
 Vue.use(Vuetify);
 
-const vuetify = new Vuetify({
-  dark: true,
-  iconfont: 'mdi',
-});
+const vuetify = new Vuetify(eXo.env.portal.vuetifyPreset);
 
 // get overrided components if exists
 if (extensionRegistry) {

@@ -86,11 +86,11 @@ public class SkinService extends AbstractResourceService implements Startable {
 
   /** Immutable and therefore thread safe. */
   private static final Pattern                                   LT                      =
-                                                                    Pattern.compile("[^{;]*;\\s*/\\*\\s*orientation=lt\\s*\\*/");
+                                                                    Pattern.compile(".*/\\*.*orientation=lt.*\\*/.*");
 
   /** Immutable and therefore thread safe. */
   private static final Pattern                                   RT                      =
-                                                                    Pattern.compile("[^{;]*;\\s*/\\*\\s*orientation=rt\\s*\\*/");
+                                                                    Pattern.compile(".*/\\*.*orientation=rt.*\\*/.*");
 
   public static final String                                     DEFAULT_SKIN_PARAM_NAME = "skin.default";
 
