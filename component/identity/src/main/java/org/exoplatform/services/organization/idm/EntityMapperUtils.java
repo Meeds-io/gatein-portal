@@ -134,7 +134,10 @@ public class EntityMapperUtils {
         enabled = true;
       }
       changed |= checkIfChanged && !Objects.equals(enabled, user.isEnabled());
-      ((UserImpl) user).setEnabled(enabled);
+
+      if(!Objects.equals(enabled, user.isEnabled())) {
+        ((UserImpl) user).setEnabled(enabled);
+      }
     }
     if (user instanceof UserImpl && attrs.containsKey(ORIGINATING_STORE)) {
       UserImpl userImpl = (UserImpl) user;

@@ -793,7 +793,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
                   //Nothing
                }
                /** Begin eXo customization : PLF-7270**/
-               if ((entry.getValue() == null || entry.getValue().length == 0) && mappedAttributeName!= "enabled") {
+               if (entry.getValue() == null || entry.getValue().length == 0) {
                   i++;
                   String attrTableJoinName = "attrs" + i;
                   String attrParamName = "attr" + i;
@@ -3256,39 +3256,54 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
                //Nothing
             }
 
+            // If the attribute key is enable, consider its absence as it was equals to true
+            if (entry.getKey().equals(EntityMapperUtils.USER_ENABLED) &&  entry.getValue() != null && entry.getValue().length == 0) {
+               if(presentAttrs.containsKey(mappedAttributeName)){
+                  toRemove.add(object);
+               }
+              continue;
+            }
+
+
             if (mappedAttributeName == null)
             {
                toRemove.add(object);
                break;
             }
-            if (!mappedAttributeName.equals("enabled")) {
-               if (presentAttrs.containsKey(mappedAttributeName)) {
-                  Set<String> given = new HashSet<String>(Arrays.asList(entry.getValue()));
 
-                  Collection present = presentAttrs.get(mappedAttributeName);
+            if (presentAttrs.containsKey(mappedAttributeName))
+            {
+               Set<String> given = new HashSet<String>(Arrays.asList(entry.getValue()));
 
-                  for (String s : given) {
-                     String regex = Tools.wildcardToRegex(s);
+               Collection present = presentAttrs.get(mappedAttributeName);
 
-                     boolean matches = false;
+               for (String s : given)
+               {
+                  String regex = Tools.wildcardToRegex(s);
 
-                     for (Object o : present) {
-                        if (o.toString().matches(regex)) {
-                           matches = true;
-                        }
-                     }
+                  boolean matches = false;
 
-                     if (!matches) {
-                        toRemove.add(object);
-                        break;
+                  for (Object o : present)
+                  {
+                     if (o.toString().matches(regex))
+                     {
+                        matches = true;
                      }
                   }
 
-               } else {
-                  toRemove.add(object);
-                  break;
-
+                  if (!matches)
+                  {
+                     toRemove.add(object);
+                     break;
+                  }
                }
+
+            }
+            else
+            {
+               toRemove.add(object);
+               break;
+
             }
          }
       }
