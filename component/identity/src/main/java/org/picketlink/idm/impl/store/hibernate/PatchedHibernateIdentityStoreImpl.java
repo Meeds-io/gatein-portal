@@ -120,6 +120,8 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
 
    public static final String ALL_GROUPS_TYPE = "@@ALL_GROUPS@@";
 
+   private static final String STORED_TC_ATTRIBUTE = "acceptedTermsAndConditions";
+
    private String id;
 
    private FeaturesMetaData supportedFeatures;
@@ -2153,8 +2155,9 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
       for (HibernateIdentityObjectAttribute attribute : storeAttributes)
       {
          String name = resolveAttributeNameFromStoreMapping(identity.getIdentityType(), attribute.getName());
-         if (name != null)
-         {
+         if (name != null && !name.equals(STORED_TC_ATTRIBUTE) || name != null && !result.containsKey(STORED_TC_ATTRIBUTE) ||
+                 name != null && name.equals(STORED_TC_ATTRIBUTE) && Integer.parseInt((String) attribute.getValues().toArray()[0])
+                         > Integer.parseInt((String) result.get(STORED_TC_ATTRIBUTE).getValues().toArray()[0])) {
             result.put(name, attribute);
          }
       }
