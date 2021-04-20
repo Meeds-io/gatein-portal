@@ -511,6 +511,26 @@ public class UserRestResourcesV1 implements ResourceContainer {
   }
 
   @GET
+  @Path("isDelegatedAdministrator")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(
+          value = "Check if current user is a delegated administrator",
+          httpMethod = "GET",
+          response = Response.class
+  )
+  @ApiResponses(
+          value = {
+                  @ApiResponse(code = 200, message = "Request fulfilled"),
+                  @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
+          }
+  )
+  public Response isDelegatedAdministrator() {
+    boolean isDelegatedAdministrator = userACL.isUserInGroup("/platform/delegated") && !userACL.isUserInGroup("/platform/administrators");
+    return Response.ok().entity("{\"result\":\"" + isDelegatedAdministrator + "\"}").build();
+  }
+
+  @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("isSynchronizedUserAllowedToChangePassword")
   @RolesAllowed("users")
