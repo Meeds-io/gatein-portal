@@ -50,71 +50,7 @@ $(document).ready(() => {
       $('body').removeClass('with-scroll');
       $('body').addClass('no-scroll');
     }
-
-    window.setTimeout(() => {
-      const $linksToHandle = $('a[href]:not([href=""]):not([href="#"]):not([load-handled])');
-      $linksToHandle.attr('load-handled', 'true');
-
-      $linksToHandle.click(function(event) {
-        const newLocationHref = $(this).attr('href');
-        const newTarget = $(this).attr('target');
-        if((newLocationHref && (newLocationHref.indexOf('/') === 0 || newLocationHref.indexOf(window.location.origin) === 0)) && (!newTarget || newTarget === '_self')) {
-          event.preventDefault();
-          event.stopPropagation();
-
-          window.history.replaceState('', window.document.title, newLocationHref);
-          fetch(newLocationHref, {
-            credentials: 'include',
-            method: 'GET'
-          })
-            .then(resp => {
-              if (resp && resp.status == 200) {
-                return resp.text();
-              }
-            })
-            .then(htmlContent => {
-              const newDocument = $('<html />');
-              newDocument.html(htmlContent);
-
-              document.body.innerHTML = '';
-              const newBody = htmlContent.substring(htmlContent.search('<body') + htmlContent.match(/<body.*>/g)[0].length, htmlContent.lastIndexOf('</body>'));
-
-              const newHead = htmlContent.substring(htmlContent.search('<head') + htmlContent.match(/<head.*>/g)[0].length, htmlContent.search('</head>'));
-              newHead.match(/<link.*id=".*".*>/g).forEach(link => {
-                const id = link.match(/id="([^"]*)"/i)[1];
-                if (!document.querySelector(`#${id}`)) {
-                  $(document.head).append(link);
-                }
-              });
-
-              document.dispatchEvent(new CustomEvent('portal-page-clear'));
-
-              const replacableScriptsIterator = newHead.matchAll(/<script[^>]*id="[^>]*"[^>]*>/g);
-              let scriptIteratorElement = replacableScriptsIterator.next().value;
-              while (scriptIteratorElement) {
-                const script = scriptIteratorElement[0];
-                const id = script.match(/id="([^"]*)"/i)[1];
-                const scriptContent = newHead.substring(scriptIteratorElement.index, newHead.indexOf('</script>', scriptIteratorElement.index));
-                const oldScriptElement = document.querySelector(`#${id}`);
-                if (oldScriptElement) {
-                  oldScriptElement.remove();
-                }
-                const scriptElement = `${scriptContent}</script>`;
-                $(document.head).append(scriptElement);
-                scriptIteratorElement = replacableScriptsIterator.next().value;
-              };
-              $(document.body).html(newBody);
-              window.loadHTMLTime = Date.now();
-              window.setTimeout(() => {
-                $('body').removeClass('hide-scroll');
-                $(window).trigger('resize');
-              }, 1000);
-            });
-        }
-      });
-    }, 500);
   }
-
   $(window).resize(controlBodyScrollClass);
   controlBodyScrollClass();
   document.addEventListener('displayTopBarLoading', controlBodyScrollClass);

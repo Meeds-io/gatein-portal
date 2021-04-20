@@ -91,6 +91,7 @@ export default {
   },
   created() {
     document.addEventListener('exo-hamburger-menu-navigation-refresh', this.refreshMenu);
+    document.addEventListener('closeAllDrawers', () => this.hamburgerMenu = false);
     $(document).on('keydown', (event) => {
       if (event.key === 'Escape') {
         this.hamburgerMenu = false;
