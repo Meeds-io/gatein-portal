@@ -33,6 +33,10 @@ public class UserRestResourcesV1 implements ResourceContainer {
 
   public static final String             WRONG_USER_PASSWORD_ERROR_CODE = "WRONG_USER_PASSWORD";
 
+  private static final String            ADMINISTRATOR_GROUP            = "/platform/administrators";
+
+  private static final String            DELEGATED_GROUP                = "/platform/delegated";
+
   public static final UserFieldValidator USERNAME_VALIDATOR             = new UserFieldValidator("userName", true, false);
 
   public static final UserFieldValidator EMAIL_VALIDATOR                = new UserFieldValidator("emailAddress", false, false);
@@ -526,7 +530,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
           }
   )
   public Response isDelegatedAdministrator() {
-    boolean isDelegatedAdministrator = userACL.isUserInGroup("/platform/delegated") && !userACL.isUserInGroup("/platform/administrators");
+    boolean isDelegatedAdministrator = userACL.isUserInGroup(DELEGATED_GROUP) && !userACL.isUserInGroup(ADMINISTRATOR_GROUP);
     return Response.ok().entity("{\"result\":\"" + isDelegatedAdministrator + "\"}").build();
   }
 
