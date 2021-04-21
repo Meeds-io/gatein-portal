@@ -24,6 +24,7 @@ import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.listener.Asynchronous;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
+import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
@@ -41,6 +42,8 @@ public class UpdateLoginTimeListener extends Listener<ConversationRegistry, Conv
   private PortalContainer     container;
 
   private OrganizationService organizationService;
+  
+  private ListenerService listenerService;
 
   public UpdateLoginTimeListener(PortalContainer container) {
     this.container = container;
@@ -51,6 +54,7 @@ public class UpdateLoginTimeListener extends Listener<ConversationRegistry, Conv
     if (organizationService == null) {
       organizationService = this.container.getComponentInstanceOfType(OrganizationService.class);
     }
+    listenerService = this.container.getComponentInstanceOfType(ListenerService.class);
     UserHandler userHandler = organizationService.getUserHandler();
     if (!userHandler.isUpdateLastLoginTime()) {
       return;
@@ -71,7 +75,8 @@ public class UpdateLoginTimeListener extends Listener<ConversationRegistry, Conv
       }
 
       user.setLastLoginTime(Calendar.getInstance().getTime());
-      userHandler.saveUser(user, true);
+      userHandler.saveUser(user, false);
+      listenerService.broadcast("exo.listener.event.lastLoginTime", null, user);
     } catch (Exception e) {
       LOG.error("Error while updating the last login time for user {}", userId, e);
     } finally {
