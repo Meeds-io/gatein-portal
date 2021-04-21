@@ -33,6 +33,10 @@ public class UserRestResourcesV1 implements ResourceContainer {
 
   public static final String             WRONG_USER_PASSWORD_ERROR_CODE = "WRONG_USER_PASSWORD";
 
+  private static final String            ADMINISTRATOR_GROUP            = "/platform/administrators";
+
+  private static final String            DELEGATED_GROUP                = "/platform/delegated";
+
   public static final UserFieldValidator USERNAME_VALIDATOR             = new UserFieldValidator("userName", true, false);
 
   public static final UserFieldValidator EMAIL_VALIDATOR                = new UserFieldValidator("emailAddress", false, false);
@@ -508,6 +512,26 @@ public class UserRestResourcesV1 implements ResourceContainer {
   )
   public Response isSuperUser() {
     return Response.ok().entity("{\"isSuperUser\":\"" + userACL.isSuperUser() + "\"}").build();
+  }
+
+  @GET
+  @Path("isDelegatedAdministrator")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(
+          value = "Check if current user is a delegated administrator",
+          httpMethod = "GET",
+          response = Response.class
+  )
+  @ApiResponses(
+          value = {
+                  @ApiResponse(code = 200, message = "Request fulfilled"),
+                  @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
+          }
+  )
+  public Response isDelegatedAdministrator() {
+    boolean isDelegatedAdministrator = userACL.isUserInGroup(DELEGATED_GROUP) && !userACL.isUserInGroup(ADMINISTRATOR_GROUP);
+    return Response.ok().entity("{\"result\":\"" + isDelegatedAdministrator + "\"}").build();
   }
 
   @GET
