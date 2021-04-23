@@ -188,6 +188,14 @@
                 <isReadOnly>false</isReadOnly>
                 <isUnique>true</isUnique>
               </attribute>
+              <attribute>
+                <name>enabled</name>
+                <mapping>${exo.ldap.users.attributes.enabled.mapping:userAccountControl}</mapping>
+                <type>text</type>
+                <isRequired>false</isRequired>
+                <isMultivalued>false</isMultivalued>
+                <isReadOnly>false</isReadOnly>
+              </attribute>
             </attributes>
             <options>
               <option>
