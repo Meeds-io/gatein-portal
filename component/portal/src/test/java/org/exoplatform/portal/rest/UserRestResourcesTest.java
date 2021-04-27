@@ -52,6 +52,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
 
     when(userACL.isSuperUser()).thenReturn(false);
     when(userACL.getAdminGroups()).thenReturn("admins");
+    when(userACL.isUserInGroup("/platform/administrators")).thenReturn(true);
 
     getContainer().unregisterComponent(OrganizationService.class);
     getContainer().unregisterComponent(UserACL.class);

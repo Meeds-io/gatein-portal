@@ -581,6 +581,65 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
     return findUsersByGroupId(groupId, UserStatus.ENABLED);
   }
 
+  public ListAccess<User> findUsersByQuery(Query query, List<String> groupIds, UserStatus userStatus) throws Exception {
+
+    UserQueryBuilder qb = service_.getIdentitySession().createUserQueryBuilder();
+
+    List<org.picketlink.idm.api.Group> groups = new ArrayList<>();
+    for (String groupId : groupIds) {
+      try {
+        org.picketlink.idm.api.Group group = orgService.getJBIDMGroup(groupId);
+        if (group != null) {
+          groups.add(group);
+        }
+      } catch (Exception e) {
+        handleException("Cannot obtain group: " + groupId + "; ", e);
+      }
+    }
+
+    qb.addRelatedGroups(groups);
+
+    if (query.getUserName() != null) {
+      String username = query.getUserName();
+      if (!username.startsWith("*")) {
+        username = "*" + username;
+      }
+      if (!username.endsWith("*")) {
+        username = username + "*";
+      }
+      qb.idFilter(username);
+    }
+    if (query.getEmail() != null) {
+      qb.attributeValuesFilter(USER_EMAIL, new String[] { query.getEmail() });
+    }
+    if (query.getFirstName() != null) {
+      qb.attributeValuesFilter(USER_FIRST_NAME, new String[] { query.getFirstName() });
+    }
+
+    if (query.getLastName() != null) {
+      qb.attributeValuesFilter(USER_LAST_NAME, new String[] { query.getLastName() });
+    }
+
+    if (disableUserActived()) {
+      switch (userStatus) {
+        case DISABLED:
+          if (filterDisabledUsersInQueries()) {
+            qb = addDisabledUserFilter(qb);
+          }
+          break;
+        case ANY:
+          break;
+        case ENABLED:
+          if (filterDisabledUsersInQueries()) {
+            qb = addEnabledUserFilter(qb);
+          }
+          break;
+      }
+    }
+
+    return new IDMUserListAccess(qb, 20, false, countPaginatedUsers(), userStatus);
+  }
+  
   @Override
   public ListAccess<User> findUsersByGroupId(String groupId, UserStatus userStatus) throws Exception {
     if (log.isTraceEnabled()) {
