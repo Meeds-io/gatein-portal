@@ -220,7 +220,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
   }
 
   @PUT
-  @RolesAllowed("administrators")
+  @RolesAllowed("users")
   @ApiOperation(
       value = "Update an existing user",
       httpMethod = "GET",
@@ -234,6 +234,10 @@ public class UserRestResourcesV1 implements ResourceContainer {
       }
   )
   public Response updateUser(@Context HttpServletRequest request, UserRestEntity userEntity) throws Exception {
+
+    if (!userACL.isUserInGroup(DELEGATED_GROUP) && !userACL.isUserInGroup(ADMINISTRATOR_GROUP)) {
+      throw new WebApplicationException(Response.Status.FORBIDDEN);
+    }
     if (userEntity == null) {
       return Response.status(Response.Status.BAD_REQUEST).entity("empty user object").build();
     }
