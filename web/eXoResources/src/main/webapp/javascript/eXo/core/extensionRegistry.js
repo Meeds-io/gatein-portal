@@ -61,10 +61,15 @@
   
   function registerExtension(app, extensionType, extensionContent) {
     var module = findModule(app, true);
-    
-    var extension = new Extension(extensionType, extensionContent);
-    module.extensions.push(extension);
 
+    const extension = new Extension(extensionType, extensionContent);
+    const extensionId = extensionContent.id || extensionContent.key;
+    const existingExtensionIndex = module.extensions.findIndex(ext => (ext.extensionContent.id || ext.extensionContent.key) === extensionId);
+    if (!extensionId || existingExtensionIndex < 0) {
+      module.extensions.push(extension);
+    } else {
+      module.extensions.splice(existingExtensionIndex, 1, extension);
+    }
     document.dispatchEvent(new CustomEvent(`extension-${app}-${extensionType}-updated`));
   }
   

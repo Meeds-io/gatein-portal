@@ -138,13 +138,12 @@ export default {
           <exo-administration-navigations :navigations="navigations" />
         `,
       });
-      const vuetify = this.vuetify;
       new VueHamburgerMenuItem({
         i18n: new VueI18n({
           locale: this.$i18n.locale,
           messages: this.$i18n.messages,
         }),
-        vuetify,
+        vuetify: this.vuetify,
       }).$mount(parentId);
     },
     openDrawer() {
