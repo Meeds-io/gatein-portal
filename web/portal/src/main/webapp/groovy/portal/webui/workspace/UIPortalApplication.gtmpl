@@ -84,17 +84,17 @@
     <% for (skinConfig in portalSkins) {
          def url = skinConfig.createURL(rcontext.controllerContext);
          url.setOrientation(orientation); %>
-      <link id="${skinConfig.id}" rel="stylesheet" type="text/css" href="$url" />
+      <link id="${skinConfig.id}" rel="stylesheet" type="text/css" href="$url" skin-type="portal-skin" />
     <% } %>
     <% for (portletSkin in portletSkins) {
          def url = portletSkin.createURL(rcontext.controllerContext);
          url.setOrientation(orientation); %>
-      <link id="${portletSkin.id}" rel="stylesheet" type="text/css" href= "$url" />
+      <link id="${portletSkin.id}" rel="stylesheet" type="text/css" href= "$url" skin-type="portlet-skin" />
     <% } %>
     <% for (customSkin in customSkins) {
          def url = customSkin.createURL(rcontext.controllerContext);
          url.setOrientation(orientation); %>
-      <link id="${customSkin.id}" rel="stylesheet" type="text/css" href= "$url" />
+      <link id="${customSkin.id}" rel="stylesheet" type="text/css" href= "$url" skin-type="custom-skin" />
     <% } %>
 
     <!-- Scripts -->
@@ -111,6 +111,8 @@
      <% if (org.exoplatform.commons.utils.PropertyManager.isDevelopping()) { %>
           eXo.developing = true ;
      <% } %>
+   </script>
+   <script type="text/javascript" id="portalHeadScripts">
      eXo.env.portal.context = "<%=docBase%>";
      eXo.env.portal.accessMode = "<%= rcontext.getAccessPath() == 0 ? "public" : "private" %>";
      eXo.env.portal.portalName = "<%=rcontext.getPortalOwner()%>";
@@ -138,6 +140,8 @@
      eXo.session.canKeepState = $canKeepState;
      eXo.session.isOpen = <%=uicomponent.isSessionOpen()%> ;
      eXo.session.itvTime = ${session.getMaxInactiveInterval()} ;
+
+     require(['SHARED/topbarLoading'], topbarLoading => topbarLoading.init());
    </script>
    <%
      def headerElements = rcontext.getExtraMarkupHeadersAsStrings();

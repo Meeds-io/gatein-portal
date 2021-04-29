@@ -148,6 +148,17 @@ public class WebuiBindingContext extends BindingContext {
     }
 
     public void include(String name, ResourceResolver resourceResolver) throws Exception {
+        if (PropertyManager.isDevelopping()) {
+          WebuiRequestContext context = getRequestContext();
+          WebuiRequestContext rootContext = (WebuiRequestContext) context.getParentAppRequestContext();
+          if (rootContext == null)
+            rootContext = context;
+          long lastAccess = rootContext.getUIApplication().getLastAccessApplication();
+          if (resourceResolver.isModified(name, lastAccess)) {
+            log.debug("Invalidate the template: {}", name);
+            service_.invalidateTemplate(name, resourceResolver);
+          }
+        }
         service_.include(name, clone(), resourceResolver);
     }
 
