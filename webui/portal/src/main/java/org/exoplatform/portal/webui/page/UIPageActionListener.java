@@ -98,15 +98,12 @@ public class UIPageActionListener {
             }
 
             if (targetNode == null) {
-                targetNode = userPortal.getDefaultPath(builder.build());
-                if (targetNode == null) {
                     if (showedUIPortal != null) {
                         UIPageBody uiPageBody = showedUIPortal.findFirstComponentOfType(UIPageBody.class);
                         uiPageBody.setUIComponent(null);
                     }
                     return;
                 }
-            }
 
             UserNode currentNavPath = null;
             if (showedUIPortal != null) {
