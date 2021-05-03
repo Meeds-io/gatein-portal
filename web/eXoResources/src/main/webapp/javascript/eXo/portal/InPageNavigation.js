@@ -1,31 +1,39 @@
 (function($) {
   const inPageNavigation = {
     installNewCSS: (newHead, newBody) => {
-      newHead.match(/<link.*id=".*".*>/g).forEach(link => {
-        const id = link.match(/id="([^"]*)"/i)[1];
-        if (!document.querySelector(`#${id}`)) {
-          const skinTypeResult = link.match(/skin-type="([a-z]*-skin)"/);
-          if (skinTypeResult && skinTypeResult.length === 2) {
-            const skinType = skinTypeResult[1];
-            const $lastSkinTypeDefinition = $(`[skin-type="${skinType}"]`).last();
-            if ($lastSkinTypeDefinition.length) {
-              // Install new CSS in the same skin files categories (portal, portlet or custom)
-              $lastSkinTypeDefinition.after(link);
-              return;
+      const headCSSLinks = newHead.match(/<link.*id=".*".*>/g);
+      if (headCSSLinks && headCSSLinks.length) {
+        headCSSLinks.forEach(link => {
+          const id = link.match(/id="([^"]*)"/i)[1];
+          if (!document.querySelector(`#${id}`)) {
+            const skinTypeResult = link.match(/skin-type="([a-z]*-skin)"/);
+            if (skinTypeResult && skinTypeResult.length === 2) {
+              const skinType = skinTypeResult[1];
+              const $lastSkinTypeDefinition = $(`[skin-type="${skinType}"]`).last();
+              if ($lastSkinTypeDefinition.length) {
+                // Install new CSS in the same skin files categories (portal, portlet or custom)
+                $lastSkinTypeDefinition.after(link);
+                return;
+              }
             }
+            // Install new CSS from newly downloaded head
+            $(document.head).append(link);
           }
-          // Install new CSS from newly downloaded head
-          $(document.head).append(link);
-        }
-      });
-      newBody.match(/<link.*id=".*".*>/g).forEach(link => {
-        const id = link.match(/id="([^"]*)"/i)[1];
-        if (!document.querySelector(`#${id}`)) {
-          // Install new CSS from newly downloaded body
-          $(document.head).append(link);
-        }
-        newBody = newBody.replace(link, '');
-      });
+        });
+      } else {
+        throw new Error('The retrieved page seems not to be a portal page');
+      }
+      const bodyCSSLinks = newBody.match(/<link.*id=".*".*>/g);
+      if (bodyCSSLinks && bodyCSSLinks.length) {
+        bodyCSSLinks.forEach(link => {
+          const id = link.match(/id="([^"]*)"/i)[1];
+          if (!document.querySelector(`#${id}`)) {
+            // Install new CSS from newly downloaded body
+            $(document.head).append(link);
+          }
+          newBody = newBody.replace(link, '');
+        });
+      }
       return newBody;
     },
     installNewJS: (newHead) => {
@@ -100,6 +108,8 @@
             .then(resp => {
               if (resp && resp.status == 200) {
                 return resp.text();
+              } else {
+                throw new Error('The retrieved page seems to be a portal page');
               }
             })
             .then(inPageNavigation.handleDownloadedContent)
@@ -108,6 +118,10 @@
               if (!eXo.env.client.InPageNavigationEnabled || oldAssetVersion !== eXo.env.client.assetsVersion) {
                 window.location.reload();
               }
+            })
+            .catch(e => {
+              console.error('Error navigating to ', newLocationHref, '. Reloading page.', e);
+              window.location.reload();
             })
             .finally(() => {
               window.handlingLink = false;
