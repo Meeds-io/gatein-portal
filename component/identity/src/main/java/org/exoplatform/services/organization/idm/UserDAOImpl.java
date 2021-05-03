@@ -444,7 +444,8 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
     // if only condition is email which is unique then delegate to other method
     // as it will be more efficient
-    if (q.getUserName() == null && q.getEmail() != null && q.getFirstName() == null && q.getLastName() == null) {
+    if (q.getUserName() == null && q.getEmail() != null && q.getFirstName() == null && q.getLastName() == null && q.getGroups()
+        == null) {
       final User uniqueUser = findUserByUniqueAttribute(USER_EMAIL, q.getEmail(), userStatus);
 
       if (uniqueUser != null) {
@@ -497,6 +498,40 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
     if (q.getLastName() != null) {
       qb.attributeValuesFilter(USER_LAST_NAME, new String[] { q.getLastName() });
     }
+    
+    if (q.getGroups() != null) {
+      List<org.picketlink.idm.api.Group> groups = new ArrayList<>();
+      for (String groupId : q.getGroups()) {
+        try {
+          org.picketlink.idm.api.Group group = orgService.getJBIDMGroup(groupId);
+          if (group != null) {
+            groups.add(group);
+          }
+        } catch (Exception e) {
+          handleException("Cannot obtain group: " + groupId + "; ", e);
+        }
+      }
+  
+      if (q.getGroups().size()>0 && groups.isEmpty()) {
+        //all groupsId provided are non existing groups
+        //so we return an empty list of users
+        return new ListAccess<User>() {
+          public User[] load(int index, int length) throws Exception {
+            if (index > 0 || length > 0) {
+              throw new IndexOutOfBoundsException("Try to access an empty list");
+            }
+            return new User[0];
+          }
+    
+          public int getSize() throws Exception {
+            return 0;
+          }
+        };
+      }
+      
+      qb.addRelatedGroups(groups);
+      
+    }
 
     if (disableUserActived()) {
       switch (userStatus) {
@@ -516,7 +551,8 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
     }
 
     IDMUserListAccess list;
-    if (q.getUserName() == null && q.getEmail() == null && q.getFirstName() == null && q.getLastName() == null) {
+    if (q.getUserName() == null && q.getEmail() == null && q.getFirstName() == null && q.getLastName() == null
+        && q.getGroups() == null) {
       list = new IDMUserListAccess(qb, 20, !countPaginatedUsers(), countPaginatedUsers(), userStatus);
     } else {
       list = new IDMUserListAccess(qb, 20, false, countPaginatedUsers(), userStatus);
@@ -580,119 +616,14 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
   public ListAccess<User> findUsersByGroupId(String groupId) throws Exception {
     return findUsersByGroupId(groupId, UserStatus.ENABLED);
   }
-
-  public ListAccess<User> findUsersByQuery(Query query, List<String> groupIds, UserStatus userStatus) throws Exception {
-
-    UserQueryBuilder qb = service_.getIdentitySession().createUserQueryBuilder();
-
-    List<org.picketlink.idm.api.Group> groups = new ArrayList<>();
-    for (String groupId : groupIds) {
-      try {
-        org.picketlink.idm.api.Group group = orgService.getJBIDMGroup(groupId);
-        if (group != null) {
-          groups.add(group);
-        }
-      } catch (Exception e) {
-        handleException("Cannot obtain group: " + groupId + "; ", e);
-      }
-    }
-
-    qb.addRelatedGroups(groups);
-
-    if (query.getUserName() != null) {
-      String username = query.getUserName();
-      if (!username.startsWith("*")) {
-        username = "*" + username;
-      }
-      if (!username.endsWith("*")) {
-        username = username + "*";
-      }
-      qb.idFilter(username);
-    }
-    if (query.getEmail() != null) {
-      qb.attributeValuesFilter(USER_EMAIL, new String[] { query.getEmail() });
-    }
-    if (query.getFirstName() != null) {
-      qb.attributeValuesFilter(USER_FIRST_NAME, new String[] { query.getFirstName() });
-    }
-
-    if (query.getLastName() != null) {
-      qb.attributeValuesFilter(USER_LAST_NAME, new String[] { query.getLastName() });
-    }
-
-    if (disableUserActived()) {
-      switch (userStatus) {
-        case DISABLED:
-          if (filterDisabledUsersInQueries()) {
-            qb = addDisabledUserFilter(qb);
-          }
-          break;
-        case ANY:
-          break;
-        case ENABLED:
-          if (filterDisabledUsersInQueries()) {
-            qb = addEnabledUserFilter(qb);
-          }
-          break;
-      }
-    }
-
-    return new IDMUserListAccess(qb, 20, false, countPaginatedUsers(), userStatus);
-  }
   
   @Override
   public ListAccess<User> findUsersByGroupId(String groupId, UserStatus userStatus) throws Exception {
-    if (log.isTraceEnabled()) {
-      Tools.logMethodIn(log, LogLevel.TRACE, "findUsersByGroupId", new Object[] { groupId, userStatus });
-    }
-
-    UserQueryBuilder qb = service_.getIdentitySession().createUserQueryBuilder();
-
-    org.picketlink.idm.api.Group jbidGroup = null;
-    try {
-      jbidGroup = orgService.getJBIDMGroup(groupId);
-    } catch (Exception e) {
-      handleException("Cannot obtain group: " + groupId + "; ", e);
-
-    }
-
-    // As test case supposed, we should return empty list instead of Exception
-    // if group is not exist.
-    if (jbidGroup == null) {
-      return new ListAccess<User>() {
-        public User[] load(int index, int length) throws Exception {
-          if (index > 0 || length > 0) {
-            throw new IndexOutOfBoundsException("Try to access an empty list");
-          }
-          return new User[0];
-        }
-
-        public int getSize() throws Exception {
-          return 0;
-        }
-      };
-    }
-
-    qb.addRelatedGroup(jbidGroup);
-
-    if (disableUserActived()) {
-      switch (userStatus) {
-      case DISABLED:
-        if (filterDisabledUsersInQueries()) {
-          qb = addDisabledUserFilter(qb);
-        }
-        break;
-      case ANY:
-        break;
-      case ENABLED:
-        if (filterDisabledUsersInQueries()) {
-          qb = addEnabledUserFilter(qb);
-        }
-        break;
-      }
-    }
-
-    return new IDMUserListAccess(qb, 20, false, countPaginatedUsers(), userStatus);
+    Query query = new Query();
+    List<String> groups = new ArrayList<>();
+    groups.add(groupId);
+    query.setGroups(groups);
+    return findUsersByQuery(query,userStatus);
   }
 
   //
