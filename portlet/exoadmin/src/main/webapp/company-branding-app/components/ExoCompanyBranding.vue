@@ -142,6 +142,7 @@
 <script>
 import { brandingConstants }  from '../companyBrandingConstants';
 import * as  brandingServices  from '../companyBrandingServices';
+import axios from 'axios';
 
 export default {
   data(){
@@ -313,13 +314,14 @@ export default {
 
       const self = this;
       // Had to use axios here since progress observation is still not supported by fetch
-      fetch(`${brandingConstants.PORTAL}/upload?uploadId=${uploadId}&action=upload`, {
+      axios.request({
         method: 'POST',
+        url: `${brandingConstants.PORTAL}/upload?uploadId=${uploadId}&action=upload`,
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(formData).toString(),
+        data: formData,
+        onUploadProgress: (progress) => {
+          this.uploadProgress = Math.round(progress.loaded * maxProgress / progress.total);
+        }
       }).then(() => {
         // Check if the file has correctly been uploaded (progress=100) before refreshing the upload list
         const progressUrl = `${brandingConstants.PORTAL}/upload?action=progress&uploadId=${uploadId}`;

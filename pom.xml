@@ -24,10 +24,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>maven-parent-pom</artifactId>
-    <groupId>org.exoplatform</groupId>
-    <version>23-M05</version>
-    <relativePath />
+    <groupId>org.gatein</groupId>
+    <artifactId>gatein-parent</artifactId>
+    <version>1.3.0.Final</version>
   </parent>
 
   <groupId>org.exoplatform.gatein.portal</groupId>
@@ -68,6 +67,10 @@
     <version.org.gatein.naming>1.1.1.Final</version.org.gatein.naming>
     <sun-opends.version>1.0.0</sun-opends.version>
     <berkeleydb.version>3.2.76</berkeleydb.version>
+    <!-- Maven Plugin for JS and CSS bundling and Unit Test execution -->
+    <com.github.eirslett.frontend.version>1.6</com.github.eirslett.frontend.version>
+    <node.version>v10.4.1</node.version>
+    <npm.version>6.1.0</npm.version>
 
     <!-- to move to gatein-dep -->
     <version.scribejava-apis>6.9.0</version.scribejava-apis>
@@ -122,10 +125,12 @@
   </scm>
 
   <modules>
+    <module>build-config</module>
     <module>component</module>
     <module>webui</module>
     <module>portlet</module>
     <module>web</module>
+    <module>examples</module>
     <module>starter</module>
     <module>cdi</module>
   </modules>
