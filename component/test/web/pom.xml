@@ -32,6 +32,7 @@
 
   <properties>
     <version.javax.servlet>2.5</version.javax.servlet>
+    <exo.test.coverage.ratio>0</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>

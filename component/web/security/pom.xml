@@ -30,6 +30,10 @@
   <name>GateIn Portal Component Web Security</name>
   <description>GateIn web security services</description>
 
+  <properties>
+    <exo.test.coverage.ratio>0.22</exo.test.coverage.ratio>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.core</groupId>
@@ -140,13 +144,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <forkMode>always</forkMode>
-        </configuration>
       </plugin>
     </plugins>
   </build>
