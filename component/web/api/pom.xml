@@ -30,10 +30,6 @@
   <name>GateIn Portal Component Web API</name>
   <description>Various API supported by GateIn related to web serving</description>
 
-  <properties>
-    <exo.test.coverage.ratio>0.29</exo.test.coverage.ratio>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>

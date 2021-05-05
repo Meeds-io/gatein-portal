@@ -32,10 +32,6 @@
   <name>GateIn Portal Component Scripting</name>
   <description>GateIn scripting and template engine</description>
 
-  <properties>
-    <exo.test.coverage.ratio>0.53</exo.test.coverage.ratio>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>

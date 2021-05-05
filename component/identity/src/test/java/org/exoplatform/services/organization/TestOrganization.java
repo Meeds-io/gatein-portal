@@ -43,6 +43,8 @@ import org.exoplatform.services.organization.impl.UserProfileImpl;
 import org.exoplatform.services.security.ConversationRegistry;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
+import org.jboss.byteman.contrib.bmunit.BMUnit;
+
 
 /**
  * Created by The eXo Platform SARL Author : Tung Pham thanhtungty@gmail.com Nov 13, 2007
@@ -62,6 +64,10 @@ public class TestOrganization extends AbstractKernelTest {
     protected static final String DEFAULT_PASSWORD = "defaultpassword";
     protected static final String DESCRIPTION = " Description";
 
+    // variable used by Byteman to know if it must execute its rule
+    protected static boolean makeTransactionCommitFail = true;
+
+
     protected UpdateLoginTimeListener updateLoginTimeListener;
 
     protected OrganizationService organizationService;
@@ -79,6 +85,10 @@ public class TestOrganization extends AbstractKernelTest {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+
+        if(getName().equals("testTransactionCommitFailsOnError")) {
+            BMUnit.loadScriptFile(getClass(), "idm", "src/test/resources/byteman");
+        }
 
         begin();
         PortalContainer container = getContainer();
@@ -108,6 +118,10 @@ public class TestOrganization extends AbstractKernelTest {
         deleteUser(USER_3);
 
         end();
+
+        if(getName().equals("testTransactionCommitFailsOnError")) {
+            BMUnit.unloadScriptFile(getClass(), "idm");
+        }
 
         super.tearDown();
     }
@@ -357,6 +371,39 @@ public class TestOrganization extends AbstractKernelTest {
         MembershipType membershipType = mtHandler_.findMembershipType(mt.getName());
         assertNotNull("Membership type " + testType + " must be exist", membershipType);
         assertEquals("Expect mebershiptype is:", testType, mtHandler_.findMembershipType(testType).getName());
+    }
+
+    /**
+     * Test if the transactions are well managed when a transaction commit operation fails (because of a
+     * connection loss for example).
+     * The test do a first user creation which fails (thanks to Byteman), then tries to do another user creation in
+     * a new transaction. This new transaction should succeed, meaning the transaction status is correct.
+     * Byteman is used to throw an exception during the commit only during the first user creation.
+     *
+     * @throws Exception
+     */
+    public void testTransactionCommitFailsOnError() throws Exception {
+        makeTransactionCommitFail = true;
+
+        try {
+            // An exception is throw during the transaction commit of this user creation, thanks to Byteman
+            createUser("userCommitFailed");
+        } finally {
+            RequestLifeCycle.end();
+        }
+
+        makeTransactionCommitFail = false;
+
+        try {
+            RequestLifeCycle.begin(getContainer());
+            // No exception is thrown during the transaction commit of this user creation
+            createUser("userCommitSucceeded");
+            RequestLifeCycle.end();
+            User userCommitSucceeded = organizationService.getUserHandler().findUserByName("userCommitSucceeded");
+            assertNotNull(userCommitSucceeded);
+        } finally {
+            RequestLifeCycle.begin(getContainer());
+        }
     }
 
     public void testFindUserProfile() throws Exception {

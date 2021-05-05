@@ -30,10 +30,6 @@
   <name>GateIn Portal Component Web Resources</name>
   <description>GateIn web resource serving services such as Javascript, skins and stylesheets</description>
 
-  <properties>
-    <exo.test.coverage.ratio>0.62</exo.test.coverage.ratio>
-  </properties>
-
   <dependencies>
 
     <dependency>

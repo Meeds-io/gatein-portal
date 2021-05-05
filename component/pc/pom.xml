@@ -32,6 +32,7 @@
   <name>GateIn Portal Component PC integration</name>
 
   <dependencies>
+
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -70,5 +71,9 @@
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.container</artifactId>
     </dependency>
+
   </dependencies>
+
+  <build>
+  </build>
 </project>

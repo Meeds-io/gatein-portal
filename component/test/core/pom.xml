@@ -30,10 +30,6 @@
   <packaging>jar</packaging>
   <name>GateIn Portal Component Core Test</name>
 
-  <properties>
-    <exo.test.coverage.ratio>0.71</exo.test.coverage.ratio>
-  </properties>
-
   <dependencies>
 
     <dependency>

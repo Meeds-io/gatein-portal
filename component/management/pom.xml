@@ -29,10 +29,6 @@
   <packaging>jar</packaging>
   <name>GateIn Portal Component Management</name>
 
-  <properties>
-    <exo.test.coverage.ratio>0</exo.test.coverage.ratio>
-  </properties>
-
   <dependencies>
 
     <dependency>

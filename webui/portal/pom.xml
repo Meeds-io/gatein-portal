@@ -31,10 +31,6 @@
   <packaging>jar</packaging>
   <name>GateIn Portal WebUI Portal</name>
 
-  <properties>
-    <exo.test.coverage.ratio>0.01</exo.test.coverage.ratio>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
