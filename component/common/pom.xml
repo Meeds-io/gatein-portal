@@ -29,6 +29,11 @@
   <artifactId>exo.portal.component.common</artifactId>
   <packaging>jar</packaging>
   <name>GateIn Portal Component Common</name>
+
+  <properties>
+    <exo.test.coverage.ratio>0.41</exo.test.coverage.ratio>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>javax.portlet</groupId>
@@ -148,17 +153,6 @@
   </dependencies>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <forkMode>always</forkMode>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>com.jcabi</groupId>

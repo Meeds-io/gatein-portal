@@ -1,6 +1,4 @@
 const path = require('path');
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
 
 let config = {
   context: path.resolve(__dirname, '.'),
@@ -9,26 +7,12 @@ let config = {
   entry: {
     branding: './src/main/webapp/company-branding-app/main.js'
   },
+  output: {
+    filename: 'js/[name].bundle.js',
+    libraryTarget: 'amd'
+  },
   module: {
     rules: [
-      {
-        test: /\.css$/,
-        use: ['vue-style-loader', 'css-loader']
-      },
-      {
-        test: /\.less$/,
-        use: ExtractTextWebpackPlugin.extract({
-          fallback: 'vue-style-loader',
-          use: [
-            {
-              loader: 'css-loader',
-            },
-            {
-              loader: 'less-loader',
-            }
-          ]
-        })
-      },
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -45,12 +29,7 @@ let config = {
         ]
       }
     ]
-  },
-  plugins: [
-    new VueLoaderPlugin(),
-    // we use ExtractTextWebpackPlugin to extract the css code on a css file
-    new ExtractTextWebpackPlugin('css/[name].css')
-  ]
+  }
 };
 
 module.exports = config;

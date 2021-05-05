@@ -43,7 +43,7 @@ public class TestDescriptorBuilder extends TestCase {
 
     public void testFoo() throws Exception {
 
-        URL routerURL = TestDescriptorBuilder.class.getResource("router.xml");
+        URL routerURL = TestDescriptorBuilder.class.getClassLoader().getResource("router.xml");
         XMLStreamReader routerReader = XMLInputFactory.newInstance().createXMLStreamReader(routerURL.openStream());
         ControllerDescriptor routerDesc = new DescriptorBuilder().build(routerReader);
 
