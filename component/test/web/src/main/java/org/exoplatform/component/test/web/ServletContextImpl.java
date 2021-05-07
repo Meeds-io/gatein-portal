@@ -24,13 +24,11 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.Set;
+import java.util.*;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
+import javax.servlet.*;
+import javax.servlet.ServletRegistration.Dynamic;
+import javax.servlet.descriptor.JspConfigDescriptor;
 
 import org.gatein.common.NotYetImplemented;
 
@@ -193,4 +191,136 @@ public class ServletContextImpl implements ServletContext {
     public void removeAttribute(String name) {
         throw new NotYetImplemented();
     }
+
+    @Override
+    public int getEffectiveMajorVersion() {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public int getEffectiveMinorVersion() {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public boolean setInitParameter(String name, String value) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public Dynamic addServlet(String servletName, String className) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public Dynamic addServlet(String servletName, Servlet servlet) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public Dynamic addServlet(String servletName, Class<? extends Servlet> servletClass) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public <T extends Servlet> T createServlet(Class<T> clazz) throws ServletException {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public ServletRegistration getServletRegistration(String servletName) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName, String className) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName, Class<? extends Filter> filterClass) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public <T extends Filter> T createFilter(Class<T> clazz) throws ServletException {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public FilterRegistration getFilterRegistration(String filterName) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public SessionCookieConfig getSessionCookieConfig() {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public void addListener(String className) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public <T extends EventListener> void addListener(T t) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public void addListener(Class<? extends EventListener> listenerClass) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public <T extends EventListener> T createListener(Class<T> clazz) throws ServletException {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public JspConfigDescriptor getJspConfigDescriptor() {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public ClassLoader getClassLoader() {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public void declareRoles(String... roleNames) {
+      throw new NotYetImplemented();
+    }
+
+    
 }

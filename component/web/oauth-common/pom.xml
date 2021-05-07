@@ -37,6 +37,7 @@
   <description>GateIn OAuth authentication and authorization common stuff</description>
 
   <properties>
+    <exo.test.coverage.ratio>0.30</exo.test.coverage.ratio>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 

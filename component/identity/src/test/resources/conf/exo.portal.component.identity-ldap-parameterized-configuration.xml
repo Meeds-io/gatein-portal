@@ -263,7 +263,7 @@
           <name>ref-addresses</name>
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
-          <property name="url" value="jdbc:hsqldb:file:${gatein.test.tmp.dir}/db/data/jdbcidm"/>
+          <property name="url" value="jdbc:hsqldb:mem:dbIdm;hsqldb.tx=mvcc"/>
         </properties-param>
         <properties-param profiles="mysql">
           <name>ref-addresses</name>
