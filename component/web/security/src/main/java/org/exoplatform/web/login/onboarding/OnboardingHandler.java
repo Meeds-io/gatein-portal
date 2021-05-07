@@ -19,35 +19,17 @@
 
 package org.exoplatform.web.login.onboarding;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import javax.portlet.PortletException;
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletSession;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.*;
+import javax.servlet.http.*;
 
-import nl.captcha.text.producer.DefaultTextProducer;
-import nl.captcha.text.renderer.DefaultWordRenderer;
-import org.apache.tools.ant.taskdefs.condition.Http;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.web.security.security.RemindPasswordTokenService;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.wci.security.Credentials;
@@ -57,16 +39,18 @@ import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.localization.LocaleContextInfoUtils;
-import org.exoplatform.services.resources.LocaleContextInfo;
-import org.exoplatform.services.resources.LocalePolicy;
-import org.exoplatform.services.resources.ResourceBundleService;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.resources.*;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.WebRequestHandler;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.login.recovery.PasswordRecoveryServiceImpl;
+import org.exoplatform.web.security.security.RemindPasswordTokenService;
 
 import nl.captcha.Captcha;
 import nl.captcha.servlet.CaptchaServletUtil;
+import nl.captcha.text.producer.DefaultTextProducer;
+import nl.captcha.text.renderer.DefaultWordRenderer;
 
 
 

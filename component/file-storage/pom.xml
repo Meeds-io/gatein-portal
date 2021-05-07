@@ -12,15 +12,6 @@
   <properties>
     <exo.test.coverage.ratio>0.51</exo.test.coverage.ratio>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-core</artifactId>
-        <version>4.2.21.Final</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>commons-lang</groupId>
@@ -68,16 +59,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <systemProperties>
-            <property>
-              <name>gatein.test.output.path</name>
-              <value>${project.build.directory}</value>
-            </property>
-            <property>
-              <name>exo.data.dir</name>
-              <value>target/exo-files</value>
-            </property>
-          </systemProperties>
+          <systemPropertyVariables>
+            <gatein.test.output.path>${project.build.directory}</gatein.test.output.path>
+            <exo.data.dir>target/exo-files</exo.data.dir>
+          </systemPropertyVariables>
         </configuration>
       </plugin>
       <plugin>

@@ -19,7 +19,7 @@ public class TestRouter extends AbstractTestController {
 
     public void testMatcher() throws Exception {
 
-        URL routerURL = TestRouter.class.getResource("controller.xml");
+        URL routerURL = TestRouter.class.getClassLoader().getResource("controller.xml");
         ControllerDescriptor routerDesc = new DescriptorBuilder().build(routerURL.openStream());
         Router router = new Router(routerDesc);
 
