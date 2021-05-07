@@ -7,9 +7,7 @@ const exoServerPath = "/exo-server";
 
 let config = merge(webpackCommonConfig, {
   output: {
-    path: path.resolve(`${exoServerPath}/webapps/exoadmin/`),
-    filename: 'js/[name].bundle.js',
-    libraryTarget: 'amd'
+    path: path.resolve(`${exoServerPath}/webapps/exoadmin/`)
   }
 });
 

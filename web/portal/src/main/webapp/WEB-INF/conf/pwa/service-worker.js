@@ -177,3 +177,6 @@ this.addEventListener('activate', function(event) {
     })
   );
 });
+
+workbox.core.skipWaiting();
+workbox.core.clientsClaim();

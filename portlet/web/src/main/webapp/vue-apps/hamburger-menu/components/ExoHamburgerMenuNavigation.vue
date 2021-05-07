@@ -91,6 +91,7 @@ export default {
   },
   created() {
     document.addEventListener('exo-hamburger-menu-navigation-refresh', this.refreshMenu);
+    document.addEventListener('closeAllDrawers', () => this.hamburgerMenu = false);
     $(document).on('keydown', (event) => {
       if (event.key === 'Escape') {
         this.hamburgerMenu = false;
@@ -161,6 +162,7 @@ export default {
       if (this.openedSecondLevel !== contentDetail.id && this.vueChildInstances[contentDetail.id].mountSecondLevel) {
         this.openedSecondLevel = contentDetail.id;
         this.vueChildInstances[contentDetail.id].mountSecondLevel('.HamburgerMenuSecondLevelParent > div');
+        document.dispatchEvent(new CustomEvent('drawerOpened'));
       }
     },
     hideSecondLevel() {
