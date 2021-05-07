@@ -15,6 +15,7 @@ import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.rest.model.GroupRestEntity;
 import org.exoplatform.portal.rest.model.MembershipRestEntity;
+import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.organization.*;
 import org.exoplatform.services.organization.idm.MembershipImpl;
 import org.exoplatform.services.organization.impl.GroupImpl;
@@ -30,16 +31,21 @@ public class GroupRestResourcesV1 implements ResourceContainer {
 
   public static final int     DEFAULT_OFFSET = 0;
 
+  private static final String  PLATFORM_EXTERNALS_GROUP  = "/platform/externals";
+
   private GroupSearchService  groupSearchService;
 
   private OrganizationService organizationService;
 
+  private ListenerService listenerService;
+
   private UserACL             userACL;
 
-  public GroupRestResourcesV1(OrganizationService organizationService, GroupSearchService groupSearchService, UserACL userACL) {
+  public GroupRestResourcesV1(OrganizationService organizationService, GroupSearchService groupSearchService, UserACL userACL, ListenerService listenerService) {
     this.organizationService = organizationService;
     this.groupSearchService = groupSearchService;
     this.userACL = userACL;
+    this.listenerService = listenerService;
   }
 
   @GET
@@ -463,6 +469,9 @@ public class GroupRestResourcesV1 implements ResourceContainer {
         return Response.status(Response.Status.BAD_REQUEST)
                 .entity("MEMBERSHIP_TYPE:NOT_FOUND")
                 .build();
+      }
+      if(group.getId().equals(PLATFORM_EXTERNALS_GROUP)) {
+        listenerService.broadcast("exo.group.update.external.user.profile",this, user);
       }
 
       organizationService.getMembershipHandler().linkMembership(user, group, membershipType, true);
