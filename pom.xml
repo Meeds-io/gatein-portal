@@ -24,9 +24,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.gatein</groupId>
-    <artifactId>gatein-parent</artifactId>
-    <version>1.3.0.Final</version>
+    <artifactId>maven-parent-pom</artifactId>
+    <groupId>org.exoplatform</groupId>
+    <version>23-M05</version>
+    <relativePath />
   </parent>
 
   <groupId>org.exoplatform.gatein.portal</groupId>
@@ -67,10 +68,6 @@
     <version.org.gatein.naming>1.1.1.Final</version.org.gatein.naming>
     <sun-opends.version>1.0.0</sun-opends.version>
     <berkeleydb.version>3.2.76</berkeleydb.version>
-    <!-- Maven Plugin for JS and CSS bundling and Unit Test execution -->
-    <com.github.eirslett.frontend.version>1.6</com.github.eirslett.frontend.version>
-    <node.version>v10.4.1</node.version>
-    <npm.version>6.1.0</npm.version>
 
     <!-- to move to gatein-dep -->
     <version.scribejava-apis>6.9.0</version.scribejava-apis>
@@ -105,11 +102,12 @@
     <!-- buildnumber-maven-plugin : needs 1.0 for git -->
     <version.buildnumber.plugin>1.0</version.buildnumber.plugin>
 
+    <!-- Disable coverage checks in this first version -->
+    <exo.test.coverage.ratio>0</exo.test.coverage.ratio>
+
     <!-- -->
     <surefire.exo.profiles>hsqldb</surefire.exo.profiles>
 
-    <version.plugin.clean>2.4.1</version.plugin.clean>
-    <version.yuicompressor-maven-plugin>0.7.1</version.yuicompressor-maven-plugin>
     <version.plugin.japex>1.2.3</version.plugin.japex>
     <version.plugin.jibx>1.3.1</version.plugin.jibx>
     <version.plugin.javadoc>2.10.3</version.plugin.javadoc>
@@ -125,12 +123,10 @@
   </scm>
 
   <modules>
-    <module>build-config</module>
     <module>component</module>
     <module>webui</module>
     <module>portlet</module>
     <module>web</module>
-    <module>examples</module>
     <module>starter</module>
     <module>cdi</module>
   </modules>
@@ -142,17 +138,6 @@
         <groupId>org.exoplatform</groupId>
         <artifactId>maven-depmgt-pom</artifactId>
         <version>${org.exoplatform.depmgt.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-
-      <!-- Needed becuase of a Maven bug. Components depend on gatein-dep and for some
-           reasons with Maven 2.2.1 it can't find that dependency anymore
-      -->
-      <dependency>
-        <groupId>org.exoplatform.gatein</groupId>
-        <artifactId>gatein-dep</artifactId>
-        <version>${org.exoplatform.gatein.dep.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -726,589 +711,34 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/java</directory>
-        <includes>
-          <include>**/*.properties</include>
-          <include>**/*.xml</include>
-          <include>**/*.xsd</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>src/main/resources</directory>
-        <includes>
-          <include>**/*.*</include>
-        </includes>
-      </resource>
-    </resources>
-    <testResources>
-      <testResource>
-        <directory>src/test/java</directory>
-        <includes>
-          <include>**/*.properties</include>
-          <include>**/*.xml</include>
-        </includes>
-      </testResource>
-      <testResource>
-        <directory>src/test/resources</directory>
-      </testResource>
-    </testResources>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <version>1.1.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <version>1.4</version>
-        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
-            <argLine>-Xms512m -Xmx512m</argLine>
-            <systemProperties>
-              <property>
-                <name>exo.files.storage.dir</name>
-                <value>target/files</value>
-              </property>
-              <property>
-                <name>log4j.configuration</name>
-                <value>gatein-log4j.properties</value>
-              </property>
-              <property>
-                <name>log4j.debug</name>
-                <value>${log4j.debug}</value>
-              </property>
-              <property>
-                <name>log4j.level</name>
-                <value>${log4j.level}</value>
-              </property>
-              <property>
-                <name>gatein.test.output.path</name>
-                <value>${project.build.directory}</value>
-              </property>
-              <property>
-                <name>org.apache.commons.logging.Log</name>
-                <value>org.apache.commons.logging.impl.Log4JLogger</value>
-              </property>
-              <property>
-                <name>org.apache.commons.logging.simplelog.defaultlog</name>
-                <value>info</value>
-              </property>
-              <property>
-                <name>org.apache.commons.logging.simplelog.log.[eXo]</name>
-                <value>debug</value>
-              </property>
-              <property>
-                <name>org.apache.commons.logging.simplelog.log.net.hibernate</name>
-                <value>warn</value>
-              </property>
-              <property>
-                <name>java.naming.factory.initial</name>
-                <value>org.exoplatform.services.naming.SimpleContextFactory</value>
-              </property>
-              <property>
-                <name>com.arjuna.ats.arjuna.objectstore.objectStoreDir</name>
-                <value>${project.build.directory}/com.arjuna.ats.arjuna.objectstore.objectStoreDir</value>
-              </property>
-              <property>
-                <name>ObjectStoreEnvironmentBean.objectStoreDir</name>
-                <value>${project.build.directory}/ObjectStoreEnvironmentBean.objectStoreDir</value>
-              </property>
-              <property>
-                <name>exo.profiles</name>
-                <value>${surefire.exo.profiles},test</value>
-              </property>
-            </systemProperties>
+            <systemPropertyVariables>
+              <exo.files.storage.dir>target/files</exo.files.storage.dir>
+              <log4j.configuration>gatein-log4j.properties</log4j.configuration>
+              <gatein.test.output.path>${project.build.directory}</gatein.test.output.path>
+              <com.arjuna.ats.arjuna.objectstore.objectStoreDir>${project.build.directory}/com.arjuna.ats.arjuna.objectstore.objectStoreDir</com.arjuna.ats.arjuna.objectstore.objectStoreDir>
+              <exo.profiles>${surefire.exo.profiles},test</exo.profiles>
+              <org.apache.commons.logging.Log>org.apache.commons.logging.impl.SimpleLog</org.apache.commons.logging.Log>
+              <org.apache.commons.logging.simplelog.defaultlog>info</org.apache.commons.logging.simplelog.defaultlog>
+              <org.apache.commons.logging.simplelog.log.org.exoplatform>debug</org.apache.commons.logging.simplelog.log.org.exoplatform>
+              <org.apache.commons.logging.simplelog.log.net.hibernate>warn</org.apache.commons.logging.simplelog.log.net.hibernate>
+              <java.naming.factory.initial>org.exoplatform.services.naming.SimpleContextFactory</java.naming.factory.initial>
+              <java.util.logging.config.class>org.exoplatform.component.test.logging.LogConfigurator</java.util.logging.config.class>
+            </systemPropertyVariables>
           </configuration>
-        </plugin>
-        <!-- we shouldn't need to specify this plugin here, but the maven compiler plugin is not accepting its memory option properties. This should be removed when we can just set the compiler properties -->
-        <!-- we need to specify this as building GateIn can cause memory problems with some JDKs (ie IBM) -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-            <fork>true</fork>
-            <meminitial>256m</meminitial>
-            <maxmem>1024m</maxmem>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>com.jcabi</groupId>
-          <artifactId>jcabi-maven-plugin</artifactId>
-          <version>${version.jcabi.plugin}</version>
-          <executions>
-            <execution>
-              <id>weave-classes</id>
-              <phase>process-classes</phase>
-              <goals>
-                <goal>ajc</goal>
-              </goals>
-              <configuration>
-                <classesDirectory>${project.build.outputDirectory}</classesDirectory>
-              </configuration>
-            </execution>
-            <execution>
-              <id>weave-test-classes</id>
-              <phase>process-test-classes</phase>
-              <goals>
-                <goal>ajc</goal>
-              </goals>
-              <configuration>
-                <classesDirectory>${project.build.testOutputDirectory}</classesDirectory>
-              </configuration>
-            </execution>
-          </executions>
         </plugin>
         <plugin>
           <groupId>org.jibx</groupId>
           <artifactId>maven-jibx-plugin</artifactId>
           <version>${version.plugin.jibx}</version>
-          <dependencies>
-            <!--Workaround https://issues.apache.org/jira/browse/BCEL-173-->
-            <dependency>
-              <groupId>org.apache.bcel</groupId>
-              <artifactId>bcel</artifactId>
-              <version>6.0-SNAPSHOT</version>
-            </dependency>
-          </dependencies>
         </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>
-                      org.apache.maven.plugins
-                    </groupId>
-                    <artifactId>
-                      maven-antrun-plugin
-                    </artifactId>
-                    <versionRange>[1.4,)</versionRange>
-                    <goals>
-                      <goal>run</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>
-                      org.jboss.maven.plugins
-                    </groupId>
-                    <artifactId>
-                      maven-jdocbook-plugin
-                    </artifactId>
-                    <versionRange>[2.3.4,)</versionRange>
-                    <goals>
-                      <goal>generate</goal>
-                      <goal>resources</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>xml-maven-plugin</artifactId>
-                    <versionRange>[1.0,)</versionRange>
-                    <goals>
-                      <goal>generate</goal>
-                      <goal>resources</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.jibx</groupId>
-                    <artifactId>
-                      maven-jibx-plugin
-                    </artifactId>
-                    <versionRange>[${version.plugin.jibx},)</versionRange>
-                    <goals>
-                      <goal>bind</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <versionRange>[1.0.0,)</versionRange>
-                    <goals>
-                      <goal>copy-dependencies</goal>
-                      <goal>unpack</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>com.sun.japex</groupId>
-          <artifactId>japex-maven-plugin</artifactId>
-          <version>${version.plugin.japex}</version>
-        </plugin>
-        <plugin>
-          <!-- Use to compress javascript gadget features -->
-          <groupId>net.sf.alchim</groupId>
-          <artifactId>yuicompressor-maven-plugin</artifactId>
-          <version>${version.yuicompressor-maven-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>${version.plugin.javadoc}</version>
-          <configuration>
-            <archive>
-              <manifest>
-                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              </manifest>
-              <manifestEntries>
-                <Date>${maven.build.timestamp}</Date>
-                <Implementation-URL>${project.url}</Implementation-URL>
-                <SCM-URL>${project.scm.connection}</SCM-URL>
-                <SCM-Revision>${buildNumber}</SCM-Revision>
-                <Specification-Title>${project.name}</Specification-Title>
-                <Specification-Version>${parsedVersion.majorVersion}.0</Specification-Version>
-                <Specification-Vendor>${project.organization.name}</Specification-Vendor>
-                <Implementation-Title>${project.name}</Implementation-Title>
-                <Implementation-Version>${project.version}</Implementation-Version>
-                <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
-              </manifestEntries>
-            </archive>
-            <tags>
-              <tag>
-                <name>LevelAPI</name>
-                <placement>a</placement>
-                <head>eXo level API</head>
-              </tag>
-              <tag>
-                <name>anchor</name>
-                <placement>a</placement>
-                <head>eXo anchor for generated doc on REST API</head>
-              </tag>
-              <tag>
-                <name>request</name>
-                <placement>a</placement>
-                <head>eXo anchor for generated doc on REST API</head>
-              </tag>
-              <tag>
-                <name>response</name>
-                <placement>a</placement>
-                <head>eXo response for generated doc on REST API</head>
-              </tag>
-              <tag>
-                <name>format</name>
-                <placement>a</placement>
-                <head>eXo format for generated doc on REST API</head>
-              </tag>
-              <tag>
-                <name>authentication</name>
-                <placement>a</placement>
-                <head>eXo authentication for generated doc on REST API</head>
-              </tag>
-              <tag>
-                <name>notificationId</name>
-                <placement>a</placement>
-                <head>eXo notificationId for generated doc on REST API</head>
-              </tag>
-            </tags>
-          </configuration>
-        </plugin>
-
       </plugins>
     </pluginManagement>
-
-    <plugins>
-      <plugin>
-        <artifactId>maven-clean-plugin</artifactId>
-        <version>${version.plugin.clean}</version>
-      </plugin>
-    </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <!-- Create a source-release artifact that contains the fully buildable
-               project directory source structure. This is the artifact which is
-               the official subject of any release vote. -->
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>source-release-assembly</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-                <configuration>
-                  <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
-                  <descriptorRefs>
-                    <descriptorRef>source-release</descriptorRef>
-                  </descriptorRefs>
-                  <tarLongFileMode>gnu</tarLongFileMode>
-                  <appendAssemblyId>true</appendAssemblyId>
-                </configuration>
-              </execution>
-            </executions>
-            <dependencies>
-              <dependency>
-                <groupId>org.apache.apache.resources</groupId>
-                <artifactId>apache-source-release-assembly-descriptor</artifactId>
-                <version>${version.apache-source-release-assembly-descriptor}</version>
-              </dependency>
-            </dependencies>
-          </plugin>
-        </plugins>
-      </build>
-      <properties>
-        <!-- Produce project sources package distribution -->
-        <version.apache-source-release-assembly-descriptor>1.0.4</version.apache-source-release-assembly-descriptor>
-      </properties>
-    </profile>
-    <profile>
-      <id>mysql5</id>
-      <dependencies>
-        <dependency>
-          <groupId>mysql</groupId>
-          <artifactId>mysql-connector-java</artifactId>
-          <version>5.1.6</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-          <version>1.2.16</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <properties>
-        <surefire.exo.profiles>mysql</surefire.exo.profiles>
-      </properties>
-    </profile>
-    <profile>
-      <id>h2</id>
-      <dependencies>
-        <dependency>
-          <groupId>com.h2database</groupId>
-          <artifactId>h2</artifactId>
-          <version>1.3.165</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <properties>
-        <surefire.exo.profiles>h2</surefire.exo.profiles>
-      </properties>
-    </profile>
-    <profile>
-      <id>pkg-jbossas710</id>
-      <activation>
-        <property>
-          <name>gatein.dev</name>
-          <value>jbossas710</value>
-        </property>
-      </activation>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>check-servers-dir-specified</id>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <requireProperty>
-                      <message>"
-
-                        Build profile 'jbossas710' is no longer supported. You may want to use: 'jbossas711'.
-
-                        "
-                      </message>
-                    </requireProperty>
-                  </rules>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>pkg-jbossas712</id>
-      <activation>
-        <property>
-          <name>gatein.dev</name>
-          <value>jbossas712</value>
-        </property>
-      </activation>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>check-servers-dir-specified</id>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <requireProperty>
-                      <message>"
-
-                        Build profile 'jbossas712' is no longer supported. You may want to use: 'jbossas713'.
-
-                        "
-                      </message>
-                    </requireProperty>
-                  </rules>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>project-repositories</id>
-      <activation>
-        <property>
-          <name>!skip-project-repositories</name>
-        </property>
-      </activation>
-      <!-- To be removed and replaced by settings in user config -->
-      <repositories>
-        <repository>
-          <id>jboss-public-repository-group</id>
-          <name>JBoss Public Maven Repository Group</name>
-          <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-          <layout>default</layout>
-          <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </snapshots>
-        </repository>
-        <repository>
-          <id>caja</id>
-          <url>http://google-caja.googlecode.com/svn/maven</url>
-        </repository>
-        <repository>
-          <id>oauth</id>
-          <url>http://oauth.googlecode.com/svn/code/maven</url>
-        </repository>
-
-        <!-- Redefine legacy jboss repository to go to JBoss Nexus instead to http://repository.jboss.org/maven2 -->
-        <repository>
-          <id>jboss</id>
-          <name>JBoss Public Maven Repository Group</name>
-          <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-          <layout>default</layout>
-          <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </snapshots>
-        </repository>
-        <repository>
-          <id>repository.jboss.org</id>
-          <name>JBoss Public Maven Repository Group</name>
-          <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-          <layout>default</layout>
-          <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </snapshots>
-        </repository>
-        <repository>
-          <id>exo-public-repository-group</id>
-          <name>eXo Public Maven Repository Group</name>
-          <url>http://repository.exoplatform.org/content/groups/public</url>
-          <layout>default</layout>
-          <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </snapshots>
-        </repository>
-        <!--<repository>-->
-        <!--<releases>-->
-        <!--<enabled>false</enabled>-->
-        <!--</releases>-->
-        <!--<snapshots>-->
-        <!--<enabled>true</enabled>-->
-        <!--</snapshots>-->
-        <!--<id>snapshots.jboss.org</id>-->
-        <!--<url>https://repository.jboss.org/nexus/content/groups/public/</url>-->
-        <!--</repository>-->
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <id>jboss-public-repository-group</id>
-          <name>JBoss Public Maven Repository Group</name>
-          <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-          <layout>default</layout>
-          <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </snapshots>
-        </pluginRepository>
-      </pluginRepositories>
-    </profile>
-  </profiles>
 </project>

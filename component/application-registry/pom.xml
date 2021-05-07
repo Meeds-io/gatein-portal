@@ -31,6 +31,10 @@
   <name>GateIn Portal Component Application Registry</name>
   <packaging>jar</packaging>
 
+  <properties>
+    <exo.test.coverage.ratio>0.50</exo.test.coverage.ratio>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.core</groupId>
