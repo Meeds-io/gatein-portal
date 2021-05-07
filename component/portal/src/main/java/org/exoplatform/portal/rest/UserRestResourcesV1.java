@@ -502,7 +502,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
   @GET
   @Path("isSuperUser")
   @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("administrators")
+  @RolesAllowed("users")
   @ApiOperation(
       value = "Check if current user is a superUser",
       httpMethod = "GET",
