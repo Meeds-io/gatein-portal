@@ -42,7 +42,7 @@ public class DefaultChangePasswordConnectorTest {
     InitParams initParams = new InitParams();
   
     DefaultChangePasswordConnector defaultChangePasswordConnector =
-        new DefaultChangePasswordConnector(initParams,organizationService, picketLinkIDMService, picketLinkIDMExternalStoreService);
+        new DefaultChangePasswordConnector(initParams,organizationService);
     
     String newPassword="newPassword";
     defaultChangePasswordConnector.changePassword(userTest.getUserName(),newPassword);
@@ -75,7 +75,7 @@ public class DefaultChangePasswordConnectorTest {
     initParams.addParameter(valueParam);
   
     DefaultChangePasswordConnector defaultChangePasswordConnector = new DefaultChangePasswordConnector(initParams,
-                                                                                                       organizationService, picketLinkIDMService, picketLinkIDMExternalStoreService);
+                                                                                                       organizationService);
     String newPassword="newPassword";
     try {
       defaultChangePasswordConnector.changePassword(userTest.getUserName(), newPassword);
@@ -88,37 +88,4 @@ public class DefaultChangePasswordConnectorTest {
     Mockito.verify(userHandler, Mockito.times(0)).saveUser(Mockito.any(),Mockito.anyBoolean());
   
   }
-//
-//  @Test
-//  public void testChangePasswordFromExternalStoreAndAllowed() throws Exception {
-//    User userTest = new UserImpl("utest");
-//    userTest.setFirstName("User");
-//    userTest.setLastName("Test");
-//    userTest.setEmail("user.test@acme.com");
-//    userTest.setPassword("P@ssword123");
-//    userTest.setOriginatingStore(OrganizationService.EXTERNAL_STORE);
-//
-//    UserDAOImpl userHandler = Mockito.mock(UserDAOImpl.class);
-//    Mockito.when(userHandler.findUserByName(userTest.getUserName())).thenReturn(userTest);
-//    Mockito.when(organizationService.getUserHandler()).thenReturn(userHandler);
-//
-//    InitParams initParams = new InitParams();
-//    ValueParam valueParam = new ValueParam();
-//    valueParam.setName("allowChangeExternalPassword");
-//    valueParam.setValue("true");
-//
-//
-//    initParams.addParameter(valueParam);
-//
-//    DefaultChangePasswordConnector defaultChangePasswordConnector = new DefaultChangePasswordConnector(initParams,
-//                                                                             organizationService);
-//    Mockito.mock(DefaultChangePasswordConnector.class);
-//    Mockito.when(DefaultChangePasswordConnector.changePassword(Mockito.anyString(),Mockito.anyString())).thenReturn()
-//    String newPassword="newPassword";
-//    defaultChangePasswordConnector.changePassword(userTest.getUserName(),newPassword);
-//
-//    //if user is from external store and change password is allowed for external store
-//    // we should save his password
-    
-//  }
 }
