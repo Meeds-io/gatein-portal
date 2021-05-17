@@ -38,8 +38,6 @@
   <name>GateIn - Portal</name>
 
   <properties>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
     <org.exoplatform.depmgt.version>19.x-SNAPSHOT</org.exoplatform.depmgt.version>
     <org.exoplatform.kernel.version>6.2.x-SNAPSHOT</org.exoplatform.kernel.version>
     <org.exoplatform.core.version>6.2.x-SNAPSHOT</org.exoplatform.core.version>
@@ -73,20 +71,6 @@
     <version.scribejava-apis>6.9.0</version.scribejava-apis>
     <version.scribejava-core>6.9.0</version.scribejava-core>
 
-    <!--
-    Various log4j properties for unit tests, examples:
-    -Dlog4j.debug=true : show log4j bootstrap (useful for debugging resolution to configuration property file)
-    -Dlog4j.level=all : very verbose logging (slow down though)
-    -->
-    <log4j.debug>false</log4j.debug>
-    <log4j.level>info</log4j.level>
-
-    <!-- ***************** -->
-    <!-- Repository Deployment URLs for eXo -->
-    <!-- ***************** -->
-    <jboss.releases.repo.url>http://repository.exoplatform.org/service/local/staging/deploy/maven2/</jboss.releases.repo.url>
-    <jboss.snapshots.repo.url>http://repository.exoplatform.org/content/repositories/exo-snapshots/</jboss.snapshots.repo.url>
-
     <!-- ************** -->
     <!-- Build settings -->
     <!-- ************** -->
@@ -95,24 +79,16 @@
     <jdk.min.version>1.8</jdk.min.version>
 
     <!-- maven-release-plugin -->
-    <useReleaseProfile>false</useReleaseProfile>
-    <version.release.plugin>2.5.1</version.release.plugin>
     <pushChanges>false</pushChanges>
 
     <!-- buildnumber-maven-plugin : needs 1.0 for git -->
     <version.buildnumber.plugin>1.0</version.buildnumber.plugin>
 
-    <!-- Disable coverage checks in this first version -->
-    <exo.test.coverage.ratio>0</exo.test.coverage.ratio>
-
     <!-- -->
     <surefire.exo.profiles>hsqldb</surefire.exo.profiles>
 
-    <version.plugin.japex>1.2.3</version.plugin.japex>
+    <!-- maven plugin versions -->
     <version.plugin.jibx>1.3.1</version.plugin.jibx>
-    <version.plugin.javadoc>2.10.3</version.plugin.javadoc>
-    <version.jcabi.plugin>0.14</version.jcabi.plugin>
-    <parsedVersion.majorVersion>N/A</parsedVersion.majorVersion>
   </properties>
 
   <scm>
@@ -318,7 +294,7 @@
       <dependency>
         <groupId>org.exoplatform.gatein.portal</groupId>
         <artifactId>exo.portal.component.web.security</artifactId>
-        <version>4.3.x-forgot-password-SNAPSHOT</version>
+        <version>${project.version}</version>
         <type>test-jar</type>
       </dependency>
       <dependency>

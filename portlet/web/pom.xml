@@ -31,6 +31,10 @@
   <packaging>war</packaging>
   <name>GateIn Portal Portlet Web</name>
 
+  <properties>
+    <exo.test.coverage.ratio>0</exo.test.coverage.ratio>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.gatein.portal</groupId>
