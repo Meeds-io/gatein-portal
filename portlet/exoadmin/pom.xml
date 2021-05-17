@@ -32,7 +32,7 @@
   <name>GateIn Portal Portlet eXoAdmin</name>
 
   <properties>
-    <portlet.version>2.0</portlet.version>
+    <exo.test.coverage.ratio>0</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
