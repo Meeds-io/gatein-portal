@@ -38,63 +38,20 @@
   <name>GateIn - Portal</name>
 
   <properties>
-    <org.exoplatform.depmgt.version>19.x-SNAPSHOT</org.exoplatform.depmgt.version>
-    <org.exoplatform.kernel.version>6.2.x-SNAPSHOT</org.exoplatform.kernel.version>
-    <org.exoplatform.core.version>6.2.x-SNAPSHOT</org.exoplatform.core.version>
-    <org.exoplatform.ws.version>6.2.x-SNAPSHOT</org.exoplatform.ws.version>
-    <org.exoplatform.gatein.sso.version>6.2.x-SNAPSHOT</org.exoplatform.gatein.sso.version>
-    <org.exoplatform.gatein.wci.version>6.2.x-SNAPSHOT</org.exoplatform.gatein.wci.version>
-    <org.exoplatform.gatein.pc.version>6.2.x-SNAPSHOT</org.exoplatform.gatein.pc.version>
-    <org.exoplatform.gatein.dep.version>2.2.x-SNAPSHOT</org.exoplatform.gatein.dep.version>
-    <org.exoplatform.framework.junit.version>1.2.4-GA</org.exoplatform.framework.junit.version>
-    <nl.captcha.simplecaptcha.version>1.1.1.Final-gatein-4</nl.captcha.simplecaptcha.version>
-    <org.gatein.api.version>1.0.1.Final</org.gatein.api.version>
-    <org.gatein.common.version>2.2.2.Final</org.gatein.common.version>
-    <org.gatein.mop.version>1.3.2.Final</org.gatein.mop.version>
-    <org.gatein.mgmt.version>2.1.0.Final</org.gatein.mgmt.version>
-    <version.reflext>1.1.0</version.reflext>
-    <org.staxnav.version>0.9.6</org.staxnav.version>
-    <jcip.version>1.0</jcip.version>
-    <commons-dbcp.version>1.4</commons-dbcp.version>
-    <commons-logging.version>1.1.1</commons-logging.version>
-    <commons-lang3.version>3.3.2</commons-lang3.version>
-    <com.google.javascript.version>v20170910</com.google.javascript.version>
-    <com.google.guava.version>20.0</com.google.guava.version>
-    <jboss-dmr.version>1.1.1.Final</jboss-dmr.version>
-    <org.jboss.portletbridge.version>3.3.1.Final</org.jboss.portletbridge.version>
-    <version.cdi.portlet.integration>1.0.3.Final</version.cdi.portlet.integration>
-    <version.org.gatein.naming>1.1.1.Final</version.org.gatein.naming>
-    <sun-opends.version>1.0.0</sun-opends.version>
-    <berkeleydb.version>3.2.76</berkeleydb.version>
+    <org.exoplatform.gatein.sso.version>6.2.x-security-fix-SNAPSHOT</org.exoplatform.gatein.sso.version>
+    <org.exoplatform.gatein.pc.version>6.2.x-security-fix-SNAPSHOT</org.exoplatform.gatein.pc.version>
 
-    <!-- to move to gatein-dep -->
-    <version.scribejava-apis>6.9.0</version.scribejava-apis>
-    <version.scribejava-core>6.9.0</version.scribejava-core>
-
-    <!-- ************** -->
-    <!-- Build settings -->
-    <!-- ************** -->
-
-    <!-- maven-enforcer-plugin -->
-    <jdk.min.version>1.8</jdk.min.version>
-
-    <!-- maven-release-plugin -->
-    <pushChanges>false</pushChanges>
-
-    <!-- buildnumber-maven-plugin : needs 1.0 for git -->
-    <version.buildnumber.plugin>1.0</version.buildnumber.plugin>
-
-    <!-- -->
+    <!-- Default eXo profiles -->
     <surefire.exo.profiles>hsqldb</surefire.exo.profiles>
 
-    <!-- maven plugin versions -->
+    <!-- FIXME: Workaround until maven-parent-pom:23-M07 is released -->
     <version.plugin.jibx>1.3.1</version.plugin.jibx>
   </properties>
 
   <scm>
-    <connection>scm:git:git://github.com/exoplatform/gatein-portal.git</connection>
-    <developerConnection>scm:git:git@github.com:exoplatform/gatein-portal.git</developerConnection>
-    <url>https://github.com/exoplatform/gatein-portal</url>
+    <connection>scm:git:git://github.com/meeds-io/gatein-portal.git</connection>
+    <developerConnection>scm:git:git@github.com:meeds-io/gatein-portal.git</developerConnection>
+    <url>https://github.com/meeds-io/gatein-portal</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -103,558 +60,276 @@
     <module>webui</module>
     <module>portlet</module>
     <module>web</module>
-    <module>starter</module>
     <module>cdi</module>
   </modules>
 
   <dependencyManagement>
     <dependencies>      
-      <!-- Import versions of external dependencies to use -->
+      <!-- GateIn-PC dependencies -->
       <dependency>
-        <groupId>org.exoplatform</groupId>
-        <artifactId>maven-depmgt-pom</artifactId>
-        <version>${org.exoplatform.depmgt.version}</version>
+       <groupId>org.exoplatform.gatein.pc</groupId>
+       <artifactId>pc-parent</artifactId>
+        <version>${org.exoplatform.gatein.pc.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
 
-      <!-- Kernel dependencies -->
+      <!-- GateIn-SSO dependencies -->
       <dependency>
-        <groupId>org.exoplatform.kernel</groupId>
-        <artifactId>kernel-parent</artifactId>
-        <version>${org.exoplatform.kernel.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <!-- Core dependencies -->
-      <dependency>
-        <groupId>org.exoplatform.core</groupId>
-        <artifactId>core-parent</artifactId>
-        <version>${org.exoplatform.core.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <!-- WS dependencies -->
-      <dependency>
-        <groupId>org.exoplatform.ws</groupId>
-        <artifactId>ws-parent</artifactId>
-        <version>${org.exoplatform.ws.version}</version>
+        <groupId>org.exoplatform.gatein.sso</groupId>
+        <artifactId>sso-parent</artifactId>
+        <version>${org.exoplatform.gatein.sso.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
 
-      <!-- to move to gatein-dep -->
+      <!-- Internal project artifacts -->
       <dependency>
-        <groupId>com.google.javascript</groupId>
-        <artifactId>closure-compiler</artifactId>
-        <version>${com.google.javascript.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>${com.google.guava.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.exoplatform.tool</groupId>
-        <artifactId>exo.tool.framework.junit</artifactId>
-        <version>${org.exoplatform.framework.junit.version}</version>
-      </dependency>
-
-      <!-- GateIn components -->
-      <dependency>
-        <groupId>org.gatein.common</groupId>
-        <artifactId>common-logging</artifactId>
-        <version>${org.gatein.common.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.api</groupId>
-        <artifactId>gatein-api</artifactId>
-        <version>${org.gatein.api.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.common</groupId>
-        <artifactId>common-common</artifactId>
-        <version>${org.gatein.common.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.wci</groupId>
-        <artifactId>wci-wci</artifactId>
-        <version>${org.exoplatform.gatein.wci.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.wci</groupId>
-        <artifactId>wci-tomcat8</artifactId>
-        <version>${org.exoplatform.gatein.wci.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.pc</groupId>
-        <artifactId>pc-bridge</artifactId>
-        <version>${org.exoplatform.gatein.pc.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.pc</groupId>
-        <artifactId>pc-federation</artifactId>
-        <version>${org.exoplatform.gatein.pc.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.pc</groupId>
-        <artifactId>pc-portlet</artifactId>
-        <version>${org.exoplatform.gatein.pc.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.pc</groupId>
-        <artifactId>pc-api</artifactId>
-        <version>${org.exoplatform.gatein.pc.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.pc</groupId>
-        <artifactId>pc-controller</artifactId>
-        <version>${org.exoplatform.gatein.pc.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.mop</groupId>
-        <artifactId>mop-api</artifactId>
-        <version>${org.gatein.mop.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.mop</groupId>
-        <artifactId>mop-spi</artifactId>
-        <version>${org.gatein.mop.version}</version>
-      </dependency>
-      <!-- Gatein Mgmt -->
-      <dependency>
-        <groupId>org.gatein.management</groupId>
-        <artifactId>gatein-management-api</artifactId>
-        <version>${org.gatein.mgmt.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.management</groupId>
-        <artifactId>gatein-management-spi</artifactId>
-        <version>${org.gatein.mgmt.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.management</groupId>
-        <artifactId>gatein-management-core</artifactId>
-        <version>${org.gatein.mgmt.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.management</groupId>
-        <artifactId>gatein-management-rest</artifactId>
-        <version>${org.gatein.mgmt.version}</version>
-      </dependency>
-      <!-- GateIn Mgmt uses jboss-dmr for model impl -->
-      <dependency>
-        <groupId>org.jboss</groupId>
-        <artifactId>jboss-dmr</artifactId>
-        <version>${jboss-dmr.version}</version>
-      </dependency>
-
-      <!-- GateIn Sources -->
-      <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.parent</artifactId>
         <version>${project.version}</version>
         <classifier>source-release</classifier>
         <type>zip</type>
       </dependency>
-      <!-- GateIn -->
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.common</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.common</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.controller</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.security</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.security</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.security-jboss</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.oauth-common</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.oauth-common</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.oauth-web</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.server</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.resources</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.portal</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.portal</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.pc</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.identity</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.identity</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.resources</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.resources</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.application-registry</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.application-registry</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.scripting</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.management</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.file-storage</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.webui.framework</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.webui.portlet</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.webui.portal</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.webui.eXo</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.webui.core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.test.core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.test.core</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.test.web</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.test.web</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.web.portal</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.eXoGadgets</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.portlet.web</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.web.rest</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.portlet.exoadmin</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.web.eXoResources</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal.examples.skins</groupId>
-        <artifactId>gatein-sample-skin</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-      </dependency>
-      <dependency>
-          <groupId>org.exoplatform.gatein.portal</groupId>
-        <artifactId>exo.portal.starter.war</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-      </dependency>
-
-      <!-- Reflext -->
-      <dependency>
-        <groupId>org.reflext</groupId>
-        <artifactId>reflext.api</artifactId>
-        <version>${version.reflext}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.reflext</groupId>
-        <artifactId>reflext.apt</artifactId>
-        <version>${version.reflext}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.reflext</groupId>
-        <artifactId>reflext.core</artifactId>
-        <version>${version.reflext}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.reflext</groupId>
-        <artifactId>reflext.jlr</artifactId>
-        <version>${version.reflext}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.reflext</groupId>
-        <artifactId>reflext.spi</artifactId>
-        <version>${version.reflext}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.gatein.captcha</groupId>
-        <artifactId>simplecaptcha</artifactId>
-        <version>${nl.captcha.simplecaptcha.version}</version>
-      </dependency>
-
-      <!-- Staxnav -->
-      <dependency>
-        <groupId>org.staxnav</groupId>
-        <artifactId>staxnav.core</artifactId>
-        <version>${org.staxnav.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>commons-dbcp</groupId>
-        <artifactId>commons-dbcp</artifactId>
-        <version>${commons-dbcp.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>${commons-lang3.version}</version>
-      </dependency>
-
-      <!-- Portlet Bridge -->
-      <dependency>
-        <groupId>org.jboss.portletbridge</groupId>
-        <artifactId>portletbridge-api</artifactId>
-        <version>${org.jboss.portletbridge.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.portletbridge</groupId>
-        <artifactId>portletbridge-impl</artifactId>
-        <version>${org.jboss.portletbridge.version}</version>
-      </dependency>
-
-      <!-- CDI/Portlet Integration Library -->
-      <dependency>
-        <groupId>org.gatein</groupId>
-        <artifactId>cdi-portlet-integration</artifactId>
-        <version>${version.cdi.portlet.integration}</version>
-      </dependency>
-
-      <!-- needed for the IBM jdk, should be remove in the future when IBM fixes its jdk (see GTNPORTAL-636) -->
-      <dependency>
-        <groupId>net.jcip</groupId>
-        <artifactId>jcip-annotations</artifactId>
-        <version>${jcip.version}</version>
-      </dependency>
-
-      <!-- SSO -->
-      <dependency>
-        <groupId>org.exoplatform.gatein.sso</groupId>
-        <artifactId>sso-auth-callback</artifactId>
-        <version>${org.exoplatform.gatein.sso.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.sso</groupId>
-        <artifactId>sso-agent</artifactId>
-        <version>${org.exoplatform.gatein.sso.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.sso</groupId>
-        <artifactId>spnego</artifactId>
-        <version>${org.exoplatform.gatein.sso.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.sso</groupId>
-        <artifactId>sso-integration</artifactId>
-        <version>${org.exoplatform.gatein.sso.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.sso</groupId>
-        <artifactId>sso-saml-plugin</artifactId>
-        <version>${org.exoplatform.gatein.sso.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.sso.integration-configs</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.gatein.portal</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.sso.agents-configs</artifactId>
         <version>${project.version}</version>
       </dependency>
-
-      <!-- OAuth -->
       <dependency>
-        <groupId>com.github.scribejava</groupId>
-        <artifactId>scribejava-apis</artifactId>
-        <version>${version.scribejava-apis}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.github.scribejava</groupId>
-        <artifactId>scribejava-core</artifactId>
-        <version>${version.scribejava-core}</version>
-      </dependency>
-
-      <!-- GateIn CDI -->
-      <dependency>
-        <groupId>org.gatein.cdi</groupId>
-        <artifactId>gatein-cdi-injection</artifactId>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.cdi.injection</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.gatein.cdi</groupId>
-        <artifactId>gatein-cdi-contexts</artifactId>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.cdi.contexts</artifactId>
         <version>${project.version}</version>
-      </dependency>
-
-      <!--Packaging-->
-      <dependency>
-        <groupId>org.gatein.naming</groupId>
-        <artifactId>gatein-naming</artifactId>
-        <version>${version.org.gatein.naming}</version>
-      </dependency>
-      <dependency>
-         <groupId>sun-opends</groupId>
-         <artifactId>OpenDS</artifactId>
-         <version>${sun-opends.version}</version>
-         <scope>test</scope>
-      </dependency>
-      <dependency>
-         <groupId>berkeleydb</groupId>
-         <artifactId>je</artifactId>
-         <version>${berkeleydb.version}</version>
-         <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -673,7 +348,6 @@
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-      <version>${commons-logging.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -695,24 +369,32 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <systemPropertyVariables>
-              <exo.files.storage.dir>target/files</exo.files.storage.dir>
+              <exo.files.storage.dir>${project.build.directory}/files</exo.files.storage.dir>
               <log4j.configuration>gatein-log4j.properties</log4j.configuration>
               <gatein.test.output.path>${project.build.directory}</gatein.test.output.path>
               <com.arjuna.ats.arjuna.objectstore.objectStoreDir>${project.build.directory}/com.arjuna.ats.arjuna.objectstore.objectStoreDir</com.arjuna.ats.arjuna.objectstore.objectStoreDir>
               <exo.profiles>${surefire.exo.profiles},test</exo.profiles>
               <org.apache.commons.logging.Log>org.apache.commons.logging.impl.SimpleLog</org.apache.commons.logging.Log>
               <org.apache.commons.logging.simplelog.defaultlog>info</org.apache.commons.logging.simplelog.defaultlog>
-              <org.apache.commons.logging.simplelog.log.org.exoplatform>debug</org.apache.commons.logging.simplelog.log.org.exoplatform>
               <org.apache.commons.logging.simplelog.log.net.hibernate>warn</org.apache.commons.logging.simplelog.log.net.hibernate>
               <java.naming.factory.initial>org.exoplatform.services.naming.SimpleContextFactory</java.naming.factory.initial>
               <java.util.logging.config.class>org.exoplatform.component.test.logging.LogConfigurator</java.util.logging.config.class>
             </systemPropertyVariables>
           </configuration>
         </plugin>
+        <!-- FIXME: Workaround until maven-parent-pom:23-M07 is released -->
         <plugin>
           <groupId>org.jibx</groupId>
           <artifactId>maven-jibx-plugin</artifactId>
           <version>${version.plugin.jibx}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <configuration>
+            <!-- Don't include libraries into Web Archives -->
+            <packagingExcludes>WEB-INF/lib/*.jar,**/less/**,**/*.vue</packagingExcludes>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>

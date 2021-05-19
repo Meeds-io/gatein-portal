@@ -187,20 +187,20 @@ public class StaxWriterBuilderImpl implements StaxWriterBuilder {
                     try {
                         writer = factory.createXMLStreamWriter((OutputStream) output);
                     } catch (XMLStreamException e) {
-                        throw new StaxNavException(null, "Exception creating XMLStreamWriter with OutputStream: " + output, e);
+                      throw new StaxNavException(e);
                     }
                 }
             } else if (output instanceof Writer) {
                 try {
                     writer = factory.createXMLStreamWriter((Writer) output);
                 } catch (XMLStreamException e) {
-                    throw new StaxNavException(null, "Exception creating XMLStreamWriter with Writer: " + output, e);
+                  throw new StaxNavException(e);
                 }
             } else if (output instanceof Result) {
                 try {
                     writer = factory.createXMLStreamWriter((Result) output);
                 } catch (XMLStreamException e) {
-                    throw new StaxNavException(null, "Exception creating XMLStreamWriter with Result: " + output, e);
+                  throw new StaxNavException(e);
                 }
             } else {
                 throw new IllegalStateException("Unknown output: " + output); // should never happen...

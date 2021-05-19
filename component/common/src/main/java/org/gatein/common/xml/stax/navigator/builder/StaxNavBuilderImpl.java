@@ -156,20 +156,20 @@ public class StaxNavBuilderImpl implements StaxNavBuilder {
                     try {
                         reader = factory.createXMLStreamReader((InputStream) input);
                     } catch (XMLStreamException e) {
-                        throw new StaxNavException(null, "Exception creating XMLStreamReader with inputStream: " + input, e);
+                      throw new StaxNavException(e);
                     }
                 }
             } else if (input instanceof Reader) {
                 try {
                     reader = factory.createXMLStreamReader((Reader) input);
                 } catch (XMLStreamException e) {
-                    throw new StaxNavException(null, "Exception creating XMLStreamReader with reader: " + input, e);
+                  throw new StaxNavException(e);
                 }
             } else if (input instanceof Source) {
                 try {
                     reader = factory.createXMLStreamReader((Source) input);
                 } catch (XMLStreamException e) {
-                    throw new StaxNavException(null, "Exception creating XMLStreamReader with Source: " + input, e);
+                  throw new StaxNavException(e);
                 }
             } else {
                 throw new IllegalStateException("Unknown input: " + input); // should never happen...
