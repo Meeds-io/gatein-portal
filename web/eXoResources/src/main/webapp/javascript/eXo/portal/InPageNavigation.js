@@ -103,11 +103,15 @@
           const oldAssetVersion = eXo.env.client.assetsVersion;
           fetch(newLocationHref, {
             credentials: 'include',
-            method: 'GET'
+            method: 'GET',
+            redirect: 'manual'
           })
             .then(resp => {
               if (resp && resp.status == 200) {
                 return resp.text();
+              } else if (resp.type === 'opaqueredirect') {
+                //redirect 302 => reload the page
+                window.location.reload();
               } else {
                 throw new Error('The retrieved page seems to be a portal page');
               }
