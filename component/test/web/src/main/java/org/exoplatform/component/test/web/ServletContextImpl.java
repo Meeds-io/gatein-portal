@@ -322,5 +322,10 @@ public class ServletContextImpl implements ServletContext {
       throw new NotYetImplemented();
     }
 
+    @Override
+    public String getVirtualServerName() {
+      return null;
+    }
+
     
 }
