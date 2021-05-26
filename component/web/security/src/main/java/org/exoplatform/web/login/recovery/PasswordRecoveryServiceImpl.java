@@ -457,4 +457,9 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         }
         return router.render(params);
     }
+    
+    @Override
+    public ChangePasswordConnector getActiveChangePasswordConnector() {
+      return this.changePasswordConnectorMap.get(this.changePasswordConnectorName);
+    }
 }
