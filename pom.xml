@@ -27,20 +27,20 @@
   <parent>
     <artifactId>maven-parent-pom</artifactId>
     <groupId>org.exoplatform</groupId>
-    <version>24-M02</version>
+    <version>24-microservices-SNAPSHOT</version>
     <relativePath/>
   </parent>
   
   <groupId>org.exoplatform.gatein.portal</groupId>
   <artifactId>exo.portal.parent</artifactId>
-  <version>6.3.x-SNAPSHOT</version>
+  <version>6.3.x-microservices-SNAPSHOT</version>
   <packaging>pom</packaging>
   
   <name>GateIn - Portal</name>
   
   <properties>
-    <org.exoplatform.gatein.sso.version>6.3.x-SNAPSHOT</org.exoplatform.gatein.sso.version>
-    <org.exoplatform.gatein.pc.version>6.3.x-SNAPSHOT</org.exoplatform.gatein.pc.version>
+    <org.exoplatform.gatein.sso.version>6.3.x-microservices-SNAPSHOT</org.exoplatform.gatein.sso.version>
+    <org.exoplatform.gatein.pc.version>6.3.x-microservices-SNAPSHOT</org.exoplatform.gatein.pc.version>
     
     <!-- Default eXo profiles -->
     <surefire.exo.profiles>hsqldb</surefire.exo.profiles>
