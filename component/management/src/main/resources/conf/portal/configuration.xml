@@ -51,4 +51,9 @@
     <type>org.gatein.management.runtime.ManagementBootstrap</type>
   </component>
 
+  <component>
+    <key>org.gatein.api.management.GateInApiManagementResource</key>
+    <type>org.gatein.api.management.GateInApiManagementResource</type>
+  </component>
+
 </configuration>
