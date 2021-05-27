@@ -11,6 +11,8 @@ import javax.ws.rs.core.*;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.rest.model.MembershipRestEntity;
 import org.exoplatform.portal.rest.model.UserRestEntity;
@@ -21,6 +23,8 @@ import org.exoplatform.services.security.ConversationState;
 
 import io.swagger.annotations.*;
 import io.swagger.jaxrs.PATCH;
+import org.exoplatform.web.login.recovery.ChangePasswordConnector;
+import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 
 @Path("v1/users")
 public class UserRestResourcesV1 implements ResourceContainer {
@@ -32,6 +36,8 @@ public class UserRestResourcesV1 implements ResourceContainer {
   public static final String             USER_NOT_FOUND_ERROR_CODE      = "USER_NOT_FOUND";
 
   public static final String             WRONG_USER_PASSWORD_ERROR_CODE = "WRONG_USER_PASSWORD";
+  
+  public static final String             CHANGE_PASSWORD_NOT_ALLOWED = "CHANGE_PASSWORD_NOT_ALLOWED";
 
   private static final String            ADMINISTRATOR_GROUP            = "/platform/administrators";
 
@@ -52,13 +58,17 @@ public class UserRestResourcesV1 implements ResourceContainer {
   private UserSearchService              userSearchService;
 
   private UserACL                        userACL;
+  
+  private PasswordRecoveryService        passwordRecoveryService;
 
   public UserRestResourcesV1(OrganizationService organizationService,
                              UserSearchService userSearchService,
-                             UserACL userACL) {
+                             UserACL userACL,
+                             PasswordRecoveryService passwordRecoveryService) {
     this.organizationService = organizationService;
     this.userSearchService = userSearchService;
     this.userACL = userACL;
+    this.passwordRecoveryService = passwordRecoveryService;
   }
 
   @GET
@@ -418,21 +428,24 @@ public class UserRestResourcesV1 implements ResourceContainer {
       if (user == null) {
         return Response.serverError().entity(USER_NOT_FOUND_ERROR_CODE).build();
       }
-
+  
+      if (!passwordRecoveryService.allowChangePassword(user.getUserName())) {
+        return Response.serverError().entity(CHANGE_PASSWORD_NOT_ALLOWED).build();
+      }
+  
       if (isSameUser && !userHandler.authenticate(username, currentPassword)) {
         return Response.serverError().entity(WRONG_USER_PASSWORD_ERROR_CODE).build();
       }
-
+  
       Locale locale = request.getLocale();
-
+  
       String errorMessage = PASSWORD_VALIDATOR.validate(locale, newPassword);
       if (StringUtils.isNotBlank(errorMessage)) {
         return Response.serverError().entity(errorMessage).build();
       }
-
-      user.setPassword(newPassword);
-      userHandler.saveUser(user, false);
-
+  
+      ChangePasswordConnector activeChangePasswordConnector = passwordRecoveryService.getActiveChangePasswordConnector();
+      activeChangePasswordConnector.changePassword(user.getUserName(),newPassword);
       return Response.noContent().build();
     } catch (Exception e) {
       return Response.serverError().entity(PASSWORD_UNKNOWN_ERROR_CODE + ":" + e.getMessage()).build();

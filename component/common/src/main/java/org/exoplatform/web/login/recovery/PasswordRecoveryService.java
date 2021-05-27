@@ -56,4 +56,6 @@ public interface PasswordRecoveryService {
   String getOnboardingURL(String tokenId, String lang);
 
   String getExternalRegistrationURL(String tokenId, String lang);
+  
+  public ChangePasswordConnector getActiveChangePasswordConnector();
 }
