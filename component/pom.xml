@@ -35,7 +35,6 @@
   <name>GateIn Portal Component</name>
 
   <modules>
-    <module>api</module>
     <module>test</module>
     <module>common</module>
     <module>file-storage</module>
@@ -47,6 +46,7 @@
     <module>scripting</module>
     <module>management</module>
     <module>identity</module>
+    <module>api</module>
   </modules>
 
 </project>
