@@ -287,7 +287,7 @@ public class LoginServlet extends AbstractHttpServlet {
 
         try {
             URI uri = new URI(initialURI);
-            if (uri.isAbsolute() && !(uri.getHost().equals(req.getServerName()))) {
+            if ((uri.getHost() != null) && !(uri.getHost().equals(req.getServerName()))) {
                 log.warn("Cannot redirect to an URI outside of the current host when using a login redirect. Redirecting to the portal context path instead.");
                 initialURI = req.getContextPath();
             }
