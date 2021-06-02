@@ -23,6 +23,17 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
     xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+  <component>
+    <key>InPageNavigationFeatureProperties</key>
+    <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
+    <init-params>
+      <properties-param>
+        <name>InPageNavigationFeatureProperties</name>
+        <description>InPageNavigation Feature enablement flag</description>
+        <property name="exo.feature.InPageNavigation.enabled" value="${exo.feature.InPageNavigation.enabled:false}" />
+      </properties-param>
+    </init-params>
+  </component>
   <external-component-plugins>
     <target-component>org.exoplatform.groovyscript.text.TemplateService</target-component>
     <component-plugin>
