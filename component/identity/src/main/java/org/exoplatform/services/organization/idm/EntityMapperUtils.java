@@ -129,9 +129,9 @@ public class EntityMapperUtils {
       // if it is from AD it always returns false since it is a number .
       Boolean enabled = Boolean.parseBoolean(attrs.get(USER_ENABLED).getValue().toString()) ;
 
-      if (status.equals("512")  )
+      if (isInteger(status))
       {
-        enabled = true;
+        enabled = isUserEnabled(Integer.parseInt(status));
       }
       changed |= checkIfChanged && !Objects.equals(enabled, user.isEnabled());
 
@@ -145,5 +145,20 @@ public class EntityMapperUtils {
     }
     return changed;
   }
-
+  private static Boolean isUserEnabled (int status) {
+    String BinaryStatus = Integer.toBinaryString(status);
+    if(BinaryStatus.charAt(BinaryStatus.length()-2) == '1') {
+      return false;
+    }
+    return true;
+  }
+  private static boolean isInteger( String input ) {
+    try {
+      Integer.parseInt( input );
+      return true;
+    }
+    catch( Exception e ) {
+      return false;
+    }
+  }
 }
