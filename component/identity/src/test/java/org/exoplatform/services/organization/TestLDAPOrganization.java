@@ -133,6 +133,7 @@ public class TestLDAPOrganization extends TestOrganization {
     assertNull(test2);
     end();
   }
+
   public void testEnabledUserDetection() throws Exception{
     User u = uHandler.createUserInstance("test");
     ((UserImpl) u).setEnabled(true);

@@ -148,6 +148,7 @@ public class EntityMapperUtils {
     }
     return changed;
   }
+
   private static Boolean isUserEnabled (int status) {
     String binaryStatus = Integer.toBinaryString(status);
     if(binaryStatus.charAt(binaryStatus.length()-2) == '1') {
@@ -155,6 +156,7 @@ public class EntityMapperUtils {
     }
     return true;
   }
+
   private static boolean isInteger( String input ) {
     try {
       Integer.parseInt( input );
