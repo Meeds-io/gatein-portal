@@ -127,8 +127,9 @@ public class EntityMapperUtils {
 
       // used when populating User from the platform ; it return true or false
       // if it is from AD it always returns false since it is a number .
-      /* in AD , the (2) value represents a disabled user and  Many UserAccessControl values represent an enabled user like 65536 which represent an enabled user
-      whose password never expires : this user is detected as disabled if he has 65538 as UserAccessControl value   */
+      // in AD , the (2) value represents a disabled user and  Many UserAccessControl values represent an enabled user like 65536 which represent an enabled user .
+      //whose password never expires : this user is detected as disabled if he has 65538 as UserAccessControl value   */
+      // UserAccessControl Documentation Link : https://docs.microsoft.com/en-us/troubleshoot/windows-server/identity/useraccountcontrol-manipulate-account-properties
       Boolean enabled = Boolean.parseBoolean(attrs.get(USER_ENABLED).getValue().toString()) ;
 
       if (isInteger(status))
