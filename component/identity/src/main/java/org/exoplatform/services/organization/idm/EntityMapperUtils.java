@@ -127,6 +127,8 @@ public class EntityMapperUtils {
 
       // used when populating User from the platform ; it return true or false
       // if it is from AD it always returns false since it is a number .
+      /* in AD , the (2) value represents a disabled user and  Many UserAccessControl values represent an enabled user like 65536 which represent an enabled user
+      whose password never expires : this user is detected as disabled if he has 65538 as UserAccessControl value   */
       Boolean enabled = Boolean.parseBoolean(attrs.get(USER_ENABLED).getValue().toString()) ;
 
       if (isInteger(status))
@@ -146,8 +148,8 @@ public class EntityMapperUtils {
     return changed;
   }
   private static Boolean isUserEnabled (int status) {
-    String BinaryStatus = Integer.toBinaryString(status);
-    if(BinaryStatus.charAt(BinaryStatus.length()-2) == '1') {
+    String binaryStatus = Integer.toBinaryString(status);
+    if(binaryStatus.charAt(binaryStatus.length()-2) == '1') {
       return false;
     }
     return true;

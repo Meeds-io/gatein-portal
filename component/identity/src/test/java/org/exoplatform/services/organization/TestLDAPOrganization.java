@@ -142,11 +142,14 @@ public class TestLDAPOrganization extends TestOrganization {
     Attribute attr1 = new SimpleAttribute("enabled");
     Attribute attr2 = new SimpleAttribute("enabled");
     Attribute attr3 = new SimpleAttribute("enabled");
-
+    // 65536 represent an enabled user whose password never expires
     attr.addValue(65536);
+    // 65538 represent an disabled user whose password never expires
     attr1.addValue(65538);
-    attr1.addValue(8388608);
-    attr1.addValue(8388610);
+    // 8388608 represent an enabled user whose password expired
+    attr2.addValue(8388608);
+    // 83886010 represent an disabled user whose password expired
+    attr3.addValue(8388610);
 
     attrs.put("enabled",attr);
     assertFalse(EntityMapperUtils.populateUser(u,attrs,true));
@@ -155,10 +158,10 @@ public class TestLDAPOrganization extends TestOrganization {
     assertTrue(EntityMapperUtils.populateUser(u,attrs,true));
     attrs.remove("enabled",attr1);
     attrs.put("enabled",attr2);
-    assertFalse(EntityMapperUtils.populateUser(u,attrs,true));
+    assertTrue(EntityMapperUtils.populateUser(u,attrs,true));
     attrs.remove("enabled",attr2);
     attrs.put("enabled",attr3);
-    assertFalse(EntityMapperUtils.populateUser(u,attrs,true));
+    assertTrue(EntityMapperUtils.populateUser(u,attrs,true));
 
   }
 
