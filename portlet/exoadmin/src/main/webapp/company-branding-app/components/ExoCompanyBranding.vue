@@ -312,14 +312,11 @@ export default {
       this.uploadInProgress = true;
 
       const self = this;
-      // Had to use axios here since progress observation is still not supported by fetch
+      
       fetch(`${brandingConstants.PORTAL}/upload?uploadId=${uploadId}&action=upload`, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(formData).toString(),
+        body: formData,
       }).then(() => {
         // Check if the file has correctly been uploaded (progress=100) before refreshing the upload list
         const progressUrl = `${brandingConstants.PORTAL}/upload?action=progress&uploadId=${uploadId}`;
