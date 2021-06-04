@@ -145,7 +145,8 @@ public class UITabContainer extends UIContainer {
                     child.setRendered(false);
                     newTabContainer.setRendered(true);
                     newTabContainer.setId(String.valueOf(Math.abs(newTabContainer.hashCode())));
-                    newTabContainer.setMoveAppsPermissions(new String[] { "Everyone" });
+                    newTabContainer.setMoveAppsPermissions(container.getMoveAppsPermissions());
+                    newTabContainer.setMoveContainersPermissions(container.getMoveContainersPermissions());
                     pcontext.addUIComponentToUpdateByAjax(container);
                     pcontext.ignoreAJAXUpdateOnPortlets(true);
                     pcontext.getJavascriptManager().require("SHARED/portalComposer", "portalComposer")
