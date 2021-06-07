@@ -15,7 +15,6 @@ import org.exoplatform.services.organization.idm.externalstore.jpa.IDMQueueDAO;
 
 @ConfiguredBy({
     @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/standalone/test-configuration.xml"),
-    @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/idm-queue-root-configuration.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/idm-queue-configuration.xml")
 })
 public class TestIDMQueueService extends AbstractKernelTest {
@@ -236,7 +235,9 @@ public class TestIDMQueueService extends AbstractKernelTest {
   }
 
   private LocalDateTime getLocalDateTime() {
-    return ZonedDateTime.now(ZoneId.of("UTC")).toLocalDateTime();
+    LocalDateTime localDateTime = ZonedDateTime.now(ZoneId.of("UTC")).toLocalDateTime();
+    localDateTime = localDateTime.minusNanos(localDateTime.getNano());
+    return localDateTime;
   }
 
 }

@@ -25,6 +25,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.xml.stream.XMLStreamException;
 
+import org.picocontainer.Startable;
+
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.configuration.ConfigurationException;
 import org.exoplatform.container.xml.InitParams;
@@ -40,7 +42,7 @@ import org.exoplatform.services.naming.InitialContextInitializer;
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
-public class InitialContextInitializer2 extends InitialContextInitializer {
+public class InitialContextInitializer2 extends InitialContextInitializer implements Startable {
 
     public InitialContextInitializer2(InitParams params) throws NamingException, ConfigurationException, FileNotFoundException,
             XMLStreamException {
@@ -59,5 +61,15 @@ public class InitialContextInitializer2 extends InitialContextInitializer {
                 super.addPlugin(plugin);
             }
         }
+    }
+
+    @Override
+    public void start() {
+      // Nothing to start
+    }
+
+    @Override
+    public void stop() {
+      // Nothing to stop
     }
 }

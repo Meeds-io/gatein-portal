@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+
+  <!-- Managing both DB that use sequences and db that use auto increment -->
+  <property name="autoIncrement" value="true" dbms="mysql,mssql,h2,hsqldb" />
+  <property name="autoIncrement" value="false" dbms="oracle,postgresql" />
+
+  <changeSet author="idm" id="1.0.0-0" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_realm" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_realm">
+      <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints primaryKey="true" />
+      </column>
+      <column name="NAME" type="VARCHAR(255)">
+        <constraints nullable="false" unique="true" />
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-1" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_creden_bin_value" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_creden_bin_value">
+      <column name="BIN_VALUE_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints primaryKey="true" />
+      </column>
+      <column name="VALUE" type="LONGBLOB" />
+    </createTable>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-2" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_attr_bin_value" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_attr_bin_value">
+      <column name="BIN_VALUE_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints primaryKey="true" />
+      </column>
+      <column name="VALUE" type="LONGBLOB" />
+    </createTable>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-3" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_io_rel_type" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_io_rel_type">
+      <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints primaryKey="true" />
+      </column>
+      <column name="NAME" type="VARCHAR(255)">
+        <constraints nullable="false" unique="true" uniqueConstraintName="UK_JBID_IO_REL_TYPE_01" />
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-4" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_io_type" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_io_type">
+      <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints primaryKey="true" />
+      </column>
+      <column name="NAME" type="VARCHAR(255)">
+        <constraints nullable="false" unique="true" uniqueConstraintName="UK_JBID_IO_TYPE_01" />
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-5" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_io_creden_type" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_io_creden_type">
+      <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints primaryKey="true" />
+      </column>
+      <column name="NAME" type="VARCHAR(255)">
+        <constraints unique="true" uniqueConstraintName="UK_JBID_IO_CREDEN_TYPE_01" />
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-6" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_real_props" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_real_props">
+      <column name="PROP_ID" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column name="PROP_VALUE" type="VARCHAR(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="PROP_NAME" type="VARCHAR(255)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addPrimaryKey columnNames="PROP_ID, PROP_NAME" constraintName="PK_JBID_REAL_PROPS_01" tableName="jbid_real_props" />
+    <addForeignKeyConstraint baseColumnNames="PROP_ID" baseTableName="jbid_real_props" constraintName="FK_JBID_REAL_PROPS_01" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_realm" />
+    <createIndex indexName="IDX_FK_JBID_REAL_PROPS_01" tableName="jbid_real_props">
+      <column name="PROP_ID" />
+    </createIndex>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-7" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_io_rel_name" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_io_rel_name">
+      <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints primaryKey="true" />
+      </column>
+      <column name="NAME" type="VARCHAR(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="REALM" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="REALM" baseTableName="jbid_io_rel_name" constraintName="FK_JBID_IO_REL_NAME_01" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_realm" />
+    <addUniqueConstraint columnNames="NAME, REALM" constraintName="UK_JBID_IO_REL_NAME_PROPS_01" tableName="jbid_io_rel_name" />
+    <createIndex indexName="IDX_FK_JBID_IO_REL_NAME_01" tableName="jbid_io_rel_name">
+      <column name="REALM" />
+    </createIndex>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-8" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_io_rel_name_props" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_io_rel_name_props">
+      <column name="PROP_ID" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column name="PROP_VALUE" type="VARCHAR(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="PROP_NAME" type="VARCHAR(255)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addPrimaryKey columnNames="PROP_ID, PROP_NAME" constraintName="PK_JBID_IO_REL_NAME_PROPS_01" tableName="jbid_io_rel_name_props" />
+    <addForeignKeyConstraint baseColumnNames="PROP_ID" baseTableName="jbid_io_rel_name_props" constraintName="FK_JBID_IO_REL_NAME_PROPS_01" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_io_rel_name" />
+    <createIndex indexName="IDX_FK_JBID_IO_REL_NAME_PROPS_01" tableName="jbid_io_rel_name_props">
+      <column name="PROP_ID" />
+    </createIndex>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-9" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_io" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_io">
+      <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints primaryKey="true" />
+      </column>
+      <column name="IDENTITY_TYPE" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column name="NAME" type="VARCHAR(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="REALM" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="REALM" baseTableName="jbid_io" constraintName="FK_JBID_IO_01" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_realm" />
+    <addForeignKeyConstraint baseColumnNames="IDENTITY_TYPE" baseTableName="jbid_io" constraintName="FK_JBID_IO_02" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_io_type" />
+    <addUniqueConstraint columnNames="IDENTITY_TYPE, NAME, REALM" constraintName="UK_JBID_IO_01" tableName="jbid_io" />
+    <createIndex indexName="IDX_FK_JBID_IO_01" tableName="jbid_io">
+      <column name="REALM" />
+    </createIndex>
+    <createIndex indexName="IDX_FK_JBID_IO_02" tableName="jbid_io">
+      <column name="IDENTITY_TYPE" />
+    </createIndex>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-10" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_io_attr" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_io_attr">
+      <column name="ATTRIBUTE_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints primaryKey="true" />
+      </column>
+      <column name="IDENTITY_OBJECT_ID" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column name="NAME" type="VARCHAR(255)" />
+      <column name="ATTRIBUTE_TYPE" type="VARCHAR(255)" />
+      <column name="BIN_VALUE_ID" type="BIGINT" />
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="IDENTITY_OBJECT_ID" baseTableName="jbid_io_attr" constraintName="FK_JBID_IO_ATTR_01" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_io" />
+    <addForeignKeyConstraint baseColumnNames="BIN_VALUE_ID" baseTableName="jbid_io_attr" constraintName="FK_JBID_IO_ATTR_02" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="BIN_VALUE_ID" referencedTableName="jbid_attr_bin_value" />
+    <addUniqueConstraint columnNames="IDENTITY_OBJECT_ID, NAME" constraintName="UK_JBID_IO_ATTR_01" tableName="jbid_io_attr" />
+    <createIndex indexName="IDX_FK_JBID_IO_ATTR_01" tableName="jbid_io_attr">
+      <column name="IDENTITY_OBJECT_ID" />
+    </createIndex>
+    <createIndex indexName="IDX_FK_JBID_IO_ATTR_02" tableName="jbid_io_attr">
+      <column name="BIN_VALUE_ID" />
+    </createIndex>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-11" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_io_attr_text_values" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_io_attr_text_values">
+      <column name="TEXT_ATTR_VALUE_ID" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column name="ATTR_VALUE" type="VARCHAR(255)" />
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="TEXT_ATTR_VALUE_ID" baseTableName="jbid_io_attr_text_values" constraintName="FK_JBID_IO_ATTR_TEXT_VALUES_01" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ATTRIBUTE_ID" referencedTableName="jbid_io_attr" />
+    <createIndex indexName="IDX_FK_JBID_IO_ATTR_TEXT_VALUES_01" tableName="jbid_io_attr_text_values">
+      <column name="TEXT_ATTR_VALUE_ID" />
+    </createIndex>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-12" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_io_creden" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_io_creden">
+      <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints primaryKey="true" />
+      </column>
+      <column name="BIN_VALUE_ID" type="BIGINT" />
+      <column name="IDENTITY_OBJECT_ID" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column name="TEXT" type="VARCHAR(255)" />
+      <column name="CREDENTIAL_TYPE" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="BIN_VALUE_ID" baseTableName="jbid_io_creden" constraintName="FK_JBID_IO_CREDEN_01" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="BIN_VALUE_ID" referencedTableName="jbid_creden_bin_value" />
+    <addForeignKeyConstraint baseColumnNames="IDENTITY_OBJECT_ID" baseTableName="jbid_io_creden" constraintName="FK_JBID_IO_CREDEN_02" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_io" />
+    <addForeignKeyConstraint baseColumnNames="CREDENTIAL_TYPE" baseTableName="jbid_io_creden" constraintName="FK_JBID_IO_CREDEN_03" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_io_creden_type" />
+    <addUniqueConstraint columnNames="IDENTITY_OBJECT_ID, CREDENTIAL_TYPE" constraintName="UK_JBID_IO_CREDEN_01" tableName="jbid_io_creden" />
+    <createIndex indexName="IDX_FK_JBID_IO_CREDEN_01" tableName="jbid_io_creden">
+      <column name="BIN_VALUE_ID" />
+    </createIndex>
+    <createIndex indexName="IDX_FK_JBID_IO_CREDEN_02" tableName="jbid_io_creden">
+      <column name="IDENTITY_OBJECT_ID" />
+    </createIndex>
+    <createIndex indexName="IDX_FK_JBID_IO_CREDEN_03" tableName="jbid_io_creden">
+      <column name="CREDENTIAL_TYPE" />
+    </createIndex>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-13" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_io_creden_props" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_io_creden_props">
+      <column name="PROP_ID" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column name="PROP_VALUE" type="VARCHAR(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="PROP_NAME" type="VARCHAR(255)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addPrimaryKey columnNames="PROP_ID, PROP_NAME" constraintName="PK_JBID_IO_CREDEN_PROPS_01" tableName="jbid_io_creden_props" />
+    <addForeignKeyConstraint baseColumnNames="PROP_ID" baseTableName="jbid_io_creden_props" constraintName="FK_JBID_IO_CREDEN_PROPS_01" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_io_creden" />
+    <createIndex indexName="IDX_FK_JBID_IO_CREDEN_PROPS_01" tableName="jbid_io_creden_props">
+      <column name="PROP_ID" />
+    </createIndex>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-14" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_io_props" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_io_props">
+      <column name="PROP_ID" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column name="PROP_VALUE" type="VARCHAR(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="PROP_NAME" type="VARCHAR(255)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addPrimaryKey columnNames="PROP_ID, PROP_NAME" constraintName="PK_JBID_IO_PROPS_01" tableName="jbid_io_props" />
+    <addForeignKeyConstraint baseColumnNames="PROP_ID" baseTableName="jbid_io_props" constraintName="FK_JBID_IO_PROPS_01" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_io" />
+    <createIndex indexName="IDX_PK_JBID_IO_PROPS_01" tableName="jbid_io_props">
+      <column name="PROP_ID" />
+    </createIndex>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-15" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_io_rel" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_io_rel">
+      <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints primaryKey="true" />
+      </column>
+      <column name="FROM_IDENTITY" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column name="NAME" type="BIGINT" />
+      <column name="TO_IDENTITY" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column name="REL_TYPE" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="NAME" baseTableName="jbid_io_rel" constraintName="FK_JBID_IO_REL_01" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_io_rel_name" />
+    <addForeignKeyConstraint baseColumnNames="REL_TYPE" baseTableName="jbid_io_rel" constraintName="FK_JBID_IO_REL_02" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_io_rel_type" />
+    <addForeignKeyConstraint baseColumnNames="FROM_IDENTITY" baseTableName="jbid_io_rel" constraintName="FK_JBID_IO_REL_03" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_io" />
+    <addForeignKeyConstraint baseColumnNames="TO_IDENTITY" baseTableName="jbid_io_rel" constraintName="FK_JBID_IO_REL_04" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_io" />
+    <addUniqueConstraint columnNames="FROM_IDENTITY, NAME, TO_IDENTITY, REL_TYPE" constraintName="UK_JBID_IO_REL_01" tableName="jbid_io_rel" />
+    <createIndex indexName="IDX_FK_JBID_IO_REL_01" tableName="jbid_io_rel">
+      <column name="NAME" />
+    </createIndex>
+    <createIndex indexName="IDX_FK_JBID_IO_REL_02" tableName="jbid_io_rel">
+      <column name="REL_TYPE" />
+    </createIndex>
+    <createIndex indexName="IDX_FK_JBID_IO_REL_03" tableName="jbid_io_rel">
+      <column name="FROM_IDENTITY" />
+    </createIndex>
+    <createIndex indexName="IDX_FK_JBID_IO_REL_04" tableName="jbid_io_rel">
+      <column name="TO_IDENTITY" />
+    </createIndex>
+  </changeSet>
+  <changeSet author="idm" id="1.0.0-16" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="jbid_io_rel_props" />
+      </not>
+    </preConditions>
+    <createTable tableName="jbid_io_rel_props">
+      <column name="PROP_ID" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column name="PROP_VALUE" type="VARCHAR(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="PROP_NAME" type="VARCHAR(255)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addPrimaryKey columnNames="PROP_ID, PROP_NAME" constraintName="PK_JBID_IO_REL_PROPS_01" tableName="jbid_io_rel_props" />
+    <addForeignKeyConstraint baseColumnNames="PROP_ID" baseTableName="jbid_io_rel_props" constraintName="FK_JBID_IO_REL_PROPS_01" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jbid_io_rel" />
+    <createIndex indexName="IDX_FK_JBID_IO_REL_PROPS_01" tableName="jbid_io_rel_props">
+      <column name="PROP_ID" />
+    </createIndex>
+  </changeSet>
+
+  <changeSet author="idm" id="1.0.0-17" onValidationFail="MARK_RAN" runOnChange="false" dbms="oracle,postgresql">
+    <preConditions>
+      <not>
+        <sequenceExists sequenceName="hibernate_sequence" />
+      </not>
+    </preConditions>
+    <createSequence sequenceName="hibernate_sequence" startValue="1"/>
+  </changeSet>
+
+</databaseChangeLog>

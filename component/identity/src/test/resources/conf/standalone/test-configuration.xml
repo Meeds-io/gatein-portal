@@ -91,12 +91,12 @@
       <properties-param>
         <name>hibernate.properties</name>
         <description>Default Hibernate Service</description>
-        <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+        <property name="hibernate.hbm2ddl.auto" value="none"/>
         <property name="hibernate.show_sql" value="false"/>
         <property name="hibernate.current_session_context_class" value="thread"/>
         <property name="hibernate.cache.use_second_level_cache" value="false"/>
         <property name="hibernate.cache.use_query_cache" value="false"/>
-        <property name="hibernate.connection.datasource" value="jdbcidm"/>
+        <property name="hibernate.connection.datasource" value="java:/comp/env/exo-idm_portal"/>
         <property name="hibernate.c3p0.min_size" value="5"/>
         <property name="hibernate.c3p0.max_size" value="20"/>
         <property name="hibernate.c3p0.timeout" value="1800"/>
@@ -117,32 +117,6 @@
     </init-params>
   </component>
 
-  <!-- Init data -->
-  <external-component-plugins>
-    <target-component>org.exoplatform.services.database.HibernateService</target-component>
-    <component-plugin>
-      <name>add.hibernate.mapping</name>
-      <set-method>addPlugin</set-method>
-      <type>org.exoplatform.services.database.impl.AddHibernateMappingPlugin</type>
-      <init-params>
-        <values-param>
-          <name>hibernate.mapping</name>
-          <value>conf/mappings/HibernateRealm.hbm.xml</value>
-          <value>conf/mappings/HibernateIdentityObjectCredentialBinaryValue.hbm.xml</value>
-          <value>conf/mappings/HibernateIdentityObjectAttributeBinaryValue.hbm.xml</value>
-          <value>conf/mappings/HibernateIdentityObject.hbm.xml</value>
-          <value>conf/mappings/HibernateIdentityObjectCredential.hbm.xml</value>
-          <value>conf/mappings/HibernateIdentityObjectCredentialType.hbm.xml</value>
-          <value>conf/mappings/HibernateIdentityObjectAttribute.hbm.xml</value>
-          <value>conf/mappings/HibernateIdentityObjectType.hbm.xml</value>
-          <value>conf/mappings/HibernateIdentityObjectRelationship.hbm.xml</value>
-          <value>conf/mappings/HibernateIdentityObjectRelationshipType.hbm.xml</value>
-          <value>conf/mappings/HibernateIdentityObjectRelationshipName.hbm.xml</value>
-        </values-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-
   <external-component-plugins>
     <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
     <component-plugin>
@@ -152,7 +126,7 @@
       <init-params>
         <value-param>
           <name>bind-name</name>
-          <value>jdbcidm</value>
+          <value>java:/comp/env/exo-idm_portal</value>
         </value-param>
         <value-param>
           <name>class-name</name>
@@ -162,34 +136,14 @@
           <name>factory</name>
           <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
         </value-param>
-        <properties-param profiles="hsqldb">
+        <properties-param>
           <name>ref-addresses</name>
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
           <property name="url" value="jdbc:hsqldb:mem:dbIdm;hsqldb.tx=mvcc"/>
         </properties-param>
-        <properties-param profiles="mysql">
-          <name>ref-addresses</name>
-          <description>ref-addresses</description>
-          <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-          <property name="url"
-                    value="jdbc:mysql://10.37.129.4/jdbcidm?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8"/>
-          <property name="username" value="root"/>
-          <property name="password" value=""/>
-        </properties-param>
-        <properties-param profiles="h2">
-          <name>ref-addresses</name>
-          <description>ref-addresses</description>
-          <property name="driverClassName" value="org.h2.Driver"/>
-          <property name="url" value="jdbc:h2:file:${gatein.test.tmp.dir}/db/data/jdbcidm;DB_CLOSE_DELAY=-1"/>
-          <property name="username" value="sa"/>
-          <property name="password" value="sa"/>
-        </properties-param>
       </init-params>
     </component-plugin>
-  </external-component-plugins>
-  <external-component-plugins>
-    <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
     <component-plugin>
       <name>bind.datasource</name>
       <set-method>addPlugin</set-method>
@@ -217,6 +171,53 @@
     </component-plugin>
   </external-component-plugins>
 
+  <!-- Data Initialization -->
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
+    <component-plugin>
+      <name>IDMChangeLogsPlugin</name>
+      <set-method>addChangeLogsPlugin</set-method>
+      <type>org.exoplatform.commons.persistence.impl.ChangeLogsPlugin</type>
+      <init-params>
+        <value-param>
+          <name>datasource</name>
+          <description>Change logs of IDM database</description>
+          <value>java:/comp/env/exo-idm_portal</value>
+        </value-param>
+        <values-param>
+          <name>changelogs</name>
+          <description>Change logs of idm queue</description>
+          <value>db/changelog/idm.db.changelog-1.0.0.xml</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <!-- Init data -->
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.database.HibernateService</target-component>
+    <component-plugin>
+      <name>add.hibernate.mapping</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.database.impl.AddHibernateMappingPlugin</type>
+      <init-params>
+        <values-param>
+          <name>hibernate.mapping</name>
+          <value>conf/mappings/HibernateRealm.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectCredentialBinaryValue.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectAttributeBinaryValue.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObject.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectCredential.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectCredentialType.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectAttribute.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectType.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectRelationship.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectRelationshipType.hbm.xml</value>
+          <value>conf/mappings/HibernateIdentityObjectRelationshipName.hbm.xml</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
 
   <external-component-plugins>
     <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
@@ -476,8 +477,5 @@
       <description>Membership type listerner for testing purpose</description>
     </component-plugin>
   </external-component-plugins>
-
-  <!--<import>jar:/conf/exo.portal.component.identity-configuration.xml</import>-->
-  <!--<import>jar:/org/exoplatform/services/organization/TestOrganization-configuration.xml</import>-->
 
 </configuration>
