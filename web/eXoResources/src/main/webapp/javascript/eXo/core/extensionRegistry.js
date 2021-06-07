@@ -64,7 +64,7 @@
 
     const extension = new Extension(extensionType, extensionContent);
     const extensionId = extensionContent.id || extensionContent.key;
-    const existingExtensionIndex = module.extensions.findIndex(ext => (ext.extensionContent.id || ext.extensionContent.key) === extensionId);
+    const existingExtensionIndex = module.extensions.findIndex(ext => ext.extensionType === extensionType && (ext.extensionContent.id || ext.extensionContent.key) === extensionId);
     if (!extensionId || existingExtensionIndex < 0) {
       module.extensions.push(extension);
     } else {
