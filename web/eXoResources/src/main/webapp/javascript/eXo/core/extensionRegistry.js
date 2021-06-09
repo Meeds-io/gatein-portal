@@ -52,11 +52,11 @@
   
   function registerComponent(app, componentName, componentOptions) {
     var module = findModule(app, true);
-    
+
     var component = new Component(componentName, componentOptions);
     module.components.push(component);
 
-    document.dispatchEvent(new CustomEvent(`component-${app}-${componentName}-updated`));
+    document.dispatchEvent(new CustomEvent(`component-${app}-${componentName}-updated`, {detail: component}));
   }
   
   function registerExtension(app, extensionType, extensionContent) {
@@ -70,7 +70,7 @@
     } else {
       module.extensions.splice(existingExtensionIndex, 1, extension);
     }
-    document.dispatchEvent(new CustomEvent(`extension-${app}-${extensionType}-updated`));
+    document.dispatchEvent(new CustomEvent(`extension-${app}-${extensionType}-updated`, {detail: extension}));
   }
   
   function loadComponents(app) {
