@@ -31,6 +31,7 @@ import org.junit.ClassRule;
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 @ConfiguredBy({
+        @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/services/organization/TestOrganizationService-jta-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/services/organization/TestOrganizationService-configuration.xml") })
 public class TestOrganizationServiceJTA extends AbstractTestOrganizationService {

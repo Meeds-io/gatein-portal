@@ -3,34 +3,33 @@ package org.exoplatform.commons.persistence.impl;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
-import liquibase.database.core.PostgresDatabase;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import org.exoplatform.commons.api.persistence.DataInitializer;
-import org.exoplatform.commons.utils.SecurityHelper;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.naming.InitialContextInitializer;
+
+import org.apache.commons.lang3.StringUtils;
 import org.picocontainer.Startable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Startable service to initialize all the data with Liquibase.
  * Changelog files are added by external plugins.
  */
 public class LiquibaseDataInitializer implements Startable, DataInitializer {
-  private static final Logger LOG = LoggerFactory.getLogger(LiquibaseDataInitializer.class);
+  private static final Log LOG = ExoLogger.getLogger(LiquibaseDataInitializer.class);
 
   public static final String LIQUIBASE_DATASOURCE_PARAM_NAME = "liquibase.datasource";
   public static final String LIQUIBASE_CONTEXTS_PARAM_NAME = "liquibase.contexts";
@@ -40,12 +39,16 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
 
   private String liquibaseContexts;
 
-  private List<ChangeLogsPlugin> changeLogsPlugins = new ArrayList<ChangeLogsPlugin>();
+  private List<ChangeLogsPlugin> changeLogsPlugins = new ArrayList<>();
+
+  public LiquibaseDataInitializer(InitialContextInitializer initialContextInitializer, InitParams initParams) {
+    this(initParams);
+  }
 
   public LiquibaseDataInitializer(InitParams initParams) {
-    if(initParams == null) {
+    if (initParams == null) {
       throw new IllegalArgumentException("No InitParams found for LiquibaseDataInitializer service. The datasource name ("
-              + LIQUIBASE_DATASOURCE_PARAM_NAME + ") should be defined at least.");
+          + LIQUIBASE_DATASOURCE_PARAM_NAME + ") should be defined at least.");
     }
 
     ValueParam liquibaseDatasourceNameParam = initParams.getValueParam(LIQUIBASE_DATASOURCE_PARAM_NAME);
@@ -53,7 +56,7 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
       datasourceName = liquibaseDatasourceNameParam.getValue();
     } else {
       throw new IllegalArgumentException("Datasource name for LiquibaseDataInitializer must be defined in the init params ("
-              + LIQUIBASE_DATASOURCE_PARAM_NAME + ")");
+          + LIQUIBASE_DATASOURCE_PARAM_NAME + ")");
     }
 
     ValueParam liquibaseContextsParam = initParams.getValueParam(LIQUIBASE_CONTEXTS_PARAM_NAME);
@@ -63,7 +66,7 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
       liquibaseContexts = LIQUIBASE_DEFAULT_CONTEXTS;
     }
 
-    LOG.info("LiquibaseDataInitializer created with : datasourceName=" + datasourceName + ", contexts=" + liquibaseContexts);
+    LOG.info("LiquibaseDataInitializer created with : datasourceName={}, contexts={}", datasourceName, liquibaseContexts);
   }
 
   public String getDatasourceName() {
@@ -98,6 +101,7 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
 
   @Override
   public void stop() {
+    // Nothing to stop
   }
 
   /**
@@ -114,24 +118,38 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
    */
   @Override
   public void initData(String datasourceName) {
-    if(!changeLogsPlugins.isEmpty()) {
-      LOG.info("Starting data initialization with Liquibase with datasource " + datasourceName);
+    if (changeLogsPlugins.isEmpty()) {
+      LOG.info("No data to initialize with Liquibase");
+    } else {
+      LOG.info("Starting data initialization with Liquibase with datasource {0}", datasourceName);
 
       DataSource datasource = getDatasource(datasourceName);
-
-      if(datasource != null) {
-        for (ChangeLogsPlugin changeLogsPlugin : this.changeLogsPlugins) {
-          LOG.info("Processing changelogs of " + changeLogsPlugin.getName());
-          for (String changelogsPath : changeLogsPlugin.getChangelogPaths()) {
-            LOG.info("  * processing changelog " + changelogsPath);
-            applyChangeLog(datasource, changelogsPath);
+      for (ChangeLogsPlugin changeLogsPlugin : this.changeLogsPlugins) {
+        LOG.info("Processing changelogs of " + changeLogsPlugin.getName());
+        String changelogDatasourceName = changeLogsPlugin.getDatasourceName();
+        DataSource changelogDatasource;
+        if (StringUtils.isBlank(changelogDatasourceName)) {
+          changelogDatasource = datasource;
+          if (changelogDatasource == null) {
+            LOG.error("Data initialization of '{}' aborted because the datasource {} has not been found.",
+                      changeLogsPlugin.getName(),
+                      datasourceName);
+            return;
+          }
+        } else {
+          changelogDatasource = getDatasource(changelogDatasourceName);
+          if (changelogDatasource == null) {
+            LOG.error("Data initialization of '{}' aborted because the datasource {} has not been found.",
+                      changeLogsPlugin.getName(),
+                      changelogDatasourceName);
+            return;
           }
         }
-      } else {
-        LOG.error("Data initialization aborted because the datasource " + datasourceName + " has not been found.");
+        for (String changelogsPath : changeLogsPlugin.getChangelogPaths()) {
+          LOG.info("  * processing changelog " + changelogsPath);
+          applyChangeLog(changelogDatasource, changelogsPath);
+        }
       }
-    } else {
-      LOG.info("No data to initialize with Liquibase");
     }
   }
 

@@ -101,12 +101,12 @@
       <properties-param>
         <name>hibernate.properties</name>
         <description>Default Hibernate Service</description>
-        <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+        <property name="hibernate.hbm2ddl.auto" value="none"/>
         <property name="hibernate.show_sql" value="false"/>
         <property name="hibernate.current_session_context_class" value="thread"/>
         <property name="hibernate.cache.use_second_level_cache" value="false"/>
         <property name="hibernate.cache.use_query_cache" value="false"/>
-        <property name="hibernate.connection.datasource" value="jdbcidm"/>
+        <property name="hibernate.connection.datasource" value="java:/comp/env/exo-idm_portal"/>
         <property name="hibernate.c3p0.min_size" value="5"/>
         <property name="hibernate.c3p0.max_size" value="20"/>
         <property name="hibernate.c3p0.timeout" value="1800"/>
@@ -114,6 +114,40 @@
       </properties-param>
     </init-params>
   </component>
+
+  <component>
+    <key>org.exoplatform.services.naming.InitialContextInitializer</key>
+    <type>org.exoplatform.commons.InitialContextInitializer2</type>
+    <init-params>
+      <properties-param>
+        <name>default-properties</name>
+        <description>Default initial context properties</description>
+        <property name="java.naming.factory.initial" value="org.exoplatform.services.naming.SimpleContextFactory"/>
+      </properties-param>
+    </init-params>
+  </component>
+
+  <!-- Data Initialization -->
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
+    <component-plugin>
+      <name>IDMChangeLogsPlugin</name>
+      <set-method>addChangeLogsPlugin</set-method>
+      <type>org.exoplatform.commons.persistence.impl.ChangeLogsPlugin</type>
+      <init-params>
+        <value-param>
+          <name>datasource</name>
+          <description>Change logs of IDM database</description>
+          <value>java:/comp/env/exo-idm_portal</value>
+        </value-param>
+        <values-param>
+          <name>changelogs</name>
+          <description>Change logs of idm queue</description>
+          <value>db/changelog/idm.db.changelog-1.0.0.xml</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
 
   <external-component-plugins>
     <target-component>org.exoplatform.services.database.HibernateService</target-component>
@@ -149,7 +183,7 @@
       <init-params>
         <value-param>
           <name>bind-name</name>
-          <value>jdbcidm</value>
+          <value>java:/comp/env/exo-idm_portal</value>
         </value-param>
         <value-param>
           <name>class-name</name>
@@ -434,5 +468,4 @@
       </init-params>
     </component-plugin>
   </external-component-plugins>
-
 </configuration>
