@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.exoplatform.gatein.portal.examples.portlets</groupId>
     <artifactId>ipc</artifactId>
-    <version>6.1.x-SNAPSHOT</version>
+    <version>6.1.3-RC01</version>
   </parent>
 
   <artifactId>producer</artifactId>
