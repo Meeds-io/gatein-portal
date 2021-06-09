@@ -10,15 +10,12 @@ import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.organization.idm.Config;
-import org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl;
-import org.exoplatform.services.organization.idm.UserDAOImpl;
+import org.exoplatform.services.organization.idm.*;
 import org.exoplatform.services.organization.idm.cache.CacheableUserHandlerImpl;
+import org.picketlink.idm.api.Attribute;
+import org.picketlink.idm.impl.api.SimpleAttribute;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by exo on 5/5/16.
@@ -135,6 +132,38 @@ public class TestLDAPOrganization extends TestOrganization {
     test2 = organization.getUserHandler().findUserByName("admin");
     assertNull(test2);
     end();
+  }
+
+  public void testEnabledUserDetection() throws Exception{
+    User u = uHandler.createUserInstance("test");
+    ((UserImpl) u).setEnabled(true);
+
+    Map<String, Attribute> attrs = new HashMap<>();
+    Attribute attr = new SimpleAttribute("enabled");
+    Attribute attr1 = new SimpleAttribute("enabled");
+    Attribute attr2 = new SimpleAttribute("enabled");
+    Attribute attr3 = new SimpleAttribute("enabled");
+    // 65536 represent an enabled user whose password never expires
+    attr.addValue(65536);
+    // 65538 represent an disabled user whose password never expires
+    attr1.addValue(65538);
+    // 8388608 represent an enabled user whose password expired
+    attr2.addValue(8388608);
+    // 83886010 represent an disabled user whose password expired
+    attr3.addValue(8388610);
+
+    attrs.put("enabled",attr);
+    assertFalse(EntityMapperUtils.populateUser(u,attrs,true));
+    attrs.remove("enabled",attr);
+    attrs.put("enabled",attr1);
+    assertTrue(EntityMapperUtils.populateUser(u,attrs,true));
+    attrs.remove("enabled",attr1);
+    attrs.put("enabled",attr2);
+    assertTrue(EntityMapperUtils.populateUser(u,attrs,true));
+    attrs.remove("enabled",attr2);
+    attrs.put("enabled",attr3);
+    assertTrue(EntityMapperUtils.populateUser(u,attrs,true));
+
   }
 
   public void testFindEnabledUsers() throws Exception {
