@@ -33,7 +33,7 @@
   <description>GateIn scripting and template engine</description>
 
   <properties>
-    <exo.test.coverage.ratio>0.53</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.52</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
