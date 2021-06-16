@@ -49,8 +49,8 @@ public class DefaultRequestHandlerTest {
 
       doAnswer(invocation -> {
         @SuppressWarnings("unchecked")
-        Map<QualifiedName, String> parameters = invocation.getArgumentAt(0, Map.class);
-        URIWriter uriWriter = invocation.getArgumentAt(1, URIWriter.class);
+        Map<QualifiedName, String> parameters = invocation.getArgument(0, Map.class);
+        URIWriter uriWriter = invocation.getArgument(1, URIWriter.class);
         uriWriter.append("/portal/");
         uriWriter.append(parameters.get(NodeURL.REQUEST_SITE_NAME));
         return null;
@@ -58,13 +58,13 @@ public class DefaultRequestHandlerTest {
 
       when(response.encodeRedirectURL(anyString())).thenAnswer(new Answer<String>() {
         public String answer(InvocationOnMock invocation) {
-          return invocation.getArgumentAt(0, String.class);
+          return invocation.getArgument(0, String.class);
         }
       });
 
       when(urlFactory.newURL(any(), any())).thenAnswer(new Answer<NodeURL>() {
         public NodeURL answer(InvocationOnMock invocation) {
-          PortalURLContext urlContext = invocation.getArgumentAt(1, PortalURLContext.class);
+          PortalURLContext urlContext = invocation.getArgument(1, PortalURLContext.class);
           when(url.getContext()).thenReturn(urlContext);
           return url;
         }
@@ -72,7 +72,7 @@ public class DefaultRequestHandlerTest {
 
       when(url.setResource(any())).thenAnswer(new Answer<NodeURL>() {
         public NodeURL answer(InvocationOnMock invocation) {
-          NavigationResource navigationResource = invocation.getArgumentAt(0, NavigationResource.class);
+          NavigationResource navigationResource = invocation.getArgument(0, NavigationResource.class);
           when(url.getResource()).thenReturn(navigationResource);
 
           assertEquals("Site type on which user is redirected is not of type PORTAL",
@@ -113,7 +113,7 @@ public class DefaultRequestHandlerTest {
 
       when(response.encodeRedirectURL(anyString())).thenAnswer(new Answer<String>() {
         public String answer(InvocationOnMock invocation) {
-          return invocation.getArgumentAt(0, String.class);
+          return invocation.getArgument(0, String.class);
         }
       });
 
@@ -144,8 +144,8 @@ public class DefaultRequestHandlerTest {
 
       doAnswer(invocation -> {
         @SuppressWarnings("unchecked")
-        Map<QualifiedName, String> parameters = invocation.getArgumentAt(0, Map.class);
-        URIWriter uriWriter = invocation.getArgumentAt(1, URIWriter.class);
+        Map<QualifiedName, String> parameters = invocation.getArgument(0, Map.class);
+        URIWriter uriWriter = invocation.getArgument(1, URIWriter.class);
         uriWriter.append("/portal/");
         uriWriter.append(parameters.get(NodeURL.REQUEST_SITE_NAME));
         return null;
@@ -153,13 +153,13 @@ public class DefaultRequestHandlerTest {
 
       when(response.encodeRedirectURL(anyString())).thenAnswer(new Answer<String>() {
         public String answer(InvocationOnMock invocation) {
-          return invocation.getArgumentAt(0, String.class);
+          return invocation.getArgument(0, String.class);
         }
       });
 
       when(urlFactory.newURL(any(), any())).thenAnswer(new Answer<NodeURL>() {
         public NodeURL answer(InvocationOnMock invocation) {
-          PortalURLContext urlContext = invocation.getArgumentAt(1, PortalURLContext.class);
+          PortalURLContext urlContext = invocation.getArgument(1, PortalURLContext.class);
           when(url.getContext()).thenReturn(urlContext);
           return url;
         }
@@ -167,7 +167,7 @@ public class DefaultRequestHandlerTest {
 
       when(url.setResource(any())).thenAnswer(new Answer<NodeURL>() {
         public NodeURL answer(InvocationOnMock invocation) {
-          NavigationResource navigationResource = invocation.getArgumentAt(0, NavigationResource.class);
+          NavigationResource navigationResource = invocation.getArgument(0, NavigationResource.class);
           when(url.getResource()).thenReturn(navigationResource);
 
           assertEquals("Site type on which user is redirected is not of type PORTAL",
@@ -206,7 +206,7 @@ public class DefaultRequestHandlerTest {
 
       when(response.encodeRedirectURL(anyString())).thenAnswer(new Answer<String>() {
         public String answer(InvocationOnMock invocation) {
-          return invocation.getArgumentAt(0, String.class);
+          return invocation.getArgument(0, String.class);
         }
       });
 
