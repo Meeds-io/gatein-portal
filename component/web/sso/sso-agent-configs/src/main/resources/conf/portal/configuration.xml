@@ -28,14 +28,6 @@
         xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-    <key>org.gatein.sso.agent.cas.CASAgent</key>
-    <type>org.gatein.sso.agent.cas.CASAgentImpl</type>
-  </component>
-  <component>
-    <key>org.gatein.sso.agent.josso.JOSSOAgent</key>
-    <type>org.gatein.sso.agent.josso.JOSSOAgentImpl</type>
-  </component>
-  <component>
     <key>org.gatein.sso.agent.opensso.OpenSSOAgent</key>
     <type>org.gatein.sso.agent.opensso.OpenSSOAgentImpl</type>
   </component>
@@ -148,69 +140,4 @@
       </init-params>
     </component-plugin>
   </external-component-plugins>
-
-  <!-- Specific filter for OpenAM cross-domain scenario -->
-  <external-component-plugins>
-    <target-component>org.gatein.sso.integration.SSOFilterIntegrator</target-component>
-    <component-plugin>
-      <name>OpenAMLoginRedirectFilter</name>
-      <set-method>addPlugin</set-method>
-      <type>org.gatein.sso.integration.SSOFilterIntegratorPlugin</type>
-      <init-params>
-        <value-param>
-          <name>filterClass</name>
-          <value>org.gatein.sso.agent.filter.OpenSSOCDLoginRedirectFilter</value>
-        </value-param>
-        <value-param>
-          <name>enabled</name>
-          <value>${gatein.sso.filter.login.openamcdc.enabled:false}</value>
-        </value-param>
-        <value-param>
-          <name>filterMapping</name>
-          <value>/sso</value>
-        </value-param>
-        <value-param>
-          <name>LOGIN_URL</name>
-          <value>${gatein.sso.filter.login.sso.url}</value>
-        </value-param>
-        <value-param>
-          <name>OpenSSORealm</name>
-          <value>${gatein.sso.openam.realm}</value>
-        </value-param>
-        <value-param>
-          <name>AgentUrl</name>
-          <value>${gatein.sso.portal.url}/@@portal.container.name@@/initiatessologin</value>
-        </value-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-
-  <!-- Configuration for JOSSO 2.2 -->
-  <external-component-plugins>
-    <target-component>org.gatein.sso.integration.SSOFilterIntegrator</target-component>
-    <component-plugin>
-      <name>InitiateLoginFilter</name>
-      <set-method>addPlugin</set-method>
-      <type>org.gatein.sso.integration.SSOFilterIntegratorPlugin</type>
-      <init-params>
-        <value-param>
-          <name>filterClass</name>
-          <value>org.gatein.sso.agent.filter.InitiateLoginFilter</value>
-        </value-param>
-        <value-param>
-          <name>enabled</name>
-          <value>${gatein.sso.filter.initiatelogin.josso2.enabled:false}</value>
-        </value-param>
-        <value-param>
-          <name>filterMapping</name>
-          <value>/josso_security_check</value>
-        </value-param>
-        <value-param>
-          <name>loginUrl</name>
-          <value>${gatein.sso.portal.url}/@@portal.container.name@@/dologin</value>
-        </value-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-
 </configuration>
