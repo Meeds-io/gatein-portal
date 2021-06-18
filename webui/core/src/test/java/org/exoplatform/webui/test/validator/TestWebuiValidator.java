@@ -81,9 +81,9 @@ public class TestWebuiValidator extends TestCase {
 
         WebuiRequestContext.setCurrentInstance(new MockRequestContext(new Locale("en")));
         uiInput = new UIFormDateTimeInput("currentDate", "currentDate", null);
-        uiInput.setValue("09/28/2011 10:59:59");
+        uiInput.setValue("09/28/2011, 10:59:59");
         assertTrue(expected(validator, uiInput));
-        uiInput.setValue("09-28-2011 10:59:59");
+        uiInput.setValue("09-28-2011, 10:59:59");
         assertFalse(expected(validator, uiInput));
         uiInput.setValue("28/09/2011 10:59:59");
         assertFalse(expected(validator, uiInput));

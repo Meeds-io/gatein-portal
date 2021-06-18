@@ -30,11 +30,8 @@ import java.io.ByteArrayInputStream;
 import java.util.Date;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  *
@@ -91,8 +88,8 @@ public class FileServiceImplTest {
   public void shouldReturnFile() throws Exception {
     BinaryProvider binaryProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
-    when(nameSpaceDAO.find(anyLong())).thenReturn(new NameSpaceEntity(1, "file", "Default NameSpace"));
-    when(fileInfoDAO.find(anyLong())).thenReturn(new FileInfoEntity(1,
+    lenient().when(nameSpaceDAO.find(anyLong())).thenReturn(new NameSpaceEntity(1, "file", "Default NameSpace"));
+    lenient().when(fileInfoDAO.find(anyLong())).thenReturn(new FileInfoEntity(1,
                                                                     "file1",
                                                                     null,
                                                                     1,
@@ -124,8 +121,9 @@ public class FileServiceImplTest {
   public void shouldWriteFile() throws Exception {
     BinaryProvider binaryProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
-    when(fileInfoDAO.create(any(FileInfoEntity.class))).thenReturn(new FileInfoEntity());
-    when(jpaDataStorage.create(any(FileInfo.class), any(NameSpace.class))).thenReturn(new FileInfo(1L,
+    lenient().when(fileInfoDAO.create(any(FileInfoEntity.class))).thenReturn(new FileInfoEntity());
+    lenient().when(jpaDataStorage.getNameSpace(any())).thenReturn(new NameSpace(null, null));
+    lenient().when(jpaDataStorage.create(any(FileInfo.class), any(NameSpace.class))).thenReturn(new FileInfo(1L,
                                                                                                    "file1",
                                                                                                    null,
                                                                                                    "file",
@@ -155,7 +153,7 @@ public class FileServiceImplTest {
   public void shouldRollbackFileWriteWhenSomethingGoesWrong() throws Exception {
     BinaryProvider binaryProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
-    when(fileInfoDAO.create(any(FileInfoEntity.class))).thenThrow(Exception.class);
+    lenient().when(fileInfoDAO.create(any(FileInfoEntity.class))).thenThrow(RuntimeException.class);
     FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, nameSpaceService);
 
     // When

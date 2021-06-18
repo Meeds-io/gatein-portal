@@ -141,7 +141,7 @@
 
     <dependency>
       <groupId>org.powermock</groupId>
-      <artifactId>powermock-api-mockito</artifactId>
+      <artifactId>powermock-api-mockito2</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -181,23 +181,6 @@
       <plugin>
         <groupId>com.jcabi</groupId>
         <artifactId>jcabi-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.jibx</groupId>
-        <artifactId>maven-jibx-plugin</artifactId>
-        <configuration>
-          <directory>src/main/resources</directory>
-          <includes>
-            <includes>binding.xml</includes>
-          </includes>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>bind</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

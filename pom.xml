@@ -43,9 +43,6 @@
 
     <!-- Default eXo profiles -->
     <surefire.exo.profiles>hsqldb</surefire.exo.profiles>
-
-    <!-- FIXME: Workaround until maven-parent-pom:23-M10 is released -->
-    <version.plugin.jibx>1.3.1</version.plugin.jibx>
   </properties>
 
   <scm>
@@ -381,12 +378,6 @@
               <java.util.logging.config.class>org.exoplatform.component.test.logging.LogConfigurator</java.util.logging.config.class>
             </systemPropertyVariables>
           </configuration>
-        </plugin>
-        <!-- FIXME: Workaround until maven-parent-pom:23-M10 is released -->
-        <plugin>
-          <groupId>org.jibx</groupId>
-          <artifactId>maven-jibx-plugin</artifactId>
-          <version>${version.plugin.jibx}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
