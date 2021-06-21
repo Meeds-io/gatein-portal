@@ -19,39 +19,43 @@
 
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  
   <modelVersion>4.0.0</modelVersion>
-
+  
   <parent>
     <artifactId>maven-parent-pom</artifactId>
     <groupId>org.exoplatform</groupId>
     <version>23-M12</version>
-    <relativePath />
+    <relativePath/>
   </parent>
-
+  
   <groupId>org.exoplatform.gatein.portal</groupId>
   <artifactId>exo.portal.parent</artifactId>
   <version>6.2.x-SNAPSHOT</version>
   <packaging>pom</packaging>
-
+  
   <name>GateIn - Portal</name>
-
+  
   <properties>
     <org.exoplatform.gatein.sso.version>6.2.x-SNAPSHOT</org.exoplatform.gatein.sso.version>
     <org.exoplatform.gatein.pc.version>6.2.x-SNAPSHOT</org.exoplatform.gatein.pc.version>
-
+    
     <!-- Default eXo profiles -->
     <surefire.exo.profiles>hsqldb</surefire.exo.profiles>
+    
+    <!-- Sonar properties -->
+    <sonar.organization>meeds-io</sonar.organization>
   </properties>
-
+  
   <scm>
     <connection>scm:git:git://github.com/meeds-io/gatein-portal.git</connection>
     <developerConnection>scm:git:git@github.com:meeds-io/gatein-portal.git</developerConnection>
     <url>https://github.com/meeds-io/gatein-portal</url>
     <tag>HEAD</tag>
   </scm>
-
+  
   <modules>
     <module>component</module>
     <module>webui</module>
@@ -59,18 +63,18 @@
     <module>web</module>
     <module>cdi</module>
   </modules>
-
+  
   <dependencyManagement>
-    <dependencies>      
+    <dependencies>
       <!-- GateIn-PC dependencies -->
       <dependency>
-       <groupId>org.exoplatform.gatein.pc</groupId>
-       <artifactId>pc-parent</artifactId>
+        <groupId>org.exoplatform.gatein.pc</groupId>
+        <artifactId>pc-parent</artifactId>
         <version>${org.exoplatform.gatein.pc.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
+      
       <!-- GateIn-SSO dependencies -->
       <dependency>
         <groupId>org.exoplatform.gatein.sso</groupId>
@@ -79,7 +83,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
+      
       <!-- Internal project artifacts -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -330,7 +334,7 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
+  
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -369,13 +373,17 @@
               <exo.files.storage.dir>${project.build.directory}/files</exo.files.storage.dir>
               <log4j.configuration>gatein-log4j.properties</log4j.configuration>
               <gatein.test.output.path>${project.build.directory}</gatein.test.output.path>
-              <com.arjuna.ats.arjuna.objectstore.objectStoreDir>${project.build.directory}/com.arjuna.ats.arjuna.objectstore.objectStoreDir</com.arjuna.ats.arjuna.objectstore.objectStoreDir>
+              <com.arjuna.ats.arjuna.objectstore.objectStoreDir>
+                ${project.build.directory}/com.arjuna.ats.arjuna.objectstore.objectStoreDir
+              </com.arjuna.ats.arjuna.objectstore.objectStoreDir>
               <exo.profiles>${surefire.exo.profiles},test</exo.profiles>
               <org.apache.commons.logging.Log>org.apache.commons.logging.impl.SimpleLog</org.apache.commons.logging.Log>
               <org.apache.commons.logging.simplelog.defaultlog>info</org.apache.commons.logging.simplelog.defaultlog>
-              <org.apache.commons.logging.simplelog.log.net.hibernate>warn</org.apache.commons.logging.simplelog.log.net.hibernate>
+              <org.apache.commons.logging.simplelog.log.net.hibernate>warn
+              </org.apache.commons.logging.simplelog.log.net.hibernate>
               <java.naming.factory.initial>org.exoplatform.services.naming.SimpleContextFactory</java.naming.factory.initial>
-              <java.util.logging.config.class>org.exoplatform.component.test.logging.LogConfigurator</java.util.logging.config.class>
+              <java.util.logging.config.class>org.exoplatform.component.test.logging.LogConfigurator
+              </java.util.logging.config.class>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -390,4 +398,34 @@
       </plugins>
     </pluginManagement>
   </build>
+  
+  <!-- This profile is used to allow github action to build branches. The github action is used for sonar analysis -->
+  <profiles>
+    <profile>
+      <id>project-repositories</id>
+      <activation>
+        <property>
+          <name>!skip-project-repositories</name>
+        </property>
+      </activation>
+      <repositories>
+        <repository>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <id>repository.exoplatform.org</id>
+          <url>https://repository.exoplatform.org/public</url>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <id>repository.exoplatform.org</id>
+          <url>https://repository.exoplatform.org/public</url>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
 </project>
