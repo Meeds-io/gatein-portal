@@ -46,6 +46,7 @@ export default {
         // data leak prevention
         'dlp-quarantine': 'dataLeakPrevention',
         'transferRules': 'dataLeakPrevention',
+        'multifactor-authentication': 'dataLeakPrevention',
         // rewards
         'rewardAdministration/kudosAdministration': 'reward',
         'rewardAdministration/walletAdministration': 'reward',
