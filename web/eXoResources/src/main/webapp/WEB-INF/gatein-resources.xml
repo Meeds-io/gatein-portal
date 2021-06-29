@@ -939,7 +939,7 @@
     <name>qrcode</name>
     <script>
       <minify>false</minify>
-      <path>/js/qrious.min.js</path>
+      <path>/javascript/easy.qrcode.min.js</path>
     </script>
   </module>
 </gatein-resources>
