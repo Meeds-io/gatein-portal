@@ -934,4 +934,12 @@
       <module>jquery</module>
     </depends>
   </module>
+  
+  <module>
+    <name>qrcode</name>
+    <script>
+      <minify>false</minify>
+      <path>/javascript/easy.qrcode.min.js</path>
+    </script>
+  </module>
 </gatein-resources>
