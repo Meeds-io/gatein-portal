@@ -43,9 +43,9 @@ export default {
         'gamification/rules': 'gamification',
         'gamification/badges': 'gamification',
         'gamification/domains': 'gamification',
-        // data leak prevention
-        'dlp-quarantine': 'dataLeakPrevention',
-        'transferRules': 'dataLeakPrevention',
+        // security
+        'dlp-quarantine': 'security',
+        'transferRules': 'security',
         // rewards
         'rewardAdministration/kudosAdministration': 'reward',
         'rewardAdministration/walletAdministration': 'reward',
