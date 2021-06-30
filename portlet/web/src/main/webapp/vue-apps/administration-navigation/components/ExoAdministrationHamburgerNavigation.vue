@@ -46,6 +46,7 @@ export default {
         // security
         'dlp-quarantine': 'security',
         'transferRules': 'security',
+        'multifactor-authentication': 'security',
         // rewards
         'rewardAdministration/kudosAdministration': 'reward',
         'rewardAdministration/walletAdministration': 'reward',
