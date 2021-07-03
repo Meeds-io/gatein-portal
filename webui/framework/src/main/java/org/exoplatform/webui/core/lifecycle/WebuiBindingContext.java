@@ -154,7 +154,7 @@ public class WebuiBindingContext extends BindingContext {
           if (rootContext == null)
             rootContext = context;
           long lastAccess = rootContext.getUIApplication().getLastAccessApplication();
-          if (resourceResolver.isModified(name, lastAccess)) {
+          if (lastAccess > 0 && resourceResolver.isModified(name, lastAccess)) {
             log.debug("Invalidate the template: {}", name);
             service_.invalidateTemplate(name, resourceResolver);
           }

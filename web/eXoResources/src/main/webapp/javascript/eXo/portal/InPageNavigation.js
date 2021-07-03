@@ -69,8 +69,6 @@
       $(document.body).html(newBody);
 
       window.setTimeout(() => {
-        $('body').removeClass('hide-scroll');
-        $(window).trigger('resize');
         document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
       }, 1000);
     },
