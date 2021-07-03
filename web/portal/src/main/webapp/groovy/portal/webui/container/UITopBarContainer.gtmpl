@@ -81,17 +81,3 @@
   	</div>
   </div>
 </div>
-<script>
-  require(['SHARED/jquery'], jq => {
-    jq(window).scroll(function() {
-      const tb = jq('#<%=uicomponent.id%>');
-      if (tb.length) {
-        if(jq(window).scrollTop()) {
-          tb.addClass('top-bar-scrolled');
-        } else {
-          tb.removeClass('top-bar-scrolled');
-        }
-      }
-    });
-  });
-</script>

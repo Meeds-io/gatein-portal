@@ -103,7 +103,7 @@ public class Lifecycle<E extends UIComponent> {
             if (rootContext == null)
                 rootContext = context;
             long lastAccess = rootContext.getUIApplication().getLastAccessApplication();
-            if (resolver.isModified(template, lastAccess)) {
+            if (lastAccess > 0 && resolver.isModified(template, lastAccess)) {
                 if (log.isDebugEnabled())
                     log.debug("Invalidate the template: " + template);
                 service.invalidateTemplate(template, resolver);

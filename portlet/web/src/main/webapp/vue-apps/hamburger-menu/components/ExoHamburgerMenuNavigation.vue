@@ -75,16 +75,11 @@ export default {
         if (!this.hamburgerMenuInitialized) {
           this.hamburgerMenuInitialized = true;
         }
-        $('body').addClass('hide-scroll');
 
         window.setTimeout(() => {
           $('.HamburgerNavigationMenu .v-overlay').click(() => {
             this.hamburgerMenu = false;
           });
-        }, 200); // eslint-disable-line no-magic-numbers
-      } else {
-        window.setTimeout(() => {
-          $('body').removeClass('hide-scroll');
         }, 200); // eslint-disable-line no-magic-numbers
       }
     },
