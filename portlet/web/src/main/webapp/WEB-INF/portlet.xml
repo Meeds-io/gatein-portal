@@ -316,48 +316,4 @@
     </portlet-preferences>
   </portlet>
 
-  <portlet>
-    <portlet-name>AdministrationHamburgerMenu</portlet-name>
-    <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
-    <init-param>
-        <name>portlet-view-dispatched-file-path</name>
-        <value>/jsp/hambergerMenuItem.jsp</value>
-    </init-param>
-    <expiration-cache>-1</expiration-cache>
-    <supports>
-      <mime-type>text/html</mime-type>
-    </supports>
-    <portlet-info>
-      <title>Administration Hamburger Menu</title>
-    </portlet-info>
-    <portlet-preferences>
-      <preference>
-        <name>jsModule</name>
-        <value>PORTLET/web/AdministrationHamburgerMenu</value>
-      </preference>
-    </portlet-preferences>
-  </portlet>
-
-  <portlet>
-    <portlet-name>UserHamburgerMenu</portlet-name>
-    <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
-    <init-param>
-        <name>portlet-view-dispatched-file-path</name>
-        <value>/jsp/hambergerMenuItem.jsp</value>
-    </init-param>
-    <expiration-cache>-1</expiration-cache>
-    <supports>
-      <mime-type>text/html</mime-type>
-    </supports>
-    <portlet-info>
-      <title>User Hamburger Menu</title>
-    </portlet-info>
-    <portlet-preferences>
-      <preference>
-        <name>jsModule</name>
-        <value>PORTLET/web/UserHamburgerMenu</value>
-      </preference>
-    </portlet-preferences>
-  </portlet>
-
 </portlet-app>
