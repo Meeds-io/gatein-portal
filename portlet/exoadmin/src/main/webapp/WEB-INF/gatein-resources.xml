@@ -97,34 +97,5 @@
     </module>
   </portlet>
 
-  <portlet>
-      <name>Branding</name>
-      <module>
-          <script>
-              <minify>false</minify>
-              <path>/js/branding.bundle.js</path>
-          </script>
-          <depends>
-              <module>vue</module>
-          </depends>
-          <depends>
-            <module>vuetify</module>
-          </depends>
-          <depends>
-              <module>eXoVueI18n</module>
-          </depends>
-          <depends>
-            <module>jquery</module>
-            <as>$</as>
-          </depends>
-          <depends>
-              <module>extensionRegistry</module>
-          </depends>
-          <depends>
-              <module>filedrop</module>
-          </depends> 
-      </module>
-  </portlet>
-
 </gatein-resources>
 

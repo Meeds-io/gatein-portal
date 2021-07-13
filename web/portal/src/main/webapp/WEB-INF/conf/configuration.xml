@@ -65,7 +65,6 @@
   <import>war:/conf/portal/controller-configuration.xml</import>
   <import>war:/conf/portal/web-configuration.xml</import>
   <import>war:/conf/portal/module-configuration.xml</import>
-  <import>war:/conf/portal/dynamic-container-configuration.xml</import>
   <import>war:/conf/portal/page-template-configuration.xml</import>
   <import>war:/conf/portal/inpage-navigation-configuration.xml</import>
 
