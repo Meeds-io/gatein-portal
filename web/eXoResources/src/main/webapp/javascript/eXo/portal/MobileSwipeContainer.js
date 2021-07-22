@@ -17,6 +17,9 @@ $(document).ready(() => {
   });
 
   $(window).on( "touchend", event => {
+    if (window.disableSwipeOnPage) {
+      return;
+    }
     const touchStart = $('.UIMobileSwipeContainer').data('touchstart');
     if (!touchStart) {
       return;
