@@ -69,7 +69,7 @@
 
   <component>
     <key>org.exoplatform.portal.mop.navigation.NavigationStore</key>
-    <type>org.exoplatform.portal.mop.navigation.NavigationStoreImpl</type>
+    <type>org.exoplatform.portal.mop.navigation.CachedNavigationStore</type>
   </component>
 
   <component>

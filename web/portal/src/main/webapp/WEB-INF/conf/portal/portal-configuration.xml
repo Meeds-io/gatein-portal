@@ -341,26 +341,26 @@
       <description>add Exo Cache Config</description>
       <init-params>
         <object-param>
-          <name>portal.MOPSessionManager</name>
+          <name>portal.NavigationNode</name>
           <description>The Cache configuration for the MOP session Manager</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
-            <field name="name"><string>portal.MOPSessionManager</string></field>
+            <field name="name"><string>portal.NavigationNode</string></field>
             <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.mop.strategy:LIRS}</string></field>
-            <field name="maxSize"><int>${exo.cache.portal.mop.MaxNodes:1400}</int></field>
+            <field name="maxSize"><int>${exo.cache.portal.mop.MaxNodes:5000}</int></field>
             <field name="liveTime"><long>${exo.cache.portal.mop.TimeToLive:86400}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.mop.cacheMode:replication}</string></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.mop.cacheMode:invalidation}</string></field>
           </object>
         </object-param>
         <!-- NavigationService configuration -->
         <object-param>
           <name>portal.NavigationService</name>
-          <description>The JBoss configuration for the navigation service</description>
+          <description>The cache configuration for the navigation Trees service</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>portal.NavigationService</string></field>
             <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.navigation.strategy:LIRS}</string></field>
-            <field name="maxSize"><int>${exo.cache.portal.navigation.MaxNodes:700}</int></field>
+            <field name="maxSize"><int>${exo.cache.portal.navigation.MaxNodes:1000}</int></field>
             <field name="liveTime"><long>${exo.cache.portal.navigation.TimeToLive:86400}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.navigation.cacheMode:replication}</string></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.navigation.cacheMode:invalidation}</string></field>
           </object>
         </object-param>
         <!-- DescriptionService configuration -->
@@ -372,7 +372,7 @@
             <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.description.strategy:LIRS}</string></field>
             <field name="maxSize"><int>${exo.cache.portal.description.MaxNodes:1400}</int></field>
             <field name="liveTime"><long>${exo.cache.portal.description.TimeToLive:86400}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.description.cacheMode:replication}</string></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.description.cacheMode:invalidation}</string></field>
           </object>
         </object-param>
         <!-- PageService configuration -->
@@ -384,7 +384,7 @@
             <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.page.strategy:LIRS}</string></field>
             <field name="maxSize"><int>${exo.cache.portal.page.MaxNodes:700}</int></field>
             <field name="liveTime"><long>${exo.cache.portal.page.TimeToLive:86400}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.page.cacheMode:replication}</string></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.page.cacheMode:invalidation}</string></field>
           </object>
         </object-param>
         <!-- TemplateService configuration -->
@@ -394,9 +394,9 @@
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>portal.TemplateService</string></field>
             <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.template.strategy:LIRS}</string></field>
-            <field name="maxSize"><int>${exo.cache.portal.template.MaxNodes:1000}</int></field>
+            <field name="maxSize"><int>${exo.cache.portal.template.MaxNodes:5000}</int></field>
             <field name="liveTime"><long>${exo.cache.portal.template.TimeToLive:-1}</long></field>
-            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.template.cacheMode:replication}</string></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.template.cacheMode:invalidation}</string></field>
           </object>
         </object-param>
         <object-param>

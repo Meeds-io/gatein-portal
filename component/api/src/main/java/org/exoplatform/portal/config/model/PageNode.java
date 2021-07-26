@@ -162,9 +162,10 @@ public class PageNode extends PageNodeContainer {
     }
 
     public NodeState getState() {
+        PageKey pageKey = pageReference != null ? PageKey.parse(pageReference) : null;
         return new NodeState(labels.getSimple(), icon, startPublicationDate == null ? -1 : startPublicationDate.getTime(),
                 endPublicationDate == null ? -1 : endPublicationDate.getTime(), visibility,
-                pageReference != null ? PageKey.parse(pageReference) : null);
+                pageKey, pageKey == null ? null : pageKey.getSite());
     }
 
     @Override
