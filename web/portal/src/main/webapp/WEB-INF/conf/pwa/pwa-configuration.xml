@@ -2,15 +2,16 @@
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd" xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-    <key>PWAConfigurationProperties</key>
-    <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
+    <type>org.exoplatform.web.pwa.ServiceWorkerService</type>
     <init-params>
-      <properties-param>
-        <name>PWAConfigurationProperties</name>
-        <description>PWA configuration properties</description>
-        <property name="pwa.service.worker.enabled" value="${pwa.service.worker.enabled:true}" />
-        <property name="pwa.service.worker.path" value="${pwa.service.worker.path:war:/conf/pwa/service-worker.js}" />
-      </properties-param>
+      <value-param>
+        <name>enabled</name>
+        <value>${pwa.service.worker.enabled:true}</value>
+      </value-param>
+      <value-param>
+        <name>filePath</name>
+        <value>${pwa.service.worker.path:war:/conf/pwa/service-worker.js}</value>
+      </value-param>
     </init-params>
   </component>
 
