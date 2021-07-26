@@ -39,6 +39,4 @@ public interface NavigationStore extends NodeStore {
 
     boolean destroyNavigation(NavigationData data);
 
-    void clear();
-
 }

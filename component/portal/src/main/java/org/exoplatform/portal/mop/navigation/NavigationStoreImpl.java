@@ -305,11 +305,6 @@ public class NavigationStoreImpl implements NavigationStore {
     }
   }
 
-  @Override
-  public void clear() {
-
-  }
-
   private NavigationEntity buildNavEntity(NavigationEntity entity, SiteKey key, Integer priority) {
     if (entity == null) {
       entity = new NavigationEntity();
@@ -327,7 +322,6 @@ public class NavigationStoreImpl implements NavigationStore {
   private NodeEntity buildNodeEntity(NodeEntity entity, NodeState state) {
     if (entity == null) {
       entity = new NodeEntity();
-      //entity.setId(UUID.randomUUID().toString());
     }
     if (state == null) {
       return entity;
@@ -380,6 +374,25 @@ public class NavigationStoreImpl implements NavigationStore {
 
     NodeState state = builder.build();
 
-    return new NodeData(parentId, node.getId().toString(), node.getName(), state, children.toArray(new String[children.size()]));
+    Long nodeId = node.getId();
+    SiteKey navigationSiteKey = getSiteKey(nodeId);
+    return new NodeData(parentId, node.getId().toString(), navigationSiteKey, node.getName(), state, children.toArray(new String[children.size()]));
+  }
+
+  private SiteKey getSiteKey(Long nodeId) {
+    NodeEntity rootNode = this.getRootNode(nodeId);
+    SiteKey siteKey = rootNode == null
+        || rootNode.getNavigationEntity() == null ? null
+                                                  : rootNode.getNavigationEntity()
+                                                            .getOwnerType()
+                                                            .key(rootNode.getNavigationEntity().getOwnerId());
+    if (siteKey == null && rootNode != null) {
+      NavigationEntity navigationEntity = navigationDAO.findByRootNode(rootNode.getId());
+      return navigationEntity == null ? null
+                                      : navigationEntity.getOwnerType()
+                                                        .key(navigationEntity.getOwnerId());
+    } else {
+      return siteKey;
+    }
   }
 }

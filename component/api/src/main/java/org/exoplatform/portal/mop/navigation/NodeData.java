@@ -24,6 +24,8 @@ import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.exoplatform.portal.mop.SiteKey;
+
 /**
  * An immutable node data class.
  *
@@ -39,6 +41,9 @@ public class NodeData implements Serializable {
     final String id;
 
     /** . */
+    final SiteKey siteKey;
+
+    /** . */
     final String name;
 
     /** . */
@@ -47,9 +52,10 @@ public class NodeData implements Serializable {
     /** . */
     final String[] children;
 
-    public NodeData(String parentId, String id, String name, NodeState state, String[] children) {
+    public NodeData(String parentId, String id, SiteKey siteKey, String name, NodeState state, String[] children) {
       this.parentId = parentId;
       this.id = id;
+      this.siteKey = siteKey;
       this.name = name;
       this.state = state;
       this.children = children;
@@ -75,6 +81,7 @@ public class NodeData implements Serializable {
         this.name = name;
         this.state = state;
         this.children = children;
+        this.siteKey = context.getState().getSiteKey();
     }
 
     public Iterator<String> iterator(boolean reverse) {

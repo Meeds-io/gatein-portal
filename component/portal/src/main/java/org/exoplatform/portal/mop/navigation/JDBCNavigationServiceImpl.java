@@ -135,7 +135,4 @@ public class JDBCNavigationServiceImpl implements NavigationService {
         manager.rebaseNode(context, scope, listener);
     }
 
-    public void clearCache() {
-        store.clear();
-    }
 }
