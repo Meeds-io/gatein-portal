@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.exoplatform.commons.utils.Safe;
+import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.page.PageKey;
 
@@ -60,6 +61,8 @@ public final class NodeState implements Serializable {
         /** . */
         private PageKey pageRef;
 
+        private SiteKey siteKey;
+
         public Builder() {
             this.icon = null;
             this.label = null;
@@ -85,6 +88,7 @@ public final class NodeState implements Serializable {
             this.endPublicationTime = state.endPublicationTime;
             this.visibility = state.visibility;
             this.pageRef = state.pageRef;
+            this.siteKey = state.siteKey;
         }
 
         public Builder label(String label) {
@@ -117,8 +121,13 @@ public final class NodeState implements Serializable {
             return this;
         }
 
+        public Builder siteKey(SiteKey siteKey) {
+          this.siteKey = siteKey;
+          return this;
+        }
+
         public NodeState build() {
-            return new NodeState(label, icon, startPublicationTime, endPublicationTime, visibility, pageRef);
+            return new NodeState(label, icon, startPublicationTime, endPublicationTime, visibility, pageRef, siteKey);
         }
     }
 
@@ -140,14 +149,18 @@ public final class NodeState implements Serializable {
     /** . */
     private final PageKey pageRef;
 
+    /** . */
+    private final SiteKey siteKey;
+
     public NodeState(String label, String icon, long startPublicationTime, long endPublicationTime, Visibility visibility,
-            PageKey pageRef) {
+            PageKey pageRef, SiteKey siteKey) {
         this.label = label;
         this.icon = icon;
         this.startPublicationTime = startPublicationTime;
         this.endPublicationTime = endPublicationTime;
         this.visibility = visibility;
         this.pageRef = pageRef;
+        this.siteKey = siteKey;
     }
 
     public String getLabel() {
@@ -180,6 +193,10 @@ public final class NodeState implements Serializable {
 
     public PageKey getPageRef() {
         return pageRef;
+    }
+
+    public SiteKey getSiteKey() {
+      return siteKey;
     }
 
     @Override

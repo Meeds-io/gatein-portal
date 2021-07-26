@@ -73,11 +73,14 @@ public class NodeEntity implements Serializable {
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "parent", orphanRemoval = true)
   @OrderBy("index ASC")
-  private List<NodeEntity>  children         = new ArrayList<NodeEntity>();
+  private List<NodeEntity>  children         = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "PARENT_ID")
   private NodeEntity        parent;
+
+  @OneToOne(fetch = FetchType.EAGER, mappedBy = "rootNode")
+  private NavigationEntity  navigationEntity;
 
   public Long getId() {
     return id;
@@ -172,6 +175,14 @@ public class NodeEntity implements Serializable {
     this.parent = parent;
   }
   
+  public NavigationEntity getNavigationEntity() {
+    return navigationEntity;
+  }
+
+  public void setNavigationEntity(NavigationEntity navigationEntity) {
+    this.navigationEntity = navigationEntity;
+  }
+
   public static final String REMOVED_EVENT = "org.exoplatform.portal.jdbc.entity.NodeEntity.removed";
   
   @PreRemove
