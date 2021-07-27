@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLDecoder;
+import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -77,32 +78,6 @@ public class ResourceRequestFilter extends AbstractFilter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         final String uri = URLDecoder.decode(httpRequest.getRequestURI(), "UTF-8");
         final HttpServletResponse httpResponse = (HttpServletResponse) response;
-        // ExoContainer portalContainer = getContainer();
-        // final SkinService skinService = (SkinService) portalContainer.getComponentInstanceOfType(SkinService.class);
-        long ifModifiedSince = httpRequest.getDateHeader(IF_MODIFIED_SINCE);
-
-        //
-        /*
-         * if (uri.endsWith(".css")) { // Check if cached resource has not been modifed, return 304 code long cssLastModified =
-         * skinService.getLastModified(uri); if (isNotModified(ifModifiedSince, cssLastModified)) {
-         * httpResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED); return; }
-         * response.setContentType("text/css; charset=UTF-8");
-         *
-         * final OutputStream out = response.getOutputStream(); final BinaryOutput output = new BinaryOutput() { public Charset
-         * getCharset() { return UTF_8; } public void write(byte b) throws IOException { out.write(b); } public void
-         * write(byte[] bytes) throws IOException { out.write(bytes); } public void write(byte[] bytes, int off, int len) throws
-         * IOException { out.write(bytes, off, len); } }; ResourceRenderer renderer = new ResourceRenderer() { public
-         * BinaryOutput getOutput() throws IOException { return output; } public void setExpiration(long seconds) { if (seconds
-         * > 0) { httpResponse.addHeader("Cache-Control", "max-age=" + seconds + ",s-maxage=" + seconds); } else {
-         * httpResponse.setHeader("Cache-Control", "no-cache"); }
-         *
-         * long lastModified = skinService.getLastModified(uri); processIfModified(lastModified, httpResponse); } };
-         *
-         * // try { skinService.renderCSS(renderer, uri); if (log.isDebugEnabled()) { log.debug("Use a merged CSS: " + uri); } }
-         * catch (Exception e) { if (e instanceof SocketException) { //Should we print something/somewhere exception message }
-         * else { log.error("Could not render css " + uri, e); httpResponse.setStatus(HttpServletResponse.SC_NOT_FOUND); } } }
-         * else {
-         */
 
         // Fast matching
         final int len = uri.length();
@@ -148,6 +123,8 @@ public class ResourceRequestFilter extends AbstractFilter {
                         Image img = futureImg.get();
                         if (img != null) {
                             // Check if cached resource has not been modifed, return 304 code
+                            String ifModifiedSinceString = httpRequest.getHeader(IF_MODIFIED_SINCE);
+                            long ifModifiedSince = ifModifiedSinceString == null ? 0 : new Date(ifModifiedSinceString).getTime();
                             long imgLastModified = img.getLastModified();
                             if (isNotModified(ifModifiedSince, imgLastModified)) {
                                 httpResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
@@ -155,7 +132,7 @@ public class ResourceRequestFilter extends AbstractFilter {
                             }
                             httpResponse.setContentType(img.type.getMimeType());
                             httpResponse.setContentLength(img.bytes.length);
-                            httpResponse.setHeader("Cache-Control", "max-age=2592000,s-maxage=2592000");
+                            httpResponse.setHeader("Cache-Control", "public,max-age=2592000");
                             processIfModified(imgLastModified, httpResponse);
 
                             OutputStream out = httpResponse.getOutputStream();
@@ -179,20 +156,9 @@ public class ResourceRequestFilter extends AbstractFilter {
         }
 
         //
-        if (!PropertyManager.isDevelopping()) {
-            httpResponse.addHeader("Cache-Control", "max-age=2592000,s-maxage=2592000");
-            httpResponse.setDateHeader(ResourceRequestFilter.EXPIRES, System.currentTimeMillis() + ResourceRequestHandler.MAX_AGE * 1000);
-        } else {
-            if (uri.endsWith(".jstmpl") || uri.endsWith(".js")) {
-                httpResponse.setHeader("Cache-Control", "no-cache");
-            }
-            if (log.isDebugEnabled())
-                log.debug(" Load Resource: " + uri);
-        }
+        httpResponse.addHeader("Cache-Control", "max-age=2592000");
+        httpResponse.setDateHeader(ResourceRequestFilter.EXPIRES, System.currentTimeMillis() + ResourceRequestHandler.MAX_AGE * 1000);
         chain.doFilter(request, response);
-        /*
-         * }
-         */
     }
 
     /**
@@ -211,12 +177,7 @@ public class ResourceRequestFilter extends AbstractFilter {
      * @return
      */
     private boolean isNotModified(long ifModifedSince, long lastModified) {
-        if (!PropertyManager.isDevelopping()) {
-            if (ifModifedSince >= lastModified) {
-                return true;
-            }
-        }
-        return false;
+      return Math.abs(ifModifedSince - lastModified) < 1000;
     }
 
     public void destroy() {

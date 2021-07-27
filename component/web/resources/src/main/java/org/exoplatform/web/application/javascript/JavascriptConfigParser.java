@@ -254,7 +254,14 @@ public class JavascriptConfigParser {
             }
         } else if (MODULE_TAG.equals(element.getTagName()) || SCRIPTS_TAG.equals(element.getTagName())) {
             String resourceName = XMLTools.asString(XMLTools.getUniqueChild(element, "name", true));
-            ResourceId id = new ResourceId(ResourceScope.SHARED, resourceName);
+            ResourceId id = null;
+            if (resourceName.contains("/")) {
+              String[] resourceParts = resourceName.split("/");
+              id = new ResourceId(ResourceScope.valueOf(resourceParts[0].toUpperCase()), resourceParts[1]);
+            } else {
+              id = new ResourceId(ResourceScope.SHARED, resourceName);
+            }
+
             FetchMode fetchMode;
             String group = null;
 
