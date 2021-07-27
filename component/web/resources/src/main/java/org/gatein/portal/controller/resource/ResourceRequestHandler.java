@@ -205,19 +205,17 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
             if (result instanceof ScriptResult.Resolved) {
                 ScriptResult.Resolved resolved = (ScriptResult.Resolved) result;
 
-                // Content type + charset
-                response.setContentType("text/javascript");
-                response.setCharacterEncoding("UTF-8");
-
-                response.setHeader("Cache-Control", "max-age=" + MAX_AGE + ",s-maxage=" + MAX_AGE);
-                response.setDateHeader(ResourceRequestFilter.EXPIRES, System.currentTimeMillis() + MAX_AGE * 1000);
-
-                // Set content length
-                response.setContentLength(resolved.bytes.length);
-
                 long ifModifiedSince = request.getDateHeader(IF_MODIFIED_SINCE);
                 if (resolved.isModified(ifModifiedSince)) {
+                    response.setHeader("Cache-Control", "public,max-age=" + MAX_AGE);
+                    response.setDateHeader(ResourceRequestFilter.EXPIRES, System.currentTimeMillis() + MAX_AGE * 1000);
                     response.setDateHeader(ResourceRequestFilter.LAST_MODIFIED, resolved.lastModified);
+                    // Content type + charset
+                    response.setContentType("text/javascript");
+                    response.setHeader("Content-Encoding", "UTF-8");
+
+                    // Set content length
+                    response.setContentLength(resolved.bytes.length);
                     // Send bytes
                     ServletOutputStream out = response.getOutputStream();
                     try {

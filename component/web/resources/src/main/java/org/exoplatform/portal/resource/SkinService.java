@@ -131,7 +131,7 @@ public class SkinService extends AbstractResourceService implements Startable {
   final String                                                   id                      =
                                                                     Long.toString(System.currentTimeMillis());
 
-  private static final long                                      MAX_AGE;
+  public static final long                                      MAX_AGE;
 
   static {
     long seconds = 86400;
@@ -508,6 +508,10 @@ public class SkinService extends AbstractResourceService implements Startable {
       if (skin != null) {
         processCSSRecursively(context, sb, false, skin, orientation);
         byte[] bytes = sb.toString().getBytes("UTF-8");
+        renderer.setExpiration(MAX_AGE);
+        if (context.getResponse() != null) {
+          context.getResponse().setContentLength(bytes.length);
+        }
         renderer.getOutput().write(bytes);
         return true;
       }
@@ -516,6 +520,9 @@ public class SkinService extends AbstractResourceService implements Startable {
       CachedStylesheet cachedCss = cache.get(new SkinContext(context, orientation), resource);
       if (cachedCss != null) {
         renderer.setExpiration(MAX_AGE);
+        if (context.getResponse() != null) {
+          context.getResponse().setContentLength(cachedCss.getLength());
+        }
         cachedCss.writeTo(renderer.getOutput());
         return true;
       }
@@ -679,10 +686,6 @@ public class SkinService extends AbstractResourceService implements Startable {
   public long getLastModified(ControllerContext context) {
     String resource = "/" + context.getParameter(ResourceRequestHandler.RESOURCE_QN) + ".css";
 
-    if (PropertyManager.isDevelopping()) {
-      return Long.MAX_VALUE;
-    }
-
     FutureMap<String, CachedStylesheet, SkinContext> cache = ltCache;
     Orientation orientation = Orientation.LT;
     String dir = context.getParameter(ResourceRequestHandler.ORIENTATION_QN);
@@ -693,7 +696,7 @@ public class SkinService extends AbstractResourceService implements Startable {
 
     CachedStylesheet cachedCSS = cache.get(new SkinContext(context, orientation), resource);
     if (cachedCSS == null) {
-      return Long.MAX_VALUE;
+      return System.currentTimeMillis();
     } else {
       return cachedCSS.getLastModified();
     }

@@ -84,7 +84,9 @@ public class ExoPortletApplicationDeployer extends PortletApplicationDeployer {
             if (globalPortletLocation != null) {
                 try {
                     GlobalPortletMetaData globalPortletMetaData = loadGlobalMetadata(globalPortletLocation);
-                    globalPortletMetaData.mergeTo(md);
+                    if (globalPortletMetaData != null) {
+                      globalPortletMetaData.mergeTo(md);
+                    }
                     if (log.isDebugEnabled()) {
                         log.debug("Complete merging global portlet metadata to portlet application "
                                 + webApp.getServletContextName());
@@ -117,13 +119,17 @@ public class ExoPortletApplicationDeployer extends PortletApplicationDeployer {
      * @throws Exception any exception
      */
     private GlobalPortletMetaData loadGlobalMetadata(String globalPortletLocation) throws Exception {
-        // TODO: Avoid using File
-        InputStream in = new FileInputStream(new File(globalPortletLocation));
-        try {
-            PortletApplicationMetaDataBuilder builder = new PortletApplicationMetaDataBuilder();
-            return GlobalPortletMetaData.unmarshalling(in);
-        } finally {
-            Safe.close(in);
+        File globalPortletFile = new File(globalPortletLocation);
+        if (globalPortletFile.exists()) {
+          InputStream in = new FileInputStream(globalPortletFile);
+          try {
+              PortletApplicationMetaDataBuilder builder = new PortletApplicationMetaDataBuilder();
+              return GlobalPortletMetaData.unmarshalling(in);
+          } finally {
+              Safe.close(in);
+          }
+        } else {
+          return null;
         }
     }
 }

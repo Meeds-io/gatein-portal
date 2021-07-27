@@ -126,8 +126,8 @@ public class TestSkinServiceInDevelopingMode extends AbstractSkinServiceTest {
         resResolver.addResource(resource, "foo");
 
         assertTrue(skinService.getCSS(newControllerContext(getRouter(), skinURL.toString()), false).length() > 0);
-        assertEquals(Long.MAX_VALUE, skinService.getLastModified(newControllerContext(getRouter(), skinURL.toString())));
+        assertTrue(skinService.getLastModified(newControllerContext(getRouter(), skinURL.toString())) > 0);
         skinURL.setOrientation(Orientation.RT);
-        assertEquals(Long.MAX_VALUE, skinService.getLastModified(newControllerContext(getRouter(), skinURL.toString())));
+        assertTrue(skinService.getLastModified(newControllerContext(getRouter(), skinURL.toString())) > 0);
     }
 }

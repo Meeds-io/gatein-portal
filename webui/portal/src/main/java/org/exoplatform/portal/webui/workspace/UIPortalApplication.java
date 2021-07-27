@@ -26,7 +26,6 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.Constants;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.application.RequestNavigationData;
-import org.exoplatform.portal.branding.BrandingRestResourcesV1;
 import org.exoplatform.portal.branding.BrandingService;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserPortalConfig;
@@ -65,6 +64,9 @@ import org.exoplatform.webui.core.UIComponentDecorator;
 import org.exoplatform.webui.core.UIContainer;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.url.ComponentURL;
+
+import org.gatein.pc.api.info.PortletInfo;
+import org.gatein.pc.portlet.impl.info.ContainerPortletInfo;
 import org.gatein.portal.controller.resource.ResourceId;
 import org.gatein.portal.controller.resource.ResourceScope;
 import org.gatein.portal.controller.resource.script.FetchMap;
@@ -675,6 +677,51 @@ public class UIPortalApplication extends UIApplication {
 
         //
         return (new HashSet<Skin>(portletSkins));
+    }
+
+    /**
+     * @return a set of current page portlet resource bundle names to preload
+     */
+    public Set<String> getPortletBundles() {
+      return getInitParamsOfPagePortlets("preload.resource.bundles");
+    }
+
+    /**
+     * @return a set of current page portlet additonal stylesheet files to preload
+     */
+    public Set<String> getPortletStylesheets() {
+      return getInitParamsOfPagePortlets("preload.resource.stylesheet");
+    }
+
+    /**
+     * @return a set of current page portlet REST resources to preload
+     */
+    public Set<String> getPortletRestResources() {
+      return getInitParamsOfPagePortlets("preload.resource.rest");
+    }
+
+    private Set<String> getInitParamsOfPagePortlets(String paramName) {
+      // Determine portlets visible on the page
+      List<UIPortlet> uiPortlets = new ArrayList<>();
+      uiWorkingWorkspace.findComponentOfType(uiPortlets, UIPortlet.class);
+      UIPortalToolPanel toolPanel = uiWorkingWorkspace.findFirstComponentOfType(UIPortalToolPanel.class);
+      Set<String> result = new HashSet<>();
+      for (UIPortlet uiPortlet : uiPortlets) {
+        PortletInfo portletInfo = uiPortlet.getProducedOfferedPortlet().getInfo();
+        if (portletInfo instanceof ContainerPortletInfo) {
+          String valuesString = ((ContainerPortletInfo) portletInfo).getInitParameter(paramName);
+          if (StringUtils.isNotBlank(valuesString)) {
+            String[] valuesArray = valuesString.contains("|") ? StringUtils.split(valuesString, '|')
+                                                              : StringUtils.split(valuesString, ',');
+            for (String value : valuesArray) {
+              if (StringUtils.isNotBlank(value)) {
+                result.add(value.trim());
+              }
+            }
+          }
+        }
+      }
+      return result;
     }
 
     private SkinConfig getPortletSkinConfig(UIPortlet portlet) {
