@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.SocketException;
 import java.nio.charset.Charset;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -54,14 +55,16 @@ public class SkinResourceRequestHandler extends WebRequestHandler {
         final HttpServletResponse response = context.getResponse();
 
         // Check if cached resource has not been modifed, return 304 code
-        long ifModifiedSince = context.getRequest().getDateHeader(IF_MODIFIED_SINCE);
-        long cssLastModified = skinService.getLastModified(context);
-        if (isNotModified(ifModifiedSince, cssLastModified)) {
+        String ifModifiedSinceString = context.getRequest().getHeader(IF_MODIFIED_SINCE);
+        long ifModifiedSince = ifModifiedSinceString == null ? 0 : new Date(ifModifiedSinceString).getTime();
+        if (ifModifiedSince > 0) {
+            response.setHeader("Cache-Control", null);
             response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
             return true;
         } else {
             //
-            response.setContentType("text/css; charset=UTF-8");
+            response.setContentType("text/css");
+            response.setHeader("Content-Encoding", "UTF-8");
 
             final OutputStream out = response.getOutputStream();
             final BinaryOutput output = new BinaryOutput() {
@@ -81,27 +84,11 @@ public class SkinResourceRequestHandler extends WebRequestHandler {
                     out.write(bytes, off, len);
                 }
             };
-            ResourceRenderer renderer = new ResourceRenderer() {
-                public BinaryOutput getOutput() {
-                    return output;
-                }
-
-                public void setExpiration(long seconds) {
-                    if (seconds > 0) {
-                        response.addHeader("Cache-Control", "max-age=" + seconds + ",s-maxage=" + seconds);
-                    } else {
-                        response.setHeader("Cache-Control", "no-cache");
-                    }
-
-                    long lastModified = skinService.getLastModified(context);
-                    response.setDateHeader(LAST_MODIFIED, lastModified);
-                    response.setDateHeader(EXPIRES, System.currentTimeMillis() + 604800000L);
-                }
-            };
 
             //
             final String resource = "/" + context.getParameter(ResourceRequestHandler.RESOURCE_QN) + ".css";
             try {
+                ResourceRenderer renderer = new SkinResourceRenderer(response, context, output);
                 if (skinService.renderCSS(context, renderer, compress)) {
                     // Ok we did the job
                     return true;
@@ -129,16 +116,42 @@ public class SkinResourceRequestHandler extends WebRequestHandler {
      * If cached resource has not changed since date in http header (If_Modified_Since), return true otherwise return false.
      */
     private boolean isNotModified(long ifModifedSince, long lastModified) {
-        if (!PropertyManager.isDevelopping()) {
-            if (ifModifedSince >= lastModified) {
-                return true;
-            }
-        }
-        return false;
+      return Math.abs(ifModifedSince - lastModified) < 1000;
     }
 
     @Override
     protected boolean getRequiresLifeCycle() {
         return false;
+    }
+
+    public class SkinResourceRenderer implements ResourceRenderer {
+
+      private final BinaryOutput      output;
+
+      private final HttpServletResponse response;
+
+      private final ControllerContext context;
+
+      public SkinResourceRenderer(HttpServletResponse response, ControllerContext context, BinaryOutput output) {
+        this.response = response;
+        this.output = output;
+        this.context = context;
+      }
+
+      public BinaryOutput getOutput() {
+        return output;
+      }
+
+      public void setExpiration(long seconds) {
+        if (seconds > 0) {
+          response.setHeader("Cache-Control", "public,max-age=" + seconds);
+        } else {
+          response.setHeader("Cache-Control", "no-cache");
+        }
+
+        long lastModified = skinService.getLastModified(context);
+        response.setDateHeader(LAST_MODIFIED, lastModified);
+        response.setDateHeader(EXPIRES, (System.currentTimeMillis() + 604800000L));
+      }
     }
 }

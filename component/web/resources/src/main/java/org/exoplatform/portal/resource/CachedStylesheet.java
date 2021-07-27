@@ -69,6 +69,10 @@ public class CachedStylesheet {
         return text;
     }
 
+    public int getLength() {
+      return bytes.length;
+    }
+
     public long getLastModified() {
         return lastModified;
     }

@@ -206,7 +206,7 @@ public class PortalRequestContext extends WebuiRequestContext {
         // is set at the first access.
 
         // TODO use the encoding from the locale-config.xml file
-        response_.setContentType("text/html; charset=UTF-8");
+        response_.setContentType("text/html");
         try {
             request_.setCharacterEncoding("UTF-8");
         } catch (UnsupportedEncodingException e) {
