@@ -1,6 +1,5 @@
 <%
 import java.util.HashMap;
-import org.gatein.portal.controller.resource.ResourceRequestHandler;
 
 def rcontext = _ctx.getRequestContext() ;
 
@@ -54,6 +53,12 @@ def customSkins = uicomponent.getCustomSkins();
      url.setOrientation(orientation); %>
   <link rel="preload" href= "$url" as="style" type="text/css" />
 <% }
+
+   def portletAdditionalStylesheets = uicomponent.getPortletStylesheets();
+   for (portletStylesheet in portletAdditionalStylesheets) { %>
+  <link rel="preload" href= "$portletStylesheet" as="style" type="text/css" />
+<% }
+
    for (customSkin in customSkins) {
      def url = customSkin.createURL(rcontext.controllerContext);
      url.setOrientation(orientation); %>

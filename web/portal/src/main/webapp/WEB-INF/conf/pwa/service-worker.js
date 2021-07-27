@@ -65,7 +65,7 @@ if (!development) {
   );
 
   workbox.routing.registerRoute(
-    new RegExp('.*/i18n/bundle/.*\\.json'),
+    new RegExp('.*/i18n/bundle/.*\\.json.*'),
     new workbox.strategies.CacheFirst({
       cacheName: bundleCacheName,
     }),
@@ -74,20 +74,6 @@ if (!development) {
 
 workbox.routing.registerRoute(
   new RegExp('.*\\.(?:png|jpg|jpeg|svg|gif|ico)'),
-  new workbox.strategies.CacheFirst({
-    cacheName: imageCacheName,
-  }),
-);
-
-workbox.routing.registerRoute(
-  new RegExp('.*/rest/.*/social/.*/avatar.*'),
-  new workbox.strategies.CacheFirst({
-    cacheName: imageCacheName,
-  }),
-);
-
-workbox.routing.registerRoute(
-  new RegExp('.*/rest/.*/social/.*/banner.*'),
   new workbox.strategies.CacheFirst({
     cacheName: imageCacheName,
   }),
