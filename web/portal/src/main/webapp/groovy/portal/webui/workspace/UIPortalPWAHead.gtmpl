@@ -1,5 +1,6 @@
 <%
 import java.util.HashMap;
+import org.exoplatform.commons.api.settings.ExoFeatureService;
 
 def rcontext = _ctx.getRequestContext() ;
 
@@ -7,6 +8,10 @@ def rcontext = _ctx.getRequestContext() ;
 %>
     <link rel="apple-touch-icon" href="/digital-workplace/skin/images/eXo.png">
 
+<%
+  def featureService = uicomponent.getApplicationComponent(ExoFeatureService.class);
+  if (featureService.isActiveFeature('PWAServiceWorker')) {
+%>
     <script type="text/javascript">
       function registerServiceWorker() {
         if ('serviceWorker' in navigator) {
@@ -23,7 +28,24 @@ def rcontext = _ctx.getRequestContext() ;
       }
       registerServiceWorker();
     </script>
-
+<%
+  } else {
+%>
+    <script type="text/javascript">
+      if (navigator.serviceWorker) {
+        navigator.serviceWorker.getRegistrations()
+          .then(function(registrations) {
+            if (registrations && registrations.length) {
+              for(const registration of registrations) {
+                registration.unregister()
+              }
+            }
+          });
+      }
+    </script>
+<%
+  }
+%>
 <%
 /* Loading needed Fonts files in top of the page as a 'preload' resource to include it in response when using HTTP/2 */
 %>

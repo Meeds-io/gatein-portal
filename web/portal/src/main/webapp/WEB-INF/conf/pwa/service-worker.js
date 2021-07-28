@@ -4,6 +4,8 @@ const cachePrefix = 'portal-pwa-resources';
 const assetsVersion = '@assets-version@';
 const siteName = '@site-name@';
 const development = @development@;
+const resourceCachingEnabled = @resourceCachingEnabled@;
+const domCachingEnabled = @domCachingEnabled@;
 
 workbox.setConfig({
   debug: false,
@@ -33,16 +35,18 @@ const cachesWhiteList = [
   cssCacheName,
   jsCacheName,
   fontCacheName,
-  bundleCacheName];
+  bundleCacheName
+];
 
-workbox.routing.registerRoute(
-  new RegExp('.*\\.(ttf|woff|woff2|otf|otf|ttc)($|\\?.*|\\#.*)'),
-  new workbox.strategies.CacheFirst({
-    cacheName: fontCacheName,
-  }),
-);
+if (resourceCachingEnabled && !development) {
 
-if (!development) {
+  workbox.routing.registerRoute(
+    new RegExp('.*\\.(ttf|woff|woff2|otf|otf|ttc)($|\\?.*|\\#.*)'),
+    new workbox.strategies.CacheFirst({
+      cacheName: fontCacheName,
+    }),
+  );
+
   workbox.routing.registerRoute(
     new RegExp('.*\\.js($|\\?.*|\\#.*)'),
     new workbox.strategies.CacheFirst({
@@ -70,83 +74,74 @@ if (!development) {
       cacheName: bundleCacheName,
     }),
   );
-}
 
-workbox.routing.registerRoute(
-  new RegExp('.*\\.(?:png|jpg|jpeg|svg|gif|ico)'),
-  new workbox.strategies.CacheFirst({
-    cacheName: imageCacheName,
-  }),
-);
-
-workbox.routing.registerRoute(
-  new RegExp('.*/dom-cache.*'),
-  new workbox.strategies.CacheOnly({
-    cacheName: domCacheName,
-  }),
-);
-
-const handleDOMResponse = (event) => {
-  return fetch(event.request)
-    .then((response) => {
-      if (cacheable.isResponseCacheable(response)) {
-        return response.text()
-          .then(html => {
-          });
-      }
-      return response;
-    });
-};
-
-const domMatcher = ({url, request, event}) => {
-  const pathname = url.pathname;
-  return (
-          pathname.includes(`/${siteName}`)
-          || pathname.includes('/g/:')
-          || pathname.includes('/u/:')
-         )
-         && !pathname.includes('/rest/')
-         && !pathname.includes('.js')
-         && !pathname.includes('.css');
-};
-
-const domHandler = async ({url, request, event, params}) => {
-  const response = await fetch(request);
-  const headers = response.headers;
-  if (response.status !== 200
-      || !headers.has('content-type')
-      || !headers.get('content-type').includes('text/html')) {
-    return response;
-  }
-
-  let html = await response.text();
-  try {
-    const cacheableDOMs = [...html.matchAll(/<v-cacheable-dom-app([ \t\r\n]*)cache-id="(.*)"([ \t\r\n]*)(\/>|>[ \t\r\n]*<\/v-cacheable-dom-app>)/g)];
-    if(cacheableDOMs.length) {
-      const domCache = await self.caches.open(domCacheName);
-      for (let index in cacheableDOMs) {
-        const cacheableDOM = cacheableDOMs[index];
-        const domToReplace = cacheableDOM[0];
-        const cacheId = cacheableDOM[2];
-        const domCacheEntry = await domCache.match(`/dom-cache?id=${cacheId}`);
-        if (domCacheEntry) {
-          const htmlAppPart = await domCacheEntry.text();
-          html = html.replace(domToReplace, htmlAppPart);
-        }
-      }
-    }
-  } catch(e) {
-    console.error('Error while treating DOM caches of URL', url, e);
-  }
-  return new Response(html, {
-    headers: response.headers,
-    status: response.status,
-  });
-};
-
-workbox.routing.registerRoute(domMatcher, domHandler);
+  workbox.routing.registerRoute(
+    new RegExp('.*\\.(?:png|jpg|jpeg|svg|gif|ico)'),
+    new workbox.strategies.CacheFirst({
+      cacheName: imageCacheName,
+    }),
+  );
 
 @extended-service-worker-parts@
+
+}
+
+if (domCachingEnabled) {
+  workbox.routing.registerRoute(
+    new RegExp('.*/dom-cache.*'),
+    new workbox.strategies.CacheOnly({
+      cacheName: domCacheName,
+    }),
+  );
+  
+  const domMatcher = ({url, request, event}) => {
+    const pathname = url.pathname;
+    return (
+            pathname.includes(`/${siteName}`)
+            || pathname.includes('/g/:')
+            || pathname.includes('/u/:')
+           )
+           && !pathname.includes('/rest/')
+           && !pathname.includes('.js')
+           && !pathname.includes('.css');
+  };
+  
+  const domHandler = async ({url, request, event, params}) => {
+    const response = await fetch(request);
+    const headers = response.headers;
+    if (response.status !== 200
+        || !headers.has('content-type')
+        || !headers.get('content-type').includes('text/html')) {
+      return response;
+    }
+  
+    let html = await response.text();
+    try {
+      const cacheableDOMs = [...html.matchAll(/<v-cacheable-dom-app([ \t\r\n]*)cache-id="(.*)"([ \t\r\n]*)(\/>|>[ \t\r\n]*<\/v-cacheable-dom-app>)/g)];
+      if(cacheableDOMs.length) {
+        const domCache = await self.caches.open(domCacheName);
+        for (let index in cacheableDOMs) {
+          const cacheableDOM = cacheableDOMs[index];
+          const domToReplace = cacheableDOM[0];
+          const cacheId = cacheableDOM[2];
+          const domCacheEntry = await domCache.match(`/dom-cache?id=${cacheId}`);
+          if (domCacheEntry) {
+            const htmlAppPart = await domCacheEntry.text();
+            html = html.replace(domToReplace, htmlAppPart);
+          }
+        }
+      }
+    } catch(e) {
+      console.error('Error while treating DOM caches of URL', url, e);
+    }
+    return new Response(html, {
+      headers: response.headers,
+      status: response.status,
+    });
+  };
+  
+  workbox.routing.registerRoute(domMatcher, domHandler);
+}
 
 self.addEventListener('install', event => {
   self.skipWaiting();

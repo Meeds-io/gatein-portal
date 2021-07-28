@@ -2,6 +2,42 @@
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd" xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
+    <key>PWAServiceWorker</key>
+    <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
+    <init-params>
+      <properties-param>
+        <name>PWAServiceWorker</name>
+        <description>PWA Service Worker Feature enablement flag</description>
+        <property name="exo.feature.PWAServiceWorker.enabled" value="${exo.feature.PWAServiceWorker.enabled:true}" />
+      </properties-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>PWAServiceWorkerResourceCaching</key>
+    <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
+    <init-params>
+      <properties-param>
+        <name>PWAServiceWorkerResourceCaching</name>
+        <description>PWA Service Worker Static Resources Caching Feature enablement flag</description>
+        <property name="exo.feature.PWAServiceWorkerResourceCaching.enabled" value="${exo.feature.PWAServiceWorkerResourceCaching.enabled:false}" />
+      </properties-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>PWAServiceWorkerSkeletonCaching</key>
+    <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
+    <init-params>
+      <properties-param>
+        <name>PWAServiceWorkerSkeletonCaching</name>
+        <description>PWA Service Worker Skeleton Caching Feature enablement flag</description>
+        <property name="exo.feature.PWAServiceWorkerSkeletonCaching.enabled" value="${exo.feature.PWAServiceWorkerResourceCaching.enabled:true}" />
+      </properties-param>
+    </init-params>
+  </component>
+
+  <component>
     <type>org.exoplatform.web.pwa.ServiceWorkerService</type>
     <init-params>
       <value-param>
