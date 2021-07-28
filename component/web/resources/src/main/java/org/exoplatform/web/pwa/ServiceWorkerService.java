@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.gatein.portal.controller.resource.ResourceRequestHandler;
 import org.picocontainer.Startable;
 
+import org.exoplatform.commons.api.settings.ExoFeatureService;
 import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.configuration.ConfigurationManager;
@@ -29,9 +30,15 @@ public class ServiceWorkerService implements Startable {
 
   private static final String              SITE_NAME_VARIABLE                     = "@site-name@";
 
+  private static final String              RESOURCE_CACHING_VARIABLE              = "@resourceCachingEnabled@";
+
+  private static final String              DOM_CACHING_VARIABLE                   = "@domCachingEnabled@";
+
   private Map<String, ServiceWorkerPlugin> plugins                                = new HashMap<>();
 
   private ConfigurationManager             configurationManager;
+
+  private ExoFeatureService                featureService;
 
   private UserPortalConfigService          portalConfigService;
 
@@ -41,10 +48,12 @@ public class ServiceWorkerService implements Startable {
 
   private String                           content                                = null;
 
-  public ServiceWorkerService(ConfigurationManager configurationManager,
+  public ServiceWorkerService(ExoFeatureService featureService,
+                              ConfigurationManager configurationManager,
                               UserPortalConfigService portalConfigService,
                               InitParams initParams) {
     this.configurationManager = configurationManager;
+    this.featureService = featureService;
     this.portalConfigService = portalConfigService;
     if (initParams != null) {
       if (initParams.containsKey("filePath")) {
@@ -115,6 +124,10 @@ public class ServiceWorkerService implements Startable {
   private String replaceVariables(String content) {
     content = content.replace(SITE_NAME_VARIABLE, portalConfigService.getDefaultPortal());
     content = content.replace(ASSETS_VERSION_VARIABLE, ResourceRequestHandler.VERSION);
+
+    content = content.replace(RESOURCE_CACHING_VARIABLE, String.valueOf(featureService.isActiveFeature("PWAServiceWorkerResourceCaching")));
+    content = content.replace(DOM_CACHING_VARIABLE, String.valueOf(featureService.isActiveFeature("PWAServiceWorkerSkeletonCaching")));
+
     return content.replace(DEVELOPMENT_VARIABLE, String.valueOf(PropertyManager.isDevelopping()));
   }
 
