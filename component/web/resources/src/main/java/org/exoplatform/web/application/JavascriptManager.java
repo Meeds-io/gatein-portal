@@ -19,11 +19,6 @@
 
 package org.exoplatform.web.application;
 
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
-import org.exoplatform.web.application.javascript.JavascriptConfigService;
-
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +26,12 @@ import org.gatein.portal.controller.resource.ResourceId;
 import org.gatein.portal.controller.resource.ResourceScope;
 import org.gatein.portal.controller.resource.script.*;
 import org.gatein.portal.controller.resource.script.Module;
+
+import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.web.application.javascript.JavascriptConfigService;
 
 /**
  * Created by The eXo Platform SAS Mar 27, 2007
@@ -219,19 +220,7 @@ public class JavascriptManager {
         Map<ScriptResource, FetchMode> resolvedPageResources = service.resolveIds(pageResourceIds);
 
         for (ScriptResource rs : resolvedPageResources.keySet()) {
-          ResourceId id = rs.getId();
-          Set<ResourceId> dependencies = service.getResource(id).getClosure();
-
-          boolean isRemote = !rs.isEmpty() && rs.getModules().get(0) instanceof Module.Remote;
-          result.put(id.toString(), isRemote);
-
-          for (ResourceId dependencyId : dependencies) {
-            ScriptResource dependencyResource = service.getResource(dependencyId);
-            if (dependencyResource != null) {
-              boolean isDependencyRemote = !dependencyResource.isEmpty() && dependencyResource.getModules().get(0) instanceof Module.Remote;
-              result.put(dependencyId.toString(), isDependencyRemote);
-            }
-          }
+          addResourceWithDependencies(service, result, rs);
         }
         for (String url : getExtendedScriptURLs()) {
           result.put(url, true);
@@ -261,4 +250,31 @@ public class JavascriptManager {
       }
       return javascriptConfigService;
     }
+
+    private void addResourceWithDependencies(JavascriptConfigService service,
+                                             Map<String, Boolean> result,
+                                             ScriptResource scriptResource) {
+      Set<ResourceId> dependencies = addResource(service, result, scriptResource);
+
+      for (ResourceId dependencyId : dependencies) {
+        ScriptResource dependencyResource = service.getResource(dependencyId);
+        if (dependencyResource != null) {
+          addResourceWithDependencies(service, result, dependencyResource);
+        } else if (PropertyManager.isDevelopping()) {
+          log.warn("Can't find dependent resource {}", dependencyId);
+        }
+      }
+    }
+
+    private Set<ResourceId> addResource(JavascriptConfigService service,
+                                        Map<String, Boolean> result,
+                                        ScriptResource scriptResource) {
+      ResourceId id = scriptResource.getId();
+      Set<ResourceId> dependencies = service.getResource(id).getClosure();
+
+      boolean isRemote = !scriptResource.isEmpty() && scriptResource.getModules().get(0) instanceof Module.Remote;
+      result.put(id.toString(), isRemote);
+      return dependencies;
+    }
+
 }
