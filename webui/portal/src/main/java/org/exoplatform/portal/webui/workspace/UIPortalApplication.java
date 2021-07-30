@@ -707,6 +707,9 @@ public class UIPortalApplication extends UIApplication {
       UIPortalToolPanel toolPanel = uiWorkingWorkspace.findFirstComponentOfType(UIPortalToolPanel.class);
       Set<String> result = new HashSet<>();
       for (UIPortlet uiPortlet : uiPortlets) {
+        if (uiPortlet == null || uiPortlet.getProducedOfferedPortlet() == null) {
+          continue;
+        }
         PortletInfo portletInfo = uiPortlet.getProducedOfferedPortlet().getInfo();
         if (portletInfo instanceof ContainerPortletInfo) {
           String valuesString = ((ContainerPortletInfo) portletInfo).getInitParameter(paramName);
