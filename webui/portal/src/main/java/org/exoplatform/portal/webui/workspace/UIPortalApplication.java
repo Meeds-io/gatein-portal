@@ -79,6 +79,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This extends the UIApplication and hence is a sibling of UIPortletApplication (used by any eXo Portlets as the Parent class
@@ -680,6 +681,15 @@ public class UIPortalApplication extends UIApplication {
     }
 
     /**
+     * @return a set of current page portlet names
+     */
+    public Set<String> getPortletNames() {
+      return getPagePortletInfos().stream()
+                                  .map(ContainerPortletInfo::getName)
+                                  .collect(Collectors.toSet());
+    }
+
+    /**
      * @return a set of current page portlet resource bundle names to preload
      */
     public Set<String> getPortletBundles() {
@@ -693,38 +703,45 @@ public class UIPortalApplication extends UIApplication {
       return getInitParamsOfPagePortlets("preload.resource.stylesheet");
     }
 
-    /**
-     * @return a set of current page portlet REST resources to preload
-     */
-    public Set<String> getPortletRestResources() {
-      return getInitParamsOfPagePortlets("preload.resource.rest");
+    public Set<String> getInitParamsOfPagePortlets(String paramName) {
+      List<ContainerPortletInfo> portletInfos = getPagePortletInfos();
+      Set<String> result = new HashSet<>();
+      for (ContainerPortletInfo portletInfo : portletInfos) {
+        String valuesString = portletInfo.getInitParameter(paramName);
+        if (StringUtils.isNotBlank(valuesString)) {
+          String[] valuesArray = valuesString.contains("|") ? StringUtils.split(valuesString, '|')
+                                                            : StringUtils.split(valuesString, ',');
+          for (String value : valuesArray) {
+            if (StringUtils.isNotBlank(value)) {
+              result.add(value.trim());
+            }
+          }
+        }
+      }
+      return result;
     }
 
-    private Set<String> getInitParamsOfPagePortlets(String paramName) {
-      // Determine portlets visible on the page
+    /**
+     * Find portlets visible on the page
+     * 
+     * @return {@link List} of {@link ContainerPortletInfo} corresponding to
+     *         portlet info on the page
+     */
+    @SuppressWarnings("rawtypes")
+    public List<ContainerPortletInfo> getPagePortletInfos() {
       List<UIPortlet> uiPortlets = new ArrayList<>();
       uiWorkingWorkspace.findComponentOfType(uiPortlets, UIPortlet.class);
-      UIPortalToolPanel toolPanel = uiWorkingWorkspace.findFirstComponentOfType(UIPortalToolPanel.class);
-      Set<String> result = new HashSet<>();
+      List<ContainerPortletInfo> portletInfos = new ArrayList<>();
       for (UIPortlet uiPortlet : uiPortlets) {
         if (uiPortlet == null || uiPortlet.getProducedOfferedPortlet() == null) {
           continue;
         }
         PortletInfo portletInfo = uiPortlet.getProducedOfferedPortlet().getInfo();
         if (portletInfo instanceof ContainerPortletInfo) {
-          String valuesString = ((ContainerPortletInfo) portletInfo).getInitParameter(paramName);
-          if (StringUtils.isNotBlank(valuesString)) {
-            String[] valuesArray = valuesString.contains("|") ? StringUtils.split(valuesString, '|')
-                                                              : StringUtils.split(valuesString, ',');
-            for (String value : valuesArray) {
-              if (StringUtils.isNotBlank(value)) {
-                result.add(value.trim());
-              }
-            }
-          }
+          portletInfos.add((ContainerPortletInfo) portletInfo);
         }
       }
-      return result;
+      return portletInfos;
     }
 
     private SkinConfig getPortletSkinConfig(UIPortlet portlet) {
@@ -864,6 +881,7 @@ public class UIPortalApplication extends UIApplication {
      */
     public void processRender(WebuiRequestContext context) throws Exception {
         PortalRequestContext pcontext = (PortalRequestContext) context;
+        pcontext.setAttribute("requestStartTime", System.currentTimeMillis());
 
         // Reload shared layout if site has changed
         if (!StringUtils.equals(this.lastPortalOwner, pcontext.getPortalOwner())) {
