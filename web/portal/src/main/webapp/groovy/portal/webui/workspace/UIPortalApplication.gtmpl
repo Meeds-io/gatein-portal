@@ -145,6 +145,12 @@
      eXo.session.itvTime = ${session.getMaxInactiveInterval()} ;
 
      require(['SHARED/topbarLoading'], topbarLoading => topbarLoading.init());
+     eXo.env.portal.onLoadCallbacks = eXo.env.portal.onLoadCallbacks || [];
+     eXo.env.portal.onLoad = () => {
+       if (eXo.env.portal.onLoadCallbacks && eXo.env.portal.onLoadCallbacks.length) {
+         eXo.env.portal.onLoadCallbacks.forEach(callback => callback());
+       }
+     };
    </script>
    <%
      def headerElements = rcontext.getExtraMarkupHeadersAsStrings();
@@ -194,7 +200,7 @@
    <% _ctx.includeTemplates("UIPortalApplication-head") %>
  </head>
 
- <body style="height: 100%;" class="$bodyClasses">
+ <body style="height: 100%;" class="$bodyClasses" onload="eXo.env.portal.onLoad()">
    <!-- Include extensible templates configured by Kernel configuration to be imported in the beginning of the body section of the Page -->
    <% _ctx.includeTemplates("UIPortalApplication-Start-body") %>
    <div class="visible-tablet"></div>
