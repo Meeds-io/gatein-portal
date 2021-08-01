@@ -31,6 +31,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.StringUtils;
 import org.gatein.common.i18n.LocalizedString;
 import org.gatein.common.net.media.MediaType;
 import org.gatein.common.util.MultiValuedPropertyMap;
@@ -42,6 +43,7 @@ import org.gatein.pc.api.info.*;
 import org.gatein.pc.api.invocation.*;
 import org.gatein.pc.api.invocation.response.*;
 import org.gatein.pc.api.state.PropertyChange;
+import org.gatein.pc.portlet.impl.info.ContainerPortletInfo;
 import org.gatein.pc.portlet.impl.spi.*;
 import org.gatein.portal.controller.resource.ResourceScope;
 import org.w3c.dom.Element;
@@ -138,6 +140,8 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
     private String theme_;
 
     private String portletStyle;
+
+    private Boolean lazyResourcesLoading = null;
 
     private boolean showPortletMode = true;
 
@@ -1022,8 +1026,19 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
 
         Text markup = null;
         if (pir instanceof FragmentResponse) {
+            if (lazyResourcesLoading == null) {
+              PortletInfo portletInfo = producedOfferedPortlet.getInfo();
+              if (portletInfo instanceof ContainerPortletInfo) {
+                String prefetchResources = ((ContainerPortletInfo) portletInfo).getInitParameter("prefetch.resources");
+                lazyResourcesLoading = StringUtils.equals(prefetchResources, "true");
+              } else {
+                lazyResourcesLoading = false;
+              }
+            }
             JavascriptManager jsMan = context.getJavascriptManager();
-            jsMan.loadScriptResource(ResourceScope.PORTLET, getApplicationId());
+            if (!lazyResourcesLoading) {
+              jsMan.loadScriptResource(ResourceScope.PORTLET, getApplicationId());
+            }
 
             FragmentResponse fragmentResponse = (FragmentResponse) pir;
             switch (fragmentResponse.getType()) {
@@ -1047,7 +1062,7 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
                     for (String key : transportHeaders.keySet()) {
                         if (JAVASCRIPT_DEPENDENCY.equals(key)) {
                             for (String value : transportHeaders.getValues(key)) {
-                                jsMan.require(value);
+                              jsMan.require(value);
                             }
                         } else {
                             for (String value : transportHeaders.getValues(key)) {
