@@ -146,6 +146,12 @@
 
      require(['SHARED/topbarLoading'], topbarLoading => topbarLoading.init());
      eXo.env.portal.onLoadCallbacks = eXo.env.portal.onLoadCallbacks || [];
+     eXo.env.portal.addOnLoadCallback = callback => {
+       eXo.env.portal.onLoadCallbacks.push(callback);
+       if (document.readyState === 'complete') {
+         callback();
+       }
+     };
      eXo.env.portal.onLoad = () => {
        if (eXo.env.portal.onLoadCallbacks && eXo.env.portal.onLoadCallbacks.length) {
          eXo.env.portal.onLoadCallbacks.forEach(callback => callback());
