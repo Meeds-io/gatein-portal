@@ -67,8 +67,10 @@ public class JavascriptManager {
      */
     public void addJavascript(CharSequence s) {
         if (s != null) {
+            scripts.append("try {");
             scripts.append(s.toString().trim());
             scripts.append(";\n");
+            scripts.append("} catch(unhandledError) { console.error(unhandledError); }");
         }
     }
 
@@ -158,8 +160,10 @@ public class JavascriptManager {
 
     public void addCustomizedOnLoadScript(CharSequence s) {
         if (s != null) {
+            customizedOnloadJavascript.append("try {");
             customizedOnloadJavascript.append(s.toString().trim());
             customizedOnloadJavascript.append(";\n");
+            customizedOnloadJavascript.append("} catch(unhandledError) { console.error(unhandledError); }");
         }
     }
 
