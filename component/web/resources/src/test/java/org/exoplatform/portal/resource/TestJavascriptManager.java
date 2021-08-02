@@ -81,7 +81,7 @@ public class TestJavascriptManager extends AbstractWebResourceTest {
         RequireJS require = jsManager.require("SHARED/jquery", "$");
         require.addScripts("$('body').css('color : red');");
 
-        String expected = "window.require([\"SHARED/base\",\"SHARED/jquery\"],function(base,$) {\n$('body').css('color : red');});";
+        String expected = "window.require([\"SHARED/base\",\"SHARED/jquery\"],function(base,$) {\ntry {$('body').css('color : red');} catch(unhandledError) { console.error(unhandledError); }});";
         assertEquals(expected, require.toString());
     }
 
@@ -101,8 +101,8 @@ public class TestJavascriptManager extends AbstractWebResourceTest {
         jsManager.addOnLoadJavascript(onload);
 
         String expected = "window.require([\"SHARED/base\",\"foo\"],function(base,bar) {\n"
-                + "bar.zoo;base.Browser.addOnLoadCallback('mid" + Math.abs(onload.hashCode()) + "'," + onload
-                + ");base.Browser.onLoad();});";
+                + "try {bar.zoo;} catch(unhandledError) { console.error(unhandledError); }try {base.Browser.addOnLoadCallback('mid" + Math.abs(onload.hashCode()) + "'," + onload
+                + ");} catch(unhandledError) { console.error(unhandledError); }try {base.Browser.onLoad();} catch(unhandledError) { console.error(unhandledError); }try {} catch(unhandledError) { console.error(unhandledError); }});";
         assertEquals(expected, jsManager.getJavaScripts());
     }
 }
