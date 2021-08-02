@@ -84,7 +84,9 @@ public class RequireJS {
     }
 
     public RequireJS addScripts(String scripts) {
+        this.scripts.append("try {");
         this.scripts.append(scripts);
+        this.scripts.append("} catch(unhandledError) { console.error(unhandledError); }");
         return this;
     }
   
