@@ -16,7 +16,7 @@
               style="font-size: 22px;"></i>
           </div>
         </a>
-        <script>
+        <script type="text/javascript">
           eXo.portal.hamburgerMenuItems = <%=hamburgerMenuItemsCount%>;
           require(['SHARED/HamburgerMenu'], function(hamgergerMenu) {
             hamgergerMenu.init();
