@@ -48,17 +48,17 @@ public class FutureExoCache<K extends Serializable, V, C> extends FutureCache<K,
     }
 
     @Override
-    protected V get(K key) {
+    public V get(K key) {
         return cache.get(key);
     }
 
     @Override
-    protected void put(K key, V entry) {
+    public void put(K key, V entry) {
         cache.put(key, entry);
     }
 
     @Override
-    protected void putOnly(K key, V value)
+    public void putOnly(K key, V value)
     {
        cache.putLocal(key, value);
     }
