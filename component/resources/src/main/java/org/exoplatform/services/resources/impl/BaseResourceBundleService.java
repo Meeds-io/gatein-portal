@@ -441,7 +441,7 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
                 if (futureCache_ == null) {
                     futureCache_ = new FutureExoCache<String, ResourceBundle, ResourceBundleContext>(loader_, cache_) {
                       @Override
-                      protected ResourceBundle get(String key) {
+                      public ResourceBundle get(String key) {
                         ResourceBundle resourceBundle = super.get(key);
                         return resourceBundle == ExoResourceBundle.NULL_OBJECT ? null : resourceBundle;
                       }
