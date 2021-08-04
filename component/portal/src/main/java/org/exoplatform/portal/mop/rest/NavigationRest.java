@@ -90,7 +90,7 @@ public class NavigationRest implements ResourceContainer {
                                                            .filter(userNavigation -> !userNavigation.getKey()
                                                                                                     .getName()
                                                                                                     .equals("global"))
-                                                           .map(userNavigation -> new ResultUserNavigation(userNavigation))
+                                                           .map(ResultUserNavigation::new)
                                                            .collect(Collectors.toList());
       return Response.ok(allNavs).build();
 
