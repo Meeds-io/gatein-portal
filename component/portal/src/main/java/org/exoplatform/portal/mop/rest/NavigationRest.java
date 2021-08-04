@@ -171,7 +171,9 @@ public class NavigationRest implements ResourceContainer {
 
     try {
       HttpUserPortalContext userPortalContext = new HttpUserPortalContext(request);
-      UserPortalConfig userPortalConfig = portalConfigService.getUserPortalConfig(portalName, username, userPortalContext);
+      UserPortalConfig userPortalConfig = portalConfigService.getUserPortalConfig(portalName,
+                                                                                  username,
+                                                                                  userPortalContext);
       if (userPortalConfig == null) {
         return Response.status(404).build();
       }
