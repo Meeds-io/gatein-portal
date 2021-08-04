@@ -214,7 +214,10 @@ public class NavigationRest implements ResourceContainer {
 
   private static UserNodeFilterConfig getUserFilterConfig(Visibility[] visibilities) {
     UserNodeFilterConfig.Builder builder = UserNodeFilterConfig.builder();
-    builder.withReadWriteCheck().withVisibility(visibilities).withTemporalCheck().withReadCheck();
+    builder.withReadWriteCheck()
+           .withVisibility(visibilities)
+           .withTemporalCheck()
+           .withReadCheck();
     return builder.build();
   }
 
