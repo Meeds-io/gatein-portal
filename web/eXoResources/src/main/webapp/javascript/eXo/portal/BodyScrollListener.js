@@ -13,6 +13,7 @@ function installScrollControlListener() {
     shadowBox.style.top = 0;
     shadowBox.style.left = 0;
     shadowBox.style.right = 0;
+    shadowBox.style.zIndex = -1;
     shadowBox.style.visibility = 'hidden';
     document.querySelector('.MiddleToolBarTDContainer .MiddleToolBar').appendChild(shadowBox);
     $siteBody[0].addEventListener('scroll', controlBodyScrollClass, false);
