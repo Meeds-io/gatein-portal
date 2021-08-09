@@ -1,28 +1,52 @@
 package org.exoplatform.portal.mop.rest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
-import org.exoplatform.portal.mop.*;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.user.*;
+import org.exoplatform.portal.mop.user.HttpUserPortalContext;
+import org.exoplatform.portal.mop.user.UserNavigation;
+import org.exoplatform.portal.mop.user.UserNode;
+import org.exoplatform.portal.mop.user.UserNodeFilterConfig;
+import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.rest.resource.ResourceContainer;
-import org.exoplatform.services.security.*;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
+import org.exoplatform.services.security.IdentityConstants;
 import org.exoplatform.ws.frameworks.json.impl.JsonParserImpl;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @Path("/v1/navigations")
 @Api(tags = "/v1/navigations", value = "/v1/navigations", description = "Retrieve sites navigations") // NOSONAR
@@ -40,46 +64,58 @@ public class NavigationRest implements ResourceContainer {
     this.portalConfigService = portalConfigService;
   }
 
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Gets navigations", httpMethod = "GET", response = Response.class, notes = "This returns site navigations")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"), @ApiResponse(code = 404, message = "Navigation does not exist"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response getSiteNavigation(@Context HttpServletRequest request) {
+    HttpUserPortalContext userPortalContext = new HttpUserPortalContext(request);
+    String portalName = portalConfigService.getDefaultPortal();
+
+    ConversationState state = ConversationState.getCurrent();
+    Identity userIdentity = state == null ? null : state.getIdentity();
+    String username = userIdentity == null ? null : userIdentity.getUserId();
+    if (StringUtils.equals(username, IdentityConstants.ANONIM)) {
+      username = null;
+    }
+
+    try {
+      UserPortalConfig userPortalConfig = portalConfigService.getUserPortalConfig(portalName, username, userPortalContext);
+      List<ResultUserNavigation> allNavs = userPortalConfig.getUserPortal()
+                                                           .getNavigations()
+                                                           .stream()
+                                                           .filter(userNavigation -> !userNavigation.getKey()
+                                                                                                    .getName()
+                                                                                                    .equals("global"))
+                                                           .map(ResultUserNavigation::new)
+                                                           .collect(Collectors.toList());
+      return Response.ok(allNavs).build();
+
+    } catch (Exception e) {
+      LOG.error("Error retrieving navigations", e);
+      return Response.status(500).build();
+    }
+
+  }
+
   @Path("/{siteType}")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(
-      value = "Gets navigations of one or multiple site navigations",
-      httpMethod = "GET",
-      response = Response.class,
-      notes = "This returns the requested site navigations"
-  )
-  @ApiResponses(
-      value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 400, message = "Invalid query input"),
-          @ApiResponse(code = 404, message = "Navigation does not exist"),
-          @ApiResponse(code = 500, message = "Internal server error")
-      }
-  )
+  @ApiOperation(value = "Gets navigations of one or multiple site navigations", httpMethod = "GET", response = Response.class, notes = "This returns the requested site navigations")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"), @ApiResponse(code = 404, message = "Navigation does not exist"),
+      @ApiResponse(code = 500, message = "Internal server error") })
   public Response getSiteTypeNavigations(@Context HttpServletRequest request,
-                                         @ApiParam(
-                                             value = "Portal site type, possible values: PORTAL, GROUP or USER",
-                                             required = true
-                                         ) @PathParam("siteType") String siteTypeName,
-                                         @ApiParam(
-                                             value = "Site names regex to exclude from results",
-                                             required = false
-                                         ) @QueryParam("exclude") String excludedSiteName,
-                                         @ApiParam(value = "Portal site name", required = true) @QueryParam(
-                                           "siteName"
-                                         ) String siteName,
-                                         @ApiParam(
-                                             value = "Scope of navigations tree to retrieve, possible values: ALL, CHILDREN, GRANDCHILDREN, SINGLE",
-                                             defaultValue = "ALL",
-                                             required = false
-                                         ) @QueryParam("scope") String scopeName,
-                                         @ApiParam(
-                                             value = "Multivalued visibilities of navigation nodes to retrieve, possible values: DISPLAYED, HIDDEN, SYSTEM or TEMPORAL. If empty, all visibilities will be used.",
-                                             defaultValue = "All possible values combined",
-                                             required = false
-                                         ) @QueryParam("visibility") List<String> visibilityNames) {
+                                         @ApiParam(value = "Portal site type, possible values: PORTAL, GROUP or USER", required = true) @PathParam("siteType") String siteTypeName,
+                                         @ApiParam(value = "Site names regex to exclude from results", required = false) @QueryParam("exclude") String excludedSiteName,
+                                         @ApiParam(value = "Portal site name", required = true) @QueryParam("siteName") String siteName,
+                                         @ApiParam(value = "Scope of navigations tree to retrieve, possible values: ALL, CHILDREN, GRANDCHILDREN, SINGLE", defaultValue = "ALL", required = false) @QueryParam("scope") String scopeName,
+                                         @ApiParam(value = "Multivalued visibilities of navigation nodes to retrieve, possible values: DISPLAYED, HIDDEN, SYSTEM or TEMPORAL. If empty, all visibilities will be used.", defaultValue = "All possible values combined", required = false) @QueryParam("visibility") List<String> visibilityNames) {
+    // this function return nodes and not navigations
     if (StringUtils.isBlank(siteTypeName)) {
       return Response.status(400).build();
     }
@@ -288,4 +324,43 @@ public class NavigationRest implements ResourceContainer {
       return userNode.getPageRef();
     }
   }
+
+  /**
+   * A class to retrieve {@link UserNavigation} attributes by avoiding cyclic JSON
+   * parsing of instance when retrieving {@link UserNavigation#getBundle()}
+   * attributes using {@link JsonParserImpl}
+   */
+  public static final class ResultUserNavigation {
+    public SiteKey getKey() {
+      return key;
+    }
+
+    public String getLabel() {
+      return label;
+    }
+
+    private SiteKey key;
+
+    private String  label;
+
+    public ResultUserNavigation(UserNavigation userNavigation) {
+      key = userNavigation.getKey();
+      if (key.getType().equals(SiteType.GROUP)) {
+        try {
+          OrganizationService orgService = ExoContainerContext.getCurrentContainer()
+                                                              .getComponentInstanceOfType(OrganizationService.class);
+          Group group = orgService.getGroupHandler().findGroupById(key.getName());
+          if (group != null) {
+            label = group.getLabel();
+          }
+        } catch (Exception e) {
+          LOG.error("Error when getting group label {}", key.getName(), e);
+        }
+      } else {
+        label = key.getName();
+      }
+    }
+
+  }
+
 }
