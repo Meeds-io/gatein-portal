@@ -153,7 +153,8 @@
        }
      };
      eXo.env.portal.onLoad = () => {
-       if (eXo.env.portal.onLoadCallbacks && eXo.env.portal.onLoadCallbacks.length) {
+       if (!eXo.env.portal.onLoadTriggered && eXo.env.portal.onLoadCallbacks && eXo.env.portal.onLoadCallbacks.length) {
+         eXo.env.portal.onLoadTriggered = true;
          eXo.env.portal.onLoadCallbacks.forEach(callback => callback());
        }
      };
