@@ -20,11 +20,11 @@ public class PortalHttpServletResponseWrapper extends HttpServletResponseWrapper
 
   private String                          redirectLocation;
 
-  private List<Map.Entry<String, String>> addedHeaders  = new ArrayList<Map.Entry<String, String>>();
+  private List<Map.Entry<String, String>> addedHeaders  = new ArrayList<>();
 
-  private Map<String, String>             settedHeaders = new HashMap<String, String>();
+  private Map<String, String>             settedHeaders = new HashMap<>();
 
-  private List<Cookie>                    cookies       = new ArrayList<Cookie>();
+  private List<Cookie>                    cookies       = new ArrayList<>();
 
   private boolean                         isError       = false;
 
@@ -34,8 +34,11 @@ public class PortalHttpServletResponseWrapper extends HttpServletResponseWrapper
 
   private boolean                         wrapMethods   = false;
 
+  private HttpServletResponse             response;
+
   public PortalHttpServletResponseWrapper(HttpServletResponse response) {
     super(response);
+    this.response = response;
   }
 
   @Override
@@ -86,10 +89,18 @@ public class PortalHttpServletResponseWrapper extends HttpServletResponseWrapper
     }
   }
 
+  public void addHeader(String name, String value, boolean wrapMethods) {
+    if (wrapMethods) {
+      this.addHeader(name, value);
+    } else {
+      this.response.addHeader(name, value);
+    }
+  }
+
   @Override
   public void addHeader(String name, String value) {
     if (wrapMethods) {
-      addedHeaders.add(new AbstractMap.SimpleEntry<String, String>(name, value));
+      addedHeaders.add(new AbstractMap.SimpleEntry<>(name, value));
     } else {
       super.addHeader(name, value);
     }
@@ -107,7 +118,6 @@ public class PortalHttpServletResponseWrapper extends HttpServletResponseWrapper
     if (!wrapMethods) {
       return;
     }
-    HttpServletResponse response = (HttpServletResponse) getResponse();
     if (!addedHeaders.isEmpty()) {
       for (Entry<String, String> entry : addedHeaders) {
         response.addHeader(entry.getKey(), entry.getValue());
