@@ -234,6 +234,7 @@ public class LocalizationLifecycle extends BaseComponentPlugin implements Applic
     Cookie cookie = new Cookie(LOCALE_COOKIE, LocaleContextInfo.getLocaleAsString(loc));
     cookie.setMaxAge(Integer.MAX_VALUE);
     cookie.setPath("/");
+    cookie.setSecure(true);
     res.addCookie(cookie);
   }
 

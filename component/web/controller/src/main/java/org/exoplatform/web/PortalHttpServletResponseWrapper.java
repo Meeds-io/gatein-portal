@@ -61,6 +61,7 @@ public class PortalHttpServletResponseWrapper extends HttpServletResponseWrapper
 
   @Override
   public void addCookie(Cookie cookie) {
+    cookie.setSecure(true);
     if (wrapMethods) {
       cookies.add(cookie);
     } else {
@@ -132,6 +133,7 @@ public class PortalHttpServletResponseWrapper extends HttpServletResponseWrapper
     }
     if (!cookies.isEmpty()) {
       for (Cookie cookie : cookies) {
+        cookie.setSecure(true);
         response.addCookie(cookie);
       }
       cookies.clear();

@@ -365,11 +365,13 @@ public class UIPortal extends UIContainer {
             Cookie cookie = new Cookie(LoginServlet.COOKIE_NAME, "");
             cookie.setPath(req.getContextPath());
             cookie.setMaxAge(0);
+            cookie.setSecure(true);
             prContext.getResponse().addCookie(cookie);
 
             Cookie oauthCookie = new Cookie(LoginServlet.OAUTH_COOKIE_NAME, "");
             oauthCookie.setPath(req.getContextPath());
             oauthCookie.setMaxAge(0);
+            oauthCookie.setSecure(true);
             prContext.getResponse().addCookie(oauthCookie);
 
             prContext.sendRedirect("/");

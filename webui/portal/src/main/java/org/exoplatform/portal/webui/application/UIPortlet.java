@@ -1076,6 +1076,7 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
                 if (fragmentResponse.getProperties().getCookies() != null) {
                     List<Cookie> cookies = fragmentResponse.getProperties().getCookies();
                     for (Cookie cookie : cookies) {
+                        cookie.setSecure(true);
                         prcontext.getResponse().addCookie(cookie);
                     }
                 }

@@ -248,6 +248,7 @@ public class LoginServlet extends AbstractHttpServlet {
                         cookie.setPath("/");
                         cookie.setHttpOnly(true);
                         cookie.setMaxAge((int) tokenService.getValidityTime());
+                        cookie.setSecure(true);
                         resp.addCookie(cookie);
 
                     } else {
@@ -259,6 +260,7 @@ public class LoginServlet extends AbstractHttpServlet {
                             Cookie cookie = new Cookie(OAUTH_COOKIE_NAME, cookieToken);
                             cookie.setPath("/");
                             cookie.setMaxAge((int) tokenService.getValidityTime());
+                            cookie.setSecure(true);
                             resp.addCookie(cookie);
 
                             req.getSession().removeAttribute(SESSION_ATTRIBUTE_REMEMBER_ME);
