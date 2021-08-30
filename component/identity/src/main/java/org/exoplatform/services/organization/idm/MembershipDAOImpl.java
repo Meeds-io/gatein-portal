@@ -41,7 +41,7 @@ public class MembershipDAOImpl extends AbstractDAOImpl implements MembershipHand
 
     public MembershipDAOImpl(PicketLinkIDMOrganizationServiceImpl orgService, PicketLinkIDMService service) {
         super(orgService, service);
-        listeners_ = new ListenerStack(5);
+        listeners_ = new ListenerStack(6);
     }
 
     public void addMembershipEventListener(MembershipEventListener listener) {
