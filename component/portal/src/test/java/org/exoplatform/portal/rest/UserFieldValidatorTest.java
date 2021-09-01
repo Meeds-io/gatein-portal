@@ -89,4 +89,16 @@ public class UserFieldValidatorTest {
     }
   }
 
+  @Test
+  public void testValidatePassword() {
+    System.setProperty("gatein.validators.passwordpolicy.regexp", "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,20})");
+    System.setProperty("gatein.validators.passwordpolicy.length.max", "20");
+    System.setProperty("gatein.validators.passwordpolicy.length.min", "8");
+
+    UserFieldValidator passwordValidator = new UserFieldValidator("password", false, false);
+    assertNotNull(passwordValidator.validate(Locale.ENGLISH, "passw"));
+    assertNotNull(passwordValidator.validate(Locale.ENGLISH, "1aa"));
+    assertNotNull(passwordValidator.validate(Locale.ENGLISH, "newPassword"));
+    assertNull(passwordValidator.validate(Locale.ENGLISH, "newPassword1"));
+  }
 }
