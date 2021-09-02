@@ -36,6 +36,8 @@ public class UserFieldValidator {
 
   private boolean                      emailValidation    = false;
 
+  private boolean                      passwordValidation    = false;
+
   private String                       field              = null;
 
   private String                       pattern            = null;
@@ -51,6 +53,7 @@ public class UserFieldValidator {
     this.usernameValidation = usernameValidation;
     this.personalNameValidation = personalNameValidation;
     this.emailValidation = StringUtils.contains(this.field, "email");
+    this.passwordValidation = StringUtils.contains(this.field, "password");
 
     String prefixedKey = KEY_PREFIX + field;
 
@@ -139,8 +142,15 @@ public class UserFieldValidator {
           return getLabel(locale, "UsernameValidator.msg.Invalid-char", label);
         }
       }
+    } else if (passwordValidation) {
+      Pattern customPasswordPattern = Pattern.compile(PropertyManager.getProperty("gatein.validators.passwordpolicy.regexp"));
+      int customPasswordMaxlength = Integer.parseInt(PropertyManager.getProperty("gatein.validators.passwordpolicy.length.max"));
+      int customPasswordMinlength = Integer.parseInt(PropertyManager.getProperty("gatein.validators.passwordpolicy.length.min"));
+      if (!customPasswordPattern.matcher(value).matches() || customPasswordMaxlength < value.length() || customPasswordMinlength > value.length()) {
+        String passwordPolicyProperty = PropertyManager.getProperty("gatein.validators.passwordpolicy.format.message");
+        return passwordPolicyProperty != null ? passwordPolicyProperty : getLabel(locale, "onboarding.login.passwordCondition");
+      }
     }
-
     return null;
   }
 
