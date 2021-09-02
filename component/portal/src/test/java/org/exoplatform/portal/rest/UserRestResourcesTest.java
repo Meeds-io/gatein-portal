@@ -1,6 +1,5 @@
 package org.exoplatform.portal.rest;
 
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
@@ -18,8 +17,6 @@ import org.exoplatform.services.organization.*;
 import org.exoplatform.services.organization.idm.UserImpl;
 import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.services.rest.impl.*;
-import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.test.mock.MockHttpServletRequest;
 
 public class UserRestResourcesTest extends BaseRestServicesTestCase {
@@ -102,7 +99,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     // Given
     String path = getChangePasswordPath(USER_1);
     String currentPassword = "currentPassword";
-    String newPassword = "newPassword";
+    String newPassword = "newPassword1";
     MockHttpServletRequest httpRequest = getChangePasswordRequest(path, currentPassword, newPassword);
 
     EnvironmentContext envctx = new EnvironmentContext();
@@ -186,7 +183,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     // Given
     String path = getChangePasswordPath(USER_1);
     String currentPassword = "currentPassword";
-    String newPassword = "newPassword";
+    String newPassword = "newPassword1";
     MockHttpServletRequest httpRequest = getChangePasswordRequest(path, currentPassword, newPassword);
     EnvironmentContext envctx = new EnvironmentContext();
     envctx.put(HttpServletRequest.class, httpRequest);
@@ -327,7 +324,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     data.put("userName", USER_2);
     data.put("lastName", USER_2);
     data.put("firstName", USER_2);
-    data.put("password", "password");
+    data.put("password", "newPassword1");
     data.put("email", USER_2 + "@example.com");
     response = getResponse("POST", "/v1/users", data.toString());
     assertNotNull(response);
@@ -426,7 +423,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     data.put("userName", USER_2);
     data.put("lastName", USER_2);
     data.put("firstName", USER_2);
-    data.put("password", "password");
+    data.put("password", "newPassword1");
     data.put("email", email2);
     response = getResponse("PUT", "/v1/users", data.toString());
     assertNotNull(response);
