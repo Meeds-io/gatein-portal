@@ -143,12 +143,28 @@ public class UserFieldValidator {
         }
       }
     } else if (passwordValidation) {
-      Pattern customPasswordPattern = Pattern.compile(PropertyManager.getProperty("gatein.validators.passwordpolicy.regexp"));
-      int customPasswordMaxlength = Integer.parseInt(PropertyManager.getProperty("gatein.validators.passwordpolicy.length.max"));
-      int customPasswordMinlength = Integer.parseInt(PropertyManager.getProperty("gatein.validators.passwordpolicy.length.min"));
-      if (!customPasswordPattern.matcher(value).matches() || customPasswordMaxlength < value.length() || customPasswordMinlength > value.length()) {
+      String regexProperty = PropertyManager.getProperty("gatein.validators.passwordpolicy.regexp");
+      String maxLengthProperty = PropertyManager.getProperty("gatein.validators.passwordpolicy.length.max");
+      String minLengthProperty = PropertyManager.getProperty("gatein.validators.passwordpolicy.length.min");
+      Pattern customPasswordPattern = null;
+      int customPasswordMaxlength = -1;
+      int customPasswordMinlength = -1;
+      if (regexProperty != null) {
+        customPasswordPattern = Pattern.compile(regexProperty);
+      }
+      if (maxLengthProperty != null) {
+        customPasswordMaxlength = Integer.parseInt(maxLengthProperty);
+      }
+      if (minLengthProperty != null) {
+        customPasswordMinlength = Integer.parseInt(minLengthProperty);
+      }
+      if (customPasswordPattern != null && !customPasswordPattern.matcher(value).matches() ||
+              customPasswordMaxlength != -1 && customPasswordMaxlength < value.length() ||
+              customPasswordMinlength != -1 && customPasswordMinlength > value.length()) {
+
         String passwordPolicyProperty = PropertyManager.getProperty("gatein.validators.passwordpolicy.format.message");
         return passwordPolicyProperty != null ? passwordPolicyProperty : getLabel(locale, "onboarding.login.passwordCondition");
+
       }
     }
     return null;
