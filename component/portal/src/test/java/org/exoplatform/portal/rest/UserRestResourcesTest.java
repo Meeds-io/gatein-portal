@@ -62,9 +62,6 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
       resourceBundleService = Mockito.mock(ResourceBundleService.class);
       container.registerComponentInstance(resourceBundleService);
     }
-    System.setProperty("gatein.validators.passwordpolicy.regexp", "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,20})");
-    System.setProperty("gatein.validators.passwordpolicy.length.max", "20");
-    System.setProperty("gatein.validators.passwordpolicy.length.min", "6");
   }
 
   @Override
