@@ -332,6 +332,11 @@
         <artifactId>exo.portal.cdi.contexts</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.microservices</artifactId>
+        <version>${project.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   

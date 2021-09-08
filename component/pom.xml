@@ -47,6 +47,7 @@
     <module>scripting</module>
     <module>management</module>
     <module>identity</module>
+    <module>microservices</module>
   </modules>
 
 </project>
