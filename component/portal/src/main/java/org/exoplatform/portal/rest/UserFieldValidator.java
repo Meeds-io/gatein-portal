@@ -87,7 +87,7 @@ public class UserFieldValidator {
       return getLabel(locale, "EmptyFieldValidator.msg.empty-input", label);
     }
     char[] buff = value.toCharArray();
-    if (buff.length < minLength || buff.length > maxLength) {
+    if ((buff.length < minLength || buff.length > maxLength) && !passwordValidation) {
       String label = getFieldLabel(locale);
       return getLabel(locale, "StringLengthValidator.msg.length-invalid", label, minLength, maxLength);
     }
