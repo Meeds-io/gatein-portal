@@ -334,7 +334,17 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.microservices</artifactId>
+        <artifactId>exo.portal.component.microservices-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.microservices-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.microservices-server</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>

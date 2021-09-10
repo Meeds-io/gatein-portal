@@ -26,9 +26,9 @@
     <version>6.3.x-microservices-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>exo.portal.component.microservices</artifactId>
+  <artifactId>exo.portal.component.microservices-server</artifactId>
   <packaging>jar</packaging>
-  <name>GateIn Portal Component Microservices</name>
+  <name>GateIn Portal Component Microservices Server</name>
 
   <properties>
     <exo.test.coverage.ratio>0</exo.test.coverage.ratio>
@@ -37,8 +37,11 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.api</artifactId>
+      <artifactId>exo.portal.component.microservices-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-services</artifactId>
     </dependency>
   </dependencies>
-
 </project>

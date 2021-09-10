@@ -185,7 +185,7 @@
   </component>
 
   <component>
-    <key>org.exoplatform.portal.config.UserPortalConfigService</key>
+    <key>org.exoplatform.portal.config.PortalConfigService</key>
     <type>org.exoplatform.portal.config.UserPortalConfigService</type>
     <component-plugins>
       <component-plugin>

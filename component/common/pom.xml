@@ -83,11 +83,6 @@
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.organization.api</artifactId>
     </dependency>
-    <!-- Staxnav -->
-    <dependency>
-      <groupId>org.staxnav</groupId>
-      <artifactId>staxnav.core</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>org.apache.commons</groupId>

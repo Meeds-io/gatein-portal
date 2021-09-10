@@ -33,7 +33,7 @@
   </description>
 
   <properties>
-    <exo.test.coverage.ratio>0.69</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.02</exo.test.coverage.ratio>
     <japex.runIterations>100000</japex.runIterations>
     <japex.numberOfThreads>1</japex.numberOfThreads>
   </properties>
