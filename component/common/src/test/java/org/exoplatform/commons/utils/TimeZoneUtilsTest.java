@@ -13,7 +13,7 @@ public class TimeZoneUtilsTest {
     List<TimeZone> timezones = TimeZoneUtils.getTimeZones();
     assertNotNull(timezones);
     assertTrue("List timezones must cover at least 24 timezones", timezones.size() > 24);
-    int oldOffset = -12 * 3600 * 1000;
+    int oldOffset = -13 * 3600 * 1000;
     for (TimeZone timeZone : timezones) {
       assertTrue(timeZone.getRawOffset() > oldOffset);
       oldOffset = timeZone.getRawOffset();

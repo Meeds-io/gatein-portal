@@ -38,6 +38,7 @@
     <module>api</module>
     <module>test</module>
     <module>common</module>
+    <module>settings</module>
     <module>file-storage</module>
     <module>pc</module>
     <module>resources</module>
