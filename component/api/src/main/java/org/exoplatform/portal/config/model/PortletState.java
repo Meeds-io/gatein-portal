@@ -17,10 +17,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.exoplatform.portal.webui.application;
-
-import org.exoplatform.portal.config.model.ApplicationState;
-import org.exoplatform.portal.config.model.ApplicationType;
+package org.exoplatform.portal.config.model;
 
 /**
  * Group the application state and the application id to form the state of a portlet.

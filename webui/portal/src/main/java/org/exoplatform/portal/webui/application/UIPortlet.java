@@ -57,6 +57,7 @@ import org.exoplatform.portal.application.state.ContextualPropertyManager;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.NoSuchDataException;
 import org.exoplatform.portal.config.model.ApplicationType;
+import org.exoplatform.portal.config.model.PortletState;
 import org.exoplatform.portal.module.ModuleRegistry;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.portlet.PortletExceptionHandleService;

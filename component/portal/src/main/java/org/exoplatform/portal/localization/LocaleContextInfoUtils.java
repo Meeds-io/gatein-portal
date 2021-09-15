@@ -7,6 +7,7 @@ import javax.servlet.http.*;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.container.*;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -84,7 +85,7 @@ public class LocaleContextInfoUtils {
     Locale sessionLocale = lastLocaleLangauge == null ? getSessionLocale(request) : LocaleUtils.toLocale(lastLocaleLangauge);
     localeCtx.setSessionLocale(sessionLocale);
     // continue setting localCtx with data fetched from request
-    localeCtx.setUserProfileLocale(getUserLocale(username));
+    localeCtx.setUserProfileLocale(I18N.getUserLocale(username));
     localeCtx.setBrowserLocales(Collections.list(request.getLocales()));
     localeCtx.setCookieLocales(getCookieLocales(request));
     localeCtx.setRemoteUser(username);
@@ -99,7 +100,7 @@ public class LocaleContextInfoUtils {
   public static LocaleContextInfo buildLocaleContextInfo(String userId) {
     LocaleContextInfo localeCtx = new LocaleContextInfo();
     localeCtx.setSupportedLocales(getSupportedLocales());
-    localeCtx.setUserProfileLocale(getUserLocale(userId));
+    localeCtx.setUserProfileLocale(I18N.getUserLocale(userId));
     localeCtx.setRemoteUser(userId);
     localeCtx.setPortalLocale(getPortalLocale());
     return localeCtx;
@@ -170,38 +171,6 @@ public class LocaleContextInfoUtils {
     if (session != null)
       lang = (String) session.getAttribute(attrName);
     return (lang != null) ? LocaleContextInfo.getLocale(lang) : null;
-  }
-  
-  /**
-   * Helper method to retrieve user locale from UserProfile
-   * @param userId
-   * @return user locale
-   */
-  private static Locale getUserLocale(String userId) {
-    String lang = "";
-    UserProfile profile = null;
-    //
-    if(userId != null) {
-      OrganizationService organizationService = ExoContainerContext.getCurrentContainer()
-                .getComponentInstanceOfType(OrganizationService.class);
-      // get user profile
-      beginContext(organizationService);
-      try {
-        profile = organizationService.getUserProfileHandler().findUserProfileByName(userId);
-      } catch (Exception e) {
-        LOG.debug(userId + " profile not found ", e);
-      } finally {
-        endContext(organizationService);
-      }
-      // fetch profile lang
-      if(profile != null) {
-        lang = profile.getAttribute(Constants.USER_LANGUAGE);
-      }
-      if (lang != null && lang.trim().length() > 0) {
-        return LocaleUtils.toLocale(lang);
-      }
-    }
-    return null;
   }
   
   /**

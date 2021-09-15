@@ -21,6 +21,15 @@ package org.exoplatform.commons.utils;
 
 import org.apache.commons.lang3.LocaleUtils;
 
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.component.ComponentRequestLifecycle;
+import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.UserProfile;
+
 import java.util.Locale;
 
 
@@ -30,6 +39,10 @@ import java.util.Locale;
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
 public class I18N {
+
+    public static final String USER_LANGUAGE = "user.language";
+
+    private static final Log LOG = ExoLogger.getLogger(I18N.class);
 
     /**
      * Provide a string representation of the locale argument to the {@link java.util.Locale#toString()} method.
@@ -132,5 +145,44 @@ public class I18N {
                 return null;
             }
         }
+    }
+
+    /**
+     * Helper method to retrieve user locale from UserProfile
+     * @param userId
+     * @return user locale
+     */
+    public static Locale getUserLocale(String userId) {
+      String lang = "";
+      UserProfile profile = null;
+      //
+      if(userId != null) {
+        OrganizationService organizationService = ExoContainerContext.getCurrentContainer()
+                  .getComponentInstanceOfType(OrganizationService.class);
+        if (organizationService == null) {
+          organizationService = PortalContainer.getInstance().getComponentInstanceOfType(OrganizationService.class);
+        }
+        // Get user profile
+        if (organizationService instanceof ComponentRequestLifecycle) {
+          RequestLifeCycle.begin((ComponentRequestLifecycle) organizationService);
+        }
+        try {
+          profile = organizationService.getUserProfileHandler().findUserProfileByName(userId);
+        } catch (Exception e) {
+          LOG.debug(userId + " profile not found ", e);
+        } finally {
+          if (organizationService instanceof ComponentRequestLifecycle) {
+            RequestLifeCycle.end();
+          }
+        }
+        // Fetch profile lang
+        if(profile != null) {
+          lang = profile.getAttribute(USER_LANGUAGE);
+        }
+        if (lang != null && lang.trim().length() > 0) {
+          return LocaleUtils.toLocale(lang);
+        }
+      }
+      return Locale.getDefault();
     }
 }
