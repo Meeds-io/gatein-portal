@@ -8,7 +8,7 @@
       <properties-param>
         <name>PWAServiceWorker</name>
         <description>PWA Service Worker Feature enablement flag</description>
-        <property name="exo.feature.PWAServiceWorker.enabled" value="${exo.feature.PWAServiceWorker.enabled:true}" />
+        <property name="exo.feature.PWAServiceWorker.enabled" value="${exo.feature.PWAServiceWorker.enabled:false}" />
       </properties-param>
     </init-params>
   </component>
