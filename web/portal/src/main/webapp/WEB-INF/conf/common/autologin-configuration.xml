@@ -46,8 +46,8 @@
       <values-param>
         <name>service.configuration</name>
         <value>cookie-token</value>
-        <value>7</value>
-        <value>DAY</value>
+        <value>${exo.token.rememberme.expiration.value:7}</value>
+        <value>${exo.token.rememberme.expiration.unit:DAY}</value>
         <value>autologin</value>
       </values-param>
     </init-params>
