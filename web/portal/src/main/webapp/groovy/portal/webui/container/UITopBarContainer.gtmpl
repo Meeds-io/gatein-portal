@@ -18,7 +18,7 @@
 	jsmanager.require("SHARED/portal", "portal").
 	addScripts("portal.UIPortal.initMouseHover('" + uicomponent.id + "');");
 %>
-<div id="UITopBarContainerParent" class="<%=uiComponentClass%>">
+<div id="UITopBarContainerParent" class="<%=uiComponentClass%>" role="banner">
   <div class="UIContainer UITopBarContainer <%=uiPortalApp.isEditing()?"EdittingContainer":""%> <%=hasPermission?"": "ProtectedContainer"%>" id="${uicomponent.id}">
   	<div class="NormalContainerBlock">
   	<%
