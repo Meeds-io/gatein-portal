@@ -547,30 +547,11 @@
 		 * Adjust height of the element to fill up free space if any
 		 */
 		fillUpFreeSpace : function(elemt) {
-		  if(typeof(elemt) == "string")
+		  if (typeof(elemt) == "string") {
 		    elemt = document.getElementById(elemt);
-			
-		  var height = eXo.core.Browser.getHeightOfFreeSpace();
-		  if (height > 0 && elemt != undefined)
-		  {
-		    height += elemt.offsetHeight;
-		    elemt.style.height = height + "px";
-		  }
-		  
-		  var jDoc = $(document), jElm = $(elemt);
-		  var docH = jDoc.height();
-		  while(jDoc.height() == docH) {
-		  	jElm.height(jElm.height() + 1);		  	
-		  }
-		  height = jElm.height() - 1;
-		  //if the vertical scrollbar appears, it'll reduce the page's width 
-		  //a html item may be pushed to the next line if there is not enoungh space
-		  while (jDoc.height() > docH) {
-			  jElm.height(jElm.height() - 1);
-		  }
-		  //need to wait for sometime until browser hide the scrollbar 
-		  window.setTimeout(function() {jElm.height(height)}, 100);
-		}		
+      }
+      elemt.style.maxHeight = `${elemt.scrollHeight - 50}px`;
+		}
 	};
 	
 	eXo.core.Browser.init();
