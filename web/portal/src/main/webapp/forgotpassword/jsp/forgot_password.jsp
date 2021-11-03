@@ -63,7 +63,7 @@
 
 
     String initURL = (String)request.getAttribute("initURL");
-    if (initURL == null) {
+    if (initURL == null || !initURL.equals(contextPath + "/login")) {
         initURL = contextPath + "/login";
     }
 
