@@ -152,6 +152,96 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
     }
 
+    public void moveGroup(Group parentOriginGroup, Group parentTargetGroup,Group groupToMove) throws Exception {
+        //find ParentOriginGroup
+        if (log.isTraceEnabled()) {
+            Tools.logMethodIn(log, LogLevel.TRACE, "moveGroup", new Object[] { "parentOriginGroup", parentOriginGroup,"parentTargetGroup", parentTargetGroup,
+                "groupToMove", groupToMove });
+        }
+
+        org.picketlink.idm.api.Group jbidParentOriginGroup = null;
+        String plParentOriginGroupName = getPLIDMGroupName(parentOriginGroup.getGroupName());
+        try {
+            jbidParentOriginGroup = getIdentitySession().getPersistenceManager()
+                                                  .findGroup(plParentOriginGroupName,
+                                                             orgService.getConfiguration().getGroupType(parentOriginGroup.getParentId()));
+        } catch (Exception e) {
+            // TODO:
+            handleException("Identity operation error: ", e);
+        }
+
+        //find ParentTargetGroup
+        org.picketlink.idm.api.Group jbidParentTargetGroup = null;
+        String plParentTargetGroupName = getPLIDMGroupName(parentTargetGroup.getGroupName());
+        try {
+            jbidParentTargetGroup = getIdentitySession().getPersistenceManager()
+                                                        .findGroup(plParentTargetGroupName,
+                                                                   orgService.getConfiguration().getGroupType(parentTargetGroup.getParentId()));
+        } catch (Exception e) {
+            // TODO:
+            handleException("Identity operation error: ", e);
+        }
+
+        //find groupToMove
+        org.picketlink.idm.api.Group jbidGroupToMove = null;
+        String plGroupToMoveName = getPLIDMGroupName(groupToMove.getGroupName());
+        try {
+            jbidGroupToMove = getIdentitySession().getPersistenceManager()
+                                                        .findGroup(plGroupToMoveName,
+                                                                   orgService.getConfiguration().getGroupType(groupToMove.getParentId()));
+        } catch (Exception e) {
+            // TODO:
+            handleException("Identity operation error: ", e);
+        }
+
+        //if one is miossing => error
+        if (jbidParentOriginGroup == null) {
+            throw new Exception("Group " + jbidParentOriginGroup + " does not exists");
+        }
+        if (jbidParentTargetGroup == null) {
+            throw new Exception("Group " + jbidParentOriginGroup + " does not exists");
+        }
+        if (jbidGroupToMove == null) {
+            throw new Exception("Group " + jbidGroupToMove + " does not exists");
+        }
+
+
+
+
+
+
+        //use RelationshiManager.disassociated
+        try {
+            getIdentitySession().getRelationshipManager()
+                                                 .disassociateGroups(jbidParentOriginGroup, List.of(jbidGroupToMove));
+        } catch (Exception e) {
+            handleException("Cannot dissociate: " + plGroupToMoveName + " to "+plParentOriginGroupName+"; ", e);
+        }
+        //use RelationshiManager.associate
+        try {
+            getIdentitySession().getRelationshipManager()
+                                .associateGroups(jbidParentTargetGroup,jbidGroupToMove);
+        } catch (Exception e) {
+            handleException("Cannot associate: " + plGroupToMoveName + " to "+plParentTargetGroupName+"; ", e);
+        }
+
+        //
+//
+//        org.picketlink.idm.api.Group jbidParentOriginGroup = null;
+//        String plParentOriginGroupName = getPLIDMGroupName(originGroup.getParentId());
+//        try {
+//            jbidOriginGroup = getIdentitySession().getPersistenceManager().findGroup(plParentOriginGroupName,
+//                                                                                     orgService.getConfiguration().getGroupType(originGroup.getParentId()));
+//        } catch (Exception e) {
+//            // TODO:
+//            handleException("Identity operation error: ", e);
+//        }
+//
+//        if (jbidOriginGroup == null) {
+//
+//        }
+    }
+
     public void saveGroup(Group group, boolean broadcast) throws Exception {
         if (log.isTraceEnabled()) {
             Tools.logMethodIn(log, LogLevel.TRACE, "saveGroup", new Object[] { "group", group, "broadcast", broadcast });
