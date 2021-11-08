@@ -194,7 +194,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
             handleException("Identity operation error: ", e);
         }
 
-        //if one is miossing => error
+        //if one is missing => error
         if (jbidParentOriginGroup == null) {
             throw new Exception("Group " + jbidParentOriginGroup + " does not exists");
         }
