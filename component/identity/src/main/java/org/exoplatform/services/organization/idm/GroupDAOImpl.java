@@ -199,7 +199,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
             throw new Exception("Group " + jbidParentOriginGroup + " does not exist");
         }
         if (jbidParentTargetGroup == null) {
-            throw new Exception("Group " + jbidParentOriginGroup + " does not exists");
+            throw new Exception("Group " + jbidParentOriginGroup + " does not exist");
         }
         if (jbidGroupToMove == null) {
             throw new Exception("Group " + jbidGroupToMove + " does not exists");
