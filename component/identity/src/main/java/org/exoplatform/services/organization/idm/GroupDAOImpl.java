@@ -152,6 +152,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
     }
 
+    @Override
     public void moveGroup(Group parentOriginGroup, Group parentTargetGroup,Group groupToMove) throws Exception {
         //find ParentOriginGroup
         if (log.isTraceEnabled()) {
@@ -166,7 +167,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                                                   .findGroup(plParentOriginGroupName,
                                                              orgService.getConfiguration().getGroupType(parentOriginGroup.getParentId()));
         } catch (Exception e) {
-            // TODO:
             handleException("Identity operation error: ", e);
         }
 
@@ -178,7 +178,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                                                         .findGroup(plParentTargetGroupName,
                                                                    orgService.getConfiguration().getGroupType(parentTargetGroup.getParentId()));
         } catch (Exception e) {
-            // TODO:
             handleException("Identity operation error: ", e);
         }
 
@@ -190,7 +189,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                                                         .findGroup(plGroupToMoveName,
                                                                    orgService.getConfiguration().getGroupType(groupToMove.getParentId()));
         } catch (Exception e) {
-            // TODO:
             handleException("Identity operation error: ", e);
         }
 
