@@ -225,21 +225,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
             handleException("Cannot associate: " + plGroupToMoveName + " to "+plParentTargetGroupName+"; ", e);
         }
 
-        //
-//
-//        org.picketlink.idm.api.Group jbidParentOriginGroup = null;
-//        String plParentOriginGroupName = getPLIDMGroupName(originGroup.getParentId());
-//        try {
-//            jbidOriginGroup = getIdentitySession().getPersistenceManager().findGroup(plParentOriginGroupName,
-//                                                                                     orgService.getConfiguration().getGroupType(originGroup.getParentId()));
-//        } catch (Exception e) {
-//            // TODO:
-//            handleException("Identity operation error: ", e);
-//        }
-//
-//        if (jbidOriginGroup == null) {
-//
-//        }
     }
 
     public void saveGroup(Group group, boolean broadcast) throws Exception {
