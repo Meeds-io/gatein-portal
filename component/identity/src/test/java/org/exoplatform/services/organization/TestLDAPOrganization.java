@@ -111,6 +111,26 @@ public class TestLDAPOrganization extends TestOrganization {
       Assert.assertTrue(childGoups.size() > 0);
   }
 
+  public void testMoveGroup() throws Exception {
+    GroupHandler handler = organizationService.getGroupHandler();
+    Group group = handler.findGroupById("/organization/communication/press-and-media");
+    assertNotNull(group);
+    Group communication = handler.findGroupById("/organization/communication");
+    int communitcationChildren = handler.findGroups(communication).size();
+
+
+    Group parentOrigin = handler.findGroupById("/organization/communication");
+    Group parentTarget = handler.findGroupById("/organization/operations");
+
+
+    handler.moveGroup(parentOrigin,parentTarget,group);
+
+    assertEquals(communitcationChildren - 1, handler.findGroups(communication).size());
+    assertNotNull(handler.findGroupById("/organization/operations/press-and-media"));
+
+
+  }
+
   public void testFindFilteredGroup() throws Exception {
     GroupHandler handler = organizationService.getGroupHandler();
     Group filteredGroup = handler.findGroupById("/organization_hierarchy/filteredSubOrganizationC");
