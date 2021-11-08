@@ -196,7 +196,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
         //if one is missing => error
         if (jbidParentOriginGroup == null) {
-            throw new Exception("Group " + jbidParentOriginGroup + " does not exists");
+            throw new Exception("Group " + jbidParentOriginGroup + " does not exist");
         }
         if (jbidParentTargetGroup == null) {
             throw new Exception("Group " + jbidParentOriginGroup + " does not exists");
