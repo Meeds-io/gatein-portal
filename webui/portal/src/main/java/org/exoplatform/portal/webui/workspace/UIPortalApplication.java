@@ -812,21 +812,21 @@ public class UIPortalApplication extends UIApplication {
     @Override
     public void processAction(WebuiRequestContext context) throws Exception {
         PortalRequestContext pcontext = (PortalRequestContext) context;
-        // String requestURI = pcontext.getRequestURI();
         RequestNavigationData requestNavData = pcontext.getNavigationData();
 
         boolean isAjax = pcontext.useAjax();
 
         if (!isAjax) {
-            if (isAjaxInLastRequest) {
-                isAjaxInLastRequest = false;
-                if (requestNavData.equals(lastNonAjaxRequestNavData) && !requestNavData.equals(lastRequestNavData)) {
-                    NodeURL nodeURL = pcontext.createURL(NodeURL.TYPE).setNode(getCurrentSite().getSelectedUserNode());
-                    pcontext.sendRedirect(nodeURL.toString());
-                    return;
-                }
+          if (isAjaxInLastRequest) {
+            isAjaxInLastRequest = false;
+            if (requestNavData.equals(lastNonAjaxRequestNavData) && !requestNavData.equals(lastRequestNavData)
+                && pcontext.getPortletParameters().isEmpty()) {
+              NodeURL nodeURL = pcontext.createURL(NodeURL.TYPE).setNode(getCurrentSite().getSelectedUserNode());
+              pcontext.sendRedirect(nodeURL.toString());
+              return;
             }
-            lastNonAjaxRequestNavData = requestNavData;
+          }
+          lastNonAjaxRequestNavData = requestNavData;
         }
 
         isAjaxInLastRequest = isAjax;
