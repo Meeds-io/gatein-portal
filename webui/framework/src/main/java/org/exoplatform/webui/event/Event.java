@@ -99,6 +99,8 @@ public class Event<T> {
                        this.getName(),
                        listener.getClass().getName());
             }
+            //Avoid the display of a blank page
+            context_.getJavascriptManager().getRequireJS().addScripts("location.reload();");
         } else {
             for (EventListener<T> listener : listeners_) {
                 listener.execute(this);
