@@ -213,6 +213,20 @@ public class CacheableGroupHandlerImpl extends GroupDAOImpl {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void moveGroup(Group parentOriginGroup, Group parentTargetGroup,Group groupToMove) throws Exception {
+    disableCacheInThread.set(true);
+    try {
+      clearCache();
+      super.moveGroup(parentOriginGroup,parentTargetGroup,groupToMove);
+    } finally {
+      disableCacheInThread.set(false);
+    }
+  }
+
   public void clearCache() {
     groupCache.clearCache();
   }
