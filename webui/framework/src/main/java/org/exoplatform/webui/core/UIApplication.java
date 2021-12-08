@@ -27,6 +27,7 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.web.application.AbstractApplicationMessage;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.application.WebuiRequestContext;
+import org.exoplatform.webui.exception.CSRFException;
 import org.exoplatform.webui.exception.MessageException;
 
 /**
@@ -123,6 +124,8 @@ public abstract class UIApplication extends UIContainer {
             super.processAction(context);
         } catch (MessageException ex) {
             addMessage(ex.getDetailMessage());
+        } catch (CSRFException e) {
+            context.getJavascriptManager().getRequireJS().addScripts("location.reload();");
         } catch (Throwable t) {
             ApplicationMessage msg = new ApplicationMessage("UIApplication.msg.unknown-error", null, ApplicationMessage.ERROR);
             addMessage(msg);
