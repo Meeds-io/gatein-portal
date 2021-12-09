@@ -19,7 +19,8 @@
 
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   
   <modelVersion>4.0.0</modelVersion>
   
@@ -27,19 +28,19 @@
     <artifactId>maven-parent-pom</artifactId>
     <groupId>org.exoplatform</groupId>
     <version>24-M02</version>
-    <relativePath />
+    <relativePath/>
   </parent>
   
   <groupId>org.exoplatform.gatein.portal</groupId>
   <artifactId>exo.portal.parent</artifactId>
-  <version>6.3.0-20211208</version>
+  <version>6.3.x-SNAPSHOT</version>
   <packaging>pom</packaging>
   
   <name>GateIn - Portal</name>
   
   <properties>
-    <org.exoplatform.gatein.sso.version>6.3.0-20211208</org.exoplatform.gatein.sso.version>
-    <org.exoplatform.gatein.pc.version>6.3.0-20211208</org.exoplatform.gatein.pc.version>
+    <org.exoplatform.gatein.sso.version>6.3.x-SNAPSHOT</org.exoplatform.gatein.sso.version>
+    <org.exoplatform.gatein.pc.version>6.3.x-SNAPSHOT</org.exoplatform.gatein.pc.version>
     
     <!-- Default eXo profiles -->
     <surefire.exo.profiles>hsqldb</surefire.exo.profiles>
@@ -52,7 +53,7 @@
     <connection>scm:git:git://github.com/meeds-io/gatein-portal.git</connection>
     <developerConnection>scm:git:git@github.com:meeds-io/gatein-portal.git</developerConnection>
     <url>https://github.com/meeds-io/gatein-portal</url>
-    <tag>6.3.0-20211208</tag>
+    <tag>HEAD</tag>
   </scm>
   
   <modules>
