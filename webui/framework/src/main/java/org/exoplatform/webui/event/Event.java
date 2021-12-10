@@ -25,6 +25,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.web.security.csrf.CSRFTokenUtil;
 import org.exoplatform.webui.application.WebuiRequestContext;
+import org.exoplatform.webui.exception.CSRFException;
 
 import javax.portlet.PortletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -99,6 +100,7 @@ public class Event<T> {
                        this.getName(),
                        listener.getClass().getName());
             }
+            throw new CSRFException("CSRF token expired or lost, please reload the page");
         } else {
             for (EventListener<T> listener : listeners_) {
                 listener.execute(this);
