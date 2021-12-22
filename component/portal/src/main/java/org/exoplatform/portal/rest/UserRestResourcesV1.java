@@ -43,6 +43,8 @@ public class UserRestResourcesV1 implements ResourceContainer {
 
   private static final String            DELEGATED_GROUP                = "/platform/delegated";
 
+    public static final String           UNCHANGED_NEW_PASSWORD_ERROR_CODE = "UNCHANGED_NEW_PASSWORD";
+
   public static final UserFieldValidator USERNAME_VALIDATOR             = new UserFieldValidator("userName", true, false);
 
   public static final UserFieldValidator EMAIL_VALIDATOR                = new UserFieldValidator("emailAddress", false, false);
@@ -435,6 +437,10 @@ public class UserRestResourcesV1 implements ResourceContainer {
   
       if (isSameUser && !userHandler.authenticate(username, currentPassword)) {
         return Response.serverError().entity(WRONG_USER_PASSWORD_ERROR_CODE).build();
+      }
+
+      if (isSameUser && userHandler.authenticate(username, newPassword))  {
+        return Response.serverError().entity(UNCHANGED_NEW_PASSWORD_ERROR_CODE).build();
       }
   
       Locale locale = request.getLocale();
