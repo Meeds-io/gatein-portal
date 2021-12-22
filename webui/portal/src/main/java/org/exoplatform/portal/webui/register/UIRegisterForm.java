@@ -51,8 +51,8 @@ import org.exoplatform.webui.form.UIFormInputWithActions;
 import org.exoplatform.webui.form.UIFormInputWithActions.ActionData;
 import org.exoplatform.webui.form.UIFormStringInput;
 import org.exoplatform.webui.form.validator.Validator;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  *
@@ -152,7 +152,7 @@ public class UIRegisterForm extends UIForm {
     public static class CheckUsernameAvailability extends EventListener<UIRegisterForm> {
 
         /** . */
-        private final Logger log = LoggerFactory.getLogger(CheckUsernameAvailability.class);
+        private final Log log         = ExoLogger.getLogger(CheckUsernameAvailability.class);
 
         static final String LISTENER_NAME = "CheckUsernameAvailability";
 

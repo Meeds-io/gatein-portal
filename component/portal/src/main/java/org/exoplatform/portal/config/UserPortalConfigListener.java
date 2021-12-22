@@ -23,8 +23,8 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserEventListener;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * Created by The eXo Platform SAS May 29, 2007
@@ -32,7 +32,7 @@ import org.gatein.common.logging.LoggerFactory;
 public class UserPortalConfigListener extends UserEventListener {
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(UserPortalConfigListener.class);
+    private final Log                   log = ExoLogger.getLogger(UserPortalConfigListener.class);
 
     /** . */
     private final UserPortalConfigService portalConfigService;

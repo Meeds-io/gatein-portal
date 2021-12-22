@@ -1,7 +1,7 @@
 package org.gatein.cdi;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.gatein.pc.portlet.container.PortletApplication;
 import org.gatein.pc.portlet.container.managed.LifeCycleStatus;
 import org.gatein.pc.portlet.container.managed.ManagedObject;
@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
 public class CDIInjectionListener implements ManagedObjectRegistryEventListener {
-    private final Logger log = LoggerFactory.getLogger(CDIInjectionListener.class);
+  private final Log                            log                        = ExoLogger.getLogger(CDIInjectionListener.class);
 
     private static final String BEAN_MGR_ATTRIBUTE = "javax.enterprise.inject.spi.BeanManager";
     private static final String SERVLET_BEAN_MGR_ATTRIBUTE = "org.jboss.weld.environment.servlet.javax.enterprise.inject.spi.BeanManager";

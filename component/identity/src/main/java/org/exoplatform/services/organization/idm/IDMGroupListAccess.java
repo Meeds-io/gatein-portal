@@ -7,7 +7,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.gatein.common.logging.*;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.LogLevel;
 import org.picketlink.idm.api.IdentitySearchCriteria;
 
 import org.exoplatform.commons.utils.ListAccess;
@@ -17,7 +19,7 @@ public class IDMGroupListAccess implements ListAccess<Group>, Serializable {
 
   private static final long            serialVersionUID = 7072169099411659727L;
 
-  private static final Logger          LOG              = LoggerFactory.getLogger(IDMGroupListAccess.class);
+  private static final Log             LOG              = ExoLogger.getLogger(IDMGroupListAccess.class);
 
   private final IdentitySearchCriteria identitySearchCriteria;
 

@@ -23,7 +23,9 @@ import java.io.Serializable;
 import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
-import org.gatein.common.logging.*;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.LogLevel;
 import org.picketlink.idm.api.*;
 import org.picketlink.idm.impl.api.IdentitySearchCriteriaImpl;
 import org.picketlink.idm.impl.api.model.SimpleRole;
@@ -40,7 +42,7 @@ import org.exoplatform.services.organization.OrganizationService;
 public class IDMMembershipListAccess implements ListAccess<Membership>, Serializable {
     private static final long serialVersionUID = 6908892334798859546L;
 
-    private static Logger log = LoggerFactory.getLogger(IDMMembershipListAccess.class);
+    private static Log                      log                       = ExoLogger.getLogger(IDMMembershipListAccess.class);
 
     private final Group group;
 

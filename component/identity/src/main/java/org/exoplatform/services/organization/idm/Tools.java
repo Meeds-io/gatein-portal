@@ -1,10 +1,11 @@
 package org.exoplatform.services.organization.idm;
 
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.LogLevel;
+
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.gatein.common.logging.LogLevel;
-import org.gatein.common.logging.Logger;
 
 /*
  * JBoss, a division of Red Hat
@@ -32,7 +33,7 @@ import org.gatein.common.logging.Logger;
  * Some helper methods
  */
 public class Tools {
-    public static void logMethodIn(Logger log, LogLevel level, String methodName, Object[] args) {
+  public static void logMethodIn(Log log, LogLevel level, String methodName, Object[] args) {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("Method '").append(methodName).append("' called with arguments: ");
@@ -49,14 +50,14 @@ public class Tools {
                 sb.append(args);
             }
 
-            log.log(level, sb.toString());
+            level.log(log, sb.toString());
         } catch (Throwable t) {
-            log.log(level, "Error in logging code block (not related to application code): ", t);
+          level.log(log, "Error in logging code block (not related to application code): ", t);
         }
 
     }
 
-    public static void logMethodOut(Logger log, LogLevel level, String methodName, Object result) {
+    public static void logMethodOut(Log log, LogLevel level, String methodName, Object result) {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("Method '").append(methodName).append("' returning object: ");
@@ -70,10 +71,10 @@ public class Tools {
                 sb.append(result);
             }
 
-            log.log(level, sb.toString());
+            level.log(log, sb.toString());
 
         } catch (Throwable t) {
-            log.log(level, "Error in logging code block (not related to application code): ", t);
+          level.log(log, "Error in logging code block (not related to application code): ", t);
         }
     }
 

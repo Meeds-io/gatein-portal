@@ -22,7 +22,8 @@ package org.exoplatform.services.organization.idm;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gatein.common.logging.LogLevel;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.LogLevel;
 import org.picketlink.idm.api.*;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.IdentitySearchCriteriaImpl;
@@ -68,7 +69,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
     public final Group createGroupInstance() {
         if (log.isTraceEnabled()) {
-            Tools.logMethodIn(log, LogLevel.TRACE, "createGroupInstance", null);
+          Tools.logMethodIn(log, LogLevel.TRACE, "createGroupInstance", null);
         }
         return new ExtGroup();
     }

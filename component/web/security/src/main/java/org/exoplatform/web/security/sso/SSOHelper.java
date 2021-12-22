@@ -24,8 +24,8 @@
 package org.exoplatform.web.security.sso;
 
 import org.exoplatform.container.xml.InitParams;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * Helper for SSO related things
@@ -37,7 +37,7 @@ public class SSOHelper {
     private final boolean skipJSPRedirection;
     private final String ssoRedirectURLSuffix;
 
-    private static final Logger log = LoggerFactory.getLogger(SSOHelper.class);
+    private static final Log log = ExoLogger.getLogger(SSOHelper.class);
 
     public SSOHelper(InitParams params) {
         String ssoEnabledParam = params.getValueParam("isSSOEnabled").getValue();

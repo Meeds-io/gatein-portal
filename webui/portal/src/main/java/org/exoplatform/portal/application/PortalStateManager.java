@@ -30,8 +30,8 @@ import org.exoplatform.webui.application.WebuiApplication;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.application.portlet.PortletRequestContext;
 import org.exoplatform.webui.core.UIApplication;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 public class PortalStateManager extends StateManager {
 
@@ -39,7 +39,7 @@ public class PortalStateManager extends StateManager {
     private static final String APPLICATION_ATTRIBUTE_PREFIX = "psm.";
 
     /** . */
-    private static final Logger log = LoggerFactory.getLogger(PortalStateManager.class);
+    private static final Log  log                          = ExoLogger.getLogger(PortalStateManager.class);
 
     @Override
     public UIApplication restoreUIRootComponent(WebuiRequestContext context) throws Exception {

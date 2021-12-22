@@ -34,8 +34,8 @@ import org.gatein.api.oauth.OAuthProviderAccessor;
 import org.gatein.api.page.*;
 import org.gatein.api.security.*;
 import org.gatein.api.site.*;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.portal.config.*;
@@ -73,7 +73,7 @@ public class PortalImpl implements Portal {
                                                                                 null,
                                                                                 PortalConfig.class);
 
-  static final Logger                      log        = LoggerFactory.getLogger("org.gatein.api");
+  static final Log                         log        = ExoLogger.getLogger("org.gatein.api");
 
   private final DataStorage                dataStorage;
 

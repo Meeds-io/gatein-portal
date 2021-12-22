@@ -25,8 +25,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.jibx.runtime.JiBXException;
 
 import org.exoplatform.commons.utils.IOUtil;
@@ -93,7 +93,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
     private boolean overrideExistingData;
 
     /** . */
-    private Logger log = LoggerFactory.getLogger(getClass());
+    private Log                          log                    = ExoLogger.getLogger(getClass());
 
     /** . */
     private NavigationService navigationService_;

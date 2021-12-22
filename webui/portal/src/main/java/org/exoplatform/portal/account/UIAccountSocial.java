@@ -48,8 +48,8 @@ import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.EventListener;
 import org.exoplatform.webui.form.UIForm;
 import org.exoplatform.webui.form.UIFormStringInput;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.spi.AccessTokenContext;
 import org.gatein.security.oauth.spi.OAuthProviderType;
 import org.gatein.security.oauth.common.OAuthConstants;
@@ -67,7 +67,7 @@ import org.gatein.security.oauth.exception.OAuthExceptionCode;
                  events    = { @EventConfig(listeners = UIAccountSocial.UnlinkSocialAccountActionListener.class) })
 public class UIAccountSocial extends UIForm {
 
-    private static final Logger log = LoggerFactory.getLogger(UIAccountSocial.class);
+  private static final Log    log                       = ExoLogger.getLogger(UIAccountSocial.class);
 
     private static final String PARAM_PROVIDER_FOR_UNLINK = "_paramProviderForUnlink";
 

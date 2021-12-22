@@ -28,8 +28,8 @@ import org.exoplatform.commons.xml.DocumentSource;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer.PortalContainerPostInitTask;
 import org.exoplatform.portal.resource.config.xml.SkinConfigParser;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.wci.WebApp;
 
 /**
@@ -43,7 +43,7 @@ import org.gatein.wci.WebApp;
 public class GateInSkinConfigDeployer extends AbstractResourceDeployer {
 
     /** . */
-    private static final Logger log = LoggerFactory.getLogger(GateInSkinConfigDeployer.class);
+    private static final Log log = ExoLogger.getLogger(GateInSkinConfigDeployer.class);
 
     /** . */
     private final SkinService skinService;

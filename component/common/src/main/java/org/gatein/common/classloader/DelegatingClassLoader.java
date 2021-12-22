@@ -32,8 +32,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * {@link ClassLoader}, which delegates work to list of delegates (Delegating classloaders), which are provided from
@@ -43,7 +43,8 @@ import org.gatein.common.logging.LoggerFactory;
  */
 public class DelegatingClassLoader extends ClassLoader {
     private final List<ClassLoader> delegates;
-    private static final Logger log = LoggerFactory.getLogger(DelegatingClassLoader.class);
+
+    private static final Log      log = ExoLogger.getLogger(DelegatingClassLoader.class);
 
     public DelegatingClassLoader(ClassLoader... delegates) {
         super(Thread.currentThread().getContextClassLoader());

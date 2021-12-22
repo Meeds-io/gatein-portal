@@ -337,16 +337,6 @@
   
   <dependencies>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
       <scope>test</scope>
@@ -371,7 +361,6 @@
           <configuration>
             <systemPropertyVariables>
               <exo.files.storage.dir>${project.build.directory}/files</exo.files.storage.dir>
-              <log4j.configuration>gatein-log4j.properties</log4j.configuration>
               <gatein.test.output.path>${project.build.directory}</gatein.test.output.path>
               <com.arjuna.ats.arjuna.objectstore.objectStoreDir>
                 ${project.build.directory}/com.arjuna.ats.arjuna.objectstore.objectStoreDir

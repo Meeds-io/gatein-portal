@@ -24,8 +24,8 @@ import java.util.List;
 
 import javax.transaction.Status;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.gatein.common.transaction.JTAUserTransactionLifecycleService;
 import org.gatein.portal.idm.impl.repository.ExoFallbackIdentityStoreRepository;
 import org.gatein.portal.idm.impl.repository.ExoLegacyFallbackIdentityStoreRepository;
@@ -65,7 +65,8 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
 
     private  OrganizationCacheHandler organizationCacheHandler;
 
-    private static final Logger log = LoggerFactory.getLogger(PicketLinkIDMOrganizationServiceImpl.class);
+    private static final Log                 log                  =
+                                                 ExoLogger.getLogger(PicketLinkIDMOrganizationServiceImpl.class);
     private static final boolean traceLoggingEnabled = log.isTraceEnabled();
 
     // Indicates whether any call to startRequest and endRequest is accepted

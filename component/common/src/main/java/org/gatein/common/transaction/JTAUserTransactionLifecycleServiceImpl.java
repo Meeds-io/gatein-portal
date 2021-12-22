@@ -32,8 +32,8 @@ import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
 import org.exoplatform.services.transaction.TransactionService;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Base implementation of {@link JTAUserTransactionLifecycleService} .
@@ -41,7 +41,7 @@ import org.gatein.common.logging.LoggerFactory;
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public class JTAUserTransactionLifecycleServiceImpl implements JTAUserTransactionLifecycleService {
-    private static final Logger log = LoggerFactory.getLogger(JTAUserTransactionLifecycleServiceImpl.class);
+  private static final Log                          log       = ExoLogger.getLogger(JTAUserTransactionLifecycleServiceImpl.class);
 
     private UserTransaction userTransaction;
 

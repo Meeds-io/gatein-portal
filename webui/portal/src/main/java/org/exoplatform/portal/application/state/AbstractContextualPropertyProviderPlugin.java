@@ -25,8 +25,8 @@ import javax.xml.namespace.QName;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.webui.application.UIPortlet;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * @author <a href="mailto:hoang281283@gmail.com">Minh Hoang TO</a>
@@ -34,7 +34,7 @@ import org.gatein.common.logging.LoggerFactory;
 public abstract class AbstractContextualPropertyProviderPlugin extends BaseComponentPlugin {
 
     /** . */
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final Log  log = ExoLogger.getLogger(getClass());
 
     /** . */
     protected final String namespaceURI;

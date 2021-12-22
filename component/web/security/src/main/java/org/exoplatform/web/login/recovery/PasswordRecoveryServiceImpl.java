@@ -28,8 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.web.login.externalRegistration.ExternalRegistrationHandler;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.wci.security.Credentials;
 
 import org.exoplatform.commons.utils.I18N;
@@ -54,7 +54,7 @@ import org.exoplatform.web.security.security.RemindPasswordTokenService;
  */
 public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
   
-    protected static Logger                  log                = LoggerFactory.getLogger(PasswordRecoveryServiceImpl.class);
+  protected static Log                         log = ExoLogger.getLogger(PasswordRecoveryServiceImpl.class);
 
     private final OrganizationService orgService;
     private final MailService mailService;

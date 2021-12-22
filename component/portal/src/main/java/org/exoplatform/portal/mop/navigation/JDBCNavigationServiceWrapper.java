@@ -21,8 +21,8 @@ package org.exoplatform.portal.mop.navigation;
 
 import java.util.List;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 import org.exoplatform.portal.mop.*;
 import org.exoplatform.services.listener.ListenerService;
@@ -33,7 +33,7 @@ import org.exoplatform.services.listener.ListenerService;
  */
 public class JDBCNavigationServiceWrapper implements NavigationService {
 
-  private static final Logger log = LoggerFactory.getLogger(JDBCNavigationServiceWrapper.class);
+  private static final Log                log = ExoLogger.getLogger(JDBCNavigationServiceWrapper.class);
 
   private final JDBCNavigationServiceImpl service;
 

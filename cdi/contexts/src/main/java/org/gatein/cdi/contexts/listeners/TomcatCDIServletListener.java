@@ -22,8 +22,8 @@
 package org.gatein.cdi.contexts.listeners;
 
 import org.gatein.cdi.CDIPortletContextExtension;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class TomcatCDIServletListener extends AbstractCDIServletListener {
 
-    private final Logger log = LoggerFactory.getLogger(TomcatCDIServletListener.class);
+  private final Log                           log = ExoLogger.getLogger(TomcatCDIServletListener.class);
 
     private volatile CDIPortletContextExtension extension;
 

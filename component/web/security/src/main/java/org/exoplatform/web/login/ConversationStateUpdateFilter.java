@@ -35,8 +35,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.exoplatform.container.web.AbstractFilter;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.web.security.AuthenticationRegistry;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.wci.security.Credentials;
 
 /**
@@ -46,7 +46,7 @@ import org.gatein.wci.security.Credentials;
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public class ConversationStateUpdateFilter extends AbstractFilter {
-    private static final Logger log = LoggerFactory.getLogger(ConversationStateUpdateFilter.class);
+  private static final Log log = ExoLogger.getLogger(ConversationStateUpdateFilter.class);
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,

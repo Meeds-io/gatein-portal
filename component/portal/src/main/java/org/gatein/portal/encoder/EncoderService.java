@@ -41,8 +41,8 @@ import org.exoplatform.management.annotations.ManagedName;
 import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
 import org.exoplatform.management.rest.annotations.RESTEndpoint;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.picocontainer.Startable;
 
 /**
@@ -59,7 +59,7 @@ public class EncoderService implements Startable {
     // Same value like SimpleLDAPIdentityStoreConfiguration.ENCODING_KEY_STORE_PASSWORD_DEFAULT
     private static final String ENCODING_KEY_STORE_PASSWORD_DEFAULT =  "somearbitrarycrazystringthatdoesnotmatter";
 
-    private static final Logger log = LoggerFactory.getLogger(EncoderService.class);
+    private static final Log  log                                 = ExoLogger.getLogger(EncoderService.class);
 
     private final char[] keyStorePassword;
     private final byte[] salt;

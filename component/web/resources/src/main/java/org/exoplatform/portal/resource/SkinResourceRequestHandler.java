@@ -12,15 +12,15 @@ import org.exoplatform.commons.utils.BinaryOutput;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.WebRequestHandler;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.portal.controller.resource.ResourceRequestHandler;
 
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
 public class SkinResourceRequestHandler extends WebRequestHandler {
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final Log          log               = ExoLogger.getLogger(getClass());
 
     /** . */
     private static final Charset UTF_8 = Charset.forName("UTF-8");

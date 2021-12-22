@@ -27,9 +27,9 @@ import org.exoplatform.commons.file.services.NameSpaceService;
 import org.exoplatform.commons.file.storage.DataStorage;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.picocontainer.Startable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ import java.util.List;
  * exo@exoplatform.com
  */
 public class NameSpaceServiceImpl implements NameSpaceService, Startable {
-  private static final Logger   LOG                    = LoggerFactory.getLogger(NameSpaceService.class);
+  private static final Log      LOG                    = ExoLogger.getLogger(NameSpaceService.class);
 
   private static final String   FILE_DEFAULT_NAMESPACE = "default.namespace";
 

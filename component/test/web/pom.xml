@@ -39,7 +39,7 @@
 
     <dependency>
       <groupId>org.gatein.common</groupId>
-      <artifactId>common-logging</artifactId>
+      <artifactId>common-common</artifactId>
     </dependency>
 
     <dependency>

@@ -26,8 +26,8 @@ package org.gatein.security.oauth.social;
 import java.io.IOException;
 import java.net.URL;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.security.oauth.exception.OAuthExceptionCode;
 import org.gatein.security.oauth.utils.HttpResponseContext;
@@ -41,7 +41,7 @@ import org.json.JSONException;
  */
 abstract class FacebookRequest<T> {
 
-    private static Logger log = LoggerFactory.getLogger(FacebookRequest.class);
+  private static Log log = ExoLogger.getLogger(FacebookRequest.class);
 
     protected abstract URL createURL(String accessToken) throws IOException;
 

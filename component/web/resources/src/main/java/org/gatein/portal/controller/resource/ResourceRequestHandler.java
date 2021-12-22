@@ -51,8 +51,8 @@ import org.exoplatform.web.controller.QualifiedName;
 
 import org.apache.commons.lang3.StringUtils;
 import org.gatein.common.io.IOTools;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.wci.ServletContainerFactory;
 import org.gatein.wci.WebAppEvent;
 import org.gatein.wci.WebAppLifeCycleEvent;
@@ -75,7 +75,7 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
     private static String PATH = "META-INF/maven/org.exoplatform.gatein.portal/exo.portal.component.web.resources/pom.properties";
 
     /** . */
-    private static final Logger log = LoggerFactory.getLogger(ResourceRequestHandler.class);
+    private static final Log log                      = ExoLogger.getLogger(ResourceRequestHandler.class);
 
     /** . */
     public static final String VERSION;

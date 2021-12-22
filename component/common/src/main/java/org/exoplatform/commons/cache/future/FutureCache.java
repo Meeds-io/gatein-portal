@@ -23,8 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * <p>
@@ -64,7 +64,7 @@ public abstract class FutureCache<K, V, C> {
     private final ConcurrentMap<K, Retrieval<K, V, C>> futureEntries;
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(FutureCache.class);
+    private final Log                                log = ExoLogger.getLogger(FutureCache.class);
 
     public FutureCache(Loader<K, V, C> loader) {
         this.loader = loader;

@@ -43,8 +43,8 @@ import org.exoplatform.webui.config.annotation.EventInterceptorConfig;
 import org.exoplatform.webui.config.annotation.ParamConfig;
 import org.exoplatform.webui.config.annotation.ValidatorConfig;
 import org.exoplatform.webui.config.metadata.ComponentMetaData;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
@@ -73,7 +73,7 @@ public class ConfigurationManager {
     private Map<String, Component> configs_ = new ConcurrentHashMap<String, Component>();
 
     /** The logger. */
-    private final Logger log;
+    private final Log            log;
 
     /** . */
     private Application application_;
@@ -84,7 +84,7 @@ public class ConfigurationManager {
      */
     public ConfigurationManager(InputStream inputStream) throws Exception {
         // Logger first
-        log = LoggerFactory.getLogger(ConfigurationManager.class);
+        log = ExoLogger.getLogger(ConfigurationManager.class);
 
         IBindingFactory bfact = BindingDirectory.getFactory(WebuiConfiguration.class);
         IUnmarshallingContext uctx = bfact.createUnmarshallingContext();

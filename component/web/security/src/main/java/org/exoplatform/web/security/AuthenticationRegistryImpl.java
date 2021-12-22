@@ -30,8 +30,8 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.wci.security.Credentials;
 
 /**
@@ -42,7 +42,7 @@ import org.gatein.wci.security.Credentials;
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public class AuthenticationRegistryImpl implements AuthenticationRegistry {
-    private static final Logger log = LoggerFactory.getLogger(AuthenticationRegistryImpl.class);
+  private static final Log                                 log      = ExoLogger.getLogger(AuthenticationRegistryImpl.class);
 
     // Key is ID of HTTP Session. Value is map with various attributes of single client (session),
     // which will be used during authentication process.

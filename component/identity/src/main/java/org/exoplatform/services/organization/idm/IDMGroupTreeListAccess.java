@@ -3,7 +3,9 @@ package org.exoplatform.services.organization.idm;
 import java.io.Serializable;
 import java.util.List;
 
-import org.gatein.common.logging.*;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.LogLevel;
 import org.picketlink.idm.api.IdentitySearchCriteria;
 
 import org.exoplatform.commons.utils.ListAccess;
@@ -13,7 +15,7 @@ public class IDMGroupTreeListAccess implements ListAccess<Group>, Serializable {
 
   private static final long            serialVersionUID = 7072169099411659727L;
 
-  private static final Logger          LOG              = LoggerFactory.getLogger(IDMGroupTreeListAccess.class);
+  private static final Log             LOG              = ExoLogger.getLogger(IDMGroupTreeListAccess.class);
 
   private final IdentitySearchCriteria identitySearchCriteria;
 

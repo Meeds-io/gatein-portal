@@ -24,8 +24,8 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * @author <a href="trongtt@gmail.com">Trong Tran</a>
@@ -33,7 +33,7 @@ import org.gatein.common.logging.LoggerFactory;
  */
 class MockResourceResolver implements ResourceResolver {
     /** . */
-    private final Logger log = LoggerFactory.getLogger(MockResourceResolver.class);
+    private final Log         log = ExoLogger.getLogger(MockResourceResolver.class);
 
     private Map<String, String> map = new HashMap<String, String>();
 

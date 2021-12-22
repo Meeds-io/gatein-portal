@@ -28,8 +28,8 @@ import org.exoplatform.resolver.ResourceResolver;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.xml.object.XMLObject;
 import org.gatein.common.classloader.DelegatingClassLoader;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
@@ -37,7 +37,7 @@ import groovy.lang.GroovyShell;
 public class Param {
 
     /** . */
-    private static final Logger log = LoggerFactory.getLogger(Param.class);
+    private static final Log log = ExoLogger.getLogger(Param.class);
 
     private String name;
 

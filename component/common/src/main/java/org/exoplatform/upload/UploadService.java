@@ -44,12 +44,12 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PortalContainerInfo;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 public class UploadService {
     /** . */
-    private static final Logger log = LoggerFactory.getLogger(UploadService.class);
+    private static final Log          log                    = ExoLogger.getLogger(UploadService.class);
 
     /**
      * These are list ascii-codes of special characters. We should not enable these characters in fileName.

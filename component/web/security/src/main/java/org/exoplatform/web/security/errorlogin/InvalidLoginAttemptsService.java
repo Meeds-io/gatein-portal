@@ -27,8 +27,8 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.mail.MailService;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * Service can be used to track invalid login attempts of users and do some actions when some number of successive login
@@ -38,7 +38,7 @@ import org.gatein.common.logging.LoggerFactory;
  * @version $Revision$
  */
 public class InvalidLoginAttemptsService {
-    private static final Logger log = LoggerFactory.getLogger(InvalidLoginAttemptsService.class);
+  private static final Log                                log        = ExoLogger.getLogger(InvalidLoginAttemptsService.class);
 
     /**
      * If false, then feature of sending mails to administrator about bad login attempts is disabled.

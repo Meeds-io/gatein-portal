@@ -69,11 +69,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.gatein.common</groupId>
-      <artifactId>common-logging</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.gatein.api</groupId>
       <artifactId>gatein-api</artifactId>
     </dependency>

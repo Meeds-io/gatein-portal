@@ -22,8 +22,8 @@ package org.exoplatform.portal.resource;
 import java.io.Reader;
 import java.util.Map;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -43,7 +43,7 @@ class CompositeResourceResolver implements ResourceResolver {
     private final String prefix;
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(CompositeResourceResolver.class);
+    private final Log                    log = ExoLogger.getLogger(CompositeResourceResolver.class);
 
     public CompositeResourceResolver(String portalContainerName, Map<SkinKey, SkinConfig> skins) {
         this.portalContainerName = portalContainerName;

@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.exoplatform.commons.serialization.model.metadata.DomainMetaData;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -35,7 +35,7 @@ import org.gatein.common.logging.LoggerFactory;
 public final class TypeDomain {
 
     /** . */
-    private static final Logger log = LoggerFactory.getLogger(TypeDomain.class);
+    private static final Log              log = ExoLogger.getLogger(TypeDomain.class);
 
     /** . */
     private final DomainMetaData metaData;

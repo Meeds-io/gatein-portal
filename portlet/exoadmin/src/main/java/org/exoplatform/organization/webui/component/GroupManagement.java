@@ -28,8 +28,8 @@ import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.security.ConversationState;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * Created by The eXo Platform SAS Author : Huu-Dung Kieu kieuhdung@gmail.com 22 dec. 08
@@ -37,7 +37,7 @@ import org.gatein.common.logging.LoggerFactory;
 public class GroupManagement {
 
     /** . */
-    private static final Logger log = LoggerFactory.getLogger(GroupManagement.class);
+    private static final Log log = ExoLogger.getLogger(GroupManagement.class);
 
     public static OrganizationService getOrganizationService() {
         return ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(OrganizationService.class);

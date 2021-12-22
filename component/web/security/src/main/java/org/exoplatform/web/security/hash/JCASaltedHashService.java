@@ -33,8 +33,8 @@ import javax.crypto.spec.PBEKeySpec;
 
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.web.security.security.SecureRandomService;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * A {@link SaltedHashService} implementation using a {@link javax.crypto.SecretKeyFactory} for salted hashing.
@@ -84,7 +84,7 @@ public class JCASaltedHashService implements SaltedHashService {
     /**
      *
      */
-    private final Logger log = LoggerFactory.getLogger(JCASaltedHashService.class);
+    private final Log        log                      = ExoLogger.getLogger(JCASaltedHashService.class);
 
     /**
      * @param algorithm

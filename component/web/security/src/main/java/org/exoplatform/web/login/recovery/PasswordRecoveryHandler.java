@@ -33,8 +33,8 @@ import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.LocalePolicy;
 
 import org.exoplatform.web.security.security.RemindPasswordTokenService;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 import org.exoplatform.services.organization.DisabledUserException;
 import org.exoplatform.services.organization.User;
@@ -63,7 +63,7 @@ import java.util.regex.Pattern;
  * @author <a href="mailto:tuyennt@exoplatform.com">Tuyen Nguyen The</a>.
  */
 public class PasswordRecoveryHandler extends WebRequestHandler {
-    protected static Logger log = LoggerFactory.getLogger(PasswordRecoveryHandler.class);
+  protected static Log                     log              = ExoLogger.getLogger(PasswordRecoveryHandler.class);
 
 
     public static final String NAME = "forgot-password";

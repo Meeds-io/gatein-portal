@@ -24,8 +24,8 @@ import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.pc.aspects.PortletLifecyclePhaseInterceptor;
 import org.exoplatform.services.resources.ResourceBundleService;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.pc.api.PortletInvoker;
 import org.gatein.pc.bridge.BridgeInterceptor;
 import org.gatein.pc.federation.FederatingPortletInvoker;
@@ -77,7 +77,7 @@ public class ExoKernelIntegration implements Startable, WebAppListener {
     private boolean producerPortletInvokerSet;
 
     /** . */
-    private Logger log = LoggerFactory.getLogger(ExoKernelIntegration.class);
+    private Log                        log = ExoLogger.getLogger(ExoKernelIntegration.class);
 
     /**
      * We enforce the dependency with the ResourceBundleService since it must be stared before the

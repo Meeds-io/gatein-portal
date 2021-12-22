@@ -26,8 +26,8 @@ import java.util.Enumeration;
 import java.util.Set;
 import java.util.Vector;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * The GateIn test classloader overrides the <code>getResources(String)</code> method to filter the resources returned by the
@@ -51,7 +51,7 @@ final class GateInTestClassLoader extends ClassLoader {
     private final Set<String> portalConfigPaths;
 
     /** . */
-    private Logger log = LoggerFactory.getLogger(AbstractGateInTest.class);
+    private Log             log = ExoLogger.getLogger(AbstractGateInTest.class);
 
     public GateInTestClassLoader(ClassLoader parent, Set<String> rootConfigPaths, Set<String> portalConfigPaths) {
         super(parent);

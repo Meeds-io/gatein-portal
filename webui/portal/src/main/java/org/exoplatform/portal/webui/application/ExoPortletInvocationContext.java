@@ -33,8 +33,8 @@ import org.exoplatform.web.url.PortalURL;
 import org.exoplatform.webui.application.portlet.PortletURLBuilder;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.url.ComponentURL;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.common.net.media.MediaType;
 import org.gatein.common.util.ParameterValidation;
 import org.gatein.pc.api.ActionURL;
@@ -59,7 +59,8 @@ class ExoPortletInvocationContext extends AbstractPortletInvocationContext {
     static final String RESOURCE_STATE_PARAM_NAME = "resourcestate";
 
     /** . */
-    private static final Logger log = LoggerFactory.getLogger(ExoPortletInvocationContext.class);
+    private static final Log                         log                           =
+                                                         ExoLogger.getLogger(ExoPortletInvocationContext.class);
 
     /** . */
     private final HttpServletResponse response;

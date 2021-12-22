@@ -49,8 +49,8 @@ import org.exoplatform.services.cache.ExoCache;
 
 import org.apache.commons.lang.StringUtils;
 import org.gatein.common.io.IOTools;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.picocontainer.Startable;
 
 import groovy.lang.Writable;
@@ -113,7 +113,8 @@ public class TemplateService implements Startable {
     private FutureCache<ResourceKey, GroovyTemplate, ResourceResolver> futureCache;
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(TemplateService.class);
+    private final Log                                                 log                        =
+                                                                          ExoLogger.getLogger(TemplateService.class);
 
     public TemplateService(TemplateStatisticService statisticService, CacheService cservice, InitParams initParams) throws Exception {
         this.engine_ = new GroovyTemplateEngine();

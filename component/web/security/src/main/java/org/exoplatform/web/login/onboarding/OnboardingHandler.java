@@ -30,8 +30,8 @@ import javax.portlet.PortletException;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.wci.security.Credentials;
 
 import org.exoplatform.commons.utils.I18N;
@@ -57,7 +57,7 @@ import nl.captcha.text.renderer.DefaultWordRenderer;
 public class OnboardingHandler extends WebRequestHandler {
     private static final QualifiedName SERVER_CAPTCHA = QualifiedName.create("gtn", "serveCaptcha");
 
-    protected static Logger log = LoggerFactory.getLogger(OnboardingHandler.class);
+    protected static Log                   log              = ExoLogger.getLogger(OnboardingHandler.class);
 
 
     public static final String NAME = "on-boarding";
