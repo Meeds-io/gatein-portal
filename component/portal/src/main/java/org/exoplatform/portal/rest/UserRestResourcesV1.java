@@ -9,7 +9,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import org.apache.commons.lang3.StringUtils;
-
+import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
@@ -222,7 +222,11 @@ public class UserRestResourcesV1 implements ResourceContainer {
     user.setFirstName(firstName);
     user.setLastName(lastName);
     user.setPassword(password);
-    organizationService.getUserHandler().createUser(user, true);
+    try {
+       organizationService.getUserHandler().createUser(user, true);
+    } catch (ObjectAlreadyExistsException objectAlreadyExistsException) {
+       return Response.status(Response.Status.BAD_REQUEST).entity("USERNAME:ALREADY_EXISTS_AS_DELETED").build();
+    }
 
     if (!user.isEnabled()) {
       organizationService.getUserHandler().setEnabled(userName, false, true);
