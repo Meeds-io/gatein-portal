@@ -115,6 +115,8 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
             this.changePasswordConnectorMap.get(this.changePasswordConnectorName).changePassword(username,password);
             try {
                 remindPasswordTokenService.deleteToken(tokenId, tokenType);
+                remindPasswordTokenService.deleteTokensByUsernameAndType(username, tokenType);
+                
             } catch (Exception ex) {
                 log.warn("Can not delete token: " + tokenId, ex);
             }

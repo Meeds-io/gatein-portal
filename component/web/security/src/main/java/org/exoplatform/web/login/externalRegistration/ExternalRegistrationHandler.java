@@ -205,6 +205,7 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
                             }
                             organizationService.getMembershipHandler().linkMembership(user, group, organizationService.getMembershipTypeHandler().findMembershipType(MEMBER), true);
                             service.sendExternalConfirmationAccountEmail(randomUserName, locale, url);
+                            remindPasswordTokenService.deleteTokensByUsernameAndType(email,remindPasswordTokenService.EXTERNAL_REGISTRATION_TOKEN);
                         }
                     } catch (Exception e) {
                         errors.add(bundle.getString("external.registration.fail.create.user"));
