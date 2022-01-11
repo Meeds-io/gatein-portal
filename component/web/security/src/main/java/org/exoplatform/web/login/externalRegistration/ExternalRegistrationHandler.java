@@ -38,6 +38,7 @@ import org.exoplatform.web.WebRequestHandler;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.login.recovery.PasswordRecoveryServiceImpl;
+import org.exoplatform.web.security.security.CookieTokenService;
 import org.exoplatform.web.security.security.RemindPasswordTokenService;
 
 import org.exoplatform.services.log.Log;
@@ -205,6 +206,7 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
                             }
                             organizationService.getMembershipHandler().linkMembership(user, group, organizationService.getMembershipTypeHandler().findMembershipType(MEMBER), true);
                             service.sendExternalConfirmationAccountEmail(randomUserName, locale, url);
+                            remindPasswordTokenService.deleteTokensByUsernameAndType(email,CookieTokenService.EXTERNAL_REGISTRATION_TOKEN);
                         }
                     } catch (Exception e) {
                         errors.add(bundle.getString("external.registration.fail.create.user"));
