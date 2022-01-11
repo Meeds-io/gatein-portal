@@ -377,7 +377,7 @@
     </createIndex>
   </changeSet>
 
-  <changeSet author="idm" id="1.0.0-17" onValidationFail="MARK_RAN" runOnChange="false" dbms="oracle,postgresql">
+  <changeSet author="idm" id="1.0.0-17" onValidationFail="MARK_RAN" runOnChange="false" dbms="oracle,postgresql,hsqldb">
     <preConditions>
       <not>
         <sequenceExists sequenceName="hibernate_sequence" />

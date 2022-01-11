@@ -27,7 +27,7 @@
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
     </modifySql>
   </changeSet>
-  <changeSet author="gatein-token" id="1.0.0-2" dbms="oracle,postgresql">
+  <changeSet author="gatein-token" id="1.0.0-2" dbms="oracle,postgresql,hsqldb">
     <createSequence sequenceName="SEQ_GATEIN_TOKEN_ID_GENERATOR" startValue="1"/>
   </changeSet>
 </databaseChangeLog>

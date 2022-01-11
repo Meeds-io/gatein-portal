@@ -35,7 +35,6 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.SimpleExpression;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.helper.Tools;
 import org.picketlink.idm.impl.model.hibernate.*;
@@ -55,16 +54,15 @@ import org.picketlink.idm.spi.store.IdentityStore;
 import org.picketlink.idm.spi.store.IdentityStoreInvocationContext;
 import org.picketlink.idm.spi.store.IdentityStoreSession;
 
-import org.exoplatform.services.organization.idm.EntityMapperUtils;
-
 /**
- * @author Boleslaw Dawidowicz
+ * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw
+ *         Dawidowicz</a>
  * @version : 0.1 $
  */
-public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Serializable {
+public class HibernateIdentityStoreImpl implements IdentityStore, Serializable {
 
   private static Logger                                             log                                            =
-                                                                        Logger.getLogger(PatchedHibernateIdentityStoreImpl.class.getName());
+                                                                        Logger.getLogger(HibernateIdentityStoreImpl.class.getName());
 
   public static final String                                        HIBERNATE_SESSION_FACTORY_REGISTRY_NAME        =
                                                                                                             "hibernateSessionFactoryRegistryName";
@@ -109,9 +107,6 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
   public static final String                                        CREDENTIAL_TYPE_PASSWORD                       = "PASSWORD";
 
   public static final String                                        CREDENTIAL_TYPE_BINARY                         = "BINARY";
-
-  public static final String                                        ALL_GROUPS_TYPE                                =
-                                                                                    "@@ALL_GROUPS@@";
 
   private String                                                    id;
 
@@ -169,7 +164,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
 
   }
 
-  public PatchedHibernateIdentityStoreImpl(String id) {
+  public HibernateIdentityStoreImpl(String id) {
     this.id = id;
   }
 
@@ -295,7 +290,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
 
     String allowNotCaseSensitiveSearch = configurationMD.getOptionSingleValue(ALLOW_NOT_CASE_SENSITIVE_SEARCH);
 
-    if (allowNotCaseSensitiveSearch == null || allowNotCaseSensitiveSearch.equalsIgnoreCase("true")) {
+    if (allowNotCaseSensitiveSearch != null && allowNotCaseSensitiveSearch.equalsIgnoreCase("true")) {
       this.isAllowNotCaseSensitiveSearch = true;
     }
 
@@ -353,10 +348,10 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
     }
 
     hibernateSession.close();
+
   }
 
   protected SessionFactory bootstrapHibernateSessionFactory(IdentityStoreConfigurationContext configurationContext) throws IdentityException {
-
     String sfJNDIName = configurationContext.getStoreConfigurationMetaData()
                                             .getOptionSingleValue(HIBERNATE_SESSION_FACTORY_JNDI_NAME);
     String sfRegistryName = configurationContext.getStoreConfigurationMetaData()
@@ -393,19 +388,20 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
 
       try {
         Configuration config = new Configuration().configure(hibernateConfiguration);
-        return config
-                     .addAnnotatedClass(HibernateIdentityObject.class)
-                     .addAnnotatedClass(HibernateIdentityObjectCredentialBinaryValue.class)
-                     .addAnnotatedClass(HibernateIdentityObjectAttributeBinaryValue.class)
-                     .addAnnotatedClass(HibernateIdentityObjectAttribute.class)
-                     .addAnnotatedClass(HibernateIdentityObjectCredential.class)
-                     .addAnnotatedClass(HibernateIdentityObjectCredentialType.class)
-                     .addAnnotatedClass(HibernateIdentityObjectRelationship.class)
-                     .addAnnotatedClass(HibernateIdentityObjectRelationshipName.class)
-                     .addAnnotatedClass(HibernateIdentityObjectRelationshipType.class)
-                     .addAnnotatedClass(HibernateIdentityObjectType.class)
-                     .addAnnotatedClass(HibernateRealm.class)
-                     .buildSessionFactory();
+        SessionFactory sessionFactory = config
+                                              .addAnnotatedClass(HibernateIdentityObject.class)
+                                              .addAnnotatedClass(HibernateIdentityObjectCredentialBinaryValue.class)
+                                              .addAnnotatedClass(HibernateIdentityObjectAttributeBinaryValue.class)
+                                              .addAnnotatedClass(HibernateIdentityObjectAttribute.class)
+                                              .addAnnotatedClass(HibernateIdentityObjectCredential.class)
+                                              .addAnnotatedClass(HibernateIdentityObjectCredentialType.class)
+                                              .addAnnotatedClass(HibernateIdentityObjectRelationship.class)
+                                              .addAnnotatedClass(HibernateIdentityObjectRelationshipName.class)
+                                              .addAnnotatedClass(HibernateIdentityObjectRelationshipType.class)
+                                              .addAnnotatedClass(HibernateIdentityObjectType.class)
+                                              .addAnnotatedClass(HibernateRealm.class)
+                                              .buildSessionFactory();
+        return sessionFactory;
       } catch (Exception e) {
         if (log.isLoggable(Level.FINER)) {
           log.log(Level.FINER, "Exception occurred: ", e);
@@ -423,7 +419,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
 
   public IdentityStoreSession createIdentityStoreSession() throws IdentityException {
     try {
-      return new ExoHibernateIdentityStoreSessionImpl(sessionFactory, lazyStartOfHibernateTransaction);
+      return new HibernateIdentityStoreSessionImpl(sessionFactory, lazyStartOfHibernateTransaction);
     } catch (Exception e) {
       if (log.isLoggable(Level.FINER)) {
         log.log(Level.FINER, "Exception occurred: ", e);
@@ -516,7 +512,6 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
 
     Session hibernateSession = getHibernateSession(ctx);
 
-    Hibernate.initialize(hibernateObject);
     try {
 
       // Remove all related relationships
@@ -540,10 +535,6 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
 
       }
 
-      hibernateObject.getCredentials().forEach(hibernateSession::delete);
-      hibernateSession.flush();
-
-      hibernateSession.refresh(hibernateObject);
       hibernateSession.delete(hibernateObject);
       hibernateSession.flush();
 
@@ -643,37 +634,16 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
       StringBuilder hqlBuilderSelect = new StringBuilder("select distinct io from HibernateIdentityObject io");
       Map<String, Object> queryParams = new HashMap<String, Object>();
 
-      StringBuilder hqlBuilderConditions = new StringBuilder(" where io.realm=:realm");
+      StringBuilder hqlBuilderConditions = new StringBuilder(" where io.realm=:realm and io.identityType=:identityType");
       queryParams.put("realm", realm);
-      /*
-       * BEGIN SOC-6210: Search for all groups by keyword. If type name passed
-       * is equals to @@ALL_GROUPS@@, then exclude USER type (search for all
-       * group types)
-       */
-      String hibernateTypeName = hibernateType.getName();
-      if (ALL_GROUPS_TYPE.equals(hibernateTypeName)) {
-        hqlBuilderConditions.append(" and io.identityType.name <> 'USER'");
-      } else {
-        hqlBuilderConditions.append(" and io.identityType=:identityType");
-        queryParams.put("identityType", hibernateType);
-      }
-      /* END SOC-6210 */
-      /* BEGIN CAL-1225: User picker in Participants tab is case sensitive */
+      queryParams.put("identityType", hibernateType);
+
+      hqlBuilderConditions.append(" and io.name like :ioName");
       if (criteria != null && criteria.getFilter() != null) {
-        String attrValue = criteria.getFilter().replaceAll("\\*", "%");
-        String operator = "=";
-        if (attrValue.contains("%")) {
-          operator = "like";
-        }
-        if (isAllowNotCaseSensitiveSearch()) {
-          attrValue = attrValue.toLowerCase();
-          hqlBuilderConditions.append(" and lower(io.name) " + operator + " :ioName");
-        } else {
-          hqlBuilderConditions.append(" and io.name " + operator + " :ioName");
-        }
-        queryParams.put("ioName", attrValue);
+        queryParams.put("ioName", criteria.getFilter().replaceAll("\\*", "%"));
+      } else {
+        queryParams.put("ioName", "%");
       }
-      /* END CAL-1225: User picker in Participants tab is case sensitive */
 
       if (criteria != null && criteria.isFiltered() && criteria.getValues() != null) {
         int i = 0;
@@ -685,61 +655,25 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
           } catch (IdentityException e) {
             // Nothing
           }
-          /** Begin eXo customization : PLF-7270 **/
-          if (entry.getValue() == null || entry.getValue().length == 0) {
+
+          Set<String> given = new HashSet<String>(Arrays.asList(entry.getValue()));
+
+          for (String attrValue : given) {
+            attrValue = attrValue.replaceAll("\\*", "%");
+
             i++;
             String attrTableJoinName = "attrs" + i;
+            String textValuesTableJoinName = "textValues" + i;
             String attrParamName = "attr" + i;
-            hqlBuilderConditions.append(" and not exists(from io.attributes as " + attrTableJoinName + " where "
-                + attrTableJoinName + ".name = :" + attrParamName + ")");
+            String textValueParamName = "textValue" + i;
+
+            hqlBuilderSelect.append(" join io.attributes as " + attrTableJoinName);
+            hqlBuilderSelect.append(" join " + attrTableJoinName + ".textValues as " + textValuesTableJoinName);
+            hqlBuilderConditions.append(" and " + attrTableJoinName + ".name like :" + attrParamName);
+            hqlBuilderConditions.append(" and " + textValuesTableJoinName + " like :" + textValueParamName);
+
             queryParams.put(attrParamName, mappedAttributeName);
-            /** End eXo customization **/
-          } else {
-            Set<String> given = new HashSet<String>(Arrays.asList(entry.getValue()));
-
-            for (String attrValue : given) {
-              attrValue = attrValue.replaceAll("\\*", "%");
-
-              /*
-               * BEGIN CAL-1225: User picker in Participants tab is case
-               * sensitive
-               */
-              String operator = "=";
-              if (attrValue.contains("%")) {
-                operator = "like";
-              }
-              if (isAllowNotCaseSensitiveSearch()) {
-                attrValue = attrValue.toLowerCase();
-              }
-              /*
-               * END CAL-1225: User picker in Participants tab is case sensitive
-               */
-              i++;
-              String attrTableJoinName = "attrs" + i;
-              String textValuesTableJoinName = "textValues" + i;
-              String attrParamName = "attr" + i;
-              String textValueParamName = "textValue" + i;
-
-              hqlBuilderSelect.append(" join io.attributes as " + attrTableJoinName);
-              hqlBuilderSelect.append(" join " + attrTableJoinName + ".textValues as " + textValuesTableJoinName);
-              /*
-               * BEGIN CAL-1225: User picker in Participants tab is case
-               * sensitive
-               */
-              hqlBuilderConditions.append(" and " + attrTableJoinName + ".name = :" + attrParamName);
-              if (isAllowNotCaseSensitiveSearch()) {
-                hqlBuilderConditions.append(" and lower(" + textValuesTableJoinName + ") " + operator + " :"
-                    + textValueParamName);
-              } else {
-                hqlBuilderConditions.append(" and " + textValuesTableJoinName + " " + operator + " :" + textValueParamName);
-              }
-              /*
-               * END CAL-1225: User picker in Participants tab is case sensitive
-               */
-
-              queryParams.put(attrParamName, mappedAttributeName);
-              queryParams.put(textValueParamName, attrValue);
-            }
+            queryParams.put(textValueParamName, attrValue);
           }
         }
       }
@@ -2398,8 +2332,8 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
 
   protected Session getHibernateSession(IdentityStoreInvocationContext ctx) throws IdentityException {
     try {
-      ExoHibernateIdentityStoreSessionImpl hbIdentityStoreSession =
-                                                                  (ExoHibernateIdentityStoreSessionImpl) ctx.getIdentityStoreSession();
+      HibernateIdentityStoreSessionImpl hbIdentityStoreSession =
+                                                               (HibernateIdentityStoreSessionImpl) ctx.getIdentityStoreSession();
 
       if (lazyStartOfHibernateTransaction) {
         hbIdentityStoreSession.startHibernateTransactionIfNotStartedYet();
@@ -2495,22 +2429,14 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
     Session hibernateSession = getHibernateSession(ctx);
 
     try {
-      SimpleExpression nameSearchCriteria = Restrictions.eq("name", io.getName());
-      if (isAllowNotCaseSensitiveSearch() && hibernateType.getName().equalsIgnoreCase("USER")) {
-        nameSearchCriteria = nameSearchCriteria.ignoreCase();
-      }
+
       hibernateObject = (HibernateIdentityObject) hibernateSession.createCriteria(HibernateIdentityObject.class)
-                                                                  .add(nameSearchCriteria)
+                                                                  .add(Restrictions.eq("name", io.getName()))
                                                                   .add(Restrictions.eq("identityType", hibernateType))
                                                                   .add(Restrictions.eq("realm", realm))
                                                                   .setCacheable(true)
                                                                   .uniqueResult();
-    } catch (NonUniqueResultException e) {
-      log.log(Level.SEVERE,
-              "The identity of type '" + hibernateType.getName() + "' and with name '" + io.getName()
-                  + "' is not unique. Thus a null will be returned. ",
-              e);
-      return null;
+
     } catch (Exception e) {
       if (log.isLoggable(Level.FINER)) {
         log.log(Level.FINER, "Exception occurred: ", e);
@@ -2757,15 +2683,6 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
           mappedAttributeName = resolveAttributeStoreMapping(object.getIdentityType(), entry.getKey());
         } catch (IdentityException e) {
           // Nothing
-        }
-
-        // If the attribute key is enable, consider its absence as it was equals
-        // to true
-        if (entry.getKey().equals(EntityMapperUtils.USER_ENABLED) && entry.getValue() != null && entry.getValue().length == 0) {
-          if (presentAttrs.containsKey(mappedAttributeName)) {
-            toRemove.add(object);
-          }
-          continue;
         }
 
         if (mappedAttributeName == null) {

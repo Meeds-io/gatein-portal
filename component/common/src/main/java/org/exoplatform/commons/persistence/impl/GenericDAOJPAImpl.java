@@ -26,8 +26,9 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.ejb.EntityManagerFactoryImpl;
+import org.hibernate.internal.SessionFactoryImpl;
 
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.api.persistence.GenericDAO;
@@ -158,13 +159,9 @@ public class GenericDAOJPAImpl<E, ID extends Serializable> implements GenericDAO
   }
 
   protected Dialect getHibernateDialect() {
-    return getEntityManager() == null || getEntityManager().getEntityManagerFactory() == null
-        || !(getEntityManager().getEntityManagerFactory() instanceof EntityManagerFactoryImpl) ? null
-                                                                                               : getDialect(((EntityManagerFactoryImpl) getEntityManager().getEntityManagerFactory()));
-  }
-
-  protected Dialect getDialect(EntityManagerFactoryImpl factoryImpl) {
-    return factoryImpl.getSessionFactory().getDialect();
+    final Session session = (Session) getEntityManager().getDelegate();
+    final SessionFactoryImpl sessionFactory = (SessionFactoryImpl) session.getSessionFactory();
+    return sessionFactory.getJdbcServices().getDialect();
   }
 
   protected boolean isMSSQLDialect() {

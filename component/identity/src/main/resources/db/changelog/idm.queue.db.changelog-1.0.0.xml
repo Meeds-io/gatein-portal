@@ -38,7 +38,7 @@
     </modifySql>
   </changeSet>
 
-  <changeSet author="idmQueue" id="1.0.0-2" dbms="oracle,postgresql">
+  <changeSet author="idmQueue" id="1.0.0-2" dbms="oracle,postgresql,hsqldb">
     <createSequence sequenceName="SEQ_IDM_QUEUE_ID" startValue="1"/>
   </changeSet>
 

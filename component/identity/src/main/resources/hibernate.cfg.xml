@@ -18,19 +18,5 @@
 		<!-- Show and print nice SQL on stdout -->
 		<property name="show_sql">false</property>
 		<property name="format_sql">false</property>
-		<!-- List of XML mapping files -->
-		<mapping resource="mappings/HibernateRealm.hbm.xml" />
-		<mapping
-			resource="mappings/HibernateIdentityObjectCredentialBinaryValue.hbm.xml" />
-		<mapping
-			resource="mappings/HibernateIdentityObjectAttributeBinaryValue.hbm.xml" />
-		<mapping resource="mappings/HibernateIdentityObject.hbm.xml" />
-		<mapping resource="mappings/HibernateIdentityObjectCredential.hbm.xml" />
-		<mapping resource="mappings/HibernateIdentityObjectCredentialType.hbm.xml" />
-		<mapping resource="mappings/HibernateIdentityObjectAttribute.hbm.xml" />
-		<mapping resource="mappings/HibernateIdentityObjectType.hbm.xml" />
-		<mapping resource="mappings/HibernateIdentityObjectRelationship.hbm.xml" />
-		<mapping resource="mappings/HibernateIdentityObjectRelationshipType.hbm.xml" />
-		<mapping resource="mappings/HibernateIdentityObjectRelationshipName.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

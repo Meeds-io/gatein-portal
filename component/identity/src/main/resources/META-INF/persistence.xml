@@ -4,7 +4,7 @@
              version="2.0">
 
   <persistence-unit name="exo-pu" transaction-type="RESOURCE_LOCAL">
-    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
     <non-jta-data-source>java:/comp/env/exo-jpa_portal</non-jta-data-source>
     <properties>
       <property name="persistenceUnitName" value="exo-pu"></property>

@@ -1,19 +1,42 @@
+/*
+* JBoss, a division of Red Hat
+* Copyright 2006, Red Hat Middleware, LLC, and individual contributors as indicated
+* by the @authors tag. See the copyright.txt in the distribution for a
+* full listing of individual contributors.
+*
+* This is free software; you can redistribute it and/or modify it
+* under the terms of the GNU Lesser General Public License as
+* published by the Free Software Foundation; either version 2.1 of
+* the License, or (at your option) any later version.
+*
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this software; if not, write to the Free
+* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+* 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+*/
+
 package org.picketlink.idm.impl.store.hibernate;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.spi.store.IdentityStoreSession;
 
 /**
- * Wrapper around HibernateEntityManager This class replaces the original
- * PicketLink HibernateIdentityStoreSessionImpl class to fix transaction status
- * management.
+ * Wrapper around HibernateEntityManager
+ *
+ * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw
+ *         Dawidowicz</a>
+ * @version : 0.1 $
  */
-public class ExoHibernateIdentityStoreSessionImpl implements IdentityStoreSession {
+public class HibernateIdentityStoreSessionImpl implements IdentityStoreSession {
   private static Logger              log               = Logger.getLogger(HibernateIdentityStoreImpl.class.getName());
 
   private final SessionFactory       sessionFactory;
@@ -22,9 +45,9 @@ public class ExoHibernateIdentityStoreSessionImpl implements IdentityStoreSessio
 
   // Tracking status of Hibernate transaction. Value "true" means that Hibernate
   // transaction has been started for this client
-  private final ThreadLocal<Boolean> hibernateTxStatus = new ThreadLocal<>();
+  private final ThreadLocal<Boolean> hibernateTxStatus = new ThreadLocal<Boolean>();
 
-  public ExoHibernateIdentityStoreSessionImpl(SessionFactory sessionFactory, boolean lazyStartOfHibernateTransaction) {
+  public HibernateIdentityStoreSessionImpl(SessionFactory sessionFactory, boolean lazyStartOfHibernateTransaction) {
     this.sessionFactory = sessionFactory;
     this.lazyStartOfHibernateTransaction = lazyStartOfHibernateTransaction;
   }
@@ -95,14 +118,8 @@ public class ExoHibernateIdentityStoreSessionImpl implements IdentityStoreSessio
 
       // Commit hibernate transaction only if it has really been started
       if (hbTxStatus != null && hbTxStatus) {
-        try {
-          commitHibernateTransaction();
-        } finally {
-          // reset PicketLink Hibernate transaction status to be consistent with
-          // the real
-          // Hibernate transaction status (see EXOGTN-2384)
-          hibernateTxStatus.set(null);
-        }
+        commitHibernateTransaction();
+        hibernateTxStatus.set(null);
       }
     } else {
       commitHibernateTransaction();
@@ -114,14 +131,8 @@ public class ExoHibernateIdentityStoreSessionImpl implements IdentityStoreSessio
       Boolean hbTxStatus = hibernateTxStatus.get();
       // Rollback hibernate transaction only if it has really been started
       if (hbTxStatus != null && hbTxStatus) {
-        try {
-          rollbackHibernateTransaction();
-        } finally {
-          // reset PicketLink Hibernate transaction status to be consistent with
-          // the real
-          // Hibernate transaction status (see EXOGTN-2384)
-          hibernateTxStatus.set(null);
-        }
+        rollbackHibernateTransaction();
+        hibernateTxStatus.set(null);
       }
     } else {
       rollbackHibernateTransaction();
@@ -130,7 +141,7 @@ public class ExoHibernateIdentityStoreSessionImpl implements IdentityStoreSessio
 
   public boolean isTransactionActive() {
     if (lazyStartOfHibernateTransaction) {
-      return hibernateTxStatus.get() != null && hibernateTxStatus.get();
+      return hibernateTxStatus.get() != null;
     } else {
       return isHibernateTransactionActive();
     }
@@ -152,12 +163,7 @@ public class ExoHibernateIdentityStoreSessionImpl implements IdentityStoreSessio
       log.log(Level.FINER, "Going to start Hibernate transaction");
     }
 
-    Transaction transaction = sessionFactory.getCurrentSession().getTransaction();
-    // Start a new transaction only no currently active one,
-    // Else, we will have a "nested transaction not supported" exception
-    if (!transaction.isActive()) {
-      transaction.begin();
-    }
+    sessionFactory.getCurrentSession().getTransaction().begin();
   }
 
   private void commitHibernateTransaction() {
