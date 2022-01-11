@@ -21,6 +21,8 @@ public interface GateInTokenStore {
     void cleanExpired();
 
     long size();
+    
+    void deleteTokensByUsernameAndType(String username, String tokenType);
 
     class TokenData {
         /** . */
@@ -34,12 +36,15 @@ public interface GateInTokenStore {
 
         /** . */
         public final Date expirationTime;
+        
+        public final String tokenType;
 
-        public TokenData(String tokenId, String hash, Credentials payload, Date expirationTime) {
+        public TokenData(String tokenId, String hash, Credentials payload, Date expirationTime, String tokenType) {
             this.tokenId = tokenId;
             this.hash = hash;
             this.expirationTime = expirationTime;
             this.payload = payload;
+            this.tokenType = tokenType;
         }
     }
 }

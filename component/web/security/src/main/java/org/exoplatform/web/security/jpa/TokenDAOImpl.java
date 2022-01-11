@@ -39,4 +39,13 @@ public class TokenDAOImpl extends GenericDAOJPAImpl<TokenEntity, Long> implement
             this.deleteAll(entities);
         }
     }
+
+    @Override
+    @ExoTransactional
+    public void deleteTokensByUsernameAndType(String username, String tokenType) {
+        Query query = getEntityManager().createNamedQuery("GateInToken.deleteTokensByUserAndType");
+        query.setParameter("username", username);
+        query.setParameter("tokenType", tokenType);
+        query.executeUpdate();
+    }
 }
