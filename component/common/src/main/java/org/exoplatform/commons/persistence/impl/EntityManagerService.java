@@ -27,7 +27,6 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.ejb.HibernatePersistence;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -69,7 +68,7 @@ public class EntityManagerService implements ComponentRequestLifecycle {
     // Setting datasource JNDI name. Get it directly from eXo global properties so it is not overridable by addons.
     String datasourceName = PropertyManager.getProperty(EXO_JPA_DATASOURCE_NAME);
     if (StringUtils.isNotBlank(datasourceName)) {
-      properties.put(HibernatePersistence.NON_JTA_DATASOURCE, datasourceName);
+      properties.put(AvailableSettings.JPA_NON_JTA_DATASOURCE, datasourceName);
       LOGGER.info("EntityManagerFactory [{}] - Creating with datasource {}.", PERSISTENCE_UNIT_NAME, datasourceName);
     } else {
       LOGGER.info("EntityManagerFactory [{}] - Creating with default datasource.", PERSISTENCE_UNIT_NAME);
@@ -89,11 +88,11 @@ public class EntityManagerService implements ComponentRequestLifecycle {
   }
 
   public String getDatasourceName() {
-    return (String) properties.get(HibernatePersistence.NON_JTA_DATASOURCE);
+    return (String) properties.get(AvailableSettings.JPA_NON_JTA_DATASOURCE);
   }
 
   public void setDatasourceName(String datasourceName) {
-    properties.put(HibernatePersistence.NON_JTA_DATASOURCE, datasourceName);
+    properties.put(AvailableSettings.JPA_NON_JTA_DATASOURCE, datasourceName);
   }
 
   private List<String> getHibernateAvailableSettings() {

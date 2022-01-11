@@ -23,79 +23,271 @@
 
 package org.exoplatform.services.organization.idm;
 
+import java.io.Serializable;
+import java.net.URL;
 import java.security.PrivilegedAction;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
+import org.hibernate.HibernateException;
+import org.hibernate.MappingException;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.SessionFactoryObserver;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.service.BootstrapServiceRegistry;
-import org.hibernate.service.BootstrapServiceRegistryBuilder;
-import org.hibernate.service.ServiceRegistry;
-import org.hibernate.service.ServiceRegistryBuilder;
-import org.hibernate.service.internal.StandardServiceRegistryImpl;
 
+import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.commons.utils.ClassLoading;
+import org.exoplatform.commons.utils.PrivilegedSystemHelper;
 import org.exoplatform.commons.utils.SecurityHelper;
+import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.component.ComponentPlugin;
+import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.PropertiesParam;
+import org.exoplatform.container.xml.Property;
 import org.exoplatform.services.cache.CacheService;
-import org.exoplatform.services.database.impl.HibernateServiceImpl;
+import org.exoplatform.services.database.HibernateService;
+import org.exoplatform.services.database.ObjectQuery;
+import org.exoplatform.services.database.impl.AddHibernateMappingPlugin;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
-/**
- * Custom implementation of {@link org.exoplatform.services.database.HibernateService} compatible with Hibernate4
- *
- * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
- */
-public class CustomHibernateServiceImpl extends HibernateServiceImpl {
-    private SessionFactory sessFactory;
+public class CustomHibernateServiceImpl implements HibernateService, ComponentRequestLifecycle {
 
-    public CustomHibernateServiceImpl(InitParams initParams, CacheService cacheService) {
-        super(initParams, cacheService);
+  private static final Log           LOG          = ExoLogger.getLogger(CustomHibernateServiceImpl.class);
+
+  public static final String         AUTO_DIALECT = "AUTO";
+
+  private ThreadLocal<Session>       threadLocal_;
+
+  private HibernateConfigurationImpl conf_;
+
+  private HashSet<String>            mappings_    = new HashSet<String>();
+
+  private SessionFactory             sessionFactory_;
+
+  public CustomHibernateServiceImpl(InitParams initParams, CacheService cacheService) {
+    threadLocal_ = new ThreadLocal<Session>();
+    PropertiesParam param = initParams.getPropertiesParam("hibernate.properties");
+    conf_ = SecurityHelper.doPrivilegedAction(new PrivilegedAction<HibernateConfigurationImpl>() {
+      public HibernateConfigurationImpl run() {
+        return new HibernateConfigurationImpl();
+      }
+    });
+    Iterator<?> properties = param.getPropertyIterator();
+    while (properties.hasNext()) {
+      Property p = (Property) properties.next();
+      conf_.setProperty(p.getName(), p.getValue());
     }
 
-    @Override
-    public SessionFactory getSessionFactory() {
-        if (sessFactory == null) {
-            sessFactory = SecurityHelper.doPrivilegedAction(new PrivilegedAction<SessionFactory>() {
-                public SessionFactory run() {
-                    return buildSessionFactory();
-                }
-            });
+    // Replace the potential "java.io.tmpdir" variable in the connection URL
+    String connectionURL = conf_.getProperty("hibernate.connection.url");
+    if (connectionURL != null) {
+      connectionURL = connectionURL.replace("${java.io.tmpdir}", PrivilegedSystemHelper.getProperty("java.io.tmpdir"));
+      conf_.setProperty("hibernate.connection.url", connectionURL);
+    }
+  }
+
+  public void addPlugin(ComponentPlugin plugin) {
+    if (plugin instanceof AddHibernateMappingPlugin) {
+      AddHibernateMappingPlugin impl = (AddHibernateMappingPlugin) plugin;
+      try {
+        List path = impl.getMapping();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+        if (path != null) {
+
+          for (int i = 0; i < path.size(); i++) {
+            String relativePath = (String) path.get(i);
+            if (!mappings_.contains(relativePath)) {
+              mappings_.add(relativePath);
+              URL url = cl.getResource(relativePath);
+              LOG.info("Adding  Hibernate Mapping: " + relativePath);
+              conf_.addURL(url);
+            }
+          }
         }
-        return sessFactory;
+
+        // Annotations
+        List<String> annotations = impl.getAnnotations();
+        if (annotations != null) {
+          for (String annotation : annotations) {
+            Class<?> clazz = ClassLoading.loadClass(annotation, this);
+            LOG.info("Adding  Hibernate Annotated class: " + annotation);
+            conf_.addAnnotatedClass(clazz);
+          }
+        }
+      } catch (MappingException ex) {
+        LOG.error(ex.getLocalizedMessage(), ex);
+      } catch (ClassNotFoundException ex) {
+        LOG.error(ex.getLocalizedMessage(), ex);
+      }
     }
+  }
 
-    // We need custom ClassloaderService, which is able to locate our UserTransactionJtaPlatform class from tccl.
-    // Default ClassLoaderServiceImpl is bootstrapped with no-arg constructor, so it uses only Hibernate Classloader
-    // TODO: Remove once https://issues.jboss.org/browse/HIBERNATE-137 will be fixed (likely whole class can be removed)
-    protected SessionFactory buildSessionFactory() {
-        Configuration conf = getHibernateConfiguration();
+  public Configuration getHibernateConfiguration() {
+    return conf_;
+  }
 
-        BootstrapServiceRegistry bootstrapRegistry = createHibernateBootstrapServiceRegistry();
-
-        final ServiceRegistry serviceRegistry = new ServiceRegistryBuilder(bootstrapRegistry).applySettings(
-                conf.getProperties()).buildServiceRegistry();
-        conf.setSessionFactoryObserver(new SessionFactoryObserver() {
-            @Override
-            public void sessionFactoryCreated(SessionFactory factory) {
-            }
-
-            @Override
-            public void sessionFactoryClosed(SessionFactory factory) {
-                ((StandardServiceRegistryImpl) serviceRegistry).destroy();
-            }
-        });
-
-        return conf.buildSessionFactory(serviceRegistry);
+  /**
+   * @return the SessionFactory
+   */
+  public SessionFactory getSessionFactory() {
+    if (sessionFactory_ == null) {
+      sessionFactory_ = conf_.buildSessionFactory();
     }
+    return sessionFactory_;
+  }
 
-    /**
-     * @return bootstrapServiceRegistry, which is using classloaderService, which is able to find classes from tccl, hibernate
-     *         classloader and system classloader
-     */
-    protected BootstrapServiceRegistry createHibernateBootstrapServiceRegistry() {
-        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        ClassLoader hibernateCl = BootstrapServiceRegistry.class.getClassLoader();
-        return new BootstrapServiceRegistryBuilder().withApplicationClassLoader(tccl).withHibernateClassLoader(hibernateCl)
-                .build();
+  public Session openSession() {
+    Session currentSession = threadLocal_.get();
+    if (currentSession == null) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("open new hibernate session in openSession()");
+      }
+      currentSession = getSessionFactory().openSession();
+      threadLocal_.set(currentSession);
     }
+    return currentSession;
+  }
 
+  public Session openNewSession() {
+    Session currentSession = threadLocal_.get();
+    if (currentSession != null) {
+      closeSession(currentSession);
+    }
+    currentSession = getSessionFactory().openSession();
+    threadLocal_.set(currentSession);
+    return currentSession;
+  }
+
+  public void closeSession(Session session) {
+    if (session == null) {
+      return;
+    }
+    try {
+      session.close();
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("close hibernate session in openSession(Session session)");
+      }
+    } catch (HibernateException t) {
+      LOG.error("Error closing hibernate session : " + t.getMessage(), t);
+    }
+    threadLocal_.set(null);
+  }
+
+  final public void closeSession() {
+    Session s = threadLocal_.get();
+    if (s != null) {
+      s.close();
+    }
+    threadLocal_.remove();
+  }
+
+  public Object findExactOne(Session session, String query, String id) throws Exception {
+    Object res = session.createQuery(query).setString("id", id).uniqueResult();
+    if (res == null) {
+      throw new ObjectNotFoundException("Cannot find the object with id: " + id);
+    }
+    return res;
+  }
+
+  public Object findOne(Session session, String query, String id) throws Exception {
+    List<?> l = session.createQuery(query).setString("id", id).list();
+    if (l.size() == 0) {
+      return null;
+    } else if (l.size() > 1) {
+      throw new Exception("Expect only one object but found" + l.size());
+    } else {
+      return l.get(0);
+    }
+  }
+
+  public Collection<?> findAll(Session session, String query) throws Exception {
+    List<?> l = session.createQuery(query).list();
+    if (l.size() == 0) {
+      return null;
+    } else {
+      return l;
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  public Object findOne(Class clazz, Serializable id) throws Exception {
+    Session session = openSession();
+    Object obj = session.get(clazz, id);
+    return obj;
+  }
+
+  public Object findOne(ObjectQuery q) throws Exception {
+    Session session = openSession();
+    List<?> l = session.createQuery(q.getHibernateQuery()).list();
+    if (l.size() == 0) {
+      return null;
+    } else if (l.size() > 1) {
+      throw new Exception("Expect only one object but found" + l.size());
+    } else {
+      return l.get(0);
+    }
+  }
+
+  public Object create(Object obj) throws Exception {
+    Session session = openSession();
+    session.save(obj);
+    session.flush();
+    return obj;
+  }
+
+  public Object update(Object obj) throws Exception {
+    Session session = openSession();
+    session.update(obj);
+    session.flush();
+    return obj;
+  }
+
+  public Object save(Object obj) throws Exception {
+    Session session = openSession();
+    session.merge(obj);
+    session.flush();
+    return obj;
+  }
+
+  public Object remove(Object obj) throws Exception {
+    Session session = openSession();
+    session.delete(obj);
+    session.flush();
+    return obj;
+  }
+
+  @SuppressWarnings("rawtypes")
+  public Object remove(Class clazz, Serializable id) throws Exception {
+    Session session = openSession();
+    Object obj = session.get(clazz, id);
+    session.delete(obj);
+    session.flush();
+    return obj;
+  }
+
+  @SuppressWarnings("rawtypes")
+  public Object remove(Session session, Class clazz, Serializable id) throws Exception {
+    Object obj = session.get(clazz, id);
+    session.delete(obj);
+    return obj;
+  }
+
+  public void startRequest(ExoContainer container) {
+
+  }
+
+  public void endRequest(ExoContainer container) {
+    closeSession();
+  }
+
+  @Override
+  public boolean isStarted(ExoContainer container) {
+    Session s = threadLocal_.get();
+    return s != null && s.isOpen();
+  }
 }

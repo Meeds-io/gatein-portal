@@ -24,7 +24,7 @@
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
     </modifySql>
   </changeSet>
-  <changeSet author="portal" id="1.0.0-2" dbms="oracle,postgresql">
+  <changeSet author="portal" id="1.0.0-2" dbms="oracle,postgresql,hsqldb">
     <createSequence sequenceName="SEQ_GTN_APPLICATION_CAT_ID" startValue="1"/>
   </changeSet>
 
@@ -48,7 +48,7 @@
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
     </modifySql>
   </changeSet>
-  <changeSet author="portal" id="1.0.0-4" dbms="oracle,postgresql">
+  <changeSet author="portal" id="1.0.0-4" dbms="oracle,postgresql,hsqldb">
     <createSequence sequenceName="SEQ_GTN_APPLICATION_ID" startValue="1"/>
   </changeSet>
   <changeSet author="portal" id="1.0.0-5">
@@ -81,7 +81,7 @@
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
     </modifySql>
   </changeSet>
-  <changeSet author="portal" id="1.0.0-7" dbms="oracle,postgresql">
+  <changeSet author="portal" id="1.0.0-7" dbms="oracle,postgresql,hsqldb">
     <createSequence sequenceName="SEQ_SITE_ID_GENERATOR" startValue="1"/>
   </changeSet>
   <changeSet author="portal" id="1.0.0-8">
@@ -109,7 +109,7 @@
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
     </modifySql>
   </changeSet>
-  <changeSet author="portal" id="1.0.0-10" dbms="oracle,postgresql">
+  <changeSet author="portal" id="1.0.0-10" dbms="oracle,postgresql,hsqldb">
     <createSequence sequenceName="SEQ_PAGE_ID_GENERATOR" startValue="1"/>
   </changeSet>
   <changeSet author="portal" id="1.0.0-11">
@@ -145,7 +145,7 @@
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
     </modifySql>
   </changeSet>
-  <changeSet author="portal" id="1.0.0-13" dbms="oracle,postgresql">
+  <changeSet author="portal" id="1.0.0-13" dbms="oracle,postgresql,hsqldb">
     <createSequence sequenceName="SEQ_GTN_NAVIGATION_NODE_ID" startValue="1"/>
   </changeSet>
   <changeSet id="portal" author="1.0.0-14">
@@ -175,7 +175,7 @@
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
     </modifySql>
   </changeSet>
-  <changeSet author="portal" id="1.0.0-16" dbms="oracle,postgresql">
+  <changeSet author="portal" id="1.0.0-16" dbms="oracle,postgresql,hsqldb">
     <createSequence sequenceName="SEQ_GTN_NAVIGATION_ID" startValue="1"/>
   </changeSet>
   <changeSet author="portal" id="1.0.0-17">
@@ -204,7 +204,7 @@
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
     </modifySql>
   </changeSet>
-  <changeSet author="portal" id="1.0.0-19" dbms="oracle,postgresql">
+  <changeSet author="portal" id="1.0.0-19" dbms="oracle,postgresql,hsqldb">
     <createSequence sequenceName="SEQ_PORTAL_DESCRIPTIONS_ID" startValue="1"/>
   </changeSet>
 
@@ -276,7 +276,7 @@
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
     </modifySql>
   </changeSet>
-  <changeSet author="portal" id="1.0.0-24" dbms="oracle,postgresql">
+  <changeSet author="portal" id="1.0.0-24" dbms="oracle,postgresql,hsqldb">
     <createSequence sequenceName="SEQ_CONTAINER_ID_GENERATOR" startValue="1"/>
     <createSequence sequenceName="SEQ_WINDOW_ID_GENERATOR" startValue="1"/>
   </changeSet>
@@ -300,7 +300,7 @@
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
     </modifySql>
   </changeSet>
-  <changeSet author="portal" id="1.0.0-26" dbms="oracle,postgresql">
+  <changeSet author="portal" id="1.0.0-26" dbms="oracle,postgresql,hsqldb">
     <createSequence sequenceName="SEQ_PORTAL_PERMISSIONS_ID" startValue="1"/>
   </changeSet>
   <changeSet author="portal" id="1.0.0-27">

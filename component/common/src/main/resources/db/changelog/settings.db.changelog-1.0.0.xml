@@ -6,8 +6,8 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
 
   <!-- Managing both DB that use sequences and db that use auto increment -->
-  <property name="autoIncrement" value="true" dbms="mysql,mssql,h2,hsqldb"/>
-  <property name="autoIncrement" value="false" dbms="oracle,postgresql"/>
+  <property name="autoIncrement" value="true" dbms="mysql,mssql,h2"/>
+  <property name="autoIncrement" value="false" dbms="oracle,postgresql,hsqldb"/>
 
   <!-- Managing auto generation of timestamp by Database -->
   <property name="now" value="now()" dbms="mysql,hsqldb,postgresql,h2"/>
@@ -70,15 +70,15 @@
     </modifySql>
   </changeSet>
 
-  <changeSet author="settings" id="1.0.0-4" dbms="oracle,postgresql">
+  <changeSet author="settings" id="1.0.0-4" dbms="oracle,postgresql,hsqldb">
     <createSequence sequenceName="SEQ_STG_SETTINGS_COMMON_ID" startValue="1"/>
   </changeSet>
 
-  <changeSet author="settings" id="1.0.0-5" dbms="oracle,postgresql">
+  <changeSet author="settings" id="1.0.0-5" dbms="oracle,postgresql,hsqldb">
     <createSequence sequenceName="SEQ_STG_CONTEXT_COMMON_ID" startValue="1"/>
   </changeSet>
 
-  <changeSet author="settings" id="1.0.0-6" dbms="oracle,postgresql">
+  <changeSet author="settings" id="1.0.0-6" dbms="oracle,postgresql,hsqldb">
     <createSequence sequenceName="SEQ_STG_SCOPE_COMMON_ID" startValue="1"/>
   </changeSet>
 

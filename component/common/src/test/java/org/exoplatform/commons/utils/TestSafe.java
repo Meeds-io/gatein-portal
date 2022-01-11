@@ -26,9 +26,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import junit.framework.AssertionFailedError;
-
 import org.exoplatform.component.test.AbstractGateInTest;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

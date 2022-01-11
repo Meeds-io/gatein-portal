@@ -50,8 +50,7 @@
 
         <!-- JTA setup -->
         <!--<property name="hibernate.current_session_context_class" value="jta"/>
-        <property name="hibernate.transaction.factory_class" value="org.hibernate.transaction.JTATransactionFactory" />
-        <property name="hibernate.transaction.jta.platform" value="org.exoplatform.services.organization.idm.UserTransactionJtaPlatform" />-->
+        <property name="hibernate.transaction.factory_class" value="org.hibernate.transaction.JTATransactionFactory" /> -->
 
         <property name="hibernate.cache.use_second_level_cache" value="false"/>
         <property name="hibernate.cache.use_query_cache" value="false"/>
@@ -256,45 +255,6 @@
     </init-params>
   </component>
 
-  <external-component-plugins>
-    <target-component>org.exoplatform.services.database.HibernateService</target-component>
-    <component-plugin>
-      <name>add.hibernate.mapping</name>
-      <set-method>addPlugin</set-method>
-      <type>org.exoplatform.services.database.impl.AddHibernateMappingPlugin</type>
-      <init-params>
-        <values-param>
-          <name>hibernate.mapping</name>
-          <value>picketlink-idm/mappings/HibernateRealm.hbm.xml</value>
-          <value>picketlink-idm/mappings/HibernateIdentityObjectCredentialBinaryValue.hbm.xml</value>
-          <value>picketlink-idm/mappings/HibernateIdentityObjectAttributeBinaryValue.hbm.xml</value>
-          <value>picketlink-idm/mappings/HibernateIdentityObject.hbm.xml</value>
-          <value>picketlink-idm/mappings/HibernateIdentityObjectCredential.hbm.xml</value>
-          <value>picketlink-idm/mappings/HibernateIdentityObjectCredentialType.hbm.xml</value>
-          <value>picketlink-idm/mappings/HibernateIdentityObjectAttribute.hbm.xml</value>
-          <value>picketlink-idm/mappings/HibernateIdentityObjectType.hbm.xml</value>
-          <value>picketlink-idm/mappings/HibernateIdentityObjectRelationship.hbm.xml</value>
-          <value>picketlink-idm/mappings/HibernateIdentityObjectRelationshipType.hbm.xml</value>
-          <value>picketlink-idm/mappings/HibernateIdentityObjectRelationshipName.hbm.xml</value>
-        </values-param>
-        <values-param profiles="sybase">
-          <name>hibernate.mapping</name>
-          <value>picketlink-idm/sybase-mappings/HibernateRealm.hbm.xml</value>
-          <value>picketlink-idm/sybase-mappings/HibernateIdentityObjectCredentialBinaryValue.hbm.xml</value>
-          <value>picketlink-idm/sybase-mappings/HibernateIdentityObjectAttributeBinaryValue.hbm.xml</value>
-          <value>picketlink-idm/sybase-mappings/HibernateIdentityObject.hbm.xml</value>
-          <value>picketlink-idm/sybase-mappings/HibernateIdentityObjectCredential.hbm.xml</value>
-          <value>picketlink-idm/sybase-mappings/HibernateIdentityObjectCredentialType.hbm.xml</value>
-          <value>picketlink-idm/sybase-mappings/HibernateIdentityObjectAttribute.hbm.xml</value>
-          <value>picketlink-idm/sybase-mappings/HibernateIdentityObjectType.hbm.xml</value>
-          <value>picketlink-idm/sybase-mappings/HibernateIdentityObjectRelationship.hbm.xml</value>
-          <value>picketlink-idm/sybase-mappings/HibernateIdentityObjectRelationshipType.hbm.xml</value>
-          <value>picketlink-idm/sybase-mappings/HibernateIdentityObjectRelationshipName.hbm.xml</value>
-        </values-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-  
   <external-component-plugins>
     <target-component>org.exoplatform.services.listener.ListenerService</target-component>
     <component-plugin>
