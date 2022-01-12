@@ -32,15 +32,17 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
-@ExoEntity
 @Entity(name = "HibernateRealm")
 @Table(name = "JBID_REALM")
+@NamedQueries(
+  {
+      @NamedQuery(
+          name = "HibernateRealm.findIRealmByName",
+          query = "SELECT o FROM HibernateRealm o WHERE o.name = :name"
+      )
+  }
+)
 public class HibernateRealm {
-
-  public static final String  findIRealmByName =
-                                               "select o from HibernateRealm o where o.name = :name";
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

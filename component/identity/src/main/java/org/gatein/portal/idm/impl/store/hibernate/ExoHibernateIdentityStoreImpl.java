@@ -113,43 +113,27 @@ public class ExoHibernateIdentityStoreImpl extends PatchedHibernateIdentityStore
 
     }
 
-    /** Add this method from the HibernateIdentityStoreImpl class because it has a private access
+    /**
+     * Add this method from the HibernateIdentityStoreImpl class because it has a private access
      * @param ctx
      * @param io
      * @return  HibernateIdentityObject used in the implementation of safeGet() method
      * @throws IdentityException
      */
-    private HibernateIdentityObject getHibernateIdentityObject(IdentityStoreInvocationContext ctx, IdentityObject io) throws IdentityException
-    {
-
-        HibernateIdentityObject hibernateObject = null;
-
-        Session hibernateSession = getHibernateSession(ctx);
-
-        try
-        {
-
-            hibernateObject = (HibernateIdentityObject)hibernateSession.createCriteria(HibernateIdentityObject.class)
-                    .add(Restrictions.eq("name", io.getName()).ignoreCase())
-                    .createAlias("identityType", "type")
-                    .add(Restrictions.eq("type.name", io.getIdentityType().getName()))
-                    .createAlias("realm", "rm")
-                    .add(Restrictions.eq("rm.name", getRealmName(ctx)))
-                    .setCacheable(true)
-                    .uniqueResult();
-
+    private HibernateIdentityObject getHibernateIdentityObject(IdentityStoreInvocationContext ctx, IdentityObject io) throws IdentityException {
+      Session hibernateSession = getHibernateSession(ctx);
+      try {
+        return hibernateSession.createNamedQuery("HibernateIdentityObject.findIdentityObjectByNameAndType", HibernateIdentityObject.class)
+                .setParameter("name", io.getName().toLowerCase())
+                .setParameter("typeName", io.getIdentityType().getName())
+                .setParameter("realmName", getRealmName(ctx))
+                .uniqueResult();
+      } catch (Exception e) {
+        if (log.isLoggable(Level.FINER)) {
+            log.log(Level.FINER, "Exception occurred: ", e);
         }
-        catch (Exception e)
-        {
-            if (log.isLoggable(Level.FINER))
-            {
-                log.log(Level.FINER, "Exception occurred: ", e);
-            }
-
-            throw new IdentityException("IdentityObject[ " + io.getName() + " | " + io.getIdentityType().getName() + "] not present in the store.", e);
-        }
-
-        return hibernateObject;
+        throw new IdentityException("IdentityObject[ " + io.getName() + " | " + io.getIdentityType().getName() + "] not present in the store.", e);
+      }
     }
 
     /** Add the implementation of the method isFirstlyCreatedIn()

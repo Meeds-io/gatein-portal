@@ -35,9 +35,6 @@ import org.hibernate.annotations.LazyToOne;
 import org.hibernate.annotations.LazyToOneOption;
 import org.picketlink.idm.spi.model.IdentityObjectAttribute;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
-@ExoEntity
 @Entity(name = "HibernateIdentityObjectAttribute")
 @Table(name = "JBID_IO_ATTR")
 public class HibernateIdentityObjectAttribute implements IdentityObjectAttribute {

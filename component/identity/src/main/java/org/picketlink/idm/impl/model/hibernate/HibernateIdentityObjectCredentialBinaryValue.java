@@ -31,9 +31,6 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
-@ExoEntity
 @Entity(name = "HibernateIdentityObjectCredentialBinaryValue")
 @Table(name = "JBID_CREDEN_BIN_VALUE")
 public class HibernateIdentityObjectCredentialBinaryValue {

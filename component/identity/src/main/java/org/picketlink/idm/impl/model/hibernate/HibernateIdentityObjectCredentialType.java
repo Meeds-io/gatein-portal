@@ -31,9 +31,6 @@ import javax.persistence.Table;
 
 import org.picketlink.idm.spi.model.IdentityObjectCredentialType;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
-@ExoEntity
 @Entity(name = "HibernateIdentityObjectCredentialType")
 @Table(name = "JBID_IO_CREDEN_TYPE")
 public class HibernateIdentityObjectCredentialType implements IdentityObjectCredentialType {
