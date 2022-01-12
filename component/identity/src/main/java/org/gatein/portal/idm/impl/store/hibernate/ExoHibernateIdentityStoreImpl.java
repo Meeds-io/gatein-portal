@@ -79,7 +79,9 @@ public class ExoHibernateIdentityStoreImpl extends PatchedHibernateIdentityStore
         HibernateIdentityObjectCredentialType hibernateType = null;
 
         try {
-            hibernateType = (HibernateIdentityObjectCredentialType) session.createCriteria(HibernateIdentityObjectCredentialType.class).add(Restrictions.eq("name", credentialType.getName())).setCacheable(true).uniqueResult();
+          hibernateType = (HibernateIdentityObjectCredentialType) session.createQuery("SELECT ct FROM HibernateIdentityObjectCredentialType ct WHERE ct.name = :name")
+                                                                         .setParameter("name", credentialType.getName())
+                                                                         .uniqueResult();
         } catch (HibernateException e) {
             if (log.isLoggable(Level.FINER)) {
                 log.log(Level.FINER, "Exception occurred: ", e);

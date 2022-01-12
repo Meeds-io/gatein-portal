@@ -47,7 +47,6 @@ import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.container.xml.Property;
-import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.database.HibernateService;
 import org.exoplatform.services.database.ObjectQuery;
 import org.exoplatform.services.database.impl.AddHibernateMappingPlugin;
@@ -62,18 +61,18 @@ public class CustomHibernateServiceImpl implements HibernateService, ComponentRe
 
   private ThreadLocal<Session>       threadLocal_;
 
-  private HibernateConfigurationImpl conf_;
+  private IdmHibernateConfiguration conf_;
 
   private HashSet<String>            mappings_    = new HashSet<String>();
 
   private SessionFactory             sessionFactory_;
 
-  public CustomHibernateServiceImpl(InitParams initParams, CacheService cacheService) {
+  public CustomHibernateServiceImpl(InitParams initParams) {
     threadLocal_ = new ThreadLocal<Session>();
     PropertiesParam param = initParams.getPropertiesParam("hibernate.properties");
-    conf_ = SecurityHelper.doPrivilegedAction(new PrivilegedAction<HibernateConfigurationImpl>() {
-      public HibernateConfigurationImpl run() {
-        return new HibernateConfigurationImpl();
+    conf_ = SecurityHelper.doPrivilegedAction(new PrivilegedAction<IdmHibernateConfiguration>() {
+      public IdmHibernateConfiguration run() {
+        return new IdmHibernateConfiguration();
       }
     });
     Iterator<?> properties = param.getPropertyIterator();
