@@ -30,8 +30,12 @@ import java.util.List;
 @Entity(name = "NameSpaceEntity")
 @ExoEntity
 @Table(name = "FILES_NAMESPACES")
-
-@NamedQueries(@NamedQuery(name = "nameSpace.getNameSpaceByName", query = "SELECT t FROM NameSpaceEntity t WHERE t.name = :name"))
+@NamedQueries(
+  @NamedQuery(
+      name = "nameSpace.getNameSpaceByName",
+      query = "SELECT t FROM NameSpaceEntity t WHERE t.name = :name"
+  )
+)
 public class NameSpaceEntity {
   @Id
   @Column(name = "NAMESPACE_ID")
