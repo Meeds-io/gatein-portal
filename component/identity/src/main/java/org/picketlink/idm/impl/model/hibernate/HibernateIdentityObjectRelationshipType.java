@@ -31,9 +31,6 @@ import javax.persistence.Table;
 
 import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
-@ExoEntity
 @Entity(name = "HibernateIdentityObjectRelationshipType")
 @Table(name = "JBID_IO_REL_TYPE")
 public class HibernateIdentityObjectRelationshipType implements IdentityObjectRelationshipType {

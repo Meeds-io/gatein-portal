@@ -36,11 +36,54 @@ import org.hibernate.annotations.LazyToOneOption;
 import org.picketlink.idm.spi.model.IdentityObjectRelationship;
 import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
-@ExoEntity
 @Entity(name = "HibernateIdentityObjectRelationship")
 @Table(name = "JBID_IO_REL")
+@NamedQueries(
+  {
+      @NamedQuery(
+          name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipWithoutName",
+          query = "SELECT r FROM HibernateIdentityObjectRelationship r"
+              + " WHERE r.type.id = :typeId"
+              + " AND r.fromIdentityObject.id = :fromIdentityObjectId"
+              + " AND r.toIdentityObject.id = :toIdentityObjectId"
+      ),
+      @NamedQuery(
+          name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipByAttributes",
+          query = "SELECT r FROM HibernateIdentityObjectRelationship r"
+              + " WHERE r.type.id = :typeId"
+              + " AND r.name.name = :name"
+              + " AND r.fromIdentityObject.id = :fromIdentityObjectId"
+              + " AND r.toIdentityObject.id = :toIdentityObjectId"
+      ),
+      @NamedQuery(
+          name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipsByIdentities",
+          query = "SELECT r FROM HibernateIdentityObjectRelationship r"
+              + " WHERE"
+              + " ("
+              + "   r.fromIdentityObject.id = :identityId1"
+              + "     AND"
+              + "   r.toIdentityObject.id = :identityId2"
+              + " ) OR ("
+              + "   r.fromIdentityObject.id = :identityId2"
+              + "     AND"
+              + "   r.toIdentityObject.id = :identityId1"
+              + " ) "
+      ),
+      @NamedQuery(
+          name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipByIdentityByType",
+          query = "SELECT r FROM HibernateIdentityObjectRelationship r"
+              + " WHERE r.type.name = :typeName"
+              + " AND r.fromIdentityObject.id = :fromIdentityObjectId"
+              + " AND r.toIdentityObject.id = :toIdentityObjectId"
+      ),
+      @NamedQuery(
+          name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipByIdentity",
+          query = "SELECT r FROM HibernateIdentityObjectRelationship r"
+              + " AND r.fromIdentityObject.id = :fromIdentityObjectId"
+              + " AND r.toIdentityObject.id = :toIdentityObjectId"
+      ),
+  }
+)
 public class HibernateIdentityObjectRelationship implements IdentityObjectRelationship {
   public static final String                      findIdentityObjectRelationshipsByType     =
                                                                                         "select r from HibernateIdentityObjectRelationship r where r.type.name = :typeName";

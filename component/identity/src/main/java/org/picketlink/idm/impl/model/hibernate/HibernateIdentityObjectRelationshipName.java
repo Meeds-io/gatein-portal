@@ -34,11 +34,16 @@ import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.LazyToOne;
 import org.hibernate.annotations.LazyToOneOption;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
-@ExoEntity
 @Entity(name = "HibernateIdentityObjectRelationshipName")
 @Table(name = "JBID_IO_REL_NAME")
+@NamedQueries(
+  {
+      @NamedQuery(
+          name = "HibernateIdentityObjectRelationshipName.findIdentityObjectRelationshipNameByName",
+          query = "select rn from HibernateIdentityObjectRelationshipName rn where rn.name like :name and rn.realm.name = :realmName"
+      ),
+  }
+)
 public class HibernateIdentityObjectRelationshipName {
 
   public static final String  findIdentityObjectRelationshipNameByName                             =

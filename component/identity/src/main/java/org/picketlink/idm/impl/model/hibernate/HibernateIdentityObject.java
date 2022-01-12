@@ -34,14 +34,21 @@ import org.picketlink.idm.common.exception.PolicyValidationException;
 import org.picketlink.idm.spi.model.IdentityObject;
 import org.picketlink.idm.spi.model.IdentityObjectCredentialType;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
-@ExoEntity
 @Entity(name = "HibernateIdentityObject")
 @Table(name = "JBID_IO")
+@NamedQueries(
+  {
+      @NamedQuery(
+          name = "HibernateIdentityObject.findIdentityObjectByNameAndType",
+          query = "SELECT o FROM HibernateIdentityObject o WHERE o.realm.name = :realmName AND lower(o.name) = :name AND o.identityType.name = :typeName"
+      ),
+      @NamedQuery(
+          name = "HibernateIdentityObject.countIdentityObjectByNameAndType",
+          query = "SELECT count(o) FROM HibernateIdentityObject o WHERE o.realm.name = :realmName AND lower(o.name) = :name AND o.identityType.name = :typeName"
+      ),
+  }
+)
 public class HibernateIdentityObject implements IdentityObject {
-  public static final String                       findIdentityObjectByNameAndType            =
-                                                                                   "select o from HibernateIdentityObject o where o.realm.name = :realmName and o.name = :name and o.identityType.name = :typeName";
 
   public static final String                       findIdentityObjectsByType                  =
                                                                              "select o from HibernateIdentityObject o where o.name like :nameFilter and o.realm.name = :realmName and o.identityType.name = :typeName";
