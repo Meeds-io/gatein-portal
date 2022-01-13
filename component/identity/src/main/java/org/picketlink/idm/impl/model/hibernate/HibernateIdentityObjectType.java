@@ -22,17 +22,21 @@
 
 package org.picketlink.idm.impl.model.hibernate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.picketlink.idm.spi.model.IdentityObjectType;
 
 @Entity(name = "HibernateIdentityObjectType")
 @Table(name = "JBID_IO_TYPE")
+@NamedQueries(
+  {
+      @NamedQuery(
+          name = "HibernateIdentityObjectType.findIdentityObjectTypeByName",
+          query = "SELECT t FROM HibernateIdentityObjectType t"
+              + " WHERE t.name = :name"
+      ),
+  }
+)
 public class HibernateIdentityObjectType implements IdentityObjectType {
 
   public static final String findIdentityObjectTypeByName =
@@ -43,7 +47,7 @@ public class HibernateIdentityObjectType implements IdentityObjectType {
   @Column(name = "ID")
   private Long               id;
 
-  @Column(name = "NAME", nullable = false)
+  @Column(name = "NAME", nullable = false, unique = true)
   private String             name;
 
   public HibernateIdentityObjectType() {

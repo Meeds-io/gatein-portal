@@ -44,43 +44,48 @@ import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
           name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipWithoutName",
           query = "SELECT r FROM HibernateIdentityObjectRelationship r"
               + " WHERE r.type.id = :typeId"
-              + " AND r.fromIdentityObject.id = :fromIdentityObjectId"
-              + " AND r.toIdentityObject.id = :toIdentityObjectId"
+              + " AND r.fromIdentityObject = :fromIdentityObject"
+              + " AND r.toIdentityObject = :toIdentityObject"
       ),
       @NamedQuery(
           name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipByAttributes",
           query = "SELECT r FROM HibernateIdentityObjectRelationship r"
               + " WHERE r.type.id = :typeId"
               + " AND r.name.name = :name"
-              + " AND r.fromIdentityObject.id = :fromIdentityObjectId"
-              + " AND r.toIdentityObject.id = :toIdentityObjectId"
+              + " AND r.fromIdentityObject = :fromIdentityObject"
+              + " AND r.toIdentityObject = :toIdentityObject"
       ),
       @NamedQuery(
           name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipsByIdentities",
           query = "SELECT r FROM HibernateIdentityObjectRelationship r"
               + " WHERE"
               + " ("
-              + "   r.fromIdentityObject.id = :identityId1"
+              + "   r.fromIdentityObject = :hio1"
               + "     AND"
-              + "   r.toIdentityObject.id = :identityId2"
+              + "   r.toIdentityObject = :hio2"
               + " ) OR ("
-              + "   r.fromIdentityObject.id = :identityId2"
+              + "   r.fromIdentityObject = :hio2"
               + "     AND"
-              + "   r.toIdentityObject.id = :identityId1"
+              + "   r.toIdentityObject = :hio1"
               + " ) "
       ),
       @NamedQuery(
           name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipByIdentityByType",
           query = "SELECT r FROM HibernateIdentityObjectRelationship r"
               + " WHERE r.type.name = :typeName"
-              + " AND r.fromIdentityObject.id = :fromIdentityObjectId"
-              + " AND r.toIdentityObject.id = :toIdentityObjectId"
+              + " AND r.fromIdentityObject = :fromIdentityObject"
+              + " AND r.toIdentityObject = :toIdentityObject"
       ),
       @NamedQuery(
           name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipByIdentity",
           query = "SELECT r FROM HibernateIdentityObjectRelationship r"
-              + " AND r.fromIdentityObject.id = :fromIdentityObjectId"
-              + " AND r.toIdentityObject.id = :toIdentityObjectId"
+              + " WHERE r.fromIdentityObject = :fromIdentityObject"
+              + " AND r.toIdentityObject = :toIdentityObject"
+      ),
+      @NamedQuery(
+          name = "HibernateIdentityObjectRelationship.removeRelationshipsByName",
+          query = "DELETE FROM HibernateIdentityObjectRelationship "
+              + " WHERE name.id = :nameId"
       ),
   }
 )

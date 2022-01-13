@@ -39,12 +39,20 @@ import org.picketlink.idm.spi.model.IdentityObjectCredentialType;
 @NamedQueries(
   {
       @NamedQuery(
-          name = "HibernateIdentityObject.findIdentityObjectByNameAndType",
+          name = "HibernateIdentityObject.findIdentityObjectByNameAndTypeIgnoreCase",
           query = "SELECT o FROM HibernateIdentityObject o WHERE o.realm.name = :realmName AND lower(o.name) = :name AND o.identityType.name = :typeName"
       ),
       @NamedQuery(
-          name = "HibernateIdentityObject.countIdentityObjectByNameAndType",
+          name = "HibernateIdentityObject.findIdentityObjectByNameAndType",
+          query = "SELECT o FROM HibernateIdentityObject o WHERE o.realm.name = :realmName AND o.name = :name AND o.identityType.name = :typeName"
+      ),
+      @NamedQuery(
+          name = "HibernateIdentityObject.countIdentityObjectByNameAndTypeIgnoreCase",
           query = "SELECT count(o) FROM HibernateIdentityObject o WHERE o.realm.name = :realmName AND lower(o.name) = :name AND o.identityType.name = :typeName"
+      ),
+      @NamedQuery(
+          name = "HibernateIdentityObject.countIdentityObjectByNameAndType",
+          query = "SELECT count(o) FROM HibernateIdentityObject o WHERE o.realm.name = :realmName AND o.name = :name AND o.identityType.name = :typeName"
       ),
   }
 )
@@ -135,8 +143,12 @@ public class HibernateIdentityObject implements IdentityObject {
     return id.toString();
   }
 
+  public Long getIdLong() {
+    return id;
+  }
+
   public void setId(String id) {
-    this.id = Long.valueOf(id);
+    this.id = Long.parseLong(id);
   }
 
   public String getName() {

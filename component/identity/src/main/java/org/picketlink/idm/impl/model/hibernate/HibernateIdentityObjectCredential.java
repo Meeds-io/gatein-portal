@@ -37,6 +37,16 @@ import org.picketlink.idm.spi.model.IdentityObjectCredential;
 
 @Entity(name = "HibernateIdentityObjectCredential")
 @Table(name = "JBID_IO_CREDEN")
+@NamedQueries(
+  {
+      @NamedQuery(
+          name = "HibernateIdentityObjectCredential.findCredentialByTypeAndIdentity",
+          query = "SELECT c FROM HibernateIdentityObjectCredential c"
+              + " INNER JOIN c.type type ON type.name = :cTypeName"
+              + " WHERE c.identityObject.id = :ioId"
+      ),
+  }
+)
 public class HibernateIdentityObjectCredential implements IdentityObjectCredential {
 
   public static final String                           findIdentityObjectCredentialByIOAndTypeNAme =

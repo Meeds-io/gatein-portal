@@ -22,17 +22,21 @@
 
 package org.picketlink.idm.impl.model.hibernate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
 
 @Entity(name = "HibernateIdentityObjectRelationshipType")
 @Table(name = "JBID_IO_REL_TYPE")
+@NamedQueries(
+  {
+      @NamedQuery(
+          name = "HibernateIdentityObjectRelationshipType.findIdentityRelationshipTypeByName",
+          query = "SELECT t FROM HibernateIdentityObjectRelationshipType t"
+              + " WHERE t.name = :name"
+      ),
+  }
+)
 public class HibernateIdentityObjectRelationshipType implements IdentityObjectRelationshipType {
 
   public static final String findIdentityObjectRelationshipTypeByName =

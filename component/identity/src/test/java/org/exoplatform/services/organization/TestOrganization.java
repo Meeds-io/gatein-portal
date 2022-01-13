@@ -352,7 +352,7 @@ public class TestOrganization extends AbstractKernelTest {
             mtHandler_.createMembershipType(mt1, true);
             fail("Exception should be thrown");
         } catch (Exception ex) {
-          ex.printStackTrace();
+          // Expected
         }
         MembershipType membershipType = mtHandler_.findMembershipType(mt.getName());
         assertNotNull("Membership type " + testType + " must be exist", membershipType);
