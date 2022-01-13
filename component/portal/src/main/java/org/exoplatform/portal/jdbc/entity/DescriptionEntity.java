@@ -36,7 +36,7 @@ public class DescriptionEntity implements Serializable {
   private static final long serialVersionUID = 1173817577220348267L;
 
   @Id
-  @SequenceGenerator(name = "SEQ_PORTAL_DESCRIPTIONS_ID", sequenceName = "SEQ_PORTAL_DESCRIPTIONS_ID")
+  @SequenceGenerator(name = "SEQ_PORTAL_DESCRIPTIONS_ID", sequenceName = "SEQ_PORTAL_DESCRIPTIONS_ID", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_PORTAL_DESCRIPTIONS_ID")
   @Column(name = "DESCRIPTION_ID")
   private Long              id;

@@ -19,7 +19,7 @@ public class TokenEntity implements Serializable {
     private static final long serialVersionUID = 6633792468705838255L;
 
     @Id
-    @SequenceGenerator(name="SEQ_GATEIN_TOKEN_ID_GENERATOR", sequenceName="SEQ_GATEIN_TOKEN_ID_GENERATOR")
+    @SequenceGenerator(name="SEQ_GATEIN_TOKEN_ID_GENERATOR", sequenceName="SEQ_GATEIN_TOKEN_ID_GENERATOR", allocationSize = 1)
     @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_GATEIN_TOKEN_ID_GENERATOR")
     @Column(name = "ID")
     private Long            id;

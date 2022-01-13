@@ -18,7 +18,7 @@ import java.util.Date;
 public class FileBinaryEntity {
     @Id
     @Column(name = "BLOB_ID")
-    @SequenceGenerator(name = "SEQ_FILES_BINARY_BLOB_ID", sequenceName = "SEQ_FILES_BINARY_BLOB_ID")
+    @SequenceGenerator(name = "SEQ_FILES_BINARY_BLOB_ID", sequenceName = "SEQ_FILES_BINARY_BLOB_ID", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_FILES_BINARY_BLOB_ID")
     private long            id;
 

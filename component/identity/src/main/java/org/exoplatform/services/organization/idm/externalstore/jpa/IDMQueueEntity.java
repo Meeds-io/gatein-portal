@@ -32,7 +32,7 @@ public class IDMQueueEntity implements Serializable {
 
   @Id
   @Column(name = "IDM_QUEUE_ID")
-  @SequenceGenerator(name = "SEQ_IDM_QUEUE_ID", sequenceName = "SEQ_IDM_QUEUE_ID")
+  @SequenceGenerator(name = "SEQ_IDM_QUEUE_ID", sequenceName = "SEQ_IDM_QUEUE_ID", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_IDM_QUEUE_ID")
   private long              id;
 

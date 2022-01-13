@@ -25,7 +25,7 @@ import java.util.Set;
 public class ScopeEntity {
   @Id
   @Column(name = "SCOPE_ID")
-  @SequenceGenerator(name="SEQ_STG_SCOPE_COMMON_ID", sequenceName="SEQ_STG_SCOPE_COMMON_ID")
+  @SequenceGenerator(name="SEQ_STG_SCOPE_COMMON_ID", sequenceName="SEQ_STG_SCOPE_COMMON_ID", allocationSize = 1)
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_STG_SCOPE_COMMON_ID")
   private long id;
 

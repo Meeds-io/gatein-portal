@@ -35,7 +35,7 @@ public class PermissionEntity implements Serializable {
   private static final long serialVersionUID = 1173817577220348267L;
 
   @Id
-  @SequenceGenerator(name = "SEQ_PORTAL_PERMISSIONS_ID", sequenceName = "SEQ_PORTAL_PERMISSIONS_ID")
+  @SequenceGenerator(name = "SEQ_PORTAL_PERMISSIONS_ID", sequenceName = "SEQ_PORTAL_PERMISSIONS_ID", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_PORTAL_PERMISSIONS_ID")
   @Column(name = "PERMISSION_ID")
   private Long              id;

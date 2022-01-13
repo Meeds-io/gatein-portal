@@ -38,7 +38,7 @@ public class ContainerEntity extends ComponentEntity implements Serializable {
   private static final long     serialVersionUID = -8045606258160322858L;
 
   @Id
-  @SequenceGenerator(name = "SEQ_CONTAINER_ID_GENERATOR", sequenceName = "SEQ_CONTAINER_ID_GENERATOR")
+  @SequenceGenerator(name = "SEQ_CONTAINER_ID_GENERATOR", sequenceName = "SEQ_CONTAINER_ID_GENERATOR", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_CONTAINER_ID_GENERATOR")
   @Column(name = "ID")
   protected Long                id;

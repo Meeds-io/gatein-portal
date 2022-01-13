@@ -42,7 +42,7 @@ public class SiteEntity extends ComponentEntity {
   private static final long     serialVersionUID = 3036823700771832314L;
 
   @Id
-  @SequenceGenerator(name = "SEQ_SITE_ID_GENERATOR", sequenceName = "SEQ_SITE_ID_GENERATOR")
+  @SequenceGenerator(name = "SEQ_SITE_ID_GENERATOR", sequenceName = "SEQ_SITE_ID_GENERATOR", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_SITE_ID_GENERATOR")
   @Column(name = "ID")
   protected Long                id;

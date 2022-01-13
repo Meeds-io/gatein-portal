@@ -69,7 +69,7 @@ import javax.persistence.*;
 public class SettingsEntity {
   @Id
   @Column(name = "SETTING_ID")
-  @SequenceGenerator(name="SEQ_STG_SETTINGS_COMMON_ID", sequenceName="SEQ_STG_SETTINGS_COMMON_ID")
+  @SequenceGenerator(name="SEQ_STG_SETTINGS_COMMON_ID", sequenceName="SEQ_STG_SETTINGS_COMMON_ID", allocationSize = 1)
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_STG_SETTINGS_COMMON_ID")
   private long id;
 

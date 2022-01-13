@@ -3,8 +3,8 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
 
   <!-- Managing both DB that use sequences and db that use auto increment -->
-  <property name="autoIncrement" value="true" dbms="mysql,mssql,h2,hsqldb" />
-  <property name="autoIncrement" value="false" dbms="oracle,postgresql" />
+  <property name="autoIncrement" value="true" dbms="mysql,mssql,h2" />
+  <property name="autoIncrement" value="false" dbms="oracle,postgresql,hsqldb" />
 
   <changeSet author="idm" id="1.0.0-0" onValidationFail="MARK_RAN" runOnChange="false">
     <preConditions onFail="MARK_RAN">
@@ -377,12 +377,16 @@
     </createIndex>
   </changeSet>
 
-  <changeSet author="idm" id="1.0.0-17" onValidationFail="MARK_RAN" runOnChange="false" dbms="oracle,postgresql,hsqldb">
+  <changeSet author="idm" id="1.0.0-17" onValidationFail="MARK_RAN" runOnChange="false" dbms="oracle,postgresql">
     <preConditions>
       <not>
         <sequenceExists sequenceName="hibernate_sequence" />
       </not>
     </preConditions>
+    <createSequence sequenceName="hibernate_sequence" startValue="1"/>
+  </changeSet>
+
+  <changeSet author="idm" id="1.0.0-18" dbms="hsqldb">
     <createSequence sequenceName="hibernate_sequence" startValue="1"/>
   </changeSet>
 
