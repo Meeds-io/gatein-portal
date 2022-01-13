@@ -143,10 +143,10 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
       // there is exception occurred
       try {
         session.getPersistenceManager().removeUser(user.getUserName(), true);
+        throw e;
       } catch (Exception e2) {
-        handleException("Can't remove user", e2);
+        handleException("Can't remove user", e);
       }
-      throw e;
     }
 
     if (broadcast) {
