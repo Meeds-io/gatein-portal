@@ -41,7 +41,7 @@ public class WindowEntity extends ComponentEntity implements Serializable {
   private static final long serialVersionUID = 6633792468705838255L;
 
   @Id
-  @SequenceGenerator(name = "SEQ_WINDOW_ID_GENERATOR", sequenceName = "SEQ_WINDOW_ID_GENERATOR")
+  @SequenceGenerator(name = "SEQ_WINDOW_ID_GENERATOR", sequenceName = "SEQ_WINDOW_ID_GENERATOR", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_WINDOW_ID_GENERATOR")
   @Column(name = "ID")
   protected Long            id;

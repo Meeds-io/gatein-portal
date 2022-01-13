@@ -35,7 +35,7 @@ import java.util.Date;
 public class OrphanFileEntity {
   @Id
   @Column(name = "ID")
-  @SequenceGenerator(name = "SEQ_FILES_ORPHAN_FILES_ID", sequenceName = "SEQ_FILES_ORPHAN_FILES_ID")
+  @SequenceGenerator(name = "SEQ_FILES_ORPHAN_FILES_ID", sequenceName = "SEQ_FILES_ORPHAN_FILES_ID", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_FILES_ORPHAN_FILES_ID")
   private long           id;
 

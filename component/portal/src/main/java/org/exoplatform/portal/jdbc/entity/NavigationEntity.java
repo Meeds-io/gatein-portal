@@ -37,7 +37,7 @@ public class NavigationEntity implements Serializable {
   private static final long serialVersionUID = 3811683620903785319L;
 
   @Id
-  @SequenceGenerator(name="SEQ_GTN_NAVIGATION_ID", sequenceName="SEQ_GTN_NAVIGATION_ID")
+  @SequenceGenerator(name="SEQ_GTN_NAVIGATION_ID", sequenceName="SEQ_GTN_NAVIGATION_ID", allocationSize = 1)
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_GTN_NAVIGATION_ID")
   @Column(name = "NAVIGATION_ID")
   private Long             id;

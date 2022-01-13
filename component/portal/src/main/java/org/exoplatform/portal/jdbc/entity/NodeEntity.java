@@ -41,7 +41,7 @@ public class NodeEntity implements Serializable {
   private static final long serialVersionUID = 8630708630711337929L;
 
   @Id
-  @SequenceGenerator(name="SEQ_GTN_NAVIGATION_NODE_ID", sequenceName="SEQ_GTN_NAVIGATION_NODE_ID")
+  @SequenceGenerator(name="SEQ_GTN_NAVIGATION_NODE_ID", sequenceName="SEQ_GTN_NAVIGATION_NODE_ID", allocationSize = 1)
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_GTN_NAVIGATION_NODE_ID")
   @Column(name = "NODE_ID")
   private Long             id;

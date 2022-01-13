@@ -20,7 +20,7 @@ public class FileInfoEntity {
 
   @Id
   @Column(name = "FILE_ID")
-  @SequenceGenerator(name = "SEQ_FILES_FILES_FILE_ID", sequenceName = "SEQ_FILES_FILES_FILE_ID")
+  @SequenceGenerator(name = "SEQ_FILES_FILES_FILE_ID", sequenceName = "SEQ_FILES_FILES_FILE_ID", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_FILES_FILES_FILE_ID")
   private long            id;
 

@@ -34,7 +34,7 @@ public class ApplicationEntity implements Serializable {
   private static final long serialVersionUID = 4955770436068594917L;
 
   @Id
-  @SequenceGenerator(name="SEQ_GTN_APPLICATION_ID", sequenceName="SEQ_GTN_APPLICATION_ID")
+  @SequenceGenerator(name="SEQ_GTN_APPLICATION_ID", sequenceName="SEQ_GTN_APPLICATION_ID", allocationSize = 1)
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_GTN_APPLICATION_ID")
   @Column(name = "ID")
   private Long            id;

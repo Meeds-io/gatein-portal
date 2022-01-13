@@ -32,7 +32,7 @@ import org.exoplatform.portal.mop.SiteType;
 
 @ExoEntity
 @Entity(name = "GateInPage")
-@SequenceGenerator(name = "SEQ_GTN_ID_GENERATOR", sequenceName = "SEQ_GTN_PAGE_ID")
+@SequenceGenerator(name = "SEQ_GTN_ID_GENERATOR", sequenceName = "SEQ_GTN_PAGE_ID", allocationSize = 1)
 @Table(name = "PORTAL_PAGES")
 @NamedQueries({
     @NamedQuery(name = "PageEntity.deleteByOwner", query = "DELETE GateInPage p WHERE p.owner.id = :ownerId"),
@@ -42,7 +42,7 @@ public class PageEntity extends ComponentEntity implements Serializable {
   private static final long     serialVersionUID = -6195451978995765259L;
 
   @Id
-  @SequenceGenerator(name = "SEQ_PAGE_ID_GENERATOR", sequenceName = "SEQ_PAGE_ID_GENERATOR")
+  @SequenceGenerator(name = "SEQ_PAGE_ID_GENERATOR", sequenceName = "SEQ_PAGE_ID_GENERATOR", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_PAGE_ID_GENERATOR")
   @Column(name = "ID")
   protected Long                id;
