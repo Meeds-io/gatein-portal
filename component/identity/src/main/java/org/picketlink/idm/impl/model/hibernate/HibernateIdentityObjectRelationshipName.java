@@ -46,40 +46,8 @@ import org.hibernate.annotations.LazyToOneOption;
 )
 public class HibernateIdentityObjectRelationshipName {
 
-  public static final String  findIdentityObjectRelationshipNameByName                             =
+  public static final String  findIdentityObjectRelationshipNameByName =
                                                                        "select rn from HibernateIdentityObjectRelationshipName rn where rn.name like :name and rn.realm.name = :realmName";
-
-  public static final String  findIdentityObjectRelationshipNames                                  =
-                                                                  "select rn.name from HibernateIdentityObjectRelationshipName rn where rn.name like :nameFilter and rn.realm.name = :realmName";
-
-  public static final String  findIdentityObjectRelationshipNamesOrderedByNameAsc                  =
-                                                                                  "select rn.name from HibernateIdentityObjectRelationshipName rn where rn.name like :nameFilter and rn.realm.name = :realmName "
-                                                                                      +
-                                                                                      "order by rn.name asc";
-
-  public static final String  findIdentityObjectRelationshipNamesOrderedByNameDesc                 =
-                                                                                   "select rn.name from HibernateIdentityObjectRelationshipName rn where rn.name like :nameFilter and rn.realm.name = :realmName "
-                                                                                       +
-                                                                                       "order by rn.name desc";
-
-  public static final String  findIdentityObjectRelationshipNamesForIdentityObject                 =
-                                                                                   "select r.name.name from HibernateIdentityObjectRelationship r where "
-                                                                                       +
-                                                                                       "r.fromIdentityObject = :identityObject or r.toIdentityObject = :identityObject";
-
-  public static final String  findIdentityObjectRelationshipNamesForIdentityObjectOrderedByNameAsc =
-                                                                                                   "select r.name.name from HibernateIdentityObjectRelationship r where "
-                                                                                                       +
-                                                                                                       "r.fromIdentityObject = :identityObject or r.toIdentityObject = :identityObject "
-                                                                                                       +
-                                                                                                       "order by r.name.name asc";
-
-  public static final String  findIdentityObjectRelationshipNamesForIdentityObjectOrdereByNameDesc =
-                                                                                                   "select r.name.name from HibernateIdentityObjectRelationship r where "
-                                                                                                       +
-                                                                                                       "r.fromIdentityObject = :identityObject or r.toIdentityObject = :identityObject "
-                                                                                                       +
-                                                                                                       "order by r.name.name desc";
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -101,7 +69,7 @@ public class HibernateIdentityObjectRelationshipName {
   @CollectionTable(name = "JBID_IO_REL_NAME_PROPS", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
   @Fetch(FetchMode.SUBSELECT)
   @LazyCollection(LazyCollectionOption.EXTRA)
-  private Map<String, String> properties                                                           =
+  private Map<String, String> properties                               =
                                          new HashMap<String, String>();
 
   public HibernateIdentityObjectRelationshipName() {

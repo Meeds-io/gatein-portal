@@ -552,17 +552,14 @@ public class HibernateIdentityStoreImpl implements IdentityStore, Serializable {
     checkIOType(identityType);
 
     HibernateIdentityObjectType jpaType = getHibernateIdentityObjectType(ctx, identityType);
-
     Session hibernateSession = getHibernateSession(ctx);
-
-    int count;
     try {
-      count = ((Number) hibernateSession
-                                        .createQuery(HibernateIdentityObject.countIdentityObjectsByType)
-                                        .setParameter("typeName", jpaType.getName())
-                                        .setParameter("realmName", getRealmName(ctx))
-                                        .setCacheable(true)
-                                        .uniqueResult()).intValue();
+      return hibernateSession.createNamedQuery("HibernateIdentityObject.countIdentityObjectsByType", Long.class)
+                             .setParameter("typeName", jpaType.getName())
+                             .setParameter("realmName", getRealmName(ctx))
+                             .setCacheable(true)
+                             .uniqueResult()
+                             .intValue();
     } catch (Exception e) {
       if (log.isLoggable(Level.FINER)) {
         log.log(Level.FINER, "Exception occurred: ", e);
@@ -570,8 +567,6 @@ public class HibernateIdentityStoreImpl implements IdentityStore, Serializable {
 
       throw new IdentityException("Cannot count stored IdentityObjects with type: " + identityType.getName(), e);
     }
-
-    return count;
   }
 
   public IdentityObject findIdentityObject(IdentityStoreInvocationContext ctx,

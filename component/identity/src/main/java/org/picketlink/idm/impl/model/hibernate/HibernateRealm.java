@@ -58,7 +58,7 @@ public class HibernateRealm {
   @CollectionTable(name = "JBID_REAL_PROPS", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
   @Fetch(FetchMode.SUBSELECT)
   @LazyCollection(LazyCollectionOption.EXTRA)
-  private Map<String, String> properties       = new HashMap<String, String>();
+  private Map<String, String> properties = new HashMap<String, String>();
 
   public HibernateRealm() {
   }

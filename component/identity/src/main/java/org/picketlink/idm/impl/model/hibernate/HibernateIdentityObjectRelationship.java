@@ -90,11 +90,6 @@ import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
   }
 )
 public class HibernateIdentityObjectRelationship implements IdentityObjectRelationship {
-  public static final String                      findIdentityObjectRelationshipsByType     =
-                                                                                        "select r from HibernateIdentityObjectRelationship r where r.type.name = :typeName";
-
-  public static final String                      findIdentityObjectRelationshipNamesByType =
-                                                                                            "select r.name from HibernateIdentityObjectRelationship r where r.type.name = :typeName";
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

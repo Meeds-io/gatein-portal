@@ -49,9 +49,6 @@ import org.picketlink.idm.spi.model.IdentityObjectCredential;
 )
 public class HibernateIdentityObjectCredential implements IdentityObjectCredential {
 
-  public static final String                           findIdentityObjectCredentialByIOAndTypeNAme =
-                                                                                                   "select c from HibernateIdentityObjectCredential c where c.type.name like :typeName and c.identityObject = :identityObject";
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "ID")
@@ -83,7 +80,7 @@ public class HibernateIdentityObjectCredential implements IdentityObjectCredenti
   @CollectionTable(name = "JBID_IO_CREDEN_PROPS", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
   @Fetch(FetchMode.SUBSELECT)
   @LazyCollection(LazyCollectionOption.EXTRA)
-  private Map<String, String>                          properties                                  =
+  private Map<String, String>                          properties =
                                                                   new HashMap<String, String>();
 
   public HibernateIdentityObjectCredential() {
