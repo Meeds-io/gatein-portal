@@ -24,48 +24,40 @@
 package org.exoplatform.services.organization.idm;
 
 import java.io.Serializable;
-import java.net.URL;
 import java.security.PrivilegedAction;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.HibernateException;
-import org.hibernate.MappingException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
-import org.exoplatform.commons.utils.ClassLoading;
 import org.exoplatform.commons.utils.PrivilegedSystemHelper;
 import org.exoplatform.commons.utils.SecurityHelper;
 import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.container.xml.Property;
 import org.exoplatform.services.database.HibernateService;
 import org.exoplatform.services.database.ObjectQuery;
-import org.exoplatform.services.database.impl.AddHibernateMappingPlugin;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 public class CustomHibernateServiceImpl implements HibernateService, ComponentRequestLifecycle {
 
-  private static final Log           LOG          = ExoLogger.getLogger(CustomHibernateServiceImpl.class);
+  private static final Log          LOG          = ExoLogger.getLogger(CustomHibernateServiceImpl.class);
 
-  public static final String         AUTO_DIALECT = "AUTO";
+  public static final String        AUTO_DIALECT = "AUTO";
 
-  private ThreadLocal<Session>       threadLocal_;
+  private ThreadLocal<Session>      threadLocal_;
 
   private IdmHibernateConfiguration conf_;
 
-  private HashSet<String>            mappings_    = new HashSet<String>();
-
-  private SessionFactory             sessionFactory_;
+  private SessionFactory            sessionFactory_;
 
   public CustomHibernateServiceImpl(InitParams initParams) {
     threadLocal_ = new ThreadLocal<Session>();
@@ -86,43 +78,6 @@ public class CustomHibernateServiceImpl implements HibernateService, ComponentRe
     if (connectionURL != null) {
       connectionURL = connectionURL.replace("${java.io.tmpdir}", PrivilegedSystemHelper.getProperty("java.io.tmpdir"));
       conf_.setProperty("hibernate.connection.url", connectionURL);
-    }
-  }
-
-  public void addPlugin(ComponentPlugin plugin) {
-    if (plugin instanceof AddHibernateMappingPlugin) {
-      AddHibernateMappingPlugin impl = (AddHibernateMappingPlugin) plugin;
-      try {
-        List path = impl.getMapping();
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        if (path != null) {
-
-          for (int i = 0; i < path.size(); i++) {
-            String relativePath = (String) path.get(i);
-            if (!mappings_.contains(relativePath)) {
-              mappings_.add(relativePath);
-              URL url = cl.getResource(relativePath);
-              LOG.info("Adding  Hibernate Mapping: " + relativePath);
-              conf_.addURL(url);
-            }
-          }
-        }
-
-        // Annotations
-        List<String> annotations = impl.getAnnotations();
-        if (annotations != null) {
-          for (String annotation : annotations) {
-            Class<?> clazz = ClassLoading.loadClass(annotation, this);
-            LOG.info("Adding  Hibernate Annotated class: " + annotation);
-            conf_.addAnnotatedClass(clazz);
-          }
-        }
-      } catch (MappingException ex) {
-        LOG.error(ex.getLocalizedMessage(), ex);
-      } catch (ClassNotFoundException ex) {
-        LOG.error(ex.getLocalizedMessage(), ex);
-      }
     }
   }
 
