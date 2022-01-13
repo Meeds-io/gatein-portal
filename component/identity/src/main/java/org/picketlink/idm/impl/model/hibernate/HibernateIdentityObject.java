@@ -52,27 +52,20 @@ import org.picketlink.idm.spi.model.IdentityObjectCredentialType;
       ),
       @NamedQuery(
           name = "HibernateIdentityObject.countIdentityObjectByNameAndType",
-          query = "SELECT count(o) FROM HibernateIdentityObject o WHERE o.realm.name = :realmName AND o.name = :name AND o.identityType.name = :typeName"
+          query = "SELECT count(o) FROM HibernateIdentityObject o"
+              + " WHERE o.realm.name = :realmName"
+              + " AND o.name = :name"
+              + " AND o.identityType.name = :typeName"
+      ),
+      @NamedQuery(
+          name = "HibernateIdentityObject.countIdentityObjectsByType",
+          query = "SELECT count(o.id) FROM HibernateIdentityObject o"
+              + " WHERE o.realm.name = :realmName"
+              + " AND o.identityType.name = :typeName"
       ),
   }
 )
 public class HibernateIdentityObject implements IdentityObject {
-
-  public static final String                       findIdentityObjectsByType                  =
-                                                                             "select o from HibernateIdentityObject o where o.name like :nameFilter and o.realm.name = :realmName and o.identityType.name = :typeName";
-
-  public static final String                       findIdentityObjectsByTypeOrderedByNameAsc  =
-                                                                                             "select o from HibernateIdentityObject o where o.name like :nameFilter and o.realm.name = :realmName and "
-                                                                                                 +
-                                                                                                 "o.identityType.name = :typeName  order by o.name asc";
-
-  public static final String                       findIdentityObjectsByTypeOrderedByNameDesc =
-                                                                                              "select o from HibernateIdentityObject o where o.name like :nameFilter and o.realm.name = :realmName and "
-                                                                                                  +
-                                                                                                  "o.identityType.name = :typeName order by o.name desc";
-
-  public static final String                       countIdentityObjectsByType                 =
-                                                                              "select count(o.id) from HibernateIdentityObject o where o.realm.name = :realmName and o.identityType.name = :typeName";
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -90,19 +83,19 @@ public class HibernateIdentityObject implements IdentityObject {
   @OneToMany(orphanRemoval = true, cascade = { CascadeType.ALL }, mappedBy = "fromIdentityObject")
   @Fetch(FetchMode.SUBSELECT)
   @LazyCollection(LazyCollectionOption.EXTRA)
-  private Set<HibernateIdentityObjectRelationship> fromRelationships                          =
+  private Set<HibernateIdentityObjectRelationship> fromRelationships =
                                                                      new HashSet<HibernateIdentityObjectRelationship>();
 
   @OneToMany(orphanRemoval = true, cascade = { CascadeType.ALL }, mappedBy = "toIdentityObject")
   @Fetch(FetchMode.SUBSELECT)
   @LazyCollection(LazyCollectionOption.EXTRA)
-  private Set<HibernateIdentityObjectRelationship> toRelationships                            =
+  private Set<HibernateIdentityObjectRelationship> toRelationships   =
                                                                    new HashSet<HibernateIdentityObjectRelationship>();
 
   @OneToMany(orphanRemoval = true, cascade = { CascadeType.ALL }, mappedBy = "identityObject")
   @Fetch(FetchMode.SUBSELECT)
   @LazyCollection(LazyCollectionOption.EXTRA)
-  private Set<HibernateIdentityObjectAttribute>    attributes                                 =
+  private Set<HibernateIdentityObjectAttribute>    attributes        =
                                                               new HashSet<HibernateIdentityObjectAttribute>();
 
   @ElementCollection
@@ -111,7 +104,7 @@ public class HibernateIdentityObject implements IdentityObject {
   @CollectionTable(name = "JBID_IO_PROPS", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
   @Fetch(FetchMode.SUBSELECT)
   @LazyCollection(LazyCollectionOption.EXTRA)
-  private Map<String, String>                      properties                                 = new HashMap<String, String>();
+  private Map<String, String>                      properties        = new HashMap<String, String>();
 
   @OneToMany(
       orphanRemoval = true,
@@ -122,7 +115,7 @@ public class HibernateIdentityObject implements IdentityObject {
   @JoinColumn(name = "IDENTITY_OBJECT_ID")
   @Fetch(FetchMode.SUBSELECT)
   @LazyCollection(LazyCollectionOption.EXTRA)
-  private Set<HibernateIdentityObjectCredential>   credentials                                =
+  private Set<HibernateIdentityObjectCredential>   credentials       =
                                                                new HashSet<HibernateIdentityObjectCredential>();
 
   @ManyToOne(fetch = FetchType.EAGER)

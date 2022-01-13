@@ -39,9 +39,6 @@ import org.picketlink.idm.spi.model.IdentityObjectType;
 )
 public class HibernateIdentityObjectType implements IdentityObjectType {
 
-  public static final String findIdentityObjectTypeByName =
-                                                          "select t from HibernateIdentityObjectType t where t.name like :name";
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "ID")
