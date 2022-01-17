@@ -262,7 +262,7 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
             Transaction idmTransaction = idmService_.getIdentitySession().getTransaction();
             if (idmTransaction != null && idmTransaction.isActive()) {
                 try {
-                  log.info("IDM Transaction rollback");
+                  log.warn("IDM Transaction rollback", e);
                   idmTransaction.rollback();
                   log.info("IDM Transaction has been rolled-backed");
                 } catch (Exception e1) {
@@ -278,7 +278,7 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
                   log.info("New IDM Transaction started");
                 }
             } else {
-              log.info("New IDM Transaction start");
+              log.warn("IDM Transaction rollbacked. New IDM Transaction start", e);
               idmService_.getIdentitySession().beginTransaction();
               log.info("New IDM Transaction started");
             }
