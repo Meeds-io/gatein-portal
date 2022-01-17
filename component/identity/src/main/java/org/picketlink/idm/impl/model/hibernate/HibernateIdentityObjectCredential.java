@@ -80,8 +80,7 @@ public class HibernateIdentityObjectCredential implements IdentityObjectCredenti
   @CollectionTable(name = "JBID_IO_CREDEN_PROPS", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
   @Fetch(FetchMode.SUBSELECT)
   @LazyCollection(LazyCollectionOption.EXTRA)
-  private Map<String, String>                          properties =
-                                                                  new HashMap<String, String>();
+  private Map<String, String>                          properties = new HashMap<String, String>();
 
   public HibernateIdentityObjectCredential() {
   }

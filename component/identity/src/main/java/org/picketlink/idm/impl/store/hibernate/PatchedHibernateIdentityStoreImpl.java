@@ -2089,14 +2089,6 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
         throw new IllegalStateException("Credential type not present in this store: " + credential.getType().getName());
       }
 
-      HibernateIdentityObjectCredential hibernateCredential = hibernateObject.getCredential(credential.getType());
-
-      if (hibernateCredential == null) {
-        hibernateCredential = new HibernateIdentityObjectCredential();
-        hibernateCredential.setType(hibernateCredentialType);
-        hibernateObject.addCredential(hibernateCredential);
-      }
-
       Object value = null;
 
       // Handle generic impl
@@ -2107,6 +2099,13 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
       } else {
         // TODO: support for empty password should be configurable
         value = credential.getValue();
+      }
+
+      HibernateIdentityObjectCredential hibernateCredential = hibernateObject.getCredential(credential.getType());
+      if (hibernateCredential == null) {
+        hibernateCredential = new HibernateIdentityObjectCredential();
+        hibernateCredential.setType(hibernateCredentialType);
+        hibernateObject.addCredential(hibernateCredential);
       }
 
       if (value instanceof String) {
