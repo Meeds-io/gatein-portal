@@ -36,7 +36,7 @@ import org.hibernate.annotations.LazyToOneOption;
 import org.picketlink.idm.spi.model.IdentityObjectCredential;
 
 @Entity(name = "HibernateIdentityObjectCredential")
-@Table(name = "JBID_IO_CREDEN")
+@Table(name = "jbid_io_creden")
 @NamedQueries(
   {
       @NamedQuery(
@@ -77,7 +77,7 @@ public class HibernateIdentityObjectCredential implements IdentityObjectCredenti
   @ElementCollection
   @MapKeyColumn(name = "PROP_NAME")
   @Column(name = "PROP_VALUE")
-  @CollectionTable(name = "JBID_IO_CREDEN_PROPS", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
+  @CollectionTable(name = "jbid_io_creden_props", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
   @Fetch(FetchMode.SUBSELECT)
   @LazyCollection(LazyCollectionOption.EXTRA)
   private Map<String, String>                          properties = new HashMap<String, String>();

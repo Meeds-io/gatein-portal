@@ -35,7 +35,7 @@ import org.hibernate.annotations.LazyToOne;
 import org.hibernate.annotations.LazyToOneOption;
 
 @Entity(name = "HibernateIdentityObjectRelationshipName")
-@Table(name = "JBID_IO_REL_NAME")
+@Table(name = "jbid_io_rel_name")
 @NamedQueries(
   {
       @NamedQuery(
@@ -66,7 +66,7 @@ public class HibernateIdentityObjectRelationshipName {
   @ElementCollection
   @MapKeyColumn(name = "PROP_NAME")
   @Column(name = "PROP_VALUE")
-  @CollectionTable(name = "JBID_IO_REL_NAME_PROPS", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
+  @CollectionTable(name = "jbid_io_rel_name_props", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
   @Fetch(FetchMode.SUBSELECT)
   @LazyCollection(LazyCollectionOption.EXTRA)
   private Map<String, String> properties                               =

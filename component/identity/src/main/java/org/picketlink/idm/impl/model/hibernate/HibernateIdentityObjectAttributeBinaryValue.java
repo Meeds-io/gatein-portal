@@ -32,7 +32,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Type;
 
 @Entity(name = "HibernateIdentityObjectAttributeBinaryValue")
-@Table(name = "JBID_ATTR_BIN_VALUE")
+@Table(name = "jbid_attr_bin_value")
 public class HibernateIdentityObjectAttributeBinaryValue {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

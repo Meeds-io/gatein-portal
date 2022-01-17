@@ -35,7 +35,7 @@ import org.picketlink.idm.spi.model.IdentityObject;
 import org.picketlink.idm.spi.model.IdentityObjectCredentialType;
 
 @Entity(name = "HibernateIdentityObject")
-@Table(name = "JBID_IO")
+@Table(name = "jbid_io")
 @NamedQueries(
   {
       @NamedQuery(
@@ -101,7 +101,7 @@ public class HibernateIdentityObject implements IdentityObject {
   @ElementCollection
   @MapKeyColumn(name = "PROP_NAME")
   @Column(name = "PROP_VALUE")
-  @CollectionTable(name = "JBID_IO_PROPS", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
+  @CollectionTable(name = "jbid_io_props", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
   @Fetch(FetchMode.SUBSELECT)
   @LazyCollection(LazyCollectionOption.EXTRA)
   private Map<String, String>                      properties        = new HashMap<String, String>();

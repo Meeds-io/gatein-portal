@@ -27,7 +27,7 @@ import javax.persistence.*;
 import org.picketlink.idm.spi.model.IdentityObjectCredentialType;
 
 @Entity(name = "HibernateIdentityObjectCredentialType")
-@Table(name = "JBID_IO_CREDEN_TYPE")
+@Table(name = "jbid_io_creden_type")
 @NamedQueries(
   {
       @NamedQuery(
