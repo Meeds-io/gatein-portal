@@ -36,7 +36,7 @@ import org.hibernate.annotations.LazyToOneOption;
 import org.picketlink.idm.spi.model.IdentityObjectAttribute;
 
 @Entity(name = "HibernateIdentityObjectAttribute")
-@Table(name = "JBID_IO_ATTR")
+@Table(name = "jbid_io_attr")
 public class HibernateIdentityObjectAttribute implements IdentityObjectAttribute {
 
   public static final String                          TYPE_TEXT   = "text";
@@ -68,7 +68,7 @@ public class HibernateIdentityObjectAttribute implements IdentityObjectAttribute
   @ElementCollection(fetch = FetchType.EAGER)
   @Column(name = "ATTR_VALUE")
   @CollectionTable(
-      name = "JBID_IO_ATTR_TEXT_VALUES",
+      name = "jbid_io_attr_text_values",
       joinColumns = { @JoinColumn(name = "TEXT_ATTR_VALUE_ID", referencedColumnName = "ATTRIBUTE_ID") }
   )
   @Fetch(FetchMode.JOIN)

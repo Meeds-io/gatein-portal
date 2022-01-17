@@ -33,7 +33,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity(name = "HibernateRealm")
-@Table(name = "JBID_REALM")
+@Table(name = "jbid_realm")
 @NamedQueries(
   {
       @NamedQuery(
@@ -55,7 +55,7 @@ public class HibernateRealm {
   @ElementCollection
   @MapKeyColumn(name = "PROP_NAME")
   @Column(name = "PROP_VALUE")
-  @CollectionTable(name = "JBID_REAL_PROPS", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
+  @CollectionTable(name = "jbid_real_props", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
   @Fetch(FetchMode.SUBSELECT)
   @LazyCollection(LazyCollectionOption.EXTRA)
   private Map<String, String> properties = new HashMap<String, String>();

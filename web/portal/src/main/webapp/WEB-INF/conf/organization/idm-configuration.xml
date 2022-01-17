@@ -44,6 +44,7 @@
         <property name="hibernate.show_sql" value="false" />
         <property name="hibernate.connection.datasource" value="${gatein.idm.datasource.name}${container.name.suffix}" />
         <property name="hibernate.connection.autocommit" value="false" />
+        <property name="hibernate.id.new_generator_mappings" value="false"/>
 
         <!-- Non-JTA setup -->
         <property name="hibernate.current_session_context_class" value="thread"/>

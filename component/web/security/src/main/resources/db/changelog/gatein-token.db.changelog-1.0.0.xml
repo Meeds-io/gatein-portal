@@ -5,8 +5,8 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
   <!-- Managing both DB that use sequences and db that use auto increment -->
-  <property name="autoIncrement" value="true" dbms="mysql,mssql,h2,sybase,db2" />
-  <property name="autoIncrement" value="false" dbms="oracle,postgresql,hsqldb" />
+  <property name="autoIncrement" value="true" dbms="mysql,mssql,h2,sybase,db2,hsqldb" />
+  <property name="autoIncrement" value="false" dbms="oracle,postgresql" />
 
   <!-- Application Registry -->
   <changeSet author="gatein-token" id="1.0.0-1">

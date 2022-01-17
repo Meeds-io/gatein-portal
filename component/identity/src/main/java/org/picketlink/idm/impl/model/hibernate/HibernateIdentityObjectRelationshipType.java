@@ -27,7 +27,7 @@ import javax.persistence.*;
 import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
 
 @Entity(name = "HibernateIdentityObjectRelationshipType")
-@Table(name = "JBID_IO_REL_TYPE")
+@Table(name = "jbid_io_rel_type")
 @NamedQueries(
   {
       @NamedQuery(

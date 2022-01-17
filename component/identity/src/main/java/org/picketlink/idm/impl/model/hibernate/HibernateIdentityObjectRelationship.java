@@ -37,7 +37,7 @@ import org.picketlink.idm.spi.model.IdentityObjectRelationship;
 import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
 
 @Entity(name = "HibernateIdentityObjectRelationship")
-@Table(name = "JBID_IO_REL")
+@Table(name = "jbid_io_rel")
 @NamedQueries(
   {
       @NamedQuery(
@@ -123,7 +123,7 @@ public class HibernateIdentityObjectRelationship implements IdentityObjectRelati
   @ElementCollection
   @MapKeyColumn(name = "PROP_NAME")
   @Column(name = "PROP_VALUE")
-  @CollectionTable(name = "JBID_IO_REL_PROPS", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
+  @CollectionTable(name = "jbid_io_rel_props", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
   @Fetch(FetchMode.SUBSELECT)
   @LazyCollection(LazyCollectionOption.EXTRA)
   private Map<String, String>                     properties                                = new HashMap<String, String>();
