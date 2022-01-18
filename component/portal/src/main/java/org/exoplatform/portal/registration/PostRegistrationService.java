@@ -25,8 +25,8 @@ package org.exoplatform.portal.registration;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.mail.MailService;
 import org.exoplatform.services.organization.User;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * This service contains actions, which should be performed after successful registration of new user (Sending mail, Activating
@@ -42,7 +42,8 @@ public class PostRegistrationService {
     private final String mailMessage;
     private final MailService mailService;
     private final Boolean sendMailEnabled; // If false, then mails won't be send.
-    private static final Logger log = LoggerFactory.getLogger(PostRegistrationService.class);
+
+    private static final Log log = ExoLogger.getLogger(PostRegistrationService.class);
 
     public PostRegistrationService(InitParams params, MailService mailService) {
         this.mailService = mailService;

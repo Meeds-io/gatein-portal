@@ -35,8 +35,8 @@ import javax.servlet.http.HttpSession;
 
 import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.security.oauth.exception.OAuthExceptionCode;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.spi.OAuthPrincipal;
 import org.gatein.security.oauth.spi.SocialNetworkService;
@@ -55,7 +55,7 @@ import org.gatein.sso.agent.filter.api.AbstractSSOInterceptor;
  */
 public class OAuthLinkAccountFilter extends AbstractSSOInterceptor {
 
-    private static Logger log = LoggerFactory.getLogger(OAuthLinkAccountFilter.class);
+  private static Log           log = ExoLogger.getLogger(OAuthLinkAccountFilter.class);
 
     private SocialNetworkService socialNetworkService;
 

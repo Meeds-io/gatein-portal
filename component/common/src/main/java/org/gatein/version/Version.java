@@ -26,9 +26,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.jar.Manifest;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
-
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 /**
  * Common GateIn version.
  *
@@ -40,7 +39,7 @@ public class Version {
     public static final String implementationVersion;
     public static final String prettyVersion;
 
-    private static final Logger log = LoggerFactory.getLogger(Version.class);
+    private static final Log log = ExoLogger.getLogger(Version.class);
 
     static {
         URL url = Version.class.getProtectionDomain().getCodeSource().getLocation();

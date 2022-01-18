@@ -28,8 +28,8 @@ import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserProfileEventListener;
 import org.exoplatform.services.organization.UserProfileHandler;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.spi.OAuthCodec;
 import org.gatein.security.oauth.spi.OAuthProviderProcessor;
 import org.gatein.security.oauth.spi.OAuthProviderType;
@@ -42,7 +42,7 @@ import org.gatein.security.oauth.spi.OAuthProviderTypeRegistry;
  */
 public class AccessTokenInvalidationListener extends UserProfileEventListener {
 
-    private static Logger log = LoggerFactory.getLogger(AccessTokenInvalidationListener.class);
+  private static Log                      log = ExoLogger.getLogger(AccessTokenInvalidationListener.class);
 
     private final UserProfileHandler userProfileHandler;
     private final OAuthProviderTypeRegistry oauthProviderTypeRegistry;

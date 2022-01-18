@@ -27,11 +27,10 @@ import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
 import org.exoplatform.container.ExoContainerContext;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.gatein.common.transaction.JTAUserTransactionLifecycleService;
 import org.picketlink.idm.api.IdentitySession;
-import org.picketlink.idm.api.Transaction;
 
 /**
  * Abstract superclass for other DAO classes
@@ -43,7 +42,7 @@ public class AbstractDAOImpl {
 
     protected final PicketLinkIDMOrganizationServiceImpl orgService;
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final Log                                log = ExoLogger.getLogger(getClass());
 
     public AbstractDAOImpl(PicketLinkIDMOrganizationServiceImpl orgService, PicketLinkIDMService idmService) {
         service_ = idmService;

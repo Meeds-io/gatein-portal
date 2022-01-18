@@ -31,11 +31,11 @@ import java.util.Map;
 import javax.naming.InvalidNameException;
 
 import org.exoplatform.commons.utils.ListenerStack;
+import org.exoplatform.services.log.LogLevel;
 import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.MembershipTypeEventListener;
 import org.exoplatform.services.organization.MembershipTypeHandler;
 import org.exoplatform.services.organization.impl.MembershipTypeImpl;
-import org.gatein.common.logging.LogLevel;
 import org.picketlink.idm.api.RoleType;
 import org.picketlink.idm.common.exception.IdentityException;
 

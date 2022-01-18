@@ -26,8 +26,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * Subclass of {@link SecureRandom} which is able to reseed itself every {@code reseedingPeriod} milliseconds. All methods
@@ -79,7 +79,7 @@ public class AutoReseedRandom extends SecureRandom implements Runnable {
      */
     private final long reseedingPeriod;
 
-    private final Logger log = LoggerFactory.getLogger(AutoReseedRandom.class);
+    private final Log           log                               = ExoLogger.getLogger(AutoReseedRandom.class);
 
     /**
      * See {@link SecureRandom#getInstance(String, String)}.

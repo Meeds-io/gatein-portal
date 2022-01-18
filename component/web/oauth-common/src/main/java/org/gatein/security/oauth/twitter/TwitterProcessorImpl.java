@@ -36,8 +36,8 @@ import org.exoplatform.services.organization.UserProfile;
 import org.gatein.security.oauth.spi.InteractionState;
 import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.security.oauth.exception.OAuthExceptionCode;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.spi.OAuthCodec;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.utils.OAuthPersistenceUtils;
@@ -53,7 +53,7 @@ import twitter4j.conf.ConfigurationBuilder;
  */
 public class TwitterProcessorImpl implements TwitterProcessor {
 
-    private static Logger log = LoggerFactory.getLogger(TwitterProcessorImpl.class);
+  private static Log           log = ExoLogger.getLogger(TwitterProcessorImpl.class);
 
     private final String redirectURL;
     private final String clientID;

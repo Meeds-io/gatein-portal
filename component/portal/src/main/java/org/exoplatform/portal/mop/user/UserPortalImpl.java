@@ -41,8 +41,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -151,7 +151,7 @@ public class UserPortalImpl implements UserPortal {
                                                                               }
                                                                             };
 
-  private final Logger                           log                        = LoggerFactory.getLogger(UserPortalImpl.class);
+  private final Log                              log                        = ExoLogger.getLogger(UserPortalImpl.class);
 
   /** . */
   final UserPortalConfigService                  service;

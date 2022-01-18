@@ -2,8 +2,8 @@ package org.exoplatform.portal.mop.jdbc.service;
 
 import java.util.List;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 import org.exoplatform.commons.api.persistence.DataInitializer;
 import org.exoplatform.portal.mop.*;
@@ -14,7 +14,7 @@ import org.exoplatform.services.listener.ListenerService;
 public class PageServiceWrapper implements PageService {
 
   /** . */
-  private static final Logger   log = LoggerFactory.getLogger(PageServiceWrapper.class);
+  private static final Log      log = ExoLogger.getLogger(PageServiceWrapper.class);
 
   /** . */
   private final PageServiceImpl service;

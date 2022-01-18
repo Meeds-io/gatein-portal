@@ -43,8 +43,8 @@ package org.exoplatform.services.html.refs;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 
 final class CharRefs {
@@ -52,7 +52,7 @@ final class CharRefs {
     boolean sorted = false;
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(CharRefs.class);
+    private final Log log    = ExoLogger.getLogger(CharRefs.class);
 
     CharRef[] charRefs = {
 

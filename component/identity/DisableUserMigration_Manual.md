@@ -26,7 +26,7 @@ __java -cp lib/*:target/exo.portal.component.identity-xxx.jar [systemProperties]
 
 ### Library: those libs should be in classpath
 
-__lib/*__  : contains hiberate, picketlink and log4j library
+__lib/*__  : contains hiberate, picketlink library
 
 	antlr-2.7.6rc1.jar 
 	hsqldb-2.0.0.jar 
@@ -41,11 +41,9 @@ __lib/*__  : contains hiberate, picketlink and log4j library
 	jta-1.1.jar 
 	picketlink-idm-spi-1.4.3.Final.jar 
 	hibernate-core-4.1.6.Final.jar 
-	log4j-1.2.16.jar 
 	slf4j-api-1.6.1.jar 
 	hibernate-jpa-2.0-api-1.0.1.Final.jar 
 	picketlink-idm-api-1.4.3.Final.jar 
-	slf4j-simple-1.6.1.jar 
 
 ### Properties
 

@@ -46,8 +46,8 @@ import org.gatein.api.site.Site;
 import org.gatein.api.site.SiteId;
 import org.gatein.api.site.SiteQuery;
 import org.gatein.api.site.SiteType;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.gatein.management.api.ManagedUser;
 import org.gatein.management.api.PathAddress;
 import org.gatein.management.api.annotations.Managed;
@@ -79,7 +79,7 @@ import static org.gatein.api.management.Utils.*;
 @SuppressWarnings("unused")
 @Managed(value = "api", description = "GateIn API Management Resource")
 public class GateInApiManagementResource {
-    private static final Logger log = LoggerFactory.getLogger("org.gatein.api.management");
+  private static final Log       log         = ExoLogger.getLogger("org.gatein.api.management");
 
     private static final SiteQuery SITE_QUERY = new SiteQuery.Builder().withSiteTypes(SiteType.SITE).build();
     private static final SiteQuery SPACE_QUERY = new SiteQuery.Builder().withSiteTypes(SiteType.SPACE).build();

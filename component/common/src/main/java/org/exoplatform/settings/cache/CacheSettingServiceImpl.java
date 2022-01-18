@@ -27,8 +27,8 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.settings.cache.selector.SettingCacheSelector;
 import org.exoplatform.settings.jpa.JPASettingServiceImpl;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 import java.util.List;
 import java.util.Map;
@@ -56,8 +56,8 @@ public class CacheSettingServiceImpl implements SettingService {
 
   protected FutureExoCache<SettingKey, SettingValue, SettingService> futureExoCache;
 
-  private static final Logger                                        log                  =
-                                                                         LoggerFactory.getLogger(CacheSettingServiceImpl.class);
+  private static final Log                                           log                  =
+                                                                         ExoLogger.getLogger(CacheSettingServiceImpl.class);
 
   private final SettingService                                       service;
 

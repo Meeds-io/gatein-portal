@@ -32,8 +32,8 @@ import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
 import org.exoplatform.management.rest.annotations.RESTEndpoint;
 import org.exoplatform.portal.config.UserPortalConfigService;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.picocontainer.Startable;
 
 /**
@@ -52,7 +52,7 @@ public class PortalStatisticService implements Startable {
     private UserPortalConfigService configService;
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(PortalStatisticService.class);
+    private final Log                            log  = ExoLogger.getLogger(PortalStatisticService.class);
 
     public PortalStatisticService(UserPortalConfigService res) {
         configService = res;

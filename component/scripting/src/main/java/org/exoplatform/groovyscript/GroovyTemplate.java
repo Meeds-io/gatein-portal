@@ -19,8 +19,8 @@
 package org.exoplatform.groovyscript;
 
 import org.apache.commons.lang.StringUtils;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -154,7 +154,7 @@ public class GroovyTemplate implements Externalizable {
                         GroovyScriptBuilder compiler = new GroovyScriptBuilder(templateId, templateName, templateText);
                         this.script = compiler.build();
                     } catch (TemplateCompilationException ex) {
-                        Logger log = LoggerFactory.getLogger(GroovyTemplate.class);
+                      Log log = ExoLogger.getLogger(GroovyTemplate.class);
                         log.error(ex.getMessage(), ex);
                     }
                 }

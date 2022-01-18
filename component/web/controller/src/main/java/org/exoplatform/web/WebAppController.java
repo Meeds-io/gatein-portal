@@ -61,8 +61,8 @@ import org.exoplatform.web.controller.metadata.DescriptorBuilder;
 import org.exoplatform.web.controller.router.Router;
 import org.exoplatform.web.controller.router.RouterConfigException;
 import org.gatein.common.http.QueryStringParser;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.picocontainer.Startable;
 
 /**
@@ -78,7 +78,7 @@ public class WebAppController implements Startable {
     public static final QualifiedName HANDLER_PARAM = QualifiedName.create("gtn", "handler");
 
     /** . */
-    protected static Logger log = LoggerFactory.getLogger(WebAppController.class);
+    protected static Log                           log           = ExoLogger.getLogger(WebAppController.class);
 
     /** . */
     private final HashMap<String, Object> attributes_;

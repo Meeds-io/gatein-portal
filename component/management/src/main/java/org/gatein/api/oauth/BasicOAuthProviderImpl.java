@@ -28,8 +28,8 @@ import java.io.IOException;
 import org.gatein.api.internal.Parameters;
 import org.gatein.api.oauth.exception.OAuthApiException;
 import org.gatein.api.oauth.exception.OAuthApiExceptionCode;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.gatein.security.oauth.spi.AccessTokenContext;
 import org.gatein.security.oauth.spi.OAuthProviderType;
 import org.gatein.security.oauth.spi.SocialNetworkService;
@@ -46,7 +46,7 @@ public class BasicOAuthProviderImpl implements OAuthProvider {
     private final OAuthProviderType internalOAuthProvider;
     private final SocialNetworkService socialNetworkService;
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final Log              log = ExoLogger.getLogger(getClass());
 
     public BasicOAuthProviderImpl(OAuthProviderType internalOAuthProvider, SocialNetworkService socialNetworkService) {
         Parameters.requireNonNull(internalOAuthProvider, "internalOAuthProvider");

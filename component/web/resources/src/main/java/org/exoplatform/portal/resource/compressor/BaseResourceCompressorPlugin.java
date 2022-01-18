@@ -25,8 +25,8 @@ import org.exoplatform.management.annotations.Managed;
 import org.exoplatform.management.annotations.ManagedDescription;
 import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * @author <a href="mailto:hoang281283@gmail.com">Minh Hoang TO</a> Aug 19, 2010
@@ -38,7 +38,7 @@ public abstract class BaseResourceCompressorPlugin extends BaseComponentPlugin i
 
     private int priority;
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final Log log = ExoLogger.getLogger(getClass());
 
     public BaseResourceCompressorPlugin(InitParams params) {
         ValueParam priorityParam = params.getValueParam("plugin.priority");

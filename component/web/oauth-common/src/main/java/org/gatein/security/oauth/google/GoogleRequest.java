@@ -27,8 +27,8 @@ import java.io.IOException;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.HttpResponseException;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.exception.OAuthException;
 
 /**
@@ -38,7 +38,7 @@ import org.gatein.security.oauth.exception.OAuthException;
  */
 abstract class GoogleRequest<T> {
 
-    private static Logger log = LoggerFactory.getLogger(GoogleRequest.class);
+  private static Log log = ExoLogger.getLogger(GoogleRequest.class);
 
     protected abstract T invokeRequest(GoogleAccessTokenContext accessTokenContext) throws IOException;
 

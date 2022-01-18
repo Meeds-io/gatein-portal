@@ -29,8 +29,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.exoplatform.container.component.ComponentPlugin;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.spi.AccessTokenContext;
 import org.gatein.security.oauth.spi.OAuthProviderType;
 import org.gatein.security.oauth.spi.OAuthProviderTypeRegistry;
@@ -45,7 +45,7 @@ public class OAuthProviderTypeRegistryImpl implements OAuthProviderTypeRegistry 
     // Key is String identifier of OauthProviderType (Key of this OAuthProviderType). Value is OAuthProviderType
     private final Map<String, OAuthProviderType> oauthProviderTypes = new LinkedHashMap<String, OAuthProviderType>();
 
-    private static final Logger log = LoggerFactory.getLogger(OAuthProviderTypeRegistryImpl.class);
+    private static final Log                   log                = ExoLogger.getLogger(OAuthProviderTypeRegistryImpl.class);
 
     // Register OAuthProviderType into our list. It's called by kernel
     public void addPlugin(ComponentPlugin plugin) {

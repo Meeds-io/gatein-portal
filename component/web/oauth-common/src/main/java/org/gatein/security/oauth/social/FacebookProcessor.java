@@ -29,8 +29,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.security.oauth.exception.OAuthExceptionCode;
@@ -48,7 +48,7 @@ import org.json.JSONObject;
  */
 public class FacebookProcessor {
 
-    private static Logger log = LoggerFactory.getLogger(FacebookProcessor.class);
+  private static Log log   = ExoLogger.getLogger(FacebookProcessor.class);
 
     protected boolean trace = log.isTraceEnabled();
 

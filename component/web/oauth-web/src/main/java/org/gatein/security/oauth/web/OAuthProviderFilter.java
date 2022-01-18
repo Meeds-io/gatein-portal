@@ -35,8 +35,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.exoplatform.web.security.AuthenticationRegistry;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.spi.AccessTokenContext;
 import org.gatein.security.oauth.spi.InteractionState;
 import org.gatein.security.oauth.common.OAuthConstants;
@@ -57,7 +57,7 @@ import org.gatein.sso.agent.filter.api.AbstractSSOInterceptor;
  */
 public abstract class OAuthProviderFilter<T extends AccessTokenContext> extends AbstractSSOInterceptor {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+  protected final Log               log = ExoLogger.getLogger(getClass());
 
     private AuthenticationRegistry authenticationRegistry;
     private OAuthProviderProcessor<T> oauthProviderProcessor;

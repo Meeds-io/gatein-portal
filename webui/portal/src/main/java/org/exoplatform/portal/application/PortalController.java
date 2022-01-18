@@ -34,8 +34,8 @@ import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.RootContainer.PortalContainerPostCreateTask;
 import org.exoplatform.container.web.AbstractHttpServlet;
 import org.exoplatform.web.WebAppController;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * The PortalContainer servlet is the main entry point for the eXo Portal product.
@@ -48,7 +48,7 @@ import org.gatein.common.logging.LoggerFactory;
 @SuppressWarnings("serial")
 public class PortalController extends AbstractHttpServlet {
 
-    protected static Logger log = LoggerFactory.getLogger("org.gatein.portal.application.PortalController");
+  protected static Log log = ExoLogger.getLogger("org.gatein.portal.application.PortalController");
 
     /**
      * The onInit() method is used to prepare the portal to receive requests.

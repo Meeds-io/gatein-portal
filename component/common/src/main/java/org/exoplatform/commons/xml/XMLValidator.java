@@ -26,8 +26,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -46,7 +46,7 @@ public class XMLValidator {
     private DocumentBuilderFactory documentBuilderFactory;
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(XMLValidator.class);
+    private final Log                  log = ExoLogger.getLogger(XMLValidator.class);
 
     public XMLValidator(Class clazz, String systemId, String resourcePath) {
         schemas = new String[] { systemId };

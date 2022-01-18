@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.gatein.common.logging.LogLevel;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.LogLevel;
 import org.picketlink.idm.api.Attribute;
 import org.picketlink.idm.api.SortOrder;
 import org.picketlink.idm.api.query.UserQuery;
@@ -45,7 +45,7 @@ import org.exoplatform.services.organization.UserStatus;
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
  */
 public class IDMUserListAccess implements ListAccess<User>, Serializable {
-    private static Logger log = LoggerFactory.getLogger(IDMUserListAccess.class);
+  private static Log                        log       = ExoLogger.getLogger(IDMUserListAccess.class);
 
     private final UserQueryBuilder userQueryBuilder;
 

@@ -37,8 +37,8 @@ import org.exoplatform.web.security.security.SecureRandomService;
 import org.gatein.security.oauth.spi.InteractionState;
 import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.security.oauth.exception.OAuthExceptionCode;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.spi.OAuthCodec;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.social.FacebookPrincipal;
@@ -52,7 +52,7 @@ import org.gatein.security.oauth.utils.OAuthPersistenceUtils;
  */
 public class GateInFacebookProcessorImpl implements GateInFacebookProcessor {
 
-    private static Logger log = LoggerFactory.getLogger(GateInFacebookProcessorImpl.class);
+  private static Log                log = ExoLogger.getLogger(GateInFacebookProcessorImpl.class);
 
     private final String clientId;
     private final String clientSecret;

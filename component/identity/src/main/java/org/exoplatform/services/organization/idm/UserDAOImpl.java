@@ -24,7 +24,7 @@ import static org.exoplatform.services.organization.idm.EntityMapperUtils.ORIGIN
 import java.text.DateFormat;
 import java.util.*;
 
-import org.gatein.common.logging.LogLevel;
+import org.exoplatform.services.log.LogLevel;
 import org.picketlink.idm.api.*;
 import org.picketlink.idm.api.query.UserQueryBuilder;
 import org.picketlink.idm.impl.api.SimpleAttribute;

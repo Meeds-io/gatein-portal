@@ -23,8 +23,8 @@
 
 package org.gatein.api.oauth;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.gatein.security.oauth.spi.AccessTokenContext;
 import org.gatein.security.oauth.spi.OAuthProviderType;
 import org.gatein.security.oauth.spi.SocialNetworkService;
@@ -40,7 +40,7 @@ public class BasicOAuthProviderAccessorImpl implements OAuthProviderAccessor {
     private final OAuthProviderTypeRegistry oauthProviderTypeRegistry;
     private final SocialNetworkService socialNetworkService;
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final Log                   log = ExoLogger.getLogger(getClass());
 
     public BasicOAuthProviderAccessorImpl(OAuthProviderTypeRegistry oauthProviderTypeRegistry, SocialNetworkService socialNetworkService) {
         this.oauthProviderTypeRegistry = oauthProviderTypeRegistry;

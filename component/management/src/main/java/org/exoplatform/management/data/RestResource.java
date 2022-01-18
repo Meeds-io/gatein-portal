@@ -52,10 +52,11 @@ import org.exoplatform.management.spi.ManagedMethodMetaData;
 import org.exoplatform.management.spi.ManagedPropertyMetaData;
 import org.exoplatform.management.spi.ManagedResource;
 import org.exoplatform.management.spi.ManagedTypeMetaData;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.impl.ApplicationContextImpl;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -79,7 +80,7 @@ public class RestResource {
     private final String description;
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(RestResource.class);
+    private final Log                     log = ExoLogger.getLogger(RestResource.class);
 
     public RestResource(String name, ManagedResource managedResource) {
         ManagedTypeMetaData managedType = managedResource.getMetaData();

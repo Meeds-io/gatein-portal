@@ -20,8 +20,8 @@ package org.exoplatform.component.test;
 
 import java.util.Map;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * A base class for tests that provides base function test.
@@ -32,7 +32,7 @@ import org.gatein.common.logging.LoggerFactory;
 public abstract class AbstractGateInTest extends BaseGateInTest {
 
     /** . */
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final Log log = ExoLogger.getLogger(getClass());
 
     protected AbstractGateInTest() {
     }

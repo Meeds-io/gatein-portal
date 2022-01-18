@@ -53,8 +53,8 @@ import org.exoplatform.web.security.security.SecureRandomService;
 import org.gatein.security.oauth.spi.InteractionState;
 import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.security.oauth.exception.OAuthExceptionCode;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.spi.OAuthCodec;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.utils.OAuthPersistenceUtils;
@@ -66,7 +66,7 @@ import org.gatein.security.oauth.utils.OAuthPersistenceUtils;
  */
 public class GoogleProcessorImpl implements GoogleProcessor {
 
-    private static Logger log = LoggerFactory.getLogger(GoogleProcessorImpl.class);
+  private static Log                log          = ExoLogger.getLogger(GoogleProcessorImpl.class);
 
     private final String redirectURL;
     private final String clientID;

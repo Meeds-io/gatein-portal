@@ -38,8 +38,8 @@ import org.exoplatform.web.security.codec.CodecInitializer;
 import org.exoplatform.web.security.security.TokenServiceInitializationException;
 import org.gatein.security.oauth.spi.AccessTokenContext;
 import org.gatein.security.oauth.exception.OAuthException;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.spi.OAuthCodec;
 import org.gatein.security.oauth.spi.OAuthProviderProcessor;
 import org.gatein.security.oauth.spi.OAuthProviderType;
@@ -53,7 +53,7 @@ import org.gatein.security.oauth.spi.SocialNetworkService;
  */
 public class SocialNetworkServiceImpl implements SocialNetworkService, OAuthCodec {
 
-    private static Logger log = LoggerFactory.getLogger(SocialNetworkServiceImpl.class);
+  private static Log          log = ExoLogger.getLogger(SocialNetworkServiceImpl.class);
 
     private OrganizationService orgService;
     private AbstractCodec codec;

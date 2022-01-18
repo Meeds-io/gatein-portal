@@ -37,8 +37,8 @@ import org.exoplatform.commons.utils.CompositeReader;
 import org.exoplatform.commons.utils.PropertyResolverReader;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.controller.QualifiedName;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.portal.controller.resource.ResourceRequestHandler;
 
 /**
@@ -47,7 +47,7 @@ import org.gatein.portal.controller.resource.ResourceRequestHandler;
 public abstract class Module {
 
     /** Our logger. */
-    private static final Logger log = LoggerFactory.getLogger(Module.class);
+    private static final Log                 log     = ExoLogger.getLogger(Module.class);
 
     /** . */
     public static final ResourceBundle.Control CONTROL = new ResourceBundle.Control() {

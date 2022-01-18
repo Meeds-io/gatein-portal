@@ -30,8 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValuesParam;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * The proxy filter service is used for filtering http access when it is performed by GateIn. The following rules applies to the
@@ -58,7 +58,7 @@ import org.gatein.common.logging.LoggerFactory;
 public class ProxyFilterService {
 
     /** . */
-    private static final Logger log = LoggerFactory.getLogger(ProxyFilterService.class);
+    private static final Log  log = ExoLogger.getLogger(ProxyFilterService.class);
 
     /** . */
     private final List<Pattern> whiteList;

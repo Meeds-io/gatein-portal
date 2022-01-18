@@ -27,8 +27,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.CharacterData;
@@ -51,7 +51,7 @@ import org.w3c.dom.NodeList;
 public class DOMSerializer {
 
     /** . */
-    private static final Logger log = LoggerFactory.getLogger(DOMSerializer.class);
+    private static final Log            log                        = ExoLogger.getLogger(DOMSerializer.class);
 
     /** Thread safe. */
     private static final XMLOutputFactory outputFactory;

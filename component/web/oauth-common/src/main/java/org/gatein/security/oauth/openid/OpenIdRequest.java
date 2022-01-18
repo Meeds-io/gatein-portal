@@ -27,15 +27,15 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.security.oauth.exception.OAuthExceptionCode;
 import org.json.JSONException;
 
 abstract class OpenIdRequest<T> {
 
-    private static Logger log = LoggerFactory.getLogger(OpenIdRequest.class);
+  private static Log log = ExoLogger.getLogger(OpenIdRequest.class);
 
     protected abstract URL createURL() throws IOException;
     

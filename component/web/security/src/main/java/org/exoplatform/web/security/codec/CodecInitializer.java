@@ -40,8 +40,8 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.web.security.security.TokenServiceInitializationException;
 import org.gatein.common.io.IOTools;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * Initialize codec from configuration.properties. Use default values if properties not provided
@@ -50,7 +50,7 @@ import org.gatein.common.logging.LoggerFactory;
  */
 public class CodecInitializer {
 
-    private final Logger log = LoggerFactory.getLogger(CodecInitializer.class);
+  private final Log              log = ExoLogger.getLogger(CodecInitializer.class);
 
     private final String confDir;
 

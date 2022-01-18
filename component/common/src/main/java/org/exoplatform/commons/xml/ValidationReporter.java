@@ -19,7 +19,7 @@
 
 package org.exoplatform.commons.xml;
 
-import org.gatein.common.logging.Logger;
+import org.exoplatform.services.log.Log;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -37,9 +37,9 @@ public class ValidationReporter implements ErrorHandler {
     private boolean valid;
 
     /** . */
-    private Logger log;
+    private Log        log;
 
-    public ValidationReporter(Logger log, String identifier) {
+    public ValidationReporter(Log log, String identifier) {
         this.identifier = identifier;
         this.log = log;
         this.valid = true;

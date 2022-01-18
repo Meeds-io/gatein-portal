@@ -40,8 +40,8 @@ import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.login.recovery.PasswordRecoveryServiceImpl;
 import org.exoplatform.web.security.security.RemindPasswordTokenService;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.wci.security.Credentials;
 
 import javax.portlet.PortletException;
@@ -63,7 +63,7 @@ import java.util.regex.Pattern;
 public class ExternalRegistrationHandler extends WebRequestHandler {
     private static final QualifiedName SERVER_CAPTCHA = QualifiedName.create("gtn", "serveCaptcha");
 
-    protected static Logger log = LoggerFactory.getLogger(ExternalRegistrationHandler.class);
+    protected static Log                   log              = ExoLogger.getLogger(ExternalRegistrationHandler.class);
 
 
     public static final String NAME = "external-registration";

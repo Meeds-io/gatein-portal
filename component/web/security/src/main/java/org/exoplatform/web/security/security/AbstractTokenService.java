@@ -39,8 +39,8 @@ import org.exoplatform.management.jmx.annotations.Property;
 import org.exoplatform.web.login.LoginServlet;
 import org.exoplatform.web.security.Token;
 import org.exoplatform.web.security.TokenStore;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.common.util.Base64;
 import org.gatein.common.util.Base64.EncodingOption;
 import org.gatein.wci.security.Credentials;
@@ -60,7 +60,7 @@ import org.picocontainer.Startable;
 @NameTemplate({ @Property(key = "service", value = "TokenStore"), @Property(key = "name", value = "{Name}") })
 public abstract class AbstractTokenService<T extends Token, K> implements Startable, TokenStore {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+  protected final Log              log                       = ExoLogger.getLogger(getClass());
 
     protected static final String SERVICE_CONFIG = "service.configuration";
 

@@ -33,15 +33,15 @@ import org.exoplatform.download.DownloadService;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.WebRequestHandler;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * Created by The eXo Platform SARL Author : LeBienThuy thuy.le@exoplatform.com Dec 9, 2006
  */
 public class DownloadHandler extends WebRequestHandler {
 
-    private final Logger log = LoggerFactory.getLogger(DownloadHandler.class);
+  private final Log log = ExoLogger.getLogger(DownloadHandler.class);
 
     public String getHandlerName() {
         return "download";

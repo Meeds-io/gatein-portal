@@ -39,8 +39,8 @@ import org.exoplatform.web.application.RequestFailure;
 import org.exoplatform.web.security.AuthenticationRegistry;
 import org.exoplatform.webui.core.UIComponent;
 import org.gatein.security.oauth.exception.OAuthException;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.exception.OAuthExceptionCode;
 
@@ -52,7 +52,7 @@ import org.gatein.security.oauth.exception.OAuthExceptionCode;
 public class OAuthLifecycle implements ApplicationLifecycle<PortalRequestContext> {
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(OAuthLifecycle.class);
+    private final Log            log = ExoLogger.getLogger(OAuthLifecycle.class);
 
     private AuthenticationRegistry authRegistry;
 

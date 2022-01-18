@@ -21,8 +21,8 @@ package org.exoplatform.portal.pc;
 
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.commons.utils.Safe;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.pc.portlet.container.ContainerPortletInvoker;
 import org.gatein.pc.portlet.container.managed.ManagedObjectRegistryEventListener;
 import org.gatein.pc.portlet.impl.deployment.DeploymentException;
@@ -47,7 +47,7 @@ import java.io.InputStream;
 public class ExoPortletApplicationDeployer extends PortletApplicationDeployer {
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(ExoPortletApplicationDeployer.class);
+    private final Log                        log = ExoLogger.getLogger(ExoPortletApplicationDeployer.class);
 
     private ManagedObjectRegistryEventListener cdiListener;
 

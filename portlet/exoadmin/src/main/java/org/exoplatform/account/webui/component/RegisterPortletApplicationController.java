@@ -34,8 +34,8 @@ import nl.captcha.Captcha;
 import nl.captcha.servlet.CaptchaServletUtil;
 
 import org.exoplatform.webui.application.portlet.PortletApplicationController;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -44,7 +44,7 @@ import org.gatein.common.logging.LoggerFactory;
 public class RegisterPortletApplicationController extends PortletApplicationController implements ResourceServingPortlet {
 
     /** . */
-    private static final Logger log = LoggerFactory.getLogger(RegisterPortletApplicationController.class);
+    private static final Log  log          = ExoLogger.getLogger(RegisterPortletApplicationController.class);
 
     private static final String PARAM_HEIGHT = "height";
 

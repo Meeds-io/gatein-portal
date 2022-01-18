@@ -30,8 +30,8 @@ import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.core.model.SelectItem;
 import org.exoplatform.webui.core.model.SelectOption;
 import org.exoplatform.webui.core.model.SelectOptionGroup;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * Represents a select element
@@ -41,7 +41,7 @@ public class UIFormSelectBoxWithGroups extends UIFormStringInput {
     /**
      * .
      */
-    private static final Logger log = LoggerFactory.getLogger(UIFormSelectBoxWithGroups.class);
+    private static final Log log       = ExoLogger.getLogger(UIFormSelectBoxWithGroups.class);
 
     /**
      * It make SelectBox's ability to select multiple values

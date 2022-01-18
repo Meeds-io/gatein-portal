@@ -34,8 +34,8 @@ import org.exoplatform.commons.serialization.model.ConvertedTypeModel;
 import org.exoplatform.commons.serialization.model.FieldModel;
 import org.exoplatform.commons.serialization.model.SerializationMode;
 import org.exoplatform.commons.serialization.model.TypeModel;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -44,7 +44,7 @@ import org.gatein.common.logging.LoggerFactory;
 public class ObjectWriter extends ObjectOutputStream {
 
     /** . */
-    private static final Logger log = LoggerFactory.getLogger(ObjectWriter.class);
+    private static final Log                     log = ExoLogger.getLogger(ObjectWriter.class);
 
     /** . */
     private final SerializationContext context;

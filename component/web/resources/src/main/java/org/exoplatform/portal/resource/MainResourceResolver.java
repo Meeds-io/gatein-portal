@@ -25,8 +25,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.servlet.ServletContext;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -41,7 +41,7 @@ public class MainResourceResolver implements ResourceResolver {
     final CopyOnWriteArrayList<ResourceResolver> resolvers;
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(MainResourceResolver.class);
+    private final Log                          log = ExoLogger.getLogger(MainResourceResolver.class);
 
     public MainResourceResolver() {
         this.contexts = new HashMap<String, SimpleResourceContext>();

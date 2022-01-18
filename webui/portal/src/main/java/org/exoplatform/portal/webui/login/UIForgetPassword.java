@@ -48,8 +48,8 @@ import org.exoplatform.webui.form.UIFormStringInput;
 import org.exoplatform.webui.form.validator.MandatoryValidator;
 import org.exoplatform.webui.form.validator.UserConfigurableValidator;
 import org.exoplatform.webui.url.ComponentURL;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.wci.security.Credentials;
 
 /**
@@ -70,7 +70,7 @@ public class UIForgetPassword extends UIForm {
     }
 
     public static class SendActionListener extends EventListener<UIForgetPassword> {
-        private final Logger log = LoggerFactory.getLogger(SendActionListener.class);
+      private final Log log = ExoLogger.getLogger(SendActionListener.class);
 
         public void execute(Event<UIForgetPassword> event) throws Exception {
             UIForgetPassword uiForm = event.getSource();

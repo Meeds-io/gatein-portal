@@ -31,8 +31,8 @@ import com.github.scribejava.core.oauth.OAuth20Service;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.organization.UserProfile;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.security.oauth.exception.OAuthExceptionCode;
@@ -42,7 +42,7 @@ import org.gatein.security.oauth.utils.OAuthPersistenceUtils;
 
 public class LinkedinProcessorImpl implements LinkedinProcessor {
 
-    private static Logger log = LoggerFactory.getLogger(LinkedinProcessorImpl.class);
+  private static Log    log         = ExoLogger.getLogger(LinkedinProcessorImpl.class);
 
     private final String redirectURL;
     private final String apiKey;

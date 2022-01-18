@@ -31,8 +31,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.sso.agent.filter.api.SSOInterceptor;
 import org.gatein.sso.integration.SSODelegateFilter;
 
@@ -45,7 +45,7 @@ public class OAuthDelegateFilter extends SSODelegateFilter {
 
     private volatile Map<SSOInterceptor, String> oauthInterceptors;
 
-    private static final Logger log = LoggerFactory.getLogger(OAuthDelegateFilter.class);
+    private static final Log                   log = ExoLogger.getLogger(OAuthDelegateFilter.class);
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         Map<SSOInterceptor, String> oauthInterceptors = getInterceptors();

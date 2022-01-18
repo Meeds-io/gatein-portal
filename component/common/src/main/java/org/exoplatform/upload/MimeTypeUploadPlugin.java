@@ -24,14 +24,14 @@ import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Created by The eXo Platform SAS Author : Nguyen Thanh Hai haint@exoplatform.com Jun 29, 2011
  */
 public class MimeTypeUploadPlugin extends BaseComponentPlugin {
-    private static final Logger log = LoggerFactory.getLogger(MimeTypeUploadPlugin.class);
+  private static final Log    log              = ExoLogger.getLogger(MimeTypeUploadPlugin.class);
     private static final String MIMETYPE_PATH = "mimetype-path";
     private static final String DEFAULT_MIMETYPE = "mimetype-default";
 

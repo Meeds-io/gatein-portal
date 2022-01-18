@@ -28,8 +28,8 @@ import org.exoplatform.web.security.codec.CodecInitializer;
 import org.exoplatform.web.security.hash.JCASaltedHashService;
 import org.exoplatform.web.security.hash.SaltedHashException;
 import org.exoplatform.web.security.hash.SaltedHashService;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.wci.security.Credentials;
 
 import java.util.Date;
@@ -103,7 +103,7 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
 
     private SaltedHashService saltedHashService;
 
-    private final Logger log = LoggerFactory.getLogger(CookieTokenService.class);
+    private final Log        log                         = ExoLogger.getLogger(CookieTokenService.class);
     
     
 

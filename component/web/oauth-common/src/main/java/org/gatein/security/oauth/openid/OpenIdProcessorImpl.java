@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.github.scribejava.core.model.OAuth2AccessToken;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.security.oauth.exception.OAuthExceptionCode;
@@ -41,7 +41,7 @@ import org.json.JSONObject;
  */
 public class OpenIdProcessorImpl implements OpenIdProcessor {
 
-    private static Logger log = LoggerFactory.getLogger(OpenIdProcessorImpl.class);
+  private static Log                log    = ExoLogger.getLogger(OpenIdProcessorImpl.class);
 
     private final String redirectURL;
     private final String authenticationURL;

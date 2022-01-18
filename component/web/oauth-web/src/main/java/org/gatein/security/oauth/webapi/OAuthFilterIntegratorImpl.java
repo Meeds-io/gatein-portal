@@ -26,8 +26,8 @@ package org.gatein.security.oauth.webapi;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.spi.OAuthProviderTypeRegistry;
 import org.gatein.sso.agent.filter.api.SSOInterceptor;
 import org.gatein.sso.integration.SSOFilterIntegratorImpl;
@@ -40,7 +40,7 @@ import org.gatein.sso.integration.SSOFilterIntegratorImpl;
  */
 public class OAuthFilterIntegratorImpl extends SSOFilterIntegratorImpl implements OAuthFilterIntegrator {
 
-    private static final Logger log = LoggerFactory.getLogger(OAuthFilterIntegratorImpl.class);
+  private static final Log                log = ExoLogger.getLogger(OAuthFilterIntegratorImpl.class);
 
     private final OAuthProviderTypeRegistry oAuthProviderTypeRegistry;
 

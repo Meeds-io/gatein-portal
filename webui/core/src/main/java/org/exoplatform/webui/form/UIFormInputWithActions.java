@@ -31,8 +31,8 @@ import org.exoplatform.commons.serialization.api.annotations.Serialized;
 import org.exoplatform.web.application.JavascriptManager;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.core.UIComponent;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * Created by The eXo Platform SARL Author : Dang Van Minh minh.dang@exoplatform.com Sep 20, 2006
@@ -41,7 +41,7 @@ import org.gatein.common.logging.LoggerFactory;
 public class UIFormInputWithActions extends UIFormInputSet {
 
     /** . */
-    private static final Logger log = LoggerFactory.getLogger(UIFormInputWithActions.class);
+    private static final Log    log         = ExoLogger.getLogger(UIFormInputWithActions.class);
 
     Map<String, List<ActionData>> actionField = new HashMap<String, List<ActionData>>();
 

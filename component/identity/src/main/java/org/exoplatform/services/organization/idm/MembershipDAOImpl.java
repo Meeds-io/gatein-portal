@@ -22,9 +22,9 @@ package org.exoplatform.services.organization.idm;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.ListAccessImpl;
 import org.exoplatform.commons.utils.ListenerStack;
+import org.exoplatform.services.log.LogLevel;
 import org.exoplatform.services.organization.*;
 import org.exoplatform.services.organization.impl.MembershipTypeImpl;
-import org.gatein.common.logging.LogLevel;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.RoleType;
 import org.picketlink.idm.common.exception.IdentityException;
@@ -66,7 +66,7 @@ public class MembershipDAOImpl extends AbstractDAOImpl implements MembershipHand
 
         if (log.isTraceEnabled()) {
             Tools.logMethodIn(log, LogLevel.TRACE, "createMembership",
-                    new Object[] { "membership", m, "broadcast", broadcast, });
+                              new Object[] { "membership", m, "broadcast", broadcast, });
         }
 
         if (broadcast) {
@@ -572,7 +572,7 @@ public class MembershipDAOImpl extends AbstractDAOImpl implements MembershipHand
                 .findUser(user.getUserName());
 
         if (gtnUser == null) {
-            log.log(LogLevel.ERROR, "Internal ERROR. Cannot obtain user: " + user.getUserName());
+          log.error("Internal ERROR. Cannot obtain user: " + user.getUserName());
             return new ListAccessImpl(Membership.class, Collections.emptyList());
         }
         return new IDMMembershipListAccess(gtnUser, !orgService.getConfiguration().isSkipPaginationInMembershipQuery());
@@ -592,7 +592,7 @@ public class MembershipDAOImpl extends AbstractDAOImpl implements MembershipHand
         org.picketlink.idm.api.Group gtnGroup = service_.getIdentitySession().getPersistenceManager().findGroupByKey(gid);
 
         if (gtnGroup == null) {
-            log.log(LogLevel.ERROR, "Internal ERROR. Cannot obtain group: " + groupId);
+          log.error("Internal ERROR. Cannot obtain group: " + groupId);
             return new ListAccessImpl(Membership.class, Collections.emptyList());
         }
         return new IDMMembershipListAccess(gtnGroup, groupId, !orgService.getConfiguration().isSkipPaginationInMembershipQuery());
@@ -728,7 +728,7 @@ public class MembershipDAOImpl extends AbstractDAOImpl implements MembershipHand
         org.picketlink.idm.api.Group gtnGroup = service_.getIdentitySession().getPersistenceManager().findGroupByKey(groupKey);
 
         if (gtnGroup == null) {
-            log.log(LogLevel.ERROR, "Internal ERROR. Cannot obtain group: " + groupId);
+          log.error("Internal ERROR. Cannot obtain group: " + groupId);
             return new ArrayList<>();
         }
 

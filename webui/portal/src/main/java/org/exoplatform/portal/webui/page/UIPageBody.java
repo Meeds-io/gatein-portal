@@ -32,8 +32,8 @@ import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.core.UIComponentDecorator;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * May 19, 2006
@@ -46,7 +46,7 @@ public class UIPageBody extends UIComponentDecorator {
     private String pageName;
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(UIPageBody.class);
+    private final Log log = ExoLogger.getLogger(UIPageBody.class);
 
     public UIPageBody(PageBody model) {
         setId("UIPageBody");
