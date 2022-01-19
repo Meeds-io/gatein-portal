@@ -119,7 +119,7 @@ public class HibernateIdentityStoreSessionImpl implements IdentityStoreSession {
       // Commit hibernate transaction only if it has really been started
       if (hbTxStatus != null && hbTxStatus) {
         commitHibernateTransaction();
-        hibernateTxStatus.set(null);
+        hibernateTxStatus.remove();
       }
     } else {
       commitHibernateTransaction();
@@ -132,7 +132,7 @@ public class HibernateIdentityStoreSessionImpl implements IdentityStoreSession {
       // Rollback hibernate transaction only if it has really been started
       if (hbTxStatus != null && hbTxStatus) {
         rollbackHibernateTransaction();
-        hibernateTxStatus.set(null);
+        hibernateTxStatus.remove();
       }
     } else {
       rollbackHibernateTransaction();
