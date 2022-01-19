@@ -38,7 +38,7 @@
     </modifySql>
   </changeSet>
 
-  <changeSet author="idmQueue" id="1.0.0-2" dbms="oracle,postgresql,hsqldb">
+  <changeSet author="idmQueue" id="1.0.0-2" dbms="oracle,postgresql">
     <createSequence sequenceName="SEQ_IDM_QUEUE_ID" startValue="1"/>
   </changeSet>
 
@@ -49,6 +49,10 @@
     <createIndex tableName="IDM_QUEUE" indexName="IDX_IDM_QUEUE_02">
       <column name="NB_RETRIES"/>
     </createIndex>
+  </changeSet>
+
+  <changeSet author="idmQueue" id="1.0.0-4" dbms="hsqldb">
+    <createSequence sequenceName="SEQ_IDM_QUEUE_ID" startValue="1"/>
   </changeSet>
 
 </databaseChangeLog>

@@ -73,15 +73,15 @@
     </modifySql>
   </changeSet>
 
-  <changeSet author="file" id="1.0.0-4" dbms="oracle,postgresql,hsqldb">
+  <changeSet author="file" id="1.0.0-4" dbms="oracle,postgresql">
     <createSequence sequenceName="SEQ_FILES_FILES_FILE_ID" startValue="1"/>
   </changeSet>
 
-  <changeSet author="file" id="1.0.0-5" dbms="oracle,postgresql,hsqldb">
+  <changeSet author="file" id="1.0.0-5" dbms="oracle,postgresql">
     <createSequence sequenceName="SEQ_FILES_NS_NAMESPACE_ID" startValue="1"/>
   </changeSet>
 
-  <changeSet author="file" id="1.0.0-6" dbms="oracle,postgresql,hsqldb">
+  <changeSet author="file" id="1.0.0-6" dbms="oracle,postgresql">
     <createSequence sequenceName="SEQ_FILES_ORPHAN_FILES_ID" startValue="1"/>
   </changeSet>
 
@@ -101,7 +101,7 @@
     </modifySql>
   </changeSet>
 
-  <changeSet author="file" id="1.0.0-8" dbms="oracle,postgresql,hsqldb">
+  <changeSet author="file" id="1.0.0-8" dbms="oracle,postgresql">
     <createSequence sequenceName="SEQ_FILES_BINARY_BLOB_ID" startValue="1"/>
   </changeSet>
 
@@ -136,6 +136,13 @@
     <modifyDataType columnName="UPDATER"
                     newDataType="NVARCHAR(200)"
                     tableName="FILES_FILES"/>
+  </changeSet>
+
+  <changeSet author="file" id="1.0.0-14" dbms="hsqldb">
+    <createSequence sequenceName="SEQ_FILES_FILES_FILE_ID" startValue="1" />
+    <createSequence sequenceName="SEQ_FILES_NS_NAMESPACE_ID" startValue="1" />
+    <createSequence sequenceName="SEQ_FILES_ORPHAN_FILES_ID" startValue="1" />
+    <createSequence sequenceName="SEQ_FILES_BINARY_BLOB_ID" startValue="1" />
   </changeSet>
 
 </databaseChangeLog>
