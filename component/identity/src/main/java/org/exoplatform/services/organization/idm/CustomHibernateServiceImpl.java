@@ -129,7 +129,7 @@ public class CustomHibernateServiceImpl implements HibernateService, ComponentRe
     } catch (HibernateException t) {
       LOG.error("Error closing hibernate session : " + t.getMessage(), t);
     }
-    threadLocal_.set(null);
+    threadLocal_.remove();
   }
 
   final public void closeSession() {
