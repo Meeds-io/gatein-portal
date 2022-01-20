@@ -19,22 +19,21 @@
 
 package org.exoplatform.portal.pc;
 
-import org.exoplatform.commons.utils.PropertyManager;
-import org.exoplatform.commons.utils.Safe;
-import org.exoplatform.services.log.Log;
-import org.exoplatform.services.log.ExoLogger;
-import org.gatein.pc.portlet.container.ContainerPortletInvoker;
-import org.gatein.pc.portlet.container.managed.ManagedObjectRegistryEventListener;
-import org.gatein.pc.portlet.impl.deployment.DeploymentException;
-import org.gatein.pc.portlet.impl.deployment.PortletApplicationDeployer;
-import org.gatein.pc.portlet.impl.deployment.PortletApplicationDeployment;
-import org.gatein.pc.portlet.impl.deployment.staxnav.PortletApplicationMetaDataBuilder;
-import org.gatein.pc.portlet.impl.metadata.PortletApplication10MetaData;
-
-import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+
+import javax.servlet.ServletContext;
+
+import org.gatein.pc.portlet.container.ContainerPortletInvoker;
+import org.gatein.pc.portlet.impl.deployment.DeploymentException;
+import org.gatein.pc.portlet.impl.deployment.PortletApplicationDeployer;
+import org.gatein.pc.portlet.impl.deployment.PortletApplicationDeployment;
+import org.gatein.pc.portlet.impl.metadata.PortletApplication10MetaData;
+
+import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Extends the {@link org.gatein.pc.portlet.impl.deployment.PortletApplicationDeployer} to inject configuration metadata from
@@ -49,29 +48,12 @@ public class ExoPortletApplicationDeployer extends PortletApplicationDeployer {
     /** . */
     private final Log                        log = ExoLogger.getLogger(ExoPortletApplicationDeployer.class);
 
-    private ManagedObjectRegistryEventListener cdiListener;
-
     public ExoPortletApplicationDeployer() {
         this(null);
     }
 
     public ExoPortletApplicationDeployer(ContainerPortletInvoker containerPortletInvoker) {
         super(containerPortletInvoker);
-
-        try {
-            Class clazz = Class.forName("org.gatein.cdi.CDIInjectionListener");
-            Object listenerInstance = clazz.newInstance();
-            if (listenerInstance instanceof ManagedObjectRegistryEventListener) {
-                cdiListener = (ManagedObjectRegistryEventListener) listenerInstance;
-
-                if (null != cdiListener) {
-                    // Add listener to perform CDI Injection
-                    this.addListener(cdiListener);
-                }
-            }
-        } catch (Exception e) {
-            log.warn("Unable to create org.gatein.cdiCDIInjectionListener", e);
-        }
     }
 
     @Override
@@ -121,12 +103,8 @@ public class ExoPortletApplicationDeployer extends PortletApplicationDeployer {
     private GlobalPortletMetaData loadGlobalMetadata(String globalPortletLocation) throws Exception {
         File globalPortletFile = new File(globalPortletLocation);
         if (globalPortletFile.exists()) {
-          InputStream in = new FileInputStream(globalPortletFile);
-          try {
-              PortletApplicationMetaDataBuilder builder = new PortletApplicationMetaDataBuilder();
-              return GlobalPortletMetaData.unmarshalling(in);
-          } finally {
-              Safe.close(in);
+          try (InputStream in = new FileInputStream(globalPortletFile)) {
+            return GlobalPortletMetaData.unmarshalling(in);
           }
         } else {
           return null;
