@@ -324,8 +324,42 @@ public class ServletContextImpl implements ServletContext {
 
     @Override
     public String getVirtualServerName() {
-      return null;
+      throw new NotYetImplemented();
     }
 
+    @Override
+    public Dynamic addJspFile(String servletName, String jspFile) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public int getSessionTimeout() {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public void setSessionTimeout(int sessionTimeout) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public String getRequestCharacterEncoding() {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public void setRequestCharacterEncoding(String encoding) {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public String getResponseCharacterEncoding() {
+      throw new NotYetImplemented();
+    }
+
+    @Override
+    public void setResponseCharacterEncoding(String encoding) {
+      throw new NotYetImplemented();
+    }
     
 }
