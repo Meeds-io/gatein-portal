@@ -160,8 +160,8 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
             Credentials encodedCredentials = new Credentials(credentials.getUsername(), encryptedPassword);
 
             try {
-                this.tokenStore.saveToken(new GateInTokenStore.TokenData(id, hashedRandomString, encodedCredentials, new Date(expirationTimeMillis)));
-//                tokenContainer.saveToken(context.getSession(), id, hashedRandomString, encodedCredentials, new Date(expirationTimeMillis));
+                this.tokenStore.saveToken(new GateInTokenStore.TokenData(id, hashedRandomString, encodedCredentials, new Date(expirationTimeMillis), type));
+//                tokenContainer.saveToken(context.getSession(), id, hashedRandomString, encodedCredentials, new Date(expirationTimeMillis, tokenType));
             } catch (TokenExistsException e) {
                 cookieTokenString = null;
             }
@@ -232,7 +232,16 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
     public void deleteTokensOfUser(final String user) {
         this.tokenStore.deleteTokenOfUser(user);
     }
-
+    
+    /**
+     * The UI should offer a way to delete all existing tokens of the current user.
+     *
+     * @param user
+     */
+    public void deleteTokensByUsernameAndType(final String username, final String tokenType) {
+        this.tokenStore.deleteTokensByUsernameAndType(username, tokenType);
+    }
+        
     /**
      * Removes all stored tokens
      */

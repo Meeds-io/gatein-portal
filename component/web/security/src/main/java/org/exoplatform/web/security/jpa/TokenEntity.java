@@ -13,7 +13,8 @@ import java.util.Date;
         @NamedQuery(name = "GateInToken.findByTokenId", query = "SELECT t FROM GateInToken t WHERE t.tokenId = :tokenId"),
         @NamedQuery(name = "GateInToken.findByUser", query = "SELECT t FROM GateInToken t WHERE t.username = :username"),
         @NamedQuery(name = "GateInToken.findExpired", query = "SELECT t FROM GateInToken t WHERE t.expirationTime < :expireTime"),
-        @NamedQuery(name = "GateInToken.cleanTokens", query = "DELETE FROM GateInToken t WHERE t.expirationTime < :expireTime")
+        @NamedQuery(name = "GateInToken.cleanTokens", query = "DELETE FROM GateInToken t WHERE t.expirationTime < :expireTime"),
+        @NamedQuery(name = "GateInToken.deleteTokensByUserAndType", query="DELETE FROM GateInToken t WHERE t.username = :username AND t.tokenType = :tokenType")
 })
 public class TokenEntity implements Serializable {
     private static final long serialVersionUID = 6633792468705838255L;
@@ -38,6 +39,10 @@ public class TokenEntity implements Serializable {
 
     @Column(name="EXPIRATION_TIME", nullable = false)
     private Long expirationTime;
+    
+    @Column(name="TOKEN_TYPE", nullable = false)
+    private String tokenType;
+    
 
     public Long getId() {
         return id;
@@ -85,5 +90,13 @@ public class TokenEntity implements Serializable {
 
     public void setExpirationTime(Date expirationTime) {
         this.expirationTime = (expirationTime != null ? expirationTime.getTime() : -1);
+    }
+
+    public String getTokenType() {
+      return tokenType;
+    }
+
+    public void setTokenType(String tokenType) {
+      this.tokenType = tokenType;
     }
 }
