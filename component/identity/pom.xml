@@ -85,11 +85,6 @@
     </dependency>
 
     <dependency>
-       <groupId>javax.transaction</groupId>
-       <artifactId>jta</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.hibernate.common</groupId>
       <artifactId>hibernate-commons-annotations</artifactId>
     </dependency>

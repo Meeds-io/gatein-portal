@@ -61,7 +61,6 @@
     <module>webui</module>
     <module>portlet</module>
     <module>web</module>
-    <module>cdi</module>
   </modules>
   
   <dependencyManagement>
@@ -320,16 +319,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.sso.agents-configs</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.cdi.injection</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.cdi.contexts</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>
