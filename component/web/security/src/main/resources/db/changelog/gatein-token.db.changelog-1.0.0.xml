@@ -30,4 +30,12 @@
   <changeSet author="gatein-token" id="1.0.0-2" dbms="oracle,postgresql">
     <createSequence sequenceName="SEQ_GATEIN_TOKEN_ID_GENERATOR" startValue="1"/>
   </changeSet>
+  <changeSet author="gatein-token" id="1.0.0-3" dbms="hsqldb">
+    <createSequence sequenceName="SEQ_GATEIN_TOKEN_ID_GENERATOR" startValue="1"/>
+  </changeSet>
+  <changeSet author="gatein-token" id="1.0.0-4">
+    <addColumn tableName="PORTAL_TOKENS">
+      <column name="TOKEN_TYPE" type="VARCHAR(250)"/>
+    </addColumn>
+  </changeSet>
 </databaseChangeLog>
