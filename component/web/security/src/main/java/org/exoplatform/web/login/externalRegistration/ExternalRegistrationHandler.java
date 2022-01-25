@@ -197,13 +197,9 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
                       user.setEmail(email);
                     }
                     try {
-                        organizationService.getUserHandler().createUser(user, true);// Broadcast user creation event
+                        organizationService.getUserHandler().createUser(user, false);
                         Group group = organizationService.getGroupHandler().findGroupById(EXTERNALS_GROUP);
                         if (organizationService.getMembershipTypeHandler() != null) {
-                            Collection<Membership>  usersMemberhips = organizationService.getMembershipHandler().findMembershipsByUserAndGroup(user.getUserName(), USERS_GROUP);
-                            for (Membership usersMemberhip : usersMemberhips) {
-                              organizationService.getMembershipHandler().removeMembership(usersMemberhip.getId(), true);
-                            }
                             organizationService.getMembershipHandler().linkMembership(user, group, organizationService.getMembershipTypeHandler().findMembershipType(MEMBER), true);
                             service.sendExternalConfirmationAccountEmail(randomUserName, locale, url);
                             remindPasswordTokenService.deleteTokensByUsernameAndType(email,CookieTokenService.EXTERNAL_REGISTRATION_TOKEN);
