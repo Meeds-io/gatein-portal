@@ -21,8 +21,16 @@ package org.exoplatform.portal.resource.compressor.impl;
 import java.io.Reader;
 import java.io.Writer;
 
-import com.google.javascript.jscomp.*;
+import org.apache.commons.io.IOUtils;
+
+import com.google.javascript.jscomp.CheckLevel;
+import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
+import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.DiagnosticGroups;
+import com.google.javascript.jscomp.SourceFile;
+import com.google.javascript.jscomp.WarningLevel;
+
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.management.annotations.Managed;
@@ -122,7 +130,8 @@ public class ClosureCompressorPlugin extends BaseResourceCompressorPlugin {
         //
         SourceFile jsInput;
         try {
-            String code = SourceFile.fromReader("code", input).getCode();
+            String code = IOUtils.toString(input);
+            code = SourceFile.fromCode("code", code).getCode();
             jsInput = SourceFile.fromCode("jsInput", code);
             compiler.compile(extern, jsInput, options);
             output.write(compiler.toSource());

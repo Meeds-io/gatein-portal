@@ -123,7 +123,7 @@ class ScriptLoader implements Loader<ScriptKey, ScriptResult, ControllerContext>
         } else {
             StringBuilder msg = new StringBuilder("Handle me gracefully JS errors\n");
             for (JSError error : res.errors) {
-                msg.append(error.sourceName).append(":").append(error.lineNumber).append(" ").append(error.description)
+                msg.append(error.getSourceName()).append(":").append(error.getLineNumber()).append(" ").append(error.getDescription())
                     .append("\n");
             }
             return new ScriptResult.Error(msg.toString());

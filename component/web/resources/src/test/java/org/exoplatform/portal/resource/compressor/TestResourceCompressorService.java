@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -39,8 +42,6 @@ import org.exoplatform.portal.resource.compressor.impl.ResourceCompressorService
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author <a href="trong.tran@exoplatform.com">Trong Tran</a>
@@ -142,7 +143,8 @@ public class TestResourceCompressorService extends AbstractWebResourceTest {
 
         SourceFile jsInput;
         try {
-            jsInput = SourceFile.fromReader(input.getName(), new FileReader(input));
+            Path path = Paths.get(input.getPath());
+            jsInput = SourceFile.fromPath(path, StandardCharsets.UTF_8);
         } catch (Exception ex) {
             throw new ResourceCompressorException(ex);
         }
