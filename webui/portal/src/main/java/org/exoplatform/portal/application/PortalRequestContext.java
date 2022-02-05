@@ -511,10 +511,10 @@ public class PortalRequestContext extends WebuiRequestContext {
 
     public String getPortalOwner() {
         UserPortalConfig userPortalConfig = getUserPortalConfig();
-        if (userPortalConfig != null) {
+        if (userPortalConfig != null && userPortalConfig.getPortalName() != null) {
             return userPortalConfig.getPortalName();
         } else {
-            return null;
+            return portalConfigService.getDefaultPortal();
         }
     }
 
