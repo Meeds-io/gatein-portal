@@ -123,7 +123,6 @@ public class PortalRequestHandler extends WebRequestHandler {
      * 7) set the header Cache-Control to no-cache or to the value specified in the portal configuration <br>
      *
      */
-    @SuppressWarnings("unchecked")
     @Override
     public boolean execute(ControllerContext controllerContext) throws Exception {
         HttpServletRequest req = controllerContext.getRequest();

@@ -1,0 +1,67 @@
+/**
+ * This file is part of the Meeds project (https://meeds.io/).
+ * Copyright (C) 2022 Meeds Association
+ * contact@meeds.io
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+package org.exoplatform.web.login;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
+public class LoginUtils {
+
+  private LoginUtils() {
+    // Utils class
+  }
+
+  /** . */
+  public static final String COOKIE_NAME                   = "rememberme";
+
+  public static final String OAUTH_COOKIE_NAME             = "oauth_rememberme";
+
+  // value of this field need equals with
+  // org.gatein.security.oauth.common.OAuthConstants.ATTRIBUTE_REMEMBER_ME
+  public static final String SESSION_ATTRIBUTE_REMEMBER_ME = "_rememberme";
+
+  /**
+   * Extract the remember me token from the request or returns null.
+   *
+   * @param req the incoming request
+   * @return the token
+   */
+  public static String getRememberMeTokenCookie(HttpServletRequest req) {
+    Cookie[] cookies = req.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if (COOKIE_NAME.equals(cookie.getName())) {
+          return cookie.getValue();
+        }
+      }
+    }
+    return null;
+  }
+
+  public static String getOauthRememberMeTokenCookie(HttpServletRequest req) {
+    Cookie[] cookies = req.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if (OAUTH_COOKIE_NAME.equals(cookie.getName())) {
+          return cookie.getValue();
+        }
+      }
+    }
+    return null;
+  }
+
+}

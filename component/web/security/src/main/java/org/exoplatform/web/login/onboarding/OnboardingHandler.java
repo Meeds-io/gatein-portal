@@ -126,7 +126,7 @@ public class OnboardingHandler extends WebRequestHandler {
             Credentials credentials = service.verifyToken(tokenId,remindPasswordTokenService.ONBOARD_TOKEN);
             if (credentials == null) {
                 //. TokenId is expired
-                return dispatch("/onboarding/jsp/token_expired.jsp", servletContext, req, res);
+                return dispatch("/WEB-INF/jsp/onboarding/token_expired.jsp", servletContext, req, res);
             }
             final String username = credentials.getUsername();
 
@@ -187,7 +187,7 @@ public class OnboardingHandler extends WebRequestHandler {
             String random = "&v=" + Calendar.getInstance().getTimeInMillis();
     
     
-            return dispatch("/onboarding/jsp/reset_password.jsp", servletContext, req, res);
+            return dispatch("/WEB-INF/jsp/onboarding/reset_password.jsp", servletContext, req, res);
         }
         return false;
     }

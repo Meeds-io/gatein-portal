@@ -46,7 +46,7 @@ import org.exoplatform.services.listener.*;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.web.application.JavascriptManager;
-import org.exoplatform.web.login.LoginServlet;
+import org.exoplatform.web.login.LoginUtils;
 import org.exoplatform.web.login.LogoutControl;
 import org.exoplatform.web.security.GateInToken;
 import org.exoplatform.web.security.security.AbstractTokenService;
@@ -355,19 +355,19 @@ public class UIPortal extends UIContainer {
                 AbstractTokenService<GateInToken, String> tokenService = AbstractTokenService.getInstance(CookieTokenService.class);
                 tokenService.deleteToken(token);
             }
-            token = LoginServlet.getOauthRememberMeTokenCookie(req);
+            token = LoginUtils.getOauthRememberMeTokenCookie(req);
             if(token != null) {
                 AbstractTokenService<GateInToken, String> tokenService = AbstractTokenService.getInstance(CookieTokenService.class);
                 tokenService.deleteToken(token);
             }
 
             LogoutControl.wantLogout();
-            Cookie cookie = new Cookie(LoginServlet.COOKIE_NAME, "");
+            Cookie cookie = new Cookie(LoginUtils.COOKIE_NAME, "");
             cookie.setPath(req.getContextPath());
             cookie.setMaxAge(0);
             prContext.getResponse().addCookie(cookie);
 
-            Cookie oauthCookie = new Cookie(LoginServlet.OAUTH_COOKIE_NAME, "");
+            Cookie oauthCookie = new Cookie(LoginUtils.OAUTH_COOKIE_NAME, "");
             oauthCookie.setPath(req.getContextPath());
             oauthCookie.setMaxAge(0);
             prContext.getResponse().addCookie(oauthCookie);
@@ -379,7 +379,7 @@ public class UIPortal extends UIContainer {
             Cookie[] cookies = req.getCookies();
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
-                    if (LoginServlet.COOKIE_NAME.equals(cookie.getName())) {
+                    if (LoginUtils.COOKIE_NAME.equals(cookie.getName())) {
                         return cookie.getValue();
                     }
                 }
