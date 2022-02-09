@@ -12,10 +12,6 @@
             if (System.getProperty("gatein.webui.keepalive.interval") != null)
               keepAliveInterval = System.getProperty("gatein.webui.keepalive.interval");
         }
-        if (isKeepAlive) {
-          jsmanager.require("SHARED/jquery", "\$")
-            .addScripts("\$(function() { window.setInterval(function(){ \$.post('/portal/login/jsp/keepalive.jsp') }, " + keepAliveInterval + "); });");
-        }
 	String changeLanguageAction = "if(document.getElementById('UIMaskWorkspace')) ajaxGet(eXo.env.server.createPortalURL('UIPortal', 'ChangeLanguage', true)); document.activeElement.blur();";
 	String accountSetting = "if(document.getElementById('UIMaskWorkspace')) ajaxGet(eXo.env.server.createPortalURL('UIPortal', 'AccountSettings', true)); document.activeElement.blur();";
 	String changeSkinAction = "if(document.getElementById('UIMaskWorkspace')) ajaxGet(eXo.env.server.createPortalURL('UIPortal', 'ChangeSkin', true)); document.activeElement.blur();";

@@ -36,7 +36,7 @@ import org.exoplatform.management.annotations.Managed;
 import org.exoplatform.management.annotations.ManagedDescription;
 import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
-import org.exoplatform.web.login.LoginServlet;
+import org.exoplatform.web.login.LoginUtils;
 import org.exoplatform.web.security.Token;
 import org.exoplatform.web.security.TokenStore;
 import org.exoplatform.services.log.Log;
@@ -228,7 +228,7 @@ public abstract class AbstractTokenService<T extends Token, K> implements Starta
     }
 
     protected String nextTokenId() {
-        return LoginServlet.COOKIE_NAME + nextRandom();
+        return LoginUtils.COOKIE_NAME + nextRandom();
     }
 
     protected String nextRandom() {

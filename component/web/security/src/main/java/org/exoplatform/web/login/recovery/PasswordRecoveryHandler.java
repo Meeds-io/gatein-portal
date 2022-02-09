@@ -121,7 +121,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
             Credentials credentials = service.verifyToken(tokenId,remindPasswordTokenService.FORGOT_PASSWORD_TOKEN);
             if (credentials == null) {
                 //. TokenId is expired
-                return dispatch("/forgotpassword/jsp/token_expired.jsp", servletContext, req, res);
+                return dispatch("/WEB-INF/jsp/forgotpassword/token_expired.jsp", servletContext, req, res);
             }
             final String username = credentials.getUsername();
 
@@ -170,7 +170,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
             req.setAttribute("tokenId", tokenId);
             req.setAttribute("username", escapeXssCharacters(username));
 
-            return dispatch("/forgotpassword/jsp/reset_password.jsp", servletContext, req, res);
+            return dispatch("/WEB-INF/jsp/forgotpassword/reset_password.jsp", servletContext, req, res);
 
         } else {
             //.
@@ -212,7 +212,7 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
             if (initURL != null) {
                 req.setAttribute("initURL", initURL);
             }
-            return dispatch("/forgotpassword/jsp/forgot_password.jsp", servletContext, req, res);
+            return dispatch("/WEB-INF/jsp/forgotpassword/forgot_password.jsp", servletContext, req, res);
         }
     }
 
