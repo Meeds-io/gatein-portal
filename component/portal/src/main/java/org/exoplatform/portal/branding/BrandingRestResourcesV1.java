@@ -87,7 +87,6 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   @GET
   @Path("/logo")
   @Produces("image/png")
-  @RolesAllowed("users")
   @ApiOperation(value = "Get Branding logo", httpMethod = "GET", response = Response.class)
   @ApiResponses(value = {
           @ApiResponse(code = 200, message = "Branding logo retrieved"),
