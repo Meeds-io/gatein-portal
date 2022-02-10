@@ -33,9 +33,9 @@
 
   <modules>
     <module>controller</module>
-    <module>security</module>
     <module>server</module>
     <module>resources</module>
+    <module>security</module>
     <module>api</module>
     <module>oauth-common</module>
     <module>oauth-web</module>

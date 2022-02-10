@@ -55,6 +55,10 @@
     </dependency>
     <dependency>
       <groupId>org.exoplatform.gatein.portal</groupId>
+      <artifactId>exo.portal.component.web.resources</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.web.api</artifactId>
     </dependency>
     <dependency>
