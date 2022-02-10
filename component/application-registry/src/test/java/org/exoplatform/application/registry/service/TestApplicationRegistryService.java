@@ -163,7 +163,55 @@ public class TestApplicationRegistryService extends AbstractKernelTest {
     ApplicationCategory storedCategory = service_.getApplicationCategory(categoryName);
     assertNotNull(storedCategory);
   }
-
+  
+  public void testImportSystemApplicationOnStartup() throws Exception {
+    
+    String systemApplicationCategoryName = "systemApplicationCategory";
+    
+    InitParams systemApplicationParams = new InitParams();
+    ObjectParameter systemApplicationCategoryParameter = new ObjectParameter();
+    systemApplicationCategoryParameter.setName(systemApplicationCategoryName);
+    ApplicationCategory systemApplicationCategory = createAppCategory(systemApplicationCategoryName, "systemApplicationCategoryDescription");
+    
+    Application systemApplication = createApplication("systemApplication", "systemApplicationCategory");
+    List<Application> systemApplications = List.of(systemApplication);
+    systemApplicationCategory.setApplications(systemApplications);
+    systemApplicationCategoryParameter.setObject(systemApplicationCategory);
+    systemApplicationParams.addParameter(systemApplicationCategoryParameter);
+    ValueParam systemParam = new ValueParam();
+    systemParam.setName("system");
+    systemParam.setValue("true");
+    systemApplicationParams.addParameter(systemParam);
+    
+    ApplicationCategoriesPlugins systemPlugins = new ApplicationCategoriesPlugins(service_, configurationManager, systemApplicationParams);
+    service_.initListener(systemPlugins);
+    startService();
+    //not existing systemApplicationCategory is created
+    ApplicationCategory storedSystemApplicationCategory = service_.getApplicationCategory(systemApplicationCategoryName);
+    assertNotNull(storedSystemApplicationCategory);
+    //systemApplication is created after systemApplicationCategory creation
+    Application storedSystemApplication = service_.getApplication("systemApplicationCategory/systemApplication");
+    assertNotNull(storedSystemApplication);
+    assertEquals(storedSystemApplication.getDisplayName(), "systemApplication");
+    
+    Application secondSystemApplication = createApplication("secondSystemApplication", "systemApplicationCategory");
+    systemApplications = List.of(systemApplication, secondSystemApplication);
+    systemApplicationCategory.setApplications(systemApplications);
+    systemApplicationCategoryParameter.setObject(systemApplicationCategory);
+    systemApplicationParams.put(systemApplicationCategoryName, systemApplicationCategoryParameter);
+    systemPlugins = new ApplicationCategoriesPlugins(service_, configurationManager, systemApplicationParams);
+    storedSystemApplication.setDisplayName("updatedSystemApplication");
+    service_.save(storedSystemApplicationCategory, storedSystemApplication);
+    startService();
+    //secondSystemApplication is created when systemApplicationCategory already exists
+    Application storedSecondSystemApplication = service_.getApplication("systemApplicationCategory/secondSystemApplication");
+    assertNotNull(storedSecondSystemApplication);
+    assertEquals(storedSecondSystemApplication.getDisplayName(), "secondSystemApplication");
+    //systemApplication is not overwritten and conserve its modified stored value 
+    storedSystemApplication = service_.getApplication("systemApplicationCategory/systemApplication");
+    assertEquals(storedSystemApplication.getDisplayName(), "updatedSystemApplication");
+  }
+  
   private void startService() {
     ((Startable) service_).start();
   }
