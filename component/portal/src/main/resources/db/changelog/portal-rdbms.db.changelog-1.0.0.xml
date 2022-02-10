@@ -98,7 +98,7 @@
       <column name="SITE_ID" type="BIGINT">
         <constraints nullable="false"/>
       </column>
-      <column name="SHOW_MAX_WINDOW" type="BIT" />
+      <column name="SHOW_MAX_WINDOW" type="BOOLEAN" />
       <column name="DISPLAY_NAME" type="NVARCHAR(200)"/>
       <column name="NAME" type="NVARCHAR(200)"/>
       <column name="DESCRIPTION" type="LONGTEXT" />
@@ -261,9 +261,9 @@
       <column name="TITLE" type="NVARCHAR(200)"/>
       <column name="ICON" type="NVARCHAR(200)"/>
       <column name="DESCRIPTION" type="LONGTEXT" />
-      <column name="SHOW_INFO_BAR" type="BIT" />
-      <column name="SHOW_APP_STATE" type="BIT" />
-      <column name="SHOW_APP_MODE" type="BIT" />
+      <column name="SHOW_INFO_BAR" type="BOOLEAN" />
+      <column name="SHOW_APP_STATE" type="BOOLEAN" />
+      <column name="SHOW_APP_MODE" type="BOOLEAN" />
       <column name="THEME" type="NVARCHAR(200)"/>
       <column name="WIDTH" type="VARCHAR(20)"/>
       <column name="HEIGHT" type="VARCHAR(20)"/>
