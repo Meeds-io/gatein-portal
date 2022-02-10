@@ -31,13 +31,13 @@
 
   <groupId>org.exoplatform.gatein.portal</groupId>
   <artifactId>exo.portal.parent</artifactId>
-  <version>6.5.x-meed-SNAPSHOT</version>
+  <version>6.5.x-meedsv2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>GateIn - Portal</name>
 
   <properties>
-    <org.exoplatform.depmgt.version>22.x-meed-SNAPSHOT</org.exoplatform.depmgt.version>
+    <org.exoplatform.depmgt.version>22.x-meedsv2-SNAPSHOT</org.exoplatform.depmgt.version>
     <org.exoplatform.kernel.release.version>6.5.0-M12</org.exoplatform.kernel.release.version>
     <org.exoplatform.core.release.version>6.5.0-M12</org.exoplatform.core.release.version>
     <org.exoplatform.ws.release.version>6.5.0-M12</org.exoplatform.ws.release.version>
