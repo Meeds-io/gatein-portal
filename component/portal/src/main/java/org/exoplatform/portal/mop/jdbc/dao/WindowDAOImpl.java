@@ -14,6 +14,7 @@ import org.exoplatform.portal.jdbc.entity.WindowEntity;
 public class WindowDAOImpl extends AbstractDAO<WindowEntity> implements WindowDAO {
 
   @Override
+  @ExoTransactional
   public List<Long> findIdsByContentIds(List<String> contentIds, Pagination pagination) {
     if (contentIds == null || contentIds.isEmpty()) {
       return Collections.emptyList();
@@ -46,6 +47,7 @@ public class WindowDAOImpl extends AbstractDAO<WindowEntity> implements WindowDA
   }
 
   @Override
+  @ExoTransactional
   public List<WindowEntity> findByIds(List<Long> ids) {
     if (ids == null || ids.isEmpty()) {
       return Collections.emptyList();
@@ -56,6 +58,7 @@ public class WindowDAOImpl extends AbstractDAO<WindowEntity> implements WindowDA
   }
   
   @Override
+  @ExoTransactional
   public void deleteById(Long id) {
     WindowEntity window = find(id);
     if (window != null) {

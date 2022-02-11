@@ -83,7 +83,7 @@ public class WindowEntity extends ComponentEntity implements Serializable {
   private String            contentId;
 
   @Lob
-  @Type(type = "org.hibernate.type.BinaryType")
+  @Type(type = "org.hibernate.type.MaterializedBlobType")
   @Column(name = "CUSTOMIZATION", length = 10000)
   @Basic(fetch = FetchType.LAZY)
   private byte[]            customization;

@@ -91,6 +91,7 @@
 
   <!-- Page -->
   <changeSet author="portal" id="1.0.0-9">
+    <validCheckSum>ANY</validCheckSum>
     <createTable tableName="PORTAL_PAGES">
       <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_PORTAL_PAGE"/>
@@ -98,7 +99,7 @@
       <column name="SITE_ID" type="BIGINT">
         <constraints nullable="false"/>
       </column>
-      <column name="SHOW_MAX_WINDOW" type="BIT" />
+      <column name="SHOW_MAX_WINDOW" type="BOOLEAN" defaultValueBoolean="false" />
       <column name="DISPLAY_NAME" type="NVARCHAR(200)"/>
       <column name="NAME" type="NVARCHAR(200)"/>
       <column name="DESCRIPTION" type="LONGTEXT" />
@@ -254,6 +255,7 @@
   </changeSet>
   
   <changeSet author="portal" id="1.0.0-23">
+    <validCheckSum>ANY</validCheckSum>
     <createTable tableName="PORTAL_WINDOWS">
       <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_PORTAL_WINDOW"/>
@@ -261,9 +263,9 @@
       <column name="TITLE" type="NVARCHAR(200)"/>
       <column name="ICON" type="NVARCHAR(200)"/>
       <column name="DESCRIPTION" type="LONGTEXT" />
-      <column name="SHOW_INFO_BAR" type="BIT" />
-      <column name="SHOW_APP_STATE" type="BIT" />
-      <column name="SHOW_APP_MODE" type="BIT" />
+      <column name="SHOW_INFO_BAR" type="BOOLEAN" defaultValueBoolean="false" />
+      <column name="SHOW_APP_STATE" type="BOOLEAN" defaultValueBoolean="false" />
+      <column name="SHOW_APP_MODE" type="BOOLEAN" defaultValueBoolean="false" />
       <column name="THEME" type="NVARCHAR(200)"/>
       <column name="WIDTH" type="VARCHAR(20)"/>
       <column name="HEIGHT" type="VARCHAR(20)"/>
