@@ -118,6 +118,26 @@
   <external-component-plugins>
     <target-component>org.exoplatform.web.WebAppController</target-component>
     <component-plugin>
+      <name>LoginHandler</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.web.login.LoginHandler</type>
+    </component-plugin>
+    <component-plugin>
+      <name>PasswordRecoveryHandler</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.web.login.recovery.PasswordRecoveryHandler</type>
+    </component-plugin>
+    <component-plugin>
+      <name>OnboardingHandler</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.web.login.onboarding.OnboardingHandler</type>
+    </component-plugin>
+    <component-plugin>
+      <name>ExternalRegistrationHandler</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.web.login.externalRegistration.ExternalRegistrationHandler</type>
+    </component-plugin>
+    <component-plugin>
       <name>UploadHandler</name>
       <set-method>register</set-method>
       <type>org.exoplatform.web.handler.UploadHandler</type>
