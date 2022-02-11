@@ -121,6 +121,16 @@
       <name>LoginHandler</name>
       <set-method>register</set-method>
       <type>org.exoplatform.web.login.LoginHandler</type>
+      <init-params>
+        <value-param>
+          <name>login.jsp.path</name>
+          <value>${exo.login.jsp.path:/WEB-INF/jsp/login/login.jsp}</value>
+        </value-param>
+        <value-param>
+          <name>username.case.insensitive</name>
+          <value>${exo.auth.case.insensitive:true}</value>
+        </value-param>
+      </init-params>
     </component-plugin>
     <component-plugin>
       <name>PasswordRecoveryHandler</name>

@@ -179,6 +179,10 @@
     <type>org.gatein.security.oauth.webapi.OAuthFilterIntegratorImpl</type>
   </component>
 
+  <component>
+    <type>org.gatein.security.oauth.web.OauthLoginParamsExtension</type>
+  </component>
+
   <external-component-plugins>
     <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
     <component-plugin>
