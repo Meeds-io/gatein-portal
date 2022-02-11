@@ -27,7 +27,9 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.*;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.gatein.common.text.EntityEncoder;
 import org.gatein.portal.controller.resource.ResourceId;
 import org.gatein.portal.controller.resource.ResourceScope;
@@ -35,15 +37,15 @@ import org.gatein.portal.controller.resource.script.*;
 import org.gatein.portal.controller.resource.script.Module;
 import org.gatein.wci.ServletContainerFactory;
 import org.gatein.wci.authentication.AuthenticationEventType;
-import org.gatein.wci.authentication.AuthenticationException;
 import org.gatein.wci.security.Credentials;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.commons.utils.PropertyManager;
-import org.exoplatform.container.*;
+import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.branding.BrandingService;
 import org.exoplatform.portal.resource.*;
 import org.exoplatform.services.log.ExoLogger;
@@ -63,21 +65,66 @@ import org.exoplatform.web.security.sso.SSOHelper;
 
 public class LoginHandler extends WebRequestHandler {
 
-  private static final Log    LOG                    = ExoLogger.getLogger(LoginHandler.class);
+  private static final Log        LOG                        = ExoLogger.getLogger(LoginHandler.class);
 
-  private static final String TEXT_HTML_CONTENT_TYPE = "text/html; charset=UTF-8";
+  private static final String     TEXT_HTML_CONTENT_TYPE     = "text/html; charset=UTF-8";
 
-  private static final String JS_PATHS_PARAM         = "paths";
+  private static final String     JS_PATHS_PARAM             = "paths";
 
-  private static final String LOGIN_JSP_PATH         = "/WEB-INF/jsp/login/login.jsp";
+  private static final String     LOGIN_JSP_PATH_PARAM       = "login.jsp.path";
 
-  private static final String IS_CASE_INSENSITIVE    = "exo.auth.case.insensitive";
+  private static final String     CASE_INSENSITIVE_PARAM     = "username.case.insensitive";
 
-  private PortalContainer     container;
+  private static final String     LOGIN_EXTENSION_JS_MODULES = "LoginExtension";
 
-  private ServletContext      servletContext;
+  private boolean                 caseInsensitive;
 
-  private boolean             caseInsensitive        = true;
+  private PortalContainer         container;
+
+  private OrganizationService     organizationService;
+
+  private LocaleConfigService     localeConfigService;
+
+  private BrandingService         brandingService;
+
+  private PasswordRecoveryService passwordRecoveryService;
+
+  private JavascriptConfigService javascriptConfigService;
+
+  private SkinService             skinService;
+
+  private SSOHelper               ssoHelper;
+
+  private ServletContext          servletContext;
+
+  private String                  loginJspPath;
+
+  public LoginHandler(PortalContainer container, // NOSONAR
+                      OrganizationService organizationService,
+                      LocaleConfigService localeConfigService,
+                      BrandingService brandingService,
+                      PasswordRecoveryService passwordRecoveryService,
+                      JavascriptConfigService javascriptConfigService,
+                      SkinService skinService,
+                      SSOHelper ssoHelper,
+                      InitParams params) {
+    this.container = container;
+    this.organizationService = organizationService;
+    this.localeConfigService = localeConfigService;
+    this.brandingService = brandingService;
+    this.passwordRecoveryService = passwordRecoveryService;
+    this.javascriptConfigService = javascriptConfigService;
+    this.skinService = skinService;
+    this.ssoHelper = ssoHelper;
+    if (params != null) {
+      if (params.containsKey(LOGIN_JSP_PATH_PARAM)) {
+        this.loginJspPath = params.getValueParam(LOGIN_JSP_PATH_PARAM).getValue();
+      }
+      if (params.containsKey(CASE_INSENSITIVE_PARAM)) {
+        this.caseInsensitive = Boolean.parseBoolean(params.getValueParam(CASE_INSENSITIVE_PARAM).getValue());
+      }
+    }
+  }
 
   @Override
   public String getHandlerName() {
@@ -89,15 +136,12 @@ public class LoginHandler extends WebRequestHandler {
     return true;
   }
 
-  /**
-   * Register WCI authentication listener, which is used to bind credentials to
-   * temporary authentication registry after each successful login
-   */
   @Override
   public void onInit(WebAppController controller, ServletConfig servletConfig) {
-    caseInsensitive = StringUtils.equalsIgnoreCase(PropertyManager.getProperty(IS_CASE_INSENSITIVE), "true");
-    this.container = PortalContainer.getInstance();
     this.servletContext = container.getPortalContext();
+
+    // Register WCI authentication listener, which is used to bind credentials
+    // to temporary authentication registry after each successful login
     ServletContainerFactory.getServletContainer().addAuthenticationListener(event -> {
       if (event.getType() == AuthenticationEventType.LOGIN) {
         bindCredentialsToAuthenticationRegistry(container, event.getRequest(), event.getCredentials());
@@ -106,7 +150,7 @@ public class LoginHandler extends WebRequestHandler {
   }
 
   @Override
-  public boolean execute(ControllerContext context) throws Exception {
+  public boolean execute(ControllerContext context) throws Exception { // NOSONAR
     HttpServletRequest request = context.getRequest();
     HttpServletResponse response = context.getResponse();
     try {
@@ -126,63 +170,38 @@ public class LoginHandler extends WebRequestHandler {
         return portalContextPath;
       }
     };
-    StringBuilder loginPath = new StringBuilder(LOGIN_JSP_PATH);
+    StringBuilder loginPath = new StringBuilder(loginJspPath);
     //
     LoginStatus status = LoginStatus.UNAUTHENTICATED;
     if (request.getRemoteUser() == null) {
-      if (username != null && password != null) {
+      if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
         // email authentication
         if (username.contains("@")) {
-          OrganizationService organizationService = this.container.getComponentInstanceOfType(OrganizationService.class);
-          UserHandler userHandler = organizationService.getUserHandler();
-          if (userHandler != null) {
-            Query emailQuery = new Query();
-            emailQuery.setEmail(username);
-            ListAccess<User> users;
-            try {
-              users = userHandler.findUsersByQuery(emailQuery);
-              if (users != null && users.getSize() > 0) {
-                username = users.load(0, 1)[0].getUserName();
-              }
-            } catch (RuntimeException e) {
-              LOG.warn("Can not login with an email associated to many users");
-              response.setContentType(TEXT_HTML_CONTENT_TYPE);
-              dispatch(context, loginPath.toString(), LoginStatus.MANY_USERS_WITH_SAME_EMAIL);
-              return true;
-            } catch (Exception e) {
-              LOG.warn("Can not get users by email", e);
-              dispatch(context, loginPath.toString(), LoginStatus.FAILED);
-              return true;
-            }
+          String userNameByEmail = getUserNameByEmail(username, context, loginPath);
+          if (StringUtils.isBlank(userNameByEmail)) {
+            return true;
+          } else {
+            username = userNameByEmail;
           }
+        } else if (caseInsensitive) {
+          username = getExactUserName(username);
         }
-        Credentials credentials = new Credentials(username, password);
 
+        Credentials credentials = new Credentials(username, password);
         // This will login or send an AuthenticationException
         try {
-          if (caseInsensitive) {
-            username = getExactUserName(username);
-            credentials = new Credentials(username, password);
-          }
           ServletContainerFactory.getServletContainer().login(request, response, credentials);
-        } catch (AuthenticationException e) {
-          LOG.debug("User authentication failed");
-          if (LOG.isTraceEnabled()) {
-            LOG.trace(e.getMessage(), e);
-          }
-        }
-
-        //
-        status = request.getRemoteUser() != null ? LoginStatus.AUTHENTICATED : LoginStatus.UNAUTHENTICATED;
-        // If we are authenticated
-        if (status == LoginStatus.AUTHENTICATED) {
-          if (LOG.isTraceEnabled()) {
-            LOG.trace("User authenticated successfuly through WCI. Will redirect to initialURI");
-          }
+          LOG.debug("User {} authenticated successfuly.", username);
 
           // Handle remember me
           addRememberMeCookie(request, response, credentials);
+        } catch (Exception e) {
+          LOG.debug("User {} authentication failed.", username, e);
+          status = LoginStatus.FAILED;
         }
+      }
+      if (request.getRemoteUser() != null) {
+        status = LoginStatus.AUTHENTICATED;
       }
     } else {
       LOG.debug("User already authenticated. Will redirect to initialURI");
@@ -199,33 +218,66 @@ public class LoginHandler extends WebRequestHandler {
         response.sendRedirect(response.encodeRedirectURL(initialURI));
       }
     } else {
-      // Show login form or redirect to SSO url (/portal/sso) if SSO is enabled
-      request.setAttribute("org.gatein.portal.login.initial_uri", initialURI);
-      SSOHelper ssoHelper = this.container.getComponentInstanceOfType(SSOHelper.class);
-
-      String disabledUser = (String) request.getAttribute(FilterDisabledLoginModule.DISABLED_USER_NAME);
-      boolean meetDisabledUser = disabledUser != null;
-      if (ssoHelper.skipJSPRedirection() && meetDisabledUser) {
-        response.setContentType(TEXT_HTML_CONTENT_TYPE);
-        request.setAttribute("", ssoHelper);
-        getServletContext().getRequestDispatcher("/WEB-INF/jsp/login/disabled.jsp").include(wrappedRequest, response);
-      } else if (ssoHelper.skipJSPRedirection()) {
-        String ssoRedirectUrl = request.getContextPath() + ssoHelper.getSSORedirectURLSuffix();
-        ssoRedirectUrl = response.encodeRedirectURL(ssoRedirectUrl);
-        if (LOG.isTraceEnabled()) {
-          LOG.trace("Redirected to SSO login URL: " + ssoRedirectUrl);
-        }
-        response.sendRedirect(ssoRedirectUrl);
-      } else {
-        if (meetDisabledUser) {
-          status = LoginStatus.DISABLED_USER;
-        }
-
-        response.setContentType(TEXT_HTML_CONTENT_TYPE);
-        dispatch(context, loginPath.toString(), status);
-      }
+      handleSsoRequest(context, wrappedRequest, loginPath, status, initialURI);
     }
     return true;
+  }
+
+  private void handleSsoRequest(ControllerContext context,
+                                HttpServletRequest request,
+                                StringBuilder loginPath,
+                                LoginStatus status,
+                                String initialURI) throws Exception {
+    HttpServletResponse response = context.getResponse();
+
+    // Show login form or redirect to SSO url (/portal/sso) if SSO is enabled
+    request.setAttribute("org.gatein.portal.login.initial_uri", initialURI);
+
+    String disabledUser = (String) request.getAttribute(FilterDisabledLoginModule.DISABLED_USER_NAME);
+    boolean meetDisabledUser = disabledUser != null;
+    if (ssoHelper.skipJSPRedirection() && meetDisabledUser) {
+      response.setContentType(TEXT_HTML_CONTENT_TYPE);
+      request.setAttribute("", ssoHelper);
+      servletContext.getRequestDispatcher("/WEB-INF/jsp/login/disabled.jsp").include(request, response);
+    } else if (ssoHelper.skipJSPRedirection()) {
+      String ssoRedirectUrl = request.getContextPath() + ssoHelper.getSSORedirectURLSuffix();
+      ssoRedirectUrl = response.encodeRedirectURL(ssoRedirectUrl);
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("Redirected to SSO login URL: " + ssoRedirectUrl);
+      }
+      response.sendRedirect(ssoRedirectUrl);
+    } else {
+      if (meetDisabledUser) {
+        status = LoginStatus.DISABLED_USER;
+      }
+
+      response.setContentType(TEXT_HTML_CONTENT_TYPE);
+      dispatch(context, loginPath.toString(), status);
+    }
+  }
+
+  private String getUserNameByEmail(String email,
+                                    ControllerContext context,
+                                    StringBuilder loginPath) throws Exception {
+    UserHandler userHandler = organizationService.getUserHandler();
+    if (userHandler != null) {
+      Query emailQuery = new Query();
+      emailQuery.setEmail(email);
+      ListAccess<User> users;
+      try {
+        users = userHandler.findUsersByQuery(emailQuery);
+        if (users != null && users.getSize() > 0) {
+          return users.load(0, 1)[0].getUserName();
+        }
+      } catch (RuntimeException e) {
+        LOG.warn("Can not login with an email associated to many users");
+        dispatch(context, loginPath.toString(), LoginStatus.MANY_USERS_WITH_SAME_EMAIL);
+      } catch (Exception e) {
+        LOG.warn("Can not get users by email", e);
+        dispatch(context, loginPath.toString(), LoginStatus.FAILED);
+      }
+    }
+    return null;
   }
 
   private void addRememberMeCookie(HttpServletRequest request, HttpServletResponse response, Credentials credentials) {
@@ -262,7 +314,6 @@ public class LoginHandler extends WebRequestHandler {
     HttpServletRequest request = controllerContext.getRequest();
     HttpServletResponse response = controllerContext.getResponse();
 
-    LocaleConfigService localeConfigService = this.container.getComponentInstanceOfType(LocaleConfigService.class);
     LocaleConfig localeConfig = request.getLocale() == null ? localeConfigService.getDefaultLocaleConfig()
                                                             : localeConfigService.getLocaleConfig(request.getLocale()
                                                                                                          .getLanguage());
@@ -282,12 +333,10 @@ public class LoginHandler extends WebRequestHandler {
     String initialURI = getInitalUri(request);
     params.put("initialUri", EntityEncoder.FULL.encode(initialURI));
 
-    BrandingService brandingService = this.container.getComponentInstanceOfType(BrandingService.class);
     String companyName = brandingService.getCompanyName();
     params.put("companyName", companyName);
 
-    PasswordRecoveryService passRecoveryServ = this.container.getComponentInstanceOfType(PasswordRecoveryService.class);
-    String forgotPasswordPath = passRecoveryServ.getPasswordRecoverURL(null, null);
+    String forgotPasswordPath = passwordRecoveryService.getPasswordRecoverURL(null, null);
     params.put("forgotPasswordPath", request.getContextPath() + forgotPasswordPath);
 
     if (status != LoginStatus.AUTHENTICATED && status != LoginStatus.UNAUTHENTICATED) {
@@ -298,9 +347,24 @@ public class LoginHandler extends WebRequestHandler {
         + PortalContainer.getCurrentRestContextName() + "/v1/platform/branding/logo?v=" + brandingService.getLastUpdatedTime();
     params.put("brandingLogo", brandingLogo);
 
+    List<LoginParamsExtension> paramsExtensions = this.container.getComponentInstancesOfType(LoginParamsExtension.class);
+    if (CollectionUtils.isNotEmpty(paramsExtensions)) {
+      paramsExtensions.forEach(paramsExtension -> {
+        Map<String, Object> extendedParams = paramsExtension.extendLoginParameters(controllerContext);
+        if (MapUtils.isNotEmpty(extendedParams)) {
+          extendedParams.forEach((key, value) -> {
+            try {
+              params.put(key, value);
+            } catch (Exception e) {
+              LOG.warn("Error while adding {}/{} in login params map", key, value, e);
+            }
+          });
+        }
+      });
+    }
+
     javascriptManager.require("PORTLET/social-portlet/Login", "loginApp").addScripts("loginApp.init(" + params.toString() + ");");
 
-    JavascriptConfigService javascriptConfigService = this.container.getComponentInstanceOfType(JavascriptConfigService.class);
     JSONObject jsConfig = javascriptConfigService.getJSConfig(controllerContext, locale);
     request.setAttribute("jsConfig", jsConfig.toString());
 
@@ -326,12 +390,10 @@ public class LoginHandler extends WebRequestHandler {
     List<String> skinUrls = getPageSkins(controllerContext, localeConfig.getOrientation());
     request.setAttribute("skinUrls", skinUrls);
 
-    getServletContext().getRequestDispatcher(dispatchPath).include(request, response);
+    servletContext.getRequestDispatcher(dispatchPath).include(request, response);
   }
 
   private List<String> getPageSkins(ControllerContext controllerContext, Orientation orientation) {
-    SkinService skinService = this.container.getComponentInstanceOfType(SkinService.class);
-
     String skinName = skinService.getDefaultSkin();
 
     List<SkinConfig> skins = new ArrayList<>();
@@ -382,7 +444,7 @@ public class LoginHandler extends WebRequestHandler {
     Iterator<String> keys = jsConfigPaths.keys();
     while (keys.hasNext()) {
       String module = keys.next();
-      if (module.contains("LoginExtension")) {
+      if (module.contains(LOGIN_EXTENSION_JS_MODULES)) {
         javascriptManager.require(module);
       }
     }
@@ -414,13 +476,6 @@ public class LoginHandler extends WebRequestHandler {
   }
 
   /**
-   * @return the servletContext
-   */
-  public ServletContext getServletContext() {
-    return servletContext;
-  }
-
-  /**
    * Add credentials to {@link ConversationState}.
    *
    * @param credentials the credentials
@@ -442,12 +497,8 @@ public class LoginHandler extends WebRequestHandler {
    * @return
    */
   private String getExactUserName(String username) {
-    ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
-    RequestLifeCycle.begin(currentContainer);
+    RequestLifeCycle.begin(container);
     try {
-      OrganizationService organizationService =
-                                              (OrganizationService) currentContainer
-                                                                                    .getComponentInstance(OrganizationService.class);
       User user = organizationService.getUserHandler().findUserByName(username);
       if (user != null) {
         username = user.getUserName();
@@ -460,10 +511,9 @@ public class LoginHandler extends WebRequestHandler {
     return username;
   }
 
-  public Map<String, Boolean> getScripts(JavascriptManager javascriptManager) {
+  private Map<String, Boolean> getScripts(JavascriptManager javascriptManager) {
     FetchMap<ResourceId> requiredResources = javascriptManager.getScriptResources();
-    JavascriptConfigService service = this.container.getComponentInstanceOfType(JavascriptConfigService.class);
-    Map<ScriptResource, FetchMode> resolved = service.resolveIds(requiredResources);
+    Map<ScriptResource, FetchMode> resolved = javascriptConfigService.resolveIds(requiredResources);
 
     Map<String, Boolean> ret = new LinkedHashMap<>();
     Map<String, Boolean> tmp = new LinkedHashMap<>();
@@ -486,4 +536,5 @@ public class LoginHandler extends WebRequestHandler {
     LOG.debug("Resolved resources for page: " + ret);
     return ret;
   }
+
 }
