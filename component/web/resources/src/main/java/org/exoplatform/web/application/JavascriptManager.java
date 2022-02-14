@@ -60,6 +60,11 @@ public class JavascriptManager {
         requireJS.require("SHARED/base", "base");
     }
 
+    public JavascriptManager(JavascriptConfigService javascriptConfigService) {
+      this();
+      this.javascriptConfigService = javascriptConfigService;
+    }
+
     /**
      * Add a valid javascript code
      *
