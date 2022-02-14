@@ -20,8 +20,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -31,31 +29,23 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.gatein.common.text.EntityEncoder;
-import org.gatein.portal.controller.resource.ResourceId;
-import org.gatein.portal.controller.resource.ResourceScope;
-import org.gatein.portal.controller.resource.script.*;
-import org.gatein.portal.controller.resource.script.Module;
 import org.gatein.wci.ServletContainerFactory;
 import org.gatein.wci.authentication.AuthenticationEventType;
 import org.gatein.wci.security.Credentials;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.branding.BrandingService;
-import org.exoplatform.portal.resource.*;
+import org.exoplatform.portal.resource.SkinService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.*;
-import org.exoplatform.services.organization.Query;
-import org.exoplatform.services.resources.*;
-import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.web.*;
-import org.exoplatform.web.application.JavascriptManager;
+import org.exoplatform.web.application.JspBasedWebHandler;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 import org.exoplatform.web.security.AuthenticationRegistry;
@@ -63,7 +53,7 @@ import org.exoplatform.web.security.security.AbstractTokenService;
 import org.exoplatform.web.security.security.CookieTokenService;
 import org.exoplatform.web.security.sso.SSOHelper;
 
-public class LoginHandler extends WebRequestHandler {
+public class LoginHandler extends JspBasedWebHandler {
 
   private static final Log        LOG                        = ExoLogger.getLogger(LoginHandler.class);
 
@@ -81,17 +71,13 @@ public class LoginHandler extends WebRequestHandler {
 
   private PortalContainer         container;
 
+  private AuthenticationRegistry  authenticationRegistry;
+
   private OrganizationService     organizationService;
-
-  private LocaleConfigService     localeConfigService;
-
-  private BrandingService         brandingService;
 
   private PasswordRecoveryService passwordRecoveryService;
 
   private JavascriptConfigService javascriptConfigService;
-
-  private SkinService             skinService;
 
   private SSOHelper               ssoHelper;
 
@@ -101,20 +87,20 @@ public class LoginHandler extends WebRequestHandler {
 
   public LoginHandler(PortalContainer container, // NOSONAR
                       OrganizationService organizationService,
+                      PasswordRecoveryService passwordRecoveryService,
+                      AuthenticationRegistry authenticationRegistry,
                       LocaleConfigService localeConfigService,
                       BrandingService brandingService,
-                      PasswordRecoveryService passwordRecoveryService,
                       JavascriptConfigService javascriptConfigService,
                       SkinService skinService,
                       SSOHelper ssoHelper,
                       InitParams params) {
+    super(localeConfigService, brandingService, javascriptConfigService, skinService);
     this.container = container;
     this.organizationService = organizationService;
-    this.localeConfigService = localeConfigService;
-    this.brandingService = brandingService;
+    this.authenticationRegistry = authenticationRegistry;
     this.passwordRecoveryService = passwordRecoveryService;
     this.javascriptConfigService = javascriptConfigService;
-    this.skinService = skinService;
     this.ssoHelper = ssoHelper;
     if (params != null) {
       if (params.containsKey(LOGIN_JSP_PATH_PARAM)) {
@@ -139,12 +125,11 @@ public class LoginHandler extends WebRequestHandler {
   @Override
   public void onInit(WebAppController controller, ServletConfig servletConfig) {
     this.servletContext = container.getPortalContext();
-
     // Register WCI authentication listener, which is used to bind credentials
     // to temporary authentication registry after each successful login
     ServletContainerFactory.getServletContainer().addAuthenticationListener(event -> {
       if (event.getType() == AuthenticationEventType.LOGIN) {
-        bindCredentialsToAuthenticationRegistry(container, event.getRequest(), event.getCredentials());
+        authenticationRegistry.setCredentials(event.getRequest(), event.getCredentials());
       }
     });
   }
@@ -310,146 +295,6 @@ public class LoginHandler extends WebRequestHandler {
     }
   }
 
-  private void dispatch(ControllerContext controllerContext, String dispatchPath, LoginStatus status) throws Exception {
-    HttpServletRequest request = controllerContext.getRequest();
-    HttpServletResponse response = controllerContext.getResponse();
-
-    LocaleConfig localeConfig = request.getLocale() == null ? localeConfigService.getDefaultLocaleConfig()
-                                                            : localeConfigService.getLocaleConfig(request.getLocale()
-                                                                                                         .getLanguage());
-    if (localeConfig == null) {
-      localeConfig = localeConfigService.getDefaultLocaleConfig();
-    }
-    request.setAttribute("localeConfig", localeConfig);
-
-    Locale locale = localeConfig.getLocale();
-
-    JavascriptManager javascriptManager = new JavascriptManager();
-    javascriptManager.loadScriptResource(ResourceScope.SHARED, "bootstrap");
-    javascriptManager.loadScriptResource(ResourceScope.PORTLET, "social-portlet/Login");
-
-    JSONObject params = new JSONObject();
-
-    String initialURI = getInitalUri(request);
-    params.put("initialUri", EntityEncoder.FULL.encode(initialURI));
-
-    String companyName = brandingService.getCompanyName();
-    params.put("companyName", companyName);
-
-    String forgotPasswordPath = passwordRecoveryService.getPasswordRecoverURL(null, null);
-    params.put("forgotPasswordPath", request.getContextPath() + forgotPasswordPath);
-
-    if (status != LoginStatus.AUTHENTICATED && status != LoginStatus.UNAUTHENTICATED) {
-      params.put("errorCode", status.getErrorCode());
-    }
-
-    String brandingLogo = "/" + PortalContainer.getCurrentPortalContainerName() + "/"
-        + PortalContainer.getCurrentRestContextName() + "/v1/platform/branding/logo?v=" + brandingService.getLastUpdatedTime();
-    params.put("brandingLogo", brandingLogo);
-
-    List<LoginParamsExtension> paramsExtensions = this.container.getComponentInstancesOfType(LoginParamsExtension.class);
-    if (CollectionUtils.isNotEmpty(paramsExtensions)) {
-      paramsExtensions.forEach(paramsExtension -> {
-        Map<String, Object> extendedParams = paramsExtension.extendLoginParameters(controllerContext);
-        if (MapUtils.isNotEmpty(extendedParams)) {
-          extendedParams.forEach((key, value) -> {
-            try {
-              params.put(key, value);
-            } catch (Exception e) {
-              LOG.warn("Error while adding {}/{} in login params map", key, value, e);
-            }
-          });
-        }
-      });
-    }
-
-    javascriptManager.require("PORTLET/social-portlet/Login", "loginApp").addScripts("loginApp.init(" + params.toString() + ");");
-
-    JSONObject jsConfig = javascriptConfigService.getJSConfig(controllerContext, locale);
-    request.setAttribute("jsConfig", jsConfig.toString());
-
-    if (jsConfig.has(JS_PATHS_PARAM)) {
-      JSONObject jsConfigPaths = jsConfig.getJSONObject(JS_PATHS_PARAM);
-      addLoginExtensionModules(javascriptManager, jsConfigPaths);
-
-      LinkedList<String> headerScripts = getHeaderScripts(javascriptManager, jsConfigPaths);
-      request.setAttribute("headerScripts", headerScripts);
-
-      Set<String> pageScripts = getPageScripts(javascriptManager, jsConfigPaths);
-      request.setAttribute("pageScripts", pageScripts);
-    }
-    request.setAttribute("inlineScripts", javascriptManager.getJavaScripts());
-
-    String brandingPrimaryColor = brandingService.getThemeColors().get("primaryColor");
-    String brandingThemeUrl = "/" + PortalContainer.getCurrentPortalContainerName() + "/"
-        + PortalContainer.getCurrentRestContextName() + "/v1/platform/branding/css?v=" + brandingService.getLastUpdatedTime();
-
-    request.setAttribute("brandingPrimaryColor", brandingPrimaryColor);
-    request.setAttribute("brandingThemeUrl", brandingThemeUrl);
-
-    List<String> skinUrls = getPageSkins(controllerContext, localeConfig.getOrientation());
-    request.setAttribute("skinUrls", skinUrls);
-
-    servletContext.getRequestDispatcher(dispatchPath).include(request, response);
-  }
-
-  private List<String> getPageSkins(ControllerContext controllerContext, Orientation orientation) {
-    String skinName = skinService.getDefaultSkin();
-
-    List<SkinConfig> skins = new ArrayList<>();
-
-    Collection<SkinConfig> portalSkins = skinService.getPortalSkins(skinName);
-    skins.addAll(portalSkins);
-
-    SkinConfig loginSkin = skinService.getSkin("portal/login", skinName);
-    skins.add(loginSkin);
-
-    Collection<SkinConfig> customSkins = skinService.getCustomPortalSkins(skinName);
-    skins.addAll(customSkins);
-    return skins.stream().map(skin -> {
-      SkinURL url = skin.createURL(controllerContext);
-      url.setOrientation(orientation);
-      return url.toString();
-    }).collect(Collectors.toList());
-  }
-
-  private Set<String> getPageScripts(JavascriptManager javascriptManager, JSONObject jsConfigPaths) throws JSONException {
-    Set<String> pageScripts = new HashSet<>();
-    Map<String, Boolean> scriptsIdsMap = javascriptManager.getPageScripts();
-    for (Entry<String, Boolean> scriptEntry : scriptsIdsMap.entrySet()) {
-      boolean isRemote = scriptEntry.getValue().booleanValue();
-      String scriptId = scriptEntry.getKey();
-      if (!isRemote && jsConfigPaths.has(scriptId)) {
-        String scriptPath = jsConfigPaths.getString(scriptId) + ".js";
-        pageScripts.add(scriptPath);
-      }
-    }
-    return pageScripts;
-  }
-
-  private LinkedList<String> getHeaderScripts(JavascriptManager javascriptManager,
-                                              JSONObject jsConfigPaths) throws JSONException {
-    Map<String, Boolean> scriptsURLs = getScripts(javascriptManager);
-    LinkedList<String> headerScripts = new LinkedList<>();
-    for (Entry<String, Boolean> moduleEntry : scriptsURLs.entrySet()) {
-      String module = moduleEntry.getKey();
-      String url = jsConfigPaths.has(module) ? jsConfigPaths.getString(module) : null;
-      headerScripts.add(url != null ? url + ".js" : module);
-    }
-    return headerScripts;
-  }
-
-  private void addLoginExtensionModules(JavascriptManager javascriptManager, JSONObject jsConfigPaths) {
-    @SuppressWarnings("unchecked")
-    Iterator<String> keys = jsConfigPaths.keys();
-    while (keys.hasNext()) {
-      String module = keys.next();
-      if (module.contains(LOGIN_EXTENSION_JS_MODULES)) {
-        javascriptManager.require(module);
-      }
-    }
-  }
-
   private String getInitalUri(HttpServletRequest request) {
     // Obtain initial URI
     String initialURI = request.getParameter("initialURI");
@@ -476,21 +321,6 @@ public class LoginHandler extends WebRequestHandler {
   }
 
   /**
-   * Add credentials to {@link ConversationState}.
-   *
-   * @param credentials the credentials
-   */
-  private static void bindCredentialsToAuthenticationRegistry(ExoContainer container,
-                                                              HttpServletRequest req,
-                                                              Credentials credentials) {
-    AuthenticationRegistry authRegistry = container.getComponentInstanceOfType(AuthenticationRegistry.class);
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("Binding credentials to temporary authentication registry for user " + credentials.getUsername());
-    }
-    authRegistry.setCredentials(req, credentials);
-  }
-
-  /**
    * Get exact username from database
    * 
    * @param username
@@ -511,30 +341,70 @@ public class LoginHandler extends WebRequestHandler {
     return username;
   }
 
-  private Map<String, Boolean> getScripts(JavascriptManager javascriptManager) {
-    FetchMap<ResourceId> requiredResources = javascriptManager.getScriptResources();
-    Map<ScriptResource, FetchMode> resolved = javascriptConfigService.resolveIds(requiredResources);
+  private void dispatch(ControllerContext controllerContext, String dispatchPath, LoginStatus status) throws Exception {
+    HttpServletRequest request = controllerContext.getRequest();
+    HttpServletResponse response = controllerContext.getResponse();
 
-    Map<String, Boolean> ret = new LinkedHashMap<>();
-    Map<String, Boolean> tmp = new LinkedHashMap<>();
-    for (ScriptResource rs : resolved.keySet()) {
-      ResourceId id = rs.getId();
-      // SHARED/bootstrap should be loaded first
-      if (ResourceScope.SHARED.equals(id.getScope()) && "bootstrap".equals(id.getName())) {
-        ret.put(id.toString(), false);
-      } else {
-        boolean isRemote = !rs.isEmpty() && rs.getModules().get(0) instanceof Module.Remote;
-        tmp.put(id.toString(), isRemote);
+    List<String> additionalJSModules = getExtendedJSModules(controllerContext, request);
+    List<String> additionalCSSModules = Collections.singletonList("portal/login");
+
+    super.prepareDispatch(controllerContext,
+                          "PORTLET/social-portlet/Login",
+                          additionalJSModules,
+                          additionalCSSModules,
+                          params -> extendUIParameters(controllerContext, status, params));
+
+    servletContext.getRequestDispatcher(dispatchPath).include(request, response);
+  }
+
+  private List<String> getExtendedJSModules(ControllerContext controllerContext, HttpServletRequest request) throws Exception {
+    List<String> additionalJSModules = new ArrayList<>();
+    JSONObject jsConfig = javascriptConfigService.getJSConfig(controllerContext, request.getLocale());
+    if (jsConfig.has(JS_PATHS_PARAM)) {
+      JSONObject jsConfigPaths = jsConfig.getJSONObject(JS_PATHS_PARAM);
+      @SuppressWarnings("unchecked")
+      Iterator<String> keys = jsConfigPaths.keys();
+      while (keys.hasNext()) {
+        String module = keys.next();
+        if (module.contains(LOGIN_EXTENSION_JS_MODULES)) {
+          additionalJSModules.add(module);
+        }
       }
     }
-    ret.putAll(tmp);
-    for (String url : javascriptManager.getExtendedScriptURLs()) {
-      ret.put(url, true);
-    }
+    return additionalJSModules;
+  }
 
-    //
-    LOG.debug("Resolved resources for page: " + ret);
-    return ret;
+  private void extendUIParameters(ControllerContext controllerContext, LoginStatus status, JSONObject params) {
+    HttpServletRequest request = controllerContext.getRequest();
+    try {
+      String initialURI = getInitalUri(request);
+      params.put("initialUri", EntityEncoder.FULL.encode(initialURI));
+
+      String forgotPasswordPath = passwordRecoveryService.getPasswordRecoverURL(null, null);
+      params.put("forgotPasswordPath", request.getContextPath() + forgotPasswordPath);
+
+      if (status != LoginStatus.AUTHENTICATED && status != LoginStatus.UNAUTHENTICATED) {
+        params.put("errorCode", status.getErrorCode());
+      }
+
+      List<LoginParamsExtension> paramsExtensions = this.container.getComponentInstancesOfType(LoginParamsExtension.class);
+      if (CollectionUtils.isNotEmpty(paramsExtensions)) {
+        paramsExtensions.forEach(paramsExtension -> {
+          Map<String, Object> extendedParams = paramsExtension.extendLoginParameters(controllerContext);
+          if (MapUtils.isNotEmpty(extendedParams)) {
+            extendedParams.forEach((key, value) -> {
+              try {
+                params.put(key, value);
+              } catch (Exception e) {
+                LOG.warn("Error while adding {}/{} in login params map", key, value, e);
+              }
+            });
+          }
+        });
+      }
+    } catch (Exception e) {
+      LOG.warn("Error while computing Login UI parameters", e);
+    }
   }
 
 }
