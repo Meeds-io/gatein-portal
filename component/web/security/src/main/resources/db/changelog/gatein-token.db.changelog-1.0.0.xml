@@ -37,4 +37,9 @@
       <column name="TOKEN_TYPE" type="VARCHAR(250)"/>
     </addColumn>
   </changeSet>
+  <changeSet author="gatein-token" id="1.0.0-5">
+    <modifyDataType tableName="PORTAL_TOKENS"
+                    columnName="PASSWORD"
+                    newDataType="NVARCHAR(500)"/>
+  </changeSet>
 </databaseChangeLog>

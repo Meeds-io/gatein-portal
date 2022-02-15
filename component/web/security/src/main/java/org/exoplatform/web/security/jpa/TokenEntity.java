@@ -34,7 +34,7 @@ public class TokenEntity implements Serializable {
     @Column(name = "USERNAME")
     private String            username;
 
-    @Column(name = "PASSWORD")
+    @Column(name = "PASSWORD", length = 500)
     private String            password;
 
     @Column(name="EXPIRATION_TIME", nullable = false)

@@ -267,7 +267,7 @@ public class LoginHandler extends JspBasedWebHandler {
 
   private void addRememberMeCookie(HttpServletRequest request, HttpServletResponse response, Credentials credentials) {
     String rememberme = request.getParameter(LoginUtils.COOKIE_NAME);
-    if ("true".equals(rememberme)) {
+    if ("true".equals(rememberme) || "on".equals(rememberme)) {
       // Create token for credentials
       CookieTokenService tokenService = AbstractTokenService.getInstance(CookieTokenService.class);
       String cookieToken = tokenService.createToken(credentials);
