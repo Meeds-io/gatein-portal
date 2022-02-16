@@ -76,6 +76,8 @@ public class RememberMeFilter extends AbstractFilter {
                 Cookie cookie = new Cookie(LoginUtils.COOKIE_NAME, "");
                 cookie.setPath(req.getContextPath());
                 cookie.setMaxAge(0);
+                cookie.setHttpOnly(true);
+                cookie.setSecure(req.isSecure());
                 resp.addCookie(cookie);
             }
         }
@@ -114,6 +116,8 @@ public class RememberMeFilter extends AbstractFilter {
                     Cookie cookie = new Cookie(LoginUtils.OAUTH_COOKIE_NAME, "");
                     cookie.setPath(req.getContextPath());
                     cookie.setMaxAge(0);
+                    cookie.setHttpOnly(true);
+                    cookie.setSecure(req.isSecure());
                     resp.addCookie(cookie);
                 }
             }

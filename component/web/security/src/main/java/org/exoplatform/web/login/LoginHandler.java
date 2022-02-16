@@ -279,6 +279,7 @@ public class LoginHandler extends JspBasedWebHandler {
       cookie.setPath("/");
       cookie.setHttpOnly(true);
       cookie.setMaxAge((int) tokenService.getValidityTime());
+      cookie.setSecure(request.isSecure());
       response.addCookie(cookie);
     } else {
       // Handle oauth remember me
@@ -289,6 +290,7 @@ public class LoginHandler extends JspBasedWebHandler {
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         cookie.setMaxAge((int) tokenService.getValidityTime());
+        cookie.setSecure(request.isSecure());
         response.addCookie(cookie);
         request.getSession().removeAttribute(LoginUtils.SESSION_ATTRIBUTE_REMEMBER_ME);
       }
