@@ -11,17 +11,16 @@ import org.exoplatform.portal.jdbc.entity.DescriptionEntity;
 import org.exoplatform.portal.jdbc.entity.DescriptionState;
 
 public class DescriptionDAOImpl extends GenericDAOJPAImpl<DescriptionEntity, Long> implements DescriptionDAO {
-  
+
   @Override
   @ExoTransactional
   public int deleteByRefId(String refId) {
-    DescriptionEntity desc = getByRefId(refId);
+    DescriptionEntity desc = find(Long.parseLong(refId));
     if (desc != null) {
-      this.delete(desc);
-      return 1; 
-    } else {
-      return 0;      
+      delete(desc);
+      return 1;
     }
+    return 0;
   }
 
   @Override
@@ -35,7 +34,7 @@ public class DescriptionDAOImpl extends GenericDAOJPAImpl<DescriptionEntity, Lon
     entity.setLocalized(states);
     if (entity.getId() == null) {
       this.create(entity);
-    } else {      
+    } else {
       this.update(entity);
     }
 
@@ -48,7 +47,7 @@ public class DescriptionDAOImpl extends GenericDAOJPAImpl<DescriptionEntity, Lon
     if (refId == null) {
       throw new IllegalArgumentException("refId , states must not be null");
     }
-    
+
     DescriptionEntity entity = getOrCreate(refId);
     entity.setState(state);
     if (entity.getId() == null) {
@@ -64,12 +63,13 @@ public class DescriptionDAOImpl extends GenericDAOJPAImpl<DescriptionEntity, Lon
     if (refId == null) {
       return null;
     }
-    
-    TypedQuery<DescriptionEntity> query = getEntityManager().createNamedQuery("DescriptionEntity.getByRefId", DescriptionEntity.class);
+
+    TypedQuery<DescriptionEntity> query = getEntityManager().createNamedQuery("DescriptionEntity.getByRefId",
+                                                                              DescriptionEntity.class);
     query.setParameter("refId", refId);
-    
+
     try {
-      return query.getSingleResult();      
+      return query.getSingleResult();
     } catch (NoResultException ex) {
       return null;
     }
@@ -82,5 +82,5 @@ public class DescriptionDAOImpl extends GenericDAOJPAImpl<DescriptionEntity, Lon
       entity.setReferenceId(refId);
     }
     return entity;
-  } 
+  }
 }
