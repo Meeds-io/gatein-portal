@@ -64,8 +64,7 @@ public class DescriptionDAOImpl extends GenericDAOJPAImpl<DescriptionEntity, Lon
       return null;
     }
 
-    TypedQuery<DescriptionEntity> query = getEntityManager().createNamedQuery("DescriptionEntity.getByRefId",
-                                                                              DescriptionEntity.class);
+    TypedQuery<DescriptionEntity> query = getEntityManager().createNamedQuery("DescriptionEntity.getByRefId", DescriptionEntity.class);
     query.setParameter("refId", refId);
 
     try {
