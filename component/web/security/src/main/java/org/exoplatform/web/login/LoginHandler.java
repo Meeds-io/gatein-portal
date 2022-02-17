@@ -55,6 +55,8 @@ import org.exoplatform.web.security.sso.SSOHelper;
 
 public class LoginHandler extends JspBasedWebHandler {
 
+  public static final String      LOGIN_EXTENSION_NAME       = "LoginExtension";
+
   private static final Log        LOG                        = ExoLogger.getLogger(LoginHandler.class);
 
   private static final String     TEXT_HTML_CONTENT_TYPE     = "text/html; charset=UTF-8";
@@ -389,20 +391,22 @@ public class LoginHandler extends JspBasedWebHandler {
         params.put("errorCode", status.getErrorCode());
       }
 
-      List<LoginParamsExtension> paramsExtensions = this.container.getComponentInstancesOfType(LoginParamsExtension.class);
+      List<UIParamsExtension> paramsExtensions = this.container.getComponentInstancesOfType(UIParamsExtension.class);
       if (CollectionUtils.isNotEmpty(paramsExtensions)) {
-        paramsExtensions.forEach(paramsExtension -> {
-          Map<String, Object> extendedParams = paramsExtension.extendLoginParameters(controllerContext);
-          if (MapUtils.isNotEmpty(extendedParams)) {
-            extendedParams.forEach((key, value) -> {
-              try {
-                params.put(key, value);
-              } catch (Exception e) {
-                LOG.warn("Error while adding {}/{} in login params map", key, value, e);
-              }
-            });
-          }
-        });
+        paramsExtensions.stream()
+                        .filter(extension -> extension.getExtensionNames().contains(LOGIN_EXTENSION_NAME))
+                        .forEach(paramsExtension -> {
+                          Map<String, Object> extendedParams = paramsExtension.extendParameters(controllerContext, LOGIN_EXTENSION_NAME);
+                          if (MapUtils.isNotEmpty(extendedParams)) {
+                            extendedParams.forEach((key, value) -> {
+                              try {
+                                params.put(key, value);
+                              } catch (Exception e) {
+                                LOG.warn("Error while adding {}/{} in login params map", key, value, e);
+                              }
+                            });
+                          }
+                        });
       }
     } catch (Exception e) {
       LOG.warn("Error while computing Login UI parameters", e);
