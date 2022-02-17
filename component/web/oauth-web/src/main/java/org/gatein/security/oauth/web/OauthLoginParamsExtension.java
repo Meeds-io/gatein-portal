@@ -26,12 +26,16 @@ import org.gatein.security.oauth.spi.OAuthProviderTypeRegistry;
 import org.json.JSONArray;
 
 import org.exoplatform.web.ControllerContext;
-import org.exoplatform.web.login.LoginParamsExtension;
+import org.exoplatform.web.login.LoginHandler;
+import org.exoplatform.web.login.UIParamsExtension;
 
 /**
  * oAuth Login parameters List
  */
-public class OauthLoginParamsExtension implements LoginParamsExtension {
+public class OauthLoginParamsExtension implements UIParamsExtension {
+
+  private static final List<String> EXTENSION_NAMES                 =
+                                                    Collections.singletonList(LoginHandler.LOGIN_EXTENSION_NAME);
 
   private static final String       OAUTH_ENABLED_PARAM             = "oAuthEnabled";
 
@@ -46,7 +50,12 @@ public class OauthLoginParamsExtension implements LoginParamsExtension {
   }
 
   @Override
-  public Map<String, Object> extendLoginParameters(ControllerContext controllerContext) {
+  public List<String> getExtensionNames() {
+    return EXTENSION_NAMES;
+  }
+
+  @Override
+  public Map<String, Object> extendParameters(ControllerContext controllerContext, String extensionName) {
     if (oAuthProviderTypeRegistry.isOAuthEnabled()
         && CollectionUtils.isNotEmpty(oAuthProviderTypeRegistry.getEnabledOAuthProviders())) {
       Map<String, Object> oAuthProvidersParams = new HashMap<>();
