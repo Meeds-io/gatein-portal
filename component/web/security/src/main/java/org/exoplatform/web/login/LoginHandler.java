@@ -44,7 +44,8 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.*;
 import org.exoplatform.services.resources.LocaleConfigService;
-import org.exoplatform.web.*;
+import org.exoplatform.web.ControllerContext;
+import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.application.JspBasedWebHandler;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.exoplatform.web.login.recovery.PasswordRecoveryService;
@@ -79,8 +80,6 @@ public class LoginHandler extends JspBasedWebHandler {
 
   private PasswordRecoveryService passwordRecoveryService;
 
-  private JavascriptConfigService javascriptConfigService;
-
   private SSOHelper               ssoHelper;
 
   private ServletContext          servletContext;
@@ -102,7 +101,6 @@ public class LoginHandler extends JspBasedWebHandler {
     this.organizationService = organizationService;
     this.authenticationRegistry = authenticationRegistry;
     this.passwordRecoveryService = passwordRecoveryService;
-    this.javascriptConfigService = javascriptConfigService;
     this.ssoHelper = ssoHelper;
     if (params != null) {
       if (params.containsKey(LOGIN_JSP_PATH_PARAM)) {
@@ -396,7 +394,8 @@ public class LoginHandler extends JspBasedWebHandler {
         paramsExtensions.stream()
                         .filter(extension -> extension.getExtensionNames().contains(LOGIN_EXTENSION_NAME))
                         .forEach(paramsExtension -> {
-                          Map<String, Object> extendedParams = paramsExtension.extendParameters(controllerContext, LOGIN_EXTENSION_NAME);
+                          Map<String, Object> extendedParams = paramsExtension.extendParameters(controllerContext,
+                                                                                                LOGIN_EXTENSION_NAME);
                           if (MapUtils.isNotEmpty(extendedParams)) {
                             extendedParams.forEach((key, value) -> {
                               try {

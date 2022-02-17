@@ -133,6 +133,17 @@
       </init-params>
     </component-plugin>
     <component-plugin>
+      <name>RegisterHandler</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.web.register.RegisterHandler</type>
+      <init-params>
+        <value-param>
+          <name>register.jsp.path</name>
+          <value>${exo.register.jsp.path:/WEB-INF/jsp/register/register.jsp}</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+    <component-plugin>
       <name>PasswordRecoveryHandler</name>
       <set-method>register</set-method>
       <type>org.exoplatform.web.login.recovery.PasswordRecoveryHandler</type>
