@@ -461,6 +461,20 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     assertEquals(400, response.getStatus());
     assertNotNull(response.getEntity());
     assertEquals("DisableSuperUser", response.getEntity().toString());
+
+    data.put("userName", USER_2);
+    data.put("lastName", USER_2);
+    data.put("firstName", USER_2);
+    data.put("password", "");
+    data.put("enabled", true);
+    data.put("email", email2);
+    response = getResponse("PUT", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertNull(response.getEntity());
+    assertEquals(204, response.getStatus());
+    user2.setDisplayName(USER_2+" "+USER_2);
+    verify(userHandler, atMost(1)).saveUser(eq(user2), eq(true));
+
   }
 
   public void testDeleteUser() throws Exception {
