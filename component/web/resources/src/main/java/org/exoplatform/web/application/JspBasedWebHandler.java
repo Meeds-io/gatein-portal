@@ -44,17 +44,17 @@ import org.exoplatform.web.application.javascript.JavascriptConfigService;
 
 public abstract class JspBasedWebHandler extends WebRequestHandler {
 
-  private static final Log        LOG            = ExoLogger.getLogger(JspBasedWebHandler.class);
+  private static final Log          LOG            = ExoLogger.getLogger(JspBasedWebHandler.class);
 
-  private static final String     JS_PATHS_PARAM = "paths";
+  protected static final String     JS_PATHS_PARAM = "paths";
 
-  private LocaleConfigService     localeConfigService;
+  protected LocaleConfigService     localeConfigService;
 
-  private BrandingService         brandingService;
+  protected BrandingService         brandingService;
 
-  private JavascriptConfigService javascriptConfigService;
+  protected JavascriptConfigService javascriptConfigService;
 
-  private SkinService             skinService;
+  protected SkinService             skinService;
 
   protected JspBasedWebHandler(LocaleConfigService localeConfigService,
                                BrandingService brandingService,
