@@ -31,7 +31,7 @@
   <description>GateIn web security services</description>
 
   <properties>
-    <exo.test.coverage.ratio>0.22</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.24</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
@@ -55,6 +55,10 @@
     </dependency>
     <dependency>
       <groupId>org.exoplatform.gatein.portal</groupId>
+      <artifactId>exo.portal.component.web.resources</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.web.api</artifactId>
     </dependency>
     <dependency>
@@ -66,8 +70,22 @@
       <artifactId>simplecaptcha</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.exoplatform.gatein.wci</groupId>
+      <artifactId>wci-wci</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-module-junit4</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-mockito2</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -76,8 +94,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.gatein.wci</groupId>
-      <artifactId>wci-wci</artifactId>
+      <groupId>org.exoplatform.kernel</groupId>
+      <artifactId>exo.kernel.container</artifactId>
+      <type>test-jar</type>
     </dependency>
   </dependencies>
 

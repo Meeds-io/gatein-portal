@@ -21,26 +21,21 @@ package org.exoplatform.web.login;
 
 import java.io.IOException;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.*;
+import javax.servlet.http.*;
 
-import org.exoplatform.container.*;
-import org.exoplatform.container.component.ComponentRequestLifecycle;
-import org.exoplatform.container.component.RequestLifeCycle;
-import org.exoplatform.container.web.AbstractFilter;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.User;
-import org.exoplatform.services.organization.UserStatus;
-import org.exoplatform.web.security.AuthenticationRegistry;
-import org.exoplatform.web.security.security.CookieTokenService;
 import org.gatein.wci.ServletContainer;
 import org.gatein.wci.ServletContainerFactory;
 import org.gatein.wci.security.Credentials;
+
+import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.component.ComponentRequestLifecycle;
+import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.container.web.AbstractFilter;
+import org.exoplatform.services.organization.*;
+import org.exoplatform.web.security.AuthenticationRegistry;
+import org.exoplatform.web.security.security.CookieTokenService;
 
 /**
  * The remember me filter performs an authentication using the {@link ServletContainer} when the current request is a GET
@@ -61,7 +56,7 @@ public class RememberMeFilter extends AbstractFilter {
             ServletException {
         ExoContainerContext.setCurrentContainer(getContainer());
         if (req.getRemoteUser() == null) {
-            String token = LoginServlet.getRememberMeTokenCookie(req);
+            String token = LoginUtils.getRememberMeTokenCookie(req);
             if (token != null) {
                 ExoContainer container = getContainer();
                 CookieTokenService tokenservice = container.getComponentInstanceOfType(CookieTokenService.class);
@@ -78,16 +73,18 @@ public class RememberMeFilter extends AbstractFilter {
 
             // Clear token cookie if we did not authenticate
             if (req.getRemoteUser() == null) {
-                Cookie cookie = new Cookie(LoginServlet.COOKIE_NAME, "");
+                Cookie cookie = new Cookie(LoginUtils.COOKIE_NAME, "");
                 cookie.setPath(req.getContextPath());
                 cookie.setMaxAge(0);
+                cookie.setHttpOnly(true);
+                cookie.setSecure(req.isSecure());
                 resp.addCookie(cookie);
             }
         }
 
         //Process oauth rememberMe
         if(req.getRemoteUser() == null) {
-            String token = LoginServlet.getOauthRememberMeTokenCookie(req);
+            String token = LoginUtils.getOauthRememberMeTokenCookie(req);
             if(token != null) {
                 ExoContainer container = getContainer();
                 CookieTokenService tokenService = container.getComponentInstanceOfType(CookieTokenService.class);
@@ -116,9 +113,11 @@ public class RememberMeFilter extends AbstractFilter {
 
                 // Clear token cookie if we did not authenticate
                 if (req.getRemoteUser() == null) {
-                    Cookie cookie = new Cookie(LoginServlet.OAUTH_COOKIE_NAME, "");
+                    Cookie cookie = new Cookie(LoginUtils.OAUTH_COOKIE_NAME, "");
                     cookie.setPath(req.getContextPath());
                     cookie.setMaxAge(0);
+                    cookie.setHttpOnly(true);
+                    cookie.setSecure(req.isSecure());
                     resp.addCookie(cookie);
                 }
             }

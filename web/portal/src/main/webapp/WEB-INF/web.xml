@@ -249,11 +249,6 @@
   </servlet>
 
   <servlet>
-    <servlet-name>LoginServlet</servlet-name>
-    <servlet-class>org.exoplatform.web.login.LoginServlet</servlet-class>
-  </servlet>
-
-  <servlet>
     <servlet-name>GateInServlet</servlet-name>
     <servlet-class>org.gatein.wci.api.GateInServlet</servlet-class>
     <load-on-startup>0</load-on-startup>
@@ -285,16 +280,6 @@
   <servlet-mapping>
     <servlet-name>accountSetupViewServlet</servlet-name>
     <url-pattern>/accountSetup</url-pattern>
-  </servlet-mapping>
-  
-  
-  <servlet-mapping>
-    <servlet-name>LoginServlet</servlet-name>
-    <url-pattern>/login</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>LoginServlet</servlet-name>
-    <url-pattern>/dologin</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

@@ -144,7 +144,7 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
             Credentials credentials = service.verifyToken(tokenId,remindPasswordTokenService.EXTERNAL_REGISTRATION_TOKEN);;
             if (credentials == null) {
                 //. TokenId is expired
-                return dispatch("/externalRegistration/jsp/token_expired.jsp", servletContext, req, res);
+                return dispatch("/WEB-INF/jsp/externalRegistration/token_expired.jsp", servletContext, req, res);
             }
             String email = credentials.getUsername();
             String currentPortalContainerName = PortalContainer.getCurrentPortalContainerName();
@@ -216,7 +216,7 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
                         req.setAttribute("lastName", reqLastName);
                         req.setAttribute("errors", errors);
                         req.setAttribute("tokenId", tokenId);
-                        return dispatch("/externalRegistration/jsp/reset_password.jsp", servletContext, req, res);
+                        return dispatch("/WEB-INF/jsp/externalRegistration/reset_password.jsp", servletContext, req, res);
                     }
                     res.sendRedirect("/" + currentPortalContainerName + LOGIN + "?email=" + email);
                     return true;
@@ -234,7 +234,7 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
               res.sendRedirect("/" + currentPortalContainerName + LOGIN + "?email=" + email);
               return true;
             }
-            return dispatch("/externalRegistration/jsp/reset_password.jsp", servletContext, req, res);
+            return dispatch("/WEB-INF/jsp/externalRegistration/reset_password.jsp", servletContext, req, res);
         }
         return false;
     }

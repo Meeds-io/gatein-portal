@@ -118,6 +118,47 @@
   <external-component-plugins>
     <target-component>org.exoplatform.web.WebAppController</target-component>
     <component-plugin>
+      <name>LoginHandler</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.web.login.LoginHandler</type>
+      <init-params>
+        <value-param>
+          <name>login.jsp.path</name>
+          <value>${exo.login.jsp.path:/WEB-INF/jsp/login/login.jsp}</value>
+        </value-param>
+        <value-param>
+          <name>username.case.insensitive</name>
+          <value>${exo.auth.case.insensitive:true}</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+    <component-plugin>
+      <name>RegisterHandler</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.web.register.RegisterHandler</type>
+      <init-params>
+        <value-param>
+          <name>register.jsp.path</name>
+          <value>${exo.register.jsp.path:/WEB-INF/jsp/register/register.jsp}</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+    <component-plugin>
+      <name>PasswordRecoveryHandler</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.web.login.recovery.PasswordRecoveryHandler</type>
+    </component-plugin>
+    <component-plugin>
+      <name>OnboardingHandler</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.web.login.onboarding.OnboardingHandler</type>
+    </component-plugin>
+    <component-plugin>
+      <name>ExternalRegistrationHandler</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.web.login.externalRegistration.ExternalRegistrationHandler</type>
+    </component-plugin>
+    <component-plugin>
       <name>UploadHandler</name>
       <set-method>register</set-method>
       <type>org.exoplatform.web.handler.UploadHandler</type>
@@ -162,17 +203,6 @@
       <name>StaticResourceRequestHandler</name>
       <set-method>register</set-method>
       <type>org.exoplatform.portal.application.StaticResourceRequestHandler</type>
-    </component-plugin>
-    <component-plugin>
-      <name>StandaloneAppRequestHandler</name>
-      <set-method>register</set-method>
-      <type>org.exoplatform.portal.application.StandaloneAppRequestHandler</type>
-      <init-params>
-        <value-param>
-          <name>webui.configuration</name>
-          <value>app:/WEB-INF/standalone-webui-configuration.xml</value>
-        </value-param>
-      </init-params>
     </component-plugin>
   </external-component-plugins>
 

@@ -31,6 +31,7 @@
   <import>war:/conf/common/autologin-configuration.xml</import>
   <import>war:/conf/common/remindpwd-configuration.xml</import>
   <import>war:/conf/common/encoder-configuration.xml</import>
+  <import>war:/conf/common/onboarding-configuration.xml</import>
 
   <!--PicketLink IDM integration-->
   <import>war:/conf/organization/idm-configuration.xml</import>
