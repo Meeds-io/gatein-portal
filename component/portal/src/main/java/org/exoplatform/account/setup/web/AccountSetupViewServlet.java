@@ -3,9 +3,7 @@ package org.exoplatform.account.setup.web;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 
 import org.exoplatform.container.PortalContainer;
 
@@ -20,12 +18,19 @@ public class AccountSetupViewServlet extends HttpServlet {
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    accountSetupService = PortalContainer.getInstance().getComponentInstanceOfType(AccountSetupService.class);
-
+    PortalContainer container = PortalContainer.getInstance();
+    accountSetupService = container.getComponentInstanceOfType(AccountSetupService.class);
     if (accountSetupService.mustSkipAccountSetup()) {
       response.sendRedirect("/");
     } else {
-      getServletContext().getRequestDispatcher(AS_JSP_RESOURCE).forward(request, response);
+      // Redirect to requested page
+      HttpServletRequest wrappedRequest = new HttpServletRequestWrapper(request) {
+        @Override
+        public String getContextPath() {
+          return "/portal";
+        }
+      };
+      container.getPortalContext().getRequestDispatcher(AS_JSP_RESOURCE).forward(wrappedRequest, response);
     }
   }
 
