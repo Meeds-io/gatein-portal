@@ -15,12 +15,13 @@ public class DescriptionDAOImpl extends GenericDAOJPAImpl<DescriptionEntity, Lon
   @Override
   @ExoTransactional
   public int deleteByRefId(String refId) {
-    DescriptionEntity desc = find(Long.parseLong(refId));
+    DescriptionEntity desc = getByRefId(refId);
     if (desc != null) {
-      delete(desc);
+      this.delete(desc);
       return 1;
+    } else {
+      return 0;
     }
-    return 0;
   }
 
   @Override

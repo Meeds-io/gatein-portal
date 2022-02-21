@@ -71,7 +71,7 @@ public class NodeEntity implements Serializable {
   @Column(name = "NODE_INDEX")
   private int               index;
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "parent", orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "parent")
   @OrderBy("index ASC")
   private List<NodeEntity>  children         = new ArrayList<>();
 
