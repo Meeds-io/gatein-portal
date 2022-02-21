@@ -304,6 +304,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
       user.setFirstName(firstName);
       user.setLastName(lastName);
       user.setPassword(password);
+      user.setDisplayName(firstName+" "+lastName);
       organizationService.getUserHandler().saveUser(user, true);
     }
 
