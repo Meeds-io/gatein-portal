@@ -18,9 +18,9 @@ public class DescriptionDAOImpl extends GenericDAOJPAImpl<DescriptionEntity, Lon
     DescriptionEntity desc = getByRefId(refId);
     if (desc != null) {
       this.delete(desc);
-      return 1;
+      return 1; 
     } else {
-      return 0;
+      return 0;      
     }
   }
 
