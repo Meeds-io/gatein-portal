@@ -33,6 +33,7 @@ public class JPAGateInTokenStorage implements GateInTokenStore {
         entity.setUsername(data.payload.getUsername());
         entity.setPassword(data.payload.getPassword());
         entity.setExpirationTime(data.expirationTime);
+        entity.setTokenType(data.tokenType);
 
         this.tokenDAO.create(entity);
     }
@@ -43,11 +44,11 @@ public class JPAGateInTokenStorage implements GateInTokenStore {
         TokenEntity entity = this.tokenDAO.findByTokenId(tokenId);
         if (entity != null) {
             return new TokenData(entity.getTokenId(), entity.getTokenHash(),
-                    new Credentials(entity.getUsername(), entity.getPassword()), entity.getExpirationTime());
+                    new Credentials(entity.getUsername(), entity.getPassword()), entity.getExpirationTime(), entity.getTokenType());
         }
         return null;
     }
-
+    
     @Override
     @ExoTransactional
     public void deleteToken(String tokenId) {
@@ -82,5 +83,13 @@ public class JPAGateInTokenStorage implements GateInTokenStore {
     @ExoTransactional
     public long size() {
         return this.tokenDAO.count();
+    }
+
+    @Override
+    @ExoTransactional
+    public void deleteTokensByUsernameAndType(String username, String tokenType) {
+      
+      this.tokenDAO.deleteTokensByUsernameAndType(username, tokenType);
+      
     }
 }
