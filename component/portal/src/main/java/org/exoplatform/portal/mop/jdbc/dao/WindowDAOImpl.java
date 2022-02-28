@@ -15,6 +15,12 @@ public class WindowDAOImpl extends AbstractDAO<WindowEntity> implements WindowDA
 
   @Override
   @ExoTransactional
+  public WindowEntity find(Long id) {
+    return super.find(id);
+  }
+
+  @Override
+  @ExoTransactional
   public List<Long> findIdsByContentIds(List<String> contentIds, Pagination pagination) {
     if (contentIds == null || contentIds.isEmpty()) {
       return Collections.emptyList();
