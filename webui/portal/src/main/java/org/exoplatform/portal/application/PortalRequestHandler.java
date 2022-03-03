@@ -131,7 +131,9 @@ public class PortalRequestHandler extends WebRequestHandler {
         log.debug("Session ID = " + req.getSession().getId());
 
         // watch out: this might get overriden later, if the portal itself has a configuration for this value
-        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Cache-Control"," no-cache, no-store, must-revalidate");
+        res.setHeader("Pragma","no-cache");
+        res.setHeader("Expires","0 ");
 
         //
         String requestPath = controllerContext.getParameter(REQUEST_PATH);
