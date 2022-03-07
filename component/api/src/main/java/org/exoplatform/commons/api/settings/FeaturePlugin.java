@@ -41,4 +41,8 @@ public abstract class FeaturePlugin extends BaseComponentPlugin {
    */
   public abstract boolean isFeatureActiveForUser(String featureName, String username);
 
+  /**
+   * Initialization feature plugin
+   */
+  public void init() {}
 }
