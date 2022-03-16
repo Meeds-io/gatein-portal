@@ -357,7 +357,7 @@ public class UploadService {
         return upload;
     }
 
-    private boolean isLimited(UploadResource upResource, double contentLength) {
+    public boolean isLimited(UploadResource upResource, double contentLength) {
         // by default, use the limit set in the service
         UploadLimit limit = defaultUploadLimitMB_;
         // if the limit is set in the request (specific for this upload) then use
@@ -375,6 +375,17 @@ public class UploadService {
             return true;
         }
         return false;
+    }
+
+    public UploadLimit getLimitForResource(UploadResource upResource) {
+        // by default, use the limit set in the service
+        UploadLimit limit = defaultUploadLimitMB_;
+        // if the limit is set in the request (specific for this upload) then use
+        // this value instead of the default one
+        if (uploadLimits.containsKey(upResource.getUploadId())) {
+            limit = uploadLimits.get(upResource.getUploadId());
+        }
+        return limit;
     }
 
     public static class UploadLimit {
