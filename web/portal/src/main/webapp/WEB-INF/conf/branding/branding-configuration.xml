@@ -11,6 +11,14 @@
         <value>${exo.branding.company.name:Employee Recognition}</value>
       </value-param>
       <value-param>
+        <name>exo.branding.company.siteName</name>
+        <value>${exo.branding.company.siteName:Meeds}</value>
+      </value-param>
+      <value-param>
+        <name>exo.branding.company.link</name>
+        <value>${exo.branding.company.link:https://meeds.io}</value>
+      </value-param>
+      <value-param>
         <name>exo.branding.company.logo</name>
         <value>${exo.branding.company.logo:/images/logo/MeedsLogo.png}</value>
       </value-param>

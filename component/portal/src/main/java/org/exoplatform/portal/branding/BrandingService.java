@@ -16,7 +16,15 @@ public interface BrandingService {
 
   String getCompanyName();
 
+  String getSiteName();
+
+  String getCompanyLink();
+
   void updateCompanyName(String companyName);
+
+  void updateCompanyLink(String companyLink);
+
+  void updateSiteName(String siteName);
 
   String getTopBarTheme();
 
