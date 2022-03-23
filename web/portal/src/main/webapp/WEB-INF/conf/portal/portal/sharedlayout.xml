@@ -61,12 +61,8 @@
       <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
       <factory-id>addonContainer</factory-id>
     </container>
-    <container id="middle-topNavigation-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
-      <name>middle-topNavigation-container</name>
-      <factory-id>addonContainer</factory-id>
-    </container>
-    <container id="AppCenterAppLauncherPortlet" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
-      <name>AppCenterAppLauncherPortlet</name>
+    <container id="ChatPortlet" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
+      <name>ChatPortlet</name>
       <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
       <factory-id>addonContainer</factory-id>
     </container>
@@ -75,9 +71,23 @@
       <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
       <factory-id>addonContainer</factory-id>
     </container>
+    <container id="AppCenterAppLauncherPortlet" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
+      <name>AppCenterAppLauncherPortlet</name>
+      <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
+      <factory-id>addonContainer</factory-id>
+    </container>
+    <container id="TimeTrackerPortlet" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
+      <name>TimeTrackerPortlet</name>
+      <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
+      <factory-id>addonContainer</factory-id>
+    </container>
     <container id="DrawerAdminToolBarPortlet" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
       <name>DrawerAdminToolBarPortlet</name>
       <access-permissions>manager:/platform/administrators;editor:/platform/web-contributors</access-permissions>
+      <factory-id>addonContainer</factory-id>
+    </container>
+    <container id="middle-topNavigation-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
+      <name>middle-topNavigation-container</name>
       <factory-id>addonContainer</factory-id>
     </container>
     <container id="TopbarLoadingContainer" template="system:/groovy/portal/webui/container/UITopbarLoadingContainer.gtmpl">
