@@ -51,9 +51,13 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   public static final String   BRANDING_COMPANY_NAME_INIT_PARAM  = "exo.branding.company.name";
 
+  public static final String   BRANDING_COMPANY_LINK_INIT_PARAM  = "exo.branding.company.link";
+
   public static final String   BRANDING_LOGO_INIT_PARAM          = "exo.branding.company.logo";
 
   public static final String   BRANDING_COMPANY_NAME_SETTING_KEY = "exo.branding.company.name";
+
+  public static final String   BRANDING_COMPANY_LINK_SETTING_KEY = "exo.branding.company.link";
 
   public static final String   BRANDING_THEME_LESS_PATH          = "exo.branding.theme.path";
   
@@ -86,6 +90,8 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   private ConfigurationManager configurationManager;
 
   private String               defaultCompanyName                = "";
+
+  private String               defaultCompanyLink                = "";
 
   private String               defaultTopbarTheme                = "Dark";
 
@@ -138,6 +144,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   public Branding getBrandingInformation() {
     Branding branding = new Branding();
     branding.setCompanyName(getCompanyName());
+    branding.setCompanyLink(getCompanyLink());
     branding.setTopBarTheme(getTopBarTheme());
     branding.setLogo(getLogo());
     branding.setThemeColors(getThemeColors());
@@ -158,6 +165,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   public void updateBrandingInformation(Branding branding) {
     try {
       updateCompanyName(branding.getCompanyName(), false);
+      updateCompanyLink(branding.getCompanyLink(), false);
       updateTopBarTheme(branding.getTopBarTheme(), false);
       updateLogo(branding.getLogo(), false);
       updateThemeColors(branding.getThemeColors(), false);
@@ -179,8 +187,25 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   }
 
   @Override
+  public String getCompanyLink() {
+    SettingValue<String> brandingCompanyLink = (SettingValue<String>) settingService.get(Context.GLOBAL,
+                                                                                         Scope.GLOBAL,
+                                                                                         BRANDING_COMPANY_LINK_SETTING_KEY);
+    if (brandingCompanyLink != null && StringUtils.isNotBlank(brandingCompanyLink.getValue())) {
+      return brandingCompanyLink.getValue();
+    } else {
+      return defaultCompanyLink;
+    }
+  }
+
+  @Override
   public void updateCompanyName(String companyName) {
     updateCompanyName(companyName, true);
+  }
+
+  @Override
+  public void updateCompanyLink(String companyLink) {
+    updateCompanyLink(companyLink, true);
   }
 
   @Override
@@ -311,6 +336,11 @@ public class BrandingServiceImpl implements BrandingService, Startable {
         this.defaultCompanyName = companyNameParam.getValue();
       }
 
+      ValueParam companyLinkParam = initParams.getValueParam(BRANDING_COMPANY_LINK_INIT_PARAM);
+      if (companyLinkParam != null) {
+        this.defaultCompanyLink = companyLinkParam.getValue();
+      }
+
       ValueParam logoParam = initParams.getValueParam(BRANDING_LOGO_INIT_PARAM);
       if (logoParam != null) {
         this.defaultConfiguredLogoPath = logoParam.getValue();
@@ -341,6 +371,17 @@ public class BrandingServiceImpl implements BrandingService, Startable {
       settingService.remove(Context.GLOBAL, Scope.GLOBAL, BRANDING_TOPBAR_THEME_SETTING_KEY);
     } else {
       settingService.set(Context.GLOBAL, Scope.GLOBAL, BRANDING_TOPBAR_THEME_SETTING_KEY, SettingValue.create(topBarTheme));
+    }
+    if (updateLastUpdatedTime) {
+      updateLastUpdatedTime(System.currentTimeMillis());
+    }
+  }
+
+  private void updateCompanyLink(String companyLink, boolean updateLastUpdatedTime) {
+    if (StringUtils.isEmpty(companyLink)) {
+      settingService.remove(Context.GLOBAL, Scope.GLOBAL, BRANDING_COMPANY_LINK_SETTING_KEY);
+    } else {
+      settingService.set(Context.GLOBAL, Scope.GLOBAL, BRANDING_COMPANY_LINK_SETTING_KEY, SettingValue.create(companyLink));
     }
     if (updateLastUpdatedTime) {
       updateLastUpdatedTime(System.currentTimeMillis());

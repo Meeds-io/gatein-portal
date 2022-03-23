@@ -37,6 +37,10 @@ public class BrandingServiceImplTest {
     companyName.setName(BrandingServiceImpl.BRANDING_COMPANY_NAME_INIT_PARAM);
     companyName.setValue("Default Company Name");
     initParams.addParam(companyName);
+    ValueParam companyLink = new ValueParam();
+    companyLink.setName(BrandingServiceImpl.BRANDING_COMPANY_LINK_INIT_PARAM);
+    companyLink.setValue("https://meeds.io");
+    initParams.addParam(companyLink);
 
     BrandingService brandingService = new BrandingServiceImpl(configurationManager, settingService, fileService, uploadService, initParams);
 
@@ -46,6 +50,7 @@ public class BrandingServiceImplTest {
     // Then
     assertNotNull(brandingInformation);
     assertEquals("Default Company Name", brandingInformation.getCompanyName());
+    assertEquals("https://meeds.io", brandingInformation.getCompanyLink());
   }
 
   @Test
@@ -167,6 +172,7 @@ public class BrandingServiceImplTest {
     // Given
     SettingService settingService = mock(SettingService.class);
     when(settingService.get(eq(Context.GLOBAL), eq(Scope.GLOBAL), eq(BrandingServiceImpl.BRANDING_COMPANY_NAME_SETTING_KEY))).thenReturn(new SettingValue("Updated Company Name"));
+    when(settingService.get(eq(Context.GLOBAL), eq(Scope.GLOBAL), eq(BrandingServiceImpl.BRANDING_COMPANY_LINK_SETTING_KEY))).thenReturn(new SettingValue("https://investors.meeds.io"));
     FileService fileService = mock(FileService.class);
     UploadService uploadService = mock(UploadService.class);
     ConfigurationManager configurationManager = mock(ConfigurationManager.class);
@@ -176,6 +182,10 @@ public class BrandingServiceImplTest {
     companyName.setName(BrandingServiceImpl.BRANDING_COMPANY_NAME_INIT_PARAM);
     companyName.setValue("Default Company Name");
     initParams.addParam(companyName);
+    ValueParam companyLink = new ValueParam();
+    companyLink.setName(BrandingServiceImpl.BRANDING_COMPANY_LINK_INIT_PARAM);
+    companyLink.setValue("https://meeds.io");
+    initParams.addParam(companyLink);
 
     BrandingService brandingService = new BrandingServiceImpl(configurationManager, settingService, fileService, uploadService, initParams);
 
@@ -185,6 +195,7 @@ public class BrandingServiceImplTest {
     // Then
     assertNotNull(brandingInformation);
     assertEquals("Updated Company Name", brandingInformation.getCompanyName());
+    assertEquals("https://investors.meeds.io", brandingInformation.getCompanyLink());
   }
 
   @Test

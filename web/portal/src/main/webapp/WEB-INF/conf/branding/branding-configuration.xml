@@ -11,6 +11,10 @@
         <value>${exo.branding.company.name:Employee Recognition}</value>
       </value-param>
       <value-param>
+        <name>exo.branding.company.link</name>
+        <value>${exo.branding.company.link:}</value>
+      </value-param>
+      <value-param>
         <name>exo.branding.company.logo</name>
         <value>${exo.branding.company.logo:/images/logo/MeedsLogo.png}</value>
       </value-param>

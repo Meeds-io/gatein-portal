@@ -9,6 +9,8 @@ public class Branding implements Serializable {
 
   private String companyName;
 
+  private String companyLink;
+
   private String topBarTheme;
 
   private Logo logo;
@@ -26,6 +28,14 @@ public class Branding implements Serializable {
 
   public void setCompanyName(String companyName) {
     this.companyName = companyName;
+  }
+
+  public String getCompanyLink() {
+    return companyLink;
+  }
+
+  public void setCompanyLink(String companyLink) {
+    this.companyLink = companyLink;
   }
 
   public String getTopBarTheme() {
