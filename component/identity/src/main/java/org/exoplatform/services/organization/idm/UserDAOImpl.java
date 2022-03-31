@@ -22,9 +22,12 @@ package org.exoplatform.services.organization.idm;
 import static org.exoplatform.services.organization.idm.EntityMapperUtils.ORIGINATING_STORE;
 
 import java.text.DateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import org.exoplatform.services.log.LogLevel;
+import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 import org.picketlink.idm.api.*;
 import org.picketlink.idm.api.query.UserQueryBuilder;
 import org.picketlink.idm.impl.api.SimpleAttribute;
@@ -42,7 +45,7 @@ import org.exoplatform.services.organization.externalstore.IDMExternalStoreServi
  */
 public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
-  private List<UserEventListener> listeners_           = new ArrayList<UserEventListener>(3);
+  private List<UserEventListener> listeners_ = new ArrayList<UserEventListener>(3);
 
   public static final String      USER_PASSWORD        = EntityMapperUtils.USER_PASSWORD;
 
@@ -67,6 +70,10 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
   public static final Set<String> USER_NON_PROFILE_KEYS;
 
   public static final DateFormat  dateFormat           = DateFormat.getInstance();
+
+  private static final String BAD_PASSWORD_COUNT = "badPasswordCount";
+
+  private static final String BAD_PASSWORD_TIME = "badPasswordTime";
 
   static {
     Set<String> keys = new HashSet<String>();
@@ -370,15 +377,24 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         throw new DisabledUserException(username);
       }
 
-      if (user.isInternalStore()) {
-        authenticated = authenticateDB(user, password);
-        if (authenticated) {
-          return true;
+      if (!isAccountLocked(user)) {
+        if (user.isInternalStore()) {
+          authenticated = authenticateDB(user, password);
+          if (authenticated) {
+            resetBadPassordCount(user.getUserName());
+            return true;
+          }
         }
       }
     }
 
-    return authenticateExternal(username, password);
+    authenticated = authenticateExternal(username, password);
+    if (!authenticated) {
+      saveLastLoginFail(username);
+    } else {
+      resetBadPassordCount(username);
+    }
+    return authenticated;
   }
 
   public boolean authenticateExternal(String username, String password) throws Exception {
@@ -395,6 +411,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
   }
 
   //
+
   public boolean authenticateDB(User user, String password) throws Exception {
     boolean authenticated = false;
 
@@ -419,7 +436,6 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
     return authenticated;
   }
-
   public LazyPageList findUsers(Query q) throws Exception {
     if (log.isTraceEnabled()) {
       Tools.logMethodIn(log, LogLevel.TRACE, "findUsers", new Object[] { "q", q });
@@ -430,8 +446,8 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
     return new LazyPageList(list, 20);
   }
 
-  //
 
+  //
   public ListAccess<User> findUsersByQuery(Query q) throws Exception {
     return findUsersByQuery(q, UserStatus.ENABLED);
   }
@@ -639,7 +655,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
     return new IDMUserListAccess(qb, 20, false, countPaginatedUsers(), userStatus);
   }
-  
+
   @Override
   public ListAccess<User> findUsersByGroupId(String groupId, UserStatus userStatus) throws Exception {
     if (log.isTraceEnabled()) {
@@ -695,8 +711,8 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
     return new IDMUserListAccess(qb, 20, false, countPaginatedUsers(), userStatus);
   }
 
-  //
 
+  //
   private void preSave(User user, boolean isNew) throws Exception {
     for (UserEventListener listener : listeners_) {
       listener.preSave(user, isNew);
@@ -885,6 +901,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
   // previously.
   // We need to ask if current User has displayName set previously and if yes,
   // it needs to be removed.
+
   private void removeDisplayNameIfNeeded(AttributesManager am, User user) throws Exception {
     try {
       Attribute attr = am.getAttribute(user.getUserName(), USER_DISPLAY_NAME);
@@ -895,7 +912,6 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
       handleException("Cannot remove displayName attribute of user: " + user.getUserName() + "; ", e);
     }
   }
-
   private UserQueryBuilder addEnabledUserFilter(UserQueryBuilder qb) throws Exception {
     return qb.attributeValuesFilter(USER_ENABLED, new String[] {});
   }
@@ -914,5 +930,114 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
   private boolean disableUserActived() {
     return orgService.getConfiguration().isDisableUserActived();
+  }
+
+  private void saveLastLoginFail(String username) {
+    try {
+      User user = orgService.getUserHandler().findUserByName(username);
+      if (user != null) {
+        UserProfile profile = orgService.getUserProfileHandler().findUserProfileByName(username);
+        if (profile == null) {
+          profile = orgService.getUserProfileHandler().createUserProfileInstance(username);
+        }
+        int currentNbFail = profile.getAttribute(BAD_PASSWORD_COUNT) != null ?
+                            Integer.parseInt(profile.getAttribute(BAD_PASSWORD_COUNT)) : 0;
+        currentNbFail++;
+        profile.setAttribute(BAD_PASSWORD_COUNT, String.valueOf(currentNbFail));
+        Instant now = Instant.now();
+        profile.setAttribute(BAD_PASSWORD_TIME, String.valueOf(now.toEpochMilli()));
+        orgService.getUserProfileHandler().saveUserProfile(profile, true);
+
+        if (currentNbFail >= orgService.getConfiguration().getMaxBadPasswordCount()) {
+          log.warn("service=login" + " operation=login" + " status=ko"
+              + " parameters=\"username:{}, badPasswordCount:{}, maxBadPasswordCount:{}, badPasswordTime={}, "
+              + "lockTimeInMinutes={}, unlockTime={}\"" + " error_msg=\"Account is locked\"",
+                   user.getUserName(),
+                   currentNbFail,
+                   orgService.getConfiguration().getMaxBadPasswordCount(),
+                   now,
+                   orgService.getConfiguration().getBlockingTime(),
+                   now.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES));
+          ExoContainer container = ExoContainerContext.getCurrentContainer();
+          PasswordRecoveryService passwordRecoveryService = container.getComponentInstanceOfType(PasswordRecoveryService.class);
+          passwordRecoveryService.sendAccountLockedEmail(user, Locale.ENGLISH);
+
+        } else {
+          log.warn("service=login" + " operation=login" + " status=ko"
+              + " parameters=\"username:{}, badPasswordCount:{}, badPasswordTime:{}, maxBadPasswordCount:{}\""
+              + " error_msg=\"Login failed\"",
+                   username,
+                   currentNbFail,
+                   now,
+                   orgService.getConfiguration().getMaxBadPasswordCount());
+        }
+      }
+    } catch (Exception e) {
+      log.error("Unable to get gatein user profile for user {}", username, e);
+    }
+
+  }
+
+  private void resetBadPassordCount(String username) {
+    try {
+      User user = orgService.getUserHandler().findUserByName(username);
+      if (user != null) {
+        UserProfile profile = orgService.getUserProfileHandler().findUserProfileByName(username);
+        if (profile == null) {
+          profile = orgService.getUserProfileHandler().createUserProfileInstance(username);
+        }
+        profile.setAttribute(BAD_PASSWORD_COUNT, String.valueOf(0));
+        orgService.getUserProfileHandler().saveUserProfile(profile, true);
+        if (log.isDebugEnabled()) {
+          log.debug("service=login"
+                       + " operation=login"
+                       + " status=ok"
+                       + " parameters=\"username:{}, badPasswordCount:{}, maxBadPasswordCount:{}\"",
+                   username, 0, orgService.getConfiguration().getMaxBadPasswordCount());
+        }
+      }
+    } catch (Exception e) {
+      log.error("Unable to get gatein user profile for user {}", username, e);
+    }
+
+  }
+
+  private boolean isAccountLocked(User user) throws AccountTemporaryLockedException{
+    try {
+      UserProfile profile = orgService.getUserProfileHandler().findUserProfileByName(user.getUserName());
+      if (profile == null) {
+        //if there is no userProfile, the user have never fail his login, we do no lock him
+        return false;
+      }
+      int currentNbFail = profile.getAttribute(BAD_PASSWORD_COUNT) != null ?
+                          Integer.parseInt(profile.getAttribute(BAD_PASSWORD_COUNT)) : 0;
+      Instant badPasswordTime = Instant.ofEpochMilli(Long.parseLong(profile.getAttribute(BAD_PASSWORD_TIME)));
+      if (currentNbFail >= orgService.getConfiguration().getMaxBadPasswordCount()
+          &&
+          badPasswordTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES).isAfter(Instant.now())) {
+
+        log.warn("service=login"
+                     + " operation=login"
+                     + " status=ko"
+                     + " parameters=\"username:{}, badPasswordCount:{}, maxBadPasswordCount:{}, badPasswordTime={}, "
+                     + "lockTimeInMinutes={}, unlockTime={}\""
+            + " error_msg=\"Account is locked\"",
+                 user.getUserName(),
+                 currentNbFail,
+                 orgService.getConfiguration().getMaxBadPasswordCount(),
+                 badPasswordTime,
+                 orgService.getConfiguration().getBlockingTime(),
+                 badPasswordTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES));
+        throw new AccountTemporaryLockedException(user.getUserName(),
+                                                  badPasswordTime.plus(orgService.getConfiguration().getBlockingTime(),
+                                                                       ChronoUnit.MINUTES));
+      }
+    } catch (AccountTemporaryLockedException atle) {
+      throw atle;
+    } catch (Exception e) {
+      log.error("Unable to get gatein user profile for user {}", user.getUserName(), e);
+    }
+    return false;
+
   }
 }

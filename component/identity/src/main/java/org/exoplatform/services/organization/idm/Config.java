@@ -92,6 +92,9 @@ public class Config {
 
     private boolean updateLastLoginTimeAfterAuthentication = true;
 
+    private int maxBadPasswordCount;
+    private int blockingTime;
+
     public Config() {
     }
 
@@ -375,5 +378,21 @@ public class Config {
 
     public void setUseCache(boolean useCache) {
       this.useCache = useCache;
+    }
+
+    public int getMaxBadPasswordCount() {
+        return maxBadPasswordCount;
+    }
+
+    public void setMaxBadPasswordCount(int maxBadPasswordCount) {
+        this.maxBadPasswordCount = maxBadPasswordCount;
+    }
+
+    public int getBlockingTime() {
+        return blockingTime;
+    }
+
+    public void setBlockingTime(int blockingTime) {
+        this.blockingTime = blockingTime;
     }
 }

@@ -34,28 +34,33 @@ public interface PasswordRecoveryService {
   void addConnector(ChangePasswordConnector connector);
 
   Credentials verifyToken(String tokenId, String type);
-  
+
   Credentials verifyToken(String tokenId);
-  
-  
-  boolean changePass(final String tokenId,final String tokenType, final String username, final String password);
+
+  boolean changePass(final String tokenId, final String tokenType, final String username, final String password);
 
   public boolean sendRecoverPasswordEmail(User user, Locale defaultLocale, HttpServletRequest req);
 
   public boolean sendOnboardingEmail(User user, Locale defaultLocale, StringBuilder url);
 
-  public String sendExternalRegisterEmail(String sender, String email, Locale locale, String space, StringBuilder url) throws Exception;
+  public String sendExternalRegisterEmail(String sender,
+                                          String email,
+                                          Locale locale,
+                                          String space,
+                                          StringBuilder url) throws Exception;
 
   public boolean sendExternalConfirmationAccountEmail(String sender, Locale locale, StringBuilder url) throws Exception;
 
-  public boolean allowChangePassword(String username) throws Exception;
+  public boolean sendAccountLockedEmail(User user, Locale defaultLocale);
 
+  public boolean allowChangePassword(String username) throws Exception;
   // EXOGTN-2114 Workaround for Java 8 Backward compatibility.
+
   String getPasswordRecoverURL(String tokenId, String lang);
 
   String getOnboardingURL(String tokenId, String lang);
 
   String getExternalRegistrationURL(String tokenId, String lang);
-  
+
   public ChangePasswordConnector getActiveChangePasswordConnector();
 }

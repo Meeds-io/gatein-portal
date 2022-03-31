@@ -232,25 +232,35 @@
             If you has existed user-database of Gatein 3.6 or below, it's recommended to migrate data and set this option to true to use disable-user
             feature or set this option to false.
             -->
-            <field name="filterDisabledUsersInQueries">
-              <boolean>true</boolean>
-            </field>
-          
-            <!-- 
-            This option is used to toogle disable-user feature
-            By default, this option is set to TRUE
-            When this option is set to FALSE,
-              the disable-user feature is deactivated, and 'filterDisabledUsersInQueries' option is ignored
-            -->
-            <field name="disableUserActived">
-              <boolean>${exo.disable.user.activated:true}</boolean>
-            </field>
+          <field name="filterDisabledUsersInQueries">
+            <boolean>true</boolean>
+          </field>
 
-            <!-- If true, the property lastLoginTime of user will be updated after successful authentication of this user to portal.
-                 If false, the property won't be updated, which could have performance improvement in systems with many concurrent user logins -->
-            <field name="updateLastLoginTimeAfterAuthentication">
-              <boolean>${exo.idm.user.updateLastLoginTime:true}</boolean>
-            </field>
+          <!--
+          This option is used to toogle disable-user feature
+          By default, this option is set to TRUE
+          When this option is set to FALSE,
+            the disable-user feature is deactivated, and 'filterDisabledUsersInQueries' option is ignored
+          -->
+          <field name="disableUserActived">
+            <boolean>${exo.disable.user.activated:true}</boolean>
+          </field>
+
+          <!-- If true, the property lastLoginTime of user will be updated after successful authentication of this user to portal.
+               If false, the property won't be updated, which could have performance improvement in systems with many concurrent user logins -->
+          <field name="updateLastLoginTimeAfterAuthentication">
+            <boolean>${exo.idm.user.updateLastLoginTime:true}</boolean>
+          </field>
+
+          <!-- This property define how many fail attempts a user can do before his account is blocked -->
+          <field name="maxBadPasswordCount">
+            <int>${exo.idm.antibruteforce.maxBadPassword:5}</int>
+          </field>
+
+          <!-- This property define how long time in minutes an account is blocked after MAXFAILEDATTEMPT failed login -->
+          <field name="blockingTime">
+            <int>${exo.idm.antibruteforce.blockingTime:10}</int>
+          </field>
         </object>
       </object-param>
     </init-params>
