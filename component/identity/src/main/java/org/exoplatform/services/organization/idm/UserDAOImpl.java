@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.LogLevel;
 import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 import org.picketlink.idm.api.*;
@@ -44,6 +45,12 @@ import org.exoplatform.services.organization.externalstore.IDMExternalStoreServi
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
  */
 public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
+
+  private static final String     STATUS_NOT_OK        = "ko";
+
+  private static final String     ACCOUNT_LOCKED       = "accountLocked";
+
+  private static final String     WRONG_CREDENTIALS    = "wrongCredentials";
 
   private List<UserEventListener> listeners_ = new ArrayList<UserEventListener>(3);
 
@@ -71,9 +78,9 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
   public static final DateFormat  dateFormat           = DateFormat.getInstance();
 
-  private static final String BAD_PASSWORD_COUNT = "badPasswordCount";
+  private static final String     WRONG_PASSWORD_COUNT = "wrongPasswordCount";
 
-  private static final String BAD_PASSWORD_TIME = "badPasswordTime";
+  private static final String     WRONG_PASSWORD_TIME  = "wrongPasswordTime";
 
   static {
     Set<String> keys = new HashSet<String>();
@@ -940,36 +947,42 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         if (profile == null) {
           profile = orgService.getUserProfileHandler().createUserProfileInstance(username);
         }
-        int currentNbFail = profile.getAttribute(BAD_PASSWORD_COUNT) != null ?
-                            Integer.parseInt(profile.getAttribute(BAD_PASSWORD_COUNT)) : 0;
+        int currentNbFail =
+                          profile.getAttribute(WRONG_PASSWORD_COUNT) != null ? Integer.parseInt(profile.getAttribute(WRONG_PASSWORD_COUNT))
+                                                                             : 0;
         currentNbFail++;
-        profile.setAttribute(BAD_PASSWORD_COUNT, String.valueOf(currentNbFail));
+        profile.setAttribute(WRONG_PASSWORD_COUNT, String.valueOf(currentNbFail));
         Instant now = Instant.now();
-        profile.setAttribute(BAD_PASSWORD_TIME, String.valueOf(now.toEpochMilli()));
+        profile.setAttribute(WRONG_PASSWORD_TIME, String.valueOf(now.toEpochMilli()));
         orgService.getUserProfileHandler().saveUserProfile(profile, true);
 
-        if (currentNbFail >= orgService.getConfiguration().getMaxBadPasswordCount()) {
+        if (currentNbFail >= orgService.getConfiguration().getMaxWrongPasswordCount()) {
           log.warn("service=login" + " operation=login" + " status=ko"
-              + " parameters=\"username:{}, badPasswordCount:{}, maxBadPasswordCount:{}, badPasswordTime={}, "
+              + " parameters=\"username:{}, wrongPasswordCount:{}, maxWrongPasswordCount:{}, wrongPasswordTime={}, "
               + "lockTimeInMinutes={}, unlockTime={}\"" + " error_msg=\"Account is locked\"",
                    user.getUserName(),
                    currentNbFail,
-                   orgService.getConfiguration().getMaxBadPasswordCount(),
+                   orgService.getConfiguration().getMaxWrongPasswordCount(),
                    now,
                    orgService.getConfiguration().getBlockingTime(),
                    now.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES));
+
+          broacastFailedLoginEvent(user.getUserName(), STATUS_NOT_OK, ACCOUNT_LOCKED);
+
           ExoContainer container = ExoContainerContext.getCurrentContainer();
           PasswordRecoveryService passwordRecoveryService = container.getComponentInstanceOfType(PasswordRecoveryService.class);
           passwordRecoveryService.sendAccountLockedEmail(user, Locale.ENGLISH);
 
         } else {
           log.warn("service=login" + " operation=login" + " status=ko"
-              + " parameters=\"username:{}, badPasswordCount:{}, badPasswordTime:{}, maxBadPasswordCount:{}\""
+              + " parameters=\"username:{}, wrongPasswordCount:{}, wrongPasswordTime:{}, maxWrongPasswordCount:{}\""
               + " error_msg=\"Login failed\"",
                    username,
                    currentNbFail,
                    now,
-                   orgService.getConfiguration().getMaxBadPasswordCount());
+                   orgService.getConfiguration().getMaxWrongPasswordCount());
+          broacastFailedLoginEvent(user.getUserName(), STATUS_NOT_OK, WRONG_CREDENTIALS);
+
         }
       }
     } catch (Exception e) {
@@ -986,14 +999,16 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         if (profile == null) {
           profile = orgService.getUserProfileHandler().createUserProfileInstance(username);
         }
-        profile.setAttribute(BAD_PASSWORD_COUNT, String.valueOf(0));
+        profile.setAttribute(WRONG_PASSWORD_COUNT, String.valueOf(0));
         orgService.getUserProfileHandler().saveUserProfile(profile, true);
         if (log.isDebugEnabled()) {
           log.debug("service=login"
                        + " operation=login"
                        + " status=ok"
-                       + " parameters=\"username:{}, badPasswordCount:{}, maxBadPasswordCount:{}\"",
-                   username, 0, orgService.getConfiguration().getMaxBadPasswordCount());
+              + " parameters=\"username:{}, wrongPasswordCount:{}, maxWrongPasswordCount:{}\"",
+                    username,
+                    0,
+                    orgService.getConfiguration().getMaxWrongPasswordCount());
         }
       }
     } catch (Exception e) {
@@ -1009,27 +1024,29 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         //if there is no userProfile, the user have never fail his login, we do no lock him
         return false;
       }
-      int currentNbFail = profile.getAttribute(BAD_PASSWORD_COUNT) != null ?
-                          Integer.parseInt(profile.getAttribute(BAD_PASSWORD_COUNT)) : 0;
-      Instant badPasswordTime = Instant.ofEpochMilli(Long.parseLong(profile.getAttribute(BAD_PASSWORD_TIME)));
-      if (currentNbFail >= orgService.getConfiguration().getMaxBadPasswordCount()
+      int currentNbFail =
+                        profile.getAttribute(WRONG_PASSWORD_COUNT) != null ? Integer.parseInt(profile.getAttribute(WRONG_PASSWORD_COUNT))
+                                                                           : 0;
+      Instant wrongPasswordTime = Instant.ofEpochMilli(Long.parseLong(profile.getAttribute(WRONG_PASSWORD_TIME)));
+      if (currentNbFail >= orgService.getConfiguration().getMaxWrongPasswordCount()
           &&
-          badPasswordTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES).isAfter(Instant.now())) {
+          wrongPasswordTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES).isAfter(Instant.now())) {
 
         log.warn("service=login"
                      + " operation=login"
                      + " status=ko"
-                     + " parameters=\"username:{}, badPasswordCount:{}, maxBadPasswordCount:{}, badPasswordTime={}, "
+            + " parameters=\"username:{}, wrongPasswordCount:{}, maxWrongPasswordCount:{}, wrongPasswordTime={}, "
                      + "lockTimeInMinutes={}, unlockTime={}\""
             + " error_msg=\"Account is locked\"",
                  user.getUserName(),
                  currentNbFail,
-                 orgService.getConfiguration().getMaxBadPasswordCount(),
-                 badPasswordTime,
+                 orgService.getConfiguration().getMaxWrongPasswordCount(),
+                 wrongPasswordTime,
                  orgService.getConfiguration().getBlockingTime(),
-                 badPasswordTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES));
+                 wrongPasswordTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES));
+        broacastFailedLoginEvent(user.getUserName(), STATUS_NOT_OK, ACCOUNT_LOCKED);
         throw new AccountTemporaryLockedException(user.getUserName(),
-                                                  badPasswordTime.plus(orgService.getConfiguration().getBlockingTime(),
+                                                  wrongPasswordTime.plus(orgService.getConfiguration().getBlockingTime(),
                                                                        ChronoUnit.MINUTES));
       }
     } catch (AccountTemporaryLockedException atle) {
@@ -1039,5 +1056,24 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
     }
     return false;
 
+  }
+
+  private void broacastFailedLoginEvent(String userId, String status, String reason) {
+    ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
+    if (currentContainer == null || (currentContainer instanceof RootContainer)) {
+      currentContainer = PortalContainer.getInstance();
+    }
+    ListenerService listenerService = currentContainer.getComponentInstanceOfType(ListenerService.class);
+
+    try {
+      Map<String, String> info = new HashMap<>();
+      info.put("user_id", userId);
+      info.put("status", status);
+      info.put("reason", reason);
+
+      listenerService.broadcast("login.failed", null, info);
+    } catch (Exception e) {
+      log.error("Error while broadcasting event 'login.failed' for user '{}'", userId, e);
+    }
   }
 }

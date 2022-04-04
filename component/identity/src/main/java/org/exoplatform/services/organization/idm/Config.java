@@ -92,7 +92,7 @@ public class Config {
 
     private boolean updateLastLoginTimeAfterAuthentication = true;
 
-    private int maxBadPasswordCount;
+    private int               maxWrongPasswordCount;
     private int blockingTime;
 
     public Config() {
@@ -380,12 +380,12 @@ public class Config {
       this.useCache = useCache;
     }
 
-    public int getMaxBadPasswordCount() {
-        return maxBadPasswordCount;
+    public int getMaxWrongPasswordCount() {
+      return maxWrongPasswordCount;
     }
 
-    public void setMaxBadPasswordCount(int maxBadPasswordCount) {
-        this.maxBadPasswordCount = maxBadPasswordCount;
+    public void setMaxWrongPasswordCount(int maxWrongPasswordCount) {
+      this.maxWrongPasswordCount = maxWrongPasswordCount;
     }
 
     public int getBlockingTime() {
