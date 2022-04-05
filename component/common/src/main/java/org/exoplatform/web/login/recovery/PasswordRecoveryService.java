@@ -49,7 +49,7 @@ public interface PasswordRecoveryService {
                                           String space,
                                           StringBuilder url) throws Exception;
 
-  public boolean sendExternalConfirmationAccountEmail(String sender, Locale locale, StringBuilder url) throws Exception;
+  public boolean sendExternalConfirmationAccountEmail(String sender, Locale locale, StringBuilder url);
 
   public boolean sendAccountLockedEmail(User user, Locale defaultLocale);
 

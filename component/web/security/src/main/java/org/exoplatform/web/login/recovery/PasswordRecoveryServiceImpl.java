@@ -304,9 +304,9 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
       content = resolveLanguage(input, bundle);
     }
 
-    content = content.replaceAll("\\$\\{FIRST_NAME\\}", user.getFirstName());
-    content = content.replaceAll("\\$\\{USERNAME\\}", user.getUserName());
-    content = content.replaceAll("\\$\\{FORGOT_PASSWORD_LINK\\}", link);
+    content = content.replace("\\$\\{FIRST_NAME\\}", user.getFirstName());
+    content = content.replace("\\$\\{USERNAME\\}", user.getUserName());
+    content = content.replace("\\$\\{FORGOT_PASSWORD_LINK\\}", link);
 
     return content;
   }
@@ -329,37 +329,37 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
   }
 
   @Override
-  public boolean sendExternalConfirmationAccountEmail(String username, Locale locale, StringBuilder url) throws Exception {
-
-    User user = orgService.getUserHandler().findUserByName(username);
-
-    ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
-
-    StringBuilder redirectUrl = new StringBuilder();
-    redirectUrl.append(url);
-    redirectUrl.append(ExternalRegistrationHandler.LOGIN);
-
-    String emailBody = buildExternalConfirmationAccountEmailBody(user.getDisplayName(),
-                                                                 user.getUserName(),
-                                                                 redirectUrl.toString(),
-                                                                 bundle);
-    String emailSubject = bundle.getString("external.confirmation.account.email.subject") + " " + brandingService.getCompanyName()
-        + "!";
-
-    String senderName = MailUtils.getSenderName();
-    String from = MailUtils.getSenderEmail();
-    if (senderName != null && !senderName.trim().isEmpty()) {
-      from = senderName + " <" + from + ">";
-    }
-
-    Message message = new Message();
-    message.setFrom(from);
-    message.setTo(user.getEmail());
-    message.setSubject(emailSubject);
-    message.setBody(emailBody);
-    message.setMimeType("text/html");
+  public boolean sendExternalConfirmationAccountEmail(String username, Locale locale, StringBuilder url) {
 
     try {
+      User user = orgService.getUserHandler().findUserByName(username);
+
+      ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
+
+      StringBuilder redirectUrl = new StringBuilder();
+      redirectUrl.append(url);
+      redirectUrl.append(ExternalRegistrationHandler.LOGIN);
+
+      String emailBody = buildExternalConfirmationAccountEmailBody(user.getDisplayName(),
+                                                                   user.getUserName(),
+                                                                   redirectUrl.toString(),
+                                                                   bundle);
+      String emailSubject = bundle.getString("external.confirmation.account.email.subject") + " "
+          + brandingService.getCompanyName() + "!";
+
+      String senderName = MailUtils.getSenderName();
+      String from = MailUtils.getSenderEmail();
+      if (senderName != null && !senderName.trim().isEmpty()) {
+        from = senderName + " <" + from + ">";
+      }
+
+      Message message = new Message();
+      message.setFrom(from);
+      message.setTo(user.getEmail());
+      message.setSubject(emailSubject);
+      message.setBody(emailBody);
+      message.setMimeType("text/html");
+
       mailService.sendMessage(message);
     } catch (Exception ex) {
       log.error("Failure to send external confirmation account email", ex);

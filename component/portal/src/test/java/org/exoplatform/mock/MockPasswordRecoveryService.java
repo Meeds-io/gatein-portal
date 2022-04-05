@@ -54,7 +54,7 @@ public class MockPasswordRecoveryService implements PasswordRecoveryService {
   }
   
   @Override
-  public boolean sendExternalConfirmationAccountEmail(String sender, Locale locale, StringBuilder url) throws Exception {
+  public boolean sendExternalConfirmationAccountEmail(String sender, Locale locale, StringBuilder url) {
     return false;
   }
 

@@ -48,9 +48,19 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
   private static final String     STATUS_NOT_OK        = "ko";
 
+  private static final String     STATUS_OK               = "ok";
+
   private static final String     ACCOUNT_LOCKED       = "accountLocked";
 
   private static final String     WRONG_CREDENTIALS    = "wrongCredentials";
+
+  private static final String     SERVICE                 = "service";
+
+  private static final String     LOGIN                   = "login";
+
+  private static final String     OPERATION               = "operation";
+
+  private static final String     STATUS                  = "status";
 
   private List<UserEventListener> listeners_ = new ArrayList<UserEventListener>(3);
 
@@ -384,15 +394,16 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         throw new DisabledUserException(username);
       }
 
-      if (!isAccountLocked(user)) {
-        if (user.isInternalStore()) {
-          authenticated = authenticateDB(user, password);
-          if (authenticated) {
-            resetAuthenticationAttempts(user.getUserName());
-            return true;
-          }
+      checkLockedAccount(user); // throw exception if account is locked
+
+      if (user.isInternalStore()) {
+        authenticated = authenticateDB(user, password);
+        if (authenticated) {
+          resetAuthenticationAttempts(user.getUserName());
+          return true;
         }
       }
+
     }
 
     authenticated = authenticateExternal(username, password);
@@ -957,7 +968,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         orgService.getUserProfileHandler().saveUserProfile(profile, true);
 
         if (currentNbFail >= orgService.getConfiguration().getMaxAuthenticationAttempts()) {
-          log.warn("service=login" + " operation=login" + " status=ko"
+          log.warn(SERVICE + "=" + LOGIN + " " + OPERATION + "=" + LOGIN + " " + STATUS + "=" + STATUS_NOT_OK
               + " parameters=\"username:{}, authenticationAttempts:{}, maxAuthenticationAttempts:{}, latestAuthFailureTime={}, "
               + "lockTimeInMinutes={}, unlockTime={}\"" + " error_msg=\"Account is locked\"",
                    user.getUserName(),
@@ -974,7 +985,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
           passwordRecoveryService.sendAccountLockedEmail(user, Locale.ENGLISH);
 
         } else {
-          log.warn("service=login" + " operation=login" + " status=ko"
+          log.warn(SERVICE + "=" + LOGIN + " " + OPERATION + "=" + LOGIN + " " + STATUS + "=" + STATUS_NOT_OK
               + " parameters=\"username:{}, authenticationAttempts:{}, latestAuthFailureTime:{}, maxAuthenticationAttempts:{}\""
               + " error_msg=\"Login failed\"",
                    username,
@@ -1002,9 +1013,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         profile.setAttribute(AUTHENTICATION_ATTEMPTS, String.valueOf(0));
         orgService.getUserProfileHandler().saveUserProfile(profile, true);
         if (log.isDebugEnabled()) {
-          log.debug("service=login"
-                       + " operation=login"
-                       + " status=ok"
+          log.debug(SERVICE + "=" + LOGIN + " " + OPERATION + "=" + LOGIN + " " + STATUS + "=" + STATUS_OK
               + " parameters=\"username:{}, authenticationAttempts:{}, maxAuthenticationAttempts:{}\"",
                     username,
                     0,
@@ -1017,48 +1026,42 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
   }
 
-  private boolean isAccountLocked(User user) throws AccountTemporaryLockedException{
+  private void checkLockedAccount(User user) throws AccountTemporaryLockedException {
     try {
       UserProfile profile = orgService.getUserProfileHandler().findUserProfileByName(user.getUserName());
-      if (profile == null) {
+      if (profile != null) {
         //if there is no userProfile, the user have never fail his login, we do no lock him
-        return false;
-      }
-      int currentNbFail =
-                        profile.getAttribute(AUTHENTICATION_ATTEMPTS) != null ? Integer.parseInt(profile.getAttribute(AUTHENTICATION_ATTEMPTS))
-                                                                              : 0;
-      Instant latestAuthFailureTime =
-                                    Instant.ofEpochMilli(profile.getAttribute(AUTHENTICATION_ATTEMPTS) != null ? Long.parseLong(profile.getAttribute(LATEST_AUTH_TIME))
-                                                                                                               : Instant.EPOCH.toEpochMilli());
-      if (currentNbFail >= orgService.getConfiguration().getMaxAuthenticationAttempts()
-          &&
-          latestAuthFailureTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES)
-                               .isAfter(Instant.now())) {
 
-        log.warn("service=login"
-                     + " operation=login"
-                     + " status=ko"
-            + " parameters=\"username:{}, authenticationAttempts:{}, maxAuthenticationAttempts:{}, latestAuthFailureTime={}, "
-                     + "lockTimeInMinutes={}, unlockTime={}\""
-            + " error_msg=\"Account is locked\"",
-                 user.getUserName(),
-                 currentNbFail,
-                 orgService.getConfiguration().getMaxAuthenticationAttempts(),
-                 latestAuthFailureTime,
-                 orgService.getConfiguration().getBlockingTime(),
-                 latestAuthFailureTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES));
-        broacastFailedLoginEvent(user.getUserName(), STATUS_NOT_OK, ACCOUNT_LOCKED);
-        throw new AccountTemporaryLockedException(user.getUserName(),
-                                                  latestAuthFailureTime.plus(orgService.getConfiguration().getBlockingTime(),
-                                                                       ChronoUnit.MINUTES));
+        int currentNbFail =
+                          profile.getAttribute(AUTHENTICATION_ATTEMPTS) != null ? Integer.parseInt(profile.getAttribute(AUTHENTICATION_ATTEMPTS))
+                                                                                : 0;
+        Instant latestAuthFailureTime =
+                                      Instant.ofEpochMilli(profile.getAttribute(AUTHENTICATION_ATTEMPTS) != null ? Long.parseLong(profile.getAttribute(LATEST_AUTH_TIME))
+                                                                                                                 : Instant.EPOCH.toEpochMilli());
+        if (currentNbFail >= orgService.getConfiguration().getMaxAuthenticationAttempts()
+            && latestAuthFailureTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES)
+                                    .isAfter(Instant.now())) {
+
+          log.warn(SERVICE + "=" + LOGIN + " " + OPERATION + "=" + LOGIN + " " + STATUS + "=" + STATUS_NOT_OK
+              + " parameters=\"username:{}, authenticationAttempts:{}, maxAuthenticationAttempts:{}, latestAuthFailureTime={}, "
+              + "lockTimeInMinutes={}, unlockTime={}\"" + " error_msg=\"Account is locked\"",
+                   user.getUserName(),
+                   currentNbFail,
+                   orgService.getConfiguration().getMaxAuthenticationAttempts(),
+                   latestAuthFailureTime,
+                   orgService.getConfiguration().getBlockingTime(),
+                   latestAuthFailureTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES));
+          broacastFailedLoginEvent(user.getUserName(), STATUS_NOT_OK, ACCOUNT_LOCKED);
+          throw new AccountTemporaryLockedException(user.getUserName(),
+                                                    latestAuthFailureTime.plus(orgService.getConfiguration().getBlockingTime(),
+                                                                               ChronoUnit.MINUTES));
+        }
       }
     } catch (AccountTemporaryLockedException atle) {
       throw atle;
     } catch (Exception e) {
       log.error("Unable to get gatein user profile for user {}", user.getUserName(), e);
     }
-    return false;
-
   }
 
   private void broacastFailedLoginEvent(String userId, String status, String reason) {
