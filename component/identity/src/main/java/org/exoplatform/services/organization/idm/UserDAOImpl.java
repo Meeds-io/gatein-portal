@@ -1074,7 +1074,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
     try {
       Map<String, String> info = new HashMap<>();
       info.put("user_id", userId);
-      info.put("status", status);
+      info.put(STATUS, status);
       info.put("reason", reason);
 
       listenerService.broadcast("login.failed", null, info);
