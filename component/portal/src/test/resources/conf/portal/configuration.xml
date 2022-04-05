@@ -85,6 +85,10 @@
   </component>
 
   <component>
+    <type>org.exoplatform.portal.config.NavigationCategoryService</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.portal.config.UserACL</key>
     <type>org.exoplatform.portal.config.UserACL</type>
     <init-params>

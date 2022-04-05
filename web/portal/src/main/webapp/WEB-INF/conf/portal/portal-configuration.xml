@@ -185,6 +185,10 @@
   </component>
 
   <component>
+    <type>org.exoplatform.portal.config.NavigationCategoryService</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.portal.config.UserPortalConfigService</key>
     <type>org.exoplatform.portal.config.UserPortalConfigService</type>
     <component-plugins>
