@@ -956,13 +956,13 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         profile.setAttribute(WRONG_PASSWORD_TIME, String.valueOf(now.toEpochMilli()));
         orgService.getUserProfileHandler().saveUserProfile(profile, true);
 
-        if (currentNbFail >= orgService.getConfiguration().getMaxWrongPasswordCount()) {
+        if (currentNbFail >= orgService.getConfiguration().getMaxAuthenticationAttempts()) {
           log.warn("service=login" + " operation=login" + " status=ko"
-              + " parameters=\"username:{}, wrongPasswordCount:{}, maxWrongPasswordCount:{}, wrongPasswordTime={}, "
+              + " parameters=\"username:{}, wrongPasswordCount:{}, maxAuthenticationAttempts:{}, wrongPasswordTime={}, "
               + "lockTimeInMinutes={}, unlockTime={}\"" + " error_msg=\"Account is locked\"",
                    user.getUserName(),
                    currentNbFail,
-                   orgService.getConfiguration().getMaxWrongPasswordCount(),
+                   orgService.getConfiguration().getMaxAuthenticationAttempts(),
                    now,
                    orgService.getConfiguration().getBlockingTime(),
                    now.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES));
@@ -975,12 +975,12 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
         } else {
           log.warn("service=login" + " operation=login" + " status=ko"
-              + " parameters=\"username:{}, wrongPasswordCount:{}, wrongPasswordTime:{}, maxWrongPasswordCount:{}\""
+              + " parameters=\"username:{}, wrongPasswordCount:{}, wrongPasswordTime:{}, maxAuthenticationAttempts:{}\""
               + " error_msg=\"Login failed\"",
                    username,
                    currentNbFail,
                    now,
-                   orgService.getConfiguration().getMaxWrongPasswordCount());
+                   orgService.getConfiguration().getMaxAuthenticationAttempts());
           broacastFailedLoginEvent(user.getUserName(), STATUS_NOT_OK, WRONG_CREDENTIALS);
 
         }
@@ -1005,10 +1005,10 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
           log.debug("service=login"
                        + " operation=login"
                        + " status=ok"
-              + " parameters=\"username:{}, wrongPasswordCount:{}, maxWrongPasswordCount:{}\"",
+              + " parameters=\"username:{}, wrongPasswordCount:{}, maxAuthenticationAttempts:{}\"",
                     username,
                     0,
-                    orgService.getConfiguration().getMaxWrongPasswordCount());
+                    orgService.getConfiguration().getMaxAuthenticationAttempts());
         }
       }
     } catch (Exception e) {
@@ -1028,19 +1028,19 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
                         profile.getAttribute(WRONG_PASSWORD_COUNT) != null ? Integer.parseInt(profile.getAttribute(WRONG_PASSWORD_COUNT))
                                                                            : 0;
       Instant wrongPasswordTime = Instant.ofEpochMilli(Long.parseLong(profile.getAttribute(WRONG_PASSWORD_TIME)));
-      if (currentNbFail >= orgService.getConfiguration().getMaxWrongPasswordCount()
+      if (currentNbFail >= orgService.getConfiguration().getMaxAuthenticationAttempts()
           &&
           wrongPasswordTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES).isAfter(Instant.now())) {
 
         log.warn("service=login"
                      + " operation=login"
                      + " status=ko"
-            + " parameters=\"username:{}, wrongPasswordCount:{}, maxWrongPasswordCount:{}, wrongPasswordTime={}, "
+            + " parameters=\"username:{}, wrongPasswordCount:{}, maxAuthenticationAttempts:{}, wrongPasswordTime={}, "
                      + "lockTimeInMinutes={}, unlockTime={}\""
             + " error_msg=\"Account is locked\"",
                  user.getUserName(),
                  currentNbFail,
-                 orgService.getConfiguration().getMaxWrongPasswordCount(),
+                 orgService.getConfiguration().getMaxAuthenticationAttempts(),
                  wrongPasswordTime,
                  orgService.getConfiguration().getBlockingTime(),
                  wrongPasswordTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES));

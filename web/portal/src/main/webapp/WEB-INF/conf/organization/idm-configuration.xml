@@ -253,8 +253,8 @@
           </field>
 
           <!-- This property define how many fail attempts a user can do before his account is blocked -->
-          <field name="maxWrongPasswordCount">
-            <int>${exo.idm.antibruteforce.maxWrongPassword:5}</int>
+          <field name="maxAuthenticationAttempts">
+            <int>${exo.idm.antibruteforce.maxAuthenticationAttempts:5}</int>
           </field>
 
           <!-- This property define how long time in minutes an account is blocked after MAXFAILEDATTEMPT failed login -->
