@@ -136,8 +136,8 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
       User user = orgService.getUserHandler().findUserByName(username);
       if (user != null) {
         UserProfile profile = orgService.getUserProfileHandler().findUserProfileByName(username);
-        if (profile != null && !profile.getAttribute("wrongPasswordCount").equals("0")) {
-          profile.setAttribute("wrongPasswordCount", String.valueOf(0));
+        if (profile != null && !profile.getAttribute("authenticationAttempts").equals("0")) {
+          profile.setAttribute("authenticationAttempts", String.valueOf(0));
           orgService.getUserProfileHandler().saveUserProfile(profile, true);
         }
       }
