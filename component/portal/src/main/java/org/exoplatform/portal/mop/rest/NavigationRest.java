@@ -1,9 +1,6 @@
 package org.exoplatform.portal.mop.rest;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
@@ -18,10 +15,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.portal.config.UserPortalConfig;
-import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.config.*;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
@@ -60,8 +58,11 @@ public class NavigationRest implements ResourceContainer {
 
   private UserPortalConfigService           portalConfigService;
 
-  public NavigationRest(UserPortalConfigService portalConfigService) {
+  private NavigationCategoryService         navigationCategoryService;
+
+  public NavigationRest(UserPortalConfigService portalConfigService, NavigationCategoryService navigationCategoryService) {
     this.portalConfigService = portalConfigService;
+    this.navigationCategoryService = navigationCategoryService;
   }
 
   @GET
@@ -121,6 +122,34 @@ public class NavigationRest implements ResourceContainer {
     }
 
     return getNavigations(request, siteTypeName, siteName, excludedSiteName, scopeName, visibilityNames);
+  }
+
+  @Path("/categories")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @ApiOperation(
+      value = "Gets navigations categories for UI",
+      httpMethod = "GET",
+      response = Response.class,
+      notes = "This returns the requested sites navigation categories"
+  )
+  @ApiResponses(
+      value = {
+          @ApiResponse(code = 200, message = "Request fulfilled"),
+          @ApiResponse(code = 500, message = "Internal server error"),
+      }
+  )
+  public Response getNavigationCategories() {
+    try {
+      JSONObject object = new JSONObject();
+      object.put("navs", navigationCategoryService.getNavigationCategories());
+      object.put("categoriesOrder", navigationCategoryService.getNavigationCategoriesOrder());
+      object.put("urisOrder", navigationCategoryService.getNavigationUriOrder());
+      return Response.ok(object.toString()).build();
+    } catch (JSONException e) {
+      LOG.warn("Error parsing navigation categories result", e);
+      return Response.serverError().build();
+    }
   }
 
   private Response getNavigations(HttpServletRequest request,
