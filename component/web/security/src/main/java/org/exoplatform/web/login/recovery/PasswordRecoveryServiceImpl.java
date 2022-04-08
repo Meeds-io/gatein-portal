@@ -304,9 +304,9 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
       content = resolveLanguage(input, bundle);
     }
 
-    content = content.replace("\\$\\{FIRST_NAME\\}", user.getFirstName());
-    content = content.replace("\\$\\{USERNAME\\}", user.getUserName());
-    content = content.replace("\\$\\{FORGOT_PASSWORD_LINK\\}", link);
+    content = content.replace("${FIRST_NAME}", user.getFirstName());
+    content = content.replace("${USERNAME}", user.getUserName());
+    content = content.replace("${FORGOT_PASSWORD_LINK}", link);
 
     return content;
   }
