@@ -65,21 +65,6 @@
       <name>middle-topNavigation-container</name>
       <factory-id>addonContainer</factory-id>
     </container>
-    <container id="AppCenterAppLauncherPortlet" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
-      <name>AppCenterAppLauncherPortlet</name>
-      <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
-      <factory-id>addonContainer</factory-id>
-    </container>
-    <container id="NotificationTopBar" template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
-      <name>NotificationTopBar</name>
-      <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
-      <factory-id>addonContainer</factory-id>
-    </container>
-    <container id="DrawerAdminToolBarPortlet" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
-      <name>DrawerAdminToolBarPortlet</name>
-      <access-permissions>manager:/platform/administrators;editor:/platform/web-contributors</access-permissions>
-      <factory-id>addonContainer</factory-id>
-    </container>
     <container id="TopbarLoadingContainer" template="system:/groovy/portal/webui/container/UITopbarLoadingContainer.gtmpl">
       <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
     </container>
