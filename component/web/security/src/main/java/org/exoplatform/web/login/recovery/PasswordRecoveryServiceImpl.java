@@ -53,209 +53,224 @@ import org.exoplatform.web.security.security.RemindPasswordTokenService;
  * @author <a href="mailto:tuyennt@exoplatform.com">Tuyen Nguyen The</a>.
  */
 public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
-  
-  protected static Log                         log = ExoLogger.getLogger(PasswordRecoveryServiceImpl.class);
 
-    private final OrganizationService orgService;
-    private final MailService mailService;
-    private final ResourceBundleService bundleService;
-    private final RemindPasswordTokenService remindPasswordTokenService;
-    private final BrandingService brandingService;
-    private final WebAppController webController;
-    
-    
-    private String changePasswordConnectorName;
-    private Map<String,ChangePasswordConnector> changePasswordConnectorMap;
+  protected static Log                         log                       = ExoLogger.getLogger(PasswordRecoveryServiceImpl.class);
 
-    
-    public PasswordRecoveryServiceImpl(InitParams initParams, OrganizationService orgService, MailService mailService,
-                                       ResourceBundleService bundleService, RemindPasswordTokenService remindPasswordTokenService, WebAppController controller, BrandingService brandingService) {
-        this.orgService = orgService;
-        this.mailService = mailService;
-        this.bundleService = bundleService;
-        this.remindPasswordTokenService = remindPasswordTokenService;
-        this.webController = controller;
-        this.brandingService = brandingService;
-        this.changePasswordConnectorMap=new HashMap<>();
-        this.changePasswordConnectorName = initParams.getValueParam("changePasswordConnector").getValue();
-   
-    }
+  private final OrganizationService            orgService;
 
-    @Override
-    public void addConnector(ChangePasswordConnector connector) {
-        if (!this.changePasswordConnectorMap.containsKey(connector.getName())) {
-            changePasswordConnectorMap.put(connector.getName(),connector);
-        }
-    }
-    
-    
-    @Override
-    public Credentials verifyToken(String tokenId, String type) {
-        Token token = remindPasswordTokenService.getToken(tokenId,type);
-        if (token == null || token.isExpired()) {
-            return null;
-        }
-        return token.getPayload();
-    }
-    
-    @Override
-    public Credentials verifyToken(String tokenId) {
-        return verifyToken(tokenId,"");
-    }
-    
-    @Override
-    public boolean allowChangePassword(String username) throws Exception {
-      User user = orgService.getUserHandler().findUserByName(username);//To be changed later by checking internal store information from social user profile
-      return user != null && (user.isInternalStore() || this.changePasswordConnectorMap.get(this.changePasswordConnectorName).isAllowChangeExternalPassword());
-    }
-    
-    @Override
-    public boolean changePass(final String tokenId,final String tokenType, final String username, final String password) {
-        try {
-            this.changePasswordConnectorMap.get(this.changePasswordConnectorName).changePassword(username,password);
-            try {
-                remindPasswordTokenService.deleteToken(tokenId, tokenType);
-                remindPasswordTokenService.deleteTokensByUsernameAndType(username, tokenType);
-                
-            } catch (Exception ex) {
-                log.warn("Can not delete token: " + tokenId, ex);
-            }
+  private final MailService                    mailService;
 
-            return true;
-        } catch (Exception ex) {
-            log.error("Can not change pass for user: " + username, ex);
-            return false;
-        }
-    }
-    
-    @Override
-    public boolean sendOnboardingEmail(User user, Locale locale, StringBuilder url) {
-        if (user == null) {
-            throw new IllegalArgumentException("User or Locale must not be null");
-        }
+  private final ResourceBundleService          bundleService;
 
-        ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
+  private final RemindPasswordTokenService     remindPasswordTokenService;
 
-        Credentials credentials = new Credentials(user.getUserName(), "");
-        String tokenId = remindPasswordTokenService.createToken(credentials, remindPasswordTokenService.ONBOARD_TOKEN);
-        StringBuilder redirectUrl = new StringBuilder();
-        redirectUrl.append(url);
-        redirectUrl.append("/" + OnboardingHandler.NAME);
-        redirectUrl.append("?lang=" + I18N.toTagIdentifier(locale));
-        redirectUrl.append("&token=" + tokenId);
-        String emailBody = buildOnboardingEmailBody(user, bundle, redirectUrl.toString());
-        String emailSubject = bundle.getString("onboarding.email.header") + " " + brandingService.getCompanyName();
-        String senderName = MailUtils.getSenderName();
-        String from = MailUtils.getSenderEmail();
-        if (senderName != null && !senderName.trim().isEmpty()) {
-            from = senderName + " <" + from + ">";
-        }
+  private final BrandingService                brandingService;
 
-        Message message = new Message();
-        message.setFrom(from);
-        message.setTo(user.getEmail());
-        message.setSubject(emailSubject);
-        message.setBody(emailBody);
-        message.setMimeType("text/html");
+  private final WebAppController               webController;
 
-        try {
-            mailService.sendMessage(message);
-        } catch (Exception ex) {
-            log.error("Failure to send onboarding email", ex);
-            return false;
-        }
+  public static final String                   CONFIGURED_DOMAIN_URL_KEY = "gatein.email.domain.url";
 
-        return true;
-    }
+  private String                               changePasswordConnectorName;
 
-    private String buildOnboardingEmailBody(User user, ResourceBundle bundle, String link) {
-      String content;
-      InputStream input = this.getClass().getClassLoader().getResourceAsStream("conf/onBoarding_email_template.html");
-      if (input == null) {
-          content = "";
-      } else {
-          content = resolveLanguage(input, bundle);
-      }
+  private Map<String, ChangePasswordConnector> changePasswordConnectorMap;
 
-      content = content.replaceAll("\\$\\{USER_DISPLAY_NAME\\}", user.getDisplayName());
-      content = content.replaceAll("\\$\\{COMPANY_NAME\\}", brandingService.getCompanyName());
-      content = content.replaceAll("\\$\\{RESET_PASSWORD_LINK\\}", link);
+  public PasswordRecoveryServiceImpl(InitParams initParams,
+                                     OrganizationService orgService,
+                                     MailService mailService,
+                                     ResourceBundleService bundleService,
+                                     RemindPasswordTokenService remindPasswordTokenService,
+                                     WebAppController controller,
+                                     BrandingService brandingService) {
+    this.orgService = orgService;
+    this.mailService = mailService;
+    this.bundleService = bundleService;
+    this.remindPasswordTokenService = remindPasswordTokenService;
+    this.webController = controller;
+    this.brandingService = brandingService;
+    this.changePasswordConnectorMap = new HashMap<>();
+    this.changePasswordConnectorName = initParams.getValueParam("changePasswordConnector").getValue();
 
-      return content;
   }
 
-    @Override
-    public String sendExternalRegisterEmail(String sender, String email, Locale locale, String space, StringBuilder url) throws Exception {
-
-        UserHandler uHandler = orgService.getUserHandler();
-        String senderFullName = uHandler.findUserByName(sender).getDisplayName();
-
-        ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
-
-        Credentials credentials = new Credentials(email, "");
-        String tokenId = remindPasswordTokenService.createToken(credentials, remindPasswordTokenService.EXTERNAL_REGISTRATION_TOKEN);
-        StringBuilder redirectUrl = new StringBuilder();
-        redirectUrl.append(url);
-        redirectUrl.append("/" + ExternalRegistrationHandler.NAME);
-        redirectUrl.append("?lang=" + I18N.toTagIdentifier(locale));
-        redirectUrl.append("&token=" + tokenId);
-
-        String emailBody = buildExternalEmailBody(senderFullName, space, redirectUrl.toString(), bundle);
-        String emailSubject = senderFullName + " " + bundle.getString("external.email.subject") + " " + brandingService.getCompanyName() + " : " + space;
-
-        String senderName = MailUtils.getSenderName();
-        String from = MailUtils.getSenderEmail();
-        if (senderName != null && !senderName.trim().isEmpty()) {
-            from = senderName + " <" + from + ">";
-        }
-
-        Message message = new Message();
-        message.setFrom(from);
-        message.setTo(email);
-        message.setSubject(emailSubject);
-        message.setBody(emailBody);
-        message.setMimeType("text/html");
-
-        try {
-            mailService.sendMessage(message);
-        } catch (Exception ex) {
-            log.error("Failure to send external user email", ex);
-            return "";
-        }
-
-        return tokenId;
+  @Override
+  public void addConnector(ChangePasswordConnector connector) {
+    if (!this.changePasswordConnectorMap.containsKey(connector.getName())) {
+      changePasswordConnectorMap.put(connector.getName(), connector);
     }
+  }
 
-    private String buildExternalEmailBody(String sender, String space, String link, ResourceBundle bundle) {
-        String content;
-        InputStream input = this.getClass().getClassLoader().getResourceAsStream("conf/external_email_template.html");
-        if (input == null) {
-            content = "";
-        } else {
-            content = resolveLanguage(input, bundle);
-        }
-
-        content = content.replaceAll("\\$\\{SENDER_DISPLAY_NAME\\}", sender);
-        content = content.replaceAll("\\$\\{COMPANY_NAME\\}", brandingService.getCompanyName());
-        content = content.replaceAll("\\$\\{SPACE_DISPLAY_NAME\\}", space);
-        content = content.replaceAll("\\$\\{EXTERNAL_REGISTRATION_LINK\\}", link);
-
-        return content;
+  @Override
+  public Credentials verifyToken(String tokenId, String type) {
+    Token token = remindPasswordTokenService.getToken(tokenId, type);
+    if (token == null || token.isExpired()) {
+      return null;
     }
+    return token.getPayload();
+  }
 
-    @Override
-    public boolean sendExternalConfirmationAccountEmail(String username, Locale locale, StringBuilder url) throws Exception {
+  @Override
+  public Credentials verifyToken(String tokenId) {
+    return verifyToken(tokenId, "");
+  }
 
-    User user = orgService.getUserHandler().findUserByName(username);
+  @Override
+  public boolean allowChangePassword(String username) throws Exception {
+    User user = orgService.getUserHandler().findUserByName(username);// To be changed later by checking internal store information
+                                                                     // from social user profile
+    return user != null && (user.isInternalStore()
+        || this.changePasswordConnectorMap.get(this.changePasswordConnectorName).isAllowChangeExternalPassword());
+  }
+
+  @Override
+  public boolean changePass(final String tokenId, final String tokenType, final String username, final String password) {
+    try {
+      this.changePasswordConnectorMap.get(this.changePasswordConnectorName).changePassword(username, password);
+      try {
+        remindPasswordTokenService.deleteToken(tokenId, tokenType);
+        remindPasswordTokenService.deleteTokensByUsernameAndType(username, tokenType);
+
+      } catch (Exception ex) {
+        log.warn("Can not delete token: " + tokenId, ex);
+      }
+
+      User user = orgService.getUserHandler().findUserByName(username);
+      if (user != null) {
+        UserProfile profile = orgService.getUserProfileHandler().findUserProfileByName(username);
+        if (profile != null && !profile.getAttribute("authenticationAttempts").equals("0")) {
+          profile.setAttribute("authenticationAttempts", String.valueOf(0));
+          orgService.getUserProfileHandler().saveUserProfile(profile, true);
+        }
+      }
+
+      return true;
+    } catch (Exception ex) {
+      log.error("Can not change pass for user: " + username, ex);
+      return false;
+    }
+  }
+
+  @Override
+  public boolean sendOnboardingEmail(User user, Locale locale, StringBuilder url) {
+    if (user == null) {
+      throw new IllegalArgumentException("User or Locale must not be null");
+    }
 
     ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
 
+    Credentials credentials = new Credentials(user.getUserName(), "");
+    String tokenId = remindPasswordTokenService.createToken(credentials, remindPasswordTokenService.ONBOARD_TOKEN);
     StringBuilder redirectUrl = new StringBuilder();
     redirectUrl.append(url);
-    redirectUrl.append(ExternalRegistrationHandler.LOGIN);
+    redirectUrl.append("/" + OnboardingHandler.NAME);
+    redirectUrl.append("?lang=" + I18N.toTagIdentifier(locale));
+    redirectUrl.append("&token=" + tokenId);
+    String emailBody = buildOnboardingEmailBody(user, bundle, redirectUrl.toString());
+    String emailSubject = bundle.getString("onboarding.email.header") + " " + brandingService.getCompanyName();
+    String senderName = MailUtils.getSenderName();
+    String from = MailUtils.getSenderEmail();
+    if (senderName != null && !senderName.trim().isEmpty()) {
+      from = senderName + " <" + from + ">";
+    }
 
-    String emailBody = buildExternalConfirmationAccountEmailBody(user.getDisplayName(), user.getUserName(),redirectUrl.toString(), bundle);
-    String emailSubject = bundle.getString("external.confirmation.account.email.subject") + " " + brandingService.getCompanyName() + "!";
+    Message message = new Message();
+    message.setFrom(from);
+    message.setTo(user.getEmail());
+    message.setSubject(emailSubject);
+    message.setBody(emailBody);
+    message.setMimeType("text/html");
+
+    try {
+      mailService.sendMessage(message);
+    } catch (Exception ex) {
+      log.error("Failure to send onboarding email", ex);
+      return false;
+    }
+
+    return true;
+  }
+
+  private String buildOnboardingEmailBody(User user, ResourceBundle bundle, String link) {
+    String content;
+    InputStream input = this.getClass().getClassLoader().getResourceAsStream("conf/onBoarding_email_template.html");
+    if (input == null) {
+      content = "";
+    } else {
+      content = resolveLanguage(input, bundle);
+    }
+
+    content = content.replaceAll("\\$\\{USER_DISPLAY_NAME\\}", user.getDisplayName());
+    content = content.replaceAll("\\$\\{COMPANY_NAME\\}", brandingService.getCompanyName());
+    content = content.replaceAll("\\$\\{RESET_PASSWORD_LINK\\}", link);
+
+    return content;
+  }
+
+  @Override
+  public String sendExternalRegisterEmail(String sender,
+                                          String email,
+                                          Locale locale,
+                                          String space,
+                                          StringBuilder url) throws Exception {
+
+    UserHandler uHandler = orgService.getUserHandler();
+    String senderFullName = uHandler.findUserByName(sender).getDisplayName();
+
+    ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
+
+    Credentials credentials = new Credentials(email, "");
+    String tokenId = remindPasswordTokenService.createToken(credentials, remindPasswordTokenService.EXTERNAL_REGISTRATION_TOKEN);
+    StringBuilder redirectUrl = new StringBuilder();
+    redirectUrl.append(url);
+    redirectUrl.append("/" + ExternalRegistrationHandler.NAME);
+    redirectUrl.append("?lang=" + I18N.toTagIdentifier(locale));
+    redirectUrl.append("&token=" + tokenId);
+
+    String emailBody = buildExternalEmailBody(senderFullName, space, redirectUrl.toString(), bundle);
+    String emailSubject = senderFullName + " " + bundle.getString("external.email.subject") + " "
+        + brandingService.getCompanyName() + " : " + space;
+
+    String senderName = MailUtils.getSenderName();
+    String from = MailUtils.getSenderEmail();
+    if (senderName != null && !senderName.trim().isEmpty()) {
+      from = senderName + " <" + from + ">";
+    }
+
+    Message message = new Message();
+    message.setFrom(from);
+    message.setTo(email);
+    message.setSubject(emailSubject);
+    message.setBody(emailBody);
+    message.setMimeType("text/html");
+
+    try {
+      mailService.sendMessage(message);
+    } catch (Exception ex) {
+      log.error("Failure to send external user email", ex);
+      return "";
+    }
+
+    return tokenId;
+  }
+
+  @Override
+  public boolean sendAccountLockedEmail(User user, Locale defaultLocale) {
+    if (user == null) {
+      throw new IllegalArgumentException("User or Locale must not be null");
+    }
+
+    Locale locale = getLocaleOfUser(user.getUserName(), defaultLocale);
+    ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
+
+    Router router = webController.getRouter();
+    Map<QualifiedName, String> params = new HashMap<>();
+    params.put(WebAppController.HANDLER_PARAM, PasswordRecoveryHandler.NAME);
+
+    StringBuilder url = new StringBuilder();
+    url.append(System.getProperty(CONFIGURED_DOMAIN_URL_KEY) + "/portal");
+    url.append(router.render(params));
+
+    String emailBody = buildAccountLockedEmailBody(user, bundle, url.toString());
+    String emailSubject = bundle.getString("gatein.accountLocked.email.subject");
 
     String senderName = MailUtils.getSenderName();
     String from = MailUtils.getSenderEmail();
@@ -273,6 +288,80 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     try {
       mailService.sendMessage(message);
     } catch (Exception ex) {
+      log.error("Failure to send account locked email", ex);
+      return false;
+    }
+
+    return true;
+  }
+
+  private String buildAccountLockedEmailBody(User user, ResourceBundle bundle, String link) {
+    String content;
+    InputStream input = this.getClass().getClassLoader().getResourceAsStream("conf/account_locked_email_template.html");
+    if (input == null) {
+      content = "";
+    } else {
+      content = resolveLanguage(input, bundle);
+    }
+
+    content = content.replace("${FIRST_NAME}", user.getFirstName());
+    content = content.replace("${USERNAME}", user.getUserName());
+    content = content.replace("${FORGOT_PASSWORD_LINK}", link);
+
+    return content;
+  }
+
+  private String buildExternalEmailBody(String sender, String space, String link, ResourceBundle bundle) {
+    String content;
+    InputStream input = this.getClass().getClassLoader().getResourceAsStream("conf/external_email_template.html");
+    if (input == null) {
+      content = "";
+    } else {
+      content = resolveLanguage(input, bundle);
+    }
+
+    content = content.replaceAll("\\$\\{SENDER_DISPLAY_NAME\\}", sender);
+    content = content.replaceAll("\\$\\{COMPANY_NAME\\}", brandingService.getCompanyName());
+    content = content.replaceAll("\\$\\{SPACE_DISPLAY_NAME\\}", space);
+    content = content.replaceAll("\\$\\{EXTERNAL_REGISTRATION_LINK\\}", link);
+
+    return content;
+  }
+
+  @Override
+  public boolean sendExternalConfirmationAccountEmail(String username, Locale locale, StringBuilder url) {
+
+    try {
+      User user = orgService.getUserHandler().findUserByName(username);
+
+      ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
+
+      StringBuilder redirectUrl = new StringBuilder();
+      redirectUrl.append(url);
+      redirectUrl.append(ExternalRegistrationHandler.LOGIN);
+
+      String emailBody = buildExternalConfirmationAccountEmailBody(user.getDisplayName(),
+                                                                   user.getUserName(),
+                                                                   redirectUrl.toString(),
+                                                                   bundle);
+      String emailSubject = bundle.getString("external.confirmation.account.email.subject") + " "
+          + brandingService.getCompanyName() + "!";
+
+      String senderName = MailUtils.getSenderName();
+      String from = MailUtils.getSenderEmail();
+      if (senderName != null && !senderName.trim().isEmpty()) {
+        from = senderName + " <" + from + ">";
+      }
+
+      Message message = new Message();
+      message.setFrom(from);
+      message.setTo(user.getEmail());
+      message.setSubject(emailSubject);
+      message.setBody(emailBody);
+      message.setMimeType("text/html");
+
+      mailService.sendMessage(message);
+    } catch (Exception ex) {
       log.error("Failure to send external confirmation account email", ex);
       return false;
     }
@@ -280,188 +369,194 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     return true;
   }
 
-    private String buildExternalConfirmationAccountEmailBody(String dispalyName, String username, String link, ResourceBundle bundle) {
-        String content;
-        InputStream input = this.getClass().getClassLoader().getResourceAsStream("conf/external_confirmation_account_email_template.html");
-        if (input == null) {
-            content = "";
-        } else {
-            content = resolveLanguage(input, bundle);
-        }
-
-        content = content.replaceAll("\\$\\{DISPLAY_NAME\\}", dispalyName);
-        content = content.replaceAll("\\$\\{COMPANY_NAME\\}", brandingService.getCompanyName());
-        content = content.replaceAll("\\$\\{USERNAME\\}", username);
-        content = content.replaceAll("\\$\\{LOGIN_LINK\\}", link);
-
-        return content;
+  private String buildExternalConfirmationAccountEmailBody(String dispalyName,
+                                                           String username,
+                                                           String link,
+                                                           ResourceBundle bundle) {
+    String content;
+    InputStream input = this.getClass()
+                            .getClassLoader()
+                            .getResourceAsStream("conf/external_confirmation_account_email_template.html");
+    if (input == null) {
+      content = "";
+    } else {
+      content = resolveLanguage(input, bundle);
     }
 
-    @Override
-    public boolean sendRecoverPasswordEmail(User user, Locale defaultLocale, HttpServletRequest req) {
-        if (user == null) {
-            throw new IllegalArgumentException("User or Locale must not be null");
-        }
+    content = content.replaceAll("\\$\\{DISPLAY_NAME\\}", dispalyName);
+    content = content.replaceAll("\\$\\{COMPANY_NAME\\}", brandingService.getCompanyName());
+    content = content.replaceAll("\\$\\{USERNAME\\}", username);
+    content = content.replaceAll("\\$\\{LOGIN_LINK\\}", link);
 
-        Locale locale = getLocaleOfUser(user.getUserName(), defaultLocale);
+    return content;
+  }
 
-        PortalContainer container = PortalContainer.getCurrentInstance(req.getServletContext());
-
-        ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
-
-        Credentials credentials = new Credentials(user.getUserName(), "");
-        String tokenId = remindPasswordTokenService.createToken(credentials,remindPasswordTokenService.FORGOT_PASSWORD_TOKEN);
-
-        Router router = webController.getRouter();
-        Map<QualifiedName, String> params = new HashMap<>();
-        params.put(WebAppController.HANDLER_PARAM, PasswordRecoveryHandler.NAME);
-        params.put(PasswordRecoveryHandler.TOKEN, tokenId);
-        params.put(PasswordRecoveryHandler.LANG, I18N.toTagIdentifier(locale));
-
-        StringBuilder url = new StringBuilder();
-        url.append(req.getScheme()).append("://").append(req.getServerName());
-        if (req.getServerPort() != 80 && req.getServerPort() != 443) {
-            url.append(':').append(req.getServerPort());
-        }
-        url.append(container.getPortalContext().getContextPath());
-        url.append(router.render(params));
-
-        String emailBody = buildRecoverEmailBody(user, bundle, url.toString());
-        String emailSubject = getEmailSubject(user, bundle);
-
-        String senderName = MailUtils.getSenderName();
-        String from = MailUtils.getSenderEmail();
-        if (senderName != null && !senderName.trim().isEmpty()) {
-            from = senderName + " <" + from + ">";
-        }
-
-        Message message = new Message();
-        message.setFrom(from);
-        message.setTo(user.getEmail());
-        message.setSubject(emailSubject);
-        message.setBody(emailBody);
-        message.setMimeType("text/html");
-
-        try {
-            mailService.sendMessage(message);
-        } catch (Exception ex) {
-            log.error("Failure to send recover password email", ex);
-            return false;
-        }
-
-        return true;
+  @Override
+  public boolean sendRecoverPasswordEmail(User user, Locale defaultLocale, HttpServletRequest req) {
+    if (user == null) {
+      throw new IllegalArgumentException("User or Locale must not be null");
     }
 
-    private Locale getLocaleOfUser(String username, Locale defLocale) {
-        try {
-            UserProfile profile = orgService.getUserProfileHandler().findUserProfileByName(username);
-            String lang = profile == null ? null : profile.getUserInfoMap().get(Constants.USER_LANGUAGE);
-            return (lang != null) ? LocaleContextInfo.getLocale(lang) : defLocale;
-        } catch (Exception ex) { //NOSONAR
-            log.debug("Can not load user profile language", ex);
-            return defLocale;
-        }
+    Locale locale = getLocaleOfUser(user.getUserName(), defaultLocale);
+
+    PortalContainer container = PortalContainer.getCurrentInstance(req.getServletContext());
+
+    ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
+
+    Credentials credentials = new Credentials(user.getUserName(), "");
+    String tokenId = remindPasswordTokenService.createToken(credentials, remindPasswordTokenService.FORGOT_PASSWORD_TOKEN);
+
+    Router router = webController.getRouter();
+    Map<QualifiedName, String> params = new HashMap<>();
+    params.put(WebAppController.HANDLER_PARAM, PasswordRecoveryHandler.NAME);
+    params.put(PasswordRecoveryHandler.TOKEN, tokenId);
+    params.put(PasswordRecoveryHandler.LANG, I18N.toTagIdentifier(locale));
+
+    StringBuilder url = new StringBuilder();
+    url.append(req.getScheme()).append("://").append(req.getServerName());
+    if (req.getServerPort() != 80 && req.getServerPort() != 443) {
+      url.append(':').append(req.getServerPort());
+    }
+    url.append(container.getPortalContext().getContextPath());
+    url.append(router.render(params));
+
+    String emailBody = buildRecoverEmailBody(user, bundle, url.toString());
+    String emailSubject = getEmailSubject(user, bundle);
+
+    String senderName = MailUtils.getSenderName();
+    String from = MailUtils.getSenderEmail();
+    if (senderName != null && !senderName.trim().isEmpty()) {
+      from = senderName + " <" + from + ">";
     }
 
-    private String buildRecoverEmailBody(User user, ResourceBundle bundle, String link) {
-        String content;
-        InputStream input = this.getClass().getClassLoader().getResourceAsStream("conf/forgot_password_email_template.html");
-        if (input == null) {
-            content = "";
-        } else {
-            content = resolveLanguage(input, bundle);
-        }
+    Message message = new Message();
+    message.setFrom(from);
+    message.setTo(user.getEmail());
+    message.setSubject(emailSubject);
+    message.setBody(emailBody);
+    message.setMimeType("text/html");
 
-        content = content.replaceAll("\\$\\{FIRST_NAME\\}", user.getFirstName());
-        content = content.replaceAll("\\$\\{USERNAME\\}", user.getUserName());
-        content = content.replaceAll("\\$\\{RESET_PASSWORD_LINK\\}", link);
-
-        return content;
+    try {
+      mailService.sendMessage(message);
+    } catch (Exception ex) {
+      log.error("Failure to send recover password email", ex);
+      return false;
     }
 
-    private String resolveLanguage(InputStream input, ResourceBundle bundle) {
-        // Read from input string
-        StringBuffer content = new StringBuffer();
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (content.length() > 0) {
-                    content.append("\n");
-                }
-                resolveLanguage(content, line, bundle);
-            }
-        } catch (IOException ex) {
-            log.error(ex);
-        }
-        return content.toString();
+    return true;
+  }
+
+  private Locale getLocaleOfUser(String username, Locale defLocale) {
+    try {
+      UserProfile profile = orgService.getUserProfileHandler().findUserProfileByName(username);
+      String lang = profile == null ? null : profile.getUserInfoMap().get(Constants.USER_LANGUAGE);
+      return (lang != null) ? LocaleContextInfo.getLocale(lang) : defLocale;
+    } catch (Exception ex) { // NOSONAR
+      log.debug("Can not load user profile language", ex);
+      return defLocale;
+    }
+  }
+
+  private String buildRecoverEmailBody(User user, ResourceBundle bundle, String link) {
+    String content;
+    InputStream input = this.getClass().getClassLoader().getResourceAsStream("conf/forgot_password_email_template.html");
+    if (input == null) {
+      content = "";
+    } else {
+      content = resolveLanguage(input, bundle);
     }
 
-    private static final Pattern PATTERN = Pattern.compile("&\\{([a-zA-Z0-9\\.]+)\\}");
-    private void resolveLanguage(StringBuffer sb, String input, ResourceBundle bundle) {
-        Matcher matcher = PATTERN.matcher(input);
-        while (matcher.find()) {
-            String key = matcher.group(1);
-            String resource;
-            try {
-                resource = bundle.getString(key);
-            } catch (MissingResourceException ex) {
-                resource = key;
-            }
-            matcher.appendReplacement(sb, resource);
-        }
-        matcher.appendTail(sb);
-    }
+    content = content.replaceAll("\\$\\{FIRST_NAME\\}", user.getFirstName());
+    content = content.replaceAll("\\$\\{USERNAME\\}", user.getUserName());
+    content = content.replaceAll("\\$\\{RESET_PASSWORD_LINK\\}", link);
 
-    // These method will be overwrite on Platform project
-    protected String getEmailSubject(User user, ResourceBundle bundle) {
-        return bundle.getString("gatein.forgotPassword.email.subject");
-    }
-    
-    @Override
-    public String getOnboardingURL(String tokenId, String lang) {
-        Router router = webController.getRouter();
-        Map<QualifiedName, String> params = new HashMap<>();
-        params.put(WebAppController.HANDLER_PARAM, OnboardingHandler.NAME);
-        if (tokenId != null) {
-          params.put(OnboardingHandler.TOKEN, tokenId);
-        }
-        if (lang != null) {
-          params.put(OnboardingHandler.LANG, lang);
-        }
-        return router.render(params);
-    }
+    return content;
+  }
 
-    @Override
-    public String getExternalRegistrationURL(String tokenId, String lang) {
-        Router router = webController.getRouter();
-        Map<QualifiedName, String> params = new HashMap<>();
-        params.put(WebAppController.HANDLER_PARAM, ExternalRegistrationHandler.NAME);
-        if (tokenId != null) {
-          params.put(ExternalRegistrationHandler.TOKEN, tokenId);
+  private String resolveLanguage(InputStream input, ResourceBundle bundle) {
+    // Read from input string
+    StringBuffer content = new StringBuffer();
+    try {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+      String line;
+      while ((line = reader.readLine()) != null) {
+        if (content.length() > 0) {
+          content.append("\n");
         }
-        if (lang != null) {
-          params.put(ExternalRegistrationHandler.LANG, lang);
-        }
-        return router.render(params);
+        resolveLanguage(content, line, bundle);
+      }
+    } catch (IOException ex) {
+      log.error(ex);
     }
+    return content.toString();
+  }
 
-    @Override
-    public String getPasswordRecoverURL(String tokenId, String lang) {
-        Router router = webController.getRouter();
-        Map<QualifiedName, String> params = new HashMap<>();
-        params.put(WebAppController.HANDLER_PARAM, PasswordRecoveryHandler.NAME);
-        if (tokenId != null) {
-          params.put(PasswordRecoveryHandler.TOKEN, tokenId);
-        }
-        if (lang != null) {
-          params.put(PasswordRecoveryHandler.LANG, lang);
-        }
-        return router.render(params);
+  private static final Pattern PATTERN = Pattern.compile("&\\{([a-zA-Z0-9\\.]+)\\}");
+
+  private void resolveLanguage(StringBuffer sb, String input, ResourceBundle bundle) {
+    Matcher matcher = PATTERN.matcher(input);
+    while (matcher.find()) {
+      String key = matcher.group(1);
+      String resource;
+      try {
+        resource = bundle.getString(key);
+      } catch (MissingResourceException ex) {
+        resource = key;
+      }
+      matcher.appendReplacement(sb, resource);
     }
-    
-    @Override
-    public ChangePasswordConnector getActiveChangePasswordConnector() {
-      return this.changePasswordConnectorMap.get(this.changePasswordConnectorName);
+    matcher.appendTail(sb);
+  }
+
+  // These method will be overwrite on Platform project
+  protected String getEmailSubject(User user, ResourceBundle bundle) {
+    return bundle.getString("gatein.forgotPassword.email.subject");
+  }
+
+  @Override
+  public String getOnboardingURL(String tokenId, String lang) {
+    Router router = webController.getRouter();
+    Map<QualifiedName, String> params = new HashMap<>();
+    params.put(WebAppController.HANDLER_PARAM, OnboardingHandler.NAME);
+    if (tokenId != null) {
+      params.put(OnboardingHandler.TOKEN, tokenId);
     }
+    if (lang != null) {
+      params.put(OnboardingHandler.LANG, lang);
+    }
+    return router.render(params);
+  }
+
+  @Override
+  public String getExternalRegistrationURL(String tokenId, String lang) {
+    Router router = webController.getRouter();
+    Map<QualifiedName, String> params = new HashMap<>();
+    params.put(WebAppController.HANDLER_PARAM, ExternalRegistrationHandler.NAME);
+    if (tokenId != null) {
+      params.put(ExternalRegistrationHandler.TOKEN, tokenId);
+    }
+    if (lang != null) {
+      params.put(ExternalRegistrationHandler.LANG, lang);
+    }
+    return router.render(params);
+  }
+
+  @Override
+  public String getPasswordRecoverURL(String tokenId, String lang) {
+    Router router = webController.getRouter();
+    Map<QualifiedName, String> params = new HashMap<>();
+    params.put(WebAppController.HANDLER_PARAM, PasswordRecoveryHandler.NAME);
+    if (tokenId != null) {
+      params.put(PasswordRecoveryHandler.TOKEN, tokenId);
+    }
+    if (lang != null) {
+      params.put(PasswordRecoveryHandler.LANG, lang);
+    }
+    return router.render(params);
+  }
+
+  @Override
+  public ChangePasswordConnector getActiveChangePasswordConnector() {
+    return this.changePasswordConnectorMap.get(this.changePasswordConnectorName);
+  }
 }

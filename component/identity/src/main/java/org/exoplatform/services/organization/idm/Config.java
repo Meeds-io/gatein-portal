@@ -92,6 +92,9 @@ public class Config {
 
     private boolean updateLastLoginTimeAfterAuthentication = true;
 
+    private int               maxAuthenticationAttempts;
+    private int blockingTime;
+
     public Config() {
     }
 
@@ -375,5 +378,21 @@ public class Config {
 
     public void setUseCache(boolean useCache) {
       this.useCache = useCache;
+    }
+
+    public int getMaxAuthenticationAttempts() {
+      return maxAuthenticationAttempts;
+    }
+
+    public void setMaxAuthenticationAttempts(int maxAuthenticationAttempts) {
+      this.maxAuthenticationAttempts = maxAuthenticationAttempts;
+    }
+
+    public int getBlockingTime() {
+        return blockingTime;
+    }
+
+    public void setBlockingTime(int blockingTime) {
+        this.blockingTime = blockingTime;
     }
 }
