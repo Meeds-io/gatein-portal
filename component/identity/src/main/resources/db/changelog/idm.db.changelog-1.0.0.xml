@@ -386,4 +386,3 @@
     <createSequence sequenceName="hibernate_sequence" startValue="1"/>
   </changeSet>
 </databaseChangeLog>
->>>>>>> b68f3276a (Task-56238 Error on postgres when updating from 6.1.5)
