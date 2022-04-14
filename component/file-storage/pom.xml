@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.exoplatform.gatein.portal</groupId>
     <artifactId>exo.portal.component</artifactId>
-    <version>6.3.x-SNAPSHOT</version>
+    <version>6.3.0-20220414</version>
   </parent>
   <artifactId>exo.portal.component.file-storage</artifactId>
   <packaging>jar</packaging>
