@@ -1036,7 +1036,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
                           profile.getAttribute(AUTHENTICATION_ATTEMPTS) != null ? Integer.parseInt(profile.getAttribute(AUTHENTICATION_ATTEMPTS))
                                                                                 : 0;
         Instant latestAuthFailureTime =
-                                      Instant.ofEpochMilli(profile.getAttribute(AUTHENTICATION_ATTEMPTS) != null ? Long.parseLong(profile.getAttribute(LATEST_AUTH_TIME))
+                                      Instant.ofEpochMilli(profile.getAttribute(LATEST_AUTH_TIME) != null ? Long.parseLong(profile.getAttribute(LATEST_AUTH_TIME))
                                                                                                                  : Instant.EPOCH.toEpochMilli());
         if (currentNbFail >= orgService.getConfiguration().getMaxAuthenticationAttempts()
             && latestAuthFailureTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES)
