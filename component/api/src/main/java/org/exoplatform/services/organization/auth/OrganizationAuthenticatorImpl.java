@@ -22,8 +22,6 @@ import org.apache.commons.lang.StringUtils;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.xml.InitParams;
@@ -102,7 +100,7 @@ public class OrganizationAuthenticatorImpl implements Authenticator
     * The thread local in which we store the last exception that occurs while calling the method 
     * validateUser
     */
-   private final ThreadLocal<Exception> lastExceptionOnValidateUser = new ThreadLocal<Exception>();
+   private final ThreadLocal<Exception> lastExceptionOnValidateUser = new ThreadLocal<>();
 
    private final OrganizationService orgService;
 
@@ -267,8 +265,12 @@ public class OrganizationAuthenticatorImpl implements Authenticator
       }
 
       if (!success) {
-         saveLastLoginFail(username);
-         throw new LoginException("Login failed for " + username.replace("\n", " ").replace("\r", " "));
+        if (username != null) {
+          saveLastLoginFail(username);
+          throw new LoginException("Login failed for " + username.replace("\n", " ").replace("\r", " "));
+        } else {
+          throw new LoginException("Login failed for " + username);
+        }
       } else {
          resetAuthenticationAttempts(username);
       }
@@ -290,7 +292,7 @@ public class OrganizationAuthenticatorImpl implements Authenticator
      this.plugins = plugins;
    }
 
-   public void begin(OrganizationService orgService) throws Exception
+   public void begin(OrganizationService orgService)
    {
       if (orgService instanceof ComponentRequestLifecycle)
       {
@@ -360,11 +362,6 @@ public class OrganizationAuthenticatorImpl implements Authenticator
    }
 
    private void broacastFailedLoginEvent(String userId, String status, String reason) {
-      ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
-      if (currentContainer == null || (currentContainer instanceof RootContainer)) {
-         currentContainer = PortalContainer.getInstance();
-      }
-      ListenerService listenerService = currentContainer.getComponentInstanceOfType(ListenerService.class);
 
       try {
          Map<String, String> info = new HashMap<>();
