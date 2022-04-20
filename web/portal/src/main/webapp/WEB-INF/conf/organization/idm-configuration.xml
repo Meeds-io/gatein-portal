@@ -251,16 +251,6 @@
           <field name="updateLastLoginTimeAfterAuthentication">
             <boolean>${exo.idm.user.updateLastLoginTime:true}</boolean>
           </field>
-
-          <!-- This property define how many fail attempts a user can do before his account is blocked -->
-          <field name="maxAuthenticationAttempts">
-            <int>${exo.idm.antibruteforce.maxAuthenticationAttempts:5}</int>
-          </field>
-
-          <!-- This property define how long time in minutes an account is blocked after MAXFAILEDATTEMPT failed login -->
-          <field name="blockingTime">
-            <int>${exo.idm.antibruteforce.blockingTime:10}</int>
-          </field>
         </object>
       </object-param>
     </init-params>

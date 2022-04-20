@@ -46,22 +46,6 @@ import org.exoplatform.services.organization.externalstore.IDMExternalStoreServi
  */
 public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
-  private static final String     STATUS_NOT_OK        = "ko";
-
-  private static final String     STATUS_OK               = "ok";
-
-  private static final String     ACCOUNT_LOCKED       = "accountLocked";
-
-  private static final String     WRONG_CREDENTIALS    = "wrongCredentials";
-
-  private static final String     SERVICE                 = "service";
-
-  private static final String     LOGIN                   = "login";
-
-  private static final String     OPERATION               = "operation";
-
-  private static final String     STATUS                  = "status";
-
   private List<UserEventListener> listeners_ = new ArrayList<UserEventListener>(3);
 
   public static final String      USER_PASSWORD        = EntityMapperUtils.USER_PASSWORD;
@@ -87,10 +71,6 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
   public static final Set<String> USER_NON_PROFILE_KEYS;
 
   public static final DateFormat  dateFormat           = DateFormat.getInstance();
-
-  private static final String     AUTHENTICATION_ATTEMPTS = "authenticationAttempts";
-
-  private static final String     LATEST_AUTH_TIME        = "latestAuthFailureTime";
 
   static {
     Set<String> keys = new HashSet<String>();
@@ -394,25 +374,16 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         throw new DisabledUserException(username);
       }
 
-      checkLockedAccount(user); // throw exception if account is locked
-
       if (user.isInternalStore()) {
         authenticated = authenticateDB(user, password);
         if (authenticated) {
-          resetAuthenticationAttempts(user.getUserName());
           return true;
         }
       }
 
     }
 
-    authenticated = authenticateExternal(username, password);
-    if (!authenticated) {
-      saveLastLoginFail(username);
-    } else {
-      resetAuthenticationAttempts(username);
-    }
-    return authenticated;
+    return authenticateExternal(username, password);
   }
 
   public boolean authenticateExternal(String username, String password) throws Exception {
@@ -950,136 +921,4 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
     return orgService.getConfiguration().isDisableUserActived();
   }
 
-  private void saveLastLoginFail(String username) {
-    try {
-      User user = orgService.getUserHandler().findUserByName(username);
-      if (user != null) {
-        UserProfile profile = orgService.getUserProfileHandler().findUserProfileByName(username);
-        if (profile == null) {
-          profile = orgService.getUserProfileHandler().createUserProfileInstance(username);
-        }
-        int currentNbFail =
-                          profile.getAttribute(AUTHENTICATION_ATTEMPTS) != null ? Integer.parseInt(profile.getAttribute(AUTHENTICATION_ATTEMPTS))
-                                                                                : 0;
-        currentNbFail++;
-        profile.setAttribute(AUTHENTICATION_ATTEMPTS, String.valueOf(currentNbFail));
-        Instant now = Instant.now();
-        profile.setAttribute(LATEST_AUTH_TIME, String.valueOf(now.toEpochMilli()));
-        orgService.getUserProfileHandler().saveUserProfile(profile, true);
-
-        if (currentNbFail >= orgService.getConfiguration().getMaxAuthenticationAttempts()) {
-          log.warn(SERVICE + "=" + LOGIN + " " + OPERATION + "=" + LOGIN + " " + STATUS + "=" + STATUS_NOT_OK
-              + " parameters=\"username:{}, authenticationAttempts:{}, maxAuthenticationAttempts:{}, latestAuthFailureTime={}, "
-              + "lockTimeInMinutes={}, unlockTime={}\"" + " error_msg=\"Account is locked\"",
-                   user.getUserName(),
-                   currentNbFail,
-                   orgService.getConfiguration().getMaxAuthenticationAttempts(),
-                   now,
-                   orgService.getConfiguration().getBlockingTime(),
-                   now.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES));
-
-          broacastFailedLoginEvent(user.getUserName(), STATUS_NOT_OK, ACCOUNT_LOCKED);
-
-          ExoContainer container = ExoContainerContext.getCurrentContainer();
-          PasswordRecoveryService passwordRecoveryService = container.getComponentInstanceOfType(PasswordRecoveryService.class);
-          passwordRecoveryService.sendAccountLockedEmail(user, Locale.ENGLISH);
-
-        } else {
-          log.warn(SERVICE + "=" + LOGIN + " " + OPERATION + "=" + LOGIN + " " + STATUS + "=" + STATUS_NOT_OK
-              + " parameters=\"username:{}, authenticationAttempts:{}, latestAuthFailureTime:{}, maxAuthenticationAttempts:{}\""
-              + " error_msg=\"Login failed\"",
-                   username,
-                   currentNbFail,
-                   now,
-                   orgService.getConfiguration().getMaxAuthenticationAttempts());
-          broacastFailedLoginEvent(user.getUserName(), STATUS_NOT_OK, WRONG_CREDENTIALS);
-
-        }
-      }
-    } catch (Exception e) {
-      log.error("Unable to get gatein user profile for user {}", username, e);
-    }
-
-  }
-
-  private void resetAuthenticationAttempts(String username) {
-    try {
-      User user = orgService.getUserHandler().findUserByName(username);
-      if (user != null) {
-        UserProfile profile = orgService.getUserProfileHandler().findUserProfileByName(username);
-        if (profile == null) {
-          profile = orgService.getUserProfileHandler().createUserProfileInstance(username);
-        }
-        profile.setAttribute(AUTHENTICATION_ATTEMPTS, String.valueOf(0));
-        orgService.getUserProfileHandler().saveUserProfile(profile, true);
-        if (log.isDebugEnabled()) {
-          log.debug(SERVICE + "=" + LOGIN + " " + OPERATION + "=" + LOGIN + " " + STATUS + "=" + STATUS_OK
-              + " parameters=\"username:{}, authenticationAttempts:{}, maxAuthenticationAttempts:{}\"",
-                    username,
-                    0,
-                    orgService.getConfiguration().getMaxAuthenticationAttempts());
-        }
-      }
-    } catch (Exception e) {
-      log.error("Unable to get gatein user profile for user {}", username, e);
-    }
-
-  }
-
-  private void checkLockedAccount(User user) throws AccountTemporaryLockedException {
-    try {
-      UserProfile profile = orgService.getUserProfileHandler().findUserProfileByName(user.getUserName());
-      if (profile != null) {
-        //if there is no userProfile, the user have never fail his login, we do no lock him
-
-        int currentNbFail =
-                          profile.getAttribute(AUTHENTICATION_ATTEMPTS) != null ? Integer.parseInt(profile.getAttribute(AUTHENTICATION_ATTEMPTS))
-                                                                                : 0;
-        Instant latestAuthFailureTime =
-                                      Instant.ofEpochMilli(profile.getAttribute(LATEST_AUTH_TIME) != null ? Long.parseLong(profile.getAttribute(LATEST_AUTH_TIME))
-                                                                                                                 : Instant.EPOCH.toEpochMilli());
-        if (currentNbFail >= orgService.getConfiguration().getMaxAuthenticationAttempts()
-            && latestAuthFailureTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES)
-                                    .isAfter(Instant.now())) {
-
-          log.warn(SERVICE + "=" + LOGIN + " " + OPERATION + "=" + LOGIN + " " + STATUS + "=" + STATUS_NOT_OK
-              + " parameters=\"username:{}, authenticationAttempts:{}, maxAuthenticationAttempts:{}, latestAuthFailureTime={}, "
-              + "lockTimeInMinutes={}, unlockTime={}\"" + " error_msg=\"Account is locked\"",
-                   user.getUserName(),
-                   currentNbFail,
-                   orgService.getConfiguration().getMaxAuthenticationAttempts(),
-                   latestAuthFailureTime,
-                   orgService.getConfiguration().getBlockingTime(),
-                   latestAuthFailureTime.plus(orgService.getConfiguration().getBlockingTime(), ChronoUnit.MINUTES));
-          broacastFailedLoginEvent(user.getUserName(), STATUS_NOT_OK, ACCOUNT_LOCKED);
-          throw new AccountTemporaryLockedException(user.getUserName(),
-                                                    latestAuthFailureTime.plus(orgService.getConfiguration().getBlockingTime(),
-                                                                               ChronoUnit.MINUTES));
-        }
-      }
-    } catch (AccountTemporaryLockedException atle) {
-      throw atle;
-    } catch (Exception e) {
-      log.error("Unable to get gatein user profile for user {}", user.getUserName(), e);
-    }
-  }
-
-  private void broacastFailedLoginEvent(String userId, String status, String reason) {
-    ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
-    if (currentContainer == null || (currentContainer instanceof RootContainer)) {
-      currentContainer = PortalContainer.getInstance();
-    }
-    ListenerService listenerService = currentContainer.getComponentInstanceOfType(ListenerService.class);
-
-    try {
-      Map<String, String> info = new HashMap<>();
-      info.put("user_id", userId);
-      info.put(STATUS, status);
-      info.put("reason", reason);
-
-      listenerService.broadcast("login.failed", null, info);
-    } catch (Exception e) {
-      log.error("Error while broadcasting event 'login.failed' for user '{}'", userId, e);
-    }
-  }
 }
