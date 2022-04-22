@@ -22,13 +22,9 @@ package org.exoplatform.services.organization.idm;
 import static org.exoplatform.services.organization.idm.EntityMapperUtils.ORIGINATING_STORE;
 
 import java.text.DateFormat;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.LogLevel;
-import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 import org.picketlink.idm.api.*;
 import org.picketlink.idm.api.query.UserQueryBuilder;
 import org.picketlink.idm.impl.api.SimpleAttribute;
