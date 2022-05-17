@@ -87,11 +87,10 @@ public class NavigationCategoryService {
     String cat1 = navigationCategories.get(key1);
     String cat2 = navigationCategories.get(key2);
     if (StringUtils.equals(cat1, cat2)) {
-      if (navigationUriOrder.containsKey(key1) && navigationUriOrder.containsKey(key2)) {
-        return navigationUriOrder.get(key1) - navigationUriOrder.get(key2);
-      } else {
-        return 0;
-      }
+      int key1Order = navigationUriOrder.containsKey(key1) ? navigationUriOrder.get(key1) : 0;
+      int key2Order = navigationUriOrder.containsKey(key2) ? navigationUriOrder.get(key2) : 0;
+      int order = key1Order - key2Order;
+      return order == 0 ? key1.compareTo(key2) : order;
     } else if (StringUtils.isBlank(cat1)) {
       return -1;
     } else if (StringUtils.isBlank(cat2)) {

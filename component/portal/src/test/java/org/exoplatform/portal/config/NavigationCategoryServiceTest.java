@@ -59,12 +59,12 @@ public class NavigationCategoryServiceTest {
   public void testAddSortedCategories() {
     NavigationCategoryService navigationCategoryService = new NavigationCategoryService();
 
-    addNavigationPlugin(navigationCategoryService, "cat1", "6", "uri1-2");
-    addNavigationPlugin(navigationCategoryService, "cat1", "6", "uri1-3");
-    addNavigationPlugin(navigationCategoryService, "cat1", "6", "uri1-1");
-    addNavigationPlugin(navigationCategoryService, "cat2", "4", "uri2-2");
-    addNavigationPlugin(navigationCategoryService, "cat2", "4", "uri2-2");
-    addNavigationPlugin(navigationCategoryService, "cat2", "4", "uri2-1");
+    addNavigationPlugin(navigationCategoryService, "cat1", "6", "uri1-2", "10");
+    addNavigationPlugin(navigationCategoryService, "cat1", "6", "uri1-3", "20");
+    addNavigationPlugin(navigationCategoryService, "cat1", "6", "uri1-1", "30");
+    addNavigationPlugin(navigationCategoryService, "cat2", "4", "uri2-2", "30");
+    addNavigationPlugin(navigationCategoryService, "cat2", "4", "uri2-2", "20");
+    addNavigationPlugin(navigationCategoryService, "cat2", "4", "uri2-1", "20");
 
     assertNotNull(navigationCategoryService.getNavigationCategories());
     assertEquals("URI must be injected only oncve in one single category",
@@ -83,8 +83,8 @@ public class NavigationCategoryServiceTest {
     assertEquals("cat1", fourthEntry.getValue());
     assertEquals("cat1", fifthEntry.getValue());
 
-    assertEquals("uri2-2", firstEntry.getKey());
-    assertEquals("uri2-1", secondEntry.getKey());
+    assertEquals("uri2-1", firstEntry.getKey());
+    assertEquals("uri2-2", secondEntry.getKey());
     assertEquals("uri1-2", thirdEntry.getKey());
     assertEquals("uri1-3", fourthEntry.getKey());
     assertEquals("uri1-1", fifthEntry.getKey());
@@ -93,11 +93,13 @@ public class NavigationCategoryServiceTest {
   private void addNavigationPlugin(NavigationCategoryService navigationCategoryService,
                                    String categoryName,
                                    String categoryOrder,
-                                   String uriValue) {
+                                   String uriValue,
+                                   String uriOrder) {
     InitParams params = new InitParams();
     addParam(params, NavigationCategoryPlugin.CATEGORY_PARAM_NAME, categoryName);
     addParam(params, NavigationCategoryPlugin.CATEGORY_ORDER_PARAM_NAME, categoryOrder);
     addParam(params, NavigationCategoryPlugin.URI_PARAM_NAME, uriValue);
+    addParam(params, NavigationCategoryPlugin.URI_ORDER_PARAM_NAME, uriOrder);
     NavigationCategoryPlugin plugin = new NavigationCategoryPlugin(params);
     navigationCategoryService.addPlugin(plugin);
   }
