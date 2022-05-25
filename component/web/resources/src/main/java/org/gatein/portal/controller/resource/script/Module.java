@@ -35,6 +35,8 @@ import javax.servlet.ServletContext;
 
 import org.exoplatform.commons.utils.CompositeReader;
 import org.exoplatform.commons.utils.PropertyResolverReader;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.services.log.Log;
@@ -49,13 +51,7 @@ public abstract class Module {
     /** Our logger. */
     private static final Log                 log     = ExoLogger.getLogger(Module.class);
 
-    /** . */
-    public static final ResourceBundle.Control CONTROL = new ResourceBundle.Control() {
-        @Override
-        public Locale getFallbackLocale(String baseName, Locale locale) {
-            return locale.equals(Locale.ENGLISH) ? null : Locale.ENGLISH;
-        }
-    };
+    protected static ResourceBundleService resourceBundleService;
 
     /** . */
     protected ScriptResource resource;
@@ -208,8 +204,7 @@ public abstract class Module {
                     }
 
                     //
-                    log.debug("About to load a bundle for locale " + locale + " and bundle " + resourceBundle);
-                    final ResourceBundle bundle = ResourceBundle.getBundle(resourceBundle, locale, bundleLoader, CONTROL);
+                    ResourceBundle bundle = getResourceBundleService().getResourceBundle(resourceBundle, locale, bundleLoader);
                     if (bundle != null) {
                         log.debug("Found bundle " + bundle + " for locale " + locale + " and bundle " + resourceBundle);
                         reader = new PropertyResolverReader(reader) {
@@ -291,5 +286,12 @@ public abstract class Module {
         }
         return sb.toString();
 
+    }
+
+    public static ResourceBundleService getResourceBundleService() {
+      if (resourceBundleService == null) {
+        resourceBundleService = PortalContainer.getInstance().getComponentInstanceOfType(ResourceBundleService.class);
+      }
+      return resourceBundleService;
     }
 }
