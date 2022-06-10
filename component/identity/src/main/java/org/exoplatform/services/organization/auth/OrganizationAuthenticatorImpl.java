@@ -20,11 +20,8 @@ package org.exoplatform.services.organization.auth;
 
 import org.apache.commons.lang.StringUtils;
 
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
-import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -33,9 +30,8 @@ import org.exoplatform.services.organization.DisabledUserException;
 import org.exoplatform.services.organization.ExtendedUserHandler;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
-import org.exoplatform.services.organization.UserProfile;
+import org.exoplatform.services.organization.plugin.SecurityCheckAuthenticationPlugin;
 import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.Credential;
 import org.exoplatform.services.security.DigestPasswordEncrypter;
@@ -46,10 +42,7 @@ import org.exoplatform.services.security.PasswordCredential;
 import org.exoplatform.services.security.PasswordEncrypter;
 import org.exoplatform.services.security.RolesExtractor;
 import org.exoplatform.services.security.UsernameCredential;
-import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import javax.security.auth.login.LoginException;
@@ -64,35 +57,7 @@ import javax.security.auth.login.LoginException;
 
 public class OrganizationAuthenticatorImpl implements Authenticator
 {
-
-   private static final String     STATUS_NOT_OK        = "ko";
-
-   private static final String     STATUS_OK               = "ok";
-
-   private static final String     ACCOUNT_LOCKED       = "accountLocked";
-
-   private static final String     WRONG_CREDENTIALS    = "wrongCredentials";
-
-   private static final String     SERVICE                 = "service";
-
-   private static final String     LOGIN                   = "login";
-
-   private static final String     OPERATION               = "operation";
-
-   private static final String     STATUS                  = "status";
-
-   private static final String     AUTHENTICATION_ATTEMPTS = "authenticationAttempts";
-
-   private static final String     LATEST_AUTH_TIME        = "latestAuthFailureTime";
-
-   private static final String     MAX_AUTHENTICATION_ATTEMPTS = "maxAuthenticationAttempts";
-
-   private static final String     BLOCKING_TIME        = "blockingTime";
-
-   private int maxAuthenticationAttempts = 5;
-
-   private int blockingTime = 10;
-
+    
    protected static final Log LOG =
       ExoLogger.getLogger("exo.core.component.organization.api.OrganizationUserRegistry");
 
@@ -111,33 +76,26 @@ public class OrganizationAuthenticatorImpl implements Authenticator
    private final ListenerService listenerService;
 
    private List<AuthenticatorPlugin> plugins = new ArrayList<>();
+   private List<SecurityCheckAuthenticationPlugin> securityCheckPlugins = new ArrayList<>();
 
    public OrganizationAuthenticatorImpl(OrganizationService orgService, RolesExtractor rolesExtractor,
-                                        PasswordEncrypter encrypter, ListenerService listenerService, InitParams initParams)
+                                        PasswordEncrypter encrypter, ListenerService listenerService)
    {
       this.orgService = orgService;
       this.encrypter = encrypter;
       this.rolesExtractor = rolesExtractor;
       this.listenerService = listenerService;
-      if (initParams != null && initParams.getValueParam(MAX_AUTHENTICATION_ATTEMPTS)!=null) {
-         this.maxAuthenticationAttempts=Integer.parseInt(initParams.getValueParam(MAX_AUTHENTICATION_ATTEMPTS).getValue());
-      }
-      if (initParams != null && initParams.getValueParam(BLOCKING_TIME)!=null) {
-         this.blockingTime=Integer.parseInt(initParams.getValueParam(BLOCKING_TIME).getValue());
-      }
-
-
    }
 
    public OrganizationAuthenticatorImpl(OrganizationService orgService, RolesExtractor rolesExtractor,
-                                        ListenerService listenerService, InitParams initParams)
+                                        ListenerService listenerService)
    {
-      this(orgService, rolesExtractor, null, listenerService, initParams);
+      this(orgService, rolesExtractor, null, listenerService);
    }
 
-   public OrganizationAuthenticatorImpl(OrganizationService orgService, ListenerService listenerService, InitParams initParams)
+   public OrganizationAuthenticatorImpl(OrganizationService orgService, ListenerService listenerService)
    {
-      this(orgService, null, null, listenerService,initParams);
+      this(orgService, null, null, listenerService);
    }
 
    public OrganizationService getOrganizationService()
@@ -211,7 +169,9 @@ public class OrganizationAuthenticatorImpl implements Authenticator
         {
            UserHandler userHandler = orgService.getUserHandler();
            if (userHandler.findUserByName(username)!=null) {
-              checkLockedAccount(userHandler.findUserByName(username)); // throw exception if account is locked
+              for (SecurityCheckAuthenticationPlugin plugin : getSecurityCheckPlugins()) {
+                plugin.doCheck(userHandler.findUserByName(username));
+              }
            }
 
            if (passwordContext != null && userHandler instanceof ExtendedUserHandler)
@@ -264,15 +224,21 @@ public class OrganizationAuthenticatorImpl implements Authenticator
         }
       }
 
-      if (!success) {
-        if (username != null) {
-          saveLastLoginFail(username);
-          throw new LoginException("Login failed for " + username.replace("\n", " ").replace("\r", " "));
+      for (SecurityCheckAuthenticationPlugin plugin : getSecurityCheckPlugins()) {
+        if (!success) {
+          if (username != null) {
+            plugin.onCheckFail(username);
+            throw new LoginException("Login failed for " + username.replace("\n", " ").replace("\r", " "));
+          } else {
+            throw new LoginException("Login failed for " + username);
+          }
         } else {
-          throw new LoginException("Login failed for " + username);
+          plugin.onCheckSuccess(username);
         }
-      } else {
-         resetAuthenticationAttempts(username);
+      }
+
+      if (!success) {
+        throw new LoginException("Login failed for " + username);
       }
 
       listenerService.broadcast(OrganizationService.USER_AUTHENTICATED_EVENT, orgService, username);
@@ -281,11 +247,19 @@ public class OrganizationAuthenticatorImpl implements Authenticator
    }
 
    public void addAuthenticatorPlugin(AuthenticatorPlugin plugin) {
-      this.plugins.add(plugin);
+     this.plugins.add(plugin);
+   }
+
+   public void addSecurityCheckAuthenticatorPlugin(SecurityCheckAuthenticationPlugin plugin) {
+     this.securityCheckPlugins.add(plugin);
    }
 
    public List<AuthenticatorPlugin> getPlugins() {
-      return plugins;
+     return plugins;
+   }
+
+   public List<SecurityCheckAuthenticationPlugin> getSecurityCheckPlugins() {
+     return securityCheckPlugins;
    }
 
    public void setPlugins(List<AuthenticatorPlugin> plugins) {
@@ -322,132 +296,4 @@ public class OrganizationAuthenticatorImpl implements Authenticator
       return e;
    }
 
-
-   private void checkLockedAccount(User user) throws AccountTemporaryLockedException {
-      try {
-         UserProfile profile = orgService.getUserProfileHandler().findUserProfileByName(user.getUserName());
-         if (profile != null) {
-            //if there is no userProfile, the user have never fail his login, we do no lock him
-
-            int currentNbFail =
-                profile.getAttribute(AUTHENTICATION_ATTEMPTS) != null ? Integer.parseInt(profile.getAttribute(AUTHENTICATION_ATTEMPTS))
-                                                                      : 0;
-            Instant latestAuthFailureTime =
-                Instant.ofEpochMilli(profile.getAttribute(LATEST_AUTH_TIME) != null ? Long.parseLong(profile.getAttribute(LATEST_AUTH_TIME))
-                                                                                           : Instant.EPOCH.toEpochMilli());
-            if (currentNbFail >= this.maxAuthenticationAttempts
-                && latestAuthFailureTime.plus(this.blockingTime, ChronoUnit.MINUTES)
-                                        .isAfter(Instant.now())) {
-
-               LOG.warn(SERVICE + "=" + LOGIN + " " + OPERATION + "=" + LOGIN + " " + STATUS + "=" + STATUS_NOT_OK
-                            + " parameters=\"username:{}, authenticationAttempts:{}, maxAuthenticationAttempts:{}, latestAuthFailureTime={}, "
-                            + "lockTimeInMinutes={}, unlockTime={}\"" + " error_msg=\"Account is locked\"",
-                        user.getUserName(),
-                        currentNbFail,
-                        this.maxAuthenticationAttempts,
-                        latestAuthFailureTime,
-                        this.blockingTime,
-                        latestAuthFailureTime.plus(this.blockingTime, ChronoUnit.MINUTES));
-               broacastFailedLoginEvent(user.getUserName(), STATUS_NOT_OK, ACCOUNT_LOCKED);
-               throw new AccountTemporaryLockedException(user.getUserName(),
-                                                         latestAuthFailureTime.plus(this.blockingTime,
-                                                                                    ChronoUnit.MINUTES));
-            }
-         }
-      } catch (AccountTemporaryLockedException atle) {
-         throw atle;
-      } catch (Exception e) {
-         LOG.error("Unable to get gatein user profile for user {}", user.getUserName(), e);
-      }
-   }
-
-   private void broacastFailedLoginEvent(String userId, String status, String reason) {
-
-      try {
-         Map<String, String> info = new HashMap<>();
-         info.put("user_id", userId);
-         info.put(STATUS, status);
-         info.put("reason", reason);
-
-         listenerService.broadcast("login.failed", null, info);
-      } catch (Exception e) {
-         LOG.error("Error while broadcasting event 'login.failed' for user '{}'", userId, e);
-      }
-   }
-
-   private void saveLastLoginFail(String username) {
-      try {
-         User user = orgService.getUserHandler().findUserByName(username);
-         if (user != null) {
-            UserProfile profile = orgService.getUserProfileHandler().findUserProfileByName(username);
-            if (profile == null) {
-               profile = orgService.getUserProfileHandler().createUserProfileInstance(username);
-            }
-            int currentNbFail =
-                profile.getAttribute(AUTHENTICATION_ATTEMPTS) != null ? Integer.parseInt(profile.getAttribute(AUTHENTICATION_ATTEMPTS))
-                                                                      : 0;
-            currentNbFail++;
-            profile.setAttribute(AUTHENTICATION_ATTEMPTS, String.valueOf(currentNbFail));
-            Instant now = Instant.now();
-            profile.setAttribute(LATEST_AUTH_TIME, String.valueOf(now.toEpochMilli()));
-            orgService.getUserProfileHandler().saveUserProfile(profile, true);
-
-            if (currentNbFail >= this.maxAuthenticationAttempts) {
-               LOG.warn(SERVICE + "=" + LOGIN + " " + OPERATION + "=" + LOGIN + " " + STATUS + "=" + STATUS_NOT_OK
-                            + " parameters=\"username:{}, authenticationAttempts:{}, maxAuthenticationAttempts:{}, latestAuthFailureTime={}, "
-                            + "lockTimeInMinutes={}, unlockTime={}\"" + " error_msg=\"Account is locked\"",
-                        user.getUserName(),
-                        currentNbFail,
-                        this.maxAuthenticationAttempts,
-                        now,
-                        this.blockingTime,
-                        now.plus(this.blockingTime, ChronoUnit.MINUTES));
-
-               broacastFailedLoginEvent(user.getUserName(), STATUS_NOT_OK, ACCOUNT_LOCKED);
-
-               ExoContainer container = ExoContainerContext.getCurrentContainer();
-               PasswordRecoveryService passwordRecoveryService = container.getComponentInstanceOfType(PasswordRecoveryService.class);
-               passwordRecoveryService.sendAccountLockedEmail(user, Locale.ENGLISH);
-
-            } else {
-               LOG.warn(SERVICE + "=" + LOGIN + " " + OPERATION + "=" + LOGIN + " " + STATUS + "=" + STATUS_NOT_OK
-                            + " parameters=\"username:{}, authenticationAttempts:{}, latestAuthFailureTime:{}, maxAuthenticationAttempts:{}\""
-                            + " error_msg=\"Login failed\"",
-                        username,
-                        currentNbFail,
-                        now,
-                        this.maxAuthenticationAttempts);
-               broacastFailedLoginEvent(user.getUserName(), STATUS_NOT_OK, WRONG_CREDENTIALS);
-
-            }
-         }
-      } catch (Exception e) {
-         LOG.error("Unable to get gatein user profile for user {}", username, e);
-      }
-
-   }
-
-   private void resetAuthenticationAttempts(String username) {
-      try {
-         User user = orgService.getUserHandler().findUserByName(username);
-         if (user != null) {
-            UserProfile profile = orgService.getUserProfileHandler().findUserProfileByName(username);
-            if (profile == null) {
-               profile = orgService.getUserProfileHandler().createUserProfileInstance(username);
-            }
-            profile.setAttribute(AUTHENTICATION_ATTEMPTS, String.valueOf(0));
-            orgService.getUserProfileHandler().saveUserProfile(profile, true);
-            if (LOG.isDebugEnabled()) {
-               LOG.debug(SERVICE + "=" + LOGIN + " " + OPERATION + "=" + LOGIN + " " + STATUS + "=" + STATUS_OK
-                             + " parameters=\"username:{}, authenticationAttempts:{}, maxAuthenticationAttempts:{}\"",
-                         username,
-                         0,
-                         this.maxAuthenticationAttempts);
-            }
-         }
-      } catch (Exception e) {
-         LOG.error("Unable to get gatein user profile for user {}", username, e);
-      }
-
-   }
 }
