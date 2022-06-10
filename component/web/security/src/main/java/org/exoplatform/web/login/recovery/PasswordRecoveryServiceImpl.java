@@ -252,65 +252,6 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     return tokenId;
   }
 
-  @Override
-  public boolean sendAccountLockedEmail(User user, Locale defaultLocale) {
-    if (user == null) {
-      throw new IllegalArgumentException("User or Locale must not be null");
-    }
-
-    Locale locale = getLocaleOfUser(user.getUserName(), defaultLocale);
-    ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
-
-    Router router = webController.getRouter();
-    Map<QualifiedName, String> params = new HashMap<>();
-    params.put(WebAppController.HANDLER_PARAM, PasswordRecoveryHandler.NAME);
-
-    StringBuilder url = new StringBuilder();
-    url.append(System.getProperty(CONFIGURED_DOMAIN_URL_KEY) + "/portal");
-    url.append(router.render(params));
-
-    String emailBody = buildAccountLockedEmailBody(user, bundle, url.toString());
-    String emailSubject = bundle.getString("gatein.accountLocked.email.subject");
-
-    String senderName = MailUtils.getSenderName();
-    String from = MailUtils.getSenderEmail();
-    if (senderName != null && !senderName.trim().isEmpty()) {
-      from = senderName + " <" + from + ">";
-    }
-
-    Message message = new Message();
-    message.setFrom(from);
-    message.setTo(user.getEmail());
-    message.setSubject(emailSubject);
-    message.setBody(emailBody);
-    message.setMimeType("text/html");
-
-    try {
-      mailService.sendMessage(message);
-    } catch (Exception ex) {
-      log.error("Failure to send account locked email", ex);
-      return false;
-    }
-
-    return true;
-  }
-
-  private String buildAccountLockedEmailBody(User user, ResourceBundle bundle, String link) {
-    String content;
-    InputStream input = this.getClass().getClassLoader().getResourceAsStream("conf/account_locked_email_template.html");
-    if (input == null) {
-      content = "";
-    } else {
-      content = resolveLanguage(input, bundle);
-    }
-
-    content = content.replace("${FIRST_NAME}", user.getFirstName());
-    content = content.replace("${USERNAME}", user.getUserName());
-    content = content.replace("${FORGOT_PASSWORD_LINK}", link);
-
-    return content;
-  }
-
   private String buildExternalEmailBody(String sender, String space, String link, ResourceBundle bundle) {
     String content;
     InputStream input = this.getClass().getClassLoader().getResourceAsStream("conf/external_email_template.html");
