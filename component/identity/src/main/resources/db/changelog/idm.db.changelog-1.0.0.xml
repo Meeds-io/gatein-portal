@@ -378,12 +378,11 @@
   </changeSet>
 
   <changeSet author="idm" id="1.0.0-17" onValidationFail="MARK_RAN" runOnChange="false" dbms="oracle,postgresql">
-    <preConditions>
+    <preConditions onFail="MARK_RAN">
       <not>
         <sequenceExists sequenceName="hibernate_sequence" />
       </not>
     </preConditions>
     <createSequence sequenceName="hibernate_sequence" startValue="1"/>
   </changeSet>
-
 </databaseChangeLog>
