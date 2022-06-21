@@ -59,11 +59,6 @@ public class MockPasswordRecoveryService implements PasswordRecoveryService {
   }
 
   @Override
-  public boolean sendAccountLockedEmail(User user, Locale defaultLocale) {
-    return false;
-  }
-
-  @Override
   public boolean allowChangePassword(String username) throws Exception {
     return true;
   }
