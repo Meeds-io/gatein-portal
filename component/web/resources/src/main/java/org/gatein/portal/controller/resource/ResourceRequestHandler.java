@@ -230,6 +230,7 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
                 ScriptResult.Error error = (ScriptResult.Error) result;
                 log.error("Could not render script " + key + "\n:" + error.message);
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                cache.remove(key);
             } else {
                 String msg = "Resource " + key + " cannot be found";
                 log.error(msg);

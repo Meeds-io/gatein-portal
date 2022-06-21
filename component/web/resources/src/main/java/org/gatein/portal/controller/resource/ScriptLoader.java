@@ -104,7 +104,7 @@ class ScriptLoader implements Loader<ScriptKey, ScriptResult, ControllerContext>
         CompilerOptions options = new CompilerOptions();
         options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
         options.setStrictModeInput(false);
-        options.setLanguageIn(CompilerOptions.LanguageMode.ECMASCRIPT_2017);
+        options.setLanguageIn(CompilerOptions.LanguageMode.ECMASCRIPT_2021);
         options.setLanguageOut(CompilerOptions.LanguageMode.ECMASCRIPT5);
         options.setExternExports(true);
         level.setOptionsForCompilationLevel(options);
