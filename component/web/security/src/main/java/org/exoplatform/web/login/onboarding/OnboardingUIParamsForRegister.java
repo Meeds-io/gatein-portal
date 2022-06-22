@@ -23,6 +23,7 @@ import javax.servlet.http.HttpSession;
 
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.web.ControllerContext;
+import org.exoplatform.web.login.LoginHandler;
 import org.exoplatform.web.login.UIParamsExtension;
 import org.exoplatform.web.register.RegisterHandler;
 import org.exoplatform.web.security.security.SecureRandomService;
@@ -35,7 +36,8 @@ public class OnboardingUIParamsForRegister implements UIParamsExtension {
 
   public static final String        ONBOARDING_REGISTER_TOKEN   = "onboardingRegisterToken";
 
-  private static final List<String> EXTENSION_NAMES             = Arrays.asList(RegisterHandler.REGISTER_EXTENSION_NAME);
+  private static final List<String> EXTENSION_NAMES             = Arrays.asList(RegisterHandler.REGISTER_EXTENSION_NAME,
+                                                                                LoginHandler.LOGIN_EXTENSION_NAME);
 
   private SecureRandomService       secureRandomService;
 
