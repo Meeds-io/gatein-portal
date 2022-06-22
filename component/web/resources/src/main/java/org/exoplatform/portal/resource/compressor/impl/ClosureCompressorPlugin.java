@@ -119,7 +119,7 @@ public class ClosureCompressorPlugin extends BaseResourceCompressorPlugin {
         //
         Compiler compiler = new Compiler();
         CompilerOptions options = new CompilerOptions();
-        options.setLanguageIn(CompilerOptions.LanguageMode.ECMASCRIPT_2017);
+        options.setLanguageIn(CompilerOptions.LanguageMode.ECMASCRIPT_2021);
         options.setStrictModeInput(false);
         options.setLanguageOut(CompilerOptions.LanguageMode.ECMASCRIPT5);
         options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
