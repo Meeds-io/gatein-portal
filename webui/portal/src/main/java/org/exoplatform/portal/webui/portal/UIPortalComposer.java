@@ -360,6 +360,7 @@ public class UIPortalComposer extends UIContainer {
             uiWorkingWS.setRenderedChild(UIPortalApplication.UI_VIEWING_WS_ID);
             PortalRequestContext prContext = Util.getPortalRequestContext();
             prContext.ignoreAJAXUpdateOnPortlets(true);
+            prContext.getJavascriptManager().getRequireJS().addScripts("location.reload(true);");
 
             UIEditInlineWorkspace uiEditWS = uiWorkingWS.getChild(UIEditInlineWorkspace.class);
             uiEditWS.getComposer().setEditted(false);
@@ -434,6 +435,7 @@ public class UIPortalComposer extends UIContainer {
             uiPortalApp.setModeState(UIPortalApplication.NORMAL_MODE);
             uiWorkingWS.setRenderedChild(UIPortalApplication.UI_VIEWING_WS_ID);
             prContext.ignoreAJAXUpdateOnPortlets(true);
+            prContext.getJavascriptManager().getRequireJS().addScripts("location.reload(true);");
 
             if (uiComposer.isPortalExist(editPortal)) {
                 PortalConfig pConfig = prContext.getDynamicPortalConfig();
