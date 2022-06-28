@@ -72,8 +72,6 @@ public class UserACL {
 
     private String adminGroups;
     
-    private String dlpGroups;
-
     private String adminMSType;
 
     private Map<String, GroupVisibilityPlugin> groupVisibilityPlugins = new HashMap<>();
@@ -100,12 +98,6 @@ public class UserACL {
             setAdminGroups(adminGroupsParam.getValue());
         }
         
-        // get dlp group value
-        ValueParam dlpGroupsParam = params.getValueParam("portal.dlp.groups");
-        if (dlpGroupsParam != null) {
-            setDlpGroups(dlpGroupsParam.getValue());
-        }
-
         // tam.nguyen get administrator member type
         ValueParam adminMSTypeParam = params.getValueParam("portal.administrator.mstype");
         if (adminMSTypeParam != null) {
@@ -202,14 +194,6 @@ public class UserACL {
         return adminGroups;
     }
     
-    public void setDlpGroups(String dlpGroups) {
-      this.dlpGroups = dlpGroups;
-    }
-    
-    public String getDlpGroups() {
-      return dlpGroups;
-    }
-
     public void setAdminMSType(String adminMSType) {
         this.adminMSType = adminMSType;
     }
