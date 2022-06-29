@@ -708,6 +708,7 @@ public class UIPortalComposer extends UIContainer {
             uiWorkingWS.setRenderedChild(UIPortalApplication.UI_VIEWING_WS_ID);
             Util.getPortalRequestContext().ignoreAJAXUpdateOnPortlets(true);
 
+            Util.getPortalRequestContext().getJavascriptManager().getRequireJS().addScripts("location.reload(true);");
             UserNode currentNode = uiPortal.getSelectedUserNode();
             PageNodeEvent<UIPortalApplication> pnevent = new PageNodeEvent<UIPortalApplication>(uiPortalApp,
                     PageNodeEvent.CHANGE_NODE, currentNode.getNavigation().getKey(), currentNode.getURI());
