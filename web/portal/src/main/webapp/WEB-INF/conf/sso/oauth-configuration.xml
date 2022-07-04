@@ -156,20 +156,8 @@
         <value>${exo.oauth.openid.accessType}</value>
       </value-param>
       <value-param>
-        <name>authenticationURL</name>
-        <value>${exo.oauth.openid.authenticationURL}</value>
-      </value-param>
-      <value-param>
-        <name>accessTokenURL</name>
-        <value>${exo.oauth.openid.accessTokenURL}</value>
-      </value-param>
-      <value-param>
-        <name>tokenInfoURL</name>
-        <value>${exo.oauth.openid.tokenInfoURL}</value>
-      </value-param>
-      <value-param>
-        <name>userInfoURL</name>
-        <value>${exo.oauth.openid.userInfoURL}</value>
+        <name>wellKnownConfigurationUrl</name>
+        <value>${exo.oauth.openid.wellKnownConfigurationUrl}</value>
       </value-param>
     </init-params>
   </component>

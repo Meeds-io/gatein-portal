@@ -11,11 +11,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.github.scribejava.core.model.OAuth2AccessToken;
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
 import org.gatein.security.oauth.common.OAuthConstants;
@@ -34,37 +36,40 @@ import org.exoplatform.web.security.security.SecureRandomService;
 import org.gatein.security.oauth.utils.OAuthUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.picocontainer.Startable;
 
 /**
  * {@inheritDoc}
  *
  */
-public class OpenIdProcessorImpl implements OpenIdProcessor {
+public class OpenIdProcessorImpl implements OpenIdProcessor , Startable {
 
   private static Log                log    = ExoLogger.getLogger(OpenIdProcessorImpl.class);
 
     private final String redirectURL;
-    private final String authenticationURL;
-    private final String accessTokenURL;
-    private final String tokenInfoURL;
-    private final String userInfoURL;
+    private String authenticationURL;
+    private String accessTokenURL;
+    private String tokenInfoURL;
+    private String userInfoURL;
     private final String clientID;
     private final String clientSecret;
     private final Set<String> scopes = new HashSet<String>();
     private final String accessType;
+
+    private final String wellKnownConfigurationUrl;
+    private String oidcServer;
     private final String applicationName;
     private final int chunkLength;
 
     private final SecureRandomService secureRandomService;
+    private final RemoteJwkSigningKeyResolver remoteJwkSigningKeyResolver;
 
     public OpenIdProcessorImpl(ExoContainerContext context, InitParams params, SecureRandomService secureRandomService) {
         this.clientID = params.getValueParam("clientId").getValue();
         this.clientSecret = params.getValueParam("clientSecret").getValue();
-        this.authenticationURL = params.getValueParam("authenticationURL").getValue();
-        this.accessTokenURL = params.getValueParam("accessTokenURL").getValue();
         this.tokenInfoURL = params.getValueParam("tokenInfoURL").getValue();
-        this.userInfoURL = params.getValueParam("userInfoURL").getValue();
         String redirectURLParam = params.getValueParam("redirectURL").getValue();
+        this.wellKnownConfigurationUrl = params.getValueParam("wellKnownConfigurationUrl").getValue();
         String scope = params.getValueParam("scope").getValue();
         this.accessType = params.getValueParam("accessType").getValue();
         ValueParam appNameParam = params.getValueParam("applicationName");
@@ -72,6 +77,10 @@ public class OpenIdProcessorImpl implements OpenIdProcessor {
             applicationName = appNameParam.getValue();
         } else {
             applicationName = "GateIn portal";
+        }
+        ValueParam localOidcServer = params.getValueParam("oidcServer");
+        if (localOidcServer!=null) {
+            this.oidcServer = localOidcServer.getValue();
         }
 
         if (clientID == null || clientID.length() == 0 || clientID.trim().equals("<<to be replaced>>")) {
@@ -106,6 +115,7 @@ public class OpenIdProcessorImpl implements OpenIdProcessor {
         }
 
         this.secureRandomService = secureRandomService;
+        this.remoteJwkSigningKeyResolver = new RemoteJwkSigningKeyResolver(this.oidcServer);
     }
 
     @Override
@@ -455,5 +465,23 @@ public class OpenIdProcessorImpl implements OpenIdProcessor {
         if (log.isTraceEnabled())
             log.trace("UserInfo Request=" + this.userInfoURL);
         return new URL(this.userInfoURL);
+    }
+    @Override
+    public void start() {
+        if(StringUtils.isBlank(this.wellKnownConfigurationUrl)){
+            log.warn("wellKnownConfigurationUrl is not configured");
+            return;
+        }
+        JsonObject json = this.remoteJwkSigningKeyResolver.getJson(this.wellKnownConfigurationUrl);
+        if (json != null) {
+            this.authenticationURL = json.getString("authorization_endpoint");
+            this.accessTokenURL = json.getString("token_endpoint");
+            this.userInfoURL = json.getString("userinfo_endpoint");
+        }
+    }
+
+    @Override
+    public void stop() {
+        // Nothing to stop
     }
 }
