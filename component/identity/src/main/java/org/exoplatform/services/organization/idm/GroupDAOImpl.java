@@ -19,6 +19,7 @@
 
 package org.exoplatform.services.organization.idm;
 
+import java.io.IOException;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
@@ -532,6 +533,50 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
         }
 
+        if (log.isTraceEnabled()) {
+            Tools.logMethodOut(log, LogLevel.TRACE, "findGroupsOfUser", exoGroups);
+        }
+
+        return exoGroups;
+    }
+
+    public Collection<Group> findGroupsOfUserByKeyword(String user, String keyword, String groupType) throws IOException {
+
+        if (log.isTraceEnabled()) {
+            Tools.logMethodIn(log, LogLevel.TRACE, "findGroupsOfUser", new Object[] { "user", user });
+        }
+        IdentitySearchCriteria identitySearchCriteria = new IdentitySearchCriteriaImpl();
+        if (StringUtils.isNotBlank(keyword)) {
+            try {
+                identitySearchCriteria.nameFilter("*" + keyword + "*");
+            } catch (Exception e) {
+                handleException("unsupported Criteria error: ", e);
+            }
+        }
+        if (user == null) {
+            if (log.isTraceEnabled()) {
+                Tools.logMethodOut(log, LogLevel.TRACE, "findGroupsOfUser", Collections.emptyList());
+            }
+            return null;
+        }
+        Collection<org.picketlink.idm.api.Group> allGroups = new HashSet<org.picketlink.idm.api.Group>();
+        try {
+            orgService.flush();
+            allGroups = getIdentitySession().getRelationshipManager().findRelatedGroups(user, groupType, identitySearchCriteria);
+        } catch (Exception e) {
+            // TODO:
+            handleException("Identity operation error: ", e);
+        }
+        List<Group> exoGroups = new LinkedList<Group>();
+        for (org.picketlink.idm.api.Group group : allGroups) {
+            try {
+                if (groupType.isEmpty() || group.getGroupType().equals(groupType)) {
+                    exoGroups.add(convertGroup(group));
+                }
+            } catch (Exception e) {
+                handleException("convert Group error: ", e);
+            }
+        }
         if (log.isTraceEnabled()) {
             Tools.logMethodOut(log, LogLevel.TRACE, "findGroupsOfUser", exoGroups);
         }
