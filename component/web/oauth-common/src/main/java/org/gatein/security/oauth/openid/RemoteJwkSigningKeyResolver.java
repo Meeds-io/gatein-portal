@@ -64,7 +64,7 @@ public class RemoteJwkSigningKeyResolver implements SigningKeyResolver {
     return getKey(header.getKeyId());
   }
 
-  public Key getKey(String keyId) {
+  private Key getKey(String keyId) {
 
     // check non synchronized to avoid a lock
     Key result = keyMap.get(keyId);
@@ -86,7 +86,7 @@ public class RemoteJwkSigningKeyResolver implements SigningKeyResolver {
     }
   }
 
-  public void updateKeys() {
+  private void updateKeys() {
 
     JsonObject configuration = getJson(issuer + "/.well-known/openid-configuration");
     String jwksUrl = configuration.getString("jwks_uri");
@@ -113,7 +113,7 @@ public class RemoteJwkSigningKeyResolver implements SigningKeyResolver {
 
   }
 
-  public JsonObject getJson(String url) {
+  private JsonObject getJson(String url) {
     StringBuilder content = new StringBuilder();
     try {
       URL wellKnownUrl = new URL(url); // creating a url object
@@ -134,8 +134,7 @@ public class RemoteJwkSigningKeyResolver implements SigningKeyResolver {
       return reader.readObject();
     }
   }
-
-  public BigInteger base64ToBigInteger(String value) {
+  private BigInteger base64ToBigInteger(String value) {
     return new BigInteger(1, Decoders.BASE64URL.decode(value));
   }
 }
