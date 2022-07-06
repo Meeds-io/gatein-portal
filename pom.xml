@@ -33,15 +33,20 @@
   
   <groupId>org.exoplatform.gatein.portal</groupId>
   <artifactId>exo.portal.parent</artifactId>
-  <version>6.4.x-SNAPSHOT</version>
+  <version>6.4.x-meed-SNAPSHOT</version>
   <packaging>pom</packaging>
   
   <name>GateIn - Portal</name>
   
   <properties>
-    <org.exoplatform.gatein.sso.version>6.4.x-SNAPSHOT</org.exoplatform.gatein.sso.version>
-    <org.exoplatform.gatein.pc.version>6.4.x-SNAPSHOT</org.exoplatform.gatein.pc.version>
-    
+    <org.exoplatform.depmgt.version>21.x-meed-SNAPSHOT</org.exoplatform.depmgt.version>
+    <org.exoplatform.kernel.version>6.4.0-M20</org.exoplatform.kernel.version>
+    <org.exoplatform.core.version>6.4.0-M20</org.exoplatform.core.version>
+    <org.exoplatform.ws.version>6.4.0-M20</org.exoplatform.ws.version>
+    <org.exoplatform.gatein.wci.version>6.4.0-M20</org.exoplatform.gatein.wci.version>
+    <org.exoplatform.gatein.sso.version>6.4.0-M20</org.exoplatform.gatein.sso.version>
+    <org.exoplatform.gatein.pc.version>6.4.0-M20</org.exoplatform.gatein.pc.version>
+
     <!-- Default eXo profiles -->
     <surefire.exo.profiles>hsqldb</surefire.exo.profiles>
     
@@ -65,6 +70,42 @@
   
   <dependencyManagement>
     <dependencies>
+      <!-- Import versions of external dependencies to use -->
+      <dependency>
+        <groupId>org.exoplatform</groupId>
+        <artifactId>maven-depmgt-pom</artifactId>
+        <version>${org.exoplatform.depmgt.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- Kernel dependencies -->
+      <dependency>
+        <groupId>org.exoplatform.kernel</groupId>
+        <artifactId>kernel-parent</artifactId>
+        <version>${org.exoplatform.kernel.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- Core dependencies -->
+      <dependency>
+        <groupId>org.exoplatform.core</groupId>
+        <artifactId>core-parent</artifactId>
+        <version>${org.exoplatform.core.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- WS dependencies -->
+      <dependency>
+        <groupId>org.exoplatform.ws</groupId>
+        <artifactId>ws-parent</artifactId>
+        <version>${org.exoplatform.ws.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
       <!-- GateIn-PC dependencies -->
       <dependency>
         <groupId>org.exoplatform.gatein.pc</groupId>
@@ -82,7 +123,16 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      
+
+      <!-- GateIn-WCI dependencies -->
+      <dependency>
+        <groupId>org.exoplatform.gatein.wci</groupId>
+        <artifactId>wci-parent</artifactId>
+        <version>${org.exoplatform.gatein.wci.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
       <!-- Internal project artifacts -->
       <dependency>
         <groupId>${project.groupId}</groupId>
