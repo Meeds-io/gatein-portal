@@ -31,15 +31,20 @@
 
   <groupId>io.meeds.portal</groupId>
   <artifactId>portal.parent</artifactId>
-  <version>7.0.x-SNAPSHOT</version>
+  <version>7.0.x-meed-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Meeds - Portal</name>
 
   <properties>
-    <io.meeds.gatein.sso.version>7.0.x-SNAPSHOT</io.meeds.gatein.sso.version>
-    <io.meeds.gatein.pc.version>7.0.x-SNAPSHOT</io.meeds.gatein.pc.version>
-    
+    <io.meeds.depmgt.version>23.x-meed-SNAPSHOT</io.meeds.depmgt.version>
+    <io.meeds.kernel.release.version>7.0.0-M10</io.meeds.kernel.release.version>
+    <io.meeds.core.release.version>7.0.0-M10</io.meeds.core.release.version>
+    <io.meeds.ws.release.version>7.0.0-M10</io.meeds.ws.release.version>
+    <io.meeds.gatein.wci.release.version>7.0.0-M10</io.meeds.gatein.wci.release.version>
+    <io.meeds.gatein.sso.release.version>7.0.0-M10</io.meeds.gatein.sso.release.version>
+    <io.meeds.gatein.pc.release.version>7.0.0-M10</io.meeds.gatein.pc.release.version>
+
     <!-- Sonar properties -->
     <sonar.organization>meeds-io</sonar.organization>
     
@@ -60,11 +65,47 @@
 
   <dependencyManagement>
     <dependencies>
+      <!-- Import versions of external dependencies to use -->
+      <dependency>
+        <groupId>io.meeds</groupId>
+        <artifactId>maven-depmgt-pom</artifactId>
+        <version>${io.meeds.depmgt.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- Kernel dependencies -->
+      <dependency>
+        <groupId>io.meeds.kernel</groupId>
+        <artifactId>kernel-parent</artifactId>
+        <version>${io.meeds.kernel.release.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- Core dependencies -->
+      <dependency>
+        <groupId>io.meeds.core</groupId>
+        <artifactId>core-parent</artifactId>
+        <version>${io.meeds.core.release.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- WS dependencies -->
+      <dependency>
+        <groupId>io.meeds.ws</groupId>
+        <artifactId>ws-parent</artifactId>
+        <version>${io.meeds.ws.release.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
       <!-- GateIn-PC dependencies -->
       <dependency>
         <groupId>io.meeds.gatein.pc</groupId>
         <artifactId>pc-parent</artifactId>
-        <version>${io.meeds.gatein.pc.version}</version>
+        <version>${io.meeds.gatein.pc.release.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -73,11 +114,20 @@
       <dependency>
         <groupId>io.meeds.gatein.sso</groupId>
         <artifactId>sso-parent</artifactId>
-        <version>${io.meeds.gatein.sso.version}</version>
+        <version>${io.meeds.gatein.sso.release.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      
+
+      <!-- GateIn-WCI dependencies -->
+      <dependency>
+        <groupId>io.meeds.gatein.wci</groupId>
+        <artifactId>wci-parent</artifactId>
+        <version>${io.meeds.gatein.wci.release.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
       <!-- Internal project artifacts -->
       <dependency>
         <groupId>${project.groupId}</groupId>
