@@ -476,7 +476,7 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
                 this.tokenInfoURL = json.getString("token_endpoint");
             }
         } catch (JSONException e) {
-            log.error("error at read Url wellnown Configuration Content : " + e.getMessage());
+            log.error("Unable to read webKnownUrl content.", e.getMessage());
         }
     }
 
