@@ -473,7 +473,6 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
                 this.authenticationURL = json.getString("authorization_endpoint");
                 this.accessTokenURL = json.getString("token_endpoint");
                 this.userInfoURL = json.getString("userinfo_endpoint");
-                this.tokenInfoURL = json.getString("token_endpoint");
             }
         } catch (JSONException e) {
             log.error("Unable to read webKnownUrl content.", e.getMessage());
