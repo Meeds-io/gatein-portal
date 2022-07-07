@@ -467,15 +467,17 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
             return;
         }
         try {
-            String wellnownConfigurationContent = readUrl(this.wellKnownConfigurationUrl);
-            if (wellnownConfigurationContent != null) {
-                JSONObject json = new JSONObject(wellnownConfigurationContent);
+            String wellKnownConfigurationContent = readUrl(new URL(this.wellKnownConfigurationUrl));
+            if (wellKnownConfigurationContent != null) {
+                JSONObject json = new JSONObject(wellKnownConfigurationContent);
                 this.authenticationURL = json.getString("authorization_endpoint");
                 this.accessTokenURL = json.getString("token_endpoint");
                 this.userInfoURL = json.getString("userinfo_endpoint");
             }
         } catch (JSONException e) {
-            log.error("Unable to read webKnownUrl content.", e.getMessage());
+            log.error("Unable to read webKnownUrl content : " + this.wellKnownConfigurationUrl);
+        } catch (MalformedURLException e) {
+            log.error("WellKnowConfigurationUrl malformed : url" + this.wellKnownConfigurationUrl);
         }
     }
 
@@ -484,22 +486,17 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
         // Nothing to stop
     }
 
-    private static String readUrl(String urlString) {
-        try {
-            URL url = new URL(urlString);
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
-                StringBuilder buffer = new StringBuilder();
-                int read;
-                char[] chars = new char[1024];
-                while ((read = reader.read(chars)) != -1)
-                    buffer.append(chars, 0, read);
+    private static String readUrl(URL url) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+            StringBuilder buffer = new StringBuilder();
+            int read;
+            char[] chars = new char[1024];
+            while ((read = reader.read(chars)) != -1)
+                buffer.append(chars, 0, read);
 
-                return buffer.toString();
-            } catch (IOException e) {
-                log.error(e.getMessage());
-            }
-        } catch (MalformedURLException e) {
-            log.error("Mal formed URL Exception");
+            return buffer.toString();
+        } catch (IOException e) {
+            log.error(e.getMessage());
         }
         return null;
     }
