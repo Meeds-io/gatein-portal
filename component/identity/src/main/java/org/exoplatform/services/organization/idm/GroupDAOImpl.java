@@ -23,16 +23,19 @@ import java.io.IOException;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.LogLevel;
-import org.picketlink.idm.api.*;
+import org.picketlink.idm.api.Attribute;
+import org.picketlink.idm.api.IdentitySearchCriteria;
+import org.picketlink.idm.api.Role;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.IdentitySearchCriteriaImpl;
 import org.picketlink.idm.impl.api.SimpleAttribute;
 
 import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.services.organization.*;
+import org.exoplatform.services.log.LogLevel;
 import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.GroupEventListener;
+import org.exoplatform.services.organization.GroupHandler;
+import org.exoplatform.services.organization.MembershipTypeHandler;
 
 /*
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
@@ -542,46 +545,46 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
     public Collection<Group> findGroupsOfUserByKeyword(String user, String keyword, String groupType) throws IOException {
 
-        if (log.isTraceEnabled()) {
-            Tools.logMethodIn(log, LogLevel.TRACE, "findGroupsOfUser", new Object[] { "user", user });
-        }
-        IdentitySearchCriteria identitySearchCriteria = new IdentitySearchCriteriaImpl();
-        if (StringUtils.isNotBlank(keyword)) {
-            try {
-                identitySearchCriteria.nameFilter("*" + keyword + "*");
-            } catch (Exception e) {
-                handleException("unsupported Criteria error: ", e);
-            }
-        }
-        if (user == null) {
-            if (log.isTraceEnabled()) {
-                Tools.logMethodOut(log, LogLevel.TRACE, "findGroupsOfUser", Collections.emptyList());
-            }
-            return null;
-        }
-        Collection<org.picketlink.idm.api.Group> allGroups = new HashSet<org.picketlink.idm.api.Group>();
+      if (log.isTraceEnabled()) {
+        Tools.logMethodIn(log, LogLevel.TRACE, "findGroupsOfUser", new Object[] { "user", user });
+      }
+      IdentitySearchCriteria identitySearchCriteria = new IdentitySearchCriteriaImpl();
+      if (StringUtils.isNotBlank(keyword)) {
         try {
-            orgService.flush();
-            allGroups = getIdentitySession().getRelationshipManager().findRelatedGroups(user, groupType, identitySearchCriteria);
+          identitySearchCriteria.nameFilter("*" + keyword + "*");
         } catch (Exception e) {
-            // TODO:
-            handleException("Identity operation error: ", e);
+          handleException("unsupported Criteria error: ", e);
         }
-        List<Group> exoGroups = new LinkedList<Group>();
-        for (org.picketlink.idm.api.Group group : allGroups) {
-            try {
-                if (groupType.isEmpty() || group.getGroupType().equals(groupType)) {
-                    exoGroups.add(convertGroup(group));
-                }
-            } catch (Exception e) {
-                handleException("convert Group error: ", e);
-            }
-        }
+      }
+      if (user == null) {
         if (log.isTraceEnabled()) {
-            Tools.logMethodOut(log, LogLevel.TRACE, "findGroupsOfUser", exoGroups);
+          Tools.logMethodOut(log, LogLevel.TRACE, "findGroupsOfUser", Collections.emptyList());
         }
+        return null;
+      }
+      Collection<org.picketlink.idm.api.Group> allGroups = new HashSet<org.picketlink.idm.api.Group>();
+      try {
+        orgService.flush();
+        allGroups = getIdentitySession().getRelationshipManager().findRelatedGroups(user, groupType, identitySearchCriteria);
+      } catch (Exception e) {
+        // TODO:
+        handleException("Identity operation error: ", e);
+      }
+      List<Group> exoGroups = new LinkedList<Group>();
+      for (org.picketlink.idm.api.Group group : allGroups) {
+        try {
+          if (groupType.isEmpty() || group.getGroupType().equals(groupType)) {
+            exoGroups.add(convertGroup(group));
+          }
+        } catch (Exception e) {
+          handleException("convert Group error: ", e);
+        }
+      }
+      if (log.isTraceEnabled()) {
+        Tools.logMethodOut(log, LogLevel.TRACE, "findGroupsOfUser", exoGroups);
+      }
 
-        return exoGroups;
+      return exoGroups;
     }
 
     public Collection<Group> getAllGroups() throws Exception {
