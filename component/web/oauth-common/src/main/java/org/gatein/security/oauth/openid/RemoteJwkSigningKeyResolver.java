@@ -134,7 +134,6 @@ public class RemoteJwkSigningKeyResolver implements SigningKeyResolver {
       return reader.readObject();
     }
   }
-
   private BigInteger base64ToBigInteger(String value) {
     return new BigInteger(1, Decoders.BASE64URL.decode(value));
   }
