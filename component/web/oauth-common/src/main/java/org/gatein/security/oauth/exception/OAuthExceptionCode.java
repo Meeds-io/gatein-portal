@@ -93,7 +93,10 @@ public enum OAuthExceptionCode {
     /**
      * Error during DB operation (For example get/set/remove access token from DB)
      */
-    PERSISTENCE_ERROR
-
+    PERSISTENCE_ERROR,
+    /**
+     * Error when OAuth2 flow failed because jwt token validation fails
+     */
+    TOKEN_VALIDATION_ERROR
 
 }
