@@ -7,7 +7,10 @@ import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,8 +23,13 @@ import org.exoplatform.services.organization.idm.MembershipImpl;
 import org.exoplatform.services.organization.impl.GroupImpl;
 import org.exoplatform.services.organization.search.GroupSearchService;
 import org.exoplatform.services.rest.resource.ResourceContainer;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @Path("v1/groups")
 public class GroupRestResourcesV1 implements ResourceContainer {
@@ -578,6 +586,71 @@ public class GroupRestResourcesV1 implements ResourceContainer {
     }
     organizationService.getMembershipHandler().removeMembership(membershipId, true);
     return Response.noContent().build();
+  }
+
+  @GET
+  @Path("treeMembers")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Gets groups tree", httpMethod = "GET", response = Response.class, notes = "This returns the list of groups children containing the given search text for the current user")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response getGroupsTreeMembers(@Context
+  UriInfo uriInfo,
+                                       @ApiParam(value = "Search text to filter groups")
+                                       @QueryParam("q")
+                                       String q,
+                                       @ApiParam(value = "Group member")
+                                       @QueryParam("groupMember")
+                                       String groupMember,
+                                       @ApiParam(value = "Group type")
+                                       @QueryParam("groupType")
+                                       String groupType,
+                                       @ApiParam(value = "Offset")
+                                       @QueryParam("offset")
+                                       int offset,
+                                       @ApiParam(value = "Limit")
+                                       @QueryParam("limit")
+                                       int limit,
+                                       @QueryParam("returnSize")
+                                       boolean returnSize) throws Exception {
+
+    Identity identity;
+    try {
+      identity = ConversationState.getCurrent().getIdentity();
+    } catch (Exception e) {
+      return Response.status(Response.Status.UNAUTHORIZED).build();
+    }
+    if (!userACL.isSuperUser() && !userACL.isUserInGroup(userACL.getAdminGroups()) && !identity.isMemberOf(groupMember)) {
+      return Response.status(Response.Status.UNAUTHORIZED).build();
+    }
+    if (StringUtils.isNotBlank(q)) {
+      q = q.replace("#", " ").replace("$", " ").replace("_", " ").replace(".", " ");
+    }
+
+    offset = offset > 0 ? offset : DEFAULT_OFFSET;
+    limit = limit > 0 ? limit : DEFAULT_LIMIT;
+
+    Collection<Group> UserGroupsList = organizationService.getGroupHandler()
+                                                          .findGroupsOfUserByKeyword(identity.getUserId(), q, groupType);
+    int totalSize = UserGroupsList.size();
+    int limitToFetch = limit;
+    if (totalSize < (offset + limitToFetch)) {
+      limitToFetch = totalSize - offset;
+    }
+    Group[] groups = null;
+    if (limitToFetch <= 0) {
+      groups = new Group[0];
+    } else {
+      groups = UserGroupsList.toArray(new Group[0]);
+      if (!returnSize) {
+        totalSize = 0;
+      }
+    }
+    List<Group> groupsList = Arrays.asList(groups);
+    CollectionEntity<Group> result = new CollectionEntity<>(groupsList, offset, limit, totalSize);
+    return Response.ok(result).build();
   }
 
   private void buildTree(List<GroupRestEntity> rootGroups,
