@@ -7,17 +7,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.github.scribejava.core.model.OAuth2AccessToken;
+import io.jsonwebtoken.*;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
@@ -49,7 +46,6 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
     private final String redirectURL;
     private String authenticationURL;
     private String accessTokenURL;
-    private String tokenInfoURL;
     private String userInfoURL;
     private final String clientID;
     private final String clientSecret;
@@ -57,8 +53,11 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
     private final String accessType;
     private final String wellKnownConfigurationUrl;
     private final String applicationName;
+    private String issuer;
     private final int chunkLength;
 
+
+    private RemoteJwkSigningKeyResolver remoteJwkSigningKeyResolver;
     private final SecureRandomService secureRandomService;
 
     public OpenIdProcessorImpl(ExoContainerContext context, InitParams params, SecureRandomService secureRandomService) {
@@ -237,14 +236,13 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
                     if (log.isTraceEnabled())
                         log.trace("Access Token=" + accessToken);
 
-                    OAuth2AccessToken tokenResponse = new OAuth2AccessToken(accessToken,
+                    return new OAuth2AccessToken(accessToken,
                             json.getString(OAuthConstants.TOKEN_TYPE_PARAMETER),
                             json.getInt(OAuthConstants.EXPIRES_IN_PARAMETER),
                             null,
                             json.has(OAuthConstants.SCOPE_PARAMETER) ?
                                     json.getString(OAuthConstants.SCOPE_PARAMETER) : null,
                             json.toString());
-                    return tokenResponse;
 
                 }
 
@@ -261,88 +259,29 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
 
     @Override
     public OpenIdAccessTokenContext validateTokenAndUpdateScopes(OpenIdAccessTokenContext accessToken) throws OAuthException {
-        Map<String, String> params = new HashMap<String, String>();
-        //some implementation needs token in field named "token"
-        //other implementation needs token in field named "access_token"
-        params.put(OAuthConstants.TOKEN_PARAMETER, accessToken.getAccessToken());
-        params.put(OAuthConstants.ACCESS_TOKEN_PARAMETER, accessToken.getAccessToken());
-        JSONObject tokenInfo = new OpenIdRequest<JSONObject>() {
-
-            @Override
-            protected URL createURL() throws IOException {
-                return getTokenInfoURL();
-            }
-
-            @Override
-            protected JSONObject invokeRequest(Map<String, String> params) throws IOException, JSONException {
-                URL url = createURL();
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setDoOutput(true);
-                String urlParameters = params.keySet().stream().map(s -> s + "=" + params.get(s)).collect(Collectors.joining("&"));
-                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                conn.setRequestProperty("charset", "utf-8");
-                conn.setRequestProperty("Authorization",
-                        "Basic " + Base64.getEncoder().encodeToString((clientID + ":" + clientSecret).getBytes()));
-                conn.setRequestProperty("Content-Length", Integer.toString(urlParameters.getBytes().length));
-                conn.setUseCaches(false);
-                try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
-                    wr.write(urlParameters.getBytes());
-                }
-                HttpResponseContext httpResponse = OAuthUtils.readUrlContent(conn);
-                if (httpResponse.getResponseCode() == 200) {
-                    return parseResponse(httpResponse.getResponse());
-                } else if (httpResponse.getResponseCode() == 400) {
-                    String errorMessage = "Error when obtaining content from OpenId. Error details: " + httpResponse.getResponse();
-                    log.warn(errorMessage);
-                    throw new OAuthException(OAuthExceptionCode.ACCESS_TOKEN_ERROR, errorMessage);
-                } else {
-                    String errorMessage = "Unspecified IO error. Http response code: " + httpResponse.getResponseCode() + ", details: " + httpResponse.getResponse();
-                    log.warn(errorMessage);
-                    throw new OAuthException(OAuthExceptionCode.IO_ERROR, errorMessage);
-                }
-            }
-
-
-            @Override
-            protected JSONObject parseResponse(String httpResponse) throws JSONException {
-                JSONObject json = new JSONObject(httpResponse);
-                return json;
-            }
-        }.executeRequest(params);
-
-        String[] scopes;
+        String scope = accessToken.getTokenData().getScope();
         try {
-            // If there was an error in the token info, abort.
-            if (tokenInfo.has("error")) {
-                throw new OAuthException(OAuthExceptionCode.ACCESS_TOKEN_ERROR,
-                        "Error during token validation: " + tokenInfo.get("error").toString());
-            }
-
-            //depending of openid implementation
-            //issued_to can be named client_id
-            String clientId = tokenInfo.has(OAuthConstants.ISSUED_TO_PARAMETER) ?
-                    tokenInfo.getString(OAuthConstants.ISSUED_TO_PARAMETER) :
-                    tokenInfo.has(OAuthConstants.CLIENT_ID_PARAMETER) ?
-                            tokenInfo.getString(OAuthConstants.CLIENT_ID_PARAMETER) : null;
-
-            if (clientId != null && !clientId.equals(clientID)) {
-                throw new OAuthException(OAuthExceptionCode.ACCESS_TOKEN_ERROR,
-                        "Token's client ID does not match app's. clientID "
-                                + "from tokenINFO: " + tokenInfo.get(OAuthConstants.ISSUED_TO_PARAMETER));
-            }
-
-            if (log.isTraceEnabled()) {
-                log.trace("Successfully validated accessToken from openid : " + tokenInfo);
-            }
-            scopes = tokenInfo.has(OAuthConstants.SCOPE_PARAMETER) ? tokenInfo.getString(OAuthConstants.SCOPE_PARAMETER).split(" ") : null;
-        } catch (JSONException jsonException) {
+            String tokenId = new JSONObject(accessToken.accessToken.getRawResponse()).get("id_token").toString();
+            Jwts.parserBuilder()
+                    .setSigningKeyResolver(remoteJwkSigningKeyResolver)
+                    .requireIssuer(this.issuer)
+                    .requireAudience(this.clientID)
+                    .build().parseClaimsJws(tokenId)
+                    .getBody();
+        } catch (IncorrectClaimException e) {
+            log.error("Issuer or audience have not the correct value in the token", e);
+            throw new OAuthException(OAuthExceptionCode.TOKEN_VALIDATION_ERROR,
+                    "Issuer or audience have not the correct value in the token", e);
+        } catch (MissingClaimException e) {
+            log.error("Required claims (issuer or audience) are missing in JWT Token", e);
+            throw new OAuthException(OAuthExceptionCode.TOKEN_VALIDATION_ERROR,
+                    "Required claims (issuer or audience) are missing in JWT Token", e);
+        } catch (JSONException e) {
+            log.error("Unable to parse the accessToken");
             throw new OAuthException(OAuthExceptionCode.ACCESS_TOKEN_ERROR,
-                    "Error during token validation: token format is ko");
+                    "Unable to parse the accessToken", e);
         }
-
-        return new OpenIdAccessTokenContext(accessToken.getTokenData(), scopes);
-
+        return new OpenIdAccessTokenContext(accessToken.getTokenData(), scope);
     }
 
     @Override
@@ -448,12 +387,6 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
         return new URL(this.accessTokenURL);
     }
 
-    protected URL getTokenInfoURL() throws IOException {
-        if (log.isTraceEnabled())
-            log.trace("TokenInfo Request=" + this.tokenInfoURL);
-        return new URL(this.tokenInfoURL);
-    }
-
     protected URL getUserInfoURL() throws IOException {
         if (log.isTraceEnabled())
             log.trace("UserInfo Request=" + this.userInfoURL);
@@ -473,6 +406,8 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
                 this.authenticationURL = json.getString("authorization_endpoint");
                 this.accessTokenURL = json.getString("token_endpoint");
                 this.userInfoURL = json.getString("userinfo_endpoint");
+                this.issuer = json.getString("issuer");
+                this.remoteJwkSigningKeyResolver = new RemoteJwkSigningKeyResolver(this.issuer);
             }
         } catch (JSONException e) {
             log.error("Unable to read webKnownUrl content : " + this.wellKnownConfigurationUrl);
