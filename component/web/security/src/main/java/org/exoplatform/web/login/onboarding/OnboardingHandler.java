@@ -70,6 +70,7 @@ public class OnboardingHandler extends WebRequestHandler {
 
     private static final ThreadLocal<Locale> currentLocale = new ThreadLocal<Locale>();
 
+    private static final String     TEXT_HTML_CONTENT_TYPE     = "text/html; charset=UTF-8";
 
     protected int _width = 200;
 
@@ -85,6 +86,7 @@ public class OnboardingHandler extends WebRequestHandler {
     public boolean execute(ControllerContext context) throws Exception {
         HttpServletRequest req = context.getRequest();
         HttpServletResponse res = context.getResponse();
+        res.setContentType(TEXT_HTML_CONTENT_TYPE);
         PortalContainer container = PortalContainer.getCurrentInstance(req.getServletContext());
         ServletContext servletContext = container.getPortalContext();
         Pattern customPasswordPattern = Pattern.compile(PropertyManager.getProperty("gatein.validators.passwordpolicy.regexp"));
