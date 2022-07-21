@@ -32,6 +32,9 @@
   <name>GateIn Portal Component Portal Data</name>
 
   <properties>
+    <rest.api.doc.title>Gatein-portal Rest APIs</rest.api.doc.title>
+    <rest.api.doc.version>1.0</rest.api.doc.version>
+    <rest.api.doc.decsription>Gatein-portal used Rest endpoints</rest.api.doc.decsription>
     <jacoco.skip>true</jacoco.skip>
     <jacoco.listener></jacoco.listener>
   </properties>
@@ -173,6 +176,28 @@
     </pluginManagement>
 
     <plugins>
+      <plugin>
+        <groupId>io.openapitools.swagger</groupId>
+        <artifactId>swagger-maven-plugin</artifactId>
+        <configuration>
+          <useResourcePackagesChildren>true</useResourcePackagesChildren>
+          <resourcePackages>
+            <locations>org.exoplatform.portal</locations>
+            <locations>org.exoplatform.settings</locations>
+          </resourcePackages>
+          <swaggerConfig>
+            <info>
+              <title>${rest.api.doc.title}</title>
+              <version>${rest.api.doc.version}</version>
+              <description>{rest.api.doc.description}</description>
+              <license>
+                <url>https://www.gnu.org/licenses/lgpl-3.0.en.html</url>
+                <name>LGPL</name>
+              </license>
+            </info>
+          </swaggerConfig>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>com.jcabi</groupId>
         <artifactId>jcabi-maven-plugin</artifactId>
