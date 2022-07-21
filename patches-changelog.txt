@@ -1,5 +1,16 @@
-              2022-07-21 eXo Support <support@exoplatform.org> 
-
-   # 6.3.0 Patches changelog: 
 
 
+              2022-06-16 eXo Support <support@exoplatform.org> 
+
+   # 6.3.0 Patches changelog:
+    
+   * 2022-06-16: Patch-6.3.0:1, Author: Jihed Chabbeh<jchabbeh@exoplatform.com>
+
+  -  https://github.com/Meeds-io/task/commit/c443356144a6cf56c04c05e5c0a79fa35f8f6540
+  -  https://github.com/Meeds-io/task/commit/22170d73d0aece8f34fc9ac89d102a2312ecf13c
+  
+  * 2022-07-21: Patch-6.3.0:2, Author: Jihed Chabbeh<jchabbeh@exoplatform.com>
+
+  -  https://github.com/Meeds-io/gatein-portal/pull/406/commits/ca31cabcb18d5739aa0116424d8de4e9704d5811
+  -  https://github.com/Meeds-io/gatein-portal/pull/406/commits/c689e7ff299cf9aa3fb2313a436dbcbde9527f94
+  -  https://github.com/Meeds-io/gatein-portal/pull/406/commits/352cfc8c8d372e87d8dc1a53614c901e5100e09e
