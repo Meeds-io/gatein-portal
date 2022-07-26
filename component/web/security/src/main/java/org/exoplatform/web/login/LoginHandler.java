@@ -60,8 +60,6 @@ public class LoginHandler extends JspBasedWebHandler {
 
   private static final Log        LOG                        = ExoLogger.getLogger(LoginHandler.class);
 
-  private static final String     TEXT_HTML_CONTENT_TYPE     = "text/html; charset=UTF-8";
-
   private static final String     JS_PATHS_PARAM             = "paths";
 
   private static final String     LOGIN_JSP_PATH_PARAM       = "login.jsp.path";
@@ -236,7 +234,6 @@ public class LoginHandler extends JspBasedWebHandler {
         status = LoginStatus.DISABLED_USER;
       }
 
-      response.setContentType(TEXT_HTML_CONTENT_TYPE);
       dispatch(context, loginPath.toString(), status);
     }
   }

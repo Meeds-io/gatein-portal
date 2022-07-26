@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +47,9 @@ public abstract class JspBasedWebHandler extends WebRequestHandler {
 
   private static final Log          LOG            = ExoLogger.getLogger(JspBasedWebHandler.class);
 
-  protected static final String     JS_PATHS_PARAM = "paths";
+  protected static final String     TEXT_HTML_CONTENT_TYPE = "text/html; charset=UTF-8";
+
+  protected static final String     JS_PATHS_PARAM         = "paths";
 
   protected LocaleConfigService     localeConfigService;
 
@@ -87,6 +90,9 @@ public abstract class JspBasedWebHandler extends WebRequestHandler {
                               List<String> additionalCSSModules,
                               Consumer<JSONObject> extendUIParameters) throws Exception {
     HttpServletRequest request = context.getRequest();
+
+    HttpServletResponse response = context.getResponse();
+    response.setContentType(TEXT_HTML_CONTENT_TYPE);
 
     LocaleConfig localeConfig = request.getLocale() == null ? localeConfigService.getDefaultLocaleConfig()
                                                             : localeConfigService.getLocaleConfig(request.getLocale()
