@@ -16,22 +16,24 @@
  */
 package org.exoplatform.web.application;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import org.exoplatform.portal.branding.BrandingService;
 import org.exoplatform.portal.resource.SkinService;
@@ -39,6 +41,12 @@ import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.impl.LocaleConfigImpl;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TestJspBasedWebHandler {
@@ -138,5 +146,6 @@ public class TestJspBasedWebHandler {
     assertTrue(inlineScripts.contains("brandingLogo"));
     assertTrue(attributes.get("brandingThemeUrl").toString().contains(String.valueOf(brandingLastModifiedTime)));
     assertEquals(attributes.get("brandingPrimaryColor").toString(), primarycolor);
+    verify(response, times(1)).setContentType(JspBasedWebHandler.TEXT_HTML_CONTENT_TYPE);
   }
 }
