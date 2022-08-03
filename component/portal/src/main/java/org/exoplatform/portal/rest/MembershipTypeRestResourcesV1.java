@@ -8,6 +8,12 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang.StringUtils;
 
 import org.exoplatform.portal.config.UserACL;
@@ -17,9 +23,8 @@ import org.exoplatform.services.organization.impl.MembershipTypeImpl;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
 
-import io.swagger.annotations.*;
-
 @Path("v1/membershipTypes")
+@Tag(name = "v1/membershipTypes", description = "Manage membership types operations")
 public class MembershipTypeRestResourcesV1 implements ResourceContainer {
 
   private OrganizationService organizationService;
@@ -34,18 +39,16 @@ public class MembershipTypeRestResourcesV1 implements ResourceContainer {
   @GET
   @RolesAllowed("administrators")
   @Produces(MediaType.APPLICATION_JSON)
-  @ApiOperation(
-      value = "Gets membership types",
-      httpMethod = "GET",
-      response = Response.class,
-      produces = MediaType.APPLICATION_JSON,
-      notes = "This returns the list of membership types"
+  @Operation(
+      summary = "Gets membership types",
+      description = "Gets membership types",
+      method = "GET"
   )
   @ApiResponses(
       value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 500, message = "Internal server error")
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")
       }
   )
   public Response getMembershipType() throws Exception {
@@ -56,21 +59,21 @@ public class MembershipTypeRestResourcesV1 implements ResourceContainer {
   @POST
   @RolesAllowed("administrators")
   @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation(
-      value = "Creates a new membership type",
-      httpMethod = "POST",
-      response = Response.class,
-      consumes = MediaType.APPLICATION_JSON
+  @Operation(
+      summary = "Creates a new membership type",
+      description = "Creates a new membership type",
+      method = "POST"
   )
   @ApiResponses(
       value = {
-          @ApiResponse(code = 204, message = "Request fulfilled"),
-          @ApiResponse(code = 400, message = "Bad request"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 500, message = "Internal server error")
+          @ApiResponse(responseCode = "204", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Bad request"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")
       }
   )
-  public Response createMembershipType(MembershipTypeImpl membershipType) throws Exception {
+  public Response createMembershipType(@RequestBody(description = "Membership type object")
+                                         MembershipTypeImpl membershipType) throws Exception {
     if (membershipType == null) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Membership type object is required").build();
     }
@@ -100,21 +103,21 @@ public class MembershipTypeRestResourcesV1 implements ResourceContainer {
   @PUT
   @RolesAllowed("administrators")
   @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation(
-      value = "Updates an existing membership type",
-      httpMethod = "PUT",
-      response = Response.class,
-      consumes = MediaType.APPLICATION_JSON
+  @Operation(
+      summary = "Updates an existing membership type",
+      description = "Updates an existing membership type",
+      method = "PUT"
   )
   @ApiResponses(
       value = {
-          @ApiResponse(code = 204, message = "Request fulfilled"),
-          @ApiResponse(code = 400, message = "Bad request"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 500, message = "Internal server error")
+          @ApiResponse(responseCode = "204", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Bad request"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")
       }
   )
-  public Response updateMembershipType(MembershipTypeImpl membershipType) throws Exception {
+  public Response updateMembershipType(@RequestBody(description = "Membership type object")
+                                          MembershipTypeImpl membershipType) throws Exception {
     if (membershipType == null) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Membership type object is required").build();
     }
@@ -135,22 +138,20 @@ public class MembershipTypeRestResourcesV1 implements ResourceContainer {
   @DELETE
   @Path("{membershipType}")
   @RolesAllowed("administrators")
-  @ApiOperation(
-      value = "Deletes an existing membership type",
-      httpMethod = "DELETE",
-      response = Response.class
-  )
+  @Operation(
+      summary = "Deletes an existing membership type",
+      description = "Deletes an existing membership type",
+      method = "DELETE")
   @ApiResponses(
       value = {
-          @ApiResponse(code = 204, message = "Request fulfilled"),
-          @ApiResponse(code = 400, message = "Bad request"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 500, message = "Internal server error")
+          @ApiResponse(responseCode = "204", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Bad request"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")
       }
   )
-  public Response deleteMembershipType(@ApiParam(value = "Membership type name", required = true) @PathParam(
-    "membershipType"
-  ) String membershipType) throws Exception {
+  public Response deleteMembershipType(@Parameter(description = "Membership type name", required = true)
+                                       @PathParam("membershipType") String membershipType) throws Exception {
     if (StringUtils.isBlank(membershipType)) {
       return Response.status(Response.Status.BAD_REQUEST).entity("NAME:MANDATORY").build();
     }
