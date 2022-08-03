@@ -11,8 +11,6 @@ import javax.ws.rs.core.*;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.rest.model.MembershipRestEntity;
 import org.exoplatform.portal.rest.model.UserRestEntity;
@@ -22,7 +20,7 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
 
 import io.swagger.annotations.*;
-import io.swagger.jaxrs.PATCH;
+import org.exoplatform.services.rest.http.PATCH;
 import org.exoplatform.web.login.recovery.ChangePasswordConnector;
 import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 
