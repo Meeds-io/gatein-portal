@@ -32,6 +32,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.web.security.AuthenticationRegistry;
 import org.exoplatform.services.log.Log;
@@ -116,7 +117,12 @@ public class OAuthAuthenticationFilter extends AbstractSSOInterceptor {
 
 
     protected void processPrincipal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, OAuthPrincipal principal) throws IOException {
-        User portalUser = socialNetworkService.findUserByOAuthProviderUsername(principal.getOauthProviderType(), principal.getUserName());
+      User portalUser;
+      if(StringUtils.isNotBlank(principal.getUserName())) {
+        portalUser = socialNetworkService.findUserByOAuthProviderUsername(principal.getOauthProviderType(), principal.getUserName());
+      } else {
+        portalUser = socialNetworkService.findUserByEmail(principal.getEmail());
+      }
 
         if (portalUser == null) {
             // This means that user has been successfully authenticated via OAuth, but doesn't exist in GateIn. So we need to establish context
@@ -139,7 +145,7 @@ public class OAuthAuthenticationFilter extends AbstractSSOInterceptor {
 
         //User gateInUser = OAuthUtils.convertOAuthPrincipalToGateInUser(principal);
         OAuthPrincipalProcessor principalProcessor = principal.getOauthProviderType().getOauthPrincipalProcessor();
-        User gateInUser = principalProcessor.convertToGateInUser(principal);
+        User gateInUser =
         authenticationRegistry.setAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER, gateInUser);
 
         String registrationRedirectUrl = getRegistrationRedirectURL(httpRequest);

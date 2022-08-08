@@ -107,16 +107,16 @@ public class OAuthUtils {
         try {
             // Assume that username is first part of email
             String email = userInfo.getString(OAuthConstants.EMAIL_ATTRIBUTE);
-            String username = email != null ? email.substring(0, email.indexOf('@')) : userInfo.getString("given_name");
-            return new OAuthPrincipal<OpenIdAccessTokenContext>(username,
-                                                                userInfo.getString(OAuthConstants.GIVEN_NAME_ATTRIBUTE),
-                                                                userInfo.getString(OAuthConstants.FAMILY_NAME_ATTRIBUTE),
-                                                                userInfo.getString(OAuthConstants.NAME_ATTRIBUTE),
-                                                                userInfo.getString(OAuthConstants.EMAIL_ATTRIBUTE),
-                                                                userInfo.has(OAuthConstants.PICTURE_ATTRIBUTE) ?
-                                                                userInfo.getString(OAuthConstants.PICTURE_ATTRIBUTE) : null,
-                                                                accessToken,
-                                                                openIdProviderType);
+
+            return new OAuthPrincipal<>(null,
+                                        userInfo.getString(OAuthConstants.GIVEN_NAME_ATTRIBUTE),
+                                        userInfo.getString(OAuthConstants.FAMILY_NAME_ATTRIBUTE),
+                                        userInfo.getString(OAuthConstants.NAME_ATTRIBUTE),
+                                        userInfo.getString(OAuthConstants.EMAIL_ATTRIBUTE),
+                                        userInfo.has(OAuthConstants.PICTURE_ATTRIBUTE) ? userInfo.getString(OAuthConstants.PICTURE_ATTRIBUTE)
+                                                                                       : null,
+                                        accessToken,
+                                        openIdProviderType);
         } catch (JSONException jsonException) {
             throw new OAuthException(OAuthExceptionCode.ACCESS_TOKEN_ERROR,
                                      "Error during user info reading: response format is ko");
