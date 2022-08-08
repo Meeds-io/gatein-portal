@@ -31,14 +31,16 @@ public class OpenIdPrincipalProcessor implements OAuthPrincipalProcessor {
     public User convertToGateInUser(OAuthPrincipal principal) {
         String email = principal.getEmail();
         String username = principal.getUserName();
-        UserImpl gateinUser = new UserImpl(OAuthUtils.refineUserName(username));
-        if(StringUtils.isNoneBlank(username)) {
-            gateinUser.setUserName(OAuthUtils.refineUserName(username));
+        UserImpl gateinUser = new UserImpl();
+        if(StringUtils.isNotBlank(username)) {
+          gateinUser.setUserName(OAuthUtils.refineUserName(username));
         }
         gateinUser.setFirstName(principal.getFirstName());
         gateinUser.setLastName(principal.getLastName());
         gateinUser.setEmail(email);
-        gateinUser.setDisplayName(principal.getDisplayName());
+        if(StringUtils.isNotBlank(principal.getDisplayName())) {
+          gateinUser.setDisplayName(principal.getDisplayName());
+        }
 
         return gateinUser;
     }
