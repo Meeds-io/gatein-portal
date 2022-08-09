@@ -26,7 +26,6 @@ package org.gatein.security.oauth.data;
 import java.lang.reflect.Method;
 
 import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.commons.utils.ListAccessImpl;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.organization.*;

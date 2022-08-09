@@ -143,11 +143,10 @@ public class OAuthAuthenticationFilter extends AbstractSSOInterceptor {
         log.trace("Not found portalUser with username " + principal.getUserName() + ". Redirecting to registration form");
       }
 
-      //User gateInUser = OAuthUtils.convertOAuthPrincipalToGateInUser(principal);
-      User gateInUser; 
+      User gateInUser;
       OAuthPrincipalProcessor principalProcessor = principal.getOauthProviderType().getOauthPrincipalProcessor();
       if(StringUtils.isNotBlank(principal.getUserName())) {
-        gateInUser = socialNetworkService.findUserByEmail(principal.getEmail());
+        gateInUser = socialNetworkService.findUserByEmail(principal.getUserName());
       } else {
         gateInUser = socialNetworkService.findUserByEmail(principal.getEmail());
       }
