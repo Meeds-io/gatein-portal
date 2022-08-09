@@ -158,7 +158,7 @@ public class SocialNetworkServiceImpl implements SocialNetworkService, OAuthCode
       Query queryByEmail = new Query();
       queryByEmail.setEmail(email);
       ListAccess<User> users = userHandler.findUsersByQuery(queryByEmail);
-      if(users == null || users.getSize() == 0 || users.getSize() > 0) {
+      if(users == null || users.getSize() == 0 || users.getSize() > 1) {
         return null;
       } else if(users.getSize() == 1) {
         return users.load(0, 1)[0];

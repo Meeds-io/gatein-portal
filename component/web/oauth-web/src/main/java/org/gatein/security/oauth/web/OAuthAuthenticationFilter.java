@@ -139,18 +139,26 @@ public class OAuthAuthenticationFilter extends AbstractSSOInterceptor {
 
     protected void handleRedirectToRegistrationForm(HttpServletRequest httpRequest, HttpServletResponse httpResponse, OAuthPrincipal principal)
             throws IOException {
-        if (log.isTraceEnabled()) {
-            log.trace("Not found portalUser with username " + principal.getUserName() + ". Redirecting to registration form");
-        }
+      if (log.isTraceEnabled()) {
+        log.trace("Not found portalUser with username " + principal.getUserName() + ". Redirecting to registration form");
+      }
 
-        //User gateInUser = OAuthUtils.convertOAuthPrincipalToGateInUser(principal);
-        OAuthPrincipalProcessor principalProcessor = principal.getOauthProviderType().getOauthPrincipalProcessor();
-        User gateInUser =
-        authenticationRegistry.setAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER, gateInUser);
+      //User gateInUser = OAuthUtils.convertOAuthPrincipalToGateInUser(principal);
+      User gateInUser; 
+      OAuthPrincipalProcessor principalProcessor = principal.getOauthProviderType().getOauthPrincipalProcessor();
+      if(StringUtils.isNotBlank(principal.getUserName())) {
+        gateInUser = socialNetworkService.findUserByEmail(principal.getEmail());
+      } else {
+        gateInUser = socialNetworkService.findUserByEmail(principal.getEmail());
+      }
+      if(gateInUser == null) {
+        gateInUser = principalProcessor.convertToGateInUser(principal);
+      }
+      authenticationRegistry.setAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER, gateInUser);
 
-        String registrationRedirectUrl = getRegistrationRedirectURL(httpRequest);
-        registrationRedirectUrl = httpResponse.encodeRedirectURL(registrationRedirectUrl);
-        httpResponse.sendRedirect(registrationRedirectUrl);
+      String registrationRedirectUrl = getRegistrationRedirectURL(httpRequest);
+      registrationRedirectUrl = httpResponse.encodeRedirectURL(registrationRedirectUrl);
+      httpResponse.sendRedirect(registrationRedirectUrl);
     }
 
 
