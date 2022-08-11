@@ -12,6 +12,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.ListAccess;
@@ -26,12 +34,9 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 
 @Path("v1/groups")
+@Tag(name = "v1/groups", description = "Manages groups operations")
 public class GroupRestResourcesV1 implements ResourceContainer {
 
   public static final int     DEFAULT_LIMIT  = 20;
@@ -53,29 +58,28 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("administrators")
-  @ApiOperation(
-      value = "Gets groups",
-      httpMethod = "GET",
-      response = Response.class,
-      notes = "This returns the list of groups containing the given search text"
-  )
+  @Operation(
+      summary = "Gets groups",
+      description = "Gets groups",
+      method = "GET")
   @ApiResponses(
       value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 500, message = "Internal server error") }
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "500", description = "Internal server error") }
   )
   public Response getGroups(@Context UriInfo uriInfo,
-                            @ApiParam(value = "Search text to filter groups") @QueryParam(
+                            @Parameter(description = "Search text to filter groups") @QueryParam(
                               "q"
                             ) String q,
-                            @ApiParam(value = "Offset") @QueryParam(
+                            @Parameter(description = "Offset") @QueryParam(
                               "offset"
                             ) int offset,
-                            @ApiParam(value = "Limit") @QueryParam(
+                            @Parameter(description = "Limit") @QueryParam(
                               "limit"
                             ) int limit,
-                            @ApiParam(value = "Whether build tree until results or not", defaultValue = "false") @QueryParam(
+                            @Parameter(description = "Whether build tree until results or not") @Schema(defaultValue = "false")
+                            @QueryParam(
                               "tree"
                             ) boolean buildTree,
                             @QueryParam(
@@ -115,29 +119,27 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   @Path("tree")
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("administrators")
-  @ApiOperation(
-      value = "Gets groups tree",
-      httpMethod = "GET",
-      response = Response.class,
-      notes = "This returns the list of groups children containing the given search text"
-  )
+  @Operation(
+      summary = "Gets groups tree",
+      description = "Gets groups tree",
+      method = "GET")
   @ApiResponses(
       value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 500, message = "Internal server error") }
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "500", description = "Internal server error") }
   )
   public Response getGroupsTree(@Context UriInfo uriInfo,
-                                @ApiParam(value = "Parent groupId to search") @QueryParam(
+                                @Parameter(description = "Parent groupId to search") @QueryParam(
                                   "parentId"
                                 ) String parentId,
-                                @ApiParam(value = "Search text to filter groups") @QueryParam(
+                                @Parameter(description = "Search text to filter groups") @QueryParam(
                                   "q"
                                 ) String q,
-                                @ApiParam(value = "Offset") @QueryParam(
+                                @Parameter(description = "Offset") @QueryParam(
                                   "offset"
                                 ) int offset,
-                                @ApiParam(value = "Limit") @QueryParam(
+                                @Parameter(description = "Limit") @QueryParam(
                                   "limit"
                                 ) int limit,
                                 @QueryParam(
@@ -181,18 +183,17 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   @POST
   @RolesAllowed("administrators")
   @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation(
-      value = "Creates a new group",
-      httpMethod = "POST",
-      response = Response.class,
-      consumes = MediaType.APPLICATION_JSON
+  @Operation(
+      summary = "Creates a new group",
+      description = "Creates a new group",
+      method = "POST"
   )
   @ApiResponses(
       value = {
-          @ApiResponse(code = 204, message = "Request fulfilled"),
-          @ApiResponse(code = 400, message = "Bad request"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 500, message = "Internal server error")
+          @ApiResponse(responseCode = "204", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Bad request"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")
       }
   )
   public Response createGroup(GroupImpl group) throws Exception {
@@ -235,18 +236,17 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   @PUT
   @RolesAllowed("administrators")
   @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation(
-      value = "Updates an existing Group",
-      httpMethod = "PUT",
-      response = Response.class,
-      consumes = MediaType.APPLICATION_JSON
+  @Operation(
+      summary = "Updates an existing Group",
+      description = "Updates an existing Group",
+      method = "PUT"
   )
   @ApiResponses(
       value = {
-          @ApiResponse(code = 204, message = "Request fulfilled"),
-          @ApiResponse(code = 400, message = "Bad request"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 500, message = "Internal server error")
+          @ApiResponse(responseCode = "204", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Bad request"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")
       }
   )
   public Response updateGroup(GroupImpl group) throws Exception {
@@ -264,20 +264,20 @@ public class GroupRestResourcesV1 implements ResourceContainer {
 
   @DELETE
   @RolesAllowed("administrators")
-  @ApiOperation(
-      value = "Deletes an existing Group",
-      httpMethod = "DELETE",
-      response = Response.class
+  @Operation(
+      summary = "Deletes an existing Group",
+      description = "Deletes an existing Group",
+      method = "DELETE"
   )
   @ApiResponses(
       value = {
-          @ApiResponse(code = 204, message = "Request fulfilled"),
-          @ApiResponse(code = 400, message = "Bad request"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 500, message = "Internal server error")
+          @ApiResponse(responseCode = "204", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Bad request"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")
       }
   )
-  public Response deleteGroup(@ApiParam(value = "Group id", required = true) @QueryParam(
+  public Response deleteGroup(@Parameter(description = "Group id", required = true) @QueryParam(
     "groupId"
   ) String groupId) throws Exception {
     if (StringUtils.isBlank(groupId)) {
@@ -300,29 +300,35 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   @Path("memberships")
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("administrators")
-  @ApiOperation(
-      value = "Gets Group memberships list",
-      httpMethod = "GET",
-      response = Response.class
+  @Operation(
+      summary = "Gets Group memberships list",
+      description = "Gets Group memberships list",
+      method = "GET"
   )
   @ApiResponses(
       value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 404, message = "Group not found"),
-          @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "404", description = "Group not found"),
+          @ApiResponse(responseCode = "500", description = "Internal server error due to data encoding"),
       }
   )
   public Response getGroupMemberships(
-                                      @ApiParam(value = "Group identifier", required = true) @QueryParam(
+                                      @Parameter(description = "Group identifier", required = true) @QueryParam(
                                         "groupId"
                                       ) String groupId,
-                                      @ApiParam(value = "Offset", required = false, defaultValue = "0") @QueryParam(
+                                      @Parameter(description = "Offset", required = false)
+                                      @Schema(defaultValue = "0")
+                                      @QueryParam(
                                         "offset"
                                       ) int offset,
-                                      @ApiParam(value = "Limit", required = false, defaultValue = "20") @QueryParam(
+                                      @Parameter(description = "Limit", required = false)
+                                      @Schema(defaultValue = "20")
+                                      @QueryParam(
                                         "limit"
                                       ) int limit,
-                                      @ApiParam(value = "Returning the number of users found or not", defaultValue = "false") @QueryParam(
+                                      @Parameter(description = "Returning the number of users found or not")
+                                      @Schema(defaultValue = "false")
+                                      @QueryParam(
                                         "returnSize"
                                       ) boolean returnSize) throws Exception {
 
@@ -360,21 +366,20 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   @Path("memberships")
   @RolesAllowed("administrators")
   @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation(
-      value = "Creates a new membership",
-      httpMethod = "POST",
-      response = Response.class,
-      consumes = MediaType.APPLICATION_JSON
+  @Operation(
+      summary = "Creates a new membership",
+      description = "Creates a new membership",
+      method = "POST"
   )
   @ApiResponses(
       value = {
-          @ApiResponse(code = 204, message = "Request fulfilled"),
-          @ApiResponse(code = 400, message = "Bad request"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 500, message = "Internal server error")
+          @ApiResponse(responseCode = "204", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Bad request"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")
       }
   )
-  public Response createMembership(MembershipImpl membership) throws Exception {
+  public Response createMembership(@RequestBody(description = "Membership Object") MembershipImpl membership) throws Exception {
     if (membership == null) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Membership object is required").build();
     }
@@ -420,21 +425,21 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   @Path("memberships/bulk")
   @RolesAllowed("administrators")
   @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation(
-          value = "Creates new memberships",
-          httpMethod = "POST",
-          response = Response.class,
-          consumes = MediaType.APPLICATION_JSON
+  @Operation(
+          summary = "Creates new memberships",
+          description = "Creates new memberships",
+          method = "POST"
   )
   @ApiResponses(
           value = {
-                  @ApiResponse(code = 204, message = "Request fulfilled"),
-                  @ApiResponse(code = 400, message = "Bad request"),
-                  @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-                  @ApiResponse(code = 500, message = "Internal server error")
+                  @ApiResponse(responseCode = "204", description = "Request fulfilled"),
+                  @ApiResponse(responseCode = "400", description = "Bad request"),
+                  @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+                  @ApiResponse(responseCode = "500", description = "Internal server error")
           }
   )
-  public Response createMultipleMembership(List<MembershipImpl> memberships) throws Exception {
+  public Response createMultipleMembership(@RequestBody(description = "List of membership objects")
+                                                          List<MembershipImpl> memberships) throws Exception {
     for (MembershipImpl membership : memberships) {
       if (membership == null) {
         return Response.status(Response.Status.BAD_REQUEST).entity("Membership object is required").build();
@@ -482,25 +487,22 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   @Path("memberships")
   @RolesAllowed("administrators")
   @Consumes(MediaType.APPLICATION_JSON)
-  @ApiOperation(
-      value = "Updates an existing membership",
-      httpMethod = "PUT",
-      response = Response.class,
-      consumes = MediaType.APPLICATION_JSON
+  @Operation(
+      summary = "Updates an existing membership",
+      description = "Updates an existing membership",
+      method = "PUT"
   )
   @ApiResponses(
       value = {
-          @ApiResponse(code = 204, message = "Request fulfilled"),
-          @ApiResponse(code = 400, message = "Bad request"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 500, message = "Internal server error")
+          @ApiResponse(responseCode = "204", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Bad request"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")
       }
   )
-  public Response updateMembership(@ApiParam(
-      value = "Membership identifier with format: MEMBERSHIP_TYPE:GROUP_ID:USER_NAME", required = true
-  ) @QueryParam(
-    "membershipId"
-  ) String membershipId, MembershipImpl membership) throws Exception {
+  public Response updateMembership(@Parameter(description = "Membership identifier with format: MEMBERSHIP_TYPE:GROUP_ID:USER_NAME", required = true)
+                                   @QueryParam("membershipId") String membershipId,
+                                   @RequestBody(description = "Membership object") MembershipImpl membership) throws Exception {
     if (membership == null) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Membership object is required").build();
     }
@@ -558,21 +560,20 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   @DELETE
   @Path("memberships")
   @RolesAllowed("administrators")
-  @ApiOperation(
-      value = "Deletes an existing membership",
-      httpMethod = "DELETE",
-      response = Response.class
-  )
+  @Operation(
+      summary = "Deletes an existing membership",
+      description = "Deletes an existing membership",
+      method = "DELETE")
   @ApiResponses(
       value = {
-          @ApiResponse(code = 204, message = "Request fulfilled"),
-          @ApiResponse(code = 400, message = "Bad request"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 500, message = "Internal server error")
+          @ApiResponse(responseCode = "204", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Bad request"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")
       }
   )
-  public Response deleteMembership(@ApiParam(
-      value = "Membership identifier with format: MEMBERSHIP_TYPE:GROUP_ID:USER_NAME", required = true
+  public Response deleteMembership(@Parameter(
+      description = "Membership identifier with format: MEMBERSHIP_TYPE:GROUP_ID:USER_NAME", required = true
   ) @QueryParam(
     "membershipId"
   ) String membershipId) throws Exception {
@@ -592,25 +593,34 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   @Path("treeMembers")
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Gets groups tree", httpMethod = "GET", response = Response.class, notes = "This returns the list of groups children containing the given search text for the current user")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "Request fulfilled"),
-      @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-      @ApiResponse(code = 500, message = "Internal server error") })
+  @Schema()
+  @Operation(
+          summary = "Gets groups tree",
+          description = "Gets groups tree",
+          method = "GET")
+  @ApiResponses(value = {
+          @ApiResponse(
+                  responseCode = "200",
+                  description = "Request fulfilled",
+                  content = @Content(
+                          schema = @Schema(implementation = CollectionEntity.class))),
+         @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+         @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response getGroupsTreeMembers(@Context
   UriInfo uriInfo,
-                                       @ApiParam(value = "Search text to filter groups")
+                                       @Parameter(description = "Search text to filter groups")
                                        @QueryParam("q")
                                        String q,
-                                       @ApiParam(value = "Group member")
+                                       @Parameter(description = "Group member")
                                        @QueryParam("groupMember")
                                        String groupMember,
-                                       @ApiParam(value = "Group type")
+                                       @Parameter(description = "Group type")
                                        @QueryParam("groupType")
                                        String groupType,
-                                       @ApiParam(value = "Offset")
+                                       @Parameter(description = "Offset")
                                        @QueryParam("offset")
                                        int offset,
-                                       @ApiParam(value = "Limit")
+                                       @Parameter(description = "Limit")
                                        @QueryParam("limit")
                                        int limit,
                                        @QueryParam("returnSize")
