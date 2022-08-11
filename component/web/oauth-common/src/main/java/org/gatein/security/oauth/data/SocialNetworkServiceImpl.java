@@ -25,14 +25,10 @@ package org.gatein.security.oauth.data;
 
 import java.lang.reflect.Method;
 
+import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.User;
-import org.exoplatform.services.organization.UserHandler;
-import org.exoplatform.services.organization.UserProfile;
-import org.exoplatform.services.organization.UserProfileHandler;
-import org.exoplatform.services.organization.UserStatus;
+import org.exoplatform.services.organization.*;
 import org.exoplatform.web.security.codec.AbstractCodec;
 import org.exoplatform.web.security.codec.CodecInitializer;
 import org.exoplatform.web.security.security.TokenServiceInitializationException;
@@ -153,7 +149,30 @@ public class SocialNetworkServiceImpl implements SocialNetworkService, OAuthCode
         }
     }
 
-    @Override
+  @Override
+  public User findUserByEmail(String email) {
+    try {
+      begin();
+      UserHandler userHandler = orgService.getUserHandler();
+      Query queryByEmail = new Query();
+      queryByEmail.setEmail(email);
+      ListAccess<User> users = userHandler.findUsersByQuery(queryByEmail);
+      if(users == null || users.getSize() == 0 || users.getSize() > 1) {
+        return null;
+      } else if(users.getSize() == 1) {
+        return users.load(0, 1)[0];
+      }
+    } catch (OAuthException oauthEx) {
+      throw oauthEx;
+    } catch (Exception e) {
+      throw new OAuthException(OAuthExceptionCode.PERSISTENCE_ERROR, e);
+    } finally {
+      end();
+    }
+    return null;
+  }
+
+  @Override
     public <T extends AccessTokenContext> void updateOAuthInfo(OAuthProviderType<T> oauthProviderType, String username, String oauthUsername, T accessToken) {
         try {
             begin();
