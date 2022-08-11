@@ -62,4 +62,11 @@ public interface SocialNetworkService {
      */
     <T extends AccessTokenContext> void removeOAuthAccessToken(OAuthProviderType<T> oauthProviderType, String username);
 
+    /**
+     * Locates a user by its email address. If no user is found or more than one user
+     * has that email, it returns null
+     * @param email
+     * @return User having provided email
+     */
+    User findUserByEmail(String email);
 }
