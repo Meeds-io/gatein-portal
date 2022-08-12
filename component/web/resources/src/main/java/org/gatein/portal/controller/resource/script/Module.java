@@ -51,6 +51,14 @@ public abstract class Module {
     /** Our logger. */
     private static final Log                 log     = ExoLogger.getLogger(Module.class);
 
+    /** . */
+    public static final ResourceBundle.Control CONTROL = new ResourceBundle.Control() {
+                                                         @Override
+                                                         public Locale getFallbackLocale(String baseName, Locale locale) {
+                                                           return locale.equals(Locale.ENGLISH) ? null : Locale.ENGLISH;
+                                                         }
+                                                       };
+
     protected static ResourceBundleService resourceBundleService;
 
     /** . */
@@ -205,13 +213,20 @@ public abstract class Module {
 
                     //
                     ResourceBundle bundle = getResourceBundleService().getResourceBundle(resourceBundle, locale, bundleLoader);
+                    if (bundle == null) {
+                      bundle = ResourceBundle.getBundle(resourceBundle, locale, bundleLoader, CONTROL);
+                      if (bundle == null && locale != Locale.ENGLISH) {
+                        bundle = ResourceBundle.getBundle(resourceBundle, Locale.ENGLISH, bundleLoader, CONTROL);
+                      }
+                    }
                     if (bundle != null) {
                         log.debug("Found bundle " + bundle + " for locale " + locale + " and bundle " + resourceBundle);
+                        ResourceBundle finalBundle = bundle;
                         reader = new PropertyResolverReader(reader) {
                             @Override
                             protected String resolve(String name) {
                                 try {
-                                    String val = bundle.getString(name);
+                                    String val = finalBundle.getString(name);
                                     return escapeJavascriptStringLiteral(val);
                                 } catch (MissingResourceException e) {
                                     // Need to use logging
