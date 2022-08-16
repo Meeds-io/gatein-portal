@@ -233,7 +233,10 @@ public class LoginHandler extends JspBasedWebHandler {
       if (meetDisabledUser) {
         status = LoginStatus.DISABLED_USER;
       }
-
+      Object ssoStatus = request.getAttribute("SSO.Login.Status");
+      if(ssoStatus != null) {
+        status = LoginStatus.valueOf((String) ssoStatus);
+      }
       dispatch(context, loginPath.toString(), status);
     }
   }
