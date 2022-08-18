@@ -11,7 +11,11 @@
   ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
   ~ Lesser General Public License for more details.
   ~
-  ~ You should have received a copy of the GNU Lesser General Public
+  ~ You should have received a copy of the GNU Lesse  <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <scope>provided</scope>
+    </dependency>r General Public
   ~ License along with this software; if not, write to the Free
   ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
@@ -44,7 +48,11 @@
       <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.portal</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.test.core</artifactId>
