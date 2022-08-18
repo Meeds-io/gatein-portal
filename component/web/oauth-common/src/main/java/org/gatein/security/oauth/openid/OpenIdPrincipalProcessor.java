@@ -18,6 +18,7 @@
  */
 package org.gatein.security.oauth.openid;
 
+import org.apache.commons.lang3.StringUtils;
 import org.gatein.security.oauth.spi.OAuthPrincipal;
 import org.gatein.security.oauth.spi.OAuthPrincipalProcessor;
 import org.gatein.security.oauth.utils.OAuthUtils;
@@ -30,18 +31,16 @@ public class OpenIdPrincipalProcessor implements OAuthPrincipalProcessor {
     public User convertToGateInUser(OAuthPrincipal principal) {
         String email = principal.getEmail();
         String username = principal.getUserName();
-        if(email != null) {
-            int index = email.indexOf('@');
-            if(index > 0) {
-                username = email.substring(0, index);
-            }
+        UserImpl gateinUser = new UserImpl();
+        if(StringUtils.isNotBlank(username)) {
+          gateinUser.setUserName(OAuthUtils.refineUserName(username));
         }
-
-        User gateinUser = new UserImpl(OAuthUtils.refineUserName(username));
         gateinUser.setFirstName(principal.getFirstName());
         gateinUser.setLastName(principal.getLastName());
         gateinUser.setEmail(email);
-        gateinUser.setDisplayName(principal.getDisplayName());
+        if(StringUtils.isNotBlank(principal.getDisplayName())) {
+          gateinUser.setDisplayName(principal.getDisplayName());
+        }
 
         return gateinUser;
     }

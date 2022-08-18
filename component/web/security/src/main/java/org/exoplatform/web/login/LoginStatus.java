@@ -22,7 +22,9 @@ public enum LoginStatus {
   AUTHENTICATED,
   FAILED("SigninFail"),
   DISABLED_USER("DisabledUserSignin"),
-  MANY_USERS_WITH_SAME_EMAIL("ManyUsersWithSameEmail");
+  MANY_USERS_WITH_SAME_EMAIL("ManyUsersWithSameEmail"),
+
+  USER_ACCOUNT_NOT_FOUND("UserAccountNotFound");
 
   private final String errorCode;
 
