@@ -14,6 +14,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,14 +46,8 @@ import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityConstants;
 import org.exoplatform.ws.frameworks.json.impl.JsonParserImpl;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-
 @Path("/v1/navigations")
-@Api(tags = "/v1/navigations", value = "/v1/navigations", description = "Retrieve sites navigations") // NOSONAR
+@Tag(name = "v1/navigations", description = "Retrieve sites navigations")
 public class NavigationRest implements ResourceContainer {
 
   private static final Log                  LOG                  = ExoLogger.getLogger(NavigationRest.class);
@@ -68,10 +68,15 @@ public class NavigationRest implements ResourceContainer {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Gets navigations", httpMethod = "GET", response = Response.class, notes = "This returns site navigations")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "Request fulfilled"),
-      @ApiResponse(code = 400, message = "Invalid query input"), @ApiResponse(code = 404, message = "Navigation does not exist"),
-      @ApiResponse(code = 500, message = "Internal server error") })
+  @Operation(
+          summary = "Gets navigations",
+          description = "Gets navigations",
+          method = "GET")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+          @ApiResponse(responseCode = "404", description = "Navigation does not exist"),
+          @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response getSiteNavigation(@Context HttpServletRequest request) {
     HttpUserPortalContext userPortalContext = new HttpUserPortalContext(request);
     String portalName = portalConfigService.getDefaultPortal();
@@ -106,16 +111,23 @@ public class NavigationRest implements ResourceContainer {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Gets navigations of one or multiple site navigations", httpMethod = "GET", response = Response.class, notes = "This returns the requested site navigations")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "Request fulfilled"),
-      @ApiResponse(code = 400, message = "Invalid query input"), @ApiResponse(code = 404, message = "Navigation does not exist"),
-      @ApiResponse(code = 500, message = "Internal server error") })
+  @Operation(
+          summary = "Gets navigations of one or multiple site navigations",
+          description = "Gets navigations of one or multiple site navigations",
+          method = "GET")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+          @ApiResponse(responseCode = "404", description = "Navigation does not exist"),
+          @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response getSiteTypeNavigations(@Context HttpServletRequest request,
-                                         @ApiParam(value = "Portal site type, possible values: PORTAL, GROUP or USER", required = true) @PathParam("siteType") String siteTypeName,
-                                         @ApiParam(value = "Site names regex to exclude from results", required = false) @QueryParam("exclude") String excludedSiteName,
-                                         @ApiParam(value = "Portal site name", required = true) @QueryParam("siteName") String siteName,
-                                         @ApiParam(value = "Scope of navigations tree to retrieve, possible values: ALL, CHILDREN, GRANDCHILDREN, SINGLE", defaultValue = "ALL", required = false) @QueryParam("scope") String scopeName,
-                                         @ApiParam(value = "Multivalued visibilities of navigation nodes to retrieve, possible values: DISPLAYED, HIDDEN, SYSTEM or TEMPORAL. If empty, all visibilities will be used.", defaultValue = "All possible values combined", required = false) @QueryParam("visibility") List<String> visibilityNames) {
+                                         @Parameter(description = "Portal site type, possible values: PORTAL, GROUP or USER", required = true) @PathParam("siteType") String siteTypeName,
+                                         @Parameter(description = "Site names regex to exclude from results", required = false) @QueryParam("exclude") String excludedSiteName,
+                                         @Parameter(description = "Portal site name", required = true) @QueryParam("siteName") String siteName,
+                                         @Parameter(description = "Scope of navigations tree to retrieve, possible values: ALL, CHILDREN, GRANDCHILDREN, SINGLE", required = false)
+                                         @Schema(defaultValue = "ALL") @QueryParam("scope") String scopeName,
+                                         @Parameter(description = "Multivalued visibilities of navigation nodes to retrieve, possible values: DISPLAYED, HIDDEN, SYSTEM or TEMPORAL. If empty, all visibilities will be used.", required = false)
+                                         @Schema(defaultValue = "All possible values combined") @QueryParam("visibility") List<String> visibilityNames) {
     // this function return nodes and not navigations
     if (StringUtils.isBlank(siteTypeName)) {
       return Response.status(400).build();
@@ -127,16 +139,14 @@ public class NavigationRest implements ResourceContainer {
   @Path("/categories")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @ApiOperation(
-      value = "Gets navigations categories for UI",
-      httpMethod = "GET",
-      response = Response.class,
-      notes = "This returns the requested sites navigation categories"
-  )
+  @Operation(
+      summary = "Gets navigations categories for UI",
+      description = "Gets navigations categories for UI",
+      method = "GET")
   @ApiResponses(
       value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 500, message = "Internal server error"),
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "500", description = "Internal server error"),
       }
   )
   public Response getNavigationCategories() {

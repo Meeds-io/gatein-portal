@@ -1,6 +1,10 @@
 package org.exoplatform.settings.rest;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
@@ -16,7 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/v1/settings")
-@Api(tags = "/v1/settings", value = "/v1/settings", description = "Managing settings")
+@Tag(name = "/v1/settings", description = "Managing settings" )
 public class SettingResource implements ResourceContainer {
 
   private SettingService settingService;
@@ -32,19 +36,19 @@ public class SettingResource implements ResourceContainer {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Gets a specific setting value",
-          httpMethod = "GET",
-          response = Response.class,
-          notes = "This returns the requested setting value in the following cases: <br/><ul><li>the authenticated user is the super user</li><li>the requested setting is a setting of the authenticated user (Context=USER)</li></ul>")
+  @Operation(
+          summary = "Gets a specific setting value",
+          description = "Gets a specific setting value",
+          method = "GET")
   @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse (code = 400, message = "Invalid query input"),
-          @ApiResponse (code = 401, message = "User does not have permissions to get it"),
-          @ApiResponse (code = 404, message = "Setting does not exist"),
-          @ApiResponse (code = 500, message = "Internal server error")})
-  public Response getSetting(@ApiParam(value = "Context - Format 'contextName,contextId' where 'contextId' is optional. Example: GLOBAL or USER,john", required = true) @PathParam("context") String contextParams,
-                             @ApiParam(value = "Scope - Format 'scopeName,scopeId' where 'scopeId' is optional. Example: GLOBAL or APPLICATION,wiki or SPACE,marketing", required = true) @PathParam("scope") String scopeParams,
-                             @ApiParam(value = "Setting key", required = true) @PathParam("settingKey") String settingKey) {
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+          @ApiResponse(responseCode = "401", description = "User does not have permissions to get it"),
+          @ApiResponse(responseCode = "404", description = "Setting does not exist"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")})
+  public Response getSetting(@Parameter(description = "Context - Format 'contextName,contextId' where 'contextId' is optional. Example: GLOBAL or USER,john", required = true) @PathParam("context") String contextParams,
+                             @Parameter(description = "Scope - Format 'scopeName,scopeId' where 'scopeId' is optional. Example: GLOBAL or APPLICATION,wiki or SPACE,marketing", required = true) @PathParam("scope") String scopeParams,
+                             @Parameter(description = "Setting key", required = true) @PathParam("settingKey") String settingKey) {
     if(StringUtils.isEmpty(contextParams) || StringUtils.isEmpty(scopeParams) || StringUtils.isEmpty(settingKey)) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Context, scope and setting key are mandatory").build();
     }
@@ -73,19 +77,19 @@ public class SettingResource implements ResourceContainer {
   @PUT
   @Consumes(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Sets a specific setting value",
-          httpMethod = "PUT",
-          response = Response.class,
-          notes = "This creates or updates the given setting value in the following cases: <br/><ul><li>the authenticated user is the super user</li><li>the given setting is a setting of the authenticated user (Context=USER)</li></ul>")
+  @Operation(
+          summary = "Sets a specific setting value",
+          description = "Sets a specific setting value",
+          method = "PUT")
   @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse (code = 400, message = "Invalid query input"),
-          @ApiResponse (code = 401, message = "User does not have permissions to update it"),
-          @ApiResponse (code = 500, message = "Internal server error")})
-  public Response setSetting(@ApiParam(value = "Context - Format 'contextName,contextId' where 'contextId' is optional. Example: GLOBAL or USER,john", required = true) @PathParam("context") String contextParams,
-                             @ApiParam(value = "Scope - Format 'scopeName,scopeId' where 'scopeId' is optional. Example: GLOBAL or APPLICATION,wiki or SPACE,marketing", required = true) @PathParam("scope") String scopeParams,
-                             @ApiParam(value = "Setting key", required = true) @PathParam("settingKey") String settingKey,
-                             @ApiParam(value = "Setting value", required = true) SettingValueEntity settingValue) {
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+          @ApiResponse(responseCode = "401", description = "User does not have permissions to update it"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")})
+  public Response setSetting(@Parameter(description = "Context - Format 'contextName,contextId' where 'contextId' is optional. Example: GLOBAL or USER,john", required = true) @PathParam("context") String contextParams,
+                             @Parameter(description = "Scope - Format 'scopeName,scopeId' where 'scopeId' is optional. Example: GLOBAL or APPLICATION,wiki or SPACE,marketing", required = true) @PathParam("scope") String scopeParams,
+                             @Parameter(description = "Setting key", required = true) @PathParam("settingKey") String settingKey,
+                             @Parameter(description = "Setting value", required = true) SettingValueEntity settingValue) {
     if(StringUtils.isEmpty(contextParams) || StringUtils.isEmpty(scopeParams) || StringUtils.isEmpty(settingKey) || settingValue == null) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Context, scope and setting key and value are mandatory").build();
     }

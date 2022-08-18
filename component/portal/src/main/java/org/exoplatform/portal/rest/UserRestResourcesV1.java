@@ -8,6 +8,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.utils.ListAccess;
@@ -16,15 +23,15 @@ import org.exoplatform.portal.rest.model.MembershipRestEntity;
 import org.exoplatform.portal.rest.model.UserRestEntity;
 import org.exoplatform.services.organization.*;
 import org.exoplatform.services.organization.search.UserSearchService;
+import org.exoplatform.services.rest.http.PATCH;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
-
-import io.swagger.annotations.*;
 import org.exoplatform.services.rest.http.PATCH;
 import org.exoplatform.web.login.recovery.ChangePasswordConnector;
 import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 
 @Path("v1/users")
+@Tag(name = "v1/users", description = "Manage User operations")
 public class UserRestResourcesV1 implements ResourceContainer {
 
   public static final int                DEFAULT_LIMIT                  = 10;
@@ -74,32 +81,30 @@ public class UserRestResourcesV1 implements ResourceContainer {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("administrators")
-  @ApiOperation(
-      value = "Gets all users",
-      httpMethod = "GET",
-      response = Response.class
+  @Operation(
+      summary = "Gets all users",
+      description = "Gets all users",
+      method = "GET"
   )
   @ApiResponses(
       value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "500", description = "Internal server error due to data encoding"),
       }
   )
   public Response getUsers(
-                           @ApiParam(
-                               value = "User name information to filter, ex: user name, last name, first name or full name",
+                           @Parameter(
+                               description = "User name information to filter, ex: user name, last name, first name or full name",
                                required = false
                            ) @QueryParam("q") String q,
-                           @ApiParam(value = "User status : ANY, ENABLED or DISABLED", required = false, defaultValue = "ANY") @QueryParam("status") String status,
-                           @ApiParam(value = "Offset", required = false, defaultValue = "0") @QueryParam(
-                             "offset"
-                           ) int offset,
-                           @ApiParam(value = "Limit", required = false, defaultValue = "10") @QueryParam(
-                             "limit"
-                           ) int limit,
-                           @ApiParam(value = "Returning the number of users found or not", defaultValue = "false") @QueryParam(
-                             "returnSize"
-                           ) boolean returnSize) throws Exception {
+                           @Parameter(description = "User status : ANY, ENABLED or DISABLED", required = false) @Schema(defaultValue = "ANY")
+                           @QueryParam("status") String status,
+                           @Parameter(description = "Offset", required = false) @Schema(defaultValue = "0")
+                           @QueryParam("offset") int offset,
+                           @Parameter(description = "Limit", required = false) @Schema(defaultValue = "10")
+                           @QueryParam("limit") int limit,
+                           @Parameter(description = "Returning the number of users found or not") @Schema(defaultValue = "false")
+                           @QueryParam("returnSize") boolean returnSize) throws Exception {
 
     offset = offset > 0 ? offset : 0;
     limit = limit > 0 ? limit : DEFAULT_LIMIT;
@@ -153,19 +158,19 @@ public class UserRestResourcesV1 implements ResourceContainer {
 
   @POST
   @RolesAllowed("administrators")
-  @ApiOperation(
-      value = "Create new user",
-      httpMethod = "GET",
-      response = Response.class
-  )
+  @Operation(
+      summary = "Create new user",
+      description = "Create new user",
+      method = "GET")
   @ApiResponses(
       value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 400, message = "Invalid query input"),
-          @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+          @ApiResponse(responseCode = "500", description = "Internal server error due to data encoding"),
       }
   )
-  public Response createUser(@Context HttpServletRequest request, UserRestEntity userEntity) throws Exception {
+  public Response createUser(@Context HttpServletRequest request,
+                             @RequestBody(description = "User Object") UserRestEntity userEntity) throws Exception {
     if (userEntity == null) {
       return Response.status(Response.Status.BAD_REQUEST).entity("empty user object").build();
     }
@@ -235,19 +240,19 @@ public class UserRestResourcesV1 implements ResourceContainer {
 
   @PUT
   @RolesAllowed("users")
-  @ApiOperation(
-      value = "Update an existing user",
-      httpMethod = "GET",
-      response = Response.class
-  )
+  @Operation(
+      summary = "Update an existing user",
+      description = "Update an existing user",
+      method = "GET")
   @ApiResponses(
       value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 400, message = "Invalid query input"),
-          @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+          @ApiResponse(responseCode = "500", description = "Internal server error due to data encoding"),
       }
   )
-  public Response updateUser(@Context HttpServletRequest request, UserRestEntity userEntity) throws Exception {
+  public Response updateUser(@Context HttpServletRequest request,
+                             @RequestBody(description = "User Object") UserRestEntity userEntity) throws Exception {
 
     if (!userACL.isUserInGroup(DELEGATED_GROUP) && !userACL.isUserInGroup(ADMINISTRATOR_GROUP)) {
       throw new WebApplicationException(Response.Status.FORBIDDEN);
@@ -331,16 +336,19 @@ public class UserRestResourcesV1 implements ResourceContainer {
   @DELETE
   @RolesAllowed("administrators")
   @Path("{id}")
-  @ApiOperation(value = "Deletes a user identified by its id", httpMethod = "DELETE", response = Response.class)
+  @Operation(
+          summary = "Deletes a user identified by its id",
+          description = "Deletes a user identified by its id",
+          method = "DELETE")
   @ApiResponses(
       value = {
-          @ApiResponse(code = 204, message = "Request fulfilled"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 404, message = "User not found"),
-          @ApiResponse(code = 500, message = "Internal server error"),
+          @ApiResponse(responseCode = "204", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "404", description = "User not found"),
+          @ApiResponse(responseCode = "500", description = "Internal server error"),
       }
   )
-  public Response deleteUser(@ApiParam(value = "User name identifier", required = true) @PathParam(
+  public Response deleteUser(@Parameter(description = "User name identifier", required = true) @PathParam(
     "id"
   ) String userName) throws Exception {
     User user = organizationService.getUserHandler().findUserByName(userName, UserStatus.ANY);
@@ -361,17 +369,20 @@ public class UserRestResourcesV1 implements ResourceContainer {
   @GET
   @RolesAllowed("users")
   @Path("{id}")
-  @ApiOperation(value = "Gets a user identified by its id", httpMethod = "GET", response = Response.class)
+  @Operation(
+          summary = "Gets a user identified by its id",
+          description = "Gets a user identified by its id",
+          method = "GET")
   @ApiResponses(
       value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 404, message = "User not found"),
-          @ApiResponse(code = 500, message = "Internal server error"),
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "404", description = "User not found"),
+          @ApiResponse(responseCode = "500", description = "Internal server error"),
       }
   )
   public Response getUser(@Context UriInfo uriInfo,
-                          @ApiParam(value = "User name identifier", required = true) @PathParam(
+                          @Parameter(description = "User name identifier", required = true) @PathParam(
                             "id"
                           ) String id) throws Exception {
 
@@ -401,24 +412,27 @@ public class UserRestResourcesV1 implements ResourceContainer {
   @PATCH
   @RolesAllowed("users")
   @Path("{id}/changePassword")
-  @ApiOperation(value = "Changes user password", httpMethod = "POST", response = Response.class)
+  @Operation(
+          summary = "Changes user password",
+          description = "Changes user password",
+          method = "POST")
   @ApiResponses(
       value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 401, message = "User not authorized to call this endpoint"),
-          @ApiResponse(code = 404, message = "User not found"),
-          @ApiResponse(code = 500, message = "Internal server error")
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to call this endpoint"),
+          @ApiResponse(responseCode = "404", description = "User not found"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")
       }
   )
   public Response changePassword(
                                  @Context HttpServletRequest request,
-                                 @ApiParam(value = "username to change his password", required = true) @PathParam(
+                                 @Parameter(description = "username to change his password", required = true) @PathParam(
                                    "id"
                                  ) String username,
-                                 @ApiParam(value = "Current user password", required = true) @FormParam(
+                                 @Parameter(description = "Current user password", required = true) @FormParam(
                                    "currentPassword"
                                  ) String currentPassword,
-                                 @ApiParam(value = "New user password", required = true) @FormParam(
+                                 @Parameter(description = "New user password", required = true) @FormParam(
                                    "newPassword"
                                  ) String newPassword) {
     boolean isAdmin = userACL.isSuperUser() || userACL.isUserInGroup(userACL.getAdminGroups());
@@ -465,31 +479,25 @@ public class UserRestResourcesV1 implements ResourceContainer {
   @Path("{id}/memberships")
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("administrators")
-  @ApiOperation(
-      value = "Gets User memberships list",
-      httpMethod = "GET",
-      response = Response.class
-  )
+  @Operation(
+      summary = "Gets User memberships list",
+      description = "Gets User memberships list",
+      method = "GET")
   @ApiResponses(
       value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 404, message = "User not found"),
-          @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "404", description = "User not found"),
+          @ApiResponse(responseCode = "500", description = "Internal server error due to data encoding"),
       }
   )
   public Response getUserMemberships(
-                                     @ApiParam(value = "User name identifier", required = true) @PathParam(
-                                       "id"
-                                     ) String userName,
-                                     @ApiParam(value = "Offset", required = false, defaultValue = "0") @QueryParam(
-                                       "offset"
-                                     ) int offset,
-                                     @ApiParam(value = "Limit", required = false, defaultValue = "20") @QueryParam(
-                                       "limit"
-                                     ) int limit,
-                                     @ApiParam(value = "Returning the number of users found or not", defaultValue = "false") @QueryParam(
-                                       "returnSize"
-                                     ) boolean returnSize) throws Exception {
+                                     @Parameter(description = "User name identifier", required = true) @PathParam("id") String userName,
+                                     @Parameter(description = "Offset", required = false) @Schema(defaultValue = "0")
+                                     @QueryParam("offset") int offset,
+                                     @Parameter(description = "Limit", required = false) @Schema(defaultValue = "20")
+                                     @QueryParam("limit") int limit,
+                                     @Parameter(description = "Returning the number of users found or not") @Schema(defaultValue = "false")
+                                     @QueryParam("returnSize") boolean returnSize) throws Exception {
 
     offset = offset > 0 ? offset : 0;
     limit = limit > 0 ? limit : DEFAULT_LIMIT;
@@ -525,15 +533,14 @@ public class UserRestResourcesV1 implements ResourceContainer {
   @Path("isSuperUser")
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(
-      value = "Check if current user is a superUser",
-      httpMethod = "GET",
-      response = Response.class
-  )
+  @Operation(
+      summary = "Check if current user is a superUser",
+      description = "Check if current user is a superUser",
+      method = "GET")
   @ApiResponses(
       value = {
-          @ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
+          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "500", description = "Internal server error due to data encoding"),
       }
   )
   public Response isSuperUser() {
@@ -544,15 +551,14 @@ public class UserRestResourcesV1 implements ResourceContainer {
   @Path("isDelegatedAdministrator")
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(
-          value = "Check if current user is a delegated administrator",
-          httpMethod = "GET",
-          response = Response.class
-  )
+  @Operation(
+          summary = "Check if current user is a delegated administrator",
+          description = "Check if current user is a delegated administrator",
+          method = "GET")
   @ApiResponses(
           value = {
-                  @ApiResponse(code = 200, message = "Request fulfilled"),
-                  @ApiResponse(code = 500, message = "Internal server error due to data encoding"),
+                  @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                  @ApiResponse(responseCode = "500", description = "Internal server error due to data encoding"),
           }
   )
   public Response isDelegatedAdministrator() {
@@ -564,13 +570,13 @@ public class UserRestResourcesV1 implements ResourceContainer {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("isSynchronizedUserAllowedToChangePassword")
   @RolesAllowed("users")
-  @ApiOperation(value = "Check if synchronized user is allowed to change his password",
-      httpMethod = "GET",
-      response = Response.class,
-      notes = "This can only be done by the logged in user.")
+  @Operation(
+          summary = "Check if synchronized user is allowed to change his password",
+          description = "Check if synchronized user is allowed to change his password",
+          method = "GET")
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Request fulfilled"),
-      @ApiResponse(code = 500, message = "Internal server error due to data encoding")})
+      @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+      @ApiResponse(responseCode = "500", description = "Internal server error due to data encoding")})
   public Response isSynchronizedUserAllowedToChangePassword(@Context UriInfo uriInfo) throws Exception {
 
     String userId = ConversationState.getCurrent().getIdentity().getUserId();
