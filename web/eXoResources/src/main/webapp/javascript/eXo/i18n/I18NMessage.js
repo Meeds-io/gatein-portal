@@ -51,6 +51,8 @@
 	  NextMonth : "${NextMonth}",
 	  PreviousYear : "${PreviousYear}",
 	  NextYear : "${NextYear}",
+	  NotFound : "${NotFound}",
+	  InProgress : "${InProgress}",
 	  weekdays : [
 	      "${weekdays.sun}",
 	      "${weekdays.mon}",
