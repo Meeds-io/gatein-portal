@@ -145,7 +145,7 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
     // Very initial request to portal
     if (state == null || state.isEmpty()) {
 
-      return initialInteraction(request, response, scopes);
+      return initialInteraction(request, response);
     } else if (state.equals(InteractionState.State.AUTH.name())) {
       OAuth2AccessToken tokenResponse = obtainAccessToken(request);
       OpenIdAccessTokenContext accessTokenContext = validateTokenAndUpdateScopes(new OpenIdAccessTokenContext(tokenResponse));
@@ -162,8 +162,7 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
 
   //
   protected InteractionState<OpenIdAccessTokenContext> initialInteraction(HttpServletRequest request,
-                                                                          HttpServletResponse response,
-                                                                          Set<String> scopes) throws IOException {
+                                                                          HttpServletResponse response) throws IOException {
     String verificationState = String.valueOf(secureRandomService.getSecureRandom().nextLong());
     String authorizeUrl = this.authenticationURL + "?" + "response_type=code" + "&client_id=" + this.clientID + "&scope="
         + this.scopes.stream().collect(Collectors.joining(" ")) + "&redirect_uri=" + this.redirectURL + "&state="

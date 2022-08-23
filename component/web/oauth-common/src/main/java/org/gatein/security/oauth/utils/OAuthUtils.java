@@ -70,7 +70,7 @@ public class OAuthUtils {
                                                                                                     String avatar,
                                                                                                     OAuthProviderType<FacebookAccessTokenContext> facebookProviderType,
                                                                                                     FacebookAccessTokenContext fbAccessTokenContext) {
-    return new OAuthPrincipal<FacebookAccessTokenContext>(facebookPrincipal.getUsername(),
+    return new OAuthPrincipal<>(facebookPrincipal.getUsername(),
                                                           facebookPrincipal.getFirstName(),
                                                           facebookPrincipal.getLastName(),
                                                           facebookPrincipal.getAttribute("name"),
@@ -98,7 +98,7 @@ public class OAuthUtils {
       lastName = null;
     }
 
-    return new OAuthPrincipal<TwitterAccessTokenContext>(twitterUser.getScreenName(),
+    return new OAuthPrincipal<>(twitterUser.getScreenName(),
                                                          firstName,
                                                          lastName,
                                                          fullName,
@@ -114,7 +114,7 @@ public class OAuthUtils {
     // Assume that username is first part of email
     String email = userInfo.getEmail();
     String username = email != null ? email.substring(0, email.indexOf('@')) : userInfo.getGivenName();
-    return new OAuthPrincipal<GoogleAccessTokenContext>(username,
+    return new OAuthPrincipal<>(username,
                                                         userInfo.getGivenName(),
                                                         userInfo.getFamilyName(),
                                                         userInfo.getName(),
