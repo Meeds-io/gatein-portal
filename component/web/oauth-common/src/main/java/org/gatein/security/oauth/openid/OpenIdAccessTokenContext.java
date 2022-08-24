@@ -1,6 +1,8 @@
 package org.gatein.security.oauth.openid;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import org.gatein.security.oauth.spi.AccessTokenContext;
@@ -15,11 +17,14 @@ public class OpenIdAccessTokenContext extends AccessTokenContext implements Seri
     
     public final OAuth2AccessToken accessToken;
 
+    private Map<String, String>  customClaims;
+
     public OpenIdAccessTokenContext(OAuth2AccessToken tokenData, String... scopes) {
         super(scopes);
         if (tokenData == null) {
             throw new IllegalArgumentException("tokenData can't be null");
         }
+        customClaims = new HashMap<>();
         this.accessToken = tokenData;
     }
 
@@ -28,6 +33,7 @@ public class OpenIdAccessTokenContext extends AccessTokenContext implements Seri
         if (tokenData == null) {
             throw new IllegalArgumentException("tokenData can't be null");
         }
+        customClaims = new HashMap<>();
         this.accessToken = tokenData;
     }
     
@@ -40,4 +46,11 @@ public class OpenIdAccessTokenContext extends AccessTokenContext implements Seri
         return accessToken;
     }
 
+    public void addCustomClaims(Map<String, String> newCustomClaims) {
+      this.customClaims.putAll(newCustomClaims);
+    }
+
+    public Map<String, String> getCustomClaims() {
+      return this.customClaims;
+    }
 }
