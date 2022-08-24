@@ -65,10 +65,7 @@ public class OpenIdFilter extends OAuthProviderFilter<OpenIdAccessTokenContext> 
             log.trace("Obtained tokenResponse from OpenId authentication: " + accessTokenContext);
         }
 
-        OAuthPrincipal<OpenIdAccessTokenContext> oauthPrincipal = OAuthUtils.convertOpenIdInfoToOAuthPrincipal(userInfo,
-                                                                                                               accessTokenContext, getOAuthProvider());
-
-        return oauthPrincipal;
+        return OAuthUtils.convertOpenIdInfoToOAuthPrincipal(userInfo, accessTokenContext, getOAuthProvider());
     }
 
 }
