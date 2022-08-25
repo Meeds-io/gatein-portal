@@ -131,6 +131,10 @@ public class OAuthUtils {
       String email = userInfo.has(OAuthConstants.EMAIL_ATTRIBUTE) ? userInfo.getString(OAuthConstants.EMAIL_ATTRIBUTE)
                                                                   : accessTokenContext.getCustomClaims()
                                                                                       .get(OAuthConstants.EMAIL_ATTRIBUTE);
+      if (email == null) {
+        throw new OAuthException(OAuthExceptionCode.UNKNOWN_ERROR,
+                                 "Error when reading user info, the email is not present, so we are unable to identify the user.");
+      }
       String givenName =
                        userInfo.has(OAuthConstants.GIVEN_NAME_ATTRIBUTE) ? userInfo.getString(OAuthConstants.GIVEN_NAME_ATTRIBUTE)
                                                                          : accessTokenContext.getCustomClaims()
