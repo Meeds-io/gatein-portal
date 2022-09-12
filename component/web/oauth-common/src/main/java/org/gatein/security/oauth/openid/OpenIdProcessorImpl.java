@@ -440,7 +440,7 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
         this.accessTokenURL = json.getString("token_endpoint");
         this.userInfoURL = json.getString("userinfo_endpoint");
         this.issuer = json.getString("issuer");
-        this.remoteJwkSigningKeyResolver = new RemoteJwkSigningKeyResolver(this.issuer);
+        this.remoteJwkSigningKeyResolver = new RemoteJwkSigningKeyResolver(this.wellKnownConfigurationUrl);
       }
     } catch (JSONException e) {
       log.error("Unable to read webKnownUrl content : " + this.wellKnownConfigurationUrl);
