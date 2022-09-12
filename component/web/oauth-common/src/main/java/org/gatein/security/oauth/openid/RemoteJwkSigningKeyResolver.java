@@ -38,7 +38,7 @@ import java.util.*;
 
 public class RemoteJwkSigningKeyResolver implements SigningKeyResolver {
 
-  private final String     wellKnownUrl;
+    private final String wellKnownUrl;
     private final Object lock = new Object();
     private Map<String, Key> keyMap = new HashMap<>();
     private static final Log LOG = ExoLogger.getLogger(RemoteJwkSigningKeyResolver.class);
