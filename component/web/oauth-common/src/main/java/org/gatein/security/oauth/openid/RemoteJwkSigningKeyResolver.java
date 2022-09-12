@@ -79,7 +79,7 @@ public class RemoteJwkSigningKeyResolver implements SigningKeyResolver {
 
     private void updateKeys() {
 
-      JSONObject configuration = getJson(wellKnownUrl);
+        JSONObject configuration = getJson(wellKnownUrl);
         try {
             String jwksUrl = configuration != null ? configuration.getString("jwks_uri") : null;
             JSONObject keys = getJson(jwksUrl);
