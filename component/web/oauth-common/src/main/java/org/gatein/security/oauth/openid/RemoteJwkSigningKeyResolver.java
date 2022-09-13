@@ -38,13 +38,13 @@ import java.util.*;
 
 public class RemoteJwkSigningKeyResolver implements SigningKeyResolver {
 
-    private final String issuer;
+    private final String wellKnownUrl;
     private final Object lock = new Object();
     private Map<String, Key> keyMap = new HashMap<>();
     private static final Log LOG = ExoLogger.getLogger(RemoteJwkSigningKeyResolver.class);
 
-    RemoteJwkSigningKeyResolver(String issuer) {
-        this.issuer = issuer;
+    RemoteJwkSigningKeyResolver(String wellKnownUrl) {
+      this.wellKnownUrl = wellKnownUrl;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class RemoteJwkSigningKeyResolver implements SigningKeyResolver {
 
     private void updateKeys() {
 
-        JSONObject configuration = getJson(issuer + "/.well-known/openid-configuration");
+        JSONObject configuration = getJson(wellKnownUrl);
         try {
             String jwksUrl = configuration != null ? configuration.getString("jwks_uri") : null;
             JSONObject keys = getJson(jwksUrl);
