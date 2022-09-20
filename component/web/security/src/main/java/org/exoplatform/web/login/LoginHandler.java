@@ -254,6 +254,10 @@ public class LoginHandler extends JspBasedWebHandler {
         if (users != null && users.getSize() > 0) {
           return users.load(0, 1)[0].getUserName();
         }
+        else {
+          LOG.debug("Can not get users by email");
+          dispatch(context, loginPath.toString(), LoginStatus.FAILED);
+        }
       } catch (RuntimeException e) {
         LOG.warn("Can not login with an email associated to many users");
         dispatch(context, loginPath.toString(), LoginStatus.MANY_USERS_WITH_SAME_EMAIL);
