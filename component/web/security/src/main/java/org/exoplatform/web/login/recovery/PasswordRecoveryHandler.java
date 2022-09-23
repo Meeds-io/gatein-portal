@@ -152,11 +152,9 @@ public class PasswordRecoveryHandler extends WebRequestHandler {
                 //
                 if (errors.isEmpty()) {
                     if (service.changePass(tokenId, remindPasswordTokenService.FORGOT_PASSWORD_TOKEN, username, password)) {
-                        success = bundle.getString("gatein.forgotPassword.resetPasswordSuccess");
-                        password = "";
-                        confirmPass = "";
                         String currentPortalContainerName = PortalContainer.getCurrentPortalContainerName();
                         res.sendRedirect("/" + currentPortalContainerName + "/login");
+                        return true;
                     } else {
                         errors.add(bundle.getString("gatein.forgotPassword.resetPasswordFailure"));
                     }
