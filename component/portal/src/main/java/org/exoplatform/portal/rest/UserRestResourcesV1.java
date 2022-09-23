@@ -302,8 +302,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
       return Response.status(Response.Status.BAD_REQUEST).entity("EMAIL:ALREADY_EXISTS").build();
     }
 
-    if (StringUtils.isNotBlank(password)
-        || !StringUtils.equals(email, user.getEmail())
+    if (!StringUtils.equals(email, user.getEmail())
         || !StringUtils.equals(lastName, user.getLastName())
         || !StringUtils.equals(firstName, user.getFirstName())) {
       user.setEmail(email);
@@ -312,6 +311,13 @@ public class UserRestResourcesV1 implements ResourceContainer {
       user.setPassword(password);
       user.setDisplayName(firstName+" "+lastName);
       organizationService.getUserHandler().saveUser(user, true);
+    }
+
+    if (StringUtils.isNotBlank(password)) {
+      // we save the password separatly from saving the user, because when changing
+      // password, we need to remove rememberme token
+      // related to this password as they are no more valid
+      passwordRecoveryService.getActiveChangePasswordConnector().changePassword(userName, password);
     }
 
     if (user.isEnabled() != enabled) {
