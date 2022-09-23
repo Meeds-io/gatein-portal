@@ -30,6 +30,7 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.web.login.externalRegistration.ExternalRegistrationHandler;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.web.security.security.CookieTokenService;
 import org.gatein.wci.security.Credentials;
 
 import org.exoplatform.commons.utils.I18N;
@@ -64,6 +65,8 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
 
   private final RemindPasswordTokenService     remindPasswordTokenService;
 
+  private final CookieTokenService             cookieTokenService;
+
   private final BrandingService                brandingService;
 
   private final WebAppController               webController;
@@ -79,12 +82,14 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
                                      MailService mailService,
                                      ResourceBundleService bundleService,
                                      RemindPasswordTokenService remindPasswordTokenService,
+                                     CookieTokenService cookieTokenService,
                                      WebAppController controller,
                                      BrandingService brandingService) {
     this.orgService = orgService;
     this.mailService = mailService;
     this.bundleService = bundleService;
     this.remindPasswordTokenService = remindPasswordTokenService;
+    this.cookieTokenService = cookieTokenService;
     this.webController = controller;
     this.brandingService = brandingService;
     this.changePasswordConnectorMap = new HashMap<>();
@@ -128,6 +133,11 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
       try {
         remindPasswordTokenService.deleteToken(tokenId, tokenType);
         remindPasswordTokenService.deleteTokensByUsernameAndType(username, tokenType);
+
+        // delete all token which have no type
+        // this is rememberMe token
+        // as user have change his password, these tokens are no more valid
+        cookieTokenService.deleteTokensByUsernameAndType(username, "");
 
       } catch (Exception ex) {
         log.warn("Can not delete token: " + tokenId, ex);

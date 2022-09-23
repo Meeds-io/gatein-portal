@@ -7,7 +7,11 @@ import java.io.ByteArrayInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.exoplatform.portal.config.DefaultGroupVisibilityPlugin;
+import org.exoplatform.web.login.recovery.ChangePasswordConnector;
+import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 import org.json.JSONObject;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import org.exoplatform.commons.utils.ListAccess;
@@ -27,6 +31,8 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
 
   private UserHandler         userHandler;
 
+  private ChangePasswordConnector changePasswordConnector;
+
   private UserACL             userACL;
 
   protected Class<?> getComponentClass() {
@@ -36,6 +42,14 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
   @Override
   public void setUp() throws Exception {
     super.setUp();
+
+    PasswordRecoveryService passwordRecoveryService = mock(PasswordRecoveryService.class);
+    changePasswordConnector = mock(ChangePasswordConnector.class);
+    Mockito.doNothing().when(changePasswordConnector).changePassword(any(), any());
+    Mockito.when(passwordRecoveryService.allowChangePassword(any())).thenReturn(true);
+    Mockito.when(passwordRecoveryService.getActiveChangePasswordConnector()).thenReturn(changePasswordConnector);
+    getContainer().unregisterComponent(PasswordRecoveryService.class);
+    getContainer().registerComponentInstance(PasswordRecoveryService.class, passwordRecoveryService);
 
     OrganizationService organizationService = mock(OrganizationService.class);
     userHandler = mock(UserHandler.class);
@@ -430,7 +444,8 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     assertNull(response.getEntity());
     assertEquals(204, response.getStatus());
 
-    verify(userHandler, atLeast(1)).saveUser(eq(user2), eq(true));
+    verify(userHandler, times(0)).saveUser(user2, true);
+    verify(changePasswordConnector, times(1)).changePassword(USER_2, "newPassword1");
     verify(userHandler, atMost(0)).setEnabled(anyString(), anyBoolean(), anyBoolean());
     
     data.put("userName", USER_2);
