@@ -8,6 +8,7 @@ import org.exoplatform.services.organization.idm.PicketLinkIDMService;
 import org.exoplatform.services.organization.idm.UserDAOImpl;
 import org.exoplatform.services.organization.idm.UserImpl;
 import org.exoplatform.services.organization.idm.externalstore.PicketLinkIDMExternalStoreService;
+import org.exoplatform.web.security.security.CookieTokenService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,12 +17,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static org.mockito.ArgumentMatchers.any;
+
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultChangePasswordConnectorTest {
   
   @Mock
-  OrganizationService organizationService;
-  
+  OrganizationService               organizationService;
+
+  @Mock
+  CookieTokenService                cookieTokenService;
   @Mock
   PicketLinkIDMService picketLinkIDMService;
   @Mock
@@ -40,9 +45,13 @@ public class DefaultChangePasswordConnectorTest {
     Mockito.when(userHandler.findUserByName(userTest.getUserName())).thenReturn(userTest);
     Mockito.when(organizationService.getUserHandler()).thenReturn(userHandler);
     InitParams initParams = new InitParams();
+
+    Mockito.doNothing().when(cookieTokenService).deleteTokensByUsernameAndType(any(), any());
   
     DefaultChangePasswordConnector defaultChangePasswordConnector =
-        new DefaultChangePasswordConnector(initParams,organizationService);
+                                                                  new DefaultChangePasswordConnector(initParams,
+                                                                                                     organizationService,
+                                                                                                     cookieTokenService);
     
     String newPassword="newPassword";
     defaultChangePasswordConnector.changePassword(userTest.getUserName(),newPassword);
@@ -51,8 +60,9 @@ public class DefaultChangePasswordConnectorTest {
     Mockito.verify(userHandler).saveUser(argument.capture(),Mockito.anyBoolean());
     Assert.assertEquals(newPassword, argument.getValue().getPassword());
   
-    Mockito.verify(userHandler, Mockito.times(1)).saveUser(Mockito.any(),Mockito.anyBoolean());
-    
+    Mockito.verify(userHandler, Mockito.times(1)).saveUser(any(), Mockito.anyBoolean());
+    Mockito.verify(cookieTokenService, Mockito.times(1)).deleteTokensByUsernameAndType("utest", "");
+
   }
   
   @Test
@@ -67,7 +77,7 @@ public class DefaultChangePasswordConnectorTest {
     UserDAOImpl userHandler = Mockito.mock(UserDAOImpl.class);
     Mockito.when(userHandler.findUserByName(userTest.getUserName())).thenReturn(userTest);
     Mockito.when(organizationService.getUserHandler()).thenReturn(userHandler);
-  
+
     InitParams initParams = new InitParams();
     ValueParam valueParam = new ValueParam();
     valueParam.setName("allowChangeExternalPassword");
@@ -75,7 +85,8 @@ public class DefaultChangePasswordConnectorTest {
     initParams.addParameter(valueParam);
   
     DefaultChangePasswordConnector defaultChangePasswordConnector = new DefaultChangePasswordConnector(initParams,
-                                                                                                       organizationService);
+                                                                                                       organizationService,
+                                                                                                       cookieTokenService);
     String newPassword="newPassword";
     try {
       defaultChangePasswordConnector.changePassword(userTest.getUserName(), newPassword);
@@ -85,7 +96,7 @@ public class DefaultChangePasswordConnectorTest {
   
     //if user is from external store and change password is not allowed for external store
     // we should not save his password
-    Mockito.verify(userHandler, Mockito.times(0)).saveUser(Mockito.any(),Mockito.anyBoolean());
-  
+    Mockito.verify(userHandler, Mockito.times(0)).saveUser(any(), Mockito.anyBoolean());
+    Mockito.verify(cookieTokenService, Mockito.times(0)).deleteTokensByUsernameAndType("utest", "");
   }
 }
