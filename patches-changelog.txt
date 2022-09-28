@@ -2,4 +2,10 @@
 
    # 6.3.1 Patches changelog: 
 
+   * 2022-09-14: Patch-6.3.1:1, Author: Jihed Chabbeh<jchabbeh@exoplatform.com>
 
+   - https://github.com/exoplatform/news/commit/68014fa1ef580142ea16cef4cb212a0b69ea4d
+
+   * 2022-09-28: Patch-6.3.1:2, Author: Jihed Chabbeh<jchabbeh@exoplatform.com>
+
+   - https://github.com/Meeds-io/gatein-portal/commit/6ef0c595a5389694323a9fe6b53704d62e36ef00
