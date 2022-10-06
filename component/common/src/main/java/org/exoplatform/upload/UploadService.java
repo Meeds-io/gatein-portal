@@ -150,7 +150,9 @@ public class UploadService {
 
         // commons-fileupload will store the temp file with name *.tmp
         // we need to rename it to our desired name
-        fileItem.getStoreLocation().renameTo(new File(storeLocation));
+        if (fileItem.getStoreLocation() != null) {
+          fileItem.getStoreLocation().renameTo(new File(storeLocation));
+        }
         File fileStore = new File(storeLocation);
         if (!fileStore.exists())
             try {
