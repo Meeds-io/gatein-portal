@@ -21,8 +21,10 @@ package org.exoplatform.services.organization.idm;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.services.security.Identity;
 import org.picketlink.idm.api.Attribute;
 import org.picketlink.idm.api.IdentitySearchCriteria;
 import org.picketlink.idm.api.Role;
@@ -45,6 +47,9 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
     public static final String GROUP_LABEL = "label";
 
     public static final String GROUP_DESCRIPTION = "description";
+
+    private static final String            ADMINISTRATOR_GROUP            = "/platform/administrators";
+
 
     private List<GroupEventListener> listeners_;
 
@@ -646,10 +651,28 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         return new IDMGroupListAccess(this, service_, identitySearchCriteria);
     }
 
+     public Collection<Group> findAllGroupsByKeyword(String keyword,
+                                                     List<String> excludedGroupsTypes,
+                                                     Identity identity) throws Exception {
+         ListAccess<Group> allGroups = findGroupsByKeyword(keyword);
+         Group[] groups = allGroups.load(0, allGroups.getSize());
+         List<Group> listAllGroups = new LinkedList<Group>();
+         if (identity.isMemberOf(ADMINISTRATOR_GROUP)){
+             listAllGroups = Arrays.stream(groups)
+                     .filter(group -> !excludedGroupsTypes.contains(((ExtGroup) group).getGroupType()))
+                     .collect(Collectors.toList());
+         } else {
+             listAllGroups = Arrays.stream(groups)
+                     .filter(group -> identity.isMemberOf(group.getId()) && !excludedGroupsTypes.contains(((ExtGroup) group).getGroupType()))
+                     .collect(Collectors.toList());
+         }
+         return listAllGroups;
+    }
+
     private void preSave(Group group, boolean isNew) throws Exception {
-        for (GroupEventListener listener : listeners_) {
-            listener.preSave(group, isNew);
-        }
+      for (GroupEventListener listener : listeners_) {
+        listener.preSave(group, isNew);
+      }
     }
 
     private void postSave(Group group, boolean isNew) throws Exception {

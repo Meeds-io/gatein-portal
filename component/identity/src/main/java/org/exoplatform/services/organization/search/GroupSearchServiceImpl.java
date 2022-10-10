@@ -8,15 +8,13 @@ import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.idm.ExtGroup;
 import org.exoplatform.services.security.Identity;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class GroupSearchServiceImpl implements GroupSearchService {
   
   private OrganizationService organizationService;
-
-  private static final String            ADMINISTRATOR_GROUP            = "/platform/administrators";
 
 
   public GroupSearchServiceImpl(OrganizationService organizationService) {
@@ -34,28 +32,13 @@ public class GroupSearchServiceImpl implements GroupSearchService {
   }
 
   @Override
-  public List<Group> findAllGroupsByKeyword(String keyword, List<String> excludedGroupsTypes, Identity identity) throws Exception {
-
-    ListAccess<Group> allGroups;
-    boolean isManager = identity.isMemberOf(ADMINISTRATOR_GROUP);
+  public Collection<Group> findAllGroupsByKeyword(String keyword, List<String> excludedGroupsTypes, Identity identity) throws Exception {
     if (StringUtils.isBlank(keyword)) {
-      allGroups = organizationService.getGroupHandler().findGroupsByKeyword("");
+      return organizationService.getGroupHandler().findAllGroupsByKeyword("", excludedGroupsTypes, identity);
     } else {
       String lowerCaseKeyword = keyword.toLowerCase();
-      allGroups = organizationService.getGroupHandler().findGroupsByKeyword(lowerCaseKeyword);
-    }
-    List<Group> listAllGroups= null;
-    Group[] groups = allGroups.load(0, allGroups.getSize());
-    if (isManager){
-      listAllGroups = Arrays.stream(groups)
-              .filter(group -> !excludedGroupsTypes.contains(((ExtGroup) group).getGroupType()))
-              .collect(Collectors.toList());
-    } else {
-      listAllGroups = Arrays.stream(groups)
-              .filter(group -> identity.isMemberOf(group.getId()) && !excludedGroupsTypes.contains(((ExtGroup) group).getGroupType()))
-              .collect(Collectors.toList());
+      return organizationService.getGroupHandler().findAllGroupsByKeyword(lowerCaseKeyword, excludedGroupsTypes, identity);
     }
 
-    return listAllGroups;
   }
 }

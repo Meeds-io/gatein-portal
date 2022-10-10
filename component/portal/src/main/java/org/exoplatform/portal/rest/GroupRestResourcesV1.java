@@ -647,29 +647,27 @@ public class GroupRestResourcesV1 implements ResourceContainer {
     Group[] groups = null;
     int totalSize = 0;
     List<String> excludedGroupsTypes = new ArrayList<>(List.of(".spaces", "root_type"));
-    List<Group> groupsList = null;
-
+    Collection<Group> UserGroupsList = null;
     if (!allGroupsForAdmin) {
-      Collection<Group> UserGroupsList = organizationService.getGroupHandler()
+      UserGroupsList = organizationService.getGroupHandler()
                                                             .findGroupsOfUserByKeyword(identity.getUserId(), q, groupType);
-      totalSize = UserGroupsList.size();
-      int limitToFetch = limit;
-      if (totalSize < (offset + limitToFetch)) {
-        limitToFetch = totalSize - offset;
-      }
-      if (limitToFetch <= 0) {
-        groups = new Group[0];
-      } else {
-        groups = UserGroupsList.toArray(new Group[0]);
-        if (!returnSize) {
-          totalSize = 0;
-        }
-      }
-      groupsList = Arrays.asList(groups);
     } else {
-      groupsList = groupSearchService.findAllGroupsByKeyword(q, excludedGroupsTypes, identity);
+      UserGroupsList  = groupSearchService.findAllGroupsByKeyword(q, excludedGroupsTypes, identity);
     }
-    
+    totalSize = UserGroupsList.size();
+    int limitToFetch = limit;
+    if (totalSize < (offset + limitToFetch)) {
+      limitToFetch = totalSize - offset;
+    }
+    if (limitToFetch <= 0) {
+      groups = new Group[0];
+    } else {
+      groups = UserGroupsList.toArray(new Group[0]);
+      if (!returnSize) {
+        totalSize = 0;
+      }
+    }
+    List<Group> groupsList = Arrays.asList(groups);
     CollectionEntity<Group> result = new CollectionEntity<>(groupsList, offset, limit, totalSize);
     return Response.ok(result).build();
   }

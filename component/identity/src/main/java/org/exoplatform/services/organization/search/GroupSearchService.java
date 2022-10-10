@@ -4,6 +4,7 @@ import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.security.Identity;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -13,6 +14,6 @@ public interface GroupSearchService {
 
   ListAccess<Group> searchGroups(String term) throws Exception;
 
-  List<Group> findAllGroupsByKeyword(String keyword, List<String> excludedGroupsTypes, Identity identity) throws Exception;
+  Collection<Group> findAllGroupsByKeyword(String keyword, List<String> excludedGroupsTypes, Identity identity) throws Exception;
 
 }
