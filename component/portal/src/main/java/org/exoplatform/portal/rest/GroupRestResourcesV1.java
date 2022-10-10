@@ -624,7 +624,10 @@ public class GroupRestResourcesV1 implements ResourceContainer {
                                        @QueryParam("limit")
                                        int limit,
                                        @QueryParam("returnSize")
-                                       boolean returnSize) throws Exception {
+                                       boolean returnSize,
+                                       @Parameter(description = "allGroupsForAdmin") 
+                                       @QueryParam("allGroupsForAdmin") 
+                                       boolean allGroupsForAdmin) throws Exception {
 
     Identity identity;
     try {
@@ -641,24 +644,32 @@ public class GroupRestResourcesV1 implements ResourceContainer {
 
     offset = offset > 0 ? offset : DEFAULT_OFFSET;
     limit = limit > 0 ? limit : DEFAULT_LIMIT;
-
-    Collection<Group> UserGroupsList = organizationService.getGroupHandler()
-                                                          .findGroupsOfUserByKeyword(identity.getUserId(), q, groupType);
-    int totalSize = UserGroupsList.size();
-    int limitToFetch = limit;
-    if (totalSize < (offset + limitToFetch)) {
-      limitToFetch = totalSize - offset;
-    }
     Group[] groups = null;
-    if (limitToFetch <= 0) {
-      groups = new Group[0];
-    } else {
-      groups = UserGroupsList.toArray(new Group[0]);
-      if (!returnSize) {
-        totalSize = 0;
+    int totalSize = 0;
+    List<String> excludedGroupsTypes = new ArrayList<>(List.of(".spaces", "root_type"));
+    List<Group> groupsList = null;
+
+    if (!allGroupsForAdmin) {
+      Collection<Group> UserGroupsList = organizationService.getGroupHandler()
+                                                            .findGroupsOfUserByKeyword(identity.getUserId(), q, groupType);
+      totalSize = UserGroupsList.size();
+      int limitToFetch = limit;
+      if (totalSize < (offset + limitToFetch)) {
+        limitToFetch = totalSize - offset;
       }
+      if (limitToFetch <= 0) {
+        groups = new Group[0];
+      } else {
+        groups = UserGroupsList.toArray(new Group[0]);
+        if (!returnSize) {
+          totalSize = 0;
+        }
+      }
+      groupsList = Arrays.asList(groups);
+    } else {
+      groupsList = groupSearchService.findAllGroupsByKeyword(q, excludedGroupsTypes, identity);
     }
-    List<Group> groupsList = Arrays.asList(groups);
+    
     CollectionEntity<Group> result = new CollectionEntity<>(groupsList, offset, limit, totalSize);
     return Response.ok(result).build();
   }

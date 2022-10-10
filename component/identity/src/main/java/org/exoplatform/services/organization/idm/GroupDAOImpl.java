@@ -767,8 +767,9 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         }
 
         String gtnGroupName = getGtnGroupName(jbidGroup.getName());
+        String gtnGroupType = jbidGroup.getGroupType();
 
-        ExtGroup exoGroup = new ExtGroup(gtnGroupName);
+        ExtGroup exoGroup = new ExtGroup(gtnGroupName, gtnGroupType);
 
         if (attrs.containsKey(GROUP_DESCRIPTION) && attrs.get(GROUP_DESCRIPTION).getValue() != null) {
             exoGroup.setDescription(attrs.get(GROUP_DESCRIPTION).getValue().toString());
