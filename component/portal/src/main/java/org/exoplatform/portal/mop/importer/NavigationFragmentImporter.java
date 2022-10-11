@@ -21,8 +21,6 @@ package org.exoplatform.portal.mop.importer;
 
 import java.util.*;
 
-import org.apache.commons.lang3.StringUtils;
-
 import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.description.DescriptionService;
@@ -179,7 +177,7 @@ public class NavigationFragmentImporter {
         }
 
         // Buffer the changes in a list
-        LinkedList<Change> changes = new LinkedList<Change>();
+        LinkedList<Change> changes = new LinkedList<>();
         while (it.hasNext()) {
             ListChangeType type = it.next();
             changes.add(new Change(type, it.getElement(), it.getIndex1(), it.getIndex2()));
