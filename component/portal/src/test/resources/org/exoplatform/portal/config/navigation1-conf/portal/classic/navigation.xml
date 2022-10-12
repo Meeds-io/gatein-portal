@@ -25,6 +25,10 @@
   <priority>1</priority>
   <page-nodes>
     <node>
+      <name>baz</name>
+      <icon>baz_icon</icon>
+    </node>
+    <node>
       <name>foo</name>
       <icon>foo_icon_1</icon>
       <node>

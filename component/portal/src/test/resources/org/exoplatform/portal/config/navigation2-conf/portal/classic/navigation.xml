@@ -32,5 +32,9 @@
       <name>bar</name>
       <icon>bar_icon</icon>
     </node>
+    <node>
+      <name>baz</name>
+      <icon>baz_icon</icon>
+    </node>
   </page-nodes>
 </node-navigation>
