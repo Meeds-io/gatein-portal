@@ -34,7 +34,7 @@ public class TestImportNavigationInsert extends AbstractImportNavigationTest {
 
     @Override
     protected final void afterOnePhaseBoot(NodeContext<?> root) {
-        assertEquals(3, root.getNodeCount());
+        assertEquals(4, root.getNodeCount());
         NodeContext<?> foo = root.get("foo");
         assertNotNull(foo);
         assertEquals("foo_icon_2", foo.getState().getIcon());
@@ -51,18 +51,25 @@ public class TestImportNavigationInsert extends AbstractImportNavigationTest {
         assertNotNull(daa);
         assertEquals("daa_icon", daa.getState().getIcon());
         assertEquals(0, daa.getNodeCount());
+        // INSERT is changed into MERGE when first startup
+        assertEquals(2, root.get("baz").getIndex());
+        assertEquals(0, root.get("foo").getIndex());
+        assertEquals(3, root.get("daa").getIndex());
     }
 
     @Override
     protected final void afterTwoPhasesBoot(NodeContext<?> root) {
-        assertEquals(2, root.getNodeCount());
+        assertEquals(3, root.getNodeCount());
         assertNotNull(root.get("foo"));
         assertNotNull(root.get("daa"));
+        assertEquals(0, root.get("baz").getIndex());
+        assertEquals(1, root.get("foo").getIndex());
+        assertEquals(2, root.get("daa").getIndex());
     }
 
     @Override
     protected final void afterTwoPhaseOverrideReboot(NodeContext<?> root) {
-        assertEquals(3, root.getNodeCount());
+        assertEquals(4, root.getNodeCount());
         NodeContext<?> foo = root.get("foo");
         assertNotNull(foo);
         assertEquals("foo_icon_1", foo.getState().getIcon());
@@ -79,6 +86,9 @@ public class TestImportNavigationInsert extends AbstractImportNavigationTest {
         assertNotNull(daa);
         assertEquals("daa_icon", daa.getState().getIcon());
         assertEquals(0, daa.getNodeCount());
+        assertEquals(0, root.get("baz").getIndex());
+        assertEquals(1, root.get("foo").getIndex());
+        assertEquals(3, root.get("daa").getIndex());
     }
 
 }
