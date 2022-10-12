@@ -177,17 +177,24 @@ public class NavigationFragmentImporter {
         }
 
         // Buffer the changes in a list
-        LinkedList<Change> foo = new LinkedList<Change>();
+        LinkedList<Change> changes = new LinkedList<>();
         while (it.hasNext()) {
             ListChangeType type = it.next();
-            foo.add(new Change(type, it.getElement(), it.getIndex1(), it.getIndex2()));
+            changes.add(new Change(type, it.getElement(), it.getIndex1(), it.getIndex2()));
         }
+        changes.sort((change1, change2) -> {
+          PageNode srcNode1 = src.getNode(change1.name);
+          PageNode srcNode2 = src.getNode(change2.name);
+          int index1 = srcNode1 == null ? Integer.MAX_VALUE : src.getNodes().indexOf(srcNode1);
+          int index2 = srcNode2 == null ? Integer.MAX_VALUE : src.getNodes().indexOf(srcNode2);
+          return index1 - index2;
+        });
 
         // The last encountered child
         NodeContext<?> previousChild = null;
 
         // Replay the changes and apply them
-        for (Change change : foo) {
+        for (Change change : changes) {
             PageNode srcChild = src.getNode(change.name);
             NodeContext<?> dstChild = dst.get(change.name);
 
@@ -199,7 +206,7 @@ public class NavigationFragmentImporter {
 
                     //
                     if (config.updatedSame) {
-                        update(srcChild, dstChild, labelMap);
+                        update(src, dst, srcChild, dstChild, labelMap);
                     }
 
                     //
@@ -216,7 +223,7 @@ public class NavigationFragmentImporter {
                 case ADD:
                     if (src.getNode(change.name) != null) {
                         if (config.updatedSame) {
-                            update(srcChild, dstChild, labelMap);
+                            update(src, dst, srcChild, dstChild, labelMap);
                         }
                         previousChild = dstChild;
                     } else {
@@ -278,8 +285,21 @@ public class NavigationFragmentImporter {
         return child;
     }
 
-    private void update(PageNode src, NodeContext<?> target, Map<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>> labelMap) {
+    private void update(PageNodeContainer srcParent, NodeContext dstParent, PageNode src, NodeContext<?> target, Map<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>> labelMap) {
         target.setState(src.getState());
+
+        int srcIndex = srcParent.getNodes().indexOf(src);
+        if (srcIndex <= 0) {
+          dstParent.add(0, target);
+        } else {
+          PageNode previousSrcNode = srcParent.getNodes().get(srcIndex - 1);
+          NodeContext previousTargetNode = dstParent.get(previousSrcNode.getName());
+          if (previousTargetNode != null) {
+            dstParent.add(previousTargetNode.getIndex() + 1, target);
+          } else {
+            dstParent.add(null, target);
+          }
+        }
 
         // Update extended labels if necessary
         I18NString labels = src.getLabels();
