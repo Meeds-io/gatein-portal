@@ -30,15 +30,4 @@ public class GroupSearchServiceImpl implements GroupSearchService {
       return organizationService.getGroupHandler().findGroupsByKeyword(lowerCaseKeyword);
     }
   }
-
-  @Override
-  public Collection<Group> findAllGroupsByKeyword(String keyword, List<String> excludedGroupsTypes, Identity identity) throws Exception {
-    if (StringUtils.isBlank(keyword)) {
-      return organizationService.getGroupHandler().findAllGroupsByKeyword("", excludedGroupsTypes, identity);
-    } else {
-      String lowerCaseKeyword = keyword.toLowerCase();
-      return organizationService.getGroupHandler().findAllGroupsByKeyword(lowerCaseKeyword, excludedGroupsTypes, identity);
-    }
-
-  }
 }

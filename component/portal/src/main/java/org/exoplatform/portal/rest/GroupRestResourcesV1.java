@@ -42,6 +42,8 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   public static final int     DEFAULT_LIMIT  = 20;
 
   public static final int     DEFAULT_OFFSET = 0;
+  public static final String     SPACES_GROUP_TYPE = ".spaces";
+  public static final String     ROOT_GROUP_TYPE = "root_type";
 
   private GroupSearchService  groupSearchService;
 
@@ -646,13 +648,13 @@ public class GroupRestResourcesV1 implements ResourceContainer {
     limit = limit > 0 ? limit : DEFAULT_LIMIT;
     Group[] groups = null;
     int totalSize = 0;
-    List<String> excludedGroupsTypes = new ArrayList<>(List.of(".spaces", "root_type"));
+    List<String> excludedGroupsTypes = new ArrayList<>(List.of(SPACES_GROUP_TYPE,ROOT_GROUP_TYPE));
     Collection<Group> UserGroupsList = null;
     if (!allGroupsForAdmin) {
       UserGroupsList = organizationService.getGroupHandler()
-                                                            .findGroupsOfUserByKeyword(identity.getUserId(), q, groupType);
+                                                            .findGroupsOfUserByKeyword(identity.getUserId(), q, excludedGroupsTypes);
     } else {
-      UserGroupsList  = groupSearchService.findAllGroupsByKeyword(q, excludedGroupsTypes, identity);
+      UserGroupsList  = organizationService.getGroupHandler().findAllGroupsByKeyword(q, excludedGroupsTypes);
     }
     totalSize = UserGroupsList.size();
     int limitToFetch = limit;

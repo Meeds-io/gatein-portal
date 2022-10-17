@@ -32,8 +32,6 @@ public class ExtGroup extends GroupImpl implements Comparable<Object> {
 
   private static final long serialVersionUID = -7379104016885124958L;
   
-  private String            groupType;
-
   public ExtGroup() {
   }
   
@@ -41,14 +39,6 @@ public class ExtGroup extends GroupImpl implements Comparable<Object> {
     super(name);
   }
 
-  public ExtGroup(String name, String groupType) {
-    super(name);
-    this.groupType = groupType;
-  }
-
-  public String getGroupType() {
-    return groupType;
-  }
 
   public String toString() {
     return "Group[" + getId() + "|" + getGroupName() + "]";

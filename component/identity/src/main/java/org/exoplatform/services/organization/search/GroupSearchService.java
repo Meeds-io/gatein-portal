@@ -14,6 +14,4 @@ public interface GroupSearchService {
 
   ListAccess<Group> searchGroups(String term) throws Exception;
 
-  Collection<Group> findAllGroupsByKeyword(String keyword, List<String> excludedGroupsTypes, Identity identity) throws Exception;
-
 }
