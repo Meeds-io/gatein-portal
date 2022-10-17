@@ -650,11 +650,11 @@ public class GroupRestResourcesV1 implements ResourceContainer {
     int totalSize = 0;
     List<String> excludedGroupsTypes = new ArrayList<>(List.of(SPACES_GROUP_TYPE,ROOT_GROUP_TYPE));
     Collection<Group> UserGroupsList = null;
-    if (!allGroupsForAdmin) {
-      UserGroupsList = organizationService.getGroupHandler()
-                                                            .findGroupsOfUserByKeyword(identity.getUserId(), q, excludedGroupsTypes);
-    } else {
+    if (allGroupsForAdmin && (userACL.isSuperUser() || userACL.isUserInGroup(userACL.getAdminGroups()))) {
       UserGroupsList  = organizationService.getGroupHandler().findAllGroupsByKeyword(q, excludedGroupsTypes);
+    } else {
+      UserGroupsList = organizationService.getGroupHandler()
+              .findGroupsOfUserByKeyword(identity.getUserId(), q, excludedGroupsTypes);
     }
     totalSize = UserGroupsList.size();
     int limitToFetch = limit;
