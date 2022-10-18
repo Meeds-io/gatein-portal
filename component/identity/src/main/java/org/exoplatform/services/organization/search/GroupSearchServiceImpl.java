@@ -5,12 +5,6 @@ import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.idm.ExtGroup;
-import org.exoplatform.services.security.Identity;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class GroupSearchServiceImpl implements GroupSearchService {
   

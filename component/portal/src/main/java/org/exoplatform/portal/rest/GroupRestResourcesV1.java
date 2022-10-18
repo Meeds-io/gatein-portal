@@ -649,14 +649,14 @@ public class GroupRestResourcesV1 implements ResourceContainer {
     Group[] groups = null;
     int totalSize = 0;
     List<String> excludedGroupsTypes = new ArrayList<>(List.of(SPACES_GROUP_TYPE,ROOT_GROUP_TYPE));
-    Collection<Group> UserGroupsList = null;
+    Collection<Group> userGroupsList = null;
     if (allGroupsForAdmin && (userACL.isSuperUser() || userACL.isUserInGroup(userACL.getAdminGroups()))) {
-      UserGroupsList  = organizationService.getGroupHandler().findAllGroupsByKeyword(q, excludedGroupsTypes);
+      userGroupsList  = organizationService.getGroupHandler().findAllGroupsByKeyword(q, excludedGroupsTypes);
     } else {
-      UserGroupsList = organizationService.getGroupHandler()
+      userGroupsList = organizationService.getGroupHandler()
               .findGroupsOfUserByKeyword(identity.getUserId(), q, excludedGroupsTypes);
     }
-    totalSize = UserGroupsList.size();
+    totalSize = userGroupsList.size();
     int limitToFetch = limit;
     if (totalSize < (offset + limitToFetch)) {
       limitToFetch = totalSize - offset;
@@ -664,7 +664,7 @@ public class GroupRestResourcesV1 implements ResourceContainer {
     if (limitToFetch <= 0) {
       groups = new Group[0];
     } else {
-      groups = UserGroupsList.toArray(new Group[0]);
+      groups = userGroupsList.toArray(new Group[0]);
       if (!returnSize) {
         totalSize = 0;
       }
