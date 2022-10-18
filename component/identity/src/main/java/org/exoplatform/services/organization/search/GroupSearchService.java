@@ -9,4 +9,5 @@ import org.exoplatform.services.organization.Group;
 public interface GroupSearchService {
 
   ListAccess<Group> searchGroups(String term) throws Exception;
+
 }
