@@ -103,6 +103,12 @@
   <build>
     <plugins>
       <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>@{argLine}--add-opens=java.base/java.security=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/jdk.internal.util.random=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens=java.xml/jdk.xml.internal=ALL-UNNAMED  </argLine>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>com.jcabi</groupId>
         <artifactId>jcabi-maven-plugin</artifactId>
       </plugin>
