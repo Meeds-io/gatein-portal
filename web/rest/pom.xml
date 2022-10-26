@@ -43,6 +43,12 @@
     <finalName>rest</finalName>
     <plugins>
       <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>@{argLine} --add-opens java.base/java.util=ALL-UNNAMED</argLine>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
           <!-- This is broken in maven-war-plugin 2.0, works in 2.0.1 -->

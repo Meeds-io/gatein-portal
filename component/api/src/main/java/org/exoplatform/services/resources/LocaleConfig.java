@@ -29,8 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * May 3, 2004
  *
- * @author: Tuan Nguyen
- * @version: $Id: LocaleConfig.java 5799 2006-05-28 17:55:42Z geaz $
+ * @author Tuan Nguyen
+ * @version $Id: LocaleConfig.java 5799 2006-05-28 17:55:42Z geaz $
  **/
 public interface LocaleConfig {
 

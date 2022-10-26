@@ -55,7 +55,7 @@ import org.picketlink.idm.spi.store.IdentityStoreInvocationContext;
 import org.picketlink.idm.spi.store.IdentityStoreSession;
 
 /**
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw
+ * @author <a href="mailto:boleslaw.dawidowicz@redhat.com">Boleslaw
  *         Dawidowicz</a>
  * @version : 0.1 $
  */

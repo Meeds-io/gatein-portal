@@ -48,8 +48,8 @@ import org.picketlink.idm.spi.cache.IdentityStoreCacheProvider;
 import org.picketlink.idm.spi.configuration.metadata.IdentityConfigurationMetaData;
 import org.picocontainer.Startable;
 
-/*
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
+/**
+ * @author <a href="mailto:boleslaw.dawidowicz@redhat.com">Boleslaw Dawidowicz</a>
  */
 public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable {
 

@@ -29,8 +29,8 @@ import java.util.ResourceBundle;
 /**
  * May 7, 2004
  *
- * @author: Tuan Nguyen
- * @version: $Id: ExoResourceBundle.java 9439 2006-10-12 03:28:53Z thuannd $
+ * @author Tuan Nguyen
+ * @version $Id: ExoResourceBundle.java 9439 2006-10-12 03:28:53Z thuannd $
  **/
 @SuppressWarnings("serial")
 public class ExoResourceBundle extends ListResourceBundle implements Serializable {

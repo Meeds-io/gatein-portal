@@ -27,8 +27,8 @@ import org.exoplatform.commons.utils.PageList;
 /**
  * May 7, 2004
  *
- * @author: Tuan Nguyen
- * @version: $Id: ResourceBundleService.java 5799 2006-05-28 17:55:42Z geaz $ This class is used to manage the Resoucebunlde. It
+ * @author Tuan Nguyen
+ * @version $Id: ResourceBundleService.java 5799 2006-05-28 17:55:42Z geaz $ This class is used to manage the Resoucebunlde. It
  *           should work like the java.util.ResourceBundle class except that the properties file can be in the database or a a
  *           directory. The class java.util.ResourceBundle require that the properties file has to be in the classpath.
  **/

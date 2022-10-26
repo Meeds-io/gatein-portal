@@ -39,8 +39,8 @@ import org.exoplatform.services.organization.GroupEventListener;
 import org.exoplatform.services.organization.GroupHandler;
 import org.exoplatform.services.organization.MembershipTypeHandler;
 
-/*
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
+/**
+ * @author <a href="mailto:boleslaw.dawidowicz@redhat.com">Boleslaw Dawidowicz</a>
  */
 public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
 
