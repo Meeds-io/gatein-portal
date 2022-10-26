@@ -37,9 +37,9 @@ import junit.framework.TestCase;
 /**
  * Thu, May 15, 2003 @
  *
- * @author: Tuan Nguyen
- * @version: $Id: TestConverter.java,v 1.6 2004/07/20 12:41:09 tuan08 Exp $
- * @since: 0.0
+ * @author Tuan Nguyen
+ * @version $Id: TestConverter.java,v 1.6 2004/07/20 12:41:09 tuan08 Exp $
+ * @since 0.0
  */
 public class TestJIBXXmlMapping extends TestCase {
 

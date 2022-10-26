@@ -41,8 +41,8 @@ import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserStatus;
 
-/*
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
+/**
+ * @author <a href="mailto:boleslaw.dawidowicz@redhat.com">Boleslaw Dawidowicz</a>
  */
 public class IDMUserListAccess implements ListAccess<User>, Serializable {
   private static Log                        log       = ExoLogger.getLogger(IDMUserListAccess.class);
