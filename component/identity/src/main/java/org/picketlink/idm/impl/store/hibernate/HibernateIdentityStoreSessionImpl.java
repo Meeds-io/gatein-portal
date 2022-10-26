@@ -32,7 +32,7 @@ import org.picketlink.idm.spi.store.IdentityStoreSession;
 /**
  * Wrapper around HibernateEntityManager
  *
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw
+ * @author <a href="mailto:boleslaw.dawidowicz@redhat.com">Boleslaw
  *         Dawidowicz</a>
  * @version : 0.1 $
  */

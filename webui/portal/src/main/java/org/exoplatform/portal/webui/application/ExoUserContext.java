@@ -39,7 +39,7 @@ import org.gatein.pc.api.invocation.resolver.PrincipalAttributeResolver;
 import org.gatein.pc.api.spi.UserContext;
 
 /**
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
+ * @author <a href="mailto:boleslaw.dawidowicz@redhat.com">Boleslaw Dawidowicz</a>
  * @author <a href="mailto:julien@jboss.org">Julien Viet</a>
  * @version $Revision$
  */

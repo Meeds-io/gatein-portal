@@ -26,10 +26,7 @@ package org.gatein.security.oauth.web.openid;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.api.services.oauth2.model.Userinfo;
-import jdk.nashorn.api.scripting.JSObject;
 import org.gatein.security.oauth.common.OAuthConstants;
-import org.gatein.security.oauth.google.GoogleProcessor;
 import org.gatein.security.oauth.openid.OpenIdAccessTokenContext;
 import org.gatein.security.oauth.openid.OpenIdProcessor;
 import org.gatein.security.oauth.spi.InteractionState;

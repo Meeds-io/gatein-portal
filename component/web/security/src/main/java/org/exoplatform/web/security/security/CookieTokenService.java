@@ -236,7 +236,8 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
     /**
      * The UI should offer a way to delete all existing tokens of the current user.
      *
-     * @param user
+     * @param username username Target username
+     * @param tokenType tokenType of the username
      */
     public void deleteTokensByUsernameAndType(final String username, final String tokenType) {
         this.tokenStore.deleteTokensByUsernameAndType(username, tokenType);

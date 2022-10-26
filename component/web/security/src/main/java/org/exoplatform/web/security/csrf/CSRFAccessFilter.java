@@ -40,7 +40,7 @@ public class CSRFAccessFilter implements MethodInvokerFilter
    private static final Log LOG = ExoLogger.getLogger(CSRFAccessFilter.class);
 
    /**
-    * Check does <tt>method</tt> contains CSRF security annotations ExoCSRFCheck
+    * Check does <code>method</code> contains CSRF security annotations ExoCSRFCheck
     *
     * @see ExoCSRFCheck
     *

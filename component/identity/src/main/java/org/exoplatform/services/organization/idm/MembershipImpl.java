@@ -21,8 +21,8 @@ package org.exoplatform.services.organization.idm;
 
 import org.exoplatform.services.organization.Membership;
 
-/*
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
+/**
+ * @author <a href="mailto:boleslaw.dawidowicz@redhat.com">Boleslaw Dawidowicz</a>
  */
 public class MembershipImpl extends org.exoplatform.services.organization.impl.MembershipImpl implements Comparable {
     private static final long serialVersionUID = -8572523969777642576L;

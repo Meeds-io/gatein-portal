@@ -36,8 +36,8 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.OrganizationService;
 
-/*
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
+/**
+ * @author <a href="mailto:boleslaw.dawidowicz@redhat.com">Boleslaw Dawidowicz</a>
  */
 public class IDMMembershipListAccess implements ListAccess<Membership>, Serializable {
     private static final long serialVersionUID = 6908892334798859546L;

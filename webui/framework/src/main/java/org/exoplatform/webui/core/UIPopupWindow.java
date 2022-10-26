@@ -29,7 +29,7 @@ import org.exoplatform.webui.event.EventListener;
 /**
  * Created by The eXo Platform SARL Author : Tran The Trong trong.tran@exoplatform.com
  *
- * @version: $Id$ Aug 11, 2006
+ * @version $Id$ Aug 11, 2006
  *
  *           A component that creates an empty popup window
  */

@@ -26,8 +26,8 @@ import java.util.ListIterator;
 /**
  * Jun 9, 2004
  *
- * @author: Tuan Nguyen
- * @version: $Id: ExoPortletPreferences.java,v 1.1 2004/07/13 02:31:13 tuan08 Exp $
+ * @author Tuan Nguyen
+ * @version $Id: ExoPortletPreferences.java,v 1.1 2004/07/13 02:31:13 tuan08 Exp $
  */
 public class PortletPreferences {
 

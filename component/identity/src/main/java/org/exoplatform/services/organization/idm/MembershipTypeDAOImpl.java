@@ -39,8 +39,8 @@ import org.exoplatform.services.organization.impl.MembershipTypeImpl;
 import org.picketlink.idm.api.RoleType;
 import org.picketlink.idm.common.exception.IdentityException;
 
-/*
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
+/**
+ * @author <a href="mailto:boleslaw.dawidowicz@redhat.com">Boleslaw Dawidowicz</a>
  */
 public class MembershipTypeDAOImpl extends AbstractDAOImpl implements MembershipTypeHandler {
 

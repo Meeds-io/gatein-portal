@@ -32,8 +32,8 @@ import org.picketlink.idm.common.exception.IdentityException;
 import javax.naming.InvalidNameException;
 import java.util.*;
 
-/*
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
+/**
+ * @author <a href="mailto:boleslaw.dawidowicz@redhat.com">Boleslaw Dawidowicz</a>
  */
 public class MembershipDAOImpl extends AbstractDAOImpl implements MembershipHandler {
 
