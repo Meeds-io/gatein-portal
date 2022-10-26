@@ -38,7 +38,7 @@ import org.exoplatform.webui.core.lifecycle.UIApplicationLifecycle;
 /**
  * Author : Nhu Dinh Thuan nhudinhthuan@yahoo.com May 30, 2006
  *
- * @version:: $Id$
+ * @version $Id$
  */
 @ComponentConfig(lifecycle = UIApplicationLifecycle.class)
 public class UIBreadcumbsPortlet extends UIPortletApplication {

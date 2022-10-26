@@ -231,7 +231,7 @@ public class UserPortalConfigService implements Startable {
 
     /**
      * <p>
-     * Build and returns an instance of <tt>UserPortalConfig</tt>.
+     * Build and returns an instance of <code>UserPortalConfig</code>.
      * </p>
      * <br>
      * <p>
@@ -239,7 +239,7 @@ public class UserPortalConfigService implements Startable {
      * as returned by the {@link UserACL#hasPermission(org.exoplatform.portal.config.model.PortalConfig)} method.
      * </p>
      * <br>
-     * The navigation loaded on the <tt>UserPortalConfig</tt> object are obtained according to the specified user
+     * The navigation loaded on the <code>UserPortalConfig</code> object are obtained according to the specified user
      * argument. The portal navigation is always loaded. If the specified user is null then the navigation of the guest
      * group as configured by {@link org.exoplatform.portal.config.UserACL#getGuestsGroup()} is also loaded, otherwise
      * the navigations are loaded according to the following rules:

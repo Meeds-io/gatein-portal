@@ -32,11 +32,11 @@ import org.gatein.common.io.UndeclaredIOException;
  * </p>
  *
  * <p>
- * The <tt>ignoreOnFailure</tt> property will stop to make further invocations to the output stream if an exception is thrown by
+ * The <code>ignoreOnFailure</code> property will stop to make further invocations to the output stream if an exception is thrown by
  * the output stream except for the {@link #close()} method.
  * </p>
  *
- * The <tt>failureFlow</tt> property modifies the control flow of the method invocation when the output stream throws an
+ * The <code>failureFlow</code> property modifies the control flow of the method invocation when the output stream throws an
  * {@link java.io.IOException}.
  *
  * <ul>

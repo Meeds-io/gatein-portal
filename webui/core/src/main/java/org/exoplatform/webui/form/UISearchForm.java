@@ -33,7 +33,7 @@ import org.exoplatform.webui.event.EventListener;
 /**
  * Author : Nguyen Viet Chung chung.nguyen@exoplatform.com Jun 22, 2006
  *
- * @version: $Id$
+ * @version $Id$
  *
  *           Represents a search form
  */
