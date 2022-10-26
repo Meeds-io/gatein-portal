@@ -36,7 +36,7 @@ import org.exoplatform.webui.event.EventListener;
 /**
  * Created by The eXo Platform SARL Author : Tran The Trong trong.tran@exoplatform.com
  *
- * @version: $Id$ Aug 14, 2006
+ * @version $Id$ Aug 14, 2006
  *
  *           A component to display messages of different types, in a popup window
  */
