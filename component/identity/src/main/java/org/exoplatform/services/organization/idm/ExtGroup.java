@@ -29,14 +29,16 @@ import org.exoplatform.services.organization.impl.GroupImpl;
  * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
  */
 public class ExtGroup extends GroupImpl implements Comparable<Object> {
-  private static final long serialVersionUID = -7379104016885124958L;
 
+  private static final long serialVersionUID = -7379104016885124958L;
+  
   public ExtGroup() {
   }
-
+  
   public ExtGroup(String name) {
     super(name);
   }
+
 
   public String toString() {
     return "Group[" + getId() + "|" + getGroupName() + "]";
