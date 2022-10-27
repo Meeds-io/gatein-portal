@@ -62,6 +62,57 @@
   <component>
     <key>org.exoplatform.services.organization.OrganizationService</key>
     <type>org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl</type>
+    <init-params>
+      <object-param>
+        <name>configuration</name>
+        <object type="org.exoplatform.services.organization.idm.Config">
+          <field name="forceMembershipOfMappedTypes">
+            <boolean>true</boolean>
+          </field>
+          <field name="associationMembershipType">
+            <string>member</string>
+          </field>
+          <field name="groupTypeMappings">
+            <map type="java.util.HashMap">
+              <entry>
+                <key>
+                  <string>/</string>
+                </key>
+                <value>
+                  <string>root_type</string>
+                </value>
+              </entry>
+              <entry>
+                <key>
+                  <string>/organization_hierarchy/*</string>
+                </key>
+                <value>
+                  <string>GROUP</string>
+                </value>
+              </entry>
+              <entry>
+                <key>
+                  <string>/role_hierarchy/*</string>
+                </key>
+                <value>
+                  <string>role_hierarchy_type</string>
+                </value>
+              </entry>
+            </map>
+          </field>
+          <field name="ignoreMappedMembershipTypeGroupList">
+            <collection type="java.util.ArrayList" item-type="java.lang.String">
+              <value>
+                <string>/organization_hierarchy/*</string>
+              </value>
+              <value>
+                <string>/role_hierarchy/*</string>
+              </value>
+            </collection>
+          </field>
+        </object>
+      </object-param>
+    </init-params>
   </component>
 
   <component>
@@ -126,6 +177,8 @@
       </properties-param>
     </init-params>
   </component>
+
+
 
   <!-- Data Initialization -->
   <external-component-plugins>
