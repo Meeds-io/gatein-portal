@@ -575,7 +575,7 @@ public class GroupRestResourcesV1 implements ResourceContainer {
       }
   )
   public Response deleteMembership(@Parameter(
-      description = "Membership identifier with format: MEMBERSHIP_TYPE:GROUP_ID:USER_NAME", required = true
+      description = "Membership identifier with format: MEMBERSHIP_TYPE:USER_NAME:GROUP_ID", required = true
   ) @QueryParam(
     "membershipId"
   ) String membershipId) throws Exception {
