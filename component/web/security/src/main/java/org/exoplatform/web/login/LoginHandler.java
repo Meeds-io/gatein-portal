@@ -185,6 +185,9 @@ public class LoginHandler extends JspBasedWebHandler {
       }
       if (request.getRemoteUser() != null) {
         status = LoginStatus.AUTHENTICATED;
+        // Delete user forgot-password tokens to invalidate recover password email link
+        CookieTokenService tokenService = AbstractTokenService.getInstance(CookieTokenService.class);
+        tokenService.deleteTokensByUsernameAndType(username, CookieTokenService.FORGOT_PASSWORD_TOKEN);
       }
     } else {
       LOG.debug("User already authenticated. Will redirect to initialURI");
