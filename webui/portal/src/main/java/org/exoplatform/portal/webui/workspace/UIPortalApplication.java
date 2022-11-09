@@ -707,10 +707,15 @@ public class UIPortalApplication extends UIApplication {
       List<ContainerPortletInfo> portletInfos = getPagePortletInfos();
       Set<String> result = new HashSet<>();
       for (ContainerPortletInfo portletInfo : portletInfos) {
+        String separator = portletInfo.getInitParameter("separator");
         String valuesString = portletInfo.getInitParameter(paramName);
+        String[] valuesArray;
         if (StringUtils.isNotBlank(valuesString)) {
-          String[] valuesArray = valuesString.contains("|") ? StringUtils.split(valuesString, '|')
-                                                            : StringUtils.split(valuesString, ',');
+          if (StringUtils.isBlank(separator)) {
+            valuesArray = valuesString.contains("|") ? StringUtils.split(valuesString, '|') : StringUtils.split(valuesString, ',');
+          } else {
+            valuesArray = StringUtils.split(valuesString, separator);
+          }
           for (String value : valuesArray) {
             if (StringUtils.isNotBlank(value)) {
               result.add(value.trim());
