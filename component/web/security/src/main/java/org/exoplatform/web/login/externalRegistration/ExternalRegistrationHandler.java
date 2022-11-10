@@ -24,11 +24,13 @@ import nl.captcha.servlet.CaptchaServletUtil;
 import nl.captcha.text.producer.DefaultTextProducer;
 import nl.captcha.text.renderer.DefaultWordRenderer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.localization.LocaleContextInfoUtils;
+import org.exoplatform.portal.rest.UserFieldValidator;
 import org.exoplatform.services.organization.*;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.LocalePolicy;
@@ -66,6 +68,13 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
 
     protected static Log                   log              = ExoLogger.getLogger(ExternalRegistrationHandler.class);
 
+    public static final String              LASTNAME               = "lastName";
+
+    public static final String              FIRSTNAME               = "firstName";
+
+    public static final UserFieldValidator LASTNAME_VALIDATOR             = new UserFieldValidator(LASTNAME, false, true);
+
+    public static final UserFieldValidator FIRSTNAME_VALIDATOR            = new UserFieldValidator(FIRSTNAME, false, true);
 
     public static final String NAME = "external-registration";
 
@@ -161,11 +170,18 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
                     errors.add(message);
                 }
 
+
                 if (reqFirstName == null || reqLastName == null) {
 
                     String message = bundle.getString("external.registration.emptyFirstNameOrLastName");
                     errors.add(message);
                 } else {
+                  if(StringUtils.isNotBlank(LASTNAME_VALIDATOR.validate(locale, reqLastName))) {
+                      errors.add(LASTNAME_VALIDATOR.validate(locale, reqLastName));
+                  }
+                  if(StringUtils.isNotBlank(FIRSTNAME_VALIDATOR.validate(locale, reqFirstName))) {
+                      errors.add(FIRSTNAME_VALIDATOR.validate(locale, reqFirstName));
+                  }
                   if (password == null || !customPasswordPattern.matcher(password).matches() || customPasswordMaxlength < password.length() || customPasswordMinlength > password.length() ) {
                         String passwordpolicyProperty = PropertyManager.getProperty("gatein.validators.passwordpolicy.format.message");
                         errors.add(passwordpolicyProperty != null ? passwordpolicyProperty : bundle.getString("onboarding.login.passwordCondition"));
