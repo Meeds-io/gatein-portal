@@ -211,8 +211,7 @@ public class TestOrganization extends AbstractKernelTest {
         }
     }
 
-    public void testFindGroupsOfUserByKeyword() throws Exception
-    {
+    public void testFindGroupsOfUserByKeyword() throws Exception {
         GroupHandler groupHandler = organizationService.getGroupHandler();
         List<String> excludedGroupsTypes = new ArrayList<>(List.of("GTN_ROOT_GROUP"));
         try {
@@ -234,14 +233,14 @@ public class TestOrganization extends AbstractKernelTest {
         GroupHandler groupHandler = organizationService.getGroupHandler();
         List<String> excludedGroupsTypes = new ArrayList<>(List.of("GTN_ROOT_GROUP"));
         try {
-            Collection<Group> groups = groupHandler.findAllGroupsByKeyword("us",excludedGroupsTypes);
+            Collection<Group> groups = groupHandler.findAllGroupsByKeyword("us", excludedGroupsTypes);
             assertNotNull(groups);
-            assertEquals(2,groups.size());
-            assertEquals(1,groupHandler.findAllGroupsByKeyword("ad",excludedGroupsTypes).size());
-            assertEquals(3,groupHandler.findAllGroupsByKeyword("test",excludedGroupsTypes).size());
+            assertEquals(2, groups.size());
+            assertEquals(1, groupHandler.findAllGroupsByKeyword("ad", excludedGroupsTypes).size());
+            assertEquals(3, groupHandler.findAllGroupsByKeyword("test", excludedGroupsTypes).size());
             excludedGroupsTypes.add("root_type");
-            assertEquals(1,groupHandler.findAllGroupsByKeyword("us",excludedGroupsTypes).size());
-            assertEquals(2,groupHandler.findAllGroupsByKeyword("test",excludedGroupsTypes).size());
+            assertEquals(1, groupHandler.findAllGroupsByKeyword("us", excludedGroupsTypes).size());
+            assertEquals(2, groupHandler.findAllGroupsByKeyword("test", excludedGroupsTypes).size());
         } catch (Exception e) {
             fail();
         }

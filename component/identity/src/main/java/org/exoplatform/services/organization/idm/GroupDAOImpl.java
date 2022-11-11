@@ -687,7 +687,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                                                        String keyword,
                                                        List<String> excludedGroupsTypes) throws Exception {
       if (log.isTraceEnabled()) {
-        Tools.logMethodIn(log, LogLevel.TRACE, "findGroupsOfUser", new Object[] { "user", user });
+          Tools.logMethodIn(log, LogLevel.TRACE, "findGroupsOfUserByKeyword", new Object[] { user, keyword, excludedGroupsTypes  });
       }
       IdentitySearchCriteria identitySearchCriteria = new IdentitySearchCriteriaImpl();
       if (StringUtils.isNotBlank(keyword)) {
@@ -699,9 +699,9 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
       }
       if (user == null) {
         if (log.isTraceEnabled()) {
-          Tools.logMethodOut(log, LogLevel.TRACE, "findGroupsOfUser", Collections.emptyList());
+          Tools.logMethodOut(log, LogLevel.TRACE, "findGroupsOfUserByKeyword", Collections.emptyList());
         }
-        return new LinkedList<>();
+        return Collections.emptyList();
       }
       Collection<org.picketlink.idm.api.Group> allGroups = new HashSet<>();
       try {
@@ -722,7 +722,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         }
       }
       if (log.isTraceEnabled()) {
-        Tools.logMethodOut(log, LogLevel.TRACE, "findAllGroups", exoGroups);
+        Tools.logMethodOut(log, LogLevel.TRACE, "findGroupsOfUserByKeyword", exoGroups);
       }
 
       return exoGroups;
