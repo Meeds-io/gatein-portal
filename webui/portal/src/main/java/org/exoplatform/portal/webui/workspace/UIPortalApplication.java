@@ -98,6 +98,45 @@ public class UIPortalApplication extends UIApplication {
 
     public static final String PORTAL_PORTLETS_SKIN_ID = "portalPortletSkins";
 
+    /**
+     * The normal, non-edit mode.
+     */
+    public static final int NORMAL_MODE = 0;
+
+    /**
+     * The combination of {@link EditMode#BLOCK} and {@link ComponentTab#APPLICATIONS}.
+     */
+    public static final int APP_BLOCK_EDIT_MODE = 1;
+
+    /**
+     * The combination of {@link EditMode#PREVIEW} and {@link ComponentTab#APPLICATIONS}.
+     */
+    public static final int APP_VIEW_EDIT_MODE = 2;
+
+    /**
+     * The combination of {@link EditMode#BLOCK} and {@link ComponentTab#CONTAINERS}.
+     */
+    public static final int CONTAINER_BLOCK_EDIT_MODE = 3;
+
+    /**
+     * The combination of {@link EditMode#PREVIEW} and {@link ComponentTab#CONTAINERS}.
+     */
+    public static final int CONTAINER_VIEW_EDIT_MODE = 4;
+
+    public static final UIComponent EMPTY_COMPONENT = new UIComponent() {
+        public String getId() {
+            return "_portal:componentId_";
+        };
+    };
+
+    public static final String UI_WORKING_WS_ID = "UIWorkingWorkspace";
+
+    public static final String UI_VIEWING_WS_ID = "UIViewWS";
+
+    public static final String UI_EDITTING_WS_ID = "UIEditInlineWS";
+
+    public static final String UI_MASK_WS_ID = "UIMaskWorkspace";
+
     public enum EditMode {
         /**
          * Edit mode with plain rectangles in place of portlets.
@@ -130,36 +169,7 @@ public class UIPortalApplication extends UIApplication {
         EDIT_PAGE
     }
 
-    /**
-     * The normal, non-edit mode.
-     */
-    public static final int NORMAL_MODE = 0;
-
-    /**
-     * The combination of {@link EditMode#BLOCK} and {@link ComponentTab#APPLICATIONS}.
-     */
-    public static final int APP_BLOCK_EDIT_MODE = 1;
-
-    /**
-     * The combination of {@link EditMode#PREVIEW} and {@link ComponentTab#APPLICATIONS}.
-     */
-    public static final int APP_VIEW_EDIT_MODE = 2;
-
-    /**
-     * The combination of {@link EditMode#BLOCK} and {@link ComponentTab#CONTAINERS}.
-     */
-    public static final int CONTAINER_BLOCK_EDIT_MODE = 3;
-
-    /**
-     * The combination of {@link EditMode#PREVIEW} and {@link ComponentTab#CONTAINERS}.
-     */
-    public static final int CONTAINER_VIEW_EDIT_MODE = 4;
-
-    public static final UIComponent EMPTY_COMPONENT = new UIComponent() {
-        public String getId() {
-            return "_portal:componentId_";
-        };
-    };
+    protected UIWorkingWorkspace  uiWorkingWorkspace;
 
     private static EditMode defaultEditMode = null;
 
@@ -168,14 +178,6 @@ public class UIPortalApplication extends UIApplication {
     private EditLevel editLevel = EditLevel.NO_EDIT;
 
     private Orientation orientation_ = Orientation.LT;
-
-    public static final String UI_WORKING_WS_ID = "UIWorkingWorkspace";
-
-    public static final String UI_VIEWING_WS_ID = "UIViewWS";
-
-    public static final String UI_EDITTING_WS_ID = "UIEditInlineWS";
-
-    public static final String UI_MASK_WS_ID = "UIMaskWorkspace";
 
     private SkinService skinService;
 
@@ -196,8 +198,6 @@ public class UIPortalApplication extends UIApplication {
     private RequestNavigationData   lastNonAjaxRequestNavData;
   
     private RequestNavigationData   lastRequestNavData;
-  
-    private UIWorkingWorkspace      uiWorkingWorkspace;
 
     private UIComponentDecorator    uiViewWorkingWorkspace;
 
