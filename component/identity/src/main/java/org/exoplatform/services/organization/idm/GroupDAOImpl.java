@@ -19,8 +19,11 @@
 
 package org.exoplatform.services.organization.idm;
 
+import static org.picketlink.idm.impl.store.hibernate.PatchedHibernateIdentityStoreImpl.ALL_GROUPS_TYPE;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.picketlink.idm.api.Attribute;
 import org.picketlink.idm.api.IdentitySearchCriteria;
@@ -50,9 +53,6 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
     private static final String CYCLIC_ID = "org.gatein.portal.identity.LOOPED_GROUP_ID";
 
     org.picketlink.idm.api.Group rootGroup = null;
-
-    public static final String                                        ALL_GROUPS_TYPE                                =
-            "@@ALL_GROUPS@@";
 
     public GroupDAOImpl(PicketLinkIDMOrganizationServiceImpl orgService, PicketLinkIDMService service) {
         super(orgService, service);
@@ -650,14 +650,10 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
     }
 
     @Override
-    public Collection<Group> findAllGroupsByKeyword(String keyword, List<String> excludedGroupsTypes) throws Exception {
+    public Collection<Group> findAllGroupsByKeyword(String keyword, List<String> excludedGroupsParent) throws Exception {
       IdentitySearchCriteria identitySearchCriteria = new IdentitySearchCriteriaImpl();
       if (StringUtils.isNotBlank(keyword)) {
-        try {
-          identitySearchCriteria.nameFilter("*" + keyword + "*");
-        } catch (Exception e) {
-          handleException("unsupported Criteria error: ", e);
-        }
+        identitySearchCriteria.nameFilter("*" + keyword + "*");
       }
       Collection<org.picketlink.idm.api.Group> allGroups = new HashSet<>();
       try {
@@ -667,7 +663,8 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         handleException("Identity operation error: ", e);
       }
       List<Group> exoGroups = new LinkedList<>();
-      for (org.picketlink.idm.api.Group group : allGroups) {
+      List<String> excludedGroupsTypes = excludedGroupsParent.stream().map(parent->orgService.getConfiguration().getGroupType(parent)).collect(Collectors.toList());
+        for (org.picketlink.idm.api.Group group : allGroups) {
         try {
           if (!excludedGroupsTypes.contains(group.getGroupType())) {
             exoGroups.add(convertGroup(group));
@@ -685,17 +682,13 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
     @Override
     public Collection<Group> findGroupsOfUserByKeyword(String user,
                                                        String keyword,
-                                                       List<String> excludedGroupsTypes) throws Exception {
+                                                       List<String> excludedGroupsParent) throws Exception {
       if (log.isTraceEnabled()) {
-          Tools.logMethodIn(log, LogLevel.TRACE, "findGroupsOfUserByKeyword", new Object[] { user, keyword, excludedGroupsTypes  });
+          Tools.logMethodIn(log, LogLevel.TRACE, "findGroupsOfUserByKeyword", new Object[] { user, keyword, excludedGroupsParent  });
       }
       IdentitySearchCriteria identitySearchCriteria = new IdentitySearchCriteriaImpl();
       if (StringUtils.isNotBlank(keyword)) {
-        try {
-          identitySearchCriteria.nameFilter("*" + keyword + "*");
-        } catch (Exception e) {
-          handleException("unsupported Criteria error: ", e);
-        }
+        identitySearchCriteria.nameFilter("*" + keyword + "*");
       }
       if (user == null) {
         if (log.isTraceEnabled()) {
@@ -704,27 +697,18 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         return Collections.emptyList();
       }
       Collection<org.picketlink.idm.api.Group> allGroups = new HashSet<>();
-      try {
-        orgService.flush();
-        allGroups =
-                  getIdentitySession().getRelationshipManager().findRelatedGroups(user, ALL_GROUPS_TYPE, identitySearchCriteria);
-      } catch (Exception e) {
-        handleException("Identity operation error: ", e);
-      }
+      orgService.flush();
+        List<String> excludedGroupsTypes = excludedGroupsParent.stream().map(parent->orgService.getConfiguration().getGroupType(parent)).collect(Collectors.toList());
+        allGroups = getIdentitySession().getRelationshipManager().findRelatedGroups(user, ALL_GROUPS_TYPE, identitySearchCriteria);
       List<Group> exoGroups = new LinkedList<>();
       for (org.picketlink.idm.api.Group group : allGroups) {
-        try {
-          if (!excludedGroupsTypes.contains(group.getGroupType())) {
-            exoGroups.add(convertGroup(group));
-          }
-        } catch (Exception e) {
-          handleException("convert Group error: ", e);
+        if (!excludedGroupsTypes.contains(group.getGroupType())) {
+          exoGroups.add(convertGroup(group));
         }
       }
       if (log.isTraceEnabled()) {
         Tools.logMethodOut(log, LogLevel.TRACE, "findGroupsOfUserByKeyword", exoGroups);
       }
-
       return exoGroups;
     }
 

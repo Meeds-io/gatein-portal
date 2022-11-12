@@ -42,8 +42,6 @@ public class GroupRestResourcesV1 implements ResourceContainer {
   public static final int     DEFAULT_LIMIT  = 20;
 
   public static final int     DEFAULT_OFFSET = 0;
-  public static final String     SPACES_GROUP_TYPE = ".spaces";
-  public static final String     ROOT_GROUP_TYPE = "root_type";
 
   private GroupSearchService  groupSearchService;
 
@@ -628,8 +626,11 @@ public class GroupRestResourcesV1 implements ResourceContainer {
                                        @QueryParam("returnSize")
                                        boolean returnSize,
                                        @Parameter(description = "allGroupsForAdmin") 
-                                       @QueryParam("allGroupsForAdmin") 
-                                       boolean allGroupsForAdmin) throws Exception {
+                                       @QueryParam("allGroupsForAdmin")
+                                       boolean allGroupsForAdmin,
+                                       @Parameter(description = "List of excluded parent/type groups")
+                                       @QueryParam("excludeParentGroup")
+                                       List<String> excludeParentGroup) throws Exception {
 
     Identity identity;
     try {
@@ -648,13 +649,12 @@ public class GroupRestResourcesV1 implements ResourceContainer {
     limit = limit > 0 ? limit : DEFAULT_LIMIT;
     Group[] groups = null;
     int totalSize = 0;
-    List<String> excludedGroupsTypes = new ArrayList<>(List.of(SPACES_GROUP_TYPE,ROOT_GROUP_TYPE));
     Collection<Group> userGroupsList = null;
     if (allGroupsForAdmin && (userACL.isSuperUser() || userACL.isUserInGroup(userACL.getAdminGroups()))) {
-      userGroupsList  = organizationService.getGroupHandler().findAllGroupsByKeyword(q, excludedGroupsTypes);
+      userGroupsList  = organizationService.getGroupHandler().findAllGroupsByKeyword(q, excludeParentGroup);
     } else {
       userGroupsList = organizationService.getGroupHandler()
-              .findGroupsOfUserByKeyword(identity.getUserId(), q, excludedGroupsTypes);
+              .findGroupsOfUserByKeyword(identity.getUserId(), q, excludeParentGroup);
     }
     totalSize = userGroupsList.size();
     int limitToFetch = limit;
