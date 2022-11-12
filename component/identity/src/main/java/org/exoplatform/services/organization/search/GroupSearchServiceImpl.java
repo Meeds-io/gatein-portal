@@ -9,8 +9,7 @@ import org.exoplatform.services.organization.OrganizationService;
 public class GroupSearchServiceImpl implements GroupSearchService {
   
   private OrganizationService organizationService;
-
-
+  
   public GroupSearchServiceImpl(OrganizationService organizationService) {
     this.organizationService = organizationService;
   }
