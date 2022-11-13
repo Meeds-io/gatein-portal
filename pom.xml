@@ -39,7 +39,7 @@
   <name>GateIn - Portal</name>
   
   <properties>
-    <org.exoplatform.depmgt.version>21.x-meed-SNAPSHOT</org.exoplatform.depmgt.version>
+    <org.exoplatform.depmgt.version>21.0-meed-20221113</org.exoplatform.depmgt.version>
     <org.exoplatform.kernel.version>6.4.0-M20</org.exoplatform.kernel.version>
     <org.exoplatform.core.version>6.4.0-M20</org.exoplatform.core.version>
     <org.exoplatform.ws.version>6.4.0-M20</org.exoplatform.ws.version>
