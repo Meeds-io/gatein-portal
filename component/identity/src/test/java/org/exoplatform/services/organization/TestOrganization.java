@@ -213,7 +213,7 @@ public class TestOrganization extends AbstractKernelTest {
 
     public void testFindGroupsOfUserByKeyword() throws Exception {
         GroupHandler groupHandler = organizationService.getGroupHandler();
-        List<String> excludedGroupsTypes = new ArrayList<>(List.of("GTN_ROOT_GROUP"));
+        List<String> excludedGroupsTypes = new ArrayList<>();
         Collection<Group> groups = groupHandler.findGroupsOfUserByKeyword("john","us",excludedGroupsTypes);
         assertNotNull(groups);
         assertEquals(1,groups.size());
@@ -227,7 +227,7 @@ public class TestOrganization extends AbstractKernelTest {
     public void testFindAllGroupsByKeyword() throws Exception
     {
         GroupHandler groupHandler = organizationService.getGroupHandler();
-        List<String> excludedGroupsTypes = new ArrayList<>(List.of("GTN_ROOT_GROUP"));
+        List<String> excludedGroupsTypes = new ArrayList<>();
         Collection<Group> groups = groupHandler.findAllGroupsByKeyword("us", excludedGroupsTypes);
         assertNotNull(groups);
         assertEquals(2, groups.size());
@@ -235,7 +235,7 @@ public class TestOrganization extends AbstractKernelTest {
         assertEquals(3, groupHandler.findAllGroupsByKeyword("test", excludedGroupsTypes).size());
         excludedGroupsTypes.add("root_type");
         assertEquals(1, groupHandler.findAllGroupsByKeyword("us", excludedGroupsTypes).size());
-        assertEquals(2, groupHandler.findAllGroupsByKeyword("test", excludedGroupsTypes).size());
+        assertEquals(1, groupHandler.findAllGroupsByKeyword("test", excludedGroupsTypes).size());
     }
 
     public void testConsistencyMembershipListAccess() throws Exception {
