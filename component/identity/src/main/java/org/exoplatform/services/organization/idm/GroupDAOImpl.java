@@ -656,22 +656,13 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
         identitySearchCriteria.nameFilter("*" + keyword + "*");
       }
       Collection<org.picketlink.idm.api.Group> allGroups = new HashSet<>();
-      try {
-        orgService.flush();
-        allGroups = getIdentitySession().getPersistenceManager().findGroup(ALL_GROUPS_TYPE, identitySearchCriteria);
-      } catch (Exception e) {
-        handleException("Identity operation error: ", e);
-      }
+      allGroups = getIdentitySession().getPersistenceManager().findGroup(ALL_GROUPS_TYPE, identitySearchCriteria);
       List<Group> exoGroups = new LinkedList<>();
       List<String> excludedGroupsTypes = excludedGroupsParent.stream().map(parent->orgService.getConfiguration().getGroupType(parent)).collect(Collectors.toList());
         for (org.picketlink.idm.api.Group group : allGroups) {
-        try {
           if (!excludedGroupsTypes.contains(group.getGroupType())) {
             exoGroups.add(convertGroup(group));
           }
-        } catch (Exception e) {
-          handleException("convert Group error: ", e);
-        }
       }
       if (log.isTraceEnabled()) {
         Tools.logMethodOut(log, LogLevel.TRACE, "findAllGroups", exoGroups);
