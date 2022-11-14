@@ -658,11 +658,13 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
       Collection<org.picketlink.idm.api.Group> allGroups = new HashSet<>();
       allGroups = getIdentitySession().getPersistenceManager().findGroup(ALL_GROUPS_TYPE, identitySearchCriteria);
       List<Group> exoGroups = new LinkedList<>();
-      List<String> excludedGroupsTypes = excludedGroupsParent.stream().map(parent->orgService.getConfiguration().getGroupType(parent)).collect(Collectors.toList());
-        for (org.picketlink.idm.api.Group group : allGroups) {
-          if (!excludedGroupsTypes.contains(group.getGroupType())) {
-            exoGroups.add(convertGroup(group));
-          }
+      List<String> excludedGroupsTypes = excludedGroupsParent.stream()
+                                                             .map(parent -> orgService.getConfiguration().getGroupType(parent))
+                                                             .collect(Collectors.toList());
+      for (org.picketlink.idm.api.Group group : allGroups) {
+        if (!excludedGroupsTypes.contains(group.getGroupType())) {
+          exoGroups.add(convertGroup(group));
+        }
       }
       if (log.isTraceEnabled()) {
         Tools.logMethodOut(log, LogLevel.TRACE, "findAllGroups", exoGroups);
@@ -675,7 +677,7 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
                                                        String keyword,
                                                        List<String> excludedGroupsParent) throws Exception {
       if (log.isTraceEnabled()) {
-          Tools.logMethodIn(log, LogLevel.TRACE, "findGroupsOfUserByKeyword", new Object[] { user, keyword, excludedGroupsParent  });
+        Tools.logMethodIn(log, LogLevel.TRACE, "findGroupsOfUserByKeyword", new Object[] { user, keyword, excludedGroupsParent });
       }
       IdentitySearchCriteria identitySearchCriteria = new IdentitySearchCriteriaImpl();
       if (StringUtils.isNotBlank(keyword)) {
@@ -689,8 +691,10 @@ public class GroupDAOImpl extends AbstractDAOImpl implements GroupHandler {
       }
       Collection<org.picketlink.idm.api.Group> allGroups = new HashSet<>();
       orgService.flush();
-        List<String> excludedGroupsTypes = excludedGroupsParent.stream().map(parent->orgService.getConfiguration().getGroupType(parent)).collect(Collectors.toList());
-        allGroups = getIdentitySession().getRelationshipManager().findRelatedGroups(user, ALL_GROUPS_TYPE, identitySearchCriteria);
+      List<String> excludedGroupsTypes = excludedGroupsParent.stream()
+                                                             .map(parent -> orgService.getConfiguration().getGroupType(parent))
+                                                             .collect(Collectors.toList());
+      allGroups = getIdentitySession().getRelationshipManager().findRelatedGroups(user, ALL_GROUPS_TYPE, identitySearchCriteria);
       List<Group> exoGroups = new LinkedList<>();
       for (org.picketlink.idm.api.Group group : allGroups) {
         if (!excludedGroupsTypes.contains(group.getGroupType())) {
