@@ -40,12 +40,12 @@
   
   <properties>
     <org.exoplatform.depmgt.version>22.x-meed-SNAPSHOT</org.exoplatform.depmgt.version>
-    <org.exoplatform.kernel.version>6.4.0-M20</org.exoplatform.kernel.version>
-    <org.exoplatform.core.version>6.4.0-M20</org.exoplatform.core.version>
-    <org.exoplatform.ws.version>6.4.0-M20</org.exoplatform.ws.version>
-    <org.exoplatform.gatein.wci.version>6.4.0-M20</org.exoplatform.gatein.wci.version>
-    <org.exoplatform.gatein.sso.version>6.4.0-M20</org.exoplatform.gatein.sso.version>
-    <org.exoplatform.gatein.pc.version>6.4.0-M20</org.exoplatform.gatein.pc.version>
+    <org.exoplatform.kernel.release.version>6.4.0</org.exoplatform.kernel.release.version>
+    <org.exoplatform.core.release.version>6.4.0</org.exoplatform.core.release.version>
+    <org.exoplatform.ws.release.version>6.4.0</org.exoplatform.ws.release.version>
+    <org.exoplatform.gatein.wci.release.version>6.4.0</org.exoplatform.gatein.wci.release.version>
+    <org.exoplatform.gatein.sso.release.version>6.4.0</org.exoplatform.gatein.sso.release.version>
+    <org.exoplatform.gatein.pc.release.version>6.4.0</org.exoplatform.gatein.pc.release.version>
 
     <!-- Default eXo profiles -->
     <surefire.exo.profiles>hsqldb</surefire.exo.profiles>
@@ -83,7 +83,7 @@
       <dependency>
         <groupId>org.exoplatform.kernel</groupId>
         <artifactId>kernel-parent</artifactId>
-        <version>${org.exoplatform.kernel.version}</version>
+        <version>${org.exoplatform.kernel.release.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -92,7 +92,7 @@
       <dependency>
         <groupId>org.exoplatform.core</groupId>
         <artifactId>core-parent</artifactId>
-        <version>${org.exoplatform.core.version}</version>
+        <version>${org.exoplatform.core.release.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -101,7 +101,7 @@
       <dependency>
         <groupId>org.exoplatform.ws</groupId>
         <artifactId>ws-parent</artifactId>
-        <version>${org.exoplatform.ws.version}</version>
+        <version>${org.exoplatform.ws.release.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -110,7 +110,7 @@
       <dependency>
         <groupId>org.exoplatform.gatein.pc</groupId>
         <artifactId>pc-parent</artifactId>
-        <version>${org.exoplatform.gatein.pc.version}</version>
+        <version>${org.exoplatform.gatein.pc.release.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -119,7 +119,7 @@
       <dependency>
         <groupId>org.exoplatform.gatein.sso</groupId>
         <artifactId>sso-parent</artifactId>
-        <version>${org.exoplatform.gatein.sso.version}</version>
+        <version>${org.exoplatform.gatein.sso.release.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -128,7 +128,7 @@
       <dependency>
         <groupId>org.exoplatform.gatein.wci</groupId>
         <artifactId>wci-parent</artifactId>
-        <version>${org.exoplatform.gatein.wci.version}</version>
+        <version>${org.exoplatform.gatein.wci.release.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
