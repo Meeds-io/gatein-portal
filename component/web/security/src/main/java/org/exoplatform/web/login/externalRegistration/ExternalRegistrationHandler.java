@@ -72,9 +72,9 @@ public class ExternalRegistrationHandler extends WebRequestHandler {
 
   public static final String               FIRSTNAME           = "firstName";
 
-  public static final UserFieldValidator   LASTNAME_VALIDATOR  = new UserFieldValidator(LASTNAME, false, true);
+  public static final UserFieldValidator   LASTNAME_VALIDATOR  = new UserFieldValidator(LASTNAME, true, false);
 
-  public static final UserFieldValidator   FIRSTNAME_VALIDATOR = new UserFieldValidator(FIRSTNAME, false, true);
+  public static final UserFieldValidator   FIRSTNAME_VALIDATOR = new UserFieldValidator(FIRSTNAME, true, false);
 
   public static final String               NAME                = "external-registration";
 
