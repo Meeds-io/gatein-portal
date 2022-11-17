@@ -19,7 +19,7 @@ package org.exoplatform.commons.api.settings;
 import java.io.Serializable;
 
 /**
- * @param T Type of the setting value object.
+ * @param <T> Object Type of the setting value object.
  * @LevelAPI Experimental
  */
 public class SettingValue<T extends Object> implements Serializable {

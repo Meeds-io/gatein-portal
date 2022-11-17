@@ -37,8 +37,8 @@ import org.exoplatform.services.organization.*;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.externalstore.IDMExternalStoreService;
 
-/*
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
+/**
+ * @author <a href="mailto:boleslaw.dawidowicz@redhat.com">Boleslaw Dawidowicz</a>
  */
 public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 

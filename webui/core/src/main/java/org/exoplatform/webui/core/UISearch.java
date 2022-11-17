@@ -30,7 +30,7 @@ import org.exoplatform.webui.form.UISearchForm;
 /**
  * Author : Nguyen Viet Chung chung.nguyen@exoplatform.com Jun 22, 2006
  *
- * @version: $Id$
+ * @version $Id$
  *
  *           A container that holds a UISearchForm
  * @see UISearchForm

@@ -41,13 +41,14 @@ public class TestTypeModel extends AbstractGateInTest {
     public void testFoo() {
         TypeDomain domain = new TypeDomain();
         assertType(String.class, domain.addTypeModel(String.class));
-        assertEquals(6, domain.getSize());
+        assertEquals(7, domain.getSize());
         assertType(String.class, domain.getTypeModel(String.class));
         assertType(Object.class, domain.getTypeModel(Object.class));
         assertType(Integer.class, domain.getTypeModel(Integer.class));
         assertType(byte[].class, domain.getTypeModel(byte[].class));
         assertType(Number.class, domain.getTypeModel(Number.class));
         assertType(Byte.class, domain.getTypeModel(Byte.class));
+        assertType(Boolean.class, domain.getTypeModel(Boolean.class));
     }
 
     public void testJuu() {

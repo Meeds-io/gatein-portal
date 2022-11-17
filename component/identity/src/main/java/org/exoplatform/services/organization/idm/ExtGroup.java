@@ -25,8 +25,8 @@ package org.exoplatform.services.organization.idm;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.impl.GroupImpl;
 
-/*
- * @author <a href="mailto:boleslaw.dawidowicz at redhat.com">Boleslaw Dawidowicz</a>
+/**
+ * @author <a href="mailto:boleslaw.dawidowicz@redhat.com">Boleslaw Dawidowicz</a>
  */
 public class ExtGroup extends GroupImpl implements Comparable<Object> {
   private static final long serialVersionUID = -7379104016885124958L;
