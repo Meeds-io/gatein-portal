@@ -86,6 +86,13 @@ public abstract class OAuthProviderFilter<T extends AccessTokenContext> extends 
         HttpServletResponse httpResponse = (HttpServletResponse)response;
         HttpSession session = httpRequest.getSession();
 
+        if (httpRequest.getRemoteUser() != null) {
+          //direct access to Auth url, redirect to context url, as user is already identified
+          httpResponse.sendRedirect(httpRequest.getContextPath());
+          return;
+        }
+
+
         // Restart current state if 'oauthInteraction' param has value 'start'
         String interaction = httpRequest.getParameter(OAuthConstants.PARAM_OAUTH_INTERACTION);
         if (OAuthConstants.PARAM_OAUTH_INTERACTION_VALUE_START.equals(interaction)) {
