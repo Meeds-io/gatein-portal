@@ -11,6 +11,7 @@ import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.commons.file.services.FileStorageException;
 import org.exoplatform.commons.file.services.NameSpaceService;
 import org.exoplatform.commons.file.storage.DataStorage;
+import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -26,18 +27,31 @@ import java.util.List;
  */
 public class FileServiceImpl implements FileService {
 
-  private static final Log    LOG             = ExoLogger.getLogger(FileServiceImpl.class);
+  private static final Log    LOG                = ExoLogger.getLogger(FileServiceImpl.class);
 
-  private DataStorage         dataStorage;
+  private static final String FILE_CREATED_EVENT = "file.created";
 
-  private BinaryProvider      binaryProvider;
+  private static final String FILE_UPDATED_EVENT = "file.updated";
 
-  private NameSpaceService    nameSpaceService;
+  private static final String FILE_DELETED_EVENT = "file.deleted";
 
-  public FileServiceImpl(DataStorage dataStorage, BinaryProvider resourceProvider, NameSpaceService nameSpaceService) throws Exception {
+  private DataStorage      dataStorage;
+
+  private BinaryProvider   binaryProvider;
+
+  private NameSpaceService nameSpaceService;
+
+  private ListenerService  listenerService;
+
+  public FileServiceImpl(DataStorage dataStorage,
+                         BinaryProvider resourceProvider,
+                         NameSpaceService nameSpaceService,
+                         ListenerService listenerService)
+      throws Exception {
     this.dataStorage = dataStorage;
     this.binaryProvider = resourceProvider;
     this.nameSpaceService = nameSpaceService;
+    this.listenerService = listenerService;
   }
 
   @Override
@@ -87,6 +101,11 @@ public class FileServiceImpl implements FileService {
     if (createdFileInfoEntity != null) {
       fileInfo.setId(createdFileInfoEntity.getId());
       file.setFileInfo(fileInfo);
+      try {
+        listenerService.broadcast(FILE_CREATED_EVENT, fileInfo, null);
+      } catch (Exception e) {
+        LOG.error("Error while broadcasting event: {}", FILE_CREATED_EVENT, e);
+      }
       return file;
     }
     return null;
@@ -110,6 +129,11 @@ public class FileServiceImpl implements FileService {
     if (createdFileInfoEntity != null) {
       fileInfo.setId(createdFileInfoEntity.getId());
       file.setFileInfo(fileInfo);
+      try {
+        listenerService.broadcast(FILE_UPDATED_EVENT, fileInfo, null);
+      } catch (Exception e) {
+        LOG.error("Error while broadcasting event: {}", FILE_UPDATED_EVENT, e);
+      }
       return file;
     }
     return null;
@@ -121,9 +145,15 @@ public class FileServiceImpl implements FileService {
     if (fileInfo != null) {
       fileInfo.setDeleted(true);
     }
-    return dataStorage.updateFileInfo(fileInfo);
+    FileInfo newFileInfo = dataStorage.updateFileInfo(fileInfo);
+    try {
+      listenerService.broadcast(FILE_DELETED_EVENT, newFileInfo, null);
+    } catch (Exception e) {
+      LOG.error("Error while broadcasting event: {}", FILE_DELETED_EVENT, e);
+    }
+    return newFileInfo;
   }
-  
+
   @Override
   public List<FileItem> getFilesByChecksum(String checksum) throws FileStorageException {
     List<FileItem> fileItemList = new ArrayList<FileItem>();
