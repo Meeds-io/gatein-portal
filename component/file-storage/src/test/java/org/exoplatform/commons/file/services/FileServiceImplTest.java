@@ -15,6 +15,7 @@ import org.exoplatform.commons.file.storage.entity.NameSpaceEntity;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.listener.ListenerService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -68,6 +69,9 @@ public class FileServiceImplTest {
 
   @Mock
   private EntityTransaction    transaction;
+  
+  @Mock
+  private ListenerService      listenerService;
 
   @Before
   public void setUp() throws Exception {
@@ -108,7 +112,7 @@ public class FileServiceImplTest {
                                                                         "",
                                                                         "d41d8cd98f00b204e9800998ecf8427e",
                                                                         false));
-    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, nameSpaceService);
+    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, nameSpaceService, listenerService);
 
     // When
     FileItem file = fileService.getFile(1);
@@ -132,29 +136,83 @@ public class FileServiceImplTest {
                                                                                                    "",
                                                                                                    "d41d8cd98f00b204e9800998ecf8427e",
                                                                                                    false));
-    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, nameSpaceService);
+    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, nameSpaceService, listenerService);
 
     // When
-    fileService.writeFile(new FileItem(null,
-                                       "file1",
-                                       "",
-                                       null,
-                                       1,
-                                       new Date(),
-                                       "",
-                                       false,
-                                       new ByteArrayInputStream("test".getBytes())));
-
+    FileItem fileItem = new FileItem(null,
+                                     "file1",
+                                     "",
+                                     null,
+                                     1,
+                                     new Date(),
+                                     "",
+                                     false,
+                                     new ByteArrayInputStream("test".getBytes()));
+    fileService.writeFile(fileItem);
+    FileInfo fileInfo = fileItem.getFileInfo();
+    fileInfo.setId(1L);
     // Then
     verify(jpaDataStorage, times(1)).create(any(FileInfo.class), any(NameSpace.class));
+    verify(listenerService, times(1)).broadcast("file.created", fileInfo, null);
   }
+
+  @Test
+  public void shouldUpdateFile() throws Exception {
+    BinaryProvider binaryProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
+    // Given
+    lenient().when(fileInfoDAO.create(any(FileInfoEntity.class))).thenReturn(new FileInfoEntity());
+    lenient().when(jpaDataStorage.getNameSpace(any())).thenReturn(new NameSpace(null, null));
+    lenient().when(jpaDataStorage.updateFileInfo(any(FileInfo.class)))
+             .thenReturn(new FileInfo(1L, "fileToUpdate", null, "file", 1, null, "", "d41d8cd98f00b204e9800998ecf8427e", false));
+
+    lenient().when(jpaDataStorage.getFileInfo(1L))
+             .thenReturn(new FileInfo(1L, "file1", null, "file", 1, null, "", "d41d8cd98f00b204e9800998ecf8427e", false));
+    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, nameSpaceService, listenerService);
+
+    // When
+    FileItem fileItem = new FileItem(1L,
+                                     "fileToUpdate",
+                                     "",
+                                     null,
+                                     1,
+                                     new Date(),
+                                     "",
+                                     false,
+                                     new ByteArrayInputStream("test".getBytes()));
+    fileService.updateFile(fileItem);
+    FileInfo fileInfo = fileItem.getFileInfo();
+    fileInfo.setId(1L);
+    // Then
+    verify(jpaDataStorage, times(1)).updateFileInfo(any(FileInfo.class));
+    verify(listenerService, times(1)).broadcast("file.updated", fileInfo, null);
+  }
+
+  @Test
+  public void shouldDeleteFile() throws Exception {
+    BinaryProvider binaryProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
+    // Given
+    FileInfo fileInfo = new FileInfo(1L, "file", null, "file", 1, null, "", "d41d8cd98f00b204e9800998ecf8427e", false);
+    FileInfo updatedFileInfo = new FileInfo(1L, "file", null, "file", 1, null, "", "d41d8cd98f00b204e9800998ecf8427e", true);
+    lenient().when(jpaDataStorage.updateFileInfo(any(FileInfo.class))).thenReturn(updatedFileInfo);
+
+    lenient().when(jpaDataStorage.getFileInfo(1L))
+            .thenReturn(fileInfo);
+    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, nameSpaceService, listenerService);
+
+    // When
+    fileService.deleteFile(1L);
+    // Then
+    verify(jpaDataStorage, times(1)).updateFileInfo(any(FileInfo.class));
+    verify(listenerService, times(1)).broadcast("file.deleted", updatedFileInfo, null);
+  }
+  
 
   @Test
   public void shouldRollbackFileWriteWhenSomethingGoesWrong() throws Exception {
     BinaryProvider binaryProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
     lenient().when(fileInfoDAO.create(any(FileInfoEntity.class))).thenThrow(RuntimeException.class);
-    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, nameSpaceService);
+    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, nameSpaceService, listenerService);
 
     // When
     FileItem file = new FileItem(null,
