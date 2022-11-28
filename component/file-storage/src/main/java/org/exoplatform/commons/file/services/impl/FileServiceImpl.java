@@ -46,8 +46,7 @@ public class FileServiceImpl implements FileService {
   public FileServiceImpl(DataStorage dataStorage,
                          BinaryProvider resourceProvider,
                          NameSpaceService nameSpaceService,
-                         ListenerService listenerService)
-      throws Exception {
+                         ListenerService listenerService) {
     this.dataStorage = dataStorage;
     this.binaryProvider = resourceProvider;
     this.nameSpaceService = nameSpaceService;
