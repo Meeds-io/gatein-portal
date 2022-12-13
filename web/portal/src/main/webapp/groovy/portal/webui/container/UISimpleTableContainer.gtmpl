@@ -12,15 +12,13 @@
 	if(!uiPortalApp.isEditing() && !hasAccessPermission) return;
 	EditMode editMode = uiPortalApp.getEditMode();
 
-	String cssStyle = "style=\"";
+	String cssStyle = "";
 	String uiComponentWidth = uicomponent.getWidth();
 	String uiComponentHeight = uicomponent.getHeight();
+	if(uiComponentWidth != null || uiComponentHeight != null) cssStyle = "style=\"";
 	if(uiComponentWidth != null) cssStyle += "width: "+uiComponentWidth+";"
 	if(uiComponentHeight != null) cssStyle += "height: "+uiComponentHeight+";"
-	cssStyle += "\"";
-	String normalCssStyle = cssStyle.substring(0,cssStyle.length()-1) ;
-	normalCssStyle+= "margin-top: 20px;"
-        normalCssStyle += "\"";
+	if(cssStyle.length() > 0) cssStyle += "\"";
 	
   String uiComponentClass = uicomponent.getCssClass() == null ? "" : uicomponent.getCssClass();
 
@@ -35,15 +33,14 @@
      def reqJS = rcontext.getJavascriptManager().require("SHARED/portal", "portal");
      reqJS.addScripts("portal.UIPortal.initMouseHover('" + uicomponent.id + "');");
 %>  
-<div class="UIContainer Simple-Table-Container<%=uiComponentClass%> EdittingContainer<%=uicomponent.getPermissionClasses()%>"
-				id="${uicomponent.id}" ${cssStyle}>
-				<%=uiComponentClass%>
+<div class="UIContainer SimpleTableContainer <%=uiComponentClass%> EdittingContainer<%=uicomponent.getPermissionClasses()%>"
+				id="${uicomponent.id}" ${cssStyle}>			
 <%
   }
   else
   {   
 %>
-<div class="UIContainer Simple-Table-Container<%=uiComponentClass%> <%=hasAccessPermission?"": "ProtectedContainer"%>" id="${uicomponent.id}" ${normalCssStyle}>
+<div class="UIContainer SimpleTableContainer <%=uiComponentClass%> <%=hasAccessPermission?"": "ProtectedContainer"%>" id="${uicomponent.id}" ${cssStyle}>
 <%
   }
 %>
@@ -79,7 +76,7 @@
 							<% 
 								String strTitle = uicomponent.getTitle() != null ?
 									ExpressionUtil.getExpressionValue(res, uicomponent.getTitle()) :
-									_ctx.appRes("UIContainer.title.SimpleTableContainer");
+									_ctx.appRes("UIContainer.title.SimpleTableContainer"); 			
 								strTitle = hasAccessPermission ? strTitle : _ctx.appRes("UIPortlet.label.protectedContent");																					
 							%>
 							<i class="uiIconContainerConfig uiIconWhite"></i>
