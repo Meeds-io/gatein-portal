@@ -30,57 +30,7 @@
 	line-height: 20px;
 }
 
-.UIContainerList .OneRowContainerLayout	{
-	background: transparent url(background/OneRowContainerLayout.gif) no-repeat left 10px; /* orientation=lt */
-	background: transparent url(background/OneRowContainerLayout-rt.gif) no-repeat right 10px; /* orientation=rt */
-}
-
 .UIContainerList .SimpleTableContainerLayout {
 	background: transparent url(background/SimpleTableContainerLayout.gif) no-repeat left 10px; /* orientation=lt */
 	background: transparent url(background/SimpleTableContainerLayout.gif) no-repeat right 10px; /* orientation=rt */
-}
-
-.UIContainerList .TwoRowContainerLayout	{
-	background: transparent url(background/TwoRowContainerLayout.gif) no-repeat left center; /* orientation=lt */
-	background: transparent url(background/TwoRowContainerLayout-rt.gif) no-repeat right center; /* orientation=rt */
-}
-
-.UIContainerList .ThreeRowContainerLayout	{
-	background: transparent url(background/ThreeRowContainerLayout.gif) no-repeat left center; /* orientation=lt */
-	background: transparent url(background/ThreeRowContainerLayout-rt.gif) no-repeat right center; /* orientation=rt */
-}
-
-.UIContainerList .TwoColumnContainerLayout	{
-	background: transparent url(background/TwoColumnContainerLayout.gif) no-repeat left center; /* orientation=lt */
-	background: transparent url(background/TwoColumnContainerLayout-rt.gif) no-repeat right center; /* orientation=rt */
-}
-
-.UIContainerList .ThreeColumnContainerLayout	{
-	background: transparent url(background/ThreeColumnContainerLayout.gif) no-repeat left center; /* orientation=lt */
-	background: transparent url(background/ThreeColumnContainerLayout-rt.gif) no-repeat right center; /* orientation=rt */
-}
-
-.UIContainerList .TwoTabContainerLayout	{
-	background: transparent url(background/TwoTabContainerLayout.gif) no-repeat left center; /* orientation=lt */
-	background: transparent url(background/TwoTabContainerLayout-rt.gif) no-repeat right center; /* orientation=rt */
-}
-
-.UIContainerList .ThreeTabContainerLayout	{
-	background: transparent url(background/ThreeTabContainerLayout.gif) no-repeat left center; /* orientation=lt */
-	background: transparent url(background/ThreeTabContainerLayout-rt.gif) no-repeat right center; /* orientation=rt */
-}
-
-.UIContainerList .TwoColumnOneRowContainerLayout	{
-	background: transparent url(background/TwoColumnOneRowContainerLayout.gif) no-repeat left center; /* orientation=lt */
-	background: transparent url(background/TwoColumnOneRowContainerLayout-rt.gif) no-repeat right center; /* orientation=rt */
-}
-
-.UIContainerList .OneRowTwoColumnContainerLayout	{
-	background: transparent url(background/OneRowTwoColumnContainerLayout.gif) no-repeat left center; /* orientation=lt */
-	background: transparent url(background/OneRowTwoColumnContainerLayout-rt.gif) no-repeat right center; /* orientation=rt */
-}
-
-.UIContainerList .OneRow2Column1RowContainerLayout	{
-	background: transparent url(background/OneRow2Column1RowContainerLayout.gif) no-repeat left center; /* orientation=lt */
-	background: transparent url(background/OneRow2Column1RowContainerLayout-rt.gif) no-repeat right center; /* orientation=rt */
 }
