@@ -35,6 +35,11 @@
 	background: transparent url(background/OneRowContainerLayout-rt.gif) no-repeat right 10px; /* orientation=rt */
 }
 
+.UIContainerList .SimpleTableContainerLayout {
+	background: transparent url(background/SimpleTableContainerLayout.gif) no-repeat left 10px; /* orientation=lt */
+	background: transparent url(background/SimpleTableContainerLayout.gif) no-repeat right 10px; /* orientation=rt */
+}
+
 .UIContainerList .TwoRowContainerLayout	{
 	background: transparent url(background/TwoRowContainerLayout.gif) no-repeat left center; /* orientation=lt */
 	background: transparent url(background/TwoRowContainerLayout-rt.gif) no-repeat right center; /* orientation=rt */
