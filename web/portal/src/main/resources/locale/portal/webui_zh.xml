@@ -181,28 +181,6 @@
     </title>
   </UITabPane>
 
-  <ContainerOptions>
-    <Category>
-      <row>行布局</row>
-      <column>列布局</column>
-      <tabs>标签布局</tabs>
-      <mix>混合布局</mix>
-    </Category>
-    <Item>
-      <oneRow>一行</oneRow>
-      <twoRows>两行</twoRows>
-      <threeRows>三行</threeRows>
-      <oneColumns>一列</oneColumns>
-      <twoColumns>两列</twoColumns>
-      <threeColumns>三列</threeColumns>
-      <threeToolbarColumns>三个工具栏列</threeToolbarColumns>
-      <twoTabs>两个标签</twoTabs>
-      <threeTabs>三个标签</threeTabs>
-      <twoColumnsOneRow>两列，一行</twoColumnsOneRow>
-      <oneRowTwoColumns>一行，两列</oneRowTwoColumns>
-      <oneRow2Column1Row>一行，两列，一行</oneRow2Column1Row>
-    </Item>
-  </ContainerOptions>
   <!--  #############################################################################-->
   <!--  #              Identifier String Validator                                  #-->
   <!--  #############################################################################-->
