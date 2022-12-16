@@ -76,7 +76,7 @@
 							<% 
 								String strTitle = uicomponent.getTitle() != null ?
 									ExpressionUtil.getExpressionValue(res, uicomponent.getTitle()) :
-									_ctx.appRes("UIContainer.title.SimpleTableContainer"); 			
+									_ctx.appRes("UISimpleTableContainer.title.Container"); 			
 								strTitle = hasAccessPermission ? strTitle : _ctx.appRes("UIPortlet.label.protectedContent");																					
 							%>
 							<i class="uiIconContainerConfig uiIconWhite"></i>
