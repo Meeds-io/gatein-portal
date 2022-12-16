@@ -29,8 +29,3 @@
 	height: 40px; 
 	line-height: 20px;
 }
-
-.UIContainerList .SimpleTableContainerLayout {
-	background: transparent url(background/SimpleTableContainerLayout.gif) no-repeat left 10px; /* orientation=lt */
-	background: transparent url(background/SimpleTableContainerLayout.gif) no-repeat right 10px; /* orientation=rt */
-}
