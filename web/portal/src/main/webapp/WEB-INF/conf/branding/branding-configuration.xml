@@ -8,7 +8,7 @@
     <init-params>
       <value-param>
         <name>exo.branding.company.name</name>
-        <value>${exo.branding.company.name:Employee Recognition}</value>
+        <value>${exo.branding.company.name:Web3 Hub}</value>
       </value-param>
       <value-param>
         <name>exo.branding.company.siteName</name>
