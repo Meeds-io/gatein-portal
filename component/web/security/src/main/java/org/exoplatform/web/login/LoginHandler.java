@@ -35,6 +35,7 @@ import org.gatein.wci.security.Credentials;
 import org.json.JSONObject;
 
 import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.xml.InitParams;
@@ -371,7 +372,6 @@ public class LoginHandler extends JspBasedWebHandler {
     JSONObject jsConfig = javascriptConfigService.getJSConfig(controllerContext, request.getLocale());
     if (jsConfig.has(JS_PATHS_PARAM)) {
       JSONObject jsConfigPaths = jsConfig.getJSONObject(JS_PATHS_PARAM);
-      @SuppressWarnings("unchecked")
       Iterator<String> keys = jsConfigPaths.keys();
       while (keys.hasNext()) {
         String module = keys.next();
@@ -391,6 +391,9 @@ public class LoginHandler extends JspBasedWebHandler {
 
       String forgotPasswordPath = passwordRecoveryService.getPasswordRecoverURL(null, null);
       params.put("forgotPasswordPath", request.getContextPath() + forgotPasswordPath);
+
+      params.put("authenticationTitle", PropertyManager.getProperty("portal.authentication.title"));
+      params.put("authenticationSubtitle", PropertyManager.getProperty("portal.authentication.subtitle"));
 
       if (status != LoginStatus.AUTHENTICATED && status != LoginStatus.UNAUTHENTICATED) {
         params.put("errorCode", status.getErrorCode());
