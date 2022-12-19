@@ -126,6 +126,7 @@ public class NavigationRest implements ResourceContainer {
                                          @Parameter(description = "Portal site name", required = true) @QueryParam("siteName") String siteName,
                                          @Parameter(description = "Scope of navigations tree to retrieve, possible values: ALL, CHILDREN, GRANDCHILDREN, SINGLE", required = false)
                                          @Schema(defaultValue = "ALL") @QueryParam("scope") String scopeName,
+                                         @Parameter(description = "parent navigation node id") @QueryParam("nodeId") String nodeId,
                                          @Parameter(description = "Multivalued visibilities of navigation nodes to retrieve, possible values: DISPLAYED, HIDDEN, SYSTEM or TEMPORAL. If empty, all visibilities will be used.", required = false)
                                          @Schema(defaultValue = "All possible values combined") @QueryParam("visibility") List<String> visibilityNames) {
     // this function return nodes and not navigations
@@ -133,7 +134,7 @@ public class NavigationRest implements ResourceContainer {
       return Response.status(400).build();
     }
 
-    return getNavigations(request, siteTypeName, siteName, excludedSiteName, scopeName, visibilityNames);
+    return getNavigations(request, siteTypeName, siteName, excludedSiteName, scopeName, nodeId, visibilityNames);
   }
 
   @Path("/categories")
@@ -167,6 +168,7 @@ public class NavigationRest implements ResourceContainer {
                                   String siteName,
                                   String excludedSiteName,
                                   String scopeName,
+                                  String nodeId,
                                   List<String> visibilityNames) {
     ConversationState state = ConversationState.getCurrent();
     Identity userIdentity = state == null ? null : state.getIdentity();
@@ -218,8 +220,13 @@ public class NavigationRest implements ResourceContainer {
       }
 
       UserPortal userPortal = userPortalConfig.getUserPortal();
-      Collection<UserNode> nodes = null;
-      if (siteType == SiteType.PORTAL || StringUtils.isBlank(siteName)) {
+      Collection<UserNode> nodes = new ArrayList<>();
+
+      if (nodeId != null && siteName != null) {
+        SiteKey siteKey = new SiteKey(siteTypeName, siteName);
+        UserNode userNode = userPortal.getNodeById(nodeId, siteKey, scope, userFilterConfig, null);
+        nodes.add(userNode);
+      } else if (siteType == SiteType.PORTAL || StringUtils.isBlank(siteName)) {
         nodes = userPortal.getNodes(siteType, excludedSiteName, scope, userFilterConfig);
       } else {
         UserNavigation navigation = userPortal.getNavigation(new SiteKey(siteType, siteName));
