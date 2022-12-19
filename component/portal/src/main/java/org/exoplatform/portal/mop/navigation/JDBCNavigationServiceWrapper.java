@@ -86,6 +86,11 @@ public class JDBCNavigationServiceWrapper implements NavigationService {
     return service.loadNode(model, navigation, scope, listener);
   }
 
+  @Override
+  public <N> NodeContext<N> loadNodeById(NodeModel<N> model, String nodeId, Scope scope, NodeChangeListener<NodeContext<N>> listener) {
+    return service.loadNodeById(model, nodeId, scope, listener);
+  }
+
   public <N> void saveNode(NodeContext<N> context,
                            NodeChangeListener<NodeContext<N>> listener) throws NavigationServiceException {
     service.saveNode(context, new NodeChangeNotifier<>(listener, this, listenerService));
