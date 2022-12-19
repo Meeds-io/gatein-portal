@@ -366,6 +366,27 @@ public class UserPortalImpl implements UserPortal {
     }
   }
 
+  @Override
+  public UserNode getNodeById(String userNodeId, SiteKey siteKey,
+                                              Scope scope,
+                                              UserNodeFilterConfig filterConfig,
+                                              NodeChangeListener<UserNode> listener) throws NullPointerException,
+                                                                                            UserPortalException,
+                                                                                            NavigationServiceException {
+    UserNavigation userNavigation = getNavigation(siteKey);
+    UserNodeContext userNodeContext = new UserNodeContext(userNavigation, filterConfig);
+    NodeContext<UserNode> nodeContext = service.getNavigationService()
+                                               .loadNodeById(userNodeContext,
+                                                       userNodeId,
+                                                       scope,
+                                                       new UserNodeListener(listener));
+    if (nodeContext != null) {
+      return nodeContext.getNode().filter();
+    } else {
+      return null;
+    }
+  }
+
   public void updateNode(UserNode node, Scope scope, NodeChangeListener<UserNode> listener) throws NullPointerException,
                                                                                             IllegalArgumentException,
                                                                                             UserPortalException,

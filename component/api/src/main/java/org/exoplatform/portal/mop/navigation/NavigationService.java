@@ -103,6 +103,20 @@ public interface NavigationService {
             NodeChangeListener<NodeContext<N>> listener) throws NullPointerException, NavigationServiceException;
 
     /**
+     * Load a navigation node from a specified navigation by its id
+     *
+     * @param model the node model
+     * @param nodeId the node id
+     * @param scope the scope
+     * @param listener the optional listener
+     * @param <N> the node generic type
+     * @return the loaded node
+     */
+    default <N> NodeContext<N> loadNodeById(NodeModel<N> model, String nodeId, Scope scope,
+                                            NodeChangeListener<NodeContext<N>> listener) {
+        throw new UnsupportedOperationException();
+    }
+    /**
      * <p>
      * Save the specified context state to the persistent storage. The operation takes the pending changes done to the tree and
      * attempt to save them to the persistent storage. When conflicts happens, a merge will be attempted however it can lead to

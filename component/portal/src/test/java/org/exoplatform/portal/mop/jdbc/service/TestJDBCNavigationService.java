@@ -391,4 +391,18 @@ public class TestJDBCNavigationService extends AbstractKernelTest {
         } catch (IllegalArgumentException e) {
         }
     }
+
+    public void testLoadNodeById() throws Exception {
+        this.createSite(SiteType.PORTAL, "test_site");
+        NavigationContext defaultNav = service.loadNavigation(SiteKey.portal("test_site"));
+        NodeContext<Node> rootNode = this.service.loadNode(Node.MODEL, defaultNav, Scope.ALL, null);
+        rootNode.add(0, "child1").getNode();
+        rootNode.add(1, "child2").getNode();
+        this.service.saveNode(rootNode, null);
+
+        NodeContext<Node> node = service.loadNodeById(Node.MODEL, rootNode.getId(), Scope.ALL, null);
+        assertNotNull(node.getNode());
+        assertEquals(2, node.getNode().getChildren().size());
+    }
+
 }
