@@ -19,7 +19,6 @@ package org.exoplatform.web.application;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -174,7 +173,7 @@ public abstract class JspBasedWebHandler extends WebRequestHandler {
       SkinURL url = skin.createURL(controllerContext);
       url.setOrientation(orientation);
       return url.toString();
-    }).collect(Collectors.toList());
+    }).toList();
   }
 
   private Set<String> getPageScripts(JavascriptManager javascriptManager,
