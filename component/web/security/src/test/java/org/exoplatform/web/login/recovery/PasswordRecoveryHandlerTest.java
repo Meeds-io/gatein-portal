@@ -37,6 +37,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -151,7 +152,7 @@ public class PasswordRecoveryHandlerTest {
   public void setUp() throws Exception {
     this.applicationParameters = null;
     ExoContainerContext.setCurrentContainer(container);
-    when(container.getComponentInstanceOfType(ResourceBundleService.class)).thenReturn(resourceBundleService);
+    lenient().when(container.getComponentInstanceOfType(ResourceBundleService.class)).thenReturn(resourceBundleService);
 
     when(container.getPortalContext()).thenReturn(servletContext);
     when(request.getContextPath()).thenReturn(CONTEXT_PATH);
