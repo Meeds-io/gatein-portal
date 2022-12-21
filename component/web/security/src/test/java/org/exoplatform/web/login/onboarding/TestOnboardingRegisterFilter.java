@@ -18,46 +18,70 @@ package org.exoplatform.web.login.onboarding;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.when;
 
 import java.security.SecureRandom;
 
 import javax.servlet.FilterChain;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.impl.UserImpl;
 import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 import org.exoplatform.web.security.security.SecureRandomService;
 
-@RunWith(PowerMockRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class TestOnboardingRegisterFilter {
 
-  @Test
-  @PrepareForTest({ ExoContainerContext.class })
-  public void testFilter() throws Exception {// NOSONAR
-    mockStatic(ExoContainerContext.class);
+  @Mock
+  private PortalContainer               container;
 
+  @Mock
+  private PasswordRecoveryService       passwordRecoveryService;
+
+  @Mock
+  private OnboardingUIParamsForRegister onboardingUIParamsForRegister;
+
+  @Mock
+  private OrganizationService           organizationService;
+
+  @Mock
+  private SecureRandomService           secureRandomService;
+
+  @Before
+  public void setUp() {
+    ExoContainerContext.setCurrentContainer(container);
+    when(container.getComponentInstanceOfType(PasswordRecoveryService.class)).thenReturn(passwordRecoveryService);
+    when(container.getComponentInstanceOfType(OnboardingUIParamsForRegister.class)).thenReturn(onboardingUIParamsForRegister);
+    when(container.getComponentInstanceOfType(OrganizationService.class)).thenReturn(organizationService);
+    when(container.getComponentInstanceOfType(SecureRandomService.class)).thenReturn(secureRandomService);
+  }
+
+  @After
+  public void teardown() {
+    ExoContainerContext.setCurrentContainer(null);
+  }
+
+  @Test
+  public void testFilter() throws Exception {// NOSONAR
     String email = "test2@user.com";
     String token = "token2";
 
-    OnboardingUIParamsForRegister onboardingUIParamsForRegister = mock(OnboardingUIParamsForRegister.class);
-    when(ExoContainerContext.getService(OnboardingUIParamsForRegister.class)).thenReturn(onboardingUIParamsForRegister);
-    PasswordRecoveryService passwordRecoveryService = mock(PasswordRecoveryService.class);
-    when(ExoContainerContext.getService(PasswordRecoveryService.class)).thenReturn(passwordRecoveryService);
-    OrganizationService organizationService = mock(OrganizationService.class);
-    when(ExoContainerContext.getService(OrganizationService.class)).thenReturn(organizationService);
-    SecureRandomService secureRandomService = mock(SecureRandomService.class);
-    when(ExoContainerContext.getService(SecureRandomService.class)).thenReturn(secureRandomService);
     SecureRandom secureRandom = mock(SecureRandom.class);
     when(secureRandomService.getSecureRandom()).thenReturn(secureRandom);
     when(secureRandom.nextLong()).thenReturn(1558666l);
@@ -93,28 +117,10 @@ public class TestOnboardingRegisterFilter {
   }
 
   @Test
-  @PrepareForTest({ ExoContainerContext.class })
   public void testRegisterWithInvalidToken() throws Exception {// NOSONAR
-    mockStatic(ExoContainerContext.class);
 
     String email = "test@user.com";
     String token = "token";
-
-    OnboardingUIParamsForRegister onboardingUIParamsForRegister = mock(OnboardingUIParamsForRegister.class);
-    when(ExoContainerContext.getService(OnboardingUIParamsForRegister.class)).thenReturn(onboardingUIParamsForRegister);
-    PasswordRecoveryService passwordRecoveryService = mock(PasswordRecoveryService.class);
-    when(ExoContainerContext.getService(PasswordRecoveryService.class)).thenReturn(passwordRecoveryService);
-    OrganizationService organizationService = mock(OrganizationService.class);
-    when(ExoContainerContext.getService(OrganizationService.class)).thenReturn(organizationService);
-    SecureRandomService secureRandomService = mock(SecureRandomService.class);
-    when(ExoContainerContext.getService(SecureRandomService.class)).thenReturn(secureRandomService);
-    SecureRandom secureRandom = mock(SecureRandom.class);
-    when(secureRandomService.getSecureRandom()).thenReturn(secureRandom);
-    when(secureRandom.nextLong()).thenReturn(1558666l);
-    UserHandler userHandler = mock(UserHandler.class);
-    when(organizationService.getUserHandler()).thenReturn(userHandler);
-    when(userHandler.createUserInstance(any())).thenAnswer(invocation -> new UserImpl(invocation.getArgument(0, String.class)));
-    when(userHandler.findUsersByQuery(any(), any())).thenReturn(null);
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
@@ -132,27 +138,16 @@ public class TestOnboardingRegisterFilter {
     OnboardingRegisterFilter onboardingRegisterFilter = new OnboardingRegisterFilter();
     onboardingRegisterFilter.doFilter(request, response, chain);
 
-    verify(userHandler, times(0)).createUser(any(), eq(true));
+    verify(organizationService, times(0)).getUserHandler();
     verify(passwordRecoveryService, times(0)).sendOnboardingEmail(any(), any(), any());
     verify(request, times(0)).setAttribute(eq(OnboardingRegisterFilter.ON_BOARDING_EMAIL_SENT), eq(true));
   }
 
   @Test
-  @PrepareForTest({ ExoContainerContext.class })
   public void testRegisterWithInvalidEmail() throws Exception {// NOSONAR
-    mockStatic(ExoContainerContext.class);
-
     String email = "invalid";
     String token = "token";
 
-    OnboardingUIParamsForRegister onboardingUIParamsForRegister = mock(OnboardingUIParamsForRegister.class);
-    when(ExoContainerContext.getService(OnboardingUIParamsForRegister.class)).thenReturn(onboardingUIParamsForRegister);
-    PasswordRecoveryService passwordRecoveryService = mock(PasswordRecoveryService.class);
-    when(ExoContainerContext.getService(PasswordRecoveryService.class)).thenReturn(passwordRecoveryService);
-    OrganizationService organizationService = mock(OrganizationService.class);
-    when(ExoContainerContext.getService(OrganizationService.class)).thenReturn(organizationService);
-    SecureRandomService secureRandomService = mock(SecureRandomService.class);
-    when(ExoContainerContext.getService(SecureRandomService.class)).thenReturn(secureRandomService);
     SecureRandom secureRandom = mock(SecureRandom.class);
     when(secureRandomService.getSecureRandom()).thenReturn(secureRandom);
     when(secureRandom.nextLong()).thenReturn(1558666l);
