@@ -111,7 +111,6 @@ public class RegisterHandler extends JspBasedWebHandler {
     JSONObject jsConfig = javascriptConfigService.getJSConfig(controllerContext, request.getLocale());
     if (jsConfig.has(JS_PATHS_PARAM)) {
       JSONObject jsConfigPaths = jsConfig.getJSONObject(JS_PATHS_PARAM);
-      @SuppressWarnings("unchecked")
       Iterator<String> keys = jsConfigPaths.keys();
       while (keys.hasNext()) {
         String module = keys.next();
