@@ -149,14 +149,18 @@ public class UserFieldValidator {
       Pattern customPasswordPattern = null;
       int customPasswordMaxlength = -1;
       int customPasswordMinlength = -1;
-      if (regexProperty != null) {
+      if (StringUtils.isNotBlank(regexProperty)) {
         customPasswordPattern = Pattern.compile(regexProperty);
       }
-      if (maxLengthProperty != null) {
+      if (StringUtils.isNotBlank(maxLengthProperty)) {
         customPasswordMaxlength = Integer.parseInt(maxLengthProperty);
+      } else {
+        customPasswordMaxlength = maxLength;
       }
-      if (minLengthProperty != null) {
+      if (StringUtils.isNotBlank(minLengthProperty)) {
         customPasswordMinlength = Integer.parseInt(minLengthProperty);
+      } else {
+        customPasswordMinlength = minLength;
       }
       if (customPasswordPattern != null && !customPasswordPattern.matcher(value).matches() ||
               customPasswordMaxlength != -1 && customPasswordMaxlength < value.length() ||
