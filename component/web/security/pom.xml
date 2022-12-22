@@ -31,7 +31,7 @@
   <description>GateIn web security services</description>
 
   <properties>
-    <exo.test.coverage.ratio>0.32</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.38</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
