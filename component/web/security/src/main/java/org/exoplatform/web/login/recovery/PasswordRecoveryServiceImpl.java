@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.web.login.externalRegistration.ExternalRegistrationHandler;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.web.security.security.CookieTokenService;
@@ -47,6 +46,7 @@ import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.controller.router.Router;
 import org.exoplatform.web.login.onboarding.OnboardingHandler;
+import org.exoplatform.web.register.ExternalRegisterHandler;
 import org.exoplatform.web.security.Token;
 import org.exoplatform.web.security.security.RemindPasswordTokenService;
 
@@ -231,7 +231,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     String tokenId = remindPasswordTokenService.createToken(credentials, remindPasswordTokenService.EXTERNAL_REGISTRATION_TOKEN);
     StringBuilder redirectUrl = new StringBuilder();
     redirectUrl.append(url);
-    redirectUrl.append("/" + ExternalRegistrationHandler.NAME);
+    redirectUrl.append("/" + ExternalRegisterHandler.NAME);
     redirectUrl.append("?lang=" + I18N.toTagIdentifier(locale));
     redirectUrl.append("&token=" + tokenId);
 
@@ -289,7 +289,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
 
       StringBuilder redirectUrl = new StringBuilder();
       redirectUrl.append(url);
-      redirectUrl.append(ExternalRegistrationHandler.LOGIN);
+      redirectUrl.append(ExternalRegisterHandler.LOGIN);
 
       String emailBody = buildExternalConfirmationAccountEmailBody(user.getDisplayName(),
                                                                    user.getUserName(),
@@ -482,12 +482,12 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
   public String getExternalRegistrationURL(String tokenId, String lang) {
     Router router = webController.getRouter();
     Map<QualifiedName, String> params = new HashMap<>();
-    params.put(WebAppController.HANDLER_PARAM, ExternalRegistrationHandler.NAME);
+    params.put(WebAppController.HANDLER_PARAM, ExternalRegisterHandler.NAME);
     if (tokenId != null) {
-      params.put(ExternalRegistrationHandler.TOKEN, tokenId);
+      params.put(ExternalRegisterHandler.TOKEN, tokenId);
     }
     if (lang != null) {
-      params.put(ExternalRegistrationHandler.LANG, lang);
+      params.put(ExternalRegisterHandler.LANG, lang);
     }
     return router.render(params);
   }
