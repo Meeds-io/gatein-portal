@@ -27,37 +27,27 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
-import org.exoplatform.web.application.javascript.JavascriptConfigParser;
-import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.gatein.portal.controller.resource.ResourceId;
 import org.gatein.portal.controller.resource.ResourceScope;
+
+import org.exoplatform.web.application.javascript.JavascriptConfigParser;
+import org.exoplatform.web.application.javascript.JavascriptConfigService;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
 public class ScriptGraph {
 
+    protected static final Map<String, ScriptGroup>           LOAD_GROUPS = new HashMap<>();
+
     /** . */
     final EnumMap<ResourceScope, Map<String, ScriptResource>> resources;
 
-    /** . */
-    final Map<String, ScriptGroup> loadGroups;
-
-    /** . */
-    private static final Log log = ExoLogger.getExoLogger(ScriptGraph.class);
-
     public ScriptGraph() {
-        EnumMap<ResourceScope, Map<String, ScriptResource>> resources = new EnumMap<ResourceScope, Map<String, ScriptResource>>(
-                ResourceScope.class);
-        for (ResourceScope scope : ResourceScope.values()) {
-            resources.put(scope, new HashMap<String, ScriptResource>());
-        }
-
-        //
-        this.resources = resources;
-        this.loadGroups = new HashMap<String, ScriptGroup>();
+      this.resources = new EnumMap<>(ResourceScope.class);
+      for (ResourceScope scope : ResourceScope.values()) {
+        resources.put(scope, new HashMap<>());
+      }
     }
 
     /**
@@ -205,20 +195,14 @@ public class ScriptGraph {
         if (resource == null) {
             ScriptGroup group = null;
             if (groupName != null && contextPath != null) {
-                group = loadGroups.get(groupName);
-                if (group == null) {
-                    ResourceId grpId = new ResourceId(ResourceScope.GROUP, groupName);
-                    loadGroups.put(groupName, group = new ScriptGroup(this, grpId, contextPath));
-                    group.addDependency(id);
-                } else if (!contextPath.equals(group.contextPath)) {
-                    log.warn("Can't add cross context resource {} to {} group", id, groupName);
-                    group = null;
-                } else {
-                    group.addDependency(id);
-                }
+                group = LOAD_GROUPS.computeIfAbsent(groupName,
+                                                    grpName -> new ScriptGroup(this,
+                                                                               new ResourceId(ResourceScope.GROUP, grpName),
+                                                                               contextPath));
+                group.addDependency(id);
             }
-
-            map.put(name, resource = new ScriptResource(this, id, fetchMode, alias, group));
+            resource = new ScriptResource(this, id, fetchMode, alias, group);
+            map.put(name, resource);
         } else if (!(id.getScope().equals(ResourceScope.SHARED) && JavascriptConfigParser.LEGACY_JAVA_SCRIPT.equals(name))) {
             throw new IllegalStateException("Duplicate ResourceId : " + id + ", later resource definition will be ignored");
         }
@@ -249,6 +233,6 @@ public class ScriptGraph {
     }
 
     public ScriptGroup getLoadGroup(String groupName) {
-        return loadGroups.get(groupName);
+        return LOAD_GROUPS.get(groupName);
     }
 }
