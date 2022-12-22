@@ -156,7 +156,7 @@
     <component-plugin>
       <name>ExternalRegistrationHandler</name>
       <set-method>register</set-method>
-      <type>org.exoplatform.web.login.externalRegistration.ExternalRegistrationHandler</type>
+      <type>org.exoplatform.web.register.ExternalRegisterHandler</type>
     </component-plugin>
     <component-plugin>
       <name>UploadHandler</name>
