@@ -1,22 +1,21 @@
 /*
- * Copyright (C) 2020 eXo Platform SAS.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
+ * This file is part of the Meeds project (https://meeds.io/).
+ * 
+ * Copyright (C) 2020 - 2022 Meeds Association contact@meeds.io
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-
 package org.exoplatform.web.login.onboarding;
 
 import static org.exoplatform.web.security.security.CookieTokenService.ONBOARD_TOKEN;
@@ -141,8 +140,8 @@ public class OnboardingHandler extends JspBasedWebHandler {
     HttpServletResponse response = controllerContext.getResponse();
 
     Locale locale = request.getLocale();
-    ResourceBundle bundle = resourceBundleService.getResourceBundle(resourceBundleService.getSharedResourceBundleNames(),
-                                                                    locale);
+    ResourceBundle resourceBundle = resourceBundleService.getResourceBundle(resourceBundleService.getSharedResourceBundleNames(),
+                                                                            locale);
 
     String serveCaptcha = controllerContext.getParameter(SERVER_CAPTCHA);
     if ("true".equals(serveCaptcha)) {
@@ -166,8 +165,14 @@ public class OnboardingHandler extends JspBasedWebHandler {
       String requestedUsername = request.getParameter(USERNAME_PARAM);
       String captcha = request.getParameter(CAPTCHA_PARAM);
       if (!isValidCaptch(request.getSession(), captcha)) {
-        parameters.put(ERROR_MESSAGE_PARAM, bundle.getString("gatein.forgotPassword.captchaError"));
-      } else if (validateUserAndPassword(tokenUsername, requestedUsername, password, confirmPass, parameters, bundle, locale)) {
+        parameters.put(ERROR_MESSAGE_PARAM, resourceBundle.getString("gatein.forgotPassword.captchaError"));
+      } else if (validateUserAndPassword(tokenUsername,
+                                         requestedUsername,
+                                         password,
+                                         confirmPass,
+                                         parameters,
+                                         resourceBundle,
+                                         locale)) {
         if (passwordRecoveryService.changePass(token, ONBOARD_TOKEN, tokenUsername, password)) {
           String loginPath = servletContext.getContextPath() + "/login";
           User user = findUser(tokenUsername);
@@ -177,7 +182,7 @@ public class OnboardingHandler extends JspBasedWebHandler {
           response.sendRedirect(loginPath);
           return true;
         } else {
-          parameters.put(ERROR_MESSAGE_PARAM, bundle.getString("gatein.forgotPassword.resetPasswordFailure"));
+          parameters.put(ERROR_MESSAGE_PARAM, resourceBundle.getString("gatein.forgotPassword.resetPasswordFailure"));
         }
       }
       parameters.put(PASSWORD_PARAM, password);
@@ -233,6 +238,8 @@ public class OnboardingHandler extends JspBasedWebHandler {
                            HttpServletRequest request,
                            HttpServletResponse response,
                            Map<String, Object> parameters) throws Exception {
+    // Invalidate the Captcha
+    request.getSession().removeAttribute(NAME);
 
     super.prepareDispatch(controllerContext,
                           "PORTLET/social-portlet/InternalOnboarding",
@@ -267,7 +274,7 @@ public class OnboardingHandler extends JspBasedWebHandler {
     return message;
   }
 
-  private boolean serveCaptchaImage(HttpServletRequest req, HttpServletResponse resp) throws Exception { // NOSONAR
+  private boolean serveCaptchaImage(HttpServletRequest req, HttpServletResponse resp) {
     HttpSession session = req.getSession();
     Captcha captcha;
     if (session.getAttribute(NAME) == null) {
