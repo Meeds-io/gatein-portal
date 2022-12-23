@@ -36,7 +36,9 @@ import java.util.Random;
 import java.util.ResourceBundle;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -47,6 +49,8 @@ import org.json.JSONObject;
 
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.branding.BrandingService;
 import org.exoplatform.portal.resource.SkinService;
 import org.exoplatform.portal.rest.UserFieldValidator;
@@ -76,64 +80,83 @@ import nl.captcha.text.renderer.DefaultWordRenderer;
 
 public class ExternalRegisterHandler extends JspBasedWebHandler {
 
-  private static final Log               LOG                            = ExoLogger.getLogger(ExternalRegisterHandler.class);
+  private static final String            ADMINISTRATORS_GROUP                    = "/platform/administrators";
 
-  private static final QualifiedName     SERVER_CAPTCHA                 = QualifiedName.create("gtn", "serveCaptcha");
+  private static final Log               LOG                                     =
+                                             ExoLogger.getLogger(ExternalRegisterHandler.class);
 
-  public static final String             EMAIL_PARAM                    = "email";
+  private static final QualifiedName     SERVER_CAPTCHA                          = QualifiedName.create("gtn", "serveCaptcha");
 
-  public static final String             LASTNAME_PARAM                 = "lastName";
+  private static final String            REGISTERED_USER_MEMBERSHIPS_INIT_PARAMS = "registeredUserMemberships";
 
-  public static final String             FIRSTNAME_PARAM                = "firstName";
+  public static final String             USERNAME_PARAM                          = "username";
 
-  public static final String             PASSWORD_PARAM                 = "password";
+  public static final String             EMAIL_PARAM                             = "email";
 
-  public static final String             PASSWORD_CONFIRM_PARAM         = "password2";
+  public static final String             LASTNAME_PARAM                          = "lastName";
 
-  public static final UserFieldValidator PASSWORD_VALIDATOR             =
+  public static final String             FIRSTNAME_PARAM                         = "firstName";
+
+  public static final String             PASSWORD_PARAM                          = "password";
+
+  public static final String             PASSWORD_CONFIRM_PARAM                  = "password2";
+
+  public static final UserFieldValidator PASSWORD_VALIDATOR                      =
                                                             new UserFieldValidator(PASSWORD_PARAM, false, false, 8, 255);
 
-  public static final UserFieldValidator LASTNAME_VALIDATOR             = new UserFieldValidator(LASTNAME_PARAM, false, true);
+  public static final UserFieldValidator LASTNAME_VALIDATOR                      =
+                                                            new UserFieldValidator(LASTNAME_PARAM, false, true);
 
-  public static final UserFieldValidator FIRSTNAME_VALIDATOR            = new UserFieldValidator(FIRSTNAME_PARAM, false, true);
+  public static final UserFieldValidator FIRSTNAME_VALIDATOR                     =
+                                                             new UserFieldValidator(FIRSTNAME_PARAM, false, true);
 
-  public static final String             NAME                           = "external-registration";
+  public static final UserFieldValidator EMAIL_VALIDATOR                         =
+                                                         new UserFieldValidator(EMAIL_PARAM, false, false);
 
-  public static final QualifiedName      TOKEN                          = QualifiedName.create("gtn", "token");
+  public static final String             NAME                                    = "external-registration";
 
-  public static final QualifiedName      LANG                           = QualifiedName.create("gtn", "lang");
+  public static final QualifiedName      TOKEN                                   = QualifiedName.create("gtn", "token");
 
-  public static final QualifiedName      INIT_URL                       = QualifiedName.create("gtn", "initURL");
+  public static final QualifiedName      LANG                                    = QualifiedName.create("gtn", "lang");
 
-  public static final String             REQ_PARAM_ACTION               = "action";
+  public static final QualifiedName      INIT_URL                                = QualifiedName.create("gtn", "initURL");
 
-  public static final String             EXTERNALS_GROUP                = "/platform/externals";
+  public static final String             REQ_PARAM_ACTION                        = "action";
 
-  public static final String             LOGIN                          = "/login";
+  public static final String             EXTERNALS_GROUP                         = "/platform/externals";
 
-  public static final String             USERS_GROUP                    = "/platform/users";
+  public static final String             LOGIN                                   = "/login";
 
-  public static final String             CAPTCHA_PARAM                  = "captcha";
+  public static final String             USERS_GROUP                             = "/platform/users";
 
-  public static final String             ACTION_PARAM                   = "action";
+  public static final String             CAPTCHA_PARAM                           = "captcha";
 
-  public static final String             SAVE_EXTERNAL_ACTION           = "saveExternal";
+  public static final String             ACTION_PARAM                            = "action";
 
-  public static final String             EXPIRED_ACTION_NAME            = "expired";
+  public static final String             SAVE_EXTERNAL_ACTION                    = "saveExternal";
 
-  public static final String             ERROR_MESSAGE_PARAM            = "error";
+  public static final String             EXPIRED_ACTION_NAME                     = "expired";
 
-  public static final String             TOKEN_ID_PARAM                 = "tokenId";
+  public static final String             ERROR_MESSAGE_PARAM                     = "error";
 
-  public static final String             SUCCESS_MESSAGE_PARAM          = "success";
+  public static final String             TOKEN_ID_PARAM                          = "tokenId";
 
-  public static final int                CAPTCHA_WIDTH                  = 200;
+  public static final int                CAPTCHA_WIDTH                           = 200;
 
-  public static final int                CAPTCHA_HEIGHT                 = 50;
+  public static final int                CAPTCHA_HEIGHT                          = 50;
 
-  public static final String             EXTERNAL_REGISTRATION_JSP_PATH = "/WEB-INF/jsp/externalRegistration/init_account.jsp"; // NOSONAR
+  public static final String             EXTERNAL_REGISTRATION_JSP_PATH          =
+                                                                        "/WEB-INF/jsp/externalRegistration/init_account.jsp";  // NOSONAR
 
-  private static final String            MEMBER                         = "member";
+  private static final String            MEMBER                                  = "member";
+
+  public static final String             USERNAME_REQUEST_PARAM                  = "username";
+
+  public static final String             PASSWORD_REQUEST_PARAM                  = "password";
+
+  public static final String             INITIAL_URI_PARAM                       = "initialURI";
+
+  private PortalContainer                container;
 
   private ServletContext                 servletContext;
 
@@ -145,6 +168,8 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
 
   private OrganizationService            organizationService;
 
+  private List<String>                   registeredUserMemberships;
+
   public ExternalRegisterHandler(PortalContainer container, // NOSONAR
                                  RemindPasswordTokenService remindPasswordTokenService,
                                  PasswordRecoveryService passwordRecoveryService,
@@ -153,13 +178,26 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
                                  LocaleConfigService localeConfigService,
                                  BrandingService brandingService,
                                  JavascriptConfigService javascriptConfigService,
-                                 SkinService skinService) {
+                                 SkinService skinService,
+                                 InitParams params) {
     super(localeConfigService, brandingService, javascriptConfigService, skinService);
+    this.container = container;
     this.servletContext = container.getPortalContext();
     this.remindPasswordTokenService = remindPasswordTokenService;
     this.passwordRecoveryService = passwordRecoveryService;
     this.resourceBundleService = resourceBundleService;
     this.organizationService = organizationService;
+    if (params != null && params.containsKey(REGISTERED_USER_MEMBERSHIPS_INIT_PARAMS)) {
+      registeredUserMemberships =
+                                Arrays.asList(params.getValueParam(REGISTERED_USER_MEMBERSHIPS_INIT_PARAMS).getValue().split(","))
+                                      .stream()
+                                      .map(StringUtils::trim)
+                                      .filter(StringUtils::isNotBlank)
+                                      .toList();
+    }
+    if (CollectionUtils.isEmpty(registeredUserMemberships)) {
+      registeredUserMemberships = Collections.singletonList(EXTERNALS_GROUP);
+    }
   }
 
   @Override
@@ -168,9 +206,13 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
   }
 
   @Override
-  public boolean execute(ControllerContext controllerContext) throws Exception {
+  public boolean execute(ControllerContext controllerContext) throws Exception {// NOSONAR
     HttpServletRequest request = controllerContext.getRequest();
     HttpServletResponse response = controllerContext.getResponse();
+
+    if (request.getRemoteUser() != null) {
+      return false;
+    }
 
     Locale locale = request.getLocale();
     ResourceBundle resourceBundle = resourceBundleService.getResourceBundle(resourceBundleService.getSharedResourceBundleNames(),
@@ -182,25 +224,26 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
     }
 
     String token = controllerContext.getParameter(TOKEN);
-    Map<String, Object> parameters = new HashMap<>();
-    Credentials credentials = StringUtils.isBlank(token) ? null
-                                                         : passwordRecoveryService.verifyToken(token,
-                                                                                               EXTERNAL_REGISTRATION_TOKEN);
+    Credentials credentials = getStoredCredentials(token);
     if (credentials == null) {
-      parameters.put(ACTION_PARAM, EXPIRED_ACTION_NAME);
       // Token expired
-      return dispatch(controllerContext, request, response, parameters);
-    }
-
-    String requestAction = request.getParameter(REQ_PARAM_ACTION);
-    String email = credentials.getUsername();
-
-    if (findUser(email) != null) {
-      redirectToLogin(request, response, email);
+      return dispatch(controllerContext,
+                      request,
+                      response,
+                      Collections.singletonMap(ACTION_PARAM, EXPIRED_ACTION_NAME));
+    } else if (findUser(credentials.getUsername()) != null) {
+      // User already exists
+      redirectToLoginPage(request,
+                          response,
+                          credentials.getUsername());
       return true;
     }
 
+    Map<String, Object> parameters = new HashMap<>();
+    String requestAction = request.getParameter(REQ_PARAM_ACTION);
+    String initialUri = request.getParameter(INITIAL_URI_PARAM);
     if (SAVE_EXTERNAL_ACTION.equalsIgnoreCase(requestAction)) {
+      String requestUsername = request.getParameter(USERNAME_PARAM);
       String requestEmail = request.getParameter(EMAIL_PARAM);
       String firstName = request.getParameter(FIRSTNAME_PARAM);
       String lastName = request.getParameter(LASTNAME_PARAM);
@@ -210,34 +253,57 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
 
       if (!isValidCaptch(request.getSession(), captcha)) {
         parameters.put(ERROR_MESSAGE_PARAM, resourceBundle.getString("gatein.forgotPassword.captchaError"));
-      } else if (validateUserAndPassword(email, requestEmail, password, confirmPass, parameters, resourceBundle, locale)
-          && validateUserFullName(firstName, lastName, parameters, locale)) {
+      } else if (isValidUserAndPassword(credentials.getUsername(),
+                                        requestUsername,
+                                        requestEmail,
+                                        password,
+                                        confirmPass,
+                                        parameters,
+                                        resourceBundle,
+                                        locale)
+          && isValidUserFullName(firstName, lastName, parameters, locale)) {
         try {
-          String username = createExternalUser(email, firstName, lastName, password);
+          String username = createUser(requestUsername, requestEmail, firstName, lastName, password);
           passwordRecoveryService.sendExternalConfirmationAccountEmail(username, locale, getBaseUrl(request));
-          remindPasswordTokenService.deleteTokensByUsernameAndType(email, CookieTokenService.EXTERNAL_REGISTRATION_TOKEN);
-          redirectToLogin(request, response, email);
+          remindPasswordTokenService.deleteTokensByUsernameAndType(username, CookieTokenService.EXTERNAL_REGISTRATION_TOKEN);
+
+          wrapForAutomaticLogin(request, response, initialUri, username, password);
           return true;
         } catch (Exception e) {
           LOG.warn("Error while registering external user", e);
           parameters.put(ERROR_MESSAGE_PARAM, resourceBundle.getString("external.registration.fail.create.user"));
         }
       }
+      parameters.put(EMAIL_PARAM, requestEmail);
       parameters.put(FIRSTNAME_PARAM, firstName);
       parameters.put(LASTNAME_PARAM, lastName);
       parameters.put(PASSWORD_PARAM, password);
       parameters.put(PASSWORD_CONFIRM_PARAM, confirmPass);
     }
-    parameters.put(EMAIL_PARAM, escapeXssCharacters(email));
+
+    // Token can be generated using email or username (Metamask for example)
+    if (StringUtils.contains(credentials.getUsername(), "@")) {
+      parameters.put(EMAIL_PARAM, escapeXssCharacters(credentials.getUsername()));
+    } else {
+      parameters.put(USERNAME_PARAM, escapeXssCharacters(credentials.getUsername()));
+    }
     parameters.put(TOKEN_ID_PARAM, token);
+    parameters.put(INITIAL_URI_PARAM, initialUri);
 
     return dispatch(controllerContext, request, response, parameters);
   }
 
-  private boolean validateUserFullName(String firstName,
-                                       String lastName,
-                                       Map<String, Object> parameters,
-                                       Locale locale) {
+  private Credentials getStoredCredentials(String token) {
+    if (StringUtils.isBlank(token)) {
+      return null;
+    }
+    return passwordRecoveryService.verifyToken(token, EXTERNAL_REGISTRATION_TOKEN);
+  }
+
+  private boolean isValidUserFullName(String firstName,
+                                      String lastName,
+                                      Map<String, Object> parameters,
+                                      Locale locale) {
     String errorMessage = FIRSTNAME_VALIDATOR.validate(locale, firstName);
     if (StringUtils.isBlank(errorMessage)) {
       errorMessage = LASTNAME_VALIDATOR.validate(locale, lastName);
@@ -250,50 +316,76 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
     }
   }
 
-  private boolean validateUserAndPassword(String tokenUsername,
-                                          String requestedUsername,
-                                          String password,
-                                          String confirmPass,
-                                          Map<String, Object> parameters,
-                                          ResourceBundle bundle,
-                                          Locale locale) {
-    if (requestedUsername == null || !requestedUsername.equals(tokenUsername)) {
+  private boolean isValidUserAndPassword(String tokenUsernameOrEmail, // NOSONAR
+                                         String username,
+                                         String email,
+                                         String password,
+                                         String confirmPass,
+                                         Map<String, Object> parameters,
+                                         ResourceBundle bundle,
+                                         Locale locale) {
+    boolean isEmailToken = StringUtils.contains(tokenUsernameOrEmail, "@");
+    boolean notSameUser = StringUtils.isBlank(tokenUsernameOrEmail)
+        || (StringUtils.isBlank(username) && StringUtils.isBlank(email))
+        || (isEmailToken && !StringUtils.equals(tokenUsernameOrEmail, email))
+        || (!isEmailToken && !StringUtils.equals(tokenUsernameOrEmail, username));
+    if (notSameUser) {
       String errorMessage = bundle.getString("gatein.forgotPassword.usernameChanged");
-      errorMessage = errorMessage.replace("{0}", tokenUsername);
+      errorMessage = errorMessage.replace("{0}", tokenUsernameOrEmail);
       parameters.put(ERROR_MESSAGE_PARAM, errorMessage);
-      return false;
     } else if (!StringUtils.equals(password, confirmPass)) {
       parameters.put(ERROR_MESSAGE_PARAM, bundle.getString("gatein.forgotPassword.confirmPasswordNotMatch"));
-      return false;
     } else {
       String errorMessage = PASSWORD_VALIDATOR.validate(locale, password);
       if (StringUtils.isNotBlank(errorMessage)) {
         parameters.put(ERROR_MESSAGE_PARAM, errorMessage);
-        return false;
+      } else if (!isEmailToken) {
+        // User added an email in registration form
+        // which wasn't provided at first place in token
+        // generation
+        errorMessage = EMAIL_VALIDATOR.validate(locale, email);
+        if (StringUtils.isNotBlank(errorMessage)) {
+          parameters.put(ERROR_MESSAGE_PARAM, errorMessage);
+        }
       }
     }
-    return true;
+    return !parameters.containsKey(ERROR_MESSAGE_PARAM);
   }
 
-  private String createExternalUser(String email, String firstName, String lastName, String password) throws Exception {
-    String username = generateExternalRegistrationUsername(firstName, lastName);
-    User externalUser = organizationService.getUserHandler().createUserInstance(username);
-    externalUser.setFirstName(firstName);
-    externalUser.setLastName(lastName);
-    externalUser.setPassword(password);
-    if (email != null) {
-      externalUser.setEmail(email);
+  private String createUser(String username, String email, String firstName, String lastName, String password) throws Exception {
+    if (StringUtils.isBlank(username)) {
+      username = generateUsername(firstName, lastName);
     }
-    organizationService.getUserHandler().createUser(externalUser, true);
-    deleteFromInternalUsersGroup(username);
+    User user = organizationService.getUserHandler().createUserInstance(username);
+    user.setFirstName(firstName);
+    user.setLastName(lastName);
+    user.setPassword(password);
+    user.setEmail(email);
+    organizationService.getUserHandler().createUser(user, true);
 
-    Group externalUsersGroup = organizationService.getGroupHandler().findGroupById(EXTERNALS_GROUP);
+    Collection<Membership> memberships = organizationService.getMembershipHandler()
+                                                            .findMembershipsByUserAndGroup(username, ADMINISTRATORS_GROUP);
+    boolean isAdministrator = CollectionUtils.isNotEmpty(memberships);
+    if (!isAdministrator) {
+      // Avoid incoherence by indicating an admin user
+      // As external
+      deleteFromInternalUsersGroup(username);
+    }
+
     MembershipType memberMembershipType = organizationService.getMembershipTypeHandler().findMembershipType(MEMBER);
-    organizationService.getMembershipHandler()
-                       .linkMembership(externalUser,
-                                       externalUsersGroup,
-                                       memberMembershipType,
-                                       true);
+    for (String groupId : registeredUserMemberships) {
+      Group group = organizationService.getGroupHandler().findGroupById(groupId);
+      if (group == null) {
+        LOG.warn("Group with id {} wasn't found, the newly registered user will not be added into it", groupId);
+      } else if (!isAdministrator || !StringUtils.equals(groupId, EXTERNALS_GROUP)) {
+        // Avoid incoherence by indicating an admin user As external
+        organizationService.getMembershipHandler()
+                           .linkMembership(user,
+                                           group,
+                                           memberMembershipType,
+                                           true);
+      }
+    }
     return username;
   }
 
@@ -342,11 +434,14 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
     return true;
   }
 
-  private void redirectToLogin(HttpServletRequest request, HttpServletResponse response, String email) throws IOException {
+  private void redirectToLoginPage(HttpServletRequest request, HttpServletResponse response,
+                                   String initialUri) throws IOException {
     // Invalidate the Captcha
     request.getSession().removeAttribute(NAME);
 
-    response.sendRedirect(servletContext.getContextPath() + LOGIN + "?email=" + email);
+    String path = !StringUtils.startsWith(initialUri, "/") ? servletContext.getContextPath() + LOGIN
+                                                           : response.encodeRedirectURL(initialUri);
+    response.sendRedirect(path);
   }
 
   @Override
@@ -413,7 +508,7 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
     }
   }
 
-  private String generateExternalRegistrationUsername(String firstname, String lastname) throws Exception {
+  private String generateUsername(String firstname, String lastname) throws Exception {
     String userNameBase = new StringBuffer(firstname.replaceAll("\\s", "")).append(".")
                                                                            .append(lastname.replaceAll("\\s", ""))
                                                                            .toString()
@@ -433,4 +528,58 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
   private String unAccent(String src) {
     return Normalizer.normalize(src, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").replace("'", "");
   }
+
+  private void wrapForAutomaticLogin(HttpServletRequest request, HttpServletResponse response, String initialUri, String username,
+                                     String password) throws ServletException, IOException {
+    restartTransaction();
+    HttpServletRequestWrapper wrappedRequestForLogin = wrapRequestForLogin(request, username, password, initialUri);
+    servletContext.getRequestDispatcher(servletContext.getContextPath() + LOGIN).include(wrappedRequestForLogin, response);
+    redirectToLoginPage(request, response, initialUri);
+  }
+
+  private HttpServletRequestWrapper wrapRequestForLogin(HttpServletRequest request,
+                                                        String username,
+                                                        String password,
+                                                        String initialUri) {
+
+    return new HttpServletRequestWrapper(request) {
+      @Override
+      public String getParameter(String name) {
+        if (StringUtils.equals(name, USERNAME_REQUEST_PARAM)) {
+          return username;
+        } else if (StringUtils.equals(name, PASSWORD_REQUEST_PARAM)) {
+          return password;
+        } else if (StringUtils.equals(name, INITIAL_URI_PARAM)) {
+          return initialUri;
+        } else {
+          return super.getParameter(name);
+        }
+      }
+
+      @Override
+      public String getRequestURI() {
+        return servletContext.getContextPath() + LOGIN;
+      }
+    };
+  }
+
+  private void restartTransaction() {
+    int i = 0;
+    // Close transactions until no encapsulated transaction
+    boolean success = true;
+    do {
+      try {
+        RequestLifeCycle.end();
+        i++;
+      } catch (IllegalStateException e) {
+        success = false;
+      }
+    } while (success);
+
+    // Restart transactions with the same number of encapsulations
+    for (int j = 0; j < i; j++) {
+      RequestLifeCycle.begin(container);
+    }
+  }
+
 }
