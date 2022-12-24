@@ -19,13 +19,13 @@
 
 package org.exoplatform.web.login.recovery;
 
-import org.exoplatform.services.organization.User;
-
-import org.gatein.wci.security.Credentials;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.Locale;
+import org.gatein.wci.security.Credentials;
+
+import org.exoplatform.services.organization.User;
 
 /**
  * @author <a href="mailto:tuyennt@exoplatform.com">Tuyen Nguyen The</a>.
@@ -47,12 +47,35 @@ public interface PasswordRecoveryService {
                                           String email,
                                           Locale locale,
                                           String space,
-                                          StringBuilder url) throws Exception;
+                                          StringBuilder url) throws Exception; // NOSONAR
+
+  /**
+   * Send An Onboarding email to registered user on the platform. The
+   * registration can be made through space invitation or through a register
+   * form, thus, the space and sender invitations can be null.
+   * 
+   * @param  sender          Username who sent the invitation from space
+   * @param  email           the invited email
+   * @param  locale          the user {@link Locale}
+   * @param  space           the space from which the user was invited
+   * @param  url             the base url of the current installation
+   * @param  spaceInvitation whether this is a space invitation or not
+   * @return                 generated token for external user registration
+   * @throws Exception       when IDM or any other exception occurs while
+   *                           generating token or sending email
+   */
+  default String sendExternalRegisterEmail(String sender,
+                                          String email,
+                                          Locale locale,
+                                          String space,
+                                          StringBuilder url,
+                                          boolean spaceInvitation) throws Exception {// NOSONAR
+    throw new UnsupportedOperationException();
+  }
 
   public boolean sendExternalConfirmationAccountEmail(String sender, Locale locale, StringBuilder url);
 
-  public boolean allowChangePassword(String username) throws Exception;
-  // EXOGTN-2114 Workaround for Java 8 Backward compatibility.
+  public boolean allowChangePassword(String username) throws Exception; // NOSONAR
 
   String getPasswordRecoverURL(String tokenId, String lang);
 
@@ -61,4 +84,5 @@ public interface PasswordRecoveryService {
   String getExternalRegistrationURL(String tokenId, String lang);
 
   public ChangePasswordConnector getActiveChangePasswordConnector();
+
 }
