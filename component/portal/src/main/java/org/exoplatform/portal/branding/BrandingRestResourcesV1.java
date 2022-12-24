@@ -38,10 +38,15 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 @Path("/v1/platform/branding")
 @Tag(name = "/v1/platform/branding", description = "Managing branding information")
 public class BrandingRestResourcesV1 implements ResourceContainer {
-  private static final Log LOG = ExoLogger.getLogger(BrandingRestResourcesV1.class);
+
+  private static final Log    LOG                    = ExoLogger.getLogger(BrandingRestResourcesV1.class);
+
+  private static final String IMAGE_MIME_TYPE        = "image/png";
 
   // 1 year
-  private static final int CACHE_IN_MILLI_SECONDS = 365 * 86400 * 1000;
+  private static final int    CACHE_IN_SECONDS       = 365 * 24 * 3600;
+
+  private static final int    CACHE_IN_MILLI_SECONDS = CACHE_IN_SECONDS * 1000;
 
   private BrandingService brandingService;
 
@@ -94,7 +99,7 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
 
   @GET
   @Path("/logo")
-  @Produces("image/png")
+  @Produces(IMAGE_MIME_TYPE)
   @Operation(
           summary = "Get Branding logo", 
           description = "Get Branding logo",
@@ -105,7 +110,9 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
           @ApiResponse(responseCode = "500", description = "Server error when retrieving branding logo") })
   public Response getBrandingLogo(@Context Request request,
                                   @Parameter(description = "The value of lastModified parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'")
-                                  @QueryParam("lastModified") String lastModified) {
+                                  @QueryParam("lastModified") String lastModified,
+                                  @Parameter(description = "The value of version parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'")
+                                  @QueryParam("v") String version) {
 
     Logo logo = brandingService.getLogo();
     if (logo == null) {
@@ -120,23 +127,23 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
     Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
     if (builder == null) {
       InputStream stream = new ByteArrayInputStream(logo.getData());
-      builder = Response.ok(stream, "image/png");
-      builder.tag(eTag);
+      builder = Response.ok(stream, IMAGE_MIME_TYPE);
+      // If the query has a lastModified parameter, it means that the client
+      // will change the lastModified entry when it really changes
+      // Which means that we can cache the image in browser side
+      // for a long time
+      if (StringUtils.isNotBlank(lastModified) || StringUtils.isNotBlank(version)) {
+        CacheControl cc = new CacheControl();
+        cc.setMaxAge(CACHE_IN_SECONDS);
+        builder.tag(eTag);
+        builder.lastModified(new Date(lastUpdated));
+        builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
+        builder.cacheControl(cc);
+      }
+    } else {
+      builder = Response.notModified(eTag);
     }
-    CacheControl cc = new CacheControl();
-    cc.setMaxAge(86400);
-    builder.type("image/png");
-    builder.tag(eTag);
-    builder.lastModified(new Date(lastUpdated));
-    // If the query has a lastModified parameter, it means that the client
-    // will change the lastModified entry when it really changes
-    // Which means that we can cache the image in browser side
-    // for a long time
-    if (StringUtils.isNotBlank(lastModified)) {
-      builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
-    }
-    builder.cacheControl(cc);
-    return builder.cacheControl(cc).build();
+    return builder.build();
   }
 
   @GET
@@ -203,7 +210,7 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
     Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
     if (builder == null) {
       InputStream stream = new ByteArrayInputStream(logo.getData());
-      builder = Response.ok(stream, "image/png");
+      builder = Response.ok(stream, IMAGE_MIME_TYPE);
       builder.tag(eTag);
     }
     CacheControl cc = new CacheControl();
