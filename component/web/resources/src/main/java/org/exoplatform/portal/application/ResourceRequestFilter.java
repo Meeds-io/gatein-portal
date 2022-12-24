@@ -132,7 +132,7 @@ public class ResourceRequestFilter extends AbstractFilter {
                             }
                             httpResponse.setContentType(img.type.getMimeType());
                             httpResponse.setContentLength(img.bytes.length);
-                            httpResponse.setHeader("Cache-Control", "public,max-age=2592000");
+                            httpResponse.setHeader("Cache-Control", "public,max-age=" + ResourceRequestHandler.MAX_AGE);
                             processIfModified(imgLastModified, httpResponse);
 
                             OutputStream out = httpResponse.getOutputStream();
@@ -156,7 +156,7 @@ public class ResourceRequestFilter extends AbstractFilter {
         }
 
         //
-        httpResponse.addHeader("Cache-Control", "max-age=2592000");
+        httpResponse.addHeader("Cache-Control", "max-age=" + ResourceRequestHandler.MAX_AGE);
         httpResponse.setDateHeader(ResourceRequestFilter.EXPIRES, System.currentTimeMillis() + ResourceRequestHandler.MAX_AGE * 1000);
         chain.doFilter(request, response);
     }

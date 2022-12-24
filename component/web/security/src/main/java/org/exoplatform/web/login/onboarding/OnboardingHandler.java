@@ -98,8 +98,6 @@ public class OnboardingHandler extends JspBasedWebHandler {
 
   public static final String             TOKEN_ID_PARAM             = "tokenId";
 
-  public static final String             SUCCESS_MESSAGE_PARAM      = "success";
-
   public static final int                CAPTCHA_WIDTH              = 200;
 
   public static final int                CAPTCHA_HEIGHT             = 50;

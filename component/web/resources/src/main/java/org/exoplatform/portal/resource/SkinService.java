@@ -134,7 +134,7 @@ public class SkinService extends AbstractResourceService implements Startable {
   public static final long                                      MAX_AGE;
 
   static {
-    long seconds = 604800;
+    long seconds = 31536000L;
     String propValue = PropertyManager.getProperty("gatein.assets.css.max-age");
     if (propValue != null) {
       try {
