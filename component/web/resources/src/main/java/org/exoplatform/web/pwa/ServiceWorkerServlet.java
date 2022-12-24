@@ -9,6 +9,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.gatein.portal.controller.resource.ResourceRequestHandler;
+
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.web.AbstractHttpServlet;
@@ -63,8 +65,8 @@ public class ServiceWorkerServlet extends AbstractHttpServlet {
 
     try {
       resp.setHeader("Service-Worker-Allowed", "/");
-      resp.setHeader("Cache-Control", "max-age=31536000");
-      resp.setDateHeader("Expires", System.currentTimeMillis() + 3600000);
+      resp.setHeader("Cache-Control", "max-age=" +  + ResourceRequestHandler.MAX_AGE);
+      resp.setDateHeader("Expires", System.currentTimeMillis() +  + ResourceRequestHandler.MAX_AGE * 1000);
       resp.setHeader("Content-Type", "text/javascript");
 
       PrintWriter writer = resp.getWriter();
