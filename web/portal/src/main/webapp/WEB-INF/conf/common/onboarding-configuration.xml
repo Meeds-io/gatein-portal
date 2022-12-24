@@ -22,7 +22,7 @@
     xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-    <type>org.exoplatform.web.login.onboarding.OnboardingUIParamsForRegister</type>
+    <type>org.exoplatform.web.register.RegisterUIParamsExtension</type>
     <init-params>
       <value-param>
         <name>enabled</name>
@@ -30,32 +30,5 @@
       </value-param>
     </init-params>
   </component>
-
-  <external-component-plugins>
-    <target-component>org.exoplatform.web.filter.ExtensibleFilter</target-component>
-    <component-plugin>
-      <name>Onboarding Register Filter</name>
-      <set-method>addFilterDefinitions</set-method>
-      <type>org.exoplatform.web.filter.FilterDefinitionPlugin</type>
-      <priority>3</priority>
-      <init-params>
-        <object-param>
-          <name>Onboarding Register Filter</name>
-          <object type="org.exoplatform.web.filter.FilterDefinition">
-            <field name="filter">
-              <object type="org.exoplatform.web.login.onboarding.OnboardingRegisterFilter" />
-            </field>
-            <field name="patterns">
-              <collection type="java.util.ArrayList" item-type="java.lang.String">
-                <value>
-                  <string>/register</string>
-                </value>
-              </collection>
-            </field>
-          </object>
-        </object-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
 
 </configuration>

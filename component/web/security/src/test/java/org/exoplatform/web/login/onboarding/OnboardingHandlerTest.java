@@ -23,7 +23,6 @@ import static org.exoplatform.web.login.onboarding.OnboardingHandler.NAME;
 import static org.exoplatform.web.login.onboarding.OnboardingHandler.PASSWORD_CONFIRM_PARAM;
 import static org.exoplatform.web.login.onboarding.OnboardingHandler.PASSWORD_PARAM;
 import static org.exoplatform.web.login.onboarding.OnboardingHandler.RESET_PASSWORD_ACTION_NAME;
-import static org.exoplatform.web.login.onboarding.OnboardingHandler.SUCCESS_MESSAGE_PARAM;
 import static org.exoplatform.web.login.onboarding.OnboardingHandler.TOKEN;
 import static org.exoplatform.web.login.onboarding.OnboardingHandler.TOKEN_ID_PARAM;
 import static org.exoplatform.web.login.onboarding.OnboardingHandler.USERNAME_PARAM;
@@ -229,7 +228,6 @@ public class OnboardingHandlerTest {
 
     assertNotNull(applicationParameters);
     assertFalse(applicationParameters.containsKey(ERROR_MESSAGE_PARAM));
-    assertFalse(applicationParameters.containsKey(SUCCESS_MESSAGE_PARAM));
     assertEquals(EXPIRED_ACTION_NAME, applicationParameters.get(ACTION_PARAM));
 
     verify(passwordRecoveryService, never()).changePass(any(), any(), any(), any());
@@ -246,7 +244,6 @@ public class OnboardingHandlerTest {
     assertEquals(TOKEN_VALUE, applicationParameters.get(TOKEN_ID_PARAM));
     assertEquals(RESET_PASSWORD_ACTION_NAME, applicationParameters.get(ACTION_PARAM));
     assertFalse(applicationParameters.containsKey(ERROR_MESSAGE_PARAM));
-    assertFalse(applicationParameters.containsKey(SUCCESS_MESSAGE_PARAM));
 
     verify(passwordRecoveryService, never()).changePass(any(), any(), any(), any());
   }
@@ -270,7 +267,6 @@ public class OnboardingHandlerTest {
     assertEquals(TOKEN_VALUE, applicationParameters.get(TOKEN_ID_PARAM));
     assertEquals(RESET_PASSWORD_ACTION_NAME, applicationParameters.get(ACTION_PARAM));
     assertEquals("gatein.forgotPassword.usernameChanged", applicationParameters.get(ERROR_MESSAGE_PARAM));
-    assertFalse(applicationParameters.containsKey(SUCCESS_MESSAGE_PARAM));
     assertEquals(password, applicationParameters.get(PASSWORD_PARAM));
     assertEquals(passwordConfirm, applicationParameters.get(PASSWORD_CONFIRM_PARAM));
 
@@ -296,7 +292,6 @@ public class OnboardingHandlerTest {
     assertEquals(TOKEN_VALUE, applicationParameters.get(TOKEN_ID_PARAM));
     assertEquals(RESET_PASSWORD_ACTION_NAME, applicationParameters.get(ACTION_PARAM));
     assertEquals("gatein.forgotPassword.confirmPasswordNotMatch", applicationParameters.get(ERROR_MESSAGE_PARAM));
-    assertFalse(applicationParameters.containsKey(SUCCESS_MESSAGE_PARAM));
     assertEquals(password, applicationParameters.get(PASSWORD_PARAM));
     assertEquals(passwordConfirm, applicationParameters.get(PASSWORD_CONFIRM_PARAM));
 
@@ -329,7 +324,6 @@ public class OnboardingHandlerTest {
     assertEquals(TOKEN_VALUE, applicationParameters.get(TOKEN_ID_PARAM));
     assertEquals(RESET_PASSWORD_ACTION_NAME, applicationParameters.get(ACTION_PARAM));
     assertEquals("onboarding.login.passwordCondition", applicationParameters.get(ERROR_MESSAGE_PARAM));
-    assertFalse(applicationParameters.containsKey(SUCCESS_MESSAGE_PARAM));
 
     verify(passwordRecoveryService, never()).changePass(any(), any(), any(), any());
   }
