@@ -69,6 +69,8 @@ public class LoginHandler extends JspBasedWebHandler {
 
   private static final String     LOGIN_EXTENSION_JS_MODULES = "LoginExtension";
 
+  public static final String      ERROR_MESSAGE_PARAM        = "error";
+
   private boolean                 caseInsensitive;
 
   private PortalContainer         container;
@@ -186,7 +188,8 @@ public class LoginHandler extends JspBasedWebHandler {
       }
       if (request.getRemoteUser() != null) {
         status = LoginStatus.AUTHENTICATED;
-        // Delete user forgot-password tokens to invalidate recover password email link
+        // Delete user forgot-password tokens to invalidate recover password
+        // email link
         CookieTokenService tokenService = AbstractTokenService.getInstance(CookieTokenService.class);
         tokenService.deleteTokensByUsernameAndType(username, CookieTokenService.FORGOT_PASSWORD_TOKEN);
       }
@@ -223,9 +226,7 @@ public class LoginHandler extends JspBasedWebHandler {
     String disabledUser = (String) request.getAttribute(FilterDisabledLoginModule.DISABLED_USER_NAME);
     boolean meetDisabledUser = disabledUser != null;
     if (ssoHelper.skipJSPRedirection() && meetDisabledUser) {
-      response.setContentType(TEXT_HTML_CONTENT_TYPE);
-      request.setAttribute("", ssoHelper);
-      servletContext.getRequestDispatcher("/WEB-INF/jsp/login/disabled.jsp").include(request, response);
+      dispatch(context, loginJspPath, LoginStatus.DISABLED_USER);
     } else if (ssoHelper.skipJSPRedirection()) {
       String ssoRedirectUrl = request.getContextPath() + ssoHelper.getSSORedirectURLSuffix();
       ssoRedirectUrl = response.encodeRedirectURL(ssoRedirectUrl);
@@ -238,7 +239,7 @@ public class LoginHandler extends JspBasedWebHandler {
         status = LoginStatus.DISABLED_USER;
       }
       Object ssoStatus = request.getAttribute("SSO.Login.Status");
-      if(ssoStatus != null) {
+      if (ssoStatus != null) {
         status = LoginStatus.valueOf((String) ssoStatus);
       }
       dispatch(context, loginPath.toString(), status);
@@ -257,8 +258,7 @@ public class LoginHandler extends JspBasedWebHandler {
         users = userHandler.findUsersByQuery(emailQuery);
         if (users != null && users.getSize() > 0) {
           return users.load(0, 1)[0].getUserName();
-        }
-        else {
+        } else {
           LOG.debug("Can not get users by email");
           dispatch(context, loginPath.toString(), LoginStatus.FAILED);
         }
@@ -333,7 +333,7 @@ public class LoginHandler extends JspBasedWebHandler {
   /**
    * Get exact username from database
    * 
-   * @param username
+   * @param  username
    * @return
    */
   private String getExactUserName(String username) {
@@ -395,8 +395,8 @@ public class LoginHandler extends JspBasedWebHandler {
       params.put("authenticationTitle", PropertyManager.getProperty("portal.authentication.title"));
       params.put("authenticationSubtitle", PropertyManager.getProperty("portal.authentication.subtitle"));
 
-      if (status != LoginStatus.AUTHENTICATED && status != LoginStatus.UNAUTHENTICATED) {
-        params.put("errorCode", status.getErrorCode());
+      if (StringUtils.isNotBlank(status.getErrorCode())) {
+        params.put(ERROR_MESSAGE_PARAM, status.getErrorCode());
       }
 
       List<UIParamsExtension> paramsExtensions = this.container.getComponentInstancesOfType(UIParamsExtension.class);

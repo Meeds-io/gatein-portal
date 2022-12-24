@@ -112,7 +112,7 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
         log.info("Use version \"" + version + "\" for resource serving");
         VERSION = version;
 
-        long seconds = 604800L;
+        long seconds = 31536000L;
         String propValue = PropertyManager.getProperty("gatein.assets.script.max-age");
         if (StringUtils.isNotBlank(propValue)) {
             try {

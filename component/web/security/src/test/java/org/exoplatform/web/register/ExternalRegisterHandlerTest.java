@@ -22,11 +22,11 @@ import static org.exoplatform.web.register.ExternalRegisterHandler.ERROR_MESSAGE
 import static org.exoplatform.web.register.ExternalRegisterHandler.EXPIRED_ACTION_NAME;
 import static org.exoplatform.web.register.ExternalRegisterHandler.FIRSTNAME_PARAM;
 import static org.exoplatform.web.register.ExternalRegisterHandler.LASTNAME_PARAM;
+import static org.exoplatform.web.register.ExternalRegisterHandler.LOGIN;
 import static org.exoplatform.web.register.ExternalRegisterHandler.NAME;
 import static org.exoplatform.web.register.ExternalRegisterHandler.PASSWORD_CONFIRM_PARAM;
 import static org.exoplatform.web.register.ExternalRegisterHandler.PASSWORD_PARAM;
 import static org.exoplatform.web.register.ExternalRegisterHandler.SAVE_EXTERNAL_ACTION;
-import static org.exoplatform.web.register.ExternalRegisterHandler.SUCCESS_MESSAGE_PARAM;
 import static org.exoplatform.web.register.ExternalRegisterHandler.TOKEN;
 import static org.exoplatform.web.register.ExternalRegisterHandler.TOKEN_ID_PARAM;
 import static org.junit.Assert.assertEquals;
@@ -67,6 +67,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.branding.BrandingService;
 import org.exoplatform.portal.resource.SkinService;
 import org.exoplatform.services.organization.GroupHandler;
@@ -98,7 +99,7 @@ public class ExternalRegisterHandlerTest {
 
   private static final String        TOKEN_VALUE    = "tokenValue";
 
-  private static final String        EMAIL          = "email";
+  private static final String        EMAIL          = "email@test.com";
 
   private static final String        LASTNAME       = "lastName";
 
@@ -155,6 +156,9 @@ public class ExternalRegisterHandlerTest {
   private Router                     router;
 
   @Mock
+  private InitParams                 params;
+
+  @Mock
   private HttpSession                session;
 
   @Mock
@@ -208,6 +212,7 @@ public class ExternalRegisterHandlerTest {
     when(javascriptConfigService.getJSConfig(any(), eq(REQUEST_LOCALE))).thenReturn(new JSONObject());
 
     when(servletContext.getRequestDispatcher(any())).thenReturn(requestDispatcher);
+    when(request.getRequestDispatcher(any())).thenReturn(requestDispatcher);
 
     when(organizationService.getUserHandler()).thenReturn(userHandler);
     when(organizationService.getGroupHandler()).thenReturn(groupHandler);
@@ -224,7 +229,8 @@ public class ExternalRegisterHandlerTest {
                                                           localeConfigService,
                                                           brandingService,
                                                           javascriptConfigService,
-                                                          skinService) {
+                                                          skinService,
+                                                          params) {
       @Override
       protected void extendApplicationParameters(JSONObject applicationParameters,
                                                  Map<String, Object> additionalParameters) {
@@ -258,7 +264,6 @@ public class ExternalRegisterHandlerTest {
 
     assertNotNull(applicationParameters);
     assertFalse(applicationParameters.containsKey(ERROR_MESSAGE_PARAM));
-    assertFalse(applicationParameters.containsKey(SUCCESS_MESSAGE_PARAM));
     assertEquals(EXPIRED_ACTION_NAME, applicationParameters.get(ACTION_PARAM));
 
     verify(passwordRecoveryService, never()).sendExternalConfirmationAccountEmail(any(), any(), any());
@@ -274,7 +279,6 @@ public class ExternalRegisterHandlerTest {
     assertEquals(EMAIL, applicationParameters.get(EMAIL_PARAM));
     assertEquals(TOKEN_VALUE, applicationParameters.get(TOKEN_ID_PARAM));
     assertFalse(applicationParameters.containsKey(ERROR_MESSAGE_PARAM));
-    assertFalse(applicationParameters.containsKey(SUCCESS_MESSAGE_PARAM));
 
     verify(passwordRecoveryService, never()).sendExternalConfirmationAccountEmail(any(), any(), any());
   }
@@ -297,7 +301,6 @@ public class ExternalRegisterHandlerTest {
     assertEquals(EMAIL, applicationParameters.get(EMAIL_PARAM));
     assertEquals(TOKEN_VALUE, applicationParameters.get(TOKEN_ID_PARAM));
     assertEquals("gatein.forgotPassword.usernameChanged", applicationParameters.get(ERROR_MESSAGE_PARAM));
-    assertFalse(applicationParameters.containsKey(SUCCESS_MESSAGE_PARAM));
     assertEquals(password, applicationParameters.get(PASSWORD_PARAM));
     assertEquals(passwordConfirm, applicationParameters.get(PASSWORD_CONFIRM_PARAM));
 
@@ -322,7 +325,6 @@ public class ExternalRegisterHandlerTest {
     assertEquals(EMAIL, applicationParameters.get(EMAIL_PARAM));
     assertEquals(TOKEN_VALUE, applicationParameters.get(TOKEN_ID_PARAM));
     assertEquals("gatein.forgotPassword.confirmPasswordNotMatch", applicationParameters.get(ERROR_MESSAGE_PARAM));
-    assertFalse(applicationParameters.containsKey(SUCCESS_MESSAGE_PARAM));
     assertEquals(password, applicationParameters.get(PASSWORD_PARAM));
     assertEquals(passwordConfirm, applicationParameters.get(PASSWORD_CONFIRM_PARAM));
 
@@ -354,7 +356,6 @@ public class ExternalRegisterHandlerTest {
     assertEquals(EMAIL, applicationParameters.get(EMAIL_PARAM));
     assertEquals(TOKEN_VALUE, applicationParameters.get(TOKEN_ID_PARAM));
     assertEquals("onboarding.login.passwordCondition", applicationParameters.get(ERROR_MESSAGE_PARAM));
-    assertFalse(applicationParameters.containsKey(SUCCESS_MESSAGE_PARAM));
 
     verify(passwordRecoveryService, never()).sendExternalConfirmationAccountEmail(any(), any(), any());
   }
@@ -374,7 +375,6 @@ public class ExternalRegisterHandlerTest {
 
     externalRegisterHandler.execute(controllerContext);
 
-    assertFalse(applicationParameters.containsKey(SUCCESS_MESSAGE_PARAM));
     assertEquals("EmptyFieldValidator.msg.empty-input", applicationParameters.get(ERROR_MESSAGE_PARAM));
 
     verify(passwordRecoveryService, never()).sendExternalConfirmationAccountEmail(any(), any(), any());
@@ -395,7 +395,6 @@ public class ExternalRegisterHandlerTest {
 
     externalRegisterHandler.execute(controllerContext);
 
-    assertFalse(applicationParameters.containsKey(SUCCESS_MESSAGE_PARAM));
     assertEquals("EmptyFieldValidator.msg.empty-input", applicationParameters.get(ERROR_MESSAGE_PARAM));
 
     verify(passwordRecoveryService, never()).sendExternalConfirmationAccountEmail(any(), any(), any());
@@ -403,7 +402,6 @@ public class ExternalRegisterHandlerTest {
 
   @Test
   public void testDisplayExternalRegistrationWhenErrorCreatingUser() throws Exception {
-//  public void testRedirectToLoginWhenValid() throws Exception {
     prepareResetPasswordContext();
 
     String password = "pass1234";
@@ -415,17 +413,13 @@ public class ExternalRegisterHandlerTest {
     when(request.getParameter(LASTNAME_PARAM)).thenReturn(LASTNAME);
     when(request.getParameter(PASSWORD_PARAM)).thenReturn(password);
     when(request.getParameter(PASSWORD_CONFIRM_PARAM)).thenReturn(passwordConfirm);
+    when(userHandler.createUserInstance(any())).thenThrow(IllegalStateException.class);
 
     externalRegisterHandler.execute(controllerContext);
 
-    assertFalse(applicationParameters.containsKey(SUCCESS_MESSAGE_PARAM));
     assertEquals("external.registration.fail.create.user", applicationParameters.get(ERROR_MESSAGE_PARAM));
 
     verify(passwordRecoveryService, never()).sendExternalConfirmationAccountEmail(any(), any(), any());
-//    assertFalse(applicationParameters.containsKey(ERROR_MESSAGE_PARAM));
-//
-//    verify(passwordRecoveryService, times(1)).sendExternalConfirmationAccountEmail(any(), REQUEST_LOCALE, any());
-//    verify(response, times(1)).sendRedirect(servletContext.getContextPath() + "/login");
   }
 
   @Test
@@ -449,7 +443,7 @@ public class ExternalRegisterHandlerTest {
     assertNull(applicationParameters);
 
     verify(passwordRecoveryService, times(1)).sendExternalConfirmationAccountEmail(any(), any(), any());
-    verify(response, times(1)).sendRedirect(servletContext.getContextPath() + "/login?email=" + EMAIL);
+    verify(response, times(1)).sendRedirect(servletContext.getContextPath() + LOGIN);
   }
 
   private void prepareResetPasswordContext() {
