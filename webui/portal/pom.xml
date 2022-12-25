@@ -39,6 +39,12 @@
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.commons</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.ogce</groupId>
+          <artifactId>xpp3</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

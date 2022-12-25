@@ -96,7 +96,7 @@ public abstract class AbstractDataImportTest extends AbstractConfigTest {
     bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport1-configuration.xml");
     bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport2-configuration.xml");
     bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.identity-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration.xml");
+    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration-local.xml");
 
     //
     setSystemProperty("override.1", "true");
@@ -121,7 +121,7 @@ public abstract class AbstractDataImportTest extends AbstractConfigTest {
     bootstrap.addConfiguration(ContainerScope.PORTAL, "conf//portalconfiguration.xml");
     bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport1-configuration.xml");
     bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.identity-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration.xml");
+    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration-local.xml");
 
     //
     setSystemProperty("override.1", "false");
@@ -143,7 +143,7 @@ public abstract class AbstractDataImportTest extends AbstractConfigTest {
     bootstrap.addConfiguration(ContainerScope.PORTAL, "conf//portalconfiguration.xml");
     bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport1-configuration.xml");
     bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.identity-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration.xml");
+    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration-local.xml");
 
     //
     setSystemProperty("override.1", "false");
@@ -174,7 +174,7 @@ public abstract class AbstractDataImportTest extends AbstractConfigTest {
     bootstrap.addConfiguration(ContainerScope.PORTAL, "conf//portalconfiguration.xml");
     bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport1-configuration.xml");
     bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.identity-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration.xml");
+    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration-local.xml");
 
     //
     setSystemProperty("override.1", "true");
@@ -205,7 +205,7 @@ public abstract class AbstractDataImportTest extends AbstractConfigTest {
     bootstrap.addConfiguration(ContainerScope.PORTAL, "conf//portalconfiguration.xml");
     bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport3-configuration.xml");
     bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.identity-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration.xml");
+    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration-local.xml");
 
     //
     setSystemProperty("override.1", "true");

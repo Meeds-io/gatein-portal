@@ -289,7 +289,7 @@
     <init-params>
       <value-param>
         <name>create.user.portal</name>
-        <value>${gatein.portal.idm.createuserportal}</value>
+        <value>${gatein.portal.idm.createuserportal:false}</value>
       </value-param>
       <value-param>
         <name>destroy.user.portal</name>

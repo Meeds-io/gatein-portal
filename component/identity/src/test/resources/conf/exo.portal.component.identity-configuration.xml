@@ -1,31 +1,27 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
-  ~ Copyright (C) 2011 eXo Platform SAS.
-  ~
-  ~ This is free software; you can redistribute it and/or modify it
-  ~ under the terms of the GNU Lesser General Public License as
-  ~ published by the Free Software Foundation; either version 2.1 of
-  ~ the License, or (at your option) any later version.
-  ~
-  ~ This software is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  ~ Lesser General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU Lesser General Public
-  ~ License along with this software; if not, write to the Free
-  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
-  -->
 
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2022 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+-->
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
                xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
-
-
-  <component>
-    <type>org.exoplatform.services.organization.cache.OrganizationCacheHandler</type>
-  </component>
 
   <component>
     <key>org.gatein.common.transaction.JTAUserTransactionLifecycleService</key>
@@ -49,99 +45,8 @@
   </component>
 
   <component>
-    <key>org.exoplatform.services.organization.idm.PicketLinkIDMService</key>
-    <type>org.exoplatform.services.organization.idm.PicketLinkIDMServiceImpl</type>
-    <init-params>
-      <value-param>
-        <name>config</name>
-        <value>jar:/conf/picketlink/exo.portal.component.identity-picketlink-idm-config.xml</value>
-      </value-param>
-    </init-params>
-  </component>
-
-  <component>
     <key>org.exoplatform.services.organization.OrganizationService</key>
-    <type>org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl</type>
-    <init-params>
-      <object-param>
-        <name>configuration</name>
-        <object type="org.exoplatform.services.organization.idm.Config">
-          <field name="forceMembershipOfMappedTypes">
-            <boolean>true</boolean>
-          </field>
-          <field name="associationMembershipType">
-            <string>member</string>
-          </field>
-          <field name="groupTypeMappings">
-            <map type="java.util.HashMap">
-              <entry>
-                <key>
-                  <string>/</string>
-                </key>
-                <value>
-                  <string>root_type</string>
-                </value>
-              </entry>
-              <entry>
-                <key>
-                  <string>/organization_hierarchy/*</string>
-                </key>
-                <value>
-                  <string>GROUP</string>
-                </value>
-              </entry>
-              <entry>
-                <key>
-                  <string>/role_hierarchy/*</string>
-                </key>
-                <value>
-                  <string>role_hierarchy_type</string>
-                </value>
-              </entry>
-            </map>
-          </field>
-          <field name="ignoreMappedMembershipTypeGroupList">
-            <collection type="java.util.ArrayList" item-type="java.lang.String">
-              <value>
-                <string>/organization_hierarchy/*</string>
-              </value>
-              <value>
-                <string>/role_hierarchy/*</string>
-              </value>
-            </collection>
-          </field>
-        </object>
-      </object-param>
-    </init-params>
-  </component>
-
-  <component>
-    <key>org.exoplatform.services.cache.CacheService</key>
-    <jmx-name>cache:type=CacheService</jmx-name>
-    <type>org.exoplatform.services.cache.impl.CacheServiceImpl</type>
-    <init-params>
-      <object-param>
-        <name>cache.config.default</name>
-        <description>The default cache configuration</description>
-        <object type="org.exoplatform.services.cache.ExoCacheConfig">
-          <field name="name">
-            <string>default</string>
-          </field>
-          <field name="maxSize">
-            <int>300</int>
-          </field>
-          <field name="liveTime">
-            <long>60</long>
-          </field>
-          <field name="distributed">
-            <boolean>false</boolean>
-          </field>
-          <field name="implementation">
-            <string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string>
-          </field>
-        </object>
-      </object-param>
-    </init-params>
+    <type>org.exoplatform.services.organization.mock.InMemoryOrganizationService</type>
   </component>
 
   <component>
@@ -177,76 +82,6 @@
       </properties-param>
     </init-params>
   </component>
-
-
-
-  <!-- Data Initialization -->
-  <external-component-plugins>
-    <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
-    <component-plugin>
-      <name>IDMChangeLogsPlugin</name>
-      <set-method>addChangeLogsPlugin</set-method>
-      <type>org.exoplatform.commons.persistence.impl.ChangeLogsPlugin</type>
-      <init-params>
-        <value-param>
-          <name>datasource</name>
-          <description>Change logs of IDM database</description>
-          <value>java:/comp/env/exo-idm_portal</value>
-        </value-param>
-        <values-param>
-          <name>changelogs</name>
-          <description>Change logs of idm queue</description>
-          <value>db/changelog/idm.db.changelog-1.0.0.xml</value>
-        </values-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-
-  <external-component-plugins>
-    <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
-    <component-plugin>
-      <name>bind.datasource</name>
-      <set-method>addPlugin</set-method>
-      <type>org.exoplatform.services.naming.BindReferencePlugin</type>
-      <init-params>
-        <value-param>
-          <name>bind-name</name>
-          <value>java:/comp/env/exo-idm_portal</value>
-        </value-param>
-        <value-param>
-          <name>class-name</name>
-          <value>javax.sql.DataSource</value>
-        </value-param>
-        <value-param>
-          <name>factory</name>
-          <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
-        </value-param>
-        <properties-param>
-          <name>ref-addresses</name>
-          <description>ref-addresses</description>
-          <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
-          <property name="url" value="jdbc:hsqldb:mem:dbIdm;hsqldb.tx=mvcc"/>
-        </properties-param>
-        <properties-param profiles="mysql">
-          <name>ref-addresses</name>
-          <description>ref-addresses</description>
-          <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-          <property name="url"
-                    value="jdbc:mysql://10.37.129.4/jdbcidm?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8"/>
-          <property name="username" value="root"/>
-          <property name="password" value=""/>
-        </properties-param>
-        <properties-param profiles="h2">
-          <name>ref-addresses</name>
-          <description>ref-addresses</description>
-          <property name="driverClassName" value="org.h2.Driver"/>
-          <property name="url" value="jdbc:h2:file:${gatein.test.tmp.dir}/db/data/jdbcidm;DB_CLOSE_DELAY=-1"/>
-          <property name="username" value="sa"/>
-          <property name="password" value="sa"/>
-        </properties-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
 
   <external-component-plugins>
     <target-component>org.exoplatform.services.organization.OrganizationService</target-component>

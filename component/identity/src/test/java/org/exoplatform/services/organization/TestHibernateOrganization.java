@@ -30,7 +30,7 @@ import org.exoplatform.container.component.RequestLifeCycle;
  * Tests on OrganizationService, only related to Hibernate
  */
 @ConfiguredBy({ 
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration-local.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/services/organization/TestOrganization-configuration.xml") })
 public class TestHibernateOrganization extends AbstractKernelTest {
 
