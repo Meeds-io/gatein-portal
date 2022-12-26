@@ -18,6 +18,7 @@
   String uiComponentWidth = uicomponent.getWidth();
   String uiComponentHeight = uicomponent.getHeight();
   if(uiComponentWidth != null || uiComponentHeight != null) cssStyle = "style=\"";
+  if(uiComponentWidth != null) cssStyle += "width: "+uiComponentWidth+";"
   if(uiComponentHeight != null) cssStyle += "height: "+uiComponentHeight+";"
   if(cssStyle.length() > 0) cssStyle += "\"";
 
@@ -41,7 +42,7 @@
   else
   {   
 %>
-<div class="UIContainer SimpleColumnContainer <%=uiComponentClass%> <%=uicomponent.getName()%> <%=hasPermission?"": "ProtectedContainer"%>" 
+<div class="UIContainer SimpleColumnContainer <%=uiComponentClass%>  <%=hasPermission?"": "ProtectedContainer"%>"
         id="${uicomponent.id}" ${cssStyle}>
 <%
   }
