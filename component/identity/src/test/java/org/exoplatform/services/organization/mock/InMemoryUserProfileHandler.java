@@ -21,17 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserProfileEventListener;
 import org.exoplatform.services.organization.UserProfileHandler;
 import org.exoplatform.services.organization.impl.UserProfileImpl;
 
 public class InMemoryUserProfileHandler implements UserProfileHandler {
-
-  private static final Log               LOG                              =
-                                             ExoLogger.getLogger(InMemoryUserProfileHandler.class);
 
   private static final String            ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
 
@@ -110,7 +105,7 @@ public class InMemoryUserProfileHandler implements UserProfileHandler {
       try {
         listener.preSave(profile, isNew);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -120,7 +115,7 @@ public class InMemoryUserProfileHandler implements UserProfileHandler {
       try {
         listener.postSave(profile, isNew);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -130,7 +125,7 @@ public class InMemoryUserProfileHandler implements UserProfileHandler {
       try {
         listener.preDelete(profile);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -140,7 +135,7 @@ public class InMemoryUserProfileHandler implements UserProfileHandler {
       try {
         listener.postDelete(profile);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }

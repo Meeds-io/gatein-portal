@@ -23,16 +23,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.exoplatform.component.test.*;
-import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.RootContainer;
 import org.exoplatform.portal.mop.importer.ImportMode;
 
 /**
- * @author <a href="trongtt@gmail.com">Trong Tran</a>
+ * @author  <a href="trongtt@gmail.com">Trong Tran</a>
  * @version $Revision$
  */
+@ConfiguredBy({})
 public abstract class AbstractDataImportTest extends AbstractConfigTest {
-  private Set<String> clearProperties = new HashSet<String>();
+  private Set<String>     clearProperties = new HashSet<String>();
 
   private PortalContainer container;
 
@@ -90,15 +92,8 @@ public abstract class AbstractDataImportTest extends AbstractConfigTest {
   }
 
   public void testOneBootWithExtension() throws Exception {
-    KernelBootstrap bootstrap = new KernelBootstrap();
-    bootstrap.addConfiguration(ContainerScope.ROOT, "conf/configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf//portalconfiguration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport1-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport2-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.identity-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration-local.xml");
+    KernelBootstrap bootstrap = startContainer(false, true, true, false);
 
-    //
     setSystemProperty("override.1", "true");
     setSystemProperty("import.mode.1", getMode().toString());
     setSystemProperty("import.portal.1", getConfig1());
@@ -106,128 +101,170 @@ public abstract class AbstractDataImportTest extends AbstractConfigTest {
     setSystemProperty("import.mode_2", getMode().toString());
     setSystemProperty("import.portal_2", getConfig2());
 
-    //
-    bootstrap.boot();
-    this.container = bootstrap.getContainer();
+    bootContainer(bootstrap);
+
     begin();
-    afterOneBootWithExtention(container);
-    end();
-    bootstrap.dispose();
+    try {
+      afterOneBootWithExtention(container);
+    } finally {
+      end();
+    }
+    stopContainer(bootstrap);
   }
 
   public void testOneBoot() throws Exception {
-    KernelBootstrap bootstrap = new KernelBootstrap();
-    bootstrap.addConfiguration(ContainerScope.ROOT, "conf/configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf//portalconfiguration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport1-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.identity-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration-local.xml");
+    KernelBootstrap bootstrap = startContainer(false, true, false, false);
 
-    //
     setSystemProperty("override.1", "false");
     setSystemProperty("import.mode.1", getMode().toString());
     setSystemProperty("import.portal.1", getConfig1());
 
-    //
-    bootstrap.boot();
-    this.container = bootstrap.getContainer();
+    bootContainer(bootstrap);
+
     begin();
-    afterFirstBoot(container);
-    end();
-    bootstrap.dispose();
+    try {
+      afterFirstBoot(container);
+    } finally {
+      end();
+    }
+    stopContainer(bootstrap);
   }
 
   public void testTwoBoots() throws Exception {
-    KernelBootstrap bootstrap = new KernelBootstrap();
-    bootstrap.addConfiguration(ContainerScope.ROOT, "conf/configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf//portalconfiguration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport1-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.identity-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration-local.xml");
+    KernelBootstrap bootstrap = startContainer(false, true, false, false);
 
     //
     setSystemProperty("override.1", "false");
     setSystemProperty("import.mode.1", getMode().toString());
     setSystemProperty("import.portal.1", getConfig1());
 
-    bootstrap.boot();
-    this.container = bootstrap.getContainer();
-    begin();
-    afterFirstBoot(container);
-    end();
-    bootstrap.dispose();
+    bootContainer(bootstrap);
 
-    //
+    begin();
+    try {
+      afterFirstBoot(container);
+    } finally {
+      end();
+    }
+    stopContainer(bootstrap);
+
     setSystemProperty("import.portal.1", getConfig2());
 
-    bootstrap.boot();
-    this.container = bootstrap.getContainer();
+    bootContainer(bootstrap);
+
     begin();
-    afterSecondBoot(container);
-    end();
-    bootstrap.dispose();
+    try {
+      afterSecondBoot(container);
+    } finally {
+      end();
+    }
+    stopContainer(bootstrap);
   }
 
   public void testTwoBootsWithOverride() throws Exception {
-    KernelBootstrap bootstrap = new KernelBootstrap();
-    bootstrap.addConfiguration(ContainerScope.ROOT, "conf/configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf//portalconfiguration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport1-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.identity-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration-local.xml");
+    KernelBootstrap bootstrap = startContainer(false, true, false, false);
 
-    //
     setSystemProperty("override.1", "true");
     setSystemProperty("import.mode.1", getMode().toString());
     setSystemProperty("import.portal.1", getConfig1());
 
-    bootstrap.boot();
-    this.container = bootstrap.getContainer();
-    begin();
-    afterFirstBoot(container);
-    end();
-    bootstrap.dispose();
+    bootContainer(bootstrap);
 
-    //
+    begin();
+    try {
+      afterFirstBoot(container);
+    } finally {
+      end();
+    }
+    stopContainer(bootstrap);
+
     setSystemProperty("import.portal.1", getConfig2());
 
-    bootstrap.boot();
-    this.container = bootstrap.getContainer();
+    bootContainer(bootstrap);
+
     begin();
-    afterSecondBootWithOverride(container);
-    end();
-    bootstrap.dispose();
+    try {
+      afterSecondBootWithOverride(container);
+    } finally {
+      end();
+    }
+    stopContainer(bootstrap);
   }
 
   public void testTwoBootsWithPortalConfigOverrideFlag() throws Exception {
-    KernelBootstrap bootstrap = new KernelBootstrap();
-    bootstrap.addConfiguration(ContainerScope.ROOT, "conf/configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf//portalconfiguration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport3-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.identity-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration-local.xml");
+    KernelBootstrap bootstrap = startContainer(false, false, false, true);
 
-    //
     setSystemProperty("override.1", "true");
     setSystemProperty("override.2", "false");
     setSystemProperty("import.mode.1", getMode().toString());
     setSystemProperty("import.portal.1", getConfig1());
 
-    bootstrap.boot();
-    this.container = bootstrap.getContainer();
+    bootContainer(bootstrap);
+
     begin();
-    afterFirstBoot(container);
-    end();
-    bootstrap.dispose();
+    try {
+      afterFirstBoot(container);
+    } finally {
+      end();
+    }
+
+    stopContainer(bootstrap);
 
     //
     setSystemProperty("import.portal.1", getConfig2());
 
+    bootContainer(bootstrap);
+    begin();
+    try {
+      afterSecondBoot(container);
+    } finally {
+      end();
+    }
+
+    stopContainer(bootstrap);
+  }
+
+  protected void stopContainer(KernelBootstrap bootstrap) {
+    if (bootstrap != null) {
+      bootstrap.dispose();
+    }
+    PortalContainer portalContainer = PortalContainer.getInstanceIfPresent();
+    if (portalContainer != null) {
+      RootContainer.getInstance().stop();
+      ExoContainerContext.setCurrentContainer(null);
+    }
+  }
+
+  protected void bootContainer(KernelBootstrap bootstrap) {
     bootstrap.boot();
     this.container = bootstrap.getContainer();
-    begin();
-    afterSecondBoot(container);
-    end();
-    bootstrap.dispose();
+    ExoContainerContext.setCurrentContainer(this.container);
   }
+
+  protected KernelBootstrap startContainer(boolean importFile0, boolean importFile1, boolean importFile2, boolean importFile3) {
+    PortalContainer portalContainer = PortalContainer.getInstanceIfPresent();
+    if (portalContainer != null) {
+      RootContainer.getInstance().stop();
+      ExoContainerContext.setCurrentContainer(null);
+    }
+
+    KernelBootstrap bootstrap = new KernelBootstrap();
+    bootstrap.addConfiguration(ContainerScope.ROOT, "conf/configuration.xml");
+    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/portal/configuration.xml");
+    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration-local.xml");
+    if (importFile0) {
+      bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport0-configuration.xml");
+    }
+    if (importFile1) {
+      bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport1-configuration.xml");
+    }
+    if (importFile2) {
+      bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport2-configuration.xml");
+    }
+    if (importFile3) {
+      bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport3-configuration.xml");
+    }
+    return bootstrap;
+  }
+
 }

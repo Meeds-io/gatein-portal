@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.MembershipTypeEventListener;
 import org.exoplatform.services.organization.MembershipTypeHandler;
@@ -31,9 +29,6 @@ import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.impl.MembershipTypeImpl;
 
 public class InMemoryMembershipTypeHandler implements MembershipTypeHandler {
-
-  private static final Log                  LOG                              =
-                                                ExoLogger.getLogger(InMemoryMembershipTypeHandler.class);
 
   private static final String               ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
 
@@ -127,7 +122,7 @@ public class InMemoryMembershipTypeHandler implements MembershipTypeHandler {
       try {
         listener.preSave(membershipType, isNew);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -137,7 +132,7 @@ public class InMemoryMembershipTypeHandler implements MembershipTypeHandler {
       try {
         listener.postSave(membershipType, isNew);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -147,7 +142,7 @@ public class InMemoryMembershipTypeHandler implements MembershipTypeHandler {
       try {
         listener.preDelete(membershipType);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -157,7 +152,7 @@ public class InMemoryMembershipTypeHandler implements MembershipTypeHandler {
       try {
         listener.postDelete(membershipType);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }

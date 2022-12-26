@@ -26,9 +26,9 @@ import org.exoplatform.jpa.BaseTest;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.settings.jpa.JPASettingServiceImpl;
-import org.exoplatform.settings.jpa.dao.SettingContextDAO;
-import org.exoplatform.settings.jpa.dao.SettingScopeDAO;
-import org.exoplatform.settings.jpa.dao.SettingsDAO;
+import org.exoplatform.settings.jpa.SettingContextDAO;
+import org.exoplatform.settings.jpa.SettingScopeDAO;
+import org.exoplatform.settings.jpa.SettingsDAO;
 
 /**
  * Test just for the implementation service Created by The eXo Platform SAS

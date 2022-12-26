@@ -59,21 +59,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- Used only for pretty printing, need to find a better solution than this -->
-    <!--
-        <dependency>
-          <groupId>net.java.dev.stax-utils</groupId>
-          <artifactId>stax-utils</artifactId>
-          <version>20060502</version>
-          <exclusions>
-            <exclusion>
-              <groupId>com.bea.xml</groupId>
-              <artifactId>jsr173-ri</artifactId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-    -->
-
     <dependency>
       <groupId>org.staxnav</groupId>
       <artifactId>staxnav.core</artifactId>
@@ -81,16 +66,8 @@
 
     <dependency>
       <groupId>org.exoplatform.gatein.portal</groupId>
-      <artifactId>exo.portal.component.identity</artifactId>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.portal</artifactId>
       <type>test-jar</type>
-      <scope>test</scope>
     </dependency>
 
     <dependency>

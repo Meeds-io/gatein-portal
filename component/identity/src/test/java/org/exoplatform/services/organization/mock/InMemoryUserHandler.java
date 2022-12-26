@@ -28,8 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
+import org.exoplatform.services.organization.DisabledUserException;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.Query;
 import org.exoplatform.services.organization.User;
@@ -40,8 +39,6 @@ import org.exoplatform.services.organization.idm.EntityMapperUtils;
 import org.exoplatform.services.organization.idm.UserImpl;
 
 public class InMemoryUserHandler implements UserHandler {
-
-  private static final Log        LOG                              = ExoLogger.getLogger(InMemoryUserHandler.class);
 
   private static final String     ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
 
@@ -112,19 +109,15 @@ public class InMemoryUserHandler implements UserHandler {
     if (usersById.containsKey(user.getUserName())) {
       return;
     }
-    saveUser(user, broadcast);
+    saveUser(user, broadcast, true);
   }
 
   @Override
-  public void saveUser(User user, boolean broadcast) {
-    boolean isNew = usersById.containsKey(user.getUserName());
-    if (broadcast) {
-      preSave(user, isNew);
+  public void saveUser(User user, boolean broadcast) throws DisabledUserException {
+    if (user != null && !user.isEnabled()) {
+      throw new DisabledUserException(user.getUserName());
     }
-    usersById.put(user.getUserName(), user);
-    if (broadcast) {
-      postSave(user, isNew);
-    }
+    saveUser(user, broadcast, false);
   }
 
   @Override
@@ -183,7 +176,7 @@ public class InMemoryUserHandler implements UserHandler {
 
   @Override
   public LazyPageList<User> getUserPageList(int pageSize) {
-    return new LazyPageList<>(new InMemoryListAccess<>(new ArrayList<>(usersById.values())),
+    return new LazyPageList<>(new InMemoryListAccess<>(new ArrayList<>(usersById.values()), new User[0]),
                               pageSize);
   }
 
@@ -198,12 +191,19 @@ public class InMemoryUserHandler implements UserHandler {
                                 .map(user -> filterUserStatus(user, userStatus))
                                 .filter(Objects::nonNull)
                                 .toList();
-    return new InMemoryListAccess<>(users);
+    return new InMemoryListAccess<>(users, new User[0]);
   }
 
   @Override
-  public boolean authenticate(String username, String password) {
-    return usersById.containsKey(username) && StringUtils.equals(usersById.get(username).getPassword(), password);
+  public boolean authenticate(String username, String password) throws DisabledUserException {
+    if (!usersById.containsKey(username)) {
+      return false;
+    }
+    User user = usersById.get(username);
+    if (!user.isEnabled()) {
+      throw new DisabledUserException(username);
+    }
+    return StringUtils.equals(user.getPassword(), password);
   }
 
   @Override
@@ -217,17 +217,17 @@ public class InMemoryUserHandler implements UserHandler {
   }
 
   @Override
-  public InMemoryListAccess<User> findUsersByQuery(Query q, UserStatus userStatus) {
+  public InMemoryListAccess<User> findUsersByQuery(Query query, UserStatus userStatus) {
     List<User> users = usersById.values()
                                 .stream()
                                 .map(user -> filterUserStatus(user, userStatus))
-                                .filter(user -> contains(user.getEmail(), q.getEmail())
-                                    && contains(user.getFirstName(), q.getFirstName())
-                                    && contains(user.getLastName(), q.getLastName())
-                                    && contains(user.getUserName(), q.getUserName()))
+                                .filter(user -> contains(user.getEmail(), query.getEmail())
+                                    && contains(user.getFirstName(), query.getFirstName())
+                                    && contains(user.getLastName(), query.getLastName())
+                                    && contains(user.getUserName(), query.getUserName()))
                                 .filter(Objects::nonNull)
                                 .toList();
-    return new InMemoryListAccess<>(users);
+    return new InMemoryListAccess<>(users, new User[0]);
   }
 
   public LazyPageList<User> findUsersByGroup(String groupId) {
@@ -247,7 +247,7 @@ public class InMemoryUserHandler implements UserHandler {
                                              .map(user -> filterUserStatus(user, userStatus))
                                              .filter(Objects::nonNull)
                                              .toList();
-    return new InMemoryListAccess<>(users);
+    return new InMemoryListAccess<>(users, new User[0]);
   }
 
   @Override
@@ -262,7 +262,7 @@ public class InMemoryUserHandler implements UserHandler {
                                                                                            .isEmpty()))
                                 .filter(Objects::nonNull)
                                 .toList();
-    return new InMemoryListAccess<>(users);
+    return new InMemoryListAccess<>(users, new User[0]);
   }
 
   @Override
@@ -289,12 +289,22 @@ public class InMemoryUserHandler implements UserHandler {
     }
   }
 
+  private void saveUser(User user, boolean broadcast, boolean isNew) {
+    if (broadcast) {
+      preSave(user, isNew);
+    }
+    usersById.put(user.getUserName(), user);
+    if (broadcast) {
+      postSave(user, isNew);
+    }
+  }
+
   private void preSave(User user, boolean isNew) {
     for (UserEventListener listener : userListeners) {
       try {
         listener.preSave(user, isNew);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -304,7 +314,7 @@ public class InMemoryUserHandler implements UserHandler {
       try {
         listener.postSave(user, isNew);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -314,7 +324,7 @@ public class InMemoryUserHandler implements UserHandler {
       try {
         listener.preDelete(user);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -324,7 +334,7 @@ public class InMemoryUserHandler implements UserHandler {
       try {
         listener.postDelete(user);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -334,7 +344,7 @@ public class InMemoryUserHandler implements UserHandler {
       try {
         listener.preSetEnabled(user);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
   }
 
@@ -343,7 +353,7 @@ public class InMemoryUserHandler implements UserHandler {
       try {
         listener.postSetEnabled(user);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
   }
 
@@ -356,7 +366,7 @@ public class InMemoryUserHandler implements UserHandler {
   }
 
   private boolean contains(String value, String queryString) {
-    return StringUtils.isBlank(queryString) || StringUtils.contains(value, queryString);
+    return StringUtils.isBlank(queryString) || StringUtils.contains(value, queryString.replace("*", ""));
   }
 
 }

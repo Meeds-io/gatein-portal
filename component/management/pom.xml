@@ -67,21 +67,13 @@
     </dependency>
     <dependency>
       <groupId>org.exoplatform.gatein.portal</groupId>
-      <artifactId>exo.portal.component.portal</artifactId>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
-      <artifactId>exo.portal.component.identity</artifactId>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.resources</artifactId>
       <type>test-jar</type>
-      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.gatein.portal</groupId>
+      <artifactId>exo.portal.component.portal</artifactId>
+      <type>test-jar</type>
     </dependency>
   </dependencies>
 </project>

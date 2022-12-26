@@ -27,8 +27,6 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupEventListener;
 import org.exoplatform.services.organization.GroupHandler;
@@ -37,9 +35,6 @@ import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.idm.ExtGroup;
 
 public class InMemoryGroupHandler implements GroupHandler {
-
-  private static final Log                LOG                              =
-                                              ExoLogger.getLogger(InMemoryGroupHandler.class);
 
   private static final String             ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
 
@@ -132,16 +127,15 @@ public class InMemoryGroupHandler implements GroupHandler {
   }
 
   public Group removeGroup(Group group, boolean broadcast) {
-    if (!groupsById.containsKey(group.getId())) {
-      throw new IllegalArgumentException(group.getId() + DOESN_T_EXISTS_MESSAGE);
+    String groupId = group.getId();
+    if (!groupsById.containsKey(groupId)) {
+      throw new IllegalArgumentException(groupId + DOESN_T_EXISTS_MESSAGE);
     }
     if (broadcast) {
       preDelete(group);
     }
 
-    Group childGroup = groupsById.remove(group.getId());
-    groupChildsById.get(childGroup.getParentId()).remove(childGroup.getId());
-    getMembershipHandler().removeMembershipByGroup(group.getId(), broadcast);
+    removeGroup(groupId, broadcast);
 
     if (broadcast) {
       postDelete(group);
@@ -183,7 +177,7 @@ public class InMemoryGroupHandler implements GroupHandler {
                                              .filter(group -> StringUtils.contains(group.getLabel(), keyword)
                                                  || StringUtils.contains(group.getGroupName(), keyword))
                                              .toList();
-    return new InMemoryListAccess<>(childGroups);
+    return new InMemoryListAccess<>(childGroups, new Group[0]);
   }
 
   public Collection<Group> findGroups(Group parent) {
@@ -214,7 +208,7 @@ public class InMemoryGroupHandler implements GroupHandler {
                                             .filter(group -> StringUtils.contains(group.getLabel(), keyword)
                                                 || StringUtils.contains(group.getGroupName(), keyword))
                                             .toList();
-    return new InMemoryListAccess<>(childGroups);
+    return new InMemoryListAccess<>(childGroups, new Group[0]);
   }
 
   @Override
@@ -246,7 +240,7 @@ public class InMemoryGroupHandler implements GroupHandler {
       try {
         listener.preSave(group, isNew);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -256,7 +250,7 @@ public class InMemoryGroupHandler implements GroupHandler {
       try {
         listener.postSave(group, isNew);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -266,7 +260,7 @@ public class InMemoryGroupHandler implements GroupHandler {
       try {
         listener.preDelete(group);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -276,13 +270,31 @@ public class InMemoryGroupHandler implements GroupHandler {
       try {
         listener.postDelete(group);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
 
   private InMemoryMembershipHandler getMembershipHandler() {
     return (InMemoryMembershipHandler) organizationService.getMembershipHandler();
+  }
+
+  private void removeGroup(String groupId, boolean broadcast) {
+    removeSubGroups(groupId, broadcast);
+
+    groupsById.remove(groupId);
+    getMembershipHandler().removeMembershipByGroup(groupId, broadcast);
+  }
+
+  private void removeSubGroups(String groupId, boolean broadcast) {
+    Map<String, Group> childGroupsById = groupChildsById.get(groupId);
+    if (childGroupsById != null) {
+      Group[] childGroupsArray = childGroupsById.values().toArray(new Group[0]);
+      for (Group childGroup : childGroupsArray) {
+        removeGroup(childGroup.getId(), broadcast);
+      }
+      childGroupsById.remove(groupId);
+    }
   }
 
 }

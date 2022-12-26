@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
-  ~ Copyright (C) 2011 eXo Platform SAS.
-  ~
-  ~ This is free software; you can redistribute it and/or modify it
-  ~ under the terms of the GNU Lesser General Public License as
-  ~ published by the Free Software Foundation; either version 2.1 of
-  ~ the License, or (at your option) any later version.
-  ~
-  ~ This software is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  ~ Lesser General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU Lesser General Public
-  ~ License along with this software; if not, write to the Free
-  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
-  -->
 
-<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
-               xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2022 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+-->
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd" xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
     <type>org.exoplatform.services.organization.cache.OrganizationCacheHandler</type>
@@ -62,10 +60,441 @@
   <component>
     <key>org.exoplatform.services.organization.OrganizationService</key>
     <type>org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl</type>
+    <component-plugins>
+      <component-plugin>
+        <name>init.service.listener</name>
+        <set-method>addListenerPlugin</set-method>
+        <type>org.exoplatform.services.organization.OrganizationDatabaseInitializer</type>
+        <description>this listener populate organization data for the first launch</description>
+        <init-params>
+          <value-param>
+            <name>checkDatabaseAlgorithm</name>
+            <description>check database</description>
+            <value>entry</value>
+          </value-param>
+          <value-param>
+            <name>printInformation</name>
+            <description>Print information init database</description>
+            <value>false</value>
+          </value-param>
+          <object-param>
+            <name>configuration</name>
+            <description>description</description>
+            <object type="org.exoplatform.services.organization.OrganizationConfig">
+              <field name="membershipType">
+                <collection type="java.util.ArrayList">
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$MembershipType">
+                      <field name="type">
+                        <string>manager</string>
+                      </field>
+                      <field name="description">
+                        <string>manager membership type</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$MembershipType">
+                      <field name="type">
+                        <string>member</string>
+                      </field>
+                      <field name="description">
+                        <string>member membership type</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$MembershipType">
+                      <field name="type">
+                        <string>validator</string>
+                      </field>
+                      <field name="description">
+                        <string>validator membership type</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$MembershipType">
+                      <field name="type">
+                        <string>*</string>
+                      </field>
+                      <field name="description">
+                        <string>any membership type</string>
+                      </field>
+                    </object>
+                  </value>
+                </collection>
+              </field>
+              <field name="group">
+                <collection type="java.util.ArrayList">
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>platform</string>
+                      </field>
+                      <field name="parentId">
+                        <string></string>
+                      </field>
+                      <field name="description">
+                        <string>the /platform group</string>
+                      </field>
+                      <field name="label">
+                        <string>Platform</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>administrators</string>
+                      </field>
+                      <field name="parentId">
+                        <string>/platform</string>
+                      </field>
+                      <field name="description">
+                        <string>the /platform/administrators group</string>
+                      </field>
+                      <field name="label">
+                        <string>Administrators</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>users</string>
+                      </field>
+                      <field name="parentId">
+                        <string>/platform</string>
+                      </field>
+                      <field name="description">
+                        <string>the /platform/users group</string>
+                      </field>
+                      <field name="label">
+                        <string>Users</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>guests</string>
+                      </field>
+                      <field name="parentId">
+                        <string>/platform</string>
+                      </field>
+                      <field name="description">
+                        <string>the /platform/guests group</string>
+                      </field>
+                      <field name="label">
+                        <string>Guests</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>organization</string>
+                      </field>
+                      <field name="parentId">
+                        <string></string>
+                      </field>
+                      <field name="description">
+                        <string>the organization group</string>
+                      </field>
+                      <field name="label">
+                        <string>Organization</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>management</string>
+                      </field>
+                      <field name="parentId">
+                        <string>/organization</string>
+                      </field>
+                      <field name="description">
+                        <string>the /organization/management group</string>
+                      </field>
+                      <field name="label">
+                        <string>Management</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>executive-board</string>
+                      </field>
+                      <field name="parentId">
+                        <string>/organization/management</string>
+                      </field>
+                      <field name="description">
+                        <string>the /organization/management/executive-board group</string>
+                      </field>
+                      <field name="label">
+                        <string>Executive Board</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>human-resources</string>
+                      </field>
+                      <field name="parentId">
+                        <string>/organization/management</string>
+                      </field>
+                      <field name="description">
+                        <string>the /organization/management/human-resource group</string>
+                      </field>
+                      <field name="label">
+                        <string>Human Resources</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>communication</string>
+                      </field>
+                      <field name="parentId">
+                        <string>/organization</string>
+                      </field>
+                      <field name="description">
+                        <string>the /organization/communication group</string>
+                      </field>
+                      <field name="label">
+                        <string>Communication</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>marketing</string>
+                      </field>
+                      <field name="parentId">
+                        <string>/organization/communication</string>
+                      </field>
+                      <field name="description">
+                        <string>the /organization/communication/marketing group</string>
+                      </field>
+                      <field name="label">
+                        <string>Marketing</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>press-and-media</string>
+                      </field>
+                      <field name="parentId">
+                        <string>/organization/communication</string>
+                      </field>
+                      <field name="description">
+                        <string>the /organization/communication/press-and-media group</string>
+                      </field>
+                      <field name="label">
+                        <string>Press and Media</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>operations</string>
+                      </field>
+                      <field name="parentId">
+                        <string>/organization</string>
+                      </field>
+                      <field name="description">
+                        <string>the /organization/operations and media group</string>
+                      </field>
+                      <field name="label">
+                        <string>Operations</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>sales</string>
+                      </field>
+                      <field name="parentId">
+                        <string>/organization/operations</string>
+                      </field>
+                      <field name="description">
+                        <string>the /organization/operations/sales group</string>
+                      </field>
+                      <field name="label">
+                        <string>Sales</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>finances</string>
+                      </field>
+                      <field name="parentId">
+                        <string>/organization/operations</string>
+                      </field>
+                      <field name="description">
+                        <string>the /organization/operations/finances group</string>
+                      </field>
+                      <field name="label">
+                        <string>Finances</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>customers</string>
+                      </field>
+                      <field name="parentId">
+                        <string></string>
+                      </field>
+                      <field name="description">
+                        <string>the /customers group</string>
+                      </field>
+                      <field name="label">
+                        <string>Customers</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
+                      <field name="name">
+                        <string>partners</string>
+                      </field>
+                      <field name="parentId">
+                        <string></string>
+                      </field>
+                      <field name="description">
+                        <string>the /partners group</string>
+                      </field>
+                      <field name="label">
+                        <string>Partners</string>
+                      </field>
+                    </object>
+                  </value>
+                </collection>
+              </field>
+              <field name="user">
+                <collection type="java.util.ArrayList">
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$User">
+                      <field name="userName">
+                        <string>root</string>
+                      </field>
+                      <field name="password">
+                        <string>gtn</string>
+                      </field>
+                      <field name="firstName">
+                        <string>Root</string>
+                      </field>
+                      <field name="lastName">
+                        <string>Root</string>
+                      </field>
+                      <field name="email">
+                        <string>root@localhost</string>
+                      </field>
+                      <field name="groups">
+                        <string>
+                        manager:/platform/administrators,*:/platform/users,
+                        member:/organization/management/executive-board
+                      </string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$User">
+                      <field name="userName">
+                        <string>john</string>
+                      </field>
+                      <field name="password">
+                        <string>gtn</string>
+                      </field>
+                      <field name="firstName">
+                        <string>John</string>
+                      </field>
+                      <field name="lastName">
+                        <string>Anthony</string>
+                      </field>
+                      <field name="email">
+                        <string>john@localhost</string>
+                      </field>
+                      <field name="groups">
+                        <string>
+                        member:/platform/administrators,member:/platform/users,
+                        manager:/organization/management/executive-board
+                      </string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$User">
+                      <field name="userName">
+                        <string>marry</string>
+                      </field>
+                      <field name="password">
+                        <string>gtn</string>
+                      </field>
+                      <field name="firstName">
+                        <string>Marry</string>
+                      </field>
+                      <field name="lastName">
+                        <string>Kelly</string>
+                      </field>
+                      <field name="email">
+                        <string>marry@localhost</string>
+                      </field>
+                      <field name="groups">
+                        <string>member:/platform/users</string>
+                      </field>
+                    </object>
+                  </value>
+                  <value>
+                    <object type="org.exoplatform.services.organization.OrganizationConfig$User">
+                      <field name="userName">
+                        <string>demo</string>
+                      </field>
+                      <field name="password">
+                        <string>gtn</string>
+                      </field>
+                      <field name="firstName">
+                        <string>Demo</string>
+                      </field>
+                      <field name="lastName">
+                        <string>exo</string>
+                      </field>
+                      <field name="email">
+                        <string>demo@localhost</string>
+                      </field>
+                      <field name="groups">
+                        <string>member:/platform/users</string>
+                      </field>
+                    </object>
+                  </value>
+                </collection>
+              </field>
+            </object>
+          </object-param>
+        </init-params>
+      </component-plugin>
+    </component-plugins>
     <init-params>
       <object-param>
         <name>configuration</name>
         <object type="org.exoplatform.services.organization.idm.Config">
+          <field name="useParentIdAsGroupType">
+            <boolean>true</boolean>
+          </field>
           <field name="forceMembershipOfMappedTypes">
             <boolean>true</boolean>
           </field>
@@ -80,6 +509,38 @@
                 </key>
                 <value>
                   <string>root_type</string>
+                </value>
+              </entry>
+              <entry>
+                <key>
+                  <string>/platform/*</string>
+                </key>
+                <value>
+                  <string>platform_type</string>
+                </value>
+              </entry>
+              <entry>
+                <key>
+                  <string>/platform/users</string>
+                </key>
+                <value>
+                  <string>users_type</string>
+                </value>
+              </entry>
+              <entry>
+                <key>
+                  <string>/organization/acme/france</string>
+                </key>
+                <value>
+                  <string>france_type</string>
+                </value>
+              </entry>
+              <entry>
+                <key>
+                  <string>/toto/*</string>
+                </key>
+                <value>
+                  <string>toto_type</string>
                 </value>
               </entry>
               <entry>
@@ -100,8 +561,24 @@
               </entry>
             </map>
           </field>
+          <!-- If this option is used then each Membership created with MembrshipType that is
+         equal to value specified here will be stored in PicketLink IDM as simple
+         Group-User association-->
+          <field name="associationMembershipType">
+            <string>member</string>
+          </field>
+
           <field name="ignoreMappedMembershipTypeGroupList">
             <collection type="java.util.ArrayList" item-type="java.lang.String">
+              <value>
+                <string>/platform/*</string>
+              </value>
+              <value>
+                <string>/organization/acme/france</string>
+              </value>
+              <value>
+                <string>/toto/*</string>
+              </value>
               <value>
                 <string>/organization_hierarchy/*</string>
               </value>
@@ -152,16 +629,16 @@
       <properties-param>
         <name>hibernate.properties</name>
         <description>Default Hibernate Service</description>
-        <property name="hibernate.hbm2ddl.auto" value="none"/>
-        <property name="hibernate.show_sql" value="false"/>
-        <property name="hibernate.current_session_context_class" value="thread"/>
-        <property name="hibernate.cache.use_second_level_cache" value="false"/>
-        <property name="hibernate.cache.use_query_cache" value="false"/>
-        <property name="hibernate.connection.datasource" value="java:/comp/env/exo-idm_portal"/>
-        <property name="hibernate.c3p0.min_size" value="5"/>
-        <property name="hibernate.c3p0.max_size" value="20"/>
-        <property name="hibernate.c3p0.timeout" value="1800"/>
-        <property name="hibernate.c3p0.max_statements" value="50"/>
+        <property name="hibernate.hbm2ddl.auto" value="none" />
+        <property name="hibernate.show_sql" value="false" />
+        <property name="hibernate.current_session_context_class" value="thread" />
+        <property name="hibernate.cache.use_second_level_cache" value="false" />
+        <property name="hibernate.cache.use_query_cache" value="false" />
+        <property name="hibernate.connection.datasource" value="java:/comp/env/exo-idm_portal" />
+        <property name="hibernate.c3p0.min_size" value="5" />
+        <property name="hibernate.c3p0.max_size" value="20" />
+        <property name="hibernate.c3p0.timeout" value="1800" />
+        <property name="hibernate.c3p0.max_statements" value="50" />
       </properties-param>
     </init-params>
   </component>
@@ -173,35 +650,12 @@
       <properties-param>
         <name>default-properties</name>
         <description>Default initial context properties</description>
-        <property name="java.naming.factory.initial" value="org.exoplatform.services.naming.SimpleContextFactory"/>
+        <property name="java.naming.factory.initial" value="org.exoplatform.services.naming.SimpleContextFactory" />
       </properties-param>
     </init-params>
   </component>
 
-
-
   <!-- Data Initialization -->
-  <external-component-plugins>
-    <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
-    <component-plugin>
-      <name>IDMChangeLogsPlugin</name>
-      <set-method>addChangeLogsPlugin</set-method>
-      <type>org.exoplatform.commons.persistence.impl.ChangeLogsPlugin</type>
-      <init-params>
-        <value-param>
-          <name>datasource</name>
-          <description>Change logs of IDM database</description>
-          <value>java:/comp/env/exo-idm_portal</value>
-        </value-param>
-        <values-param>
-          <name>changelogs</name>
-          <description>Change logs of idm queue</description>
-          <value>db/changelog/idm.db.changelog-1.0.0.xml</value>
-        </values-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-
   <external-component-plugins>
     <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
     <component-plugin>
@@ -224,276 +678,61 @@
         <properties-param>
           <name>ref-addresses</name>
           <description>ref-addresses</description>
-          <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
-          <property name="url" value="jdbc:hsqldb:mem:dbIdm;hsqldb.tx=mvcc"/>
+          <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+          <property name="url" value="jdbc:hsqldb:mem:dbIdm;hsqldb.tx=mvcc" />
         </properties-param>
         <properties-param profiles="mysql">
           <name>ref-addresses</name>
           <description>ref-addresses</description>
-          <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-          <property name="url"
-                    value="jdbc:mysql://10.37.129.4/jdbcidm?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8"/>
-          <property name="username" value="root"/>
-          <property name="password" value=""/>
+          <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+          <property name="url" value="jdbc:mysql://10.37.129.4/jdbcidm?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8" />
+          <property name="username" value="root" />
+          <property name="password" value="" />
         </properties-param>
         <properties-param profiles="h2">
           <name>ref-addresses</name>
           <description>ref-addresses</description>
-          <property name="driverClassName" value="org.h2.Driver"/>
-          <property name="url" value="jdbc:h2:file:${gatein.test.tmp.dir}/db/data/jdbcidm;DB_CLOSE_DELAY=-1"/>
-          <property name="username" value="sa"/>
-          <property name="password" value="sa"/>
+          <property name="driverClassName" value="org.h2.Driver" />
+          <property name="url" value="jdbc:h2:file:${gatein.test.tmp.dir}/db/data/jdbcidm;DB_CLOSE_DELAY=-1" />
+          <property name="username" value="sa" />
+          <property name="password" value="sa" />
         </properties-param>
       </init-params>
     </component-plugin>
   </external-component-plugins>
 
+  <!-- Data Initialization -->
   <external-component-plugins>
-    <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
+    <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
     <component-plugin>
-      <name>init.service.listener</name>
-      <set-method>addListenerPlugin</set-method>
-      <type>org.exoplatform.services.organization.OrganizationDatabaseInitializer</type>
-      <description>this listener populate organization data for the first launch</description>
+      <name>IDMQueueChangeLogsPlugin</name>
+      <set-method>addChangeLogsPlugin</set-method>
+      <type>org.exoplatform.commons.persistence.impl.ChangeLogsPlugin</type>
+      <init-params>
+        <values-param>
+          <name>changelogs</name>
+          <description>Change logs of idm queue</description>
+          <value>db/changelog/idm.queue.db.changelog-1.0.0.xml</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+    <component-plugin>
+      <name>IDMChangeLogsPlugin</name>
+      <set-method>addChangeLogsPlugin</set-method>
+      <type>org.exoplatform.commons.persistence.impl.ChangeLogsPlugin</type>
       <init-params>
         <value-param>
-          <name>checkDatabaseAlgorithm</name>
-          <description>check database</description>
-          <value>entry</value>
+          <name>datasource</name>
+          <description>Change logs of IDM database</description>
+          <value>${exo.idm.datasource.name:java:/comp/env/exo-idm_portal}</value>
         </value-param>
-        <value-param>
-          <name>printInformation</name>
-          <description>Print information init database</description>
-          <value>false</value>
-        </value-param>
-        <object-param>
-          <name>configuration</name>
-          <description>description</description>
-          <object type="org.exoplatform.services.organization.OrganizationConfig">
-            <field  name="membershipType">
-              <collection type="java.util.ArrayList">
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$MembershipType">
-                    <field  name="type"><string>manager</string></field>
-                    <field  name="description"><string>manager membership type</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$MembershipType">
-                    <field  name="type"><string>member</string></field>
-                    <field  name="description"><string>member membership type</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$MembershipType">
-                    <field  name="type"><string>validator</string></field>
-                    <field  name="description"><string>validator membership type</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$MembershipType">
-                    <field  name="type"><string>*</string></field>
-                    <field  name="description"><string>any membership type</string></field>
-                  </object>
-                </value>
-              </collection>
-            </field>
-
-            <field  name="group">
-              <collection type="java.util.ArrayList">
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>platform</string></field>
-                    <field  name="parentId"><string></string></field>
-                    <field  name="description"><string>the /platform group</string></field>
-                    <field  name="label"><string>Platform</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>administrators</string></field>
-                    <field  name="parentId"><string>/platform</string></field>
-                    <field  name="description"><string>the /platform/administrators group</string></field>
-                    <field  name="label"><string>Administrators</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>users</string></field>
-                    <field  name="parentId"><string>/platform</string></field>
-                    <field  name="description"><string>the /platform/users group</string></field>
-                    <field  name="label"><string>Users</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>guests</string></field>
-                    <field  name="parentId"><string>/platform</string></field>
-                    <field  name="description"><string>the /platform/guests group</string></field>
-                    <field  name="label"><string>Guests</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>organization</string></field>
-                    <field  name="parentId"><string></string></field>
-                    <field  name="description"><string>the organization group</string></field>
-                    <field  name="label"><string>Organization</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>management</string></field>
-                    <field  name="parentId"><string>/organization</string></field>
-                    <field  name="description"><string>the /organization/management group</string></field>
-                    <field  name="label"><string>Management</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>executive-board</string></field>
-                    <field  name="parentId"><string>/organization/management</string></field>
-                    <field  name="description"><string>the /organization/management/executive-board group</string></field>
-                    <field  name="label"><string>Executive Board</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>human-resources</string></field>
-                    <field  name="parentId"><string>/organization/management</string></field>
-                    <field  name="description"><string>the /organization/management/human-resource group</string></field>
-                    <field  name="label"><string>Human Resources</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>communication</string></field>
-                    <field  name="parentId"><string>/organization</string></field>
-                    <field  name="description"><string>the /organization/communication group</string></field>
-                    <field  name="label"><string>Communication</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>marketing</string></field>
-                    <field  name="parentId"><string>/organization/communication</string></field>
-                    <field  name="description"><string>the /organization/communication/marketing group</string></field>
-                    <field  name="label"><string>Marketing</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>press-and-media</string></field>
-                    <field  name="parentId"><string>/organization/communication</string></field>
-                    <field  name="description"><string>the /organization/communication/press-and-media group</string></field>
-                    <field  name="label"><string>Press and Media</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>operations</string></field>
-                    <field  name="parentId"><string>/organization</string></field>
-                    <field  name="description"><string>the /organization/operations and media group</string></field>
-                    <field  name="label"><string>Operations</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>sales</string></field>
-                    <field  name="parentId"><string>/organization/operations</string></field>
-                    <field  name="description"><string>the /organization/operations/sales group</string></field>
-                    <field  name="label"><string>Sales</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>finances</string></field>
-                    <field  name="parentId"><string>/organization/operations</string></field>
-                    <field  name="description"><string>the /organization/operations/finances group</string></field>
-                    <field  name="label"><string>Finances</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>customers</string></field>
-                    <field  name="parentId"><string></string></field>
-                    <field  name="description"><string>the /customers group</string></field>
-                    <field  name="label"><string>Customers</string></field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
-                    <field  name="name"><string>partners</string></field>
-                    <field  name="parentId"><string></string></field>
-                    <field  name="description"><string>the /partners group</string></field>
-                    <field  name="label"><string>Partners</string></field>
-                  </object>
-                </value>
-              </collection>
-            </field>
-
-            <field  name="user">
-              <collection type="java.util.ArrayList">
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$User">
-                    <field  name="userName"><string>root</string></field>
-                    <field  name="password"><string>gtn</string></field>
-                    <field  name="firstName"><string>Root</string></field>
-                    <field  name="lastName"><string>Root</string></field>
-                    <field  name="email"><string>root@localhost</string></field>
-                    <field  name="groups">
-                      <string>
-                        manager:/platform/administrators,member:/platform/users,
-                        member:/organization/management/executive-board
-                      </string>
-                    </field>
-                  </object>
-                </value>
-
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$User">
-                    <field  name="userName"><string>john</string></field>
-                    <field  name="password"><string>gtn</string></field>
-                    <field  name="firstName"><string>John</string></field>
-                    <field  name="lastName"><string>Anthony</string></field>
-                    <field  name="email"><string>john@localhost</string></field>
-                    <field  name="groups">
-                      <string>
-                        member:/platform/administrators,member:/platform/users,
-                        manager:/organization/management/executive-board
-                      </string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$User">
-                    <field  name="userName"><string>marry</string></field>
-                    <field  name="password"><string>gtn</string></field>
-                    <field  name="firstName"><string>Marry</string></field>
-                    <field  name="lastName"><string>Kelly</string></field>
-                    <field  name="email"><string>marry@localhost</string></field>
-                    <field  name="groups">
-                      <string>member:/platform/users</string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.organization.OrganizationConfig$User">
-                    <field  name="userName"><string>demo</string></field>
-                    <field  name="password"><string>gtn</string></field>
-                    <field  name="firstName"><string>Demo</string></field>
-                    <field  name="lastName"><string>exo</string></field>
-                    <field  name="email"><string>demo@localhost</string></field>
-                    <field  name="groups">
-                      <string>member:/platform/guests,member:/platform/users</string>
-                    </field>
-                  </object>
-                </value>
-              </collection>
-            </field>
-          </object>
-        </object-param>
+        <values-param>
+          <name>changelogs</name>
+          <description>Change logs of idm queue</description>
+          <value>db/changelog/idm.db.changelog-1.0.0.xml</value>
+        </values-param>
       </init-params>
     </component-plugin>
   </external-component-plugins>
+
 </configuration>

@@ -15,93 +15,87 @@
  */
 package org.exoplatform.portal.mop.jdbc.dao.mock;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
+import org.gatein.api.common.Pagination;
 import org.gatein.api.page.PageQuery;
+import org.gatein.api.site.SiteType;
 
-import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.jpa.mock.AbstractInMemoryDAO;
 import org.exoplatform.portal.jdbc.entity.PageEntity;
 import org.exoplatform.portal.mop.jdbc.dao.PageDAO;
 import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.services.organization.mock.InMemoryListAccess;
 
-public class InMemoryPageDAO implements PageDAO {
-
-  @Override
-  public Long count() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public PageEntity find(Long id) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public List<PageEntity> findAll() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public PageEntity create(PageEntity entity) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void createAll(List<PageEntity> entities) {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public PageEntity update(PageEntity entity) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void updateAll(List<PageEntity> entities) {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void delete(PageEntity entity) {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void deleteAll(List<PageEntity> entities) {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void deleteAll() {
-    // TODO Auto-generated method stub
-    
-  }
+public class InMemoryPageDAO extends AbstractInMemoryDAO<PageEntity> implements PageDAO {
 
   @Override
   public PageEntity findByKey(PageKey pageKey) {
-    // TODO Auto-generated method stub
-    return null;
+    return entities.values()
+                   .stream()
+                   .filter(page -> StringUtils.equals(pageKey.getName(), page.getName())
+                       && StringUtils.equals(pageKey.getSite().getName(), page.getOwnerId())
+                       && pageKey.getSite().getType().equals(page.getOwnerType()))
+                   .findFirst()
+                   .orElse(null);
   }
 
   @Override
-  public ListAccess<PageEntity> findByQuery(PageQuery query) {
-    // TODO Auto-generated method stub
-    return null;
+  public InMemoryListAccess<PageEntity> findByQuery(PageQuery query) { // NOSONAR
+    Pagination pagination = query.getPagination();
+    Stream<PageEntity> pagesStream = entities.values()
+                                             .stream()
+                                             .filter(page -> {
+                                               if (StringUtils.isNotBlank(query.getSiteName())
+                                                   && !StringUtils.equals(query.getSiteName(), page.getOwnerId())) { // NOSONAR
+                                                 return false;
+                                               }
+                                               if (query.getSiteType() != null // NOSONAR
+                                                   && convertSiteType(query.getSiteType()) != page.getOwnerType()) {
+                                                 return false;
+                                               }
+                                               if (query.getDisplayName() != null // NOSONAR
+                                                   && (page.getDisplayName() == null
+                                                       || !StringUtils.contains(page.getDisplayName().toLowerCase(),
+                                                                                query.getDisplayName().toLowerCase()))) {
+                                                 return false;
+                                               }
+                                               return true;
+                                             });
+    if (pagination != null && pagination.getLimit() > 0) {
+      pagesStream = pagesStream.limit((long) pagination.getOffset() + pagination.getLimit());
+      List<PageEntity> result = pagesStream.toList();
+      if (pagination.getOffset() > 0) {
+        result = result.size() > pagination.getOffset() ? result.subList(pagination.getOffset(), result.size())
+                                                        : Collections.emptyList();
+      }
+      return new InMemoryListAccess<>(result, new PageEntity[0]);
+    } else {
+      List<PageEntity> result = pagesStream.toList();
+      return new InMemoryListAccess<>(result, new PageEntity[0]);
+    }
   }
 
   @Override
-  public void deleteByOwner(long id) {
-    // TODO Auto-generated method stub
-    
+  public void deleteByOwner(long ownerId) {
+    List<PageEntity> ownerPages = entities.values()
+                                          .stream()
+                                          .filter(page -> ownerId == page.getOwner().getId())
+                                          .toList();
+    deleteAll(ownerPages);
   }
 
+  private org.exoplatform.portal.mop.SiteType convertSiteType(SiteType siteType) {
+    switch (siteType) {
+    case SITE:
+      return org.exoplatform.portal.mop.SiteType.PORTAL;
+    case SPACE:
+      return org.exoplatform.portal.mop.SiteType.GROUP;
+    default:
+      return org.exoplatform.portal.mop.SiteType.USER;
+    }
+  }
 }

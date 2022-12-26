@@ -25,12 +25,8 @@
                xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
     <component>
-        <type>org.exoplatform.mock.DummyDependantComponent</type>
-    </component>
-
-    <component>
         <key>org.exoplatform.services.naming.InitialContextInitializer</key>
-        <type>org.exoplatform.services.naming.InitialContextInitializer</type>
+        <type>org.exoplatform.commons.InitialContextInitializer2</type>
         <init-params>
             <properties-param>
                 <name>default-properties</name>

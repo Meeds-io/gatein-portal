@@ -24,8 +24,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.MembershipEventListener;
@@ -35,8 +33,6 @@ import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.idm.MembershipImpl;
 
 public class InMemoryMembershipHandler implements MembershipHandler {
-
-  private static final Log              LOG                              = ExoLogger.getLogger(InMemoryMembershipHandler.class);
 
   private static final String           ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
 
@@ -95,7 +91,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
                                                            (key,
                                                             existingMemberships) -> existingMemberships == null ? Collections.emptyList()
                                                                                                                 : new ArrayList<>(existingMemberships));
-    memberships.forEach(membership -> removeMembership(membership.getId(), broadcast));
+    removeMemberships(memberships, broadcast);
     return memberships;
   }
 
@@ -104,7 +100,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
                                                             (key,
                                                              existingMemberships) -> existingMemberships == null ? Collections.emptyList()
                                                                                                                  : new ArrayList<>(existingMemberships));
-    memberships.forEach(membership -> removeMembership(membership.getId(), broadcast));
+    removeMemberships(memberships, broadcast);
     return memberships;
   }
 
@@ -113,7 +109,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
                                                                      (key,
                                                                       existingMemberships) -> existingMemberships == null ? Collections.emptyList()
                                                                                                                           : new ArrayList<>(existingMemberships));
-    memberships.forEach(membership -> removeMembership(membership.getId(), broadcast));
+    removeMemberships(memberships, broadcast);
     return memberships;
   }
 
@@ -149,7 +145,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
 
   @Override
   public ListAccess<Membership> findAllMembershipsByUser(User user) {
-    return new InMemoryListAccess<>(findMembershipsByUser(user.getUserName()));
+    return new InMemoryListAccess<>(findMembershipsByUser(user.getUserName()), new Membership[0]);
   }
 
   @Override
@@ -163,7 +159,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
 
   @Override
   public ListAccess<Membership> findAllMembershipsByGroup(Group group) {
-    return new InMemoryListAccess<>(findMembershipsByGroup(group));
+    return new InMemoryListAccess<>(findMembershipsByGroup(group), new Membership[0]);
   }
 
   private void saveMembership(Membership membership, boolean broadcast) {
@@ -210,7 +206,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
       try {
         listener.preSave(membership, true);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -220,7 +216,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
       try {
         listener.postSave(membership, true);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -230,7 +226,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
       try {
         listener.preDelete(membership);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
     }
   }
@@ -240,8 +236,15 @@ public class InMemoryMembershipHandler implements MembershipHandler {
       try {
         listener.postDelete(membership);
       } catch (Exception e) {
-        LOG.warn(ERROR_BROADCASTING_EVENT_MESSAGE, listener.getClass(), e);
+        throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
+    }
+  }
+
+  private void removeMemberships(List<Membership> memberships, boolean broadcast) {
+    Membership[] membershipsArray = memberships.toArray(new Membership[0]);
+    for (Membership membership : membershipsArray) {
+      removeMembership(membership.getId(), broadcast);
     }
   }
 

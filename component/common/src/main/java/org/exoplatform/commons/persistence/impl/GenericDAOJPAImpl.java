@@ -32,6 +32,7 @@ import org.hibernate.internal.SessionFactoryImpl;
 
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.api.persistence.GenericDAO;
+import org.exoplatform.settings.jpa.entity.ScopeEntity;
 
 /**
  * @author <a href="trongtt@gmail.com">Trong Tran</a>

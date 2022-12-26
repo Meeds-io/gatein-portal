@@ -9,7 +9,7 @@ import org.exoplatform.services.organization.search.UserSearchService;
 
 @ConfiguredBy(
   {
-      @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration-local.xml"),
+      @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
       @ConfigurationUnit(
           scope = ContainerScope.PORTAL, path = "org/exoplatform/services/organization/TestOrganization-configuration.xml"
       ) }
