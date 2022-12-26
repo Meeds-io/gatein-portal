@@ -86,11 +86,7 @@ public class ExoTransactionalAspect {
       begunTx = true;
     }
     try {
-      Object result = point.proceed();
-      return result;
-    } catch (RuntimeException e) {
-        LOG.error("Error while processing transactional method.", e);
-        throw e;
+      return point.proceed();
     } finally {
       // Do we need to end Transaction ?
       try {
