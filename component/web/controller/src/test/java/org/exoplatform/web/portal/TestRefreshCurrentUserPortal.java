@@ -53,10 +53,10 @@ public class TestRefreshCurrentUserPortal extends AbstractKernelTest {
 
   @Override
   protected void setUp() throws Exception {
+    super.setUp();
     begin();
 
-    UserPortalConfigService upcs = (UserPortalConfigService) getContainer().getComponentInstanceOfType(
-                                                                                                       UserPortalConfigService.class);
+    UserPortalConfigService upcs = getContainer().getComponentInstanceOfType(UserPortalConfigService.class);
     UserPortalConfig upc = upcs.getUserPortalConfig("classic", "root", new SimpleUserPortalContext(Locale.ENGLISH));
     final UserPortal userPortal = upc.getUserPortal();
 
@@ -111,6 +111,7 @@ public class TestRefreshCurrentUserPortal extends AbstractKernelTest {
   @Override
   protected void tearDown() throws Exception {
     end();
+    super.tearDown();
   }
 
   public void testCreate() throws Exception {
