@@ -221,6 +221,7 @@ public class InMemoryUserHandler implements UserHandler {
     List<User> users = usersById.values()
                                 .stream()
                                 .map(user -> filterUserStatus(user, userStatus))
+                                .filter(Objects::nonNull)
                                 .filter(user -> contains(user.getEmail(), query.getEmail())
                                     && contains(user.getFirstName(), query.getFirstName())
                                     && contains(user.getLastName(), query.getLastName())
@@ -293,7 +294,12 @@ public class InMemoryUserHandler implements UserHandler {
     if (broadcast) {
       preSave(user, isNew);
     }
-    usersById.put(user.getUserName(), user);
+    String userName = user.getUserName();
+    if (StringUtils.isBlank(user.getPassword()) && usersById.containsKey(userName)) {
+      // Preserve old password of user if not changed by current save
+      user.setPassword(usersById.get(userName).getPassword());
+    }
+    usersById.put(userName, user);
     if (broadcast) {
       postSave(user, isNew);
     }

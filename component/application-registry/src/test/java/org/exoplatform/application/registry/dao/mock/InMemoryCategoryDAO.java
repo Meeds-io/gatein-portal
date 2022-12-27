@@ -15,21 +15,57 @@
  */
 package org.exoplatform.application.registry.dao.mock;
 
+import java.util.HashSet;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.application.registry.dao.CategoryDAO;
+import org.exoplatform.application.registry.entity.ApplicationEntity;
 import org.exoplatform.application.registry.entity.CategoryEntity;
 import org.exoplatform.jpa.mock.AbstractInMemoryDAO;
 
 public class InMemoryCategoryDAO extends AbstractInMemoryDAO<CategoryEntity> implements CategoryDAO {
 
-  @Override
-  public CategoryEntity findByName(String name) {
-    return entities.values()
-                   .stream()
-                   .filter(entity -> StringUtils.equals(name, entity.getName()))
-                   .findFirst()
-                   .orElse(null);
+  private InMemoryApplicationDAO applicationDAO;
+
+  public InMemoryCategoryDAO(InMemoryApplicationDAO applicationDAO) {
+    this.applicationDAO = applicationDAO;
   }
 
+  @Override
+  public List<CategoryEntity> findAll() {
+    List<CategoryEntity> categories = super.findAll();
+    return categories.stream().map(entity -> this.findByName(entity.getName())).toList();
+  }
+
+  @Override
+  public CategoryEntity findByName(String name) {
+    CategoryEntity categoryEntity = entities.values()
+                                            .stream()
+                                            .filter(entity -> StringUtils.equals(name, entity.getName()))
+                                            .findFirst()
+                                            .orElse(null);
+    if (categoryEntity != null) {
+      List<ApplicationEntity> applications = getCategoryApplications(name);
+      categoryEntity.setApplications(new HashSet<>(applications));
+    }
+    return categoryEntity;
+  }
+
+  @Override
+  public void delete(CategoryEntity entity) {
+    super.delete(entity);
+    List<ApplicationEntity> applications = getCategoryApplications(entity.getName());
+    applications.forEach(applicationDAO::delete);
+  }
+
+  private List<ApplicationEntity> getCategoryApplications(String name) {
+    return this.applicationDAO.findAll()
+                              .stream()
+                              .filter(appEntity -> appEntity.getCategory() != null
+                                  && StringUtils.equals(appEntity.getCategory().getName(),
+                                                        name))
+                              .toList();
+  }
 }
