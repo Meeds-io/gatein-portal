@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.MembershipTypeEventListener;
 import org.exoplatform.services.organization.MembershipTypeHandler;
@@ -66,7 +68,7 @@ public class InMemoryMembershipTypeHandler implements MembershipTypeHandler {
   @Override
   public MembershipType createMembershipType(MembershipType membershipType, boolean broadcast) {
     if (membershipTypesById.containsKey(membershipType.getName())) {
-      return membershipTypesById.get(membershipType.getName());
+      return findMembershipType(membershipType.getName());
     }
     return saveMembershipType(membershipType, broadcast);
   }
@@ -79,16 +81,16 @@ public class InMemoryMembershipTypeHandler implements MembershipTypeHandler {
     Date now = new Date();
     membershipType.setCreatedDate(now);
     membershipType.setModifiedDate(now);
-    membershipTypesById.put(membershipType.getName(), membershipType);
+    membershipTypesById.put(membershipType.getName(), ObjectUtils.clone(membershipType));
     if (broadcast) {
       postSave(membershipType, true);
     }
-    return membershipType;
+    return ObjectUtils.clone(membershipType);
   }
 
   @Override
   public MembershipType findMembershipType(String name) {
-    return membershipTypesById.get(name);
+    return ObjectUtils.clone(membershipTypesById.get(name));
   }
 
   @Override
@@ -121,6 +123,8 @@ public class InMemoryMembershipTypeHandler implements MembershipTypeHandler {
     for (MembershipTypeEventListener listener : membershipTypeListeners) {
       try {
         listener.preSave(membershipType, isNew);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -131,6 +135,8 @@ public class InMemoryMembershipTypeHandler implements MembershipTypeHandler {
     for (MembershipTypeEventListener listener : membershipTypeListeners) {
       try {
         listener.postSave(membershipType, isNew);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -141,6 +147,8 @@ public class InMemoryMembershipTypeHandler implements MembershipTypeHandler {
     for (MembershipTypeEventListener listener : membershipTypeListeners) {
       try {
         listener.preDelete(membershipType);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -151,6 +159,8 @@ public class InMemoryMembershipTypeHandler implements MembershipTypeHandler {
     for (MembershipTypeEventListener listener : membershipTypeListeners) {
       try {
         listener.postDelete(membershipType);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.LazyPageList;
@@ -34,6 +35,7 @@ import org.exoplatform.services.organization.Query;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserEventListener;
 import org.exoplatform.services.organization.UserHandler;
+import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserStatus;
 import org.exoplatform.services.organization.idm.EntityMapperUtils;
 import org.exoplatform.services.organization.idm.UserImpl;
@@ -125,7 +127,7 @@ public class InMemoryUserHandler implements UserHandler {
     if (!usersById.containsKey(userName)) {
       return null;
     }
-    User user = usersById.get(userName);
+    User user = getClonedUser(userName);
     if (user.isEnabled() == enabled) {
       return user;
     }
@@ -143,7 +145,7 @@ public class InMemoryUserHandler implements UserHandler {
 
   @Override
   public User removeUser(String userName, boolean broadcast) {
-    User user = usersById.get(userName);
+    User user = getClonedUser(userName);
     if (broadcast) {
       preDelete(user);
     }
@@ -170,13 +172,13 @@ public class InMemoryUserHandler implements UserHandler {
     if (!usersById.containsKey(userName)) {
       return null;
     }
-    User user = usersById.get(userName);
+    User user = getClonedUser(userName);
     return filterUserStatus(user, userStatus);
   }
 
   @Override
   public LazyPageList<User> getUserPageList(int pageSize) {
-    return new LazyPageList<>(new InMemoryListAccess<>(new ArrayList<>(usersById.values()), new User[0]),
+    return new LazyPageList<>(new InMemoryListAccess<>(usersById.values().stream().toList(), new User[0]),
                               pageSize);
   }
 
@@ -199,7 +201,7 @@ public class InMemoryUserHandler implements UserHandler {
     if (!usersById.containsKey(username)) {
       return false;
     }
-    User user = usersById.get(username);
+    User user = getClonedUser(username);
     if (!user.isEnabled()) {
       throw new DisabledUserException(username);
     }
@@ -266,6 +268,39 @@ public class InMemoryUserHandler implements UserHandler {
     return new InMemoryListAccess<>(users, new User[0]);
   }
 
+  // TODO Not Overridden but used, should be part of API in core module !!!
+  public User findUserByUniqueAttribute(String attributeName, String attributeValue, UserStatus userStatus) {
+    InMemoryUserProfileHandler userProfileHandler = (InMemoryUserProfileHandler) organizationService.getUserProfileHandler();
+    List<UserProfile> profiles = userProfileHandler.findUserProfiles()
+                                                   .stream()
+                                                   .filter(Objects::nonNull)
+                                                   .filter(profile -> profile.getUserInfoMap() != null
+                                                       && profile.getUserInfoMap().containsKey(attributeName)
+                                                       && StringUtils.equals(profile.getUserInfoMap().get(attributeName),
+                                                                             attributeValue))
+                                                   .distinct()
+                                                   .toList();
+    User user = null;
+    if (profiles.isEmpty()) {
+      if (StringUtils.equals("userName", attributeName)) {
+        user = usersById.values()
+                        .stream()
+                        .filter(existingUser -> StringUtils.equals(existingUser.getUserName(), attributeValue))
+                        .findFirst()
+                        .orElse(null);
+      } else if (StringUtils.equals("email", attributeName)) {
+        user = usersById.values()
+                        .stream()
+                        .filter(existingUser -> StringUtils.equalsIgnoreCase(existingUser.getEmail(), attributeValue))
+                        .findFirst()
+                        .orElse(null);
+      }
+    } else if (profiles.size() == 1) {
+      user = usersById.get(profiles.get(0).getUserName());
+    }
+    return filterUserStatus(user, userStatus);
+  }
+
   @Override
   public boolean isUpdateLastLoginTime() {
     return true;
@@ -297,7 +332,7 @@ public class InMemoryUserHandler implements UserHandler {
     String userName = user.getUserName();
     if (StringUtils.isBlank(user.getPassword()) && usersById.containsKey(userName)) {
       // Preserve old password of user if not changed by current save
-      user.setPassword(usersById.get(userName).getPassword());
+      user.setPassword(getClonedUser(userName).getPassword());
     }
     usersById.put(userName, user);
     if (broadcast) {
@@ -309,6 +344,8 @@ public class InMemoryUserHandler implements UserHandler {
     for (UserEventListener listener : userListeners) {
       try {
         listener.preSave(user, isNew);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -319,6 +356,8 @@ public class InMemoryUserHandler implements UserHandler {
     for (UserEventListener listener : userListeners) {
       try {
         listener.postSave(user, isNew);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -329,6 +368,8 @@ public class InMemoryUserHandler implements UserHandler {
     for (UserEventListener listener : userListeners) {
       try {
         listener.preDelete(user);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -339,6 +380,8 @@ public class InMemoryUserHandler implements UserHandler {
     for (UserEventListener listener : userListeners) {
       try {
         listener.postDelete(user);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -349,6 +392,8 @@ public class InMemoryUserHandler implements UserHandler {
     for (UserEventListener listener : userListeners)
       try {
         listener.preSetEnabled(user);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -358,6 +403,8 @@ public class InMemoryUserHandler implements UserHandler {
     for (UserEventListener listener : userListeners)
       try {
         listener.postSetEnabled(user);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -373,6 +420,10 @@ public class InMemoryUserHandler implements UserHandler {
 
   private boolean contains(String value, String queryString) {
     return StringUtils.isBlank(queryString) || StringUtils.contains(value, queryString.replace("*", ""));
+  }
+
+  private User getClonedUser(String userName) {
+    return ObjectUtils.clone(usersById.get(userName));
   }
 
 }

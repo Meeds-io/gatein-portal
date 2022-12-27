@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.ListAccess;
@@ -111,7 +112,7 @@ public class InMemoryGroupHandler implements GroupHandler {
       preSave(group, broadcast);
     }
 
-    groupsById.put(group.getId(), group);
+    groupsById.put(group.getId(), ObjectUtils.clone(group));
     if (group.getId().lastIndexOf("/") > 0) {
       String[] parts = group.getId().split("/");
       String parentId = StringUtils.join(Arrays.copyOfRange(parts, 0, parts.length - 1), "/");
@@ -119,7 +120,8 @@ public class InMemoryGroupHandler implements GroupHandler {
     } else {
       group.setParentId(ROOT_PARENT_ID);
     }
-    groupChildsById.computeIfAbsent(group.getParentId(), key -> new HashMap<String, Group>()).put(group.getId(), group);
+    groupChildsById.computeIfAbsent(group.getParentId(), key -> new HashMap<String, Group>())
+                   .put(group.getId(), ObjectUtils.clone(group));
 
     if (broadcast) {
       postSave(group, broadcast);
@@ -148,6 +150,7 @@ public class InMemoryGroupHandler implements GroupHandler {
     return memberships.stream()
                       .map(membership -> groupsById.get(membership.getGroupId()))
                       .filter(Objects::nonNull)
+                      .map(ObjectUtils::clone)
                       .toList();
   }
 
@@ -161,12 +164,13 @@ public class InMemoryGroupHandler implements GroupHandler {
                                                                                   membershipType) ? groupsById.get(membership.getGroupId())
                                                                                                   : null)
                       .filter(Objects::nonNull)
+                      .map(ObjectUtils::clone)
                       .toList();
   }
 
   @Override
   public Group findGroupById(String groupId) {
-    return groupsById.get(groupId);
+    return ObjectUtils.clone(groupsById.get(groupId));
   }
 
   @Override
@@ -182,7 +186,10 @@ public class InMemoryGroupHandler implements GroupHandler {
 
   public Collection<Group> findGroups(Group parent) {
     return groupChildsById.computeIfAbsent(parent.getId(), key -> Collections.emptyMap())
-                          .values();
+                          .values()
+                          .stream()
+                          .map(ObjectUtils::clone)
+                          .toList();
   }
 
   public Collection<Group> findGroupsOfUser(String userName) {
@@ -190,6 +197,7 @@ public class InMemoryGroupHandler implements GroupHandler {
     return memberships.stream()
                       .map(membership -> groupsById.get(membership.getGroupId()))
                       .filter(Objects::nonNull)
+                      .map(ObjectUtils::clone)
                       .toList();
   }
 
@@ -200,7 +208,7 @@ public class InMemoryGroupHandler implements GroupHandler {
   }
 
   public Collection<Group> getAllGroups() {
-    return groupsById.values();
+    return groupsById.values().stream().map(ObjectUtils::clone).toList();
   }
 
   public ListAccess<Group> findGroupsByKeyword(String keyword) {
@@ -239,6 +247,8 @@ public class InMemoryGroupHandler implements GroupHandler {
     for (GroupEventListener listener : groupListeners) {
       try {
         listener.preSave(group, isNew);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -249,6 +259,8 @@ public class InMemoryGroupHandler implements GroupHandler {
     for (GroupEventListener listener : groupListeners) {
       try {
         listener.postSave(group, isNew);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -259,6 +271,8 @@ public class InMemoryGroupHandler implements GroupHandler {
     for (GroupEventListener listener : groupListeners) {
       try {
         listener.preDelete(group);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -269,6 +283,8 @@ public class InMemoryGroupHandler implements GroupHandler {
     for (GroupEventListener listener : groupListeners) {
       try {
         listener.postDelete(group);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }

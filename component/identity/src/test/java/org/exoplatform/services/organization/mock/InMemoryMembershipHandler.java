@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.ListAccess;
@@ -115,7 +116,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
 
   @Override
   public Membership findMembership(String id) {
-    return membershipsById.get(id);
+    return ObjectUtils.clone(membershipsById.get(id));
   }
 
   @Override
@@ -135,6 +136,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
                           .stream()
                           .filter(membership -> StringUtils.equals(userName, membership.getUserName())
                               && StringUtils.equals(groupId, membership.getGroupId()))
+                          .map(ObjectUtils::clone)
                           .toList();
   }
 
@@ -169,7 +171,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
     if (broadcast) {
       preSave(membership);
     }
-    membershipsById.put(membership.getId(), membership);
+    membershipsById.put(membership.getId(), ObjectUtils.clone(membership));
     userMemberships.computeIfAbsent(membership.getUserName(), key -> new ArrayList<Membership>()).add(membership);
     groupMemberships.computeIfAbsent(membership.getGroupId(), key -> new ArrayList<Membership>()).add(membership);
     membershipTypeMemberships.computeIfAbsent(membership.getMembershipType(), key -> new ArrayList<Membership>()).add(membership);
@@ -205,6 +207,8 @@ public class InMemoryMembershipHandler implements MembershipHandler {
     for (MembershipEventListener listener : membershiptListeners) {
       try {
         listener.preSave(membership, true);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -215,6 +219,8 @@ public class InMemoryMembershipHandler implements MembershipHandler {
     for (MembershipEventListener listener : membershiptListeners) {
       try {
         listener.postSave(membership, true);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -225,6 +231,8 @@ public class InMemoryMembershipHandler implements MembershipHandler {
     for (MembershipEventListener listener : membershiptListeners) {
       try {
         listener.preDelete(membership);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -235,6 +243,8 @@ public class InMemoryMembershipHandler implements MembershipHandler {
     for (MembershipEventListener listener : membershiptListeners) {
       try {
         listener.postDelete(membership);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }

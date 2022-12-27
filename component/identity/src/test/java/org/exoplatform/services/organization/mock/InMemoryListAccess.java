@@ -1,8 +1,10 @@
 package org.exoplatform.services.organization.mock;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 
 import org.exoplatform.commons.utils.ListAccess;
 
@@ -16,7 +18,7 @@ public class InMemoryListAccess<T> implements ListAccess<T> {
 
   @SuppressWarnings("unchecked")
   public InMemoryListAccess(List<T> values, T[] defaultResult) {
-    this.values = values;
+    this.values = values.stream().filter(Objects::nonNull).map(ObjectUtils::clone).toList();
     this.defaultResult = defaultResult;
     this.modelClass = CollectionUtils.isEmpty(this.values) ? null
                                                            : (Class<T>) this.values.get(0).getClass();

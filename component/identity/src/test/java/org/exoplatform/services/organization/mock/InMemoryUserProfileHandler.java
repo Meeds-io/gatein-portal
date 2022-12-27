@@ -16,10 +16,11 @@
 package org.exoplatform.services.organization.mock;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.ObjectUtils;
 
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserProfileEventListener;
@@ -66,7 +67,7 @@ public class InMemoryUserProfileHandler implements UserProfileHandler {
     if (broadcast) {
       preSave(profile, isNew);
     }
-    profilesById.put(profile.getUserName(), profile);
+    profilesById.put(profile.getUserName(), ObjectUtils.clone(profile));
     if (broadcast) {
       postSave(profile, isNew);
     }
@@ -92,18 +93,20 @@ public class InMemoryUserProfileHandler implements UserProfileHandler {
 
   @Override
   public UserProfile findUserProfileByName(String userName) {
-    return profilesById.get(userName);
+    return ObjectUtils.clone(profilesById.get(userName));
   }
 
   @Override
-  public Collection<UserProfile> findUserProfiles() {
-    return profilesById.values();
+  public List<UserProfile> findUserProfiles() {
+    return profilesById.values().stream().map(ObjectUtils::clone).toList();
   }
 
   private void preSave(UserProfile profile, boolean isNew) {
     for (UserProfileEventListener listener : profileListeners) {
       try {
         listener.preSave(profile, isNew);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -114,6 +117,8 @@ public class InMemoryUserProfileHandler implements UserProfileHandler {
     for (UserProfileEventListener listener : profileListeners) {
       try {
         listener.postSave(profile, isNew);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -124,6 +129,8 @@ public class InMemoryUserProfileHandler implements UserProfileHandler {
     for (UserProfileEventListener listener : profileListeners) {
       try {
         listener.preDelete(profile);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
@@ -134,6 +141,8 @@ public class InMemoryUserProfileHandler implements UserProfileHandler {
     for (UserProfileEventListener listener : profileListeners) {
       try {
         listener.postDelete(profile);
+      } catch (RuntimeException e) {
+        throw e;
       } catch (Exception e) {
         throw new IllegalStateException(ERROR_BROADCASTING_EVENT_MESSAGE.replace("{}", listener.getClass().getName()), e);
       }
