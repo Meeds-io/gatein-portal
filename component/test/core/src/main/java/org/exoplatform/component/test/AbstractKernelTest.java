@@ -49,6 +49,12 @@ public abstract class AbstractKernelTest extends AbstractGateInTest {
      */
     private static final Map<String, AtomicLong> COUNTERS = new HashMap<String, AtomicLong>();
 
+    static {
+      if (System.getProperty("gatein.email.domain.url") == null) {
+        System.setProperty("gatein.email.domain.url", "http://localhost:8080");
+      }
+    }
+
     /** . */
     protected AbstractKernelTest() {
         super();
