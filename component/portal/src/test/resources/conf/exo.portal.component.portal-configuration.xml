@@ -269,6 +269,14 @@
     </component-plugins>
     <init-params>
       <value-param>
+        <name>create.user.portal</name>
+        <value>false</value>
+      </value-param>
+      <value-param>
+        <name>destroy.user.portal</name>
+        <value>false</value>
+      </value-param>
+      <value-param>
         <name>default.import.mode</name>
         <value>conserve</value>
       </value-param>

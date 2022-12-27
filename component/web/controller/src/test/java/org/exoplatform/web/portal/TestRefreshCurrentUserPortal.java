@@ -123,7 +123,7 @@ public class TestRefreshCurrentUserPortal extends AbstractKernelTest {
     RequestContext.setCurrentInstance(requestContext);
     ns.saveNavigation(new NavigationContext(SiteKey.group("/platform"), new NavigationState(1)));
     navs = userPortal.getNavigations();
-    assertEquals(3, navs.size());
+        assertEquals(2, navs.size());
     RequestContext.setCurrentInstance(null);
   }
 
@@ -137,16 +137,16 @@ public class TestRefreshCurrentUserPortal extends AbstractKernelTest {
     NavigationContext nav = new NavigationContext(siteKeyToTest, new NavigationState(1));
     ns.saveNavigation(nav);
     navs = userPortal.getNavigations();
-    assertEquals(3, navs.size());
+        assertEquals(2, navs.size());
     RequestContext.setCurrentInstance(requestContext);
     NodeContext root = ns.loadNode(NodeModel.SELF_MODEL, nav, Scope.ALL, null);
     root.add(null, "foo");
     ns.saveNode(root, null);
     navs = userPortal.getNavigations();
-    assertEquals(3, navs.size());
+        assertEquals(2, navs.size());
     ns.destroyNavigation(nav);
     navs = userPortal.getNavigations();
-    assertEquals(2, navs.size());
+        assertEquals(1, navs.size());
     restartTransaction();
     RequestContext.setCurrentInstance(null);
   }
@@ -156,11 +156,11 @@ public class TestRefreshCurrentUserPortal extends AbstractKernelTest {
     NavigationContext nav = new NavigationContext(SiteKey.group("/platform"), new NavigationState(1));
     ns.saveNavigation(nav);
     List<UserNavigation> navs = userPortal.getNavigations();
-    assertEquals(3, navs.size());
+        assertEquals(2, navs.size());
     RequestContext.setCurrentInstance(requestContext);
     ns.destroyNavigation(nav);
     navs = userPortal.getNavigations();
-    assertEquals(2, navs.size());
+        assertEquals(1, navs.size());
     RequestContext.setCurrentInstance(null);
   }
 }
