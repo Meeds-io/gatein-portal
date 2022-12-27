@@ -19,16 +19,12 @@
 
 package org.exoplatform.commons;
 
-import java.io.FileNotFoundException;
-
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.xml.stream.XMLStreamException;
 
 import org.picocontainer.Startable;
 
 import org.exoplatform.container.component.ComponentPlugin;
-import org.exoplatform.container.configuration.ConfigurationException;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.naming.BindReferencePlugin;
 import org.exoplatform.services.naming.InitialContextInitializer;
@@ -44,8 +40,7 @@ import org.exoplatform.services.naming.InitialContextInitializer;
  */
 public class InitialContextInitializer2 extends InitialContextInitializer implements Startable {
 
-    public InitialContextInitializer2(InitParams params) throws NamingException, ConfigurationException, FileNotFoundException,
-            XMLStreamException {
+    public InitialContextInitializer2(InitParams params) throws Exception { // NOSONAR
         super(params);
     }
 

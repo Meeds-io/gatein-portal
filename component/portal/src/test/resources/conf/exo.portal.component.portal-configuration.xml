@@ -243,6 +243,10 @@
                   <value>classic</value>
               </value-param>
               <value-param>
+                  <name>page.templates.location</name>
+                  <value>classpath:/portal/template/pages</value>
+              </value-param>
+              <value-param>
                   <name>initializing.failure.ignore</name>
                   <value>true</value>
               </value-param>

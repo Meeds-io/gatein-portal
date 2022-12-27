@@ -53,6 +53,12 @@ public abstract class AbstractKernelTest extends AbstractGateInTest {
       if (System.getProperty("gatein.email.domain.url") == null) {
         System.setProperty("gatein.email.domain.url", "http://localhost:8080");
       }
+      if (System.getProperty("exo.files.storage.dir") == null) {
+        System.setProperty("exo.files.storage.dir", "target/files");
+      }
+      if (System.getProperty("com.arjuna.ats.arjuna.objectstore.objectStoreDir") == null) {
+        System.setProperty("com.arjuna.ats.arjuna.objectstore.objectStoreDir", "target/com.arjuna.ats.arjuna.objectstore.objectStoreDir");
+      }
     }
 
     /** . */
