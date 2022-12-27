@@ -127,9 +127,9 @@ public class InMemoryUserHandler implements UserHandler {
     if (!usersById.containsKey(userName)) {
       return null;
     }
-    User user = getClonedUser(userName);
+    User user = usersById.get(userName);
     if (user.isEnabled() == enabled) {
-      return user;
+      return getClonedUser(userName);
     }
     if (broadcast) {
       preSetEnabled(user);
@@ -140,12 +140,12 @@ public class InMemoryUserHandler implements UserHandler {
     if (broadcast) {
       postSetEnabled(user);
     }
-    return user;
+    return getClonedUser(userName);
   }
 
   @Override
   public User removeUser(String userName, boolean broadcast) {
-    User user = getClonedUser(userName);
+    User user = usersById.get(userName);
     if (broadcast) {
       preDelete(user);
     }
@@ -201,7 +201,7 @@ public class InMemoryUserHandler implements UserHandler {
     if (!usersById.containsKey(username)) {
       return false;
     }
-    User user = getClonedUser(username);
+    User user = usersById.get(username);
     if (!user.isEnabled()) {
       throw new DisabledUserException(username);
     }
@@ -332,7 +332,7 @@ public class InMemoryUserHandler implements UserHandler {
     String userName = user.getUserName();
     if (StringUtils.isBlank(user.getPassword()) && usersById.containsKey(userName)) {
       // Preserve old password of user if not changed by current save
-      user.setPassword(getClonedUser(userName).getPassword());
+      user.setPassword(usersById.get(userName).getPassword());
     }
     usersById.put(userName, user);
     if (broadcast) {

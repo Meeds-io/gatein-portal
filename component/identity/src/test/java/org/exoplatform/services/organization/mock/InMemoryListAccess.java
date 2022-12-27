@@ -23,14 +23,16 @@ public class InMemoryListAccess<T> implements ListAccess<T> {
     this.defaultResult = defaultResult;
     List<T> retrievedValues = values == null ? Collections.emptyList()
                                              : values.stream().filter(Objects::nonNull).toList();
-    if (CollectionUtils.isNotEmpty(values)) {
+    if (CollectionUtils.isNotEmpty(retrievedValues)) {
       T firstElement = retrievedValues.get(0);
       if (firstElement instanceof Cloneable) {
-        this.values = values.stream().map(ObjectUtils::clone).filter(Objects::nonNull).toList();
+        this.values = retrievedValues.stream().map(ObjectUtils::clone).filter(Objects::nonNull).toList();
       } else {
-        this.values = new ArrayList<>(values);
+        this.values = new ArrayList<>(retrievedValues);
       }
       this.modelClass = (Class<T>) firstElement.getClass();
+    } else {
+      this.values = Collections.emptyList();
     }
   }
 
