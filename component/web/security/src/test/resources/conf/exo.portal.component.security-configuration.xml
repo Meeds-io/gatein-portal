@@ -25,7 +25,6 @@
     xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-    <key>org.exoplatform.web.security.security.SecureRandomService</key>
     <type>org.exoplatform.web.security.security.SecureRandomService</type>
   </component>
 
@@ -110,24 +109,6 @@
     </init-params>
   </component>
 
-  <!-- TODO remove TransientTokenService service component -->
-  <component>
-    <key>org.exoplatform.web.security.security.TransientTokenService</key>
-    <type>org.exoplatform.web.security.security.TransientTokenService</type>
-    <init-params>
-      <value-param>
-        <name>cleanup.period.time</name>
-        <value>0</value>
-      </value-param>
-      <values-param>
-        <name>service.configuration</name>
-        <value>memory-token</value>
-        <value>2</value>
-        <value>SECOND</value>
-      </values-param>
-    </init-params>
-  </component>
-
   <component>
     <key>org.exoplatform.web.security.security.RemindPasswordTokenService</key>
     <type>org.exoplatform.web.security.security.RemindPasswordTokenService</type>
@@ -141,21 +122,5 @@
       </values-param>
     </init-params>
   </component>
-
-  <external-component-plugins>
-    <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
-    <component-plugin>
-      <name>PortalRDBMSChangeLogsPlugin</name>
-      <set-method>addChangeLogsPlugin</set-method>
-      <type>org.exoplatform.commons.persistence.impl.ChangeLogsPlugin</type>
-      <init-params>
-        <values-param>
-          <name>changelogs</name>
-          <description>Change logs of Portal RDBMS</description>
-          <value>db/changelog/gatein-token.db.changelog-1.0.0.xml</value>
-        </values-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
 
 </configuration>

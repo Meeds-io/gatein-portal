@@ -24,6 +24,21 @@
                xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
+    <key>org.exoplatform.commons.api.persistence.DataInitializer</key>
+    <type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializerTestContext</type>
+    <init-params>
+      <value-param>
+        <name>liquibase.datasource</name>
+        <value>${exo.jpa.datasource.name:java:/comp/env/exo-jpa_portal}</value>
+      </value-param>
+      <value-param>
+        <name>liquibase.contexts</name>
+        <value>${exo.liquibase.contexts:test}</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
     <key>org.exoplatform.commons.api.event.EventManager</key>
     <type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
   </component>
@@ -51,21 +66,6 @@
 
   <component>
     <type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.commons.api.persistence.DataInitializer</key>
-    <type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializer</type>
-    <init-params>
-      <value-param>
-        <name>liquibase.datasource</name>
-        <value>${exo.jpa.datasource.name:java:/comp/env/exo-jpa_portal}</value>
-      </value-param>
-      <value-param>
-        <name>liquibase.contexts</name>
-        <value>${exo.liquibase.contexts:production}</value>
-      </value-param>
-    </init-params>
   </component>
 
    <external-component-plugins>

@@ -28,6 +28,7 @@ import org.aspectj.lang.annotation.Aspect;
 
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -51,9 +52,15 @@ public class ExoTransactionalAspect {
     boolean emStarted = false;
 
     // Do we need to start EntityManager ?
-    EntityManagerService service = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(EntityManagerService.class);
+    EntityManagerService service = ExoContainerContext.getService(EntityManagerService.class);
     if (service == null) {
-      throw new IllegalStateException("Cannot find EntityManagerService instance. This may happen when ExoContainerContext.getCurrentContainer is not set in current thread.");
+      PortalContainer container = PortalContainer.getInstanceIfPresent();
+      if (container != null) {
+        service = container.getComponentInstanceOfType(EntityManagerService.class);
+      }
+      if (service == null) {
+        throw new IllegalStateException("Cannot find EntityManagerService instance. This may happen when ExoContainerContext.getCurrentContainer is not set in current thread.");
+      }
     }
     entityManager = service.getEntityManager();
     if (entityManager == null) {

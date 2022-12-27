@@ -119,7 +119,7 @@
 
   <component>
     <key>org.exoplatform.services.organization.OrganizationService</key>
-    <type>org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl</type>
+    <type>org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceWrapper</type>
     <component-plugins>
       <component-plugin>
         <name>init.service.listener</name>
@@ -276,51 +276,6 @@
       </properties-param>
     </init-params>
   </component>
-
-  <external-component-plugins>
-    <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
-    <component-plugin>
-      <name>bind.datasource</name>
-      <set-method>addPlugin</set-method>
-      <type>org.exoplatform.services.naming.BindReferencePlugin</type>
-      <init-params>
-        <value-param>
-          <name>bind-name</name>
-          <value>java:/comp/env/exo-idm_portal</value>
-        </value-param>
-        <value-param>
-          <name>class-name</name>
-          <value>javax.sql.DataSource</value>
-        </value-param>
-        <value-param>
-          <name>factory</name>
-          <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
-        </value-param>
-        <properties-param profiles="hsqldb">
-          <name>ref-addresses</name>
-          <description>ref-addresses</description>
-          <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
-          <property name="url" value="jdbc:hsqldb:mem:dbIdm;hsqldb.tx=mvcc" />
-        </properties-param>
-        <properties-param profiles="mysql">
-          <name>ref-addresses</name>
-          <description>ref-addresses</description>
-          <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-          <property name="url" value="jdbc:mysql://10.37.129.4/jdbcidm?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8" />
-          <property name="username" value="root" />
-          <property name="password" value="" />
-        </properties-param>
-        <properties-param profiles="h2">
-          <name>ref-addresses</name>
-          <description>ref-addresses</description>
-          <property name="driverClassName" value="org.h2.Driver" />
-          <property name="url" value="jdbc:h2:file:${gatein.test.tmp.dir}/db/data/jdbcidm;DB_CLOSE_DELAY=-1" />
-          <property name="username" value="sa" />
-          <property name="password" value="sa" />
-        </properties-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
 
   <!-- Data Initialization -->
   <external-component-plugins>

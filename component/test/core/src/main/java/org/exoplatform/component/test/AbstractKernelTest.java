@@ -36,7 +36,7 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
-public class AbstractKernelTest extends AbstractGateInTest {
+public abstract class AbstractKernelTest extends AbstractGateInTest {
 
     /** . */
     private static KernelBootstrap bootstrap;
@@ -131,9 +131,6 @@ public class AbstractKernelTest extends AbstractGateInTest {
               bootstrap.dispose();
             }
             bootContainer();
-          } else {
-            log.warn("PortalContainer seems to not be properly stopped by previous tests. PortalContainer is not started again with Test "
-                + getClass().getName() + " configuration files. The flag forceContainerReload = false");
           }
         } else {
             bootContainer();
@@ -152,14 +149,9 @@ public class AbstractKernelTest extends AbstractGateInTest {
 
             //
             bootstrap = null;
-        } else if(isPortalContainerPresent()) {
-          log.warn("PortalContainer seems to be not properly stopped. PortalContainer will be stopped in class " + getClass().getName() + ".");
-
-          if (isForceContainerReload()) {
+        } else if(isPortalContainerPresent() && isForceContainerReload()) {
+            log.info("PortalContainer will be stopped in class " + getClass().getName() + ".");
             forceStop();
-          } else {
-            log.warn("PortalContainer will not be stopped sine the flag forceContainerReload = false");
-          }
         }
     }
 
@@ -168,8 +160,9 @@ public class AbstractKernelTest extends AbstractGateInTest {
       bootstrap = new KernelBootstrap(Thread.currentThread().getContextClassLoader());
 
       // Configure ourselves
+      bootstrap.addConfiguration(ContainerScope.ROOT, "conf/root-configuration.xml");
+      bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/portal-configuration.xml");
       bootstrap.addConfiguration(getClass());
-
       //
       bootstrap.boot();
 
@@ -178,7 +171,7 @@ public class AbstractKernelTest extends AbstractGateInTest {
     }
 
     private boolean isPortalContainerPresent() {
-      return PortalContainer.getInstanceIfPresent() != null;
+      return ExoContainerContext.getCurrentContainerIfPresent() != null && PortalContainer.getInstanceIfPresent() != null;
     }
 
 }

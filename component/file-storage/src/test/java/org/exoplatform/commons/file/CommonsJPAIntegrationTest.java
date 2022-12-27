@@ -30,8 +30,10 @@ import org.exoplatform.component.test.ContainerScope;
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/files-configuration.xml"),
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-configuration.xml") })
+@ConfiguredBy({
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/files-configuration.xml"),
+})
 public class CommonsJPAIntegrationTest extends BaseTest {
   protected FileInfoDAO   fileInfoDAO;
 

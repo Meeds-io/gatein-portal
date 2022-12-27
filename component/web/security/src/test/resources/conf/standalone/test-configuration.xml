@@ -23,12 +23,6 @@
                xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
                xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
-  <container-lifecycle-plugin>
-    <type>org.exoplatform.commons.container.test.DatabaseInitializerPlugin</type>
-  </container-lifecycle-plugin>
-
-  <import>jar:/conf/exo.portal.component.common-configuration.xml</import>
-  <import>jar:/conf/exo.portal.component.settings-configuration.xml</import>
-  <import>jar:/conf/portal-configuration.xml</import>
+  <import>jar:/conf/exo.portal.component.security-configuration.xml</import>
 
 </configuration>

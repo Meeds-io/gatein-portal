@@ -21,31 +21,5 @@
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
                xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
-  <component>
-    <key>org.exoplatform.services.naming.InitialContextInitializer</key>
-    <type>org.exoplatform.commons.InitialContextInitializer2</type>
-    <init-params>
-      <properties-param>
-        <name>default-properties</name>
-        <description>Default initial context properties</description>
-        <property name="java.naming.factory.initial" value="org.exoplatform.services.naming.SimpleContextFactory"/>
-      </properties-param>
-    </init-params>
-  </component>
-
-  <component>
-    <key>org.exoplatform.commons.api.persistence.DataInitializer</key>
-    <type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializer</type>
-    <init-params>
-      <value-param>
-        <name>liquibase.datasource</name>
-        <value>${exo.jpa.datasource.name:java:/comp/env/exo-jpa_portal}</value>
-      </value-param>
-      <value-param>
-        <name>liquibase.contexts</name>
-        <value>${exo.liquibase.contexts:production}</value>
-      </value-param>
-    </init-params>
-  </component>
 
 </configuration>
