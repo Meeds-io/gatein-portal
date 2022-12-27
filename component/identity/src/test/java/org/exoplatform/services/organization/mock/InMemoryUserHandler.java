@@ -42,35 +42,35 @@ import org.exoplatform.services.organization.idm.UserImpl;
 
 public class InMemoryUserHandler implements UserHandler {
 
-  private static final String     ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
+  private static final String      ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
 
-  public static final String      USER_PASSWORD                    = EntityMapperUtils.USER_PASSWORD;
+  public static final String       USER_PASSWORD                    = EntityMapperUtils.USER_PASSWORD;
 
-  public static final String      USER_PASSWORD_SALT               = "passwordSalt";
+  public static final String       USER_PASSWORD_SALT               = "passwordSalt";
 
-  public static final String      USER_FIRST_NAME                  = EntityMapperUtils.USER_FIRST_NAME;
+  public static final String       USER_FIRST_NAME                  = EntityMapperUtils.USER_FIRST_NAME;
 
-  public static final String      USER_LAST_NAME                   = EntityMapperUtils.USER_LAST_NAME;
+  public static final String       USER_LAST_NAME                   = EntityMapperUtils.USER_LAST_NAME;
 
-  public static final String      USER_DISPLAY_NAME                = EntityMapperUtils.USER_DISPLAY_NAME;
+  public static final String       USER_DISPLAY_NAME                = EntityMapperUtils.USER_DISPLAY_NAME;
 
-  public static final String      USER_EMAIL                       = EntityMapperUtils.USER_EMAIL;
+  public static final String       USER_EMAIL                       = EntityMapperUtils.USER_EMAIL;
 
-  public static final String      USER_CREATED_DATE                = EntityMapperUtils.USER_CREATED_DATE;
+  public static final String       USER_CREATED_DATE                = EntityMapperUtils.USER_CREATED_DATE;
 
-  public static final String      USER_LAST_LOGIN_TIME             = EntityMapperUtils.USER_LAST_LOGIN_TIME;
+  public static final String       USER_LAST_LOGIN_TIME             = EntityMapperUtils.USER_LAST_LOGIN_TIME;
 
-  public static final String      USER_ORGANIZATION_ID             = EntityMapperUtils.USER_ORGANIZATION_ID;
+  public static final String       USER_ORGANIZATION_ID             = EntityMapperUtils.USER_ORGANIZATION_ID;
 
-  public static final String      USER_ENABLED                     = EntityMapperUtils.USER_ENABLED;
+  public static final String       USER_ENABLED                     = EntityMapperUtils.USER_ENABLED;
 
-  public static final DateFormat  dateFormat                       = DateFormat.getInstance();
+  public static final DateFormat   dateFormat                       = DateFormat.getInstance();
 
-  private OrganizationService     organizationService;
+  private OrganizationService      organizationService;
 
-  private List<UserEventListener> userListeners                    = new ArrayList<>();
+  private List<UserEventListener>  userListeners                    = new ArrayList<>();
 
-  private Map<String, User>       usersById                        = new HashMap<>();
+  private static Map<String, User> usersById                        = new HashMap<>();
 
   public InMemoryUserHandler(OrganizationService organizationService) {
     this.organizationService = organizationService;

@@ -1,5 +1,7 @@
 package org.exoplatform.services.organization.mock;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,10 +20,18 @@ public class InMemoryListAccess<T> implements ListAccess<T> {
 
   @SuppressWarnings("unchecked")
   public InMemoryListAccess(List<T> values, T[] defaultResult) {
-    this.values = values.stream().filter(Objects::nonNull).map(ObjectUtils::clone).toList();
     this.defaultResult = defaultResult;
-    this.modelClass = CollectionUtils.isEmpty(this.values) ? null
-                                                           : (Class<T>) this.values.get(0).getClass();
+    List<T> retrievedValues = values == null ? Collections.emptyList()
+                                             : values.stream().filter(Objects::nonNull).toList();
+    if (CollectionUtils.isNotEmpty(values)) {
+      T firstElement = retrievedValues.get(0);
+      if (firstElement instanceof Cloneable) {
+        this.values = values.stream().map(ObjectUtils::clone).filter(Objects::nonNull).toList();
+      } else {
+        this.values = new ArrayList<>(values);
+      }
+      this.modelClass = (Class<T>) firstElement.getClass();
+    }
   }
 
   @SuppressWarnings("unchecked")

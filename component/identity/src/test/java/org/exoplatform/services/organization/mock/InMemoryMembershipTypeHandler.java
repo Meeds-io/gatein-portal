@@ -32,13 +32,13 @@ import org.exoplatform.services.organization.impl.MembershipTypeImpl;
 
 public class InMemoryMembershipTypeHandler implements MembershipTypeHandler {
 
-  private static final String               ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
+  private static final String                ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
 
-  private OrganizationService               organizationService;
+  private OrganizationService                organizationService;
 
-  private List<MembershipTypeEventListener> membershipTypeListeners          = new ArrayList<>();
+  private List<MembershipTypeEventListener>  membershipTypeListeners          = new ArrayList<>();
 
-  private Map<String, MembershipType>       membershipTypesById              = new HashMap<>();
+  private static Map<String, MembershipType> membershipTypesById              = new HashMap<>();
 
   public InMemoryMembershipTypeHandler(OrganizationService organizationService) {
     this.organizationService = organizationService;

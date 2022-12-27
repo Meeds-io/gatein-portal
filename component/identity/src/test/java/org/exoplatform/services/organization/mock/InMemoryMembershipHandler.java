@@ -35,17 +35,17 @@ import org.exoplatform.services.organization.idm.MembershipImpl;
 
 public class InMemoryMembershipHandler implements MembershipHandler {
 
-  private static final String           ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
+  private static final String                  ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
 
-  private List<MembershipEventListener> membershiptListeners             = new ArrayList<>();
+  private List<MembershipEventListener>        membershiptListeners             = new ArrayList<>();
 
-  private Map<String, Membership>       membershipsById                  = new HashMap<>();
+  private static Map<String, Membership>       membershipsById                  = new HashMap<>();
 
-  private Map<String, List<Membership>> userMemberships                  = new HashMap<>();
+  private static Map<String, List<Membership>> userMemberships                  = new HashMap<>();
 
-  private Map<String, List<Membership>> groupMemberships                 = new HashMap<>();
+  private static Map<String, List<Membership>> groupMemberships                 = new HashMap<>();
 
-  private Map<String, List<Membership>> membershipTypeMemberships        = new HashMap<>();
+  private static Map<String, List<Membership>> membershipTypeMemberships        = new HashMap<>();
 
   @Override
   public void addMembershipEventListener(MembershipEventListener listener) {

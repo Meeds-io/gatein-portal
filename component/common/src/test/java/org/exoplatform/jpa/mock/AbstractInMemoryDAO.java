@@ -30,18 +30,21 @@ import org.exoplatform.services.log.Log;
 
 public class AbstractInMemoryDAO<E> implements GenericDAO<E, Long> {
 
-  private static final Log LOG         = ExoLogger.getLogger(AbstractInMemoryDAO.class);
+  private static final Log                   LOG         = ExoLogger.getLogger(AbstractInMemoryDAO.class);
 
-  protected Class<E>       modelClass;
+  protected Class<E>                         modelClass;
 
-  protected AtomicLong     idGenerator = new AtomicLong();
+  protected AtomicLong                       idGenerator = new AtomicLong();
 
-  protected Map<Long, E>   entities    = new HashMap<>();
+  protected static Map<String, Map<Long, ?>> allEntities = new HashMap<>();
+
+  protected Map<Long, E>                     entities;
 
   @SuppressWarnings("unchecked")
   public AbstractInMemoryDAO() {
     ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
     this.modelClass = (Class<E>) genericSuperclass.getActualTypeArguments()[0];
+    this.entities = (Map<Long, E>) allEntities.computeIfAbsent(this.getClass().getName(), key -> new HashMap<>());
   }
 
   @Override

@@ -37,19 +37,19 @@ import org.exoplatform.services.organization.idm.ExtGroup;
 
 public class InMemoryGroupHandler implements GroupHandler {
 
-  private static final String             ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
+  private static final String                    ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
 
-  private static final String             ROOT_PARENT_ID                   = "";
+  private static final String                    ROOT_PARENT_ID                   = "";
 
-  private static final String             DOESN_T_EXISTS_MESSAGE           = " doesn't exists";
+  private static final String                    DOESN_T_EXISTS_MESSAGE           = " doesn't exists";
 
-  private OrganizationService             organizationService;
+  private OrganizationService                    organizationService;
 
-  private List<GroupEventListener>        groupListeners                   = new ArrayList<>();
+  private List<GroupEventListener>               groupListeners                   = new ArrayList<>();
 
-  private Map<String, Group>              groupsById                       = new HashMap<>();
+  private static Map<String, Group>              groupsById                       = new HashMap<>();
 
-  private Map<String, Map<String, Group>> groupChildsById                  = new HashMap<>();
+  private static Map<String, Map<String, Group>> groupChildsById                  = new HashMap<>();
 
   public InMemoryGroupHandler(OrganizationService organizationService) {
     this.organizationService = organizationService;

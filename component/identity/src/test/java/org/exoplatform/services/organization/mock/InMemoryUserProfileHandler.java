@@ -29,11 +29,11 @@ import org.exoplatform.services.organization.impl.UserProfileImpl;
 
 public class InMemoryUserProfileHandler implements UserProfileHandler {
 
-  private static final String            ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
+  private static final String             ERROR_BROADCASTING_EVENT_MESSAGE = "Error broadcasting event : {}";
 
-  private List<UserProfileEventListener> profileListeners                 = new ArrayList<>();
+  private List<UserProfileEventListener>  profileListeners                 = new ArrayList<>();
 
-  private Map<String, UserProfile>       profilesById                     = new HashMap<>();
+  private static Map<String, UserProfile> profilesById                     = new HashMap<>();
 
   @Override
   public void addUserProfileEventListener(UserProfileEventListener listener) {
