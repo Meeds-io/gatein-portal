@@ -452,11 +452,8 @@
               <exo.profiles>${surefire.exo.profiles},test</exo.profiles>
               <org.apache.commons.logging.Log>org.apache.commons.logging.impl.SimpleLog</org.apache.commons.logging.Log>
               <org.apache.commons.logging.simplelog.defaultlog>info</org.apache.commons.logging.simplelog.defaultlog>
-              <org.apache.commons.logging.simplelog.log.net.hibernate>warn
-              </org.apache.commons.logging.simplelog.log.net.hibernate>
+              <org.apache.commons.logging.simplelog.log.net.hibernate>warn</org.apache.commons.logging.simplelog.log.net.hibernate>
               <java.naming.factory.initial>org.exoplatform.services.naming.SimpleContextFactory</java.naming.factory.initial>
-              <java.util.logging.config.class>org.exoplatform.component.test.logging.LogConfigurator
-              </java.util.logging.config.class>
             </systemPropertyVariables>
           </configuration>
         </plugin>
