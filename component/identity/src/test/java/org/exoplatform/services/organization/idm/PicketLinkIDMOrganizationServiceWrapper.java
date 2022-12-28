@@ -32,6 +32,14 @@ public class PicketLinkIDMOrganizationServiceWrapper extends PicketLinkIDMOrgani
     super(params, idmService, jtaTransactionLifecycleService, organizationCacheHandler);
   }
 
+  public PicketLinkIDMOrganizationServiceWrapper(InitParams params,
+                                                 PicketLinkIDMService idmService,
+                                                 OrganizationCacheHandler organizationCacheHandler,
+                                                 InitialContextInitializer initialContextInitializer)
+      throws Exception {
+    super(params, idmService, null, organizationCacheHandler);
+  }
+
   @Override
   public void start() {// NOSONAR
     super.start();

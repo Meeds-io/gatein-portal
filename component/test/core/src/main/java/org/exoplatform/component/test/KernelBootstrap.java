@@ -32,11 +32,15 @@ import junit.framework.AssertionFailedError;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
 public class KernelBootstrap {
+
+    protected final Log                          LOG     = ExoLogger.getLogger(getClass());
 
     /** The system property for gatein tmp dir. */
     private static final String TMP_DIR = "gatein.test.tmp.dir";
@@ -62,17 +66,11 @@ public class KernelBootstrap {
 
     public KernelBootstrap(ClassLoader realClassLoader) {
 
-        //
-        Set<String> rootConfigPaths = new LinkedHashSet<String>();
-        rootConfigPaths.add("conf/root-configuration.xml");
-        Set<String> portalConfigPaths = new LinkedHashSet<String>();
-        portalConfigPaths.add("conf/portal-configuration.xml");
-        EnumMap<ContainerScope, Set<String>> configs = new EnumMap<ContainerScope, Set<String>>(ContainerScope.class);
-        configs.put(ContainerScope.ROOT, rootConfigPaths);
-        configs.put(ContainerScope.PORTAL, portalConfigPaths);
+        this.configs = new EnumMap<>(ContainerScope.class);
+        configs.put(ContainerScope.ROOT, new LinkedHashSet<>());
+        configs.put(ContainerScope.PORTAL, new LinkedHashSet<>());
 
-        //
-        File targetDir = new File(System.getProperty("gatein.test.output.path", "target/temp"));
+        this.targetDir = new File(System.getProperty("gatein.test.output.path", "target/temp"));
         if (!targetDir.exists()) {
           targetDir.mkdir();
         }
@@ -83,10 +81,7 @@ public class KernelBootstrap {
             throw new AssertionFailedError("Target dir is not writable");
         }
 
-        //
-        this.configs = configs;
-        this.targetDir = targetDir;
-        this.tmpDir = findTmpDir(targetDir);
+        this.tmpDir = findTmpDir(this.targetDir);
         this.realClassLoader = realClassLoader;
     }
 
@@ -146,7 +141,19 @@ public class KernelBootstrap {
     }
 
     public void addConfiguration(ContainerScope scope, String path) {
-        configs.get(scope).add(path);
+      if (ContainerScope.STANDALONE == scope) {
+        // consider STANDALONE scope as PortalContainer Scope
+        scope = ContainerScope.PORTAL;
+      } else {
+        // If one of defined scopes is different than STANDALONE, then add
+        // default configuration files
+        configs.get(ContainerScope.ROOT).add("conf/root-configuration.xml");
+        configs.get(ContainerScope.ROOT).add("conf/configuration.xml");
+        configs.get(ContainerScope.PORTAL).add("conf/portal-configuration.xml");
+        configs.get(ContainerScope.PORTAL).add("conf/portal/configuration.xml");
+        configs.get(ContainerScope.PORTAL).add("conf/extended-portal-configuration.xml");
+      }
+      configs.get(scope).add(path);
     }
 
     private void addConfiguration(ConfigurationUnit unit) {
@@ -197,6 +204,12 @@ public class KernelBootstrap {
             // Set property globally available for configuration XML
             System.setProperty(TMP_DIR, tmpDir.getCanonicalPath());
 
+            if (configs.get(ContainerScope.ROOT).isEmpty()) {
+              configs.get(ContainerScope.ROOT).add("conf/root-configuration.xml");
+            }
+            if (configs.get(ContainerScope.PORTAL).isEmpty()) {
+              configs.get(ContainerScope.PORTAL).add("conf/portal-configuration.xml");
+            }
             //
             ClassLoader testClassLoader = new GateInTestClassLoader(realClassLoader, configs.get(ContainerScope.ROOT),
                     configs.get(ContainerScope.PORTAL));

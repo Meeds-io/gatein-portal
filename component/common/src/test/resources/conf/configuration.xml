@@ -23,11 +23,9 @@
                xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
                xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
-  <container-lifecycle-plugin>
-    <type>org.exoplatform.commons.container.test.DatabaseInitializerPlugin</type>
-  </container-lifecycle-plugin>
-
-  <import>jar:/conf/exo.portal.component.common-configuration.xml</import>
-  <import>jar:/conf/root-configuration.xml</import>
+  <component>
+      <key>org.exoplatform.commons.persistence.impl.EntityManagerService</key>
+      <type>org.exoplatform.jpa.mock.MockEntityManagerService</type>
+  </component>
 
 </configuration>

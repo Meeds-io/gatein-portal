@@ -372,12 +372,6 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.eXoGadgets</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.portlet.web</artifactId>
         <version>${project.version}</version>
         <type>war</type>
@@ -471,7 +465,7 @@
           <artifactId>maven-war-plugin</artifactId>
           <configuration>
             <!-- Don't include libraries into Web Archives -->
-            <packagingExcludes>WEB-INF/lib/*.jar,**/less/**,**/*.vue</packagingExcludes>
+            <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
           </configuration>
         </plugin>
         <plugin>

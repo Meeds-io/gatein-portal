@@ -42,7 +42,6 @@ import javax.tools.StandardLocation;
  * 7/22/15
  */
 @SupportedAnnotationTypes("org.exoplatform.commons.api.persistence.ExoEntity")
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class ExoEntityProcessor extends AbstractProcessor {
   /** Path to the generated entities.idx file **/
   public static final String ENTITIES_IDX_PATH = "exo-jpa-entities/entities.idx";

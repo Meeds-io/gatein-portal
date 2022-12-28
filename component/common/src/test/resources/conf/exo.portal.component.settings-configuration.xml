@@ -23,33 +23,22 @@
                xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
                xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
-  <container-lifecycle-plugin>
-    <type>org.exoplatform.commons.container.test.DatabaseInitializerPlugin</type>
-  </container-lifecycle-plugin>
-
   <component>
-    <key>org.exoplatform.commons.api.persistence.DataInitializer</key>
-    <type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializerTestContext</type>
-    <init-params>
-      <value-param>
-        <name>liquibase.datasource</name>
-        <value>${exo.jpa.datasource.name:java:/comp/env/exo-jpa_portal}</value>
-      </value-param>
-      <value-param>
-        <name>liquibase.contexts</name>
-        <value>${exo.liquibase.contexts:test}</value>
-      </value-param>
-    </init-params>
+     <type>org.exoplatform.services.rest.impl.ResourceBinder</type>
   </component>
 
   <component>
-      <type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
+     <type>org.exoplatform.services.rest.impl.provider.JAXBContextResolver</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.services.rest.impl.RequestHandlerImpl</type>
   </component>
 
   <component>
     <key>org.exoplatform.services.cache.CacheService</key>
     <jmx-name>cache:type=CacheService</jmx-name>
-    <type>org.exoplatform.services.cache.impl.CacheServiceImpl</type>
+    <type>org.exoplatform.commons.container.test.MockedCacheService</type>
     <init-params>
       <object-param>
         <name>cache.config.default</name>
@@ -61,7 +50,7 @@
             <int>30000</int>
           </field>
           <field name="liveTime">
-            <long>60000</long>
+            <long>120000</long>
           </field>
           <field name="implementation">
             <string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string>
@@ -100,5 +89,4 @@
     <type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
   </component>
 
-  <import>jar:/org/gatein/common/transaction/configuration.xml</import>
 </configuration>

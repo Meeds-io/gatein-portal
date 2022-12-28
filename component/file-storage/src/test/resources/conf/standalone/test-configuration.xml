@@ -40,6 +40,4 @@
         </component-plugin>
     </external-component-plugins>
 
-  <import>jar:/conf/exo.portal.component.file-storage-configuration.xml</import>
-
 </configuration>

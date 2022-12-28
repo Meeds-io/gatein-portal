@@ -33,41 +33,13 @@
 
   <dependencies>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>exo.portal.component.resources</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gatein.common</groupId>
-      <artifactId>common-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.gatein.pc</groupId>
-      <artifactId>pc-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.gatein.pc</groupId>
-      <artifactId>pc-portlet</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.gatein.pc</groupId>
-      <artifactId>pc-federation</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.gatein.pc</groupId>
-      <artifactId>pc-bridge</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.gatein.wci</groupId>
-      <artifactId>wci-wci</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.kernel</groupId>
-      <artifactId>exo.kernel.container</artifactId>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>exo.portal.component.resources</artifactId>
+      <type>test-jar</type>
     </dependency>
   </dependencies>
 </project>

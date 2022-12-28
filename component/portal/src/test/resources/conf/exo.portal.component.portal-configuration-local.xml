@@ -57,7 +57,7 @@
 
   <component>
     <key>org.exoplatform.portal.pom.data.ModelDataStorage</key>
-    <type>org.exoplatform.portal.mop.jdbc.dao.mock.InMemoryModelDataStorage</type>
+    <type>org.exoplatform.portal.mop.jdbc.service.JDBCModelStorageImpl</type>
   </component>
 
   <component>
@@ -83,45 +83,6 @@
   <component>
     <key>org.exoplatform.portal.mop.description.DescriptionService</key>
     <type>org.exoplatform.portal.mop.jdbc.service.DescriptionServiceImpl</type>
-  </component>
-
-  <component>
-     <type>org.exoplatform.services.rest.impl.ResourceBinder</type>
-  </component>
-
-  <component>
-     <type>org.exoplatform.services.rest.impl.provider.JAXBContextResolver</type>
-  </component>
-  <component>
-    <type>org.exoplatform.services.rest.impl.RequestHandlerImpl</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.services.cache.CacheService</key>
-    <jmx-name>cache:type=CacheService</jmx-name>
-    <type>org.exoplatform.services.cache.impl.CacheServiceImpl</type>
-    <init-params>
-      <object-param>
-        <name>cache.config.default</name>
-        <object type="org.exoplatform.services.cache.ExoCacheConfig">
-          <field name="name">
-            <string>default</string>
-          </field>
-          <field name="maxSize">
-            <int>30000</int>
-          </field>
-          <field name="liveTime">
-            <long>60000</long>
-          </field>
-          <field name="distributed">
-            <boolean>false</boolean>
-          </field>
-          <field name="implementation">
-            <string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string>
-          </field>
-        </object>
-      </object-param>
-    </init-params>
   </component>
 
   <component>
@@ -216,17 +177,6 @@
   <component>
     <key>org.exoplatform.portal.mop.description.DescriptionService</key>
     <type>org.exoplatform.portal.mop.jdbc.service.DescriptionServiceImpl</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.services.resources.LocaleConfigService</key>
-    <type>org.exoplatform.services.resources.impl.LocaleConfigServiceImpl</type>
-    <init-params>
-      <value-param>
-        <name>locale.config.file</name>
-        <value>jar:/bundles/locales-config.xml</value>
-      </value-param>
-    </init-params>
   </component>
 
   <component>

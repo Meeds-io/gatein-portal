@@ -42,7 +42,8 @@ public class DatabaseInitializerPlugin extends BaseContainerLifecyclePlugin {
         // StandaloneContainer only
         container.unregisterComponent(dataInitializer);
       } else if (dataInitializer instanceof Startable startable) {
-        startable.start(); // Inject DBMS Schema before starting any other service
+        startable.start(); // Inject DBMS Schema before starting any other
+                           // service
       }
     }
   }

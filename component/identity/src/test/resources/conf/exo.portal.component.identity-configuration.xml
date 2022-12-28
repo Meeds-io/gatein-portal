@@ -22,27 +22,6 @@
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd" xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-    <key>org.gatein.common.transaction.JTAUserTransactionLifecycleService</key>
-    <type>org.gatein.common.transaction.JTAUserTransactionLifecycleServiceImpl</type>
-  </component>
-
-  <component>
-    <key>org.infinispan.transaction.lookup.TransactionManagerLookup</key>
-    <type>org.exoplatform.services.transaction.infinispan.JBossStandaloneJTAManagerLookup</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.services.transaction.TransactionService</key>
-    <type>org.exoplatform.services.transaction.infinispan.JBossTransactionsService</type>
-    <init-params>
-      <value-param>
-        <name>timeout</name>
-        <value>300</value>
-      </value-param>
-    </init-params>
-  </component>
-
-  <component>
     <key>org.exoplatform.services.organization.OrganizationService</key>
     <type>org.exoplatform.services.organization.mock.InMemoryOrganizationService</type>
     <component-plugins>
@@ -325,28 +304,6 @@
         </init-params>
       </component-plugin>
     </component-plugins>
-  </component>
-
-  <component>
-    <key>org.exoplatform.services.database.HibernateService</key>
-    <jmx-name>database:type=HibernateService</jmx-name>
-    <type>org.exoplatform.services.organization.idm.CustomHibernateServiceImpl</type>
-    <init-params>
-      <properties-param>
-        <name>hibernate.properties</name>
-        <description>Default Hibernate Service</description>
-        <property name="hibernate.hbm2ddl.auto" value="none" />
-        <property name="hibernate.show_sql" value="false" />
-        <property name="hibernate.current_session_context_class" value="thread" />
-        <property name="hibernate.cache.use_second_level_cache" value="false" />
-        <property name="hibernate.cache.use_query_cache" value="false" />
-        <property name="hibernate.connection.datasource" value="java:/comp/env/exo-idm_portal" />
-        <property name="hibernate.c3p0.min_size" value="5" />
-        <property name="hibernate.c3p0.max_size" value="20" />
-        <property name="hibernate.c3p0.timeout" value="1800" />
-        <property name="hibernate.c3p0.max_statements" value="50" />
-      </properties-param>
-    </init-params>
   </component>
 
 </configuration>

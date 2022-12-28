@@ -36,6 +36,10 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@ConfiguredBy({
+  @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+})
 public abstract class AbstractKernelTest extends AbstractGateInTest {
 
     /** . */
@@ -172,8 +176,6 @@ public abstract class AbstractKernelTest extends AbstractGateInTest {
       bootstrap = new KernelBootstrap(Thread.currentThread().getContextClassLoader());
 
       // Configure ourselves
-      bootstrap.addConfiguration(ContainerScope.ROOT, "conf/root-configuration.xml");
-      bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/portal-configuration.xml");
       bootstrap.addConfiguration(getClass());
       //
       bootstrap.boot();

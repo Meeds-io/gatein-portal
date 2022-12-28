@@ -74,7 +74,7 @@
     <key>org.exoplatform.portal.mop.jdbc.dao.CategoryDAO</key>
     <type>org.exoplatform.application.registry.dao.CategoryDAOImpl</type>
   </component>
-   
+
   <component>
     <key>org.exoplatform.portal.pom.data.ModelDataStorage</key>
     <type>org.exoplatform.portal.mop.jdbc.service.JDBCModelStorageImpl</type>

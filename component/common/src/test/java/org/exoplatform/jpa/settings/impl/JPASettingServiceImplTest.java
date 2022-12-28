@@ -35,7 +35,9 @@ import org.exoplatform.settings.jpa.SettingsDAO;
  * Author : eXoPlatform exo@exoplatform.com Nov 12, 2012
  */
 @ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.settings-configuration-local.xml")
+  @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.settings-configuration-local.xml")
 })
 public class JPASettingServiceImplTest extends BaseTest {
 
