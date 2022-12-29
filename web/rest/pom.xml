@@ -27,24 +27,4 @@
   <artifactId>exo.portal.web.rest</artifactId>
   <packaging>war</packaging>
   <name>GateIn Portal Web REST application</name>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.exoplatform.ws</groupId>
-      <artifactId>exo.ws.frameworks.servlet</artifactId>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <finalName>rest</finalName>
-    <plugins>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <argLine>@{argLine} --add-opens java.base/java.util=ALL-UNNAMED</argLine>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
 </project>

@@ -19,25 +19,24 @@
 
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <artifactId>maven-parent-pom</artifactId>
     <groupId>org.exoplatform</groupId>
     <version>25-M06</version>
-    <relativePath/>
+    <relativePath />
   </parent>
-  
+
   <groupId>org.exoplatform.gatein.portal</groupId>
   <artifactId>exo.portal.parent</artifactId>
   <version>6.4.x-meedsv2-SNAPSHOT</version>
   <packaging>pom</packaging>
-  
+
   <name>GateIn - Portal</name>
-  
+
   <properties>
     <org.exoplatform.depmgt.version>21.x-meedsv2-SNAPSHOT</org.exoplatform.depmgt.version>
     <org.exoplatform.kernel.release.version>6.4.0-M20</org.exoplatform.kernel.release.version>
@@ -47,27 +46,24 @@
     <org.exoplatform.gatein.sso.release.version>6.4.0-M20</org.exoplatform.gatein.sso.release.version>
     <org.exoplatform.gatein.pc.release.version>6.4.0-M20</org.exoplatform.gatein.pc.release.version>
 
-    <!-- Default eXo profiles -->
-    <surefire.exo.profiles>hsqldb</surefire.exo.profiles>
-    
     <!-- Sonar properties -->
     <sonar.organization>meeds-io</sonar.organization>
   </properties>
-  
+
   <scm>
     <connection>scm:git:git://github.com/meeds-io/gatein-portal.git</connection>
     <developerConnection>scm:git:git@github.com:meeds-io/gatein-portal.git</developerConnection>
     <url>https://github.com/meeds-io/gatein-portal</url>
     <tag>HEAD</tag>
   </scm>
-  
+
   <modules>
     <module>component</module>
     <module>webui</module>
     <module>portlet</module>
     <module>web</module>
   </modules>
-  
+
   <dependencyManagement>
     <dependencies>
       <!-- Import versions of external dependencies to use -->
@@ -114,7 +110,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      
+
       <!-- GateIn-SSO dependencies -->
       <dependency>
         <groupId>org.exoplatform.gatein.sso</groupId>
@@ -141,6 +137,7 @@
         <classifier>source-release</classifier>
         <type>zip</type>
       </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.api</artifactId>
@@ -148,20 +145,107 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.common</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.common</artifactId>
-        <version>${project.version}</version>
+        <artifactId>exo.portal.component.api</artifactId>
         <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.common</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.web</artifactId>
+        <artifactId>exo.portal.component.common</artifactId>
+        <type>test-jar</type>
         <version>${project.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.file-storage</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.file-storage</artifactId>
+        <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.resources</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.resources</artifactId>
+        <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.identity</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.identity</artifactId>
+        <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.pc</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.pc</artifactId>
+        <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.portal</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.portal</artifactId>
+        <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.application-registry</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.application-registry</artifactId>
+        <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.scripting</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.scripting</artifactId>
+        <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.controller</artifactId>
@@ -173,6 +257,7 @@
         <type>test-jar</type>
         <version>${project.version}</version>
       </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.security</artifactId>
@@ -181,9 +266,10 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.security</artifactId>
-        <version>${project.version}</version>
         <type>test-jar</type>
+        <version>${project.version}</version>
       </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.server</artifactId>
@@ -191,11 +277,25 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.web.server</artifactId>
+        <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.web.api</artifactId>
+        <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.web.resources</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -205,94 +305,7 @@
         <type>test-jar</type>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.portal</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.portal</artifactId>
-        <version>${project.version}</version>
-        <type>test-jar</type>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.pc</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.pc</artifactId>
-        <type>test-jar</type>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.identity</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.identity</artifactId>
-        <version>${project.version}</version>
-        <type>test-jar</type>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.resources</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.resources</artifactId>
-        <version>${project.version}</version>
-        <type>test-jar</type>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.application-registry</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.application-registry</artifactId>
-        <version>${project.version}</version>
-        <type>test-jar</type>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.scripting</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.scripting</artifactId>
-        <type>test-jar</type>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.management</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.management</artifactId>
-        <type>test-jar</type>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.file-storage</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.file-storage</artifactId>
-        <type>test-jar</type>
-        <version>${project.version}</version>
-      </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.webui.framework</artifactId>
@@ -304,6 +317,7 @@
         <type>test-jar</type>
         <version>${project.version}</version>
       </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.webui.portlet</artifactId>
@@ -315,6 +329,7 @@
         <type>test-jar</type>
         <version>${project.version}</version>
       </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.webui.portal</artifactId>
@@ -326,6 +341,7 @@
         <type>test-jar</type>
         <version>${project.version}</version>
       </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.webui.eXo</artifactId>
@@ -333,6 +349,13 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.webui.eXo</artifactId>
+        <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.webui.core</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -342,28 +365,55 @@
         <type>test-jar</type>
         <version>${project.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.web.sso.integration-configs</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.web.sso.integration-configs</artifactId>
+        <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.web.sso.agents-configs</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.web.sso.agents-configs</artifactId>
+        <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.management</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.management</artifactId>
+        <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.test.core</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.test.core</artifactId>
-        <version>${project.version}</version>
-        <type>test-jar</type>
-      </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.test.web</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.test.web</artifactId>
-        <version>${project.version}</version>
-        <type>test-jar</type>
-      </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.web.portal</artifactId>
@@ -394,48 +444,9 @@
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.web.sso.integration-configs</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.web.sso.integration-configs</artifactId>
-        <type>test-jar</type>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.web.sso.agents-configs</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.web.sso.agents-configs</artifactId>
-        <type>test-jar</type>
-        <version>${project.version}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
-  
-  <dependencies>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.javassist</groupId>
-      <artifactId>javassist</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+
   <build>
     <pluginManagement>
       <plugins>
@@ -444,16 +455,13 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <systemPropertyVariables>
-              <exo.files.storage.dir>${project.build.directory}/files</exo.files.storage.dir>
               <gatein.test.output.path>${project.build.directory}</gatein.test.output.path>
-              <com.arjuna.ats.arjuna.objectstore.objectStoreDir>
-                ${project.build.directory}/com.arjuna.ats.arjuna.objectstore.objectStoreDir
-              </com.arjuna.ats.arjuna.objectstore.objectStoreDir>
-              <exo.profiles>${surefire.exo.profiles},test</exo.profiles>
               <org.apache.commons.logging.Log>org.apache.commons.logging.impl.SimpleLog</org.apache.commons.logging.Log>
               <org.apache.commons.logging.simplelog.defaultlog>info</org.apache.commons.logging.simplelog.defaultlog>
               <org.apache.commons.logging.simplelog.log.net.hibernate>warn</org.apache.commons.logging.simplelog.log.net.hibernate>
               <java.naming.factory.initial>org.exoplatform.services.naming.SimpleContextFactory</java.naming.factory.initial>
+              <!-- Mandatory for testing -->
+              <exo.profiles>test</exo.profiles>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -480,7 +488,7 @@
       </plugins>
     </pluginManagement>
   </build>
-  
+
   <!-- This profile is used to allow github action to build branches. The github action is used for sonar analysis -->
   <profiles>
     <profile>
