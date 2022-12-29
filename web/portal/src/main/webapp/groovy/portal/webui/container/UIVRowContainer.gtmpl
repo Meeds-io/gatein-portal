@@ -38,16 +38,16 @@
      def reqJS = rcontext.getJavascriptManager().require("SHARED/portal", "portal");
      reqJS.addScripts("portal.UIPortal.initMouseHover('" + uicomponent.id + "');");
     %>
-<div class="UIContainer <%=uiComponentClass%> EdittingContainer<%=uicomponent.getPermissionClasses()%>" id="${uicomponent.id}" ${cssStyle}>
+<div class="UIContainer row ma-0 border-box-sizing <%=uiComponentClass%> EdittingContainer<%=uicomponent.getPermissionClasses()%>" id="${uicomponent.id}" ${cssStyle}>
   <div class="NormalContainerBlock UIComponentBlock">
     <div class="LAYOUT-CONTAINER LAYOUT-BLOCK">
       <div class="UIIntermediateContainer">
         <%if(hasAccessPermission) {%>
-          <div id="${uicomponent.id}Children" class="UIRowContainer <%=(editMode != EditMode.NO_EDIT && uicomponent.getChildren().size() == 0) ? "EmptyContainer" : ""%>">
+          <div id="${uicomponent.id}Children" class="UIRowContainer row ma-0 border-box-sizing <%=(editMode != EditMode.NO_EDIT && uicomponent.getChildren().size() == 0) ? "EmptyContainer" : ""%>">
               <%uicomponent.renderChildren();%>
           </div>
         <% } else { %>
-          <div id="${uicomponent.id}Children" class="ProtectedContent">
+          <div id="${uicomponent.id}Children" class="ProtectedContent row ma-0 border-box-sizing">
             <%=_ctx.appRes("UIPortlet.label.protectedContent")%>
           </div>
         <% } %>
