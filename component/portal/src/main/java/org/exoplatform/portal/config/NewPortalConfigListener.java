@@ -472,19 +472,20 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
     }
 
     public void createPage(NewPortalConfig config, String owner) throws Exception {
-        UnmarshalledObject<PageSet> pageSet = getConfig(config, owner, "pages", PageSet.class);
-        if (pageSet == null) {
-            return;
-        }
-        RequestLifeCycle.begin(PortalContainer.getInstance());
-        try{
-            ImportMode importMode = getRightMode(config.getImportMode());
-            ArrayList<Page> list = pageSet.getObject().getPages();            
-            PageImporter importer = new PageImporter(importMode, new SiteKey(config.getOwnerType(), owner), list, dataStorage_, pageService_);
-            importer.perform();
-        } finally {
-            RequestLifeCycle.end();
-        }
+      UnmarshalledObject<PageSet> pageSet = getConfig(config, owner, "pages", PageSet.class);
+      RequestLifeCycle.begin(PortalContainer.getInstance());
+      try {
+        ImportMode importMode = getRightMode(config.getImportMode());
+        ArrayList<Page> list = pageSet != null ? pageSet.getObject().getPages() : new ArrayList<>();
+        PageImporter importer = new PageImporter(importMode,
+                                                 new SiteKey(config.getOwnerType(), owner),
+                                                 list,
+                                                 dataStorage_,
+                                                 pageService_);
+        importer.perform();
+      } finally {
+        RequestLifeCycle.end();
+      }
     }
 
     public void createPageNavigation(NewPortalConfig config, String owner) throws Exception {

@@ -25,7 +25,7 @@ import java.util.HashSet;
 /**
  * Author : Nhu Dinh Thuan nhudinhthuan@yahoo.com May 23, 2006
  */
-public final class NewPortalConfig {
+public class NewPortalConfig {
 
     private HashSet<String> predefinedOwner = new HashSet<String>(5);
 
