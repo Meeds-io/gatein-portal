@@ -40,7 +40,7 @@ import org.exoplatform.services.log.Log;
  */
 public class KernelBootstrap {
 
-    protected final Log                          LOG     = ExoLogger.getLogger(getClass());
+    protected final Log                          log     = ExoLogger.getLogger(getClass());
 
     /** The system property for gatein tmp dir. */
     private static final String TMP_DIR = "gatein.test.tmp.dir";
