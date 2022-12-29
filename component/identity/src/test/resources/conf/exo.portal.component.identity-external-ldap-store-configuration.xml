@@ -71,11 +71,6 @@
   </component>
 
   <component>
-    <key>org.exoplatform.services.scheduler.JobSchedulerService</key>
-    <type>org.exoplatform.services.scheduler.impl.JobSchedulerServiceImpl</type>
-  </component>
-
-  <component>
     <key>org.exoplatform.services.organization.search.UserSearchService</key>
     <type>org.exoplatform.services.organization.search.UserSearchServiceImpl</type>
   </component>
