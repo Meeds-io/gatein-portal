@@ -181,7 +181,9 @@ public abstract class AbstractKernelTest extends AbstractGateInTest {
       bootstrap.boot();
 
       //
-      return bootstrap.getContainer();
+      PortalContainer portalContainer = bootstrap.getContainer();
+      ExoContainerContext.setCurrentContainer(portalContainer);
+      return portalContainer;
     }
 
     private boolean isPortalContainerPresent() {
