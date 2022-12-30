@@ -277,42 +277,7 @@
     <component-plugin>
       <name>new.user.event.listener</name>
       <set-method>addListenerPlugin</set-method>
-      <type>org.exoplatform.services.organization.impl.NewUserEventListener</type>
-      <description>this listener assign group and membership to a new created user</description>
-      <init-params>
-        <object-param>
-          <name>configuration</name>
-          <description>description</description>
-          <object type="org.exoplatform.services.organization.impl.NewUserConfig">
-            <field name="group">
-              <collection type="java.util.ArrayList">
-                <value>
-                  <object type="org.exoplatform.services.organization.impl.NewUserConfig$JoinGroup">
-                    <field name="groupId">
-                      <string>/platform/users</string>
-                    </field>
-                    <field name="membership">
-                      <string>member</string>
-                    </field>
-                  </object>
-                </value>
-              </collection>
-            </field>
-            <field name="ignoredUser">
-              <collection type="java.util.HashSet">
-                <value>
-                  <string>${exo.super.user}</string>
-                </value>
-              </collection>
-            </field>
-          </object>
-        </object-param>
-      </init-params>
-    </component-plugin>
-    <component-plugin>
-      <name>new.user.event.listener</name>
-      <set-method>addListenerPlugin</set-method>
-      <type>org.exoplatform.services.organization.impl.NewUserEventListener</type>
+      <type>org.exoplatform.services.organization.plugin.NewUserEventListener</type>
       <description>this listener assign group and membership to a new created user</description>
       <init-params>
         <object-param>

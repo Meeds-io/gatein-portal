@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright (C) 2011 eXo Platform SAS.
   ~
@@ -102,7 +102,7 @@
               <string>merge</string>
             </field>
             <field name="templateLocation">
-              <string>classpath:/org/exoplatform/portal/config/conf</string>
+               <string>classpath:/org/exoplatform/portal/config/conf</string>
             </field>
           </object>
         </object-param>

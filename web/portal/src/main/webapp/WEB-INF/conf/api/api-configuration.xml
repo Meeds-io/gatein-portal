@@ -32,9 +32,4 @@
       <type>org.gatein.api.PortalImpl</type>
    </component>
 
-   <component>
-      <key>org.gatein.api.oauth.OAuthProviderAccessor</key>
-      <type>org.exoplatform.portal.application.oauth.OAuthProviderAccessorImpl</type>
-   </component>
-
 </configuration>

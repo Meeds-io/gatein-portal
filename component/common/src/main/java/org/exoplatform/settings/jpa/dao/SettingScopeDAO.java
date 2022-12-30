@@ -13,10 +13,11 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.settings.jpa.entity.ScopeEntity;
 
-public class SettingScopeDAO extends GenericDAOJPAImpl<ScopeEntity, Long> {
+public class SettingScopeDAO extends GenericDAOJPAImpl<ScopeEntity, Long> implements org.exoplatform.settings.jpa.SettingScopeDAO {
   private static final Log LOG = ExoLogger.getLogger(SettingScopeDAO.class);
 
   @ExoTransactional
+  @Override
   public ScopeEntity getScopeByTypeAndName(String scopeType, String scopeName) {
     TypedQuery<ScopeEntity> query;
     if (StringUtils.isBlank(scopeName)) {

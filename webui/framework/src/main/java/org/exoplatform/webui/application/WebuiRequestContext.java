@@ -19,7 +19,6 @@
 
 package org.exoplatform.webui.application;
 
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -88,12 +87,13 @@ public abstract class WebuiRequestContext extends RequestContext {
     }
 
     public ResourceBundle getApplicationResourceBundle() {
-        if (appRes_ == null) {
+        Application application = getApplication();
+        if (appRes_ == null && application != null) {
             try {
                 Locale locale = getLocale();
-                appRes_ = getApplication().getResourceBundle(locale);
+                appRes_ = application.getResourceBundle(locale);
             } catch (Exception e) {
-                throw new UndeclaredThrowableException(e);
+                throw new IllegalStateException(e);
             }
         }
         return appRes_;

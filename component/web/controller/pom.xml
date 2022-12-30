@@ -1,26 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (C) 2009 eXo Platform SAS.
-  ~
-  ~ This is free software; you can redistribute it and/or modify it
-  ~ under the terms of the GNU Lesser General Public License as
-  ~ published by the Free Software Foundation; either version 2.1 of
-  ~ the License, or (at your option) any later version.
-  ~
-  ~ This software is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  ~ Lesser General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU Lesse  <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <scope>provided</scope>
-    </dependency>r General Public
-  ~ License along with this software; if not, write to the Free
-  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
-  -->
+  This file is part of the Meeds project (https://meeds.io/).
 
+  Copyright (C) 2022 Meeds Association contact@meeds.io
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 3 of the License, or (at your option) any later version.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+  You should have received a copy of the GNU Lesser General Public License
+  along with this program; if not, write to the Free Software Foundation,
+  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.exoplatform.gatein.portal</groupId>
@@ -37,60 +32,19 @@
   </description>
 
   <properties>
-    <exo.test.coverage.ratio>0.69</exo.test.coverage.ratio>
-    <japex.runIterations>100000</japex.runIterations>
-    <japex.numberOfThreads>1</japex.numberOfThreads>
+    <exo.test.coverage.ratio>0.70</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
-
     <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>exo.portal.component.portal</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
-      <artifactId>exo.portal.component.test.core</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- Used only for pretty printing, need to find a better solution than this -->
-    <!--
-        <dependency>
-          <groupId>net.java.dev.stax-utils</groupId>
-          <artifactId>stax-utils</artifactId>
-          <version>20060502</version>
-          <exclusions>
-            <exclusion>
-              <groupId>com.bea.xml</groupId>
-              <artifactId>jsr173-ri</artifactId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-    -->
 
     <dependency>
-      <groupId>org.staxnav</groupId>
-      <artifactId>staxnav.core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
-      <artifactId>exo.portal.component.identity</artifactId>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>exo.portal.component.portal</artifactId>
       <type>test-jar</type>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -122,83 +76,4 @@
       </exclusions>
     </dependency>
   </dependencies>
-
-  <profiles>
-    <profile>
-      <id>japex</id>
-      <properties>
-        <japex.runIterations>1000000</japex.runIterations>
-        <japex.numberOfThreads>4</japex.numberOfThreads>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.sun.japex</groupId>
-            <artifactId>japex-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>japex</id>
-                <goals>
-                  <goal>japex</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <japexConfig>
-                <testSuite xmlns="http://www.sun.com/japex/testSuite" name="ParsingPerformance">
-                  <param name="japex.namedClassPath" value="maven.test.classpath" />
-                  <param name="japex.resultUnit" value="ms" />
-                  <param name="japex.warmupIterations" value="10000" />
-                  <param name="japex.runIterations" value="${japex.runIterations}" />
-                  <param name="japex.numberOfThreads" value="${japex.numberOfThreads}" />
-                  <driver name="JavaUtilRegex">
-                    <param name="japex.driverClass" value="org.exoplatform.web.controller.performance.ControllerRendererDriver" />
-                    <param name="description" value="Controller performance with the java.util.regex package" />
-                    <param name="regex" value="java" />
-                  </driver>
-                  <driver name="JRegex">
-                    <param name="japex.driverClass" value="org.exoplatform.web.controller.performance.ControllerRendererDriver" />
-                    <param name="description" value="Controller performance with the jregex package" />
-                    <param name="regex" value="jregex" />
-                  </driver>
-                  <testCase name="classic">
-                    <param name="parameters" value="{ 'gtn:handler' : 'portal', 'gtn:sitetype' : 'portal' , 'gtn:sitename' : 'classic', 'gtn:path' : 'page' }" />
-                  </testCase>
-                  <testCase name="fr/classic">
-                    <param name="parameters" value="{ 'gtn:handler' : 'portal', 'gtn:lang' : 'fr', 'gtn:sitetype' : 'portal' , 'gtn:sitename' : 'classic', 'gtn:path' : 'page' }" />
-                  </testCase>
-                  <testCase name="group">
-                    <param name="parameters" value="{ 'gtn:handler' : 'portal', 'gtn:sitetype' : 'group' , 'gtn:sitename' : '/platform/administrator', 'gtn:path' : 'page' }" />
-                  </testCase>
-                  <testCase name="user">
-                    <param name="parameters" value="{ 'gtn:handler' : 'portal', 'gtn:sitetype' : 'user' , 'gtn:sitename' : 'root', 'gtn:path' : 'page' }" />
-                  </testCase>
-                </testSuite>
-              </japexConfig>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <!-- A never ending test used to profile the rendering execution -->
-      <id>standalone</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <includes>
-                  <include>**/Standalone.java</include>
-                </includes>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-  </profiles>
 </project>
