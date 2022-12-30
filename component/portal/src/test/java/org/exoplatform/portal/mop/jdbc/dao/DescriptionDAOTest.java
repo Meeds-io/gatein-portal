@@ -1,15 +1,14 @@
 package org.exoplatform.portal.mop.jdbc.dao;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 import org.exoplatform.commons.utils.I18N;
-import org.exoplatform.component.test.*;
 import org.exoplatform.portal.jdbc.entity.DescriptionEntity;
 import org.exoplatform.portal.jdbc.entity.DescriptionState;
 
-@ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
-public class DescriptionDAOTest extends AbstractKernelTest {
+public class DescriptionDAOTest extends AbstractDAOTest {
   private DescriptionDAO descDAO;
 
   @Override

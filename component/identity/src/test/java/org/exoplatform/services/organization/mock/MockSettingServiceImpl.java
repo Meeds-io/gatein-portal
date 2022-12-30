@@ -26,12 +26,12 @@ import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 
-/** 
-* Create mock setting service 
-*/
+/**
+ * Create mock setting service
+ */
 public class MockSettingServiceImpl implements SettingService {
-  
-  Map<String, SettingValue<?>> settingMap = new HashMap<String, SettingValue<?>>();
+
+  static Map<String, SettingValue<?>> settingMap = new HashMap<String, SettingValue<?>>();
 
   @Override
   public void set(Context context, Scope scope, String key, SettingValue<?> value) {
@@ -94,7 +94,7 @@ public class MockSettingServiceImpl implements SettingService {
 
   @Override
   public void save(Context context) {
-    
+
   }
 
 }

@@ -26,16 +26,18 @@ import org.exoplatform.jpa.BaseTest;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.settings.jpa.JPASettingServiceImpl;
-import org.exoplatform.settings.jpa.dao.SettingContextDAO;
-import org.exoplatform.settings.jpa.dao.SettingScopeDAO;
-import org.exoplatform.settings.jpa.dao.SettingsDAO;
+import org.exoplatform.settings.jpa.SettingContextDAO;
+import org.exoplatform.settings.jpa.SettingScopeDAO;
+import org.exoplatform.settings.jpa.SettingsDAO;
 
 /**
  * Test just for the implementation service Created by The eXo Platform SAS
  * Author : eXoPlatform exo@exoplatform.com Nov 12, 2012
  */
 @ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/jpa/configuration.xml")
+  @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.settings-configuration-local.xml")
 })
 public class JPASettingServiceImplTest extends BaseTest {
 

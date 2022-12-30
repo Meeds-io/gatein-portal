@@ -289,7 +289,7 @@
     <init-params>
       <value-param>
         <name>create.user.portal</name>
-        <value>${gatein.portal.idm.createuserportal}</value>
+        <value>${gatein.portal.idm.createuserportal:false}</value>
       </value-param>
       <value-param>
         <name>destroy.user.portal</name>
@@ -338,6 +338,19 @@
       <type>org.exoplatform.services.cache.ExoCacheConfigPlugin</type>
       <description>add Exo Cache Config</description>
       <init-params>
+        <!-- SettingService -->
+        <object-param>
+          <name>commons.SettingService</name>
+          <description>The Cache configuration for the setting service</description>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>commons.SettingService</string></field>
+            <field name="maxSize"><int>${exo.cache.commons.SettingService.MaxNodes:100000}</int></field>
+            <field name="liveTime"><long>${exo.cache.commons.SettingService.TimeToLive:86400}</long></field>
+            <field name="cacheMode" profiles="cluster"><string>${exo.cache.commons.SettingService:replication}</string></field>
+            <field name="strategy" profiles="cluster"><string>${exo.cache.commons.SettingService.strategy:LIRS}</string></field>
+          </object>
+        </object-param>
+        <!-- Portal API -->
         <object-param>
           <name>portal.NavigationNode</name>
           <description>The Cache configuration for the MOP session Manager</description>

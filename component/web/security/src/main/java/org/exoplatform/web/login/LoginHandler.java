@@ -289,19 +289,6 @@ public class LoginHandler extends JspBasedWebHandler {
       cookie.setMaxAge((int) tokenService.getValidityTime());
       cookie.setSecure(request.isSecure());
       response.addCookie(cookie);
-    } else {
-      // Handle oauth remember me
-      if ("true".equals(request.getSession().getAttribute(LoginUtils.SESSION_ATTRIBUTE_REMEMBER_ME))) {
-        CookieTokenService tokenService = AbstractTokenService.getInstance(CookieTokenService.class);
-        String cookieToken = tokenService.createToken(credentials);
-        Cookie cookie = new Cookie(LoginUtils.OAUTH_COOKIE_NAME, cookieToken);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge((int) tokenService.getValidityTime());
-        cookie.setSecure(request.isSecure());
-        response.addCookie(cookie);
-        request.getSession().removeAttribute(LoginUtils.SESSION_ATTRIBUTE_REMEMBER_ME);
-      }
     }
   }
 

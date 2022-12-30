@@ -15,10 +15,11 @@ import java.util.List;
 /**
  * Created by exo on 3/8/17.
  */
-public class SettingsDAO extends GenericDAOJPAImpl<SettingsEntity, Long> {
+public class SettingsDAO extends GenericDAOJPAImpl<SettingsEntity, Long> implements org.exoplatform.settings.jpa.SettingsDAO {
   private static final Log LOG = ExoLogger.getLogger(SettingsDAO.class);
 
   @ExoTransactional
+  @Override
   public List<SettingsEntity> getSettingsByContextTypeAndName(String contextType, String contextName) {
     TypedQuery<SettingsEntity> query;
     if (StringUtils.isBlank(contextName)) {
@@ -33,6 +34,7 @@ public class SettingsDAO extends GenericDAOJPAImpl<SettingsEntity, Long> {
   }
 
   @ExoTransactional
+  @Override
   public List<SettingsEntity> getSettingsByContextAndScope(String contextType,
                                                            String contextName,
                                                            String scopeType,
@@ -55,6 +57,7 @@ public class SettingsDAO extends GenericDAOJPAImpl<SettingsEntity, Long> {
   }
 
   @ExoTransactional
+  @Override
   public SettingsEntity getSettingByContextAndScopeAndKey(String contextType,
                                                           String contextName,
                                                           String scopeType,
@@ -93,6 +96,7 @@ public class SettingsDAO extends GenericDAOJPAImpl<SettingsEntity, Long> {
   }
 
   @ExoTransactional
+  @Override
   public long countSettingsByNameAndValueAndScope(String scopeType, String scopeName, String key, String value) {
     TypedQuery<Long> query;
     if (StringUtils.isBlank(scopeName)) {
