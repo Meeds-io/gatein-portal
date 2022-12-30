@@ -3,13 +3,10 @@ package org.exoplatform.portal.mop.jdbc.dao;
 import java.util.Arrays;
 import java.util.List;
 
-import org.exoplatform.component.test.*;
 import org.exoplatform.portal.jdbc.entity.PermissionEntity;
 import org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE;
 
-@ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
-public class PermissionDAOTest extends AbstractKernelTest {
+public class PermissionDAOTest extends AbstractDAOTest {
   private PermissionDAO     permissionDAO;
 
   @Override
