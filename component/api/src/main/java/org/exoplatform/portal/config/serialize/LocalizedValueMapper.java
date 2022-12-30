@@ -44,19 +44,14 @@ public class LocalizedValueMapper implements IUnmarshaller, IAliasable, IMarshal
     /** . */
     private String marshallName;
 
-    /** . */
-    private int marshallIndex;
-
     public LocalizedValueMapper(String uri, int index, String name) {
         this.marshalURI = uri;
         this.marshallName = name;
-        this.marshallIndex = index;
     }
 
     public LocalizedValueMapper() {
         this.marshalURI = null;
         this.marshallName = "label";
-        this.marshallIndex = 0;
     }
 
     public boolean isPresent(IUnmarshallingContext ctx) throws JiBXException {
@@ -74,7 +69,7 @@ public class LocalizedValueMapper implements IUnmarshaller, IAliasable, IMarshal
         Locale lang = null;
         for (int i = 0; i < count; i++) {
             String attrName = ctx.getAttributeName(i);
-            if (attrName.equals("xml:lang")) {
+            if (attrName.equals("xml:lang") || attrName.equals("lang")) {
                 String attrValue = ctx.getAttributeValue(i).trim();
                 Matcher matcher = RFC1766_PATTERN.matcher(attrValue);
                 if (matcher.matches()) {

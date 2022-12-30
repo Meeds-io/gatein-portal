@@ -48,10 +48,13 @@ public class JTAUserTransactionLifecycleServiceImpl implements JTAUserTransactio
     private TransactionService transactionService;
 
     // For now, we have one listener instance for all transactions
-    private List<JTAUserTransactionLifecycleListener> listeners = new LinkedList<JTAUserTransactionLifecycleListener>();
+    private List<JTAUserTransactionLifecycleListener> listeners = new LinkedList<>();
 
     public JTAUserTransactionLifecycleServiceImpl(TransactionService transactionService) {
         this.transactionService = transactionService;
+    }
+
+    public JTAUserTransactionLifecycleServiceImpl() {
     }
 
     /**
@@ -61,7 +64,10 @@ public class JTAUserTransactionLifecycleServiceImpl implements JTAUserTransactio
         UserTransaction tx = getUserTransaction();
 
         try {
-            if (tx.getStatus() == Status.STATUS_NO_TRANSACTION) {
+            if (tx == null) {
+              // for test scope, this may happen
+                log.debug("UserTransaction is null, ignore transactional behavior");
+            } else if (tx.getStatus() == Status.STATUS_NO_TRANSACTION) {
                 executeListenersBeforeBegin();
                 tx.begin();
                 executeListenersAfterBegin();
@@ -69,7 +75,7 @@ public class JTAUserTransactionLifecycleServiceImpl implements JTAUserTransactio
                 log.warn("UserTransaction not started as it's in state " + tx.getStatus());
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Error when starting transaction", e);
         }
     }
 
@@ -80,18 +86,23 @@ public class JTAUserTransactionLifecycleServiceImpl implements JTAUserTransactio
         UserTransaction tx = getUserTransaction();
 
         try {
-            int txStatus = tx.getStatus();
-            if (txStatus == Status.STATUS_NO_TRANSACTION) {
-                log.warn("UserTransaction can't be finished as it wasn't started");
-            } else if (txStatus == Status.STATUS_MARKED_ROLLBACK || txStatus == Status.STATUS_ROLLEDBACK
-                    || txStatus == Status.STATUS_ROLLING_BACK) {
-                log.warn("Going to rollback UserTransaction as it's status is " + txStatus);
-                tx.rollback();
+            if (tx == null) {
+              // for test scope, this may happen
+              log.debug("UserTransaction is null, ignore transactional behavior");
             } else {
-                tx.commit();
+              int txStatus = tx.getStatus();
+              if (txStatus == Status.STATUS_NO_TRANSACTION) {
+                  log.warn("UserTransaction can't be finished as it wasn't started");
+              } else if (txStatus == Status.STATUS_MARKED_ROLLBACK || txStatus == Status.STATUS_ROLLEDBACK
+                      || txStatus == Status.STATUS_ROLLING_BACK) {
+                  log.warn("Going to rollback UserTransaction as it's status is " + txStatus);
+                  tx.rollback();
+              } else {
+                  tx.commit();
+              }
             }
-        } catch (Exception se) {
-            throw new RuntimeException(se);
+        } catch (Exception e) {
+          throw new IllegalStateException("Error when committing transaction", e);
         }
     }
 

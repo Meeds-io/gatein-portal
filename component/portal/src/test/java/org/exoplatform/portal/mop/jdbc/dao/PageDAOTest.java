@@ -2,15 +2,12 @@ package org.exoplatform.portal.mop.jdbc.dao;
 
 import org.gatein.api.page.PageQuery;
 
-import org.exoplatform.component.test.*;
 import org.exoplatform.portal.jdbc.entity.PageEntity;
 import org.exoplatform.portal.jdbc.entity.SiteEntity;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageKey;
 
-@ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
-public class PageDAOTest extends AbstractKernelTest {
+public class PageDAOTest extends AbstractDAOTest {
   private PageDAO pageDAO;
   private SiteDAO siteDAO;
   

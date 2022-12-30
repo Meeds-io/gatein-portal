@@ -2,14 +2,11 @@ package org.exoplatform.portal.mop.jdbc.dao;
 
 import java.util.List;
 
-import org.exoplatform.component.test.*;
 import org.exoplatform.portal.jdbc.entity.SiteEntity;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 
-@ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
-public class SiteDAOTest extends AbstractKernelTest {
+public class SiteDAOTest extends AbstractDAOTest {
   private SiteDAO siteDAO;
 
   @Override
@@ -17,6 +14,7 @@ public class SiteDAOTest extends AbstractKernelTest {
     begin();
     super.setUp();
     this.siteDAO = getContainer().getComponentInstanceOfType(SiteDAO.class);
+    this.siteDAO.deleteAll();
   }
 
   @Override
