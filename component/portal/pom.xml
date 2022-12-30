@@ -1,24 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
+  This file is part of the Meeds project (https://meeds.io/).
 
-    Copyright (C) 2009 eXo Platform SAS.
+  Copyright (C) 2022 Meeds Association contact@meeds.io
 
-    This is free software; you can redistribute it and/or modify it
-    under the terms of the GNU Lesser General Public License as
-    published by the Free Software Foundation; either version 2.1 of
-    the License, or (at your option) any later version.
-
-    This software is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public
-    License along with this software; if not, write to the Free
-    Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-    02110-1301 USA, or see the FSF site: http://www.fsf.org.
-
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 3 of the License, or (at your option) any later version.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+  You should have received a copy of the GNU Lesser General Public License
+  along with this program; if not, write to the Free Software Foundation,
+  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.exoplatform.gatein.portal</groupId>
@@ -35,141 +32,68 @@
     <rest.api.doc.title>Gatein-portal Rest APIs</rest.api.doc.title>
     <rest.api.doc.version>1.0</rest.api.doc.version>
     <rest.api.doc.description>Gatein-portal used Rest endpoints</rest.api.doc.description>
-    <jacoco.skip>true</jacoco.skip>
-    <jacoco.listener></jacoco.listener>
+
+    <exo.test.coverage.ratio>0.63</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
-
     <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
-      <artifactId>exo.portal.component.common</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>exo.portal.component.file-storage</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>exo.portal.component.pc</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>exo.portal.component.identity</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>exo.portal.component.resources</artifactId>
     </dependency>
-  
-    <dependency>
-      <groupId>org.exoplatform.ws</groupId>
-      <artifactId>exo.ws.rest.core</artifactId>
-    </dependency>
 
-    <dependency>
-      <groupId>org.gatein.api</groupId>
-      <artifactId>gatein-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.gatein.mop</groupId>
-      <artifactId>mop-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.gatein.mop</groupId>
-      <artifactId>mop-spi</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.gatein.management</groupId>
-      <artifactId>gatein-management-spi</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-    </dependency>
-
+    <!-- TODO: Should simply be replace bu org.json -->
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.swagger.core.v3</groupId>
-      <artifactId>swagger-annotations</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>exo.portal.component.identity</artifactId>
       <type>test-jar</type>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
-      <artifactId>exo.portal.component.test.core</artifactId>
-      <scope>test</scope>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>exo.portal.component.file-storage</artifactId>
+      <type>test-jar</type>
     </dependency>
-
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-inline</artifactId>
-      <scope>test</scope>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>exo.portal.component.resources</artifactId>
+      <type>test-jar</type>
     </dependency>
 
-    <dependency>
-      <groupId>org.powermock</groupId>
-      <artifactId>powermock-module-junit4</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.powermock</groupId>
-      <artifactId>powermock-api-mockito2</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.exoplatform.ws</groupId>
-      <artifactId>exo.ws.testframework</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-client</artifactId>
-        <scope>test</scope>
-    </dependency>
-
+    <!-- Used For BrandingService which compiles Less Files to CSS -->
     <dependency>
       <groupId>com.github.sommeri</groupId>
       <artifactId>less4j</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.exoplatform.kernel</groupId>
+      <artifactId>exo.kernel.component.ext.cache.impl.infinispan.v8</artifactId>
+      <!--
+        Make it here provided to avoid transitive dependency for test scope
+        and is added in exo.portal.web.portal for runtime usage
+       -->
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -211,18 +135,6 @@
       <plugin>
         <groupId>com.jcabi</groupId>
         <artifactId>jcabi-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

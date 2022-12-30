@@ -41,7 +41,7 @@ public class KernelRuleTestScopedTestCase {
         assertNull(kernel.getContainer().getComponentInstance(CustomService.class));
     }
 
-    @ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-configuration.xml") })
+    @ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-jdbc-configuration.xml") })
     @Test
     public void testB() throws Exception {
         test();

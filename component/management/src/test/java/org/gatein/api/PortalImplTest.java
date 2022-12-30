@@ -136,7 +136,9 @@ public class PortalImplTest extends AbstractApiTest {
     public void findPages_Filter() {
         createSite(new SiteId("find-pages"), "page3", "page1", "page5", "page2", "page4");
 
-        Filter<Page> filter = new Filter<Page>() {
+        Filter<Page> filter = new Filter<>() {
+            private static final long serialVersionUID = 8214110126241358541L;
+
             public boolean accept(Page element) {
                 return element.getName().equals("page1") || element.getName().equals("page4");
             }
@@ -250,7 +252,9 @@ public class PortalImplTest extends AbstractApiTest {
         createSite(new SiteId("d"));
         createSite(new SiteId("b"));
 
-        List<Site> sites = portal.findSites(new SiteQuery.Builder().includeEmptySites(true).withFilter(new Filter<Site>() {
+        List<Site> sites = portal.findSites(new SiteQuery.Builder().includeEmptySites(true).withFilter(new Filter<>() {
+            private static final long serialVersionUID = 7299077018643501291L;
+
             @Override
             public boolean accept(Site site) {
                 return site.getName().equals("a") || site.getName().equals("b");
@@ -268,7 +272,6 @@ public class PortalImplTest extends AbstractApiTest {
     @Test
     public void findSites_NaturalOrdering() {
         List<Site> sites = portal.findSites(new SiteQuery.Builder().includeEmptySites(true).build());
-        int initialSize = sites.size();
 
         createSite(new SiteId("z"));
         createSite(new SiteId("a"));
@@ -606,7 +609,7 @@ public class PortalImplTest extends AbstractApiTest {
         assertFalse(portal.removePage(new PageId("test1", "page2")));
     }
 
-    @Test(expected = EntityNotFoundException.class)
+    @Test(expected = EntityNotFoundException.class) // NOSONAR
     public void removePage_SiteNonExisting() {
         createSite(new SiteId("test1"), "page1");
 

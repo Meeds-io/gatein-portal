@@ -276,7 +276,7 @@ background: transparent url(/eXoResources/skin/DefaultSkin/portal/webui/componen
 
 .UIPageBrowser .UIGrid {	
 	width: 99.7%;
-	!width: 98%;
+  width: 98%;
 	margin: auto;
 }
 
@@ -2722,9 +2722,9 @@ a {
 }
 
 .ClearFix {
-	!display: inline-block;
-  !zoom: 1;
-  !display: block; 
+  display: inline-block;
+  zoom: 1;
+  display: block; 
 }
 
 .InlineContainer {

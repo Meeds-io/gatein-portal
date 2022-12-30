@@ -28,12 +28,6 @@ public class LoginUtils {
   /** . */
   public static final String COOKIE_NAME                   = "rememberme";
 
-  public static final String OAUTH_COOKIE_NAME             = "oauth_rememberme";
-
-  // value of this field need equals with
-  // org.gatein.security.oauth.common.OAuthConstants.ATTRIBUTE_REMEMBER_ME
-  public static final String SESSION_ATTRIBUTE_REMEMBER_ME = "_rememberme";
-
   /**
    * Extract the remember me token from the request or returns null.
    *
@@ -45,18 +39,6 @@ public class LoginUtils {
     if (cookies != null) {
       for (Cookie cookie : cookies) {
         if (COOKIE_NAME.equals(cookie.getName())) {
-          return cookie.getValue();
-        }
-      }
-    }
-    return null;
-  }
-
-  public static String getOauthRememberMeTokenCookie(HttpServletRequest req) {
-    Cookie[] cookies = req.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (OAUTH_COOKIE_NAME.equals(cookie.getName())) {
           return cookie.getValue();
         }
       }
