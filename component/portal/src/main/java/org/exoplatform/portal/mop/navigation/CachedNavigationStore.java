@@ -1,6 +1,7 @@
 package org.exoplatform.portal.mop.navigation;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.exoplatform.commons.cache.future.FutureExoCache;
 import org.exoplatform.commons.cache.future.Loader;
@@ -16,8 +17,6 @@ import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.cache.ObjectCacheInfo;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-
-import com.google.common.base.Objects;
 
 public class CachedNavigationStore extends NavigationStoreImpl {
 
@@ -210,7 +209,7 @@ public class CachedNavigationStore extends NavigationStoreImpl {
 
     @Override
     public boolean select(final NavigationKey navigationKey, final ObjectCacheInfo<? extends NavigationData> ocinfo) {
-      return Objects.equal(key, navigationKey.getKey()) || Objects.equal(key, ocinfo.get().getSiteKey());
+      return Objects.equals(key, navigationKey.getKey()) || Objects.equals(key, ocinfo.get().getSiteKey());
     }
 
     @Override
@@ -234,8 +233,8 @@ public class CachedNavigationStore extends NavigationStoreImpl {
 
     @Override
     public boolean select(final Long nodeKey, final ObjectCacheInfo<? extends NodeData> ocinfo) {
-      return Objects.equal(nodeId, nodeKey) || Objects.equal(key, ocinfo.get().getParentId())
-          || Objects.equal(key, ocinfo.get().getState().getSiteKey());
+      return Objects.equals(nodeId, nodeKey) || Objects.equals(key, ocinfo.get().getParentId())
+          || Objects.equals(key, ocinfo.get().getState().getSiteKey());
     }
 
     @Override
@@ -277,7 +276,7 @@ public class CachedNavigationStore extends NavigationStoreImpl {
 
     @Override
     public int hashCode() {
-      return Objects.hashCode(key, nodeId);
+      return Objects.hash(key, nodeId);
     }
 
     @Override
@@ -285,8 +284,8 @@ public class CachedNavigationStore extends NavigationStoreImpl {
       if (!(obj instanceof NavigationKey)) {
         return false;
       }
-      return Objects.equal(key, ((NavigationKey) obj).key)
-          && Objects.equal(nodeId, ((NavigationKey) obj).nodeId);
+      return Objects.equals(key, ((NavigationKey) obj).key)
+          && Objects.equals(nodeId, ((NavigationKey) obj).nodeId);
     }
   }
 }

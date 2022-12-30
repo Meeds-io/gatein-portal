@@ -20,7 +20,6 @@
 package org.exoplatform.portal.webui.portal;
 
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.portal.account.UIAccountSetting;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.model.*;
@@ -37,22 +36,13 @@ import org.exoplatform.portal.webui.portal.UIPortalComponentActionListener.Chang
 import org.exoplatform.portal.webui.portal.UIPortalComponentActionListener.ChangeSkinActionListener;
 import org.exoplatform.portal.webui.portal.UIPortalComponentActionListener.EditPortalPropertiesActionListener;
 import org.exoplatform.portal.webui.portal.UIPortalComponentActionListener.MoveChildActionListener;
-import org.exoplatform.portal.webui.portal.UIPortalComponentActionListener.RecoveryPasswordAndUsernameActionListener;
-import org.exoplatform.portal.webui.portal.UIPortalComponentActionListener.ShowLoginFormActionListener;
 import org.exoplatform.portal.webui.util.Util;
-import org.exoplatform.portal.webui.workspace.UIMaskWorkspace;
-import org.exoplatform.portal.webui.workspace.UIPortalApplication;
 import org.exoplatform.services.listener.*;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.User;
-import org.exoplatform.web.application.JavascriptManager;
 import org.exoplatform.web.login.LoginUtils;
 import org.exoplatform.web.login.LogoutControl;
 import org.exoplatform.web.security.GateInToken;
 import org.exoplatform.web.security.security.AbstractTokenService;
 import org.exoplatform.web.security.security.CookieTokenService;
-import org.exoplatform.web.url.navigation.NavigationResource;
-import org.exoplatform.web.url.navigation.NodeURL;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
 import org.exoplatform.webui.core.UIComponent;
@@ -68,24 +58,19 @@ import java.util.List;
 import java.util.Map;
 
 @ComponentConfig(lifecycle = UIPortalLifecycle.class, template = "system:/groovy/portal/webui/portal/UIPortal.gtmpl", events = {
-        @EventConfig(listeners = ChangeApplicationListActionListener.class),
-        @EventConfig(listeners = MoveChildActionListener.class, csrfCheck = false),
-        @EventConfig(listeners = UIPortal.LogoutActionListener.class, csrfCheck = false),
-        @EventConfig(listeners = ShowLoginFormActionListener.class, csrfCheck = false),
-        @EventConfig(listeners = ChangeLanguageActionListener.class, csrfCheck = false),
-        @EventConfig(listeners = EditPortalPropertiesActionListener.class, csrfCheck = false),
-        @EventConfig(listeners = ChangeSkinActionListener.class, csrfCheck = false),
-        @EventConfig(listeners = RecoveryPasswordAndUsernameActionListener.class),
-        @EventConfig(listeners = UIPortal.AccountSettingsActionListener.class, csrfCheck = false),
-        @EventConfig(listeners = UIPortalActionListener.PingActionListener.class, csrfCheck = false) })
+  @EventConfig(listeners = ChangeApplicationListActionListener.class),
+  @EventConfig(listeners = MoveChildActionListener.class, csrfCheck = false),
+  @EventConfig(listeners = UIPortal.LogoutActionListener.class, csrfCheck = false),
+  @EventConfig(listeners = ChangeLanguageActionListener.class, csrfCheck = false),
+  @EventConfig(listeners = EditPortalPropertiesActionListener.class, csrfCheck = false),
+  @EventConfig(listeners = ChangeSkinActionListener.class, csrfCheck = false)
+})
 public class UIPortal extends UIContainer {
     private SiteKey siteKey;
 
     private String locale;
 
     private String label;
-
-    private String description;
 
     private String editPermission;
 
@@ -355,22 +340,12 @@ public class UIPortal extends UIContainer {
                 AbstractTokenService<GateInToken, String> tokenService = AbstractTokenService.getInstance(CookieTokenService.class);
                 tokenService.deleteToken(token);
             }
-            token = LoginUtils.getOauthRememberMeTokenCookie(req);
-            if(token != null) {
-                AbstractTokenService<GateInToken, String> tokenService = AbstractTokenService.getInstance(CookieTokenService.class);
-                tokenService.deleteToken(token);
-            }
 
             LogoutControl.wantLogout();
             Cookie cookie = new Cookie(LoginUtils.COOKIE_NAME, "");
             cookie.setPath(req.getContextPath());
             cookie.setMaxAge(0);
             prContext.getResponse().addCookie(cookie);
-
-            Cookie oauthCookie = new Cookie(LoginUtils.OAUTH_COOKIE_NAME, "");
-            oauthCookie.setPath(req.getContextPath());
-            oauthCookie.setMaxAge(0);
-            prContext.getResponse().addCookie(oauthCookie);
 
             prContext.sendRedirect("/");
         }
@@ -387,34 +362,6 @@ public class UIPortal extends UIContainer {
             return null;
         }
 
-    }
-
-    public static class AccountSettingsActionListener extends EventListener<UIPortal> {
-        public void execute(Event<UIPortal> event) throws Exception {
-            UIPortal uiPortal = event.getSource();
-            UIPortalApplication uiApp = uiPortal.getAncestorOfType(UIPortalApplication.class);
-            UIMaskWorkspace uiMaskWS = uiApp.getChildById(UIPortalApplication.UI_MASK_WS_ID);
-
-            // Modified by nguyenanhkien2a@gmail.com
-            // We should check account for existing
-            String username = Util.getPortalRequestContext().getRemoteUser();
-            OrganizationService service = uiPortal.getApplicationComponent(OrganizationService.class);
-            User useraccount = service.getUserHandler().findUserByName(username);
-
-            if (useraccount != null) {
-                UIAccountSetting uiAccountForm = uiMaskWS.createUIComponent(UIAccountSetting.class, null, null);
-                uiMaskWS.setUIComponent(uiAccountForm);
-                uiMaskWS.setShow(true);
-                event.getRequestContext().addUIComponentToUpdateByAjax(uiMaskWS);
-            } else {
-                // Show message detail to user and then logout if user press ok button
-                JavascriptManager jsManager = Util.getPortalRequestContext().getJavascriptManager();
-                jsManager.require("SHARED/base").addScripts(
-                        "if(confirm('"
-                                + Util.getPortalRequestContext().getApplicationResourceBundle()
-                                        .getString("UIAccountProfiles.msg.NotExistingAccount") + "')) {eXo.portal.logout();}");
-            }
-        }
     }
 
     public void setRedirects(ArrayList<PortalRedirect> portalRedirects) {
