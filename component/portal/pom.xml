@@ -63,13 +63,6 @@
       <artifactId>json-simple</artifactId>
     </dependency>
 
-    <!-- io.swagger for REST API Doc generation -->
-    <dependency>
-      <groupId>io.swagger.core.v3</groupId>
-      <artifactId>swagger-annotations</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>exo.portal.component.identity</artifactId>

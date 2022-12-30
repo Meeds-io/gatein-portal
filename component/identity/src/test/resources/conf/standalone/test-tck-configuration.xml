@@ -23,7 +23,7 @@
                xmlns="http://www.exoplatform.org/xml/ns/kernel_1_3.xsd">
 
   <container-lifecycle-plugin>
-    <type>org.exoplatform.commons.container.test.DatabaseInitializerPlugin</type>
+    <type>org.exoplatform.commons.container.test.TestDatabaseInitializerContainerPlugin</type>
   </container-lifecycle-plugin>
 
   <import>jar:/conf/base-root-configuration.xml</import>

@@ -26,7 +26,7 @@ import org.exoplatform.services.naming.InitialContextInitializer;
 /**
  * A class to start the database at first before starting any other component
  */
-public class DatabaseInitializerPlugin extends BaseContainerLifecyclePlugin {
+public class TestDatabaseInitializerContainerPlugin extends BaseContainerLifecyclePlugin {
 
   @Override
   public void initContainer(ExoContainer container) {

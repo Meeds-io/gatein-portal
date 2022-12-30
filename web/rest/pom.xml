@@ -27,4 +27,7 @@
   <artifactId>exo.portal.web.rest</artifactId>
   <packaging>war</packaging>
   <name>GateIn Portal Web REST application</name>
+  <build>
+    <finalName>rest</finalName>
+  </build>
 </project>
