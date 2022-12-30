@@ -35,6 +35,7 @@ public class DefaultRequestHandlerTest {
   public void testGetDefaultSite() {
     URLFactoryService urlFactory = mock(URLFactoryService.class);
     NodeURL url = mock(NodeURL.class);
+    when(url.toString()).thenCallRealMethod();
     UserPortalConfigService portalConfigService = mock(UserPortalConfigService.class);
     ControllerContext context = mock(ControllerContext.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
@@ -87,7 +88,7 @@ public class DefaultRequestHandlerTest {
 
       DefaultRequestHandler defaultRequestHandler = new DefaultRequestHandler(portalConfigService, urlFactory);
       defaultRequestHandler.execute(context);
-      verify(response).sendRedirect(eq("/portal/site2"));
+      verify(response).sendRedirect("/portal/site2");
     } catch (Exception e) {
       LOG.error("Error while executing method", e);
       fail(e.getMessage());
@@ -130,6 +131,7 @@ public class DefaultRequestHandlerTest {
   public void testGetNonDefaultSite() {
     URLFactoryService urlFactory = mock(URLFactoryService.class);
     NodeURL url = mock(NodeURL.class);
+    when(url.toString()).thenCallRealMethod();
     UserPortalConfigService portalConfigService = mock(UserPortalConfigService.class);
     ControllerContext context = mock(ControllerContext.class);
     HttpServletResponse response = mock(HttpServletResponse.class);

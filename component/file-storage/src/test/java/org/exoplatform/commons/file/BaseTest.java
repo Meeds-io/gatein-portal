@@ -24,7 +24,9 @@ import org.exoplatform.container.PortalContainer;
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/components-configuration.xml") })
+@ConfiguredBy({
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/components-configuration.xml"),
+})
 public abstract class BaseTest extends AbstractKernelTest {
 
   /** . */

@@ -24,8 +24,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.gatein.wci.ServletContainer;
@@ -37,134 +43,79 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.web.AbstractFilter;
-import org.exoplatform.services.organization.*;
-import org.exoplatform.web.security.AuthenticationRegistry;
+import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.web.security.security.CookieTokenService;
 
 /**
- * The remember me filter performs an authentication using the {@link ServletContainer} when the current request is a GET
- * request, the user is not authenticated and there is a remember me token cookie in the request.
+ * The remember me filter performs an authentication using the
+ * {@link ServletContainer} when the current request is a GET request, the user
+ * is not authenticated and there is a remember me token cookie in the request.
  *
- * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @author  <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
 public class RememberMeFilter extends AbstractFilter {
-    //value of this field need equals with: org.gatein.security.oauth.common.OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER_FOR_JAAS
-    public static final String ATTRIBUTE_AUTHENTICATED_PORTAL_USER_FOR_JAAS = "_authenticatedPortalUserForJaas";
 
-    public List<String>      ignoredPaths                                 = null;
+  private List<String> ignoredPaths = null;
 
-    @Override
-    protected void afterInit(FilterConfig config) throws ServletException {
-      String ignoredPathsParameter = config.getInitParameter("ignoredPaths");
-      if (StringUtils.isBlank(ignoredPathsParameter)) {
-        this.ignoredPaths = Collections.emptyList();
-      } else {
-        this.ignoredPaths = Arrays.asList(StringUtils.split(ignoredPathsParameter, ","));
+  @Override
+  protected void afterInit(FilterConfig config) throws ServletException {
+    String ignoredPathsParameter = config.getInitParameter("ignoredPaths");
+    if (StringUtils.isBlank(ignoredPathsParameter)) {
+      this.ignoredPaths = Collections.emptyList();
+    } else {
+      this.ignoredPaths = Arrays.asList(StringUtils.split(ignoredPathsParameter, ","));
+    }
+  }
+
+  public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
+    doFilter((HttpServletRequest) req, (HttpServletResponse) resp, chain);
+  }
+
+  private void doFilter(HttpServletRequest request, // NOSONAR
+                        HttpServletResponse response,
+                        FilterChain chain) throws IOException, ServletException {
+    ExoContainerContext.setCurrentContainer(getContainer());
+    String servletPath = request.getServletPath();
+    if (request.getRemoteUser() == null
+        && this.ignoredPaths.stream().noneMatch(ignoredPath -> StringUtils.startsWith(servletPath, ignoredPath))) {
+      String token = LoginUtils.getRememberMeTokenCookie(request);
+      if (token != null) {
+        ExoContainer container = getContainer();
+        CookieTokenService tokenservice = container.getComponentInstanceOfType(CookieTokenService.class);
+        Credentials credentials = tokenservice.validateToken(token, false);
+        if (credentials != null) {
+          ServletContainer servletContainer = ServletContainerFactory.getServletContainer();
+          try {
+            servletContainer.login(request, response, credentials);
+          } catch (Exception e) {
+            // Clear token cookie if we did not authenticate
+            if (request.getRemoteUser() == null) {
+              Cookie cookie = new Cookie(LoginUtils.COOKIE_NAME, "");
+              cookie.setPath(request.getContextPath());
+              cookie.setMaxAge(0);
+              cookie.setHttpOnly(true);
+              cookie.setSecure(request.isSecure());
+              response.addCookie(cookie);
+            }
+          }
+        }
       }
     }
 
-    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
-        doFilter((HttpServletRequest) req, (HttpServletResponse) resp, chain);
+    // Continue
+    chain.doFilter(request, response);
+  }
+
+  public void begin(OrganizationService orgService) {
+    if (orgService instanceof ComponentRequestLifecycle componentRequestLifcycle) {
+      RequestLifeCycle.begin(componentRequestLifcycle);
     }
+  }
 
-    private void doFilter(HttpServletRequest req, HttpServletResponse resp, FilterChain chain) throws IOException,
-            ServletException {
-        ExoContainerContext.setCurrentContainer(getContainer());
-        String servletPath = req.getServletPath();
-        if (req.getRemoteUser() == null
-            && this.ignoredPaths.stream().noneMatch(ignoredPath -> StringUtils.startsWith(servletPath, ignoredPath))) {
-            String token = LoginUtils.getRememberMeTokenCookie(req);
-            if (token != null) {
-                ExoContainer container = getContainer();
-                CookieTokenService tokenservice = container.getComponentInstanceOfType(CookieTokenService.class);
-                Credentials credentials = tokenservice.validateToken(token, false);
-                if (credentials != null) {
-                    ServletContainer servletContainer = ServletContainerFactory.getServletContainer();
-                    try {
-                        servletContainer.login(req, resp, credentials);
-                    } catch (Exception e) {
-                        // Could not authenticate
-                    }
-                }
-            }
-
-            // Clear token cookie if we did not authenticate
-            if (req.getRemoteUser() == null) {
-                Cookie cookie = new Cookie(LoginUtils.COOKIE_NAME, "");
-                cookie.setPath(req.getContextPath());
-                cookie.setMaxAge(0);
-                cookie.setHttpOnly(true);
-                cookie.setSecure(req.isSecure());
-                resp.addCookie(cookie);
-            }
-        }
-
-        //Process oauth rememberMe
-        if(req.getRemoteUser() == null) {
-            String token = LoginUtils.getOauthRememberMeTokenCookie(req);
-            if(token != null) {
-                ExoContainer container = getContainer();
-                CookieTokenService tokenService = container.getComponentInstanceOfType(CookieTokenService.class);
-                Credentials credentials = tokenService.validateToken(token, false);
-                AuthenticationRegistry authRegistry = container.getComponentInstanceOfType(AuthenticationRegistry.class);
-                OrganizationService orgService = container.getComponentInstanceOfType(OrganizationService.class);
-
-                if (credentials != null) {
-                    ServletContainer servletContainer = ServletContainerFactory.getServletContainer();
-                    try {
-                        String username = credentials.getUsername();
-
-                        begin(orgService);
-                        User portalUser = orgService.getUserHandler().findUserByName(username, UserStatus.ENABLED);
-                        if(portalUser != null) {
-                            authRegistry.setAttributeOfClient(req, ATTRIBUTE_AUTHENTICATED_PORTAL_USER_FOR_JAAS, portalUser);
-
-                            servletContainer.login(req, resp, credentials);
-                        }
-                    } catch (Exception e) {
-                        // Could not authenticate
-                    } finally {
-                      end(orgService);
-                    }
-                }
-
-                // Clear token cookie if we did not authenticate
-                if (req.getRemoteUser() == null) {
-                    Cookie cookie = new Cookie(LoginUtils.OAUTH_COOKIE_NAME, "");
-                    cookie.setPath(req.getContextPath());
-                    cookie.setMaxAge(0);
-                    cookie.setHttpOnly(true);
-                    cookie.setSecure(req.isSecure());
-                    resp.addCookie(cookie);
-                }
-            }
-        }
-
-        if (req.getRemoteUser() == null) {
-            String disabledUser = (String)req.getAttribute(FilterDisabledLoginModule.DISABLED_USER_NAME);
-            if (disabledUser != null) {
-                req.getRequestDispatcher("/login").forward(req, resp);
-                return;
-            }
-        }
-
-        // Continue
-        chain.doFilter(req, resp);
+  public void end(OrganizationService orgService) {
+    if (orgService instanceof ComponentRequestLifecycle) {
+      RequestLifeCycle.end();
     }
-
-    public void destroy() {
-    }
-
-    public void begin(OrganizationService orgService) {
-        if (orgService instanceof ComponentRequestLifecycle) {
-            RequestLifeCycle.begin((ComponentRequestLifecycle) orgService);
-        }
-    }
-
-    public void end(OrganizationService orgService) {
-        if (orgService instanceof ComponentRequestLifecycle) {
-            RequestLifeCycle.end();
-        }
-    }
+  }
 }

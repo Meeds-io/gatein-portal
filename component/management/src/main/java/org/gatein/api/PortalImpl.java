@@ -30,7 +30,6 @@ import org.gatein.api.internal.Parameters;
 import org.gatein.api.navigation.Navigation;
 import org.gatein.api.navigation.NavigationImpl;
 import org.gatein.api.oauth.OAuthProvider;
-import org.gatein.api.oauth.OAuthProviderAccessor;
 import org.gatein.api.page.*;
 import org.gatein.api.security.*;
 import org.gatein.api.site.*;
@@ -93,8 +92,6 @@ public class PortalImpl implements Portal {
 
   private final UserPortalConfigService    userPortalConfigService;
 
-  private final OAuthProviderAccessor      oauthProviderAccessor;
-
   public PortalImpl(DataStorage dataStorage,
                     PageService pageService,
                     NavigationService navigationService,
@@ -103,8 +100,7 @@ public class PortalImpl implements Portal {
                     Authenticator authenticator,
                     IdentityRegistry identityRegistry,
                     UserACL acl,
-                    UserPortalConfigService userPortalConfigService,
-                    OAuthProviderAccessor oauthProviderAccessor) {
+                    UserPortalConfigService userPortalConfigService) {
     this.dataStorage = dataStorage;
     this.pageService = pageService;
     this.navigationService = navigationService;
@@ -114,7 +110,6 @@ public class PortalImpl implements Portal {
     this.identityRegistry = identityRegistry;
     this.acl = acl;
     this.userPortalConfigService = userPortalConfigService;
-    this.oauthProviderAccessor = oauthProviderAccessor;
   }
 
   @Override
@@ -422,7 +417,7 @@ public class PortalImpl implements Portal {
 
   @Override
   public OAuthProvider getOAuthProvider(String oauthProviderKey) {
-    return oauthProviderAccessor.getOAuthProvider(oauthProviderKey);
+    throw new UnsupportedOperationException();
   }
 
   private static <T> void filter(List<T> list, Filter<T> filter) {
@@ -520,4 +515,5 @@ public class PortalImpl implements Portal {
 
     return list.toArray(new PortalConfig[list.size()]);
   }
+
 }
