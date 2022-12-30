@@ -26,35 +26,6 @@
     xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-    <key>org.exoplatform.services.cache.CacheService</key>
-    <jmx-name>cache:type=CacheService</jmx-name>
-    <type>org.exoplatform.services.cache.impl.CacheServiceImpl</type>
-    <init-params>
-      <object-param>
-        <name>cache.config.default</name>
-        <description>The default cache configuration</description>
-        <object type="org.exoplatform.services.cache.ExoCacheConfig">
-          <field name="name">
-            <string>default</string>
-          </field>
-          <field name="maxSize">
-            <int>300</int>
-          </field>
-          <field name="liveTime">
-            <long>60</long>
-          </field>
-          <field name="distributed">
-            <boolean>false</boolean>
-          </field>
-          <field name="implementation">
-            <string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string>
-          </field>
-        </object>
-      </object-param>
-    </init-params>
-  </component>
-
-  <component>
     <key>org.exoplatform.services.resources.LocaleConfigService</key>
     <type>org.exoplatform.services.resources.impl.LocaleConfigServiceImpl</type>
     <init-params>
@@ -78,22 +49,16 @@
         <name>classpath.resources</name>
         <description>The resources that start with the following package name should be load from file system
         </description>
-        <value>locale.portlet</value>
       </values-param>
 
       <values-param>
         <name>init.resources</name>
         <description>Store the following resources into the db for the first launch</description>
-        <value>locale.test.resources.test</value>
       </values-param>
 
       <values-param>
         <name>portal.resource.names</name>
-        <description>The properties files of the portal , those file will be merged
-          into one ResourceBundle properties
-        </description>
-        <value>local.portal.portal</value>
-        <value>local.portal.custom</value>
+        <description>The properties files of the portal , those file will be merged into one ResourceBundle properties</description>
       </values-param>
     </init-params>
   </component>

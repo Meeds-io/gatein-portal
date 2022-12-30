@@ -23,11 +23,11 @@
 
 package org.gatein.portal.encoder;
 
-import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.portal.config.AbstractConfigTest;
 
 /**
  * Test for {@link EncoderService}
@@ -36,7 +36,7 @@ import org.exoplatform.container.PortalContainer;
  */
 @ConfiguredBy({
    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.encoder-configuration.xml")})
-public class TestEncoderService extends AbstractKernelTest {
+public class TestEncoderService extends AbstractConfigTest {
 
     private EncoderService encoderService;
 
@@ -44,6 +44,7 @@ public class TestEncoderService extends AbstractKernelTest {
     protected void setUp() throws Exception {
         PortalContainer portalContainer = PortalContainer.getInstance();
         this.encoderService = (EncoderService) portalContainer.getComponentInstanceOfType(EncoderService.class);
+        super.setUp();
     }
 
     public void testEncoder() throws Exception {

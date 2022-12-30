@@ -49,8 +49,9 @@ import org.exoplatform.services.security.Identity;
  * Created by The eXo Platform SARL Author : Tung Pham thanhtungty@gmail.com Nov 13, 2007
  */
 @ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/services/organization/TestOrganization-configuration.xml") })
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration-new-user-listener.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/services/organization/TestOrganization-configuration.xml"),
+})
 public class TestOrganization extends AbstractKernelTest {
 
     protected static final String GROUP_1 = "testOrganization_group1";
@@ -220,7 +221,7 @@ public class TestOrganization extends AbstractKernelTest {
         assertEquals(1,groupHandler.findGroupsOfUserByKeyword("john","ad",excludedGroupsTypes).size());
         assertEquals(1,groupHandler.findGroupsOfUserByKeyword("demo","us",excludedGroupsTypes).size());
         assertEquals(0,groupHandler.findGroupsOfUserByKeyword("demo","ad",excludedGroupsTypes).size());
-        excludedGroupsTypes.add("GTN_GROUP_TYPE");
+        excludedGroupsTypes.add("platform_type");
         assertEquals(0,groupHandler.findGroupsOfUserByKeyword("john","ad",excludedGroupsTypes).size());
     }
 
@@ -235,7 +236,7 @@ public class TestOrganization extends AbstractKernelTest {
         assertEquals(3, groupHandler.findAllGroupsByKeyword("test", excludedGroupsTypes).size());
         excludedGroupsTypes.add("root_type");
         assertEquals(1, groupHandler.findAllGroupsByKeyword("us", excludedGroupsTypes).size());
-        assertEquals(1, groupHandler.findAllGroupsByKeyword("test", excludedGroupsTypes).size());
+        assertEquals(2, groupHandler.findAllGroupsByKeyword("test", excludedGroupsTypes).size());
     }
 
     public void testConsistencyMembershipListAccess() throws Exception {

@@ -36,7 +36,9 @@ import org.exoplatform.settings.cache.CacheSettingServiceImpl;
  * Nov 22, 2012
  */
 @ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/settings/configuration.xml")
+  @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.settings-configuration-local.xml")
 })
 public class CacheSettingTest extends BaseTestCase {
   protected static SettingService               settingService;

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2022 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+-->
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd" xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+
+  <component>
+    <key>org.exoplatform.commons.file.storage.dao.FileInfoDAO</key>
+    <type>org.exoplatform.commons.file.storage.dao.impl.FileInfoDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.commons.file.storage.dao.NameSpaceDAO</key>
+    <type>org.exoplatform.commons.file.storage.dao.impl.NameSpaceDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.commons.file.storage.dao.OrphanFileDAO</key>
+    <type>org.exoplatform.commons.file.storage.dao.impl.OrphanFileDAOImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.file.storage.dao.FileBinaryDAO</key>
+    <type>org.exoplatform.commons.file.storage.dao.impl.FileBinaryDAOImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.file.storage.DataStorage</key>
+    <type>org.exoplatform.commons.file.storage.DataStorage</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.file.resource.FileSystemResourceProvider</type>
+    <init-params>
+      <value-param>
+        <name>rootPath</name>
+        <value>target/files</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.file.resource.RdbmsResourceProvider</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.file.resource.BinaryProvider</key>
+    <type>org.exoplatform.commons.file.resource.BinaryProviderDelegate</type>
+    <init-params>
+      <value-param>
+        <name>storageType</name>
+        <value>${exo.files.binaries.storage.type:fs}</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.file.services.FileService</key>
+    <type>org.exoplatform.commons.file.services.impl.FileServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.file.services.NameSpaceService</key>
+    <type>org.exoplatform.commons.file.services.impl.NameSpaceServiceImpl</type>
+    <init-params>
+      <value-param>
+        <name>default.namespace</name>
+        <value>file</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.file.services.NameSpaceService</target-component>
+    <component-plugin>
+      <name>WikiNameSpacePlugin</name>
+      <set-method>addNameSpacePlugin</set-method>
+      <type>org.exoplatform.commons.file.services.NameSpacePlugin</type>
+      <init-params>
+        <properties-param>
+          <name>fileNameSpace.params</name>
+          <property name="name" value="wiki" />
+          <property name="description" value="Wiki" />
+        </properties-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+    <!-- Data Initialization for ES -->
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
+    <component-plugin>
+      <name>WikiChangeLogsPlugin</name>
+      <set-method>addChangeLogsPlugin</set-method>
+      <type>org.exoplatform.commons.persistence.impl.ChangeLogsPlugin</type>
+      <init-params>
+        <values-param>
+          <name>changelogs</name>
+          <description>Change logs of wiki</description>
+          <value>db/changelog/file.db.changelog-1.0.0.xml</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.file.resource.BinaryProvider</target-component>
+    <component-plugin>
+      <name>ResourceProviderPlugin</name>
+      <set-method>addResourceProviderPlugin</set-method>
+      <type>org.exoplatform.commons.file.resource.ResourceProviderPlugin</type>
+      <init-params>
+        <value-param>
+          <name>storageType</name>
+          <value>fs</value>
+        </value-param>
+        <value-param>
+          <name>class</name>
+          <value>org.exoplatform.commons.file.resource.FileSystemResourceProvider</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+    <component-plugin>
+      <name>ResourceProviderPlugin</name>
+      <set-method>addResourceProviderPlugin</set-method>
+      <type>org.exoplatform.commons.file.resource.ResourceProviderPlugin</type>
+      <init-params>
+        <value-param>
+          <name>storageType</name>
+          <value>rdbms</value>
+        </value-param>
+        <value-param>
+          <name>class</name>
+          <value>org.exoplatform.commons.file.resource.RdbmsResourceProvider</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+</configuration>
