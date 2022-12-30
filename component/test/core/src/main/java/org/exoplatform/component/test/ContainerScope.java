@@ -32,6 +32,11 @@ public enum ContainerScope {
     /**
      * The portal container scope.
      */
-    PORTAL
+    PORTAL,
+
+    /**
+     * The portal container in a standalone mode by excluding default configurations.
+     */
+    STANDALONE
 
 }

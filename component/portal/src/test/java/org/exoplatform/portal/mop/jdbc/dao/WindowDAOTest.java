@@ -8,13 +8,10 @@ import javax.persistence.EntityTransaction;
 import org.gatein.api.common.Pagination;
 
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
-import org.exoplatform.component.test.*;
 import org.exoplatform.portal.jdbc.entity.WindowEntity;
 import org.exoplatform.portal.jdbc.entity.WindowEntity.AppType;
 
-@ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
-public class WindowDAOTest extends AbstractKernelTest {
+public class WindowDAOTest extends AbstractDAOTest {
   private WindowDAO windowDAO;
   
   private EntityTransaction transaction;

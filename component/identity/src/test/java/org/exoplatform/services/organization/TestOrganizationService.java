@@ -30,9 +30,11 @@ import org.junit.ClassRule;
  */
 
 @ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/services/organization/TestOrganizationService-jdbc-configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/services/organization/TestOrganizationService-configuration.xml") })
+  @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/services/organization/TestOrganizationService-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/services/organization/TestOrganizationService-jdbc-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration-new-user-listener.xml"),
+})
 public class TestOrganizationService extends AbstractTestOrganizationService {
     @ClassRule
     public static KernelLifeCycle kernel = new KernelLifeCycle();

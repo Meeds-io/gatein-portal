@@ -36,7 +36,11 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
-public class AbstractKernelTest extends AbstractGateInTest {
+@ConfiguredBy({
+  @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+})
+public abstract class AbstractKernelTest extends AbstractGateInTest {
 
     /** . */
     private static KernelBootstrap bootstrap;
@@ -48,6 +52,18 @@ public class AbstractKernelTest extends AbstractGateInTest {
      * method run, since the class is instantiated each Test method run
      */
     private static final Map<String, AtomicLong> COUNTERS = new HashMap<String, AtomicLong>();
+
+    static {
+      if (System.getProperty("gatein.email.domain.url") == null) {
+        System.setProperty("gatein.email.domain.url", "http://localhost:8080");
+      }
+      if (System.getProperty("exo.files.storage.dir") == null) {
+        System.setProperty("exo.files.storage.dir", "target/files");
+      }
+      if (System.getProperty("com.arjuna.ats.arjuna.objectstore.objectStoreDir") == null) {
+        System.setProperty("com.arjuna.ats.arjuna.objectstore.objectStoreDir", "target/com.arjuna.ats.arjuna.objectstore.objectStoreDir");
+      }
+    }
 
     /** . */
     protected AbstractKernelTest() {
@@ -131,9 +147,6 @@ public class AbstractKernelTest extends AbstractGateInTest {
               bootstrap.dispose();
             }
             bootContainer();
-          } else {
-            log.warn("PortalContainer seems to not be properly stopped by previous tests. PortalContainer is not started again with Test "
-                + getClass().getName() + " configuration files. The flag forceContainerReload = false");
           }
         } else {
             bootContainer();
@@ -152,14 +165,9 @@ public class AbstractKernelTest extends AbstractGateInTest {
 
             //
             bootstrap = null;
-        } else if(isPortalContainerPresent()) {
-          log.warn("PortalContainer seems to be not properly stopped. PortalContainer will be stopped in class " + getClass().getName() + ".");
-
-          if (isForceContainerReload()) {
+        } else if(isPortalContainerPresent() && isForceContainerReload()) {
+            log.info("PortalContainer will be stopped in class " + getClass().getName() + ".");
             forceStop();
-          } else {
-            log.warn("PortalContainer will not be stopped sine the flag forceContainerReload = false");
-          }
         }
     }
 
@@ -169,16 +177,17 @@ public class AbstractKernelTest extends AbstractGateInTest {
 
       // Configure ourselves
       bootstrap.addConfiguration(getClass());
-
       //
       bootstrap.boot();
 
       //
-      return bootstrap.getContainer();
+      PortalContainer portalContainer = bootstrap.getContainer();
+      ExoContainerContext.setCurrentContainer(portalContainer);
+      return portalContainer;
     }
 
     private boolean isPortalContainerPresent() {
-      return PortalContainer.getInstanceIfPresent() != null;
+      return ExoContainerContext.getCurrentContainerIfPresent() != null && PortalContainer.getInstanceIfPresent() != null;
     }
 
 }

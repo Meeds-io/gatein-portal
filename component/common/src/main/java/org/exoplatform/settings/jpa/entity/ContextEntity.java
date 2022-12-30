@@ -67,7 +67,7 @@ public class ContextEntity {
   @Column(name = "CONTEXT_ID")
   @SequenceGenerator(name="SEQ_STG_CONTEXT_COMMON_ID", sequenceName="SEQ_STG_CONTEXT_COMMON_ID", allocationSize = 1)
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_STG_CONTEXT_COMMON_ID")
-  private long id;
+  private Long id;
 
   @Column(name = "NAME")
   private String name;
@@ -78,8 +78,12 @@ public class ContextEntity {
   @OneToMany(fetch=FetchType.LAZY, mappedBy = "context")
   private Set<SettingsEntity> settings;
 
-  public long getId() {
+  public Long getId() {
     return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
   }
 
   public String getName() {
