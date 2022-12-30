@@ -57,7 +57,7 @@ public class TestOrganizationAuthenticator extends TestCase
       if (registry == null)
       {
          URL containerConfURL =
-            TestOrganizationAuthenticator.class.getResource("/conf/standalone/test-configuration.xml");
+            TestOrganizationAuthenticator.class.getResource("/conf/standalone/test-authenticator-configuration.xml");
          assertNotNull(containerConfURL);
          String containerConf = containerConfURL.toString();
          URL loginConfURL = TestOrganizationAuthenticator.class.getResource("/login.conf");

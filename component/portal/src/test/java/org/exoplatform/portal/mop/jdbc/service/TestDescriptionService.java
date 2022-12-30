@@ -19,19 +19,20 @@
 
 package org.exoplatform.portal.mop.jdbc.service;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 import org.gatein.common.util.Tools;
 
-import org.exoplatform.component.test.*;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.portal.config.AbstractConfigTest;
 import org.exoplatform.portal.mop.State;
 import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.portal.mop.jdbc.dao.DescriptionDAO;
 
-@ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
-public class TestDescriptionService extends AbstractKernelTest {
+public class TestDescriptionService extends AbstractConfigTest {
 
   private DescriptionService service;
   

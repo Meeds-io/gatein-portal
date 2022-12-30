@@ -168,7 +168,7 @@ public class WebAppController implements Startable {
         configurationPathRef.set(path);
     }
 
-    private void loadConfiguration(URL url) throws RouterConfigException, IOException {
+    protected void loadConfiguration(URL url) throws RouterConfigException, IOException {
         log.info("Loading router configuration " + url);
         InputStream in = url.openStream();
         try {

@@ -31,7 +31,7 @@ import org.exoplatform.container.PortalContainer;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/tokenservice-configuration.xml") })
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.security-configuration-local.xml") })
 public class TestSimpleGeneratorService extends AbstractKernelTest {
     private SimpleGeneratorCookieTokenService service;
     String type="testtype";

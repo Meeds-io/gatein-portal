@@ -12,10 +12,11 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
-public class SettingContextDAO extends GenericDAOJPAImpl<ContextEntity, Long> {
+public class SettingContextDAO extends GenericDAOJPAImpl<ContextEntity, Long> implements org.exoplatform.settings.jpa.SettingContextDAO {
   private static final Log LOG = ExoLogger.getLogger(SettingContextDAO.class);
 
   @ExoTransactional
+  @Override
   public ContextEntity getContextByTypeAndName(String contextType, String contextName) {
     TypedQuery<ContextEntity> query;
     if (StringUtils.isBlank(contextName)) {
@@ -39,6 +40,7 @@ public class SettingContextDAO extends GenericDAOJPAImpl<ContextEntity, Long> {
   }
 
   @ExoTransactional
+  @Override
   public List<ContextEntity> getEmptyContextsByScopeAndContextType(String contextType,
                                                                    String scopeType,
                                                                    String scopeName,
@@ -66,6 +68,7 @@ public class SettingContextDAO extends GenericDAOJPAImpl<ContextEntity, Long> {
   }
 
   @ExoTransactional
+  @Override
   public List<ContextEntity> getContextsByTypeAndSettingNameAndScope(String contextType,
                                                                      String scopeType,
                                                                      String scopeName,
@@ -95,6 +98,7 @@ public class SettingContextDAO extends GenericDAOJPAImpl<ContextEntity, Long> {
   }
 
   @ExoTransactional
+  @Override
   public long countContextsByType(String contextType) {
     TypedQuery<Long> query = getEntityManager().createNamedQuery("SettingsContextEntity.countContextsByType", Long.class)
                                                .setParameter("contextType", contextType);
@@ -102,6 +106,7 @@ public class SettingContextDAO extends GenericDAOJPAImpl<ContextEntity, Long> {
   }
 
   @ExoTransactional
+  @Override
   public List<String> getContextNamesByType(String contextType, int offset, int limit) {
     TypedQuery<String> query = getEntityManager().createNamedQuery("SettingsContextEntity.getContextNamesByType", String.class)
                                                         .setParameter("contextType", contextType)
