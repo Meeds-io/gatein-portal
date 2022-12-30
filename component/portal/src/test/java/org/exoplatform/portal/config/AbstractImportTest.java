@@ -21,18 +21,27 @@ package org.exoplatform.portal.config;
 
 import java.util.List;
 
+import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.component.test.KernelBootstrap;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.RootContainer;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.importer.ImportMode;
 import org.exoplatform.portal.mop.importer.Status;
-import org.exoplatform.portal.mop.navigation.*;
+import org.exoplatform.portal.mop.navigation.NavigationContext;
+import org.exoplatform.portal.mop.navigation.NavigationService;
+import org.exoplatform.portal.mop.navigation.Node;
+import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.NodeModel;
+import org.exoplatform.portal.mop.navigation.Scope;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
+@ConfiguredBy({})
 public abstract class AbstractImportTest extends AbstractConfigTest {
 
   private PortalContainer container;
@@ -50,12 +59,12 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
   protected abstract void afterTwoPhaseOverrideReboot(NodeContext<?> root);
 
   @Override
-  protected void setUp() throws Exception {
+  protected void setUp() {// NOSONAR
     // Avoid starting container
   }
 
   @Override
-  protected void tearDown() throws Exception {
+  protected void tearDown() {// NOSONAR
     // Avoid starting container
   }
 
@@ -74,14 +83,8 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
     return container;
   }
 
-  public void testOnePhase() throws Exception {
-    KernelBootstrap bootstrap = new KernelBootstrap();
-    bootstrap.addConfiguration(ContainerScope.ROOT, "conf/configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf//portalconfiguration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport1-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport2-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.identity-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration.xml");
+  public void testOnePhase() throws Exception {// NOSONAR
+    KernelBootstrap bootstrap = startContainer(false, true, true, false);
 
     //
     System.setProperty("override.1", "true");
@@ -91,9 +94,8 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
     System.setProperty("import.mode_2", getMode().toString());
     System.setProperty("import.portal_2", getConfig2());
 
-    //
-    bootstrap.boot();
-    this.container = bootstrap.getContainer();
+    bootContainer(bootstrap);
+
     NavigationService service = container.getComponentInstanceOfType(NavigationService.class);
     begin();
     try {
@@ -108,13 +110,8 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
     }
   }
 
-  public void testTwoPhasesOverride() throws Exception {
-    KernelBootstrap bootstrap = new KernelBootstrap();
-    bootstrap.addConfiguration(ContainerScope.ROOT, "conf/configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf//portalconfiguration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport1-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.identity-configuration.xml");
-    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration.xml");
+  public void testTwoPhasesOverride() throws Exception {// NOSONAR
+    KernelBootstrap bootstrap = startContainer(false, true, false, false);
 
     //
     System.setProperty("override.1", "true");
@@ -122,8 +119,9 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
 
     //
     System.setProperty("import.portal.1", getConfig1());
-    bootstrap.boot();
-    this.container = bootstrap.getContainer();
+
+    bootContainer(bootstrap);
+
     NavigationService service = container.getComponentInstanceOfType(NavigationService.class);
     begin();
     try {
@@ -133,13 +131,14 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
     } finally {
       restartTransaction();
       end();
-      bootstrap.dispose();
+      stopContainer(bootstrap);
     }
 
     //
     System.setProperty("import.portal.1", getConfig2());
-    bootstrap.boot();
-    container = bootstrap.getContainer();
+
+    bootContainer(bootstrap);
+
     service = container.getComponentInstanceOfType(NavigationService.class);
     begin();
     try {
@@ -150,8 +149,8 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
       restartTransaction();
       clearPortalData(container);
       end();
-      bootstrap.dispose();
-    }    
+      stopContainer(bootstrap);
+    }
   }
 
   private void clearPortalData(PortalContainer container) throws Exception {
@@ -168,4 +167,48 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
     }
     dataStorage.saveImportStatus(Status.WANT_REIMPORT);
   }
+
+  protected void stopContainer(KernelBootstrap bootstrap) {
+    if (bootstrap != null) {
+      bootstrap.dispose();
+    }
+    PortalContainer portalContainer = PortalContainer.getInstanceIfPresent();
+    if (portalContainer != null) {
+      RootContainer.getInstance().stop();
+      ExoContainerContext.setCurrentContainer(null);
+    }
+  }
+
+  protected void bootContainer(KernelBootstrap bootstrap) {
+    bootstrap.boot();
+    this.container = bootstrap.getContainer();
+    ExoContainerContext.setCurrentContainer(this.container);
+  }
+
+  protected KernelBootstrap startContainer(boolean importFile0, boolean importFile1, boolean importFile2, boolean importFile3) {
+    PortalContainer portalContainer = PortalContainer.getInstanceIfPresent();
+    if (portalContainer != null) {
+      RootContainer.getInstance().stop();
+      ExoContainerContext.setCurrentContainer(null);
+    }
+
+    KernelBootstrap bootstrap = new KernelBootstrap();
+    bootstrap.addConfiguration(ContainerScope.ROOT, "conf/configuration.xml");
+    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/portal/configuration.xml");
+    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration-local.xml");
+    if (importFile0) {
+      bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport0-configuration.xml");
+    }
+    if (importFile1) {
+      bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport1-configuration.xml");
+    }
+    if (importFile2) {
+      bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport2-configuration.xml");
+    }
+    if (importFile3) {
+      bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport3-configuration.xml");
+    }
+    return bootstrap;
+  }
+
 }

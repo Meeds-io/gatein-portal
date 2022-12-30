@@ -30,7 +30,7 @@
     <local-cache-configuration name="local-configuration" statistics="false" statistics-available="false">
       <locking isolation="READ_COMMITTED" write-skew="false" acquire-timeout="20000" striping="false"/>
       <transaction locking="OPTIMISTIC" mode="NON_XA"/>
-      <eviction strategy="LRU" max-entries="1000000"/>
+      <eviction strategy="LRU" size="1000000"/>
       <expiration interval="5000" lifespan="180000"/>
     </local-cache-configuration>
 
