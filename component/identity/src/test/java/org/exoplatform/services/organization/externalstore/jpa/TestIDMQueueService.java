@@ -14,7 +14,8 @@ import org.exoplatform.services.organization.externalstore.model.*;
 import org.exoplatform.services.organization.idm.externalstore.jpa.IDMQueueDAO;
 
 @ConfiguredBy({
-    @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/standalone/test-configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/idm-queue-configuration.xml")
 })
 public class TestIDMQueueService extends AbstractKernelTest {

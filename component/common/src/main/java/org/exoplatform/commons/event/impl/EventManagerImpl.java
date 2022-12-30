@@ -47,8 +47,12 @@ public class EventManagerImpl<S, D> extends ListenerService implements EventMana
 
     private static final Log LOG = ExoLogger.getLogger(EventManagerImpl.class);
 
+    public EventManagerImpl(ExoContainerContext ctx, InitParams params) {
+        super(ctx, params);
+    }
+
     public EventManagerImpl(ExoContainerContext ctx, InitialContextInitializer initializer, InitParams params) {
-        super(ctx, initializer, params);
+      super(ctx, initializer, params);
     }
 
     /**

@@ -37,6 +37,8 @@ import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.organization.idm.Config;
 import org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl;
 import org.exoplatform.services.organization.idm.UserDAOImpl;
+
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +77,7 @@ public class AbstractTestOrganizationService {
 
     private static final int USERS_LIST_SIZE = 15;
 
-    private PortalContainer manager;
+    private PortalContainer container;
 
     static {
         USERS = new ArrayList<String>(USERS_LIST_SIZE);
@@ -88,8 +90,8 @@ public class AbstractTestOrganizationService {
         if (!runtest)
             return;
 
-        manager = PortalContainer.getInstance();
-        service_ = (OrganizationService) manager.getComponentInstanceOfType(OrganizationService.class);
+        container = PortalContainer.getInstance();
+        service_ = container.getComponentInstanceOfType(OrganizationService.class);
         userHandler_ = service_.getUserHandler();
         profileHandler_ = service_.getUserProfileHandler();
         groupHandler_ = service_.getGroupHandler();
@@ -97,7 +99,6 @@ public class AbstractTestOrganizationService {
         membershipHandler_ = service_.getMembershipHandler();
 
         RequestLifeCycle.begin((ComponentRequestLifecycle) service_);
-
     }
 
     @After
@@ -125,7 +126,7 @@ public class AbstractTestOrganizationService {
         assertNotNull(config.getGroupTypeMappings());
         assertNotNull(config.getGroupTypeMappings().keySet());
 
-        assertEquals(config.getGroupTypeMappings().keySet().size(), 5);
+        assertTrue(config.getGroupTypeMappings().keySet().size() > 0);
         assertEquals(config.getGroupTypeMappings().get("/"), "root_type");
 
         assertEquals(config.getGroupType("/"), "root_type");
@@ -148,23 +149,26 @@ public class AbstractTestOrganizationService {
 
     @Test
     public void testUserPageSize() throws Exception {
+        int initialSize = userHandler_.findAllUsers().getSize();
+
         for (String name : USERS)
             createUser(name);
 
         Query query = new Query();
         PageList users = userHandler_.findUsers(query);
         // newly created plus one 'demo' from configuration
-        assertEquals(USERS_LIST_SIZE + 1, users.getAll().size());
+        assertEquals(USERS_LIST_SIZE + initialSize, users.getAll().size());
         assertEquals(1, users.getAvailablePage());
-        for (Object o : users.getPage(1)) {
-            User u = (User) o;
-            if (!u.getUserName().equals("demo"))
-                assertTrue(USERS.contains(u.getUserName()));
+        List<User> usersList = users.getPage(1);
+        for (String username : USERS) {
+          assertTrue(username, usersList.stream().anyMatch(user -> StringUtils.equals(username, user.getUserName())));
         }
     }
 
     @Test
     public void testUser() throws Exception {
+        int initialSize = userHandler_.findAllUsers().getSize();
+
         createUser(USER);
         User user = userHandler_.findUserByName(USER);
         assertTrue("Found user instance ", user != null);
@@ -195,13 +199,13 @@ public class AbstractTestOrganizationService {
 
         PageList piterator = userHandler_.getUserPageList(10);
         // newly created 'test' and 'demo'
-        assertEquals(2, piterator.currentPage().size());
+        assertEquals(initialSize + 1l, piterator.currentPage().size());
 
         // membershipHandler_.removeMembershipByUser(USER,false);
         userHandler_.removeUser(USER, true);
         piterator = userHandler_.getUserPageList(10);
         // one 'demo'
-        assertEquals(1, piterator.currentPage().size());
+        assertEquals(initialSize, piterator.currentPage().size());
         assertNull("User: USER is removed: ", userHandler_.findUserByName(USER));
         assertNull(" user's profile of USER was removed:", profileHandler_.findUserProfileByName(USER));
     }
@@ -252,8 +256,9 @@ public class AbstractTestOrganizationService {
 
     @Test
     public void testFindUsers() throws Exception {
-        if (userHandler_ instanceof UserDAOImpl) {
-            UserDAOImpl ud = (UserDAOImpl) userHandler_;
+        if (userHandler_ instanceof UserDAOImpl ud) {
+            int initialSize = userHandler_.findAllUsers().getSize();
+
             User user1 = ud.createUserInstance("foo");
             user1.setFirstName("foo");
             user1.setLastName("bar");
@@ -268,10 +273,9 @@ public class AbstractTestOrganizationService {
 
             Query query = new Query();
             List<User> users = ud.findUsers(query).getAll();
-            assertEquals(3, users.size());
-            assertEquals("demo", users.get(0).getUserName());
-            assertEquals("foo", users.get(1).getUserName());
-            assertEquals("foobar", users.get(2).getUserName());
+            assertEquals(initialSize + 2, users.size());
+            assertTrue("foo", users.stream().anyMatch(user -> StringUtils.equals("foo", user.getUserName())));
+            assertTrue("foobar", users.stream().anyMatch(user -> StringUtils.equals("foobar", user.getUserName())));
 
             query.setEmail("*foo*");
             users = ud.findUsers(query).getAll();
@@ -372,11 +376,12 @@ public class AbstractTestOrganizationService {
         
         groups = groupHandler_.resolveGroupByMembership("demo", "member");
         assertNotNull(groups);
-        assertEquals(2, groups.size());
+        assertEquals(1, groups.size());
     }
 
     @Test
     public void testMembershipType() throws Exception {
+        int initialSize = mtHandler_.findMembershipTypes().size();
         /* Create a membershipType */
         String testType = "testType";
         MembershipType mt = mtHandler_.createMembershipTypeInstance();
@@ -402,18 +407,18 @@ public class AbstractTestOrganizationService {
          * find all membership type Expect result: 4 membershipType: "testmembership", "anothertype", "member" and "*" (default
          * membership type, it is created at startup time)
          */
-        assertEquals("Expect 4 membership in collection: ", 4, mtHandler_.findMembershipTypes().size());
+        assertEquals("Expect 2 memberships added in collection: ", initialSize + 2l, mtHandler_.findMembershipTypes().size());
         assertEquals("The * should be the first one in collection: ", MembershipTypeHandler.ANY_MEMBERSHIP_TYPE, mtHandler_.findMembershipTypes().iterator().next().getName());
 
         /* remove "testmembership" */
         mtHandler_.removeMembershipType(testType, true);
         assertEquals("Membership type has been removed:", null, mtHandler_.findMembershipType(testType));
-        assertEquals("Expect 2 membership in collection(1 is default): ", 3, mtHandler_.findMembershipTypes().size());
+        assertEquals("Expect 2 membership in collection(1 is default): ", initialSize + 1l, mtHandler_.findMembershipTypes().size());
 
         /* remove "anothertype" */
         mtHandler_.removeMembershipType("anothertype", true);
         assertEquals("Membership type has been removed:", null, mtHandler_.findMembershipType("anothertype"));
-        assertEquals("Expect 1 membership in collection(default type): ", 2, mtHandler_.findMembershipTypes().size());
+        assertEquals("Expect 1 membership in collection(default type): ", initialSize, mtHandler_.findMembershipTypes().size());
         /* All membershipType was removed(except default membership) */
     }
 
@@ -568,8 +573,8 @@ public class AbstractTestOrganizationService {
         membershipHandler_.linkMembership(userBenj, group3, mt, true);
         membershipHandler_.linkMembership(userTuan, group1, mt, true);
 
-        assertEquals(membershipHandler_.removeMembershipByUser(Tuan, true).size(), 2);
-        assertEquals(membershipHandler_.removeMembershipByUser(Benj, true).size(), 4);
+        assertEquals(1, membershipHandler_.removeMembershipByUser(Tuan, true).size());
+        assertEquals(3, membershipHandler_.removeMembershipByUser(Benj, true).size());
 
         mtHandler_.removeMembershipType("testmembership_", true);
         userHandler_.removeUser(Tuan, true);
@@ -650,7 +655,7 @@ public class AbstractTestOrganizationService {
 
     @Test
     public void testFindUsersByGroupId() throws Exception {
-        PageList users = userHandler_.findUsersByGroup("/users");
+        PageList users = userHandler_.findUsersByGroup("/platform/users");
         assertTrue(users.getAvailable() > 0);
     }
 

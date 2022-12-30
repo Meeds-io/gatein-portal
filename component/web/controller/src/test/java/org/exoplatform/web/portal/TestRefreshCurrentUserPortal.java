@@ -38,126 +38,129 @@ import org.exoplatform.web.url.*;
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
 @ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/web/portal/configuration.xml") })
+    @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/test.mop.portal.configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/web/portal/configuration.xml")
+})
 public class TestRefreshCurrentUserPortal extends AbstractKernelTest {
 
-    /** . */
-    private RequestContext requestContext;
+  /** . */
+  private RequestContext requestContext;
 
-    /** . */
-    private UserPortal userPortal;
+  /** . */
+  private UserPortal     userPortal;
 
-    @Override
-    protected void setUp() throws Exception {
-        begin();
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    begin();
 
-        UserPortalConfigService upcs = (UserPortalConfigService) getContainer().getComponentInstanceOfType(
-                UserPortalConfigService.class);
-        UserPortalConfig upc = upcs.getUserPortalConfig("classic", "root", new SimpleUserPortalContext(Locale.ENGLISH));
-        final UserPortal userPortal = upc.getUserPortal();
+    UserPortalConfigService upcs = getContainer().getComponentInstanceOfType(UserPortalConfigService.class);
+    UserPortalConfig upc = upcs.getUserPortalConfig("classic", "root", new SimpleUserPortalContext(Locale.ENGLISH));
+    final UserPortal userPortal = upc.getUserPortal();
 
-        //
-        RequestContext requestContext = new RequestContext(null) {
-            @Override
-            public URLFactory getURLFactory() {
-                throw new UnsupportedOperationException();
-            }
+    //
+    RequestContext requestContext = new RequestContext(null) {
+      @Override
+      public URLFactory getURLFactory() {
+        throw new UnsupportedOperationException();
+      }
 
-            @Override
-            public <R, U extends PortalURL<R, U>> U newURL(ResourceType<R, U> resourceType, URLFactory urlFactory) {
-                throw new UnsupportedOperationException();
-            }
+      @Override
+      public <R, U extends PortalURL<R, U>> U newURL(ResourceType<R, U> resourceType, URLFactory urlFactory) {
+        throw new UnsupportedOperationException();
+      }
 
-            @Override
-            public Orientation getOrientation() {
-                throw new UnsupportedOperationException();
-            }
+      @Override
+      public Orientation getOrientation() {
+        throw new UnsupportedOperationException();
+      }
 
-            @Override
-            public String getRequestParameter(String name) {
-                throw new UnsupportedOperationException();
-            }
+      @Override
+      public String getRequestParameter(String name) {
+        throw new UnsupportedOperationException();
+      }
 
-            @Override
-            public String[] getRequestParameterValues(String name) {
-                throw new UnsupportedOperationException();
-            }
+      @Override
+      public String[] getRequestParameterValues(String name) {
+        throw new UnsupportedOperationException();
+      }
 
-            @Override
-            public URLBuilder<?> getURLBuilder() {
-                throw new UnsupportedOperationException();
-            }
+      @Override
+      public URLBuilder<?> getURLBuilder() {
+        throw new UnsupportedOperationException();
+      }
 
-            @Override
-            public boolean useAjax() {
-                throw new UnsupportedOperationException();
-            }
+      @Override
+      public boolean useAjax() {
+        throw new UnsupportedOperationException();
+      }
 
-            @Override
-            public UserPortal getUserPortal() {
-                return userPortal;
-            }
-        };
+      @Override
+      public UserPortal getUserPortal() {
+        return userPortal;
+      }
+    };
 
-        //
-        this.userPortal = userPortal;
-        this.requestContext = requestContext;
-    }
+    //
+    this.userPortal = userPortal;
+    this.requestContext = requestContext;
+  }
 
-    @Override
-    protected void tearDown() throws Exception {
-        end();
-    }
+  @Override
+  protected void tearDown() throws Exception {
+    end();
+    super.tearDown();
+  }
 
-    public void testCreate() throws Exception {
-        List<UserNavigation> navs = userPortal.getNavigations();
-        assertFalse(navs.isEmpty());
-        NavigationService ns = (NavigationService) getContainer().getComponentInstanceOfType(NavigationService.class);
-        SiteKey siteKeyToTest = navs.get(0).getKey();
+  public void testCreate() throws Exception {
+    List<UserNavigation> navs = userPortal.getNavigations();
+    assertFalse(navs.isEmpty());
+    NavigationService ns = (NavigationService) getContainer().getComponentInstanceOfType(NavigationService.class);
+    SiteKey siteKeyToTest = navs.get(0).getKey();
 
-        RequestContext.setCurrentInstance(requestContext);
-        ns.saveNavigation(new NavigationContext(SiteKey.group("/platform"), new NavigationState(1)));
-        navs = userPortal.getNavigations();
+    RequestContext.setCurrentInstance(requestContext);
+    ns.saveNavigation(new NavigationContext(SiteKey.group("/platform"), new NavigationState(1)));
+    navs = userPortal.getNavigations();
         assertEquals(2, navs.size());
-        RequestContext.setCurrentInstance(null);
-    }
+    RequestContext.setCurrentInstance(null);
+  }
 
-    public void testUpdate() throws Exception {
-        List<UserNavigation> navs = userPortal.getNavigations();
-        assertFalse(navs.isEmpty());
-        int initialSize = navs.size();
-        NavigationService ns = (NavigationService) getContainer().getComponentInstanceOfType(NavigationService.class);
-        SiteKey siteKeyToTest = navs.get(0).getKey();
+  public void testUpdate() throws Exception {
+    List<UserNavigation> navs = userPortal.getNavigations();
+    assertFalse(navs.isEmpty());
+    int initialSize = navs.size();
+    NavigationService ns = (NavigationService) getContainer().getComponentInstanceOfType(NavigationService.class);
+    SiteKey siteKeyToTest = navs.get(0).getKey();
 
-        NavigationContext nav = new NavigationContext(siteKeyToTest, new NavigationState(1));
-        ns.saveNavigation(nav);
-        navs = userPortal.getNavigations();
+    NavigationContext nav = new NavigationContext(siteKeyToTest, new NavigationState(1));
+    ns.saveNavigation(nav);
+    navs = userPortal.getNavigations();
         assertEquals(2, navs.size());
-        RequestContext.setCurrentInstance(requestContext);
-        NodeContext root = ns.loadNode(NodeModel.SELF_MODEL, nav, Scope.ALL, null);
-        root.add(null, "foo");
-        ns.saveNode(root, null);
-        navs = userPortal.getNavigations();
+    RequestContext.setCurrentInstance(requestContext);
+    NodeContext root = ns.loadNode(NodeModel.SELF_MODEL, nav, Scope.ALL, null);
+    root.add(null, "foo");
+    ns.saveNode(root, null);
+    navs = userPortal.getNavigations();
         assertEquals(2, navs.size());
-        ns.destroyNavigation(nav);
-        navs = userPortal.getNavigations();
+    ns.destroyNavigation(nav);
+    navs = userPortal.getNavigations();
         assertEquals(1, navs.size());
-        restartTransaction();
-        RequestContext.setCurrentInstance(null);
-    }
+    restartTransaction();
+    RequestContext.setCurrentInstance(null);
+  }
 
-    public void testDestroy() throws Exception {
-        NavigationService ns = (NavigationService) getContainer().getComponentInstanceOfType(NavigationService.class);
-        NavigationContext nav = new NavigationContext(SiteKey.group("/platform"), new NavigationState(1));
-        ns.saveNavigation(nav);
-        List<UserNavigation> navs = userPortal.getNavigations();
+  public void testDestroy() throws Exception {
+    NavigationService ns = (NavigationService) getContainer().getComponentInstanceOfType(NavigationService.class);
+    NavigationContext nav = new NavigationContext(SiteKey.group("/platform"), new NavigationState(1));
+    ns.saveNavigation(nav);
+    List<UserNavigation> navs = userPortal.getNavigations();
         assertEquals(2, navs.size());
-        RequestContext.setCurrentInstance(requestContext);
-        ns.destroyNavigation(nav);
-        navs = userPortal.getNavigations();
+    RequestContext.setCurrentInstance(requestContext);
+    ns.destroyNavigation(nav);
+    navs = userPortal.getNavigations();
         assertEquals(1, navs.size());
-        RequestContext.setCurrentInstance(null);
-    }
+    RequestContext.setCurrentInstance(null);
+  }
 }
