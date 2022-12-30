@@ -9,6 +9,7 @@ import javax.persistence.TypedQuery;
 import java.util.List;
 
 public class TokenDAOImpl extends GenericDAOJPAImpl<TokenEntity, Long> implements TokenDAO {
+
     @Override
     public TokenEntity findByTokenId(String tokenId) {
         TypedQuery<TokenEntity> query = getEntityManager().createNamedQuery("GateInToken.findByTokenId", TokenEntity.class);

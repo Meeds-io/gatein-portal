@@ -28,7 +28,7 @@ import org.exoplatform.web.security.security.RemindPasswordTokenService;
 /**
  * @author <a href="mailto:tuyennt@exoplatform.com">Tuyen Nguyen The</a>.
  */
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/tokenservice-configuration.xml") })
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.security-configuration-local.xml") })
 public class TestRemindPasswordTokenService extends AbstractCookieTokenServiceTest {
     @Override
     public void setUp() throws Exception {
