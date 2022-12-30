@@ -32,50 +32,6 @@
   <external-component-plugins>
     <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
     <component-plugin>
-      <name>new.user.event.listener</name>
-      <set-method>addListenerPlugin</set-method>
-      <type>org.exoplatform.services.organization.impl.NewUserEventListener</type>
-      <description>this listener assign group and membership to a new created user</description>
-      <init-params>
-        <object-param>
-          <name>configuration</name>
-          <description>description</description>
-          <object type="org.exoplatform.services.organization.impl.NewUserConfig">
-            <field name="group">
-              <collection type="java.util.ArrayList">
-                <value>
-                  <object type="org.exoplatform.services.organization.impl.NewUserConfig$JoinGroup">
-                    <field name="groupId">
-                      <string>/platform/users</string>
-                    </field>
-                    <field name="membership">
-                      <string>member</string>
-                    </field>
-                  </object>
-                </value>
-              </collection>
-            </field>
-            <field name="ignoredUser">
-              <collection type="java.util.HashSet">
-                <value>
-                  <string>root</string>
-                </value>
-                <value>
-                  <string>john</string>
-                </value>
-                <value>
-                  <string>mary</string>
-                </value>
-                <value>
-                  <string>demo</string>
-                </value>
-              </collection>
-            </field>
-          </object>
-        </object-param>
-      </init-params>
-    </component-plugin>
-    <component-plugin>
       <name>init.service.listener</name>
       <set-method>addListenerPlugin</set-method>
       <type>org.exoplatform.services.organization.OrganizationDatabaseInitializer</type>
@@ -484,7 +440,7 @@
                       <string>demo@localhost</string>
                     </field>
                     <field name="groups">
-                      <string>member:/platform/guests,member:/platform/users</string>
+                      <string>member:/platform/users</string>
                     </field>
                   </object>
                 </value>
@@ -519,5 +475,7 @@
       </init-params>
     </component-plugin>
   </external-component-plugins>
+
+  <import>jar:/conf/exo.portal.component.identity-configuration-local.xml</import>
 
 </configuration>

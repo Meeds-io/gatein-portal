@@ -7,17 +7,24 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import org.exoplatform.component.test.*;
-import org.exoplatform.portal.jdbc.entity.*;
+import org.exoplatform.portal.config.AbstractConfigTest;
+import org.exoplatform.portal.jdbc.entity.ComponentEntity;
 import org.exoplatform.portal.jdbc.entity.ComponentEntity.TYPE;
+import org.exoplatform.portal.jdbc.entity.ContainerEntity;
+import org.exoplatform.portal.jdbc.entity.PageEntity;
+import org.exoplatform.portal.jdbc.entity.SiteEntity;
+import org.exoplatform.portal.jdbc.entity.WindowEntity;
 import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.jdbc.dao.*;
-import org.exoplatform.portal.mop.page.*;
+import org.exoplatform.portal.mop.jdbc.dao.ContainerDAO;
+import org.exoplatform.portal.mop.jdbc.dao.PageDAO;
+import org.exoplatform.portal.mop.jdbc.dao.SiteDAO;
+import org.exoplatform.portal.mop.jdbc.dao.WindowDAO;
+import org.exoplatform.portal.mop.page.PageContext;
+import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.page.PageService;
 
-@ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
-public class TestPageService extends AbstractKernelTest {
+public class TestPageService extends AbstractConfigTest {
   private PageService pageService;
   
   private SiteDAO siteDAO;

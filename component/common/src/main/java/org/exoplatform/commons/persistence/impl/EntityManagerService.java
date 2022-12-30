@@ -56,22 +56,31 @@ public class EntityManagerService implements ComponentRequestLifecycle {
   private static final String         EXO_JPA_DATASOURCE_NAME     = "exo.jpa.datasource.name";
   private static final String         EXO_PREFIX_FOR_HIB_SETTINGS = "exo.jpa.";
 
-  private EntityManagerFactory        entityManagerFactory;
+  protected EntityManagerFactory        entityManagerFactory;
+
+  protected Properties properties;
 
   private ThreadLocal<EntityManager>  instance                    = new ThreadLocal<>();
 
-  private final Properties properties;
-
   public EntityManagerService() {
+    this(null, null);
+  }
+
+  public EntityManagerService(EntityManagerFactory managerFactory, Properties props) {
+    if (managerFactory != null && props != null) {
+      this.entityManagerFactory = managerFactory;
+      this.properties = props;
+      return;
+    }
     properties = new Properties();
 
     // Setting datasource JNDI name. Get it directly from eXo global properties so it is not overridable by addons.
     String datasourceName = PropertyManager.getProperty(EXO_JPA_DATASOURCE_NAME);
     if (StringUtils.isNotBlank(datasourceName)) {
       properties.put(AvailableSettings.JPA_NON_JTA_DATASOURCE, datasourceName);
-      LOGGER.info("EntityManagerFactory [{}] - Creating with datasource {}.", PERSISTENCE_UNIT_NAME, datasourceName);
+      LOGGER.info("EntityManagerFactory [{}] - Creating with datasource {}.", getPersistenceUnitName(), datasourceName);
     } else {
-      LOGGER.info("EntityManagerFactory [{}] - Creating with default datasource.", PERSISTENCE_UNIT_NAME);
+      LOGGER.info("EntityManagerFactory [{}] - Creating with default datasource.", getPersistenceUnitName());
     }
 
     // Get Hibernate properties in eXo global properties
@@ -79,12 +88,12 @@ public class EntityManagerService implements ComponentRequestLifecycle {
       String propertyValue = PropertyManager.getProperty(EXO_PREFIX_FOR_HIB_SETTINGS + propertyName);
       if (StringUtils.isNotBlank(propertyValue)) {
         properties.put(propertyName, propertyValue);
-        LOGGER.info("EntityManagerFactory [{}] - Setting [{}] to [{}]", PERSISTENCE_UNIT_NAME, propertyName, propertyValue);
+        LOGGER.info("EntityManagerFactory [{}] - Setting [{}] to [{}]", getPersistenceUnitName(), propertyName, propertyValue);
       }
     }
 
-    entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, properties);
-    LOGGER.info("EntityManagerFactory [{}] - Created.", PERSISTENCE_UNIT_NAME);
+    entityManagerFactory = Persistence.createEntityManagerFactory(getPersistenceUnitName(), properties);
+    LOGGER.info("EntityManagerFactory [{}] - Created.", getPersistenceUnitName());
   }
 
   public String getDatasourceName() {
@@ -151,6 +160,9 @@ public class EntityManagerService implements ComponentRequestLifecycle {
     return instance.get() != null && instance.get().getTransaction() != null;
   }
 
+  public String getPersistenceUnitName() {
+    return PERSISTENCE_UNIT_NAME;
+  }
 
   void closeEntityManager() {
     EntityManager em = getEntityManager();
