@@ -6,14 +6,13 @@ import java.util.List;
 import javax.persistence.EntityTransaction;
 
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
-import org.exoplatform.component.test.*;
-import org.exoplatform.portal.jdbc.entity.*;
+import org.exoplatform.portal.jdbc.entity.NavigationEntity;
+import org.exoplatform.portal.jdbc.entity.NodeEntity;
+import org.exoplatform.portal.jdbc.entity.SiteEntity;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
 
-@ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")})
-public class NavigationDAOTest extends AbstractKernelTest {
+public class NavigationDAOTest extends AbstractDAOTest {
 
   private SiteDAO           siteDAO;
 

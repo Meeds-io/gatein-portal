@@ -34,7 +34,7 @@ import org.exoplatform.services.naming.InitialContextInitializer;
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-configuration.xml") })
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-jdbc-configuration.xml") })
 public class BootstrapTestCase extends AbstractKernelTest {
 
     /** . */
