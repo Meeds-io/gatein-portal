@@ -26,70 +26,7 @@
     xmlns="http://www.exoplatform.org/xml/ns/gatein_resources_1_4">
 
   <portlet>
-    <name>RegisterPortlet</name>
-    <module>
-      <depends>
-        <module>uiForm</module>
-      </depends>
-    </module>
-  </portlet>
-
-  <portlet>
-    <name>StarToolbarPortlet</name>
-    <module>
-      <depends>
-        <module>navigation</module>
-      </depends>
-    </module>
-  </portlet>
-
-  <portlet>
-    <name>UserToolbarSitePortlet</name>
-    <module>
-      <depends>
-        <module>navigation</module>
-      </depends>
-    </module>
-  </portlet>
-
-  <portlet>
-    <name>UserToolbarGroupPortlet</name>
-    <module>
-      <depends>
-        <module>navigation</module>
-      </depends>
-    </module>
-  </portlet>
-
-  <portlet>
-    <name>AdminToolbarPortlet</name>
-    <module>
-      <depends>
-        <module>navigation</module>
-      </depends>
-    </module>
-  </portlet>
-
-  <portlet>
     <name>ApplicationRegistryPortlet</name>
-    <module>
-      <depends>
-        <module>uiForm</module>
-      </depends>
-    </module>
-  </portlet>
-
-  <portlet>
-    <name>OrganizationPortlet</name>
-    <module>
-      <depends>
-        <module>uiForm</module>
-      </depends>
-    </module>
-  </portlet>
-
-  <portlet>
-    <name>AccountPortlet</name>
     <module>
       <depends>
         <module>uiForm</module>

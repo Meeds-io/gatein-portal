@@ -18,6 +18,8 @@ package org.exoplatform.services.organization.idm.cache;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.commons.cache.future.FutureExoCache;
 import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.services.cache.ExoCache;
@@ -83,18 +85,17 @@ public class CacheableUserHandlerImpl extends UserDAOImpl {
     try {
       user = super.removeUser(userName, broadcast);
 
-      userCache.remove(userName);
-      userProfileCache.remove(userName);
+      if (StringUtils.isNotBlank(userName)) {
+        userCache.remove(userName);
+        userProfileCache.remove(userName);
+      }
 
       if (user != null) {
         membershipCache.remove(new MembershipCacheKey(userName, null, null));
         List<?> objects = membershipCache.getCachedObjects();
         for (Object obj : objects) {
-          if (obj instanceof Membership) {
-            Membership membership = (Membership) obj;
-            if (membership.getUserName().equals(userName)) {
-              membershipCache.remove(new MembershipCacheKey(membership));
-            }
+          if (obj instanceof Membership membership && membership.getUserName().equals(userName)) {
+            membershipCache.remove(new MembershipCacheKey(membership));
           }
         }
       }

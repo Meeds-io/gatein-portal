@@ -28,6 +28,11 @@
     xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
+    <key>org.gatein.sso.integration.SSOFilterIntegrator</key>
+    <type>org.gatein.sso.integration.SSOFilterIntegratorImpl</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.web.security.sso.SSOHelper</key>
     <type>org.exoplatform.web.security.sso.SSOHelper</type>
     <init-params>

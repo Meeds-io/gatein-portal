@@ -17,7 +17,9 @@ import java.util.ResourceBundle;
  * @author <a href="trongtt@gmail.com">Trong Tran</a>
  * @version $Revision$
  */
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "bundles/resource-bundle-configuration.xml") })
+@ConfiguredBy({
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "bundles/resource-bundle-configuration.xml"),
+})
 public class TestResourceBundleService extends AbstractKernelTest {
 
     private static String test_res = "bundles.portal.test";
