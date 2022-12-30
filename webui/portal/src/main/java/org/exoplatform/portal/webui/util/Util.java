@@ -45,7 +45,7 @@ import org.exoplatform.webui.event.Event;
 public class Util {
     public static PortalRequestContext getPortalRequestContext() {
         WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
-        if (!(context instanceof PortalRequestContext)) {
+        if (context != null && !(context instanceof PortalRequestContext)) {
             context = (WebuiRequestContext) context.getParentAppRequestContext();
         }
         return (PortalRequestContext) context;

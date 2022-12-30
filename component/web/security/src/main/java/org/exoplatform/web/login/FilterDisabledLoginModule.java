@@ -23,7 +23,7 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 
-import java.lang.reflect.Method;
+import org.gatein.sso.agent.tomcat.ServletAccess;
 
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -37,125 +37,85 @@ import org.exoplatform.services.security.jaas.AbstractLoginModule;
 
 public class FilterDisabledLoginModule extends AbstractLoginModule {
 
-    private static final Log log = ExoLogger.getLogger(FilterDisabledLoginModule.class);
+  private static final Log   log                = ExoLogger.getLogger(FilterDisabledLoginModule.class);
 
-    /** JACC get context method. */
-    private static Method getContextMethod;
+  public static final String DISABLED_USER_NAME = "_disabledUserName";
 
-    public static final String DISABLED_USER_NAME = "_disabledUserName";
+  @Override
+  public boolean login() throws LoginException {
+    log.debug("In login of FilterDisabledLoginModule.");
 
-    static {
+    try {
+      Callback[] callbacks = new Callback[] {
+          new NameCallback("Username")
+      };
+      callbackHandler.handle(callbacks);
+
+      String username = ((NameCallback) callbacks[0]).getName();
+      if (username != null) {
+        OrganizationService organizationService = getContainer().getComponentInstanceOfType(OrganizationService.class);
+        begin(organizationService);
         try {
-            Class<?> policyContextClass = Thread.currentThread().getContextClassLoader()
-                    .loadClass("javax.security.jacc.PolicyContext");
-            getContextMethod = policyContextClass.getDeclaredMethod("getContext", String.class);
-        } catch (ClassNotFoundException ignore) {
-            log.debug("JACC not found ignoring it", ignore);
-        } catch (Exception e) {
-            log.error("Could not obtain JACC get context method", e);
-        }
-    }
+          UserHandler uHandler = organizationService.getUserHandler();
+          User user = uHandler.findUserByName(username, UserStatus.ANY);
 
-    @Override
-    public boolean login() throws LoginException {
-        log.debug("In login of FilterDisabledLoginModule.");
-
-        try {
-            Callback[] callbacks = new Callback[] { new NameCallback("Username") };
-            callbackHandler.handle(callbacks);
-
-            String username = ((NameCallback) callbacks[0]).getName();
-            if (username != null) {
-                OrganizationService service = (OrganizationService) getContainer().getComponentInstanceOfType(
-                        OrganizationService.class);
-
-                try {
-                    begin(service);
-                    UserHandler uHandler = service.getUserHandler();
-                    User user = uHandler.findUserByName(username, UserStatus.ANY);
-
-                    if (user == null) {
-                        log.debug("user {0} doesn't exists. FilterDisabledLoginModule will be ignored.", username);
-                    } else if (!user.isEnabled()) {
-                        HttpServletRequest request = getCurrentHttpServletRequest();
-                        if (request != null) {
-                            request.setAttribute(DISABLED_USER_NAME, username);
-                        }
-
-                        throw new LoginException("Can't authenticate. user " + username + " is disabled");
-                    }
-                } finally {
-                    end(service);
-                }
-            } else {
-                log.debug("No username has been committed. FilterDisabledLoginModule will be ignored.");
+          if (user == null) {
+            log.debug("user {0} doesn't exists. FilterDisabledLoginModule will be ignored.", username);
+          } else if (!user.isEnabled()) {
+            HttpServletRequest request = getCurrentHttpServletRequest();
+            if (request != null) {
+              request.setAttribute(DISABLED_USER_NAME, username);
             }
 
-            return true;
-        } catch (final Exception e) {
-            log.warn(e.getMessage());
-            throw new LoginException(e.getMessage());
+            throw new LoginException("Can't authenticate. user " + username + " is disabled");
+          }
+        } finally {
+          end(organizationService);
         }
+      } else {
+        log.debug("No username has been committed. FilterDisabledLoginModule will be ignored.");
+      }
+
+      return true;
+    } catch (final Exception e) {
+      log.warn(e.getMessage());
+      throw new LoginException(e.getMessage());
     }
+  }
 
-    protected HttpServletRequest getCurrentHttpServletRequest() {
-        HttpServletRequest request = null;
+  protected HttpServletRequest getCurrentHttpServletRequest() {
+    return ServletAccess.getRequest();
+  }
 
-        // JBoss way
-        if (getContextMethod != null) {
-            try {
-                request = (HttpServletRequest) getContextMethod.invoke(null, "javax.servlet.http.HttpServletRequest");
-            } catch (Throwable e) {
-                log.error("LoginModule error. Turn off session credentials checking with proper configuration option of "
-                        + "LoginModule set to false");
-                log.error(this, e);
-            }
-        } else {
-            // Tomcat way (Assumed that ServletAccessValve has been configured in context.xml)
-            try {
-                // TODO: improve this
-                Class<?> clazz = Thread.currentThread().getContextClassLoader()
-                        .loadClass("org.gatein.sso.agent.tomcat.ServletAccess");
-                Method getRequestMethod = clazz.getDeclaredMethod("getRequest");
-                request = (HttpServletRequest) getRequestMethod.invoke(null);
-            } catch (Exception e) {
-                log.error("Unexpected exception when trying to obtain HttpServletRequest from ServletAccess thread-local", e);
-            }
-        }
+  @Override
+  public boolean commit() throws LoginException {
+    return true;
+  }
 
-        log.trace("Returning HttpServletRequest {0}", request);
-        return request;
+  @Override
+  public boolean abort() throws LoginException {
+    return true;
+  }
+
+  @Override
+  public boolean logout() throws LoginException {
+    return true;
+  }
+
+  @Override
+  protected Log getLogger() {
+    return log;
+  }
+
+  private void begin(OrganizationService orgService) {
+    if (orgService instanceof ComponentRequestLifecycle componentRequestLifecycle) {
+      RequestLifeCycle.begin(componentRequestLifecycle);
     }
+  }
 
-    @Override
-    public boolean commit() throws LoginException {
-        return true;
+  private void end(OrganizationService orgService) {
+    if (orgService instanceof ComponentRequestLifecycle) {
+      RequestLifeCycle.end();
     }
-
-    @Override
-    public boolean abort() throws LoginException {
-        return true;
-    }
-
-    @Override
-    public boolean logout() throws LoginException {
-        return true;
-    }
-
-    @Override
-    protected Log getLogger() {
-        return log;
-    }
-
-    private void begin(OrganizationService orgService) {
-        if (orgService instanceof ComponentRequestLifecycle) {
-            RequestLifeCycle.begin((ComponentRequestLifecycle) orgService);
-        }
-    }
-
-    private void end(OrganizationService orgService) {
-        if (orgService instanceof ComponentRequestLifecycle) {
-            RequestLifeCycle.end();
-        }
-    }
+  }
 }

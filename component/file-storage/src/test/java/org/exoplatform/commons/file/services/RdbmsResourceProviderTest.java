@@ -34,6 +34,7 @@ public class RdbmsResourceProviderTest extends CommonsJPAIntegrationTest {
   @After
   public void tearDown() {
     fileBinaryDAO.deleteAll();
+    super.tearDown();
   }
 
   public void testWriteBinary() throws Exception {
