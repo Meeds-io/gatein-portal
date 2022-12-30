@@ -19,6 +19,7 @@
 package org.exoplatform.commons.persistence.impl;
 
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -54,7 +55,7 @@ public class EntityManagerHolder {
       boolean emStarted = false;
       EntityManager entityManager = null;
 
-      EntityManagerService service = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(EntityManagerService.class);
+      EntityManagerService service = getService();
       try {
         entityManager = service.getEntityManager();
         if (entityManager == null) {
@@ -74,4 +75,19 @@ public class EntityManagerHolder {
       }
     }
   }
+
+  private static EntityManagerService getService() {
+    EntityManagerService service = ExoContainerContext.getService(EntityManagerService.class);
+    if (service == null) {
+      PortalContainer container = PortalContainer.getInstanceIfPresent();
+      if (container != null) {
+        service = container.getComponentInstanceOfType(EntityManagerService.class);
+      }
+      if (service == null) {
+        throw new IllegalStateException("Cannot find EntityManagerService instance. This may happen when ExoContainerContext.getCurrentContainer is not set in current thread.");
+      }
+    }
+    return service;
+  }
+
 }

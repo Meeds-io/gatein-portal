@@ -30,7 +30,7 @@ import org.exoplatform.web.security.security.TransientTokenService;
  *
  */
 
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/tokenservice-configuration.xml") })
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.security-configuration-local.xml") })
 public class TestTransientTokenService extends AbstractTokenServiceTest<TransientTokenService> {
 
     public void setUp() throws Exception {

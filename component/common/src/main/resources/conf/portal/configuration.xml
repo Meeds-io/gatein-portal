@@ -17,23 +17,8 @@
   </component>
 
   <component>
-    <type>org.exoplatform.settings.jpa.dao.SettingContextDAO</type>
-  </component>
-  <component>
-    <type>org.exoplatform.settings.jpa.dao.SettingScopeDAO</type>
-  </component>
-  <component>
-    <type>org.exoplatform.settings.jpa.dao.SettingsDAO</type>
-  </component>
-
-  <component>
     <key>org.exoplatform.commons.api.event.EventManager</key>
     <type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.commons.api.settings.SettingService</key>
-    <type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
   </component>
 
   <component>
@@ -50,29 +35,5 @@
       </value-param>
     </init-params>
   </component>
-
-  <external-component-plugins>
-    <target-component>org.exoplatform.services.cache.CacheService</target-component>
-    <component-plugin>
-      <name>addExoCacheConfig</name>
-      <set-method>addExoCacheConfig</set-method>
-      <type>org.exoplatform.services.cache.ExoCacheConfigPlugin</type>
-      <description>The Cache configuration for the setting service</description>
-      <init-params>
-        <!-- SettingService -->
-        <object-param>
-          <name>commons.SettingService</name>
-          <description>The Cache configuration for the setting service</description>
-          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
-            <field name="name"><string>commons.SettingService</string></field>
-            <field name="maxSize"><int>${exo.cache.commons.SettingService.MaxNodes:100000}</int></field>
-            <field name="liveTime"><long>${exo.cache.commons.SettingService.TimeToLive:86400}</long></field>
-            <field name="cacheMode" profiles="cluster"><string>${exo.cache.commons.SettingService:replication}</string></field>
-            <field name="strategy" profiles="cluster"><string>${exo.cache.commons.SettingService.strategy:LIRS}</string></field>
-          </object>
-        </object-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
 
 </configuration>
