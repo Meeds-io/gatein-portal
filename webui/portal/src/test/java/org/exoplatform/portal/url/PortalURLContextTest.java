@@ -1,8 +1,25 @@
 package org.exoplatform.portal.url;
 
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import static org.exoplatform.web.controller.metadata.DescriptorBuilder.pathParam;
+import static org.exoplatform.web.controller.metadata.DescriptorBuilder.route;
+import static org.exoplatform.web.controller.metadata.DescriptorBuilder.routeParam;
+import static org.exoplatform.web.controller.metadata.DescriptorBuilder.router;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.WebAppController;
@@ -10,20 +27,8 @@ import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.controller.router.Router;
 import org.exoplatform.web.url.navigation.NavigationResource;
 import org.exoplatform.web.url.navigation.NodeURL;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import static org.exoplatform.web.controller.metadata.DescriptorBuilder.*;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
+import junit.framework.TestCase;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PortalURLContextTest extends TestCase {
@@ -65,6 +70,6 @@ public class PortalURLContextTest extends TestCase {
                 "/home/&apos;%29&semi;alert%28&apos;xss-vulnerability&apos;%29;alert%28&apos;"));
 
         String expected = "http://localhost:8080/portal/public/fr/classic/home/&amp;apos;%2529&amp;semi;alert%2528&amp;apos;xss-vulnerability&amp;apos;%2529;alert%2528&amp;apos;";
-        Assert.assertEquals(expected, url.toString());
+        assertEquals(expected, url.toString());
     }
 }

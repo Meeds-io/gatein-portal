@@ -23,6 +23,7 @@
 package org.exoplatform.portal.webui.test;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,11 +50,11 @@ public class ComponentConfigConcurrentTest extends AbstractGateInTest {
         Map<String, String> initParams = new HashMap<String, String>();
         initParams.put("webui.configuration", "webui.configuration");
 
-        String basedir = System.getProperty("basedir");
-        String webuiConfig = basedir + "/src/test/resources/webui-configuration.xml";
         Map<String, URL> resources = new HashMap<String, URL>();
-        resources.put("webui.configuration", new File(webuiConfig).toURI().toURL());
-        initParams.put("webui.configuration", new File(webuiConfig).toURI().toURL().toString());
+        String webuiConfig = getClass().getClassLoader().getResource("webui-configuration.xml").getFile();
+        URI uri = new File(webuiConfig).toURI();
+        resources.put("webui.configuration", uri.toURL());
+        initParams.put("webui.configuration", uri.toURL().toString());
 
         mockApplication = new MockApplication(initParams, resources, null);
         mockApplication.onInit();
@@ -92,7 +93,7 @@ public class ComponentConfigConcurrentTest extends AbstractGateInTest {
         public void run() {
             try {
                 UIPortal uiPortal = mockApplication.createUIComponent(UIPortal.class, null, null, null);
-                eventConfig = uiPortal.getComponentConfig().getUIComponentEventConfig("Ping");
+                eventConfig = uiPortal.getComponentConfig().getUIComponentEventConfig("Logout");
 
                 // log message now if eventConfig is null, so that we know about all failed workers. Test will be failed later.
                 if (eventConfig == null) {
