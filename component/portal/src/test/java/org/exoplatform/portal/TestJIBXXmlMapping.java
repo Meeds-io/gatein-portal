@@ -124,7 +124,6 @@ public class TestJIBXXmlMapping extends TestCase {
     public void testExtendedNavigationMapping() throws Exception {
         UnmarshalledObject<PageNavigation> obj = ModelUnmarshaller.unmarshall(PageNavigation.class, new FileInputStream(
                 "src/test/resources/jibx/extended-navigation.xml"));
-        ;
         PageNavigation nav = obj.getObject();
         assertEquals(Version.V_1_6, obj.getVersion());
 
