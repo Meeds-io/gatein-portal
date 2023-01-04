@@ -108,39 +108,6 @@
               </field>
             </object>
           </object-param>
-          <object-param>
-            <name>tools</name>
-            <description>description</description>
-            <object type="org.exoplatform.application.registry.ApplicationCategory">
-              <field name="name"><string>Tools</string></field>
-              <field name="displayName"><string>Tools</string></field>
-              <field name="description"><string>Applications for tools</string></field>
-              <field name="accessPermissions">
-                <collection type="java.util.ArrayList" item-type="java.lang.String">
-                  <value><string>*:/platform/users</string></value>
-                </collection>
-              </field>
-              <field name="applications">
-                <collection type="java.util.ArrayList">
-                  <value>
-                    <object type="org.exoplatform.application.registry.Application">
-                      <field name="applicationName"><string>IFramePortlet</string></field>
-                      <field name="categoryName"><string>tools</string></field>
-                      <field name="displayName"><string>IFrame</string></field>
-                      <field name="description"><string>IFrame Portlet</string></field>
-                      <field name="type"><string>portlet</string></field>
-                      <field name="contentId"><string>web/IFramePortlet</string></field>
-                      <field name="accessPermissions">
-                        <collection type="java.util.ArrayList" item-type="java.lang.String">
-                          <value><string>*:/platform/users</string></value>
-                        </collection>
-                      </field>
-                    </object>
-                  </value>
-                </collection>
-              </field>
-            </object>
-          </object-param>
         </init-params>
       </component-plugin>
     </component-plugins>
