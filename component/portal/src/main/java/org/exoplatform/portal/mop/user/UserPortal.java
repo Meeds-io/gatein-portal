@@ -84,6 +84,29 @@ public interface UserPortal {
             NodeChangeListener<UserNode> listener);
 
     /**
+     * Load specific navigation node children
+     *
+     * @param userNodeId target userNode id
+     * @param siteKey Site key
+     * @param scope the scope
+     * @param filterConfig an optional filter
+     * @param listener an optional listener
+     * @return {@link UserNode}
+     * @throws NullPointerException
+     * @throws UserPortalException
+     * @throws NavigationServiceException
+     */
+    default UserNode getNodeById(String userNodeId,
+                                 SiteKey siteKey,
+                                 Scope scope,
+                                 UserNodeFilterConfig filterConfig,
+                                 NodeChangeListener<UserNode> listener) throws NullPointerException,
+            UserPortalException,
+            NavigationServiceException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
      * Load the list of user nodes computed from the list of
      * {@link UserNavigation} of type siteType (PORTAL, GROUP or USER)
      * 

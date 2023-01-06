@@ -120,6 +120,21 @@ public class JDBCNavigationServiceImpl implements NavigationService {
         }
     }
 
+    @Override
+    public <N> NodeContext<N> loadNodeById(NodeModel<N> model, String nodeId, Scope scope,
+                                           NodeChangeListener<NodeContext<N>> listener) {
+        if (model == null) {
+            throw new NullPointerException("No null model accepted");
+        }
+        if (nodeId == null) {
+            throw new NullPointerException("No null node id accepted");
+        }
+        if (scope == null) {
+            throw new NullPointerException("No null scope accepted");
+        }
+        return manager.loadNode(model, nodeId, scope, listener);
+    }
+
     public <N> void updateNode(NodeContext<N> root, Scope scope, NodeChangeListener<NodeContext<N>> listener)
             throws NullPointerException, IllegalArgumentException, NavigationServiceException {
         manager.updateNode(root, scope, listener);
