@@ -216,14 +216,19 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
             } finally {
                 RequestLifeCycle.end();
             }
-            for (NewPortalConfig ele : configs) {
+            RequestLifeCycle.begin(PortalContainer.getInstance());
+            try {
+              for (NewPortalConfig ele : configs) {
                 try {
-                    if(ele.getOverrideMode() || prepareImport) {
-                        initPageDB(ele);
-                    }
+                  if (ele.getOverrideMode() || prepareImport) {
+                    initPageDB(ele);
+                  }
                 } catch (Exception e) {
-                    log.error("NewPortalConfig error: " + e.getMessage(), e);
+                  log.error("NewPortalConfig error: " + e.getMessage(), e);
                 }
+              }
+            } finally {
+              RequestLifeCycle.end();
             }
             RequestLifeCycle.begin(PortalContainer.getInstance());
             try {
