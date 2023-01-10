@@ -54,7 +54,7 @@ public class RedefinableResourceFilter implements Filter {
             path = path.substring(ctx.length());
         }
 
-        if (StringUtils.contains(path, "favicon")) {
+        if (StringUtils.contains(path, "favicon.ico")) {
           HttpServletResponse upcastedResponse = (HttpServletResponse) response;
           upcastedResponse.setHeader("Cache-Control", "public,max-age=86400");
           long now = System.currentTimeMillis();
