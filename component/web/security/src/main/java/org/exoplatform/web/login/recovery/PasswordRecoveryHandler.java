@@ -37,6 +37,7 @@ import org.json.JSONObject;
 
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.branding.BrandingService;
 import org.exoplatform.portal.resource.SkinService;
@@ -199,6 +200,9 @@ public class PasswordRecoveryHandler extends JspBasedWebHandler {
   }
 
   protected void extendApplicationParameters(JSONObject applicationParameters, Map<String, Object> additionalParameters) {
+    applicationParameters.put("authenticationTitle", PropertyManager.getProperty("portal.authentication.title"));
+    applicationParameters.put("authenticationSubtitle", PropertyManager.getProperty("portal.authentication.subtitle"));
+
     additionalParameters.forEach(applicationParameters::put);
   }
 
