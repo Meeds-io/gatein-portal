@@ -16,58 +16,120 @@
  */
 package org.exoplatform.web.register;
 
-import java.util.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
+import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.branding.BrandingService;
 import org.exoplatform.portal.resource.SkinService;
+import org.exoplatform.portal.rest.UserFieldValidator;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.Query;
+import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.UserStatus;
 import org.exoplatform.services.resources.LocaleConfigService;
+import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.web.ControllerContext;
-import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.application.JspBasedWebHandler;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.exoplatform.web.login.UIParamsExtension;
+import org.exoplatform.web.login.recovery.PasswordRecoveryService;
+
+import nl.captcha.Captcha;
+import nl.captcha.servlet.CaptchaServletUtil;
+import nl.captcha.text.producer.DefaultTextProducer;
+import nl.captcha.text.renderer.DefaultWordRenderer;
 
 public class RegisterHandler extends JspBasedWebHandler {
 
-  public static final String  REGISTER_EXTENSION_NAME       = "RegisterExtension";
+  private static final Log               LOG                           = ExoLogger.getLogger(RegisterHandler.class);
 
-  public static final String  REGISTER_ENABLED              = "registerEnabled";
+  public static final String             NAME                          = "register";
 
-  public static final String  REGISTER_ERROR_PARAM          = "errorCode";
+  public static final String             REGISTER_EXTENSION_NAME       = "RegisterExtension";
 
-  private static final Log    LOG                           = ExoLogger.getLogger(RegisterHandler.class);
+  public static final String             REGISTER_ENABLED              = "registerEnabled";
 
-  private static final String REGISTER_JSP_PATH_PARAM       = "register.jsp.path";
+  public static final String             REGISTER_JSP_PATH_PARAM       = "register.jsp.path";
 
-  private static final String REGISTER_EXTENSION_JS_MODULES = "RegisterExtension";
+  public static final String             REGISTER_EXTENSION_JS_MODULES = "RegisterExtension";
 
-  private PortalContainer     container;
+  public static final String             REGISTRATION_ERROR_CODE       = "REGISTRATION_ERROR";
 
-  private ServletContext      servletContext;
+  public static final String             EMAIL_PARAM                   = "email";
 
-  private String              registerJspPath;
+  public static final String             CAPTCHA_PARAM                 = "captcha";
 
-  public RegisterHandler(PortalContainer container,
+  public static final UserFieldValidator EMAIL_VALIDATOR               =
+                                                         new UserFieldValidator(EMAIL_PARAM, false, false);
+
+  public static final String             ONBOARDING_EMAIL_SENT_MESSAGE = "onboardingEmailSent";
+
+  public static final String             SUCCESS_MESSAGE_PARAM         = "success";
+
+  public static final String             ERROR_MESSAGE_PARAM           = "error";
+
+  public static final int                CAPTCHA_WIDTH                 = 200;
+
+  public static final int                CAPTCHA_HEIGHT                = 50;
+
+  private PortalContainer                container;
+
+  private PasswordRecoveryService        passwordRecoveryService;
+
+  private OrganizationService            organizationService;
+
+  private ResourceBundleService          resourceBundleService;
+
+  private ServletContext                 servletContext;
+
+  private String                         registerJspPath;
+
+  private boolean                        enabled;
+
+  public RegisterHandler(PortalContainer container, // NOSONAR
+                         ResourceBundleService resourceBundleService,
+                         PasswordRecoveryService passwordRecoveryService,
+                         OrganizationService organizationService,
                          LocaleConfigService localeConfigService,
                          BrandingService brandingService,
                          JavascriptConfigService javascriptConfigService,
                          SkinService skinService,
+                         RegisterUIParamsExtension registerUIParamsExtension,
                          InitParams params) {
     super(localeConfigService, brandingService, javascriptConfigService, skinService);
     this.container = container;
+    this.passwordRecoveryService = passwordRecoveryService;
+    this.organizationService = organizationService;
+    this.resourceBundleService = resourceBundleService;
+    this.enabled = registerUIParamsExtension != null && registerUIParamsExtension.isRegisterEnabled();
+    this.servletContext = container.getPortalContext();
     if (params != null && params.containsKey(REGISTER_JSP_PATH_PARAM)) {
       this.registerJspPath = params.getValueParam(REGISTER_JSP_PATH_PARAM).getValue();
     }
@@ -75,7 +137,7 @@ public class RegisterHandler extends JspBasedWebHandler {
 
   @Override
   public String getHandlerName() {
-    return "register";
+    return NAME;
   }
 
   @Override
@@ -84,14 +146,52 @@ public class RegisterHandler extends JspBasedWebHandler {
   }
 
   @Override
-  public void onInit(WebAppController controller, ServletConfig servletConfig) {
-    this.servletContext = container.getPortalContext();
-  }
-
-  @Override
   public boolean execute(ControllerContext controllerContext) throws Exception {
     HttpServletRequest request = controllerContext.getRequest();
     HttpServletResponse response = controllerContext.getResponse();
+
+    // If user is already authenticated, no registration form is required
+    if (request.getRemoteUser() != null) {
+      return false;
+    }
+
+    if (!enabled) {
+      LOG.warn("An hack tentative for user registration was detected");
+      response.setStatus(401);
+      return true;
+    }
+
+    Locale locale = request.getLocale();
+    ResourceBundle resourceBundle = resourceBundleService.getResourceBundle(resourceBundleService.getSharedResourceBundleNames(),
+                                                                            locale);
+
+    String serveCaptcha = request.getParameter("serveCaptcha");
+    if ("true".equals(serveCaptcha)) {
+      return serveCaptchaImage(request, response);
+    }
+
+    Map<String, Object> parameters = new HashMap<>();
+    String email = request.getParameter(EMAIL_PARAM);
+    if (StringUtils.isNotBlank(email)) {
+      String captcha = request.getParameter(CAPTCHA_PARAM);
+      if (!isValidCaptch(request.getSession(), captcha)) {
+        parameters.put(ERROR_MESSAGE_PARAM, resourceBundle.getString("gatein.forgotPassword.captchaError"));
+      } else if (isValidEmail(email, resourceBundle, locale, parameters)) {
+        sendOnboardingEmail(email, request);
+        parameters.put(SUCCESS_MESSAGE_PARAM, ONBOARDING_EMAIL_SENT_MESSAGE);
+      }
+      parameters.put(EMAIL_PARAM, email);
+    }
+
+    return dispatch(controllerContext, parameters);
+  }
+
+  protected boolean dispatch(ControllerContext controllerContext, Map<String, Object> parameters) throws Exception {
+    HttpServletRequest request = controllerContext.getRequest();
+    HttpServletResponse response = controllerContext.getResponse();
+
+    // Invalidate the Captcha
+    request.getSession().removeAttribute(NAME);
 
     List<String> additionalJSModules = getExtendedJSModules(controllerContext, request);
     List<String> additionalCSSModules = Collections.singletonList("portal/login");
@@ -100,35 +200,23 @@ public class RegisterHandler extends JspBasedWebHandler {
                           "PORTLET/social-portlet/Register",
                           additionalJSModules,
                           additionalCSSModules,
-                          params -> extendUIParameters(controllerContext, params));
+                          params -> extendApplicationParameters(controllerContext, params, parameters));
 
     servletContext.getRequestDispatcher(registerJspPath).include(request, response);
     return true;
   }
 
-  private List<String> getExtendedJSModules(ControllerContext controllerContext, HttpServletRequest request) throws Exception {
-    List<String> additionalJSModules = new ArrayList<>();
-    JSONObject jsConfig = javascriptConfigService.getJSConfig(controllerContext, request.getLocale());
-    if (jsConfig.has(JS_PATHS_PARAM)) {
-      JSONObject jsConfigPaths = jsConfig.getJSONObject(JS_PATHS_PARAM);
-      @SuppressWarnings("unchecked")
-      Iterator<String> keys = jsConfigPaths.keys();
-      while (keys.hasNext()) {
-        String module = keys.next();
-        if (module.contains(REGISTER_EXTENSION_JS_MODULES)) {
-          additionalJSModules.add(module);
-        }
-      }
-    }
-    return additionalJSModules;
-  }
-
-  private void extendUIParameters(ControllerContext controllerContext, JSONObject params) {
+  protected void extendApplicationParameters(ControllerContext controllerContext,
+                                             JSONObject params,
+                                             Map<String, Object> parameters) {
     try {
-      Object errorCode = controllerContext.getRequest().getAttribute(REGISTER_ERROR_PARAM);
-      if (errorCode != null) {
-        params.put(REGISTER_ERROR_PARAM, errorCode);
+      if (parameters != null) {
+        parameters.forEach(params::put);
       }
+
+      params.put("authenticationTitle", PropertyManager.getProperty("portal.authentication.title"));
+      params.put("authenticationSubtitle", PropertyManager.getProperty("portal.authentication.subtitle"));
+
       List<UIParamsExtension> paramsExtensions = this.container.getComponentInstancesOfType(UIParamsExtension.class);
       if (CollectionUtils.isNotEmpty(paramsExtensions)) {
         paramsExtensions.stream()
@@ -152,4 +240,110 @@ public class RegisterHandler extends JspBasedWebHandler {
     }
   }
 
+  private List<String> getExtendedJSModules(ControllerContext controllerContext, HttpServletRequest request) throws Exception {
+    List<String> additionalJSModules = new ArrayList<>();
+    JSONObject jsConfig = javascriptConfigService.getJSConfig(controllerContext, request.getLocale());
+    if (jsConfig.has(JS_PATHS_PARAM)) {
+      JSONObject jsConfigPaths = jsConfig.getJSONObject(JS_PATHS_PARAM);
+      Iterator<String> keys = jsConfigPaths.keys();
+      while (keys.hasNext()) {
+        String module = keys.next();
+        if (module.contains(REGISTER_EXTENSION_JS_MODULES)) {
+          additionalJSModules.add(module);
+        }
+      }
+    }
+    return additionalJSModules;
+  }
+
+  private void sendOnboardingEmail(String email, HttpServletRequest request) throws Exception {
+    StringBuilder url = getUrl(request);
+    Locale locale = request.getLocale();
+    passwordRecoveryService.sendExternalRegisterEmail(null, email, locale, null, url, false);
+  }
+
+  private boolean isValidEmail(String email,
+                               ResourceBundle resourceBundle,
+                               Locale locale,
+                               Map<String, Object> parameters) throws Exception {
+    String errorMessage = EMAIL_VALIDATOR.validate(locale, email);
+    if (StringUtils.isNotBlank(errorMessage)) {
+      parameters.put(ERROR_MESSAGE_PARAM, errorMessage);
+    } else {
+      try {
+        // Check if mail address is already used
+        Query query = new Query();
+        query.setEmail(email);
+        ListAccess<User> users = organizationService.getUserHandler().findUsersByQuery(query, UserStatus.ANY);
+        if (users != null && users.getSize() > 0) {
+          // Must not lack the information anonymously that the user exists
+          // Thus, send it as succeeded operation
+          parameters.put(SUCCESS_MESSAGE_PARAM, ONBOARDING_EMAIL_SENT_MESSAGE);
+        } else {
+          User user = organizationService.getUserHandler().findUserByName(email);
+          if (user != null) {
+            // Must not lack the information anonymously that the user exists
+            // Thus, send it as succeeded operation
+            parameters.put(SUCCESS_MESSAGE_PARAM, ONBOARDING_EMAIL_SENT_MESSAGE);
+          }
+        }
+      } catch (RuntimeException e) {
+        LOG.debug("Error retrieving users list with email {}. Thus, we will consider the email as already used", email, e);
+        parameters.put(ERROR_MESSAGE_PARAM, resourceBundle.getString("external.registration.fail.create.user"));
+      }
+    }
+    return !parameters.containsKey(ERROR_MESSAGE_PARAM) && !parameters.containsKey(SUCCESS_MESSAGE_PARAM);
+  }
+
+  private boolean isValidCaptch(HttpSession session, String captchaValue) {
+    Captcha captcha = (Captcha) session.getAttribute(NAME);
+    return ((captcha != null) && (captcha.isCorrect(captchaValue)));
+  }
+
+  private boolean serveCaptchaImage(HttpServletRequest req, HttpServletResponse resp) {
+    HttpSession session = req.getSession();
+    Captcha captcha;
+    if (session.getAttribute(NAME) == null) {
+      List<Font> textFonts = Arrays.asList(new Font("Arial", Font.BOLD, 40), new Font("Courier", Font.BOLD, 40));
+      captcha = new Captcha.Builder(CAPTCHA_WIDTH, CAPTCHA_HEIGHT)
+                                                                  .addText(new DefaultTextProducer(5),
+                                                                           new DefaultWordRenderer(Color.WHITE, textFonts))
+                                                                  .gimp()
+                                                                  .addNoise()
+                                                                  .addBackground()
+                                                                  .build();
+
+      session.setAttribute(NAME, captcha);
+      writeImage(resp, captcha.getImage());
+
+    }
+
+    captcha = (Captcha) session.getAttribute(NAME);
+    writeImage(resp, captcha.getImage());
+
+    return true;
+  }
+
+  private void writeImage(HttpServletResponse response, BufferedImage bi) {
+    response.setHeader("Cache-Control", "private,no-cache,no-store");
+    response.setContentType("image/png"); // PNGs allow for transparency. JPGs
+                                          // do not.
+    try {
+      CaptchaServletUtil.writeImage(response.getOutputStream(), bi);
+    } catch (IOException e) {
+      LOG.error(e.getMessage(), e);
+    }
+  }
+
+  private StringBuilder getUrl(HttpServletRequest request) {
+    StringBuilder url = new StringBuilder();
+    if (request != null) {
+      url.append(request.getScheme()).append("://").append(request.getServerName());
+      if (request.getServerPort() != 80 && request.getServerPort() != 443) {
+        url.append(':').append(request.getServerPort());
+      }
+      url.append("/" + PortalContainer.getCurrentPortalContainerName());
+    }
+    return url;
+  }
 }

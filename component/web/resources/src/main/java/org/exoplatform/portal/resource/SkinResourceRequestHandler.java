@@ -9,7 +9,6 @@ import java.util.Date;
 import javax.servlet.http.HttpServletResponse;
 
 import org.exoplatform.commons.utils.BinaryOutput;
-import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.WebRequestHandler;
 import org.exoplatform.services.log.Log;
@@ -145,13 +144,13 @@ public class SkinResourceRequestHandler extends WebRequestHandler {
       public void setExpiration(long seconds) {
         if (seconds > 0) {
           response.setHeader("Cache-Control", "public,max-age=" + seconds);
+          response.setDateHeader(EXPIRES, (System.currentTimeMillis() + seconds * 1000L));
         } else {
           response.setHeader("Cache-Control", "no-cache");
         }
 
         long lastModified = skinService.getLastModified(context);
         response.setDateHeader(LAST_MODIFIED, lastModified);
-        response.setDateHeader(EXPIRES, (System.currentTimeMillis() + 604800000L));
       }
     }
 }

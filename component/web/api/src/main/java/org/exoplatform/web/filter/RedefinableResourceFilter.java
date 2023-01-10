@@ -24,6 +24,9 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.container.PortalContainer;
 
@@ -51,6 +54,15 @@ public class RedefinableResourceFilter implements Filter {
             path = path.substring(ctx.length());
         }
 
+        if (StringUtils.contains(path, "favicon.ico")) {
+          HttpServletResponse upcastedResponse = (HttpServletResponse) response;
+          upcastedResponse.setHeader("Cache-Control", "public,max-age=86400");
+          long now = System.currentTimeMillis();
+          upcastedResponse.setDateHeader("Expires", now + 86400000l);
+          upcastedResponse.setDateHeader("Last-Modified", now);
+          upcastedResponse.setContentType("image/png");
+          upcastedResponse.setHeader("Content-Encoding", "UTF-8");
+        }
         mergedContext.getRequestDispatcher(path).include(request, response);
     }
 

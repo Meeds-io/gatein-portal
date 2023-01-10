@@ -19,281 +19,253 @@
 
 package org.exoplatform.web.login.recovery;
 
-import org.exoplatform.commons.utils.I18N;
-import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.commons.utils.PropertyManager;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.localization.LocaleContextInfoUtils;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.Query;
-import org.exoplatform.services.organization.UserHandler;
-import org.exoplatform.services.organization.UserStatus;
-import org.exoplatform.services.resources.LocaleContextInfo;
-import org.exoplatform.services.resources.LocalePolicy;
+import static org.exoplatform.web.security.security.CookieTokenService.FORGOT_PASSWORD_TOKEN;
 
-import org.exoplatform.web.security.security.RemindPasswordTokenService;
-import org.exoplatform.services.log.Log;
-import org.exoplatform.services.log.ExoLogger;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 
-import org.exoplatform.services.organization.DisabledUserException;
-import org.exoplatform.services.organization.User;
-import org.exoplatform.services.resources.ResourceBundleService;
-import org.exoplatform.web.ControllerContext;
-import org.exoplatform.web.WebRequestHandler;
-import org.exoplatform.web.controller.QualifiedName;
-
-import org.gatein.wci.security.Credentials;
-
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import org.gatein.wci.security.Credentials;
+import org.json.JSONObject;
+
+import org.exoplatform.commons.utils.I18N;
+import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.portal.branding.BrandingService;
+import org.exoplatform.portal.resource.SkinService;
+import org.exoplatform.portal.rest.UserFieldValidator;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.Query;
+import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.UserStatus;
+import org.exoplatform.services.resources.LocaleConfigService;
+import org.exoplatform.services.resources.ResourceBundleService;
+import org.exoplatform.web.ControllerContext;
+import org.exoplatform.web.application.JspBasedWebHandler;
+import org.exoplatform.web.application.javascript.JavascriptConfigService;
+import org.exoplatform.web.controller.QualifiedName;
 
 /**
  * @author <a href="mailto:tuyennt@exoplatform.com">Tuyen Nguyen The</a>.
  */
-public class PasswordRecoveryHandler extends WebRequestHandler {
-  protected static Log                     log              = ExoLogger.getLogger(PasswordRecoveryHandler.class);
+public class PasswordRecoveryHandler extends JspBasedWebHandler {
 
+  public static final QualifiedName      TOKEN                      = QualifiedName.create("gtn", "token");
 
-    public static final String NAME = "forgot-password";
+  public static final QualifiedName      LANG                       = QualifiedName.create("gtn", "lang");
 
-    public static final QualifiedName TOKEN = QualifiedName.create("gtn", "token");
-    public static final QualifiedName LANG = QualifiedName.create("gtn", "lang");
-    public static final QualifiedName INIT_URL = QualifiedName.create("gtn", "initURL");
+  public static final QualifiedName      INIT_URL                   = QualifiedName.create("gtn", "initialURI");
 
-    public static final String REQ_PARAM_ACTION = "action";
+  public static final String             NAME                       = "forgot-password";
 
-    private static final ThreadLocal<Locale> currentLocale = new ThreadLocal<Locale>();
+  public static final String             FORM_URL_PARAM             = "formUrl";
 
-    @Override
-    public String getHandlerName() {
-        return NAME;
-    }
+  public static final String             ACTION_PARAM               = "action";
 
-    @Override
-    public boolean execute(ControllerContext context) throws Exception {
-        HttpServletRequest req = context.getRequest();
-        HttpServletResponse res = context.getResponse();
-        PortalContainer container = PortalContainer.getCurrentInstance(req.getServletContext());
-        ServletContext servletContext = container.getPortalContext();
-        Pattern customPasswordPattern = Pattern.compile(PropertyManager.getProperty("gatein.validators.passwordpolicy.regexp"));
-        int customPasswordMaxlength = Integer.parseInt(PropertyManager.getProperty("gatein.validators.passwordpolicy.length.max"));
-        int customPasswordMinlength = Integer.parseInt(PropertyManager.getProperty("gatein.validators.passwordpolicy.length.min"));
+  public static final String             RESET_PASSWORD_ACTION_NAME = "resetPassword";
 
-        Locale requestLocale = null;
-        String lang = context.getParameter(LANG);
-        Locale locale;
-        if (lang != null && lang.length() > 0) {
-            requestLocale = I18N.parseTagIdentifier(lang);
-            locale = requestLocale;
-        } else {
-            locale = calculateLocale(context);
-        }
-        currentLocale.set(locale);
-        req.setAttribute("request_locale", locale);
+  public static final String             INITIAL_URI_PARAM          = INIT_URL.getName();
 
-        PasswordRecoveryServiceImpl service = getService(PasswordRecoveryServiceImpl.class);
-        ResourceBundleService bundleService = getService(ResourceBundleService.class);
-        RemindPasswordTokenService remindPasswordTokenService= getService(RemindPasswordTokenService.class);
-        OrganizationService orgService = getService(OrganizationService.class);
-        ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
+  public static final String             EXPIRED_ACTION_NAME        = "expired";
 
-        String token = context.getParameter(TOKEN);
-        String initURL = escapeXssCharacters(context.getParameter(INIT_URL));
+  public static final String             SEND_ACTION_NAME           = "send";
 
-        String requestAction = req.getParameter(REQ_PARAM_ACTION);
+  public static final String             ERROR_MESSAGE_PARAM        = "error";
 
-        if (token != null && !token.isEmpty()) {
-            String tokenId = context.getParameter(TOKEN);
+  public static final String             TOKEN_ID_PARAM             = "tokenId";
 
-            //. Check tokenID is expired or not
-            Credentials credentials = service.verifyToken(tokenId,remindPasswordTokenService.FORGOT_PASSWORD_TOKEN);
-            if (credentials == null) {
-                //. TokenId is expired
-                return dispatch("/WEB-INF/jsp/forgotpassword/token_expired.jsp", servletContext, req, res);
-            }
-            final String username = credentials.getUsername();
+  public static final String             SUCCESS_MESSAGE_PARAM      = "success";
 
-            if ("resetPassword".equalsIgnoreCase(requestAction)) {
-                String reqUser = req.getParameter("username");
-                String password = req.getParameter("password");
-                String confirmPass = req.getParameter("password2");
+  public static final String             USERNAME_PARAM             = "username";
 
+  public static final String             PASSWORD_PARAM             = "password";
 
-                List<String> errors = new ArrayList<String>();
-                String success = "";
+  public static final String             PASSWORD_CONFIRM_PARAM     = "password2";
 
-                if (reqUser == null || !reqUser.equals(username)) {
-                    // Username is changed
-                    String message = bundle.getString("gatein.forgotPassword.usernameChanged");
-                    message = message.replace("{0}", username);
-                    errors.add(message);
-                } else {
-                  if (password == null || !customPasswordPattern.matcher(password).matches() || customPasswordMaxlength < password.length() || customPasswordMinlength > password.length() ) {
-                        String passwordpolicyProperty = PropertyManager.getProperty("gatein.validators.passwordpolicy.format.message");
-                        errors.add(passwordpolicyProperty != null ? passwordpolicyProperty : bundle.getString("onboarding.login.passwordCondition"));
-                    }
-                    if (!password.equals(confirmPass)) {
-                        errors.add(bundle.getString("gatein.forgotPassword.confirmPasswordNotMatch"));
-                    }
-                }
+  public static final UserFieldValidator PASSWORD_VALIDATOR         =
+                                                            new UserFieldValidator(PASSWORD_PARAM, false, false, 8, 255);
 
-                //
-                if (errors.isEmpty()) {
-                    if (service.changePass(tokenId, remindPasswordTokenService.FORGOT_PASSWORD_TOKEN, username, password)) {
-                        String currentPortalContainerName = PortalContainer.getCurrentPortalContainerName();
-                        res.sendRedirect("/" + currentPortalContainerName + "/login");
-                        return true;
-                    } else {
-                        errors.add(bundle.getString("gatein.forgotPassword.resetPasswordFailure"));
-                    }
-                }
-                req.setAttribute("password", password);
-                req.setAttribute("password2", confirmPass);
-                req.setAttribute("errors", errors);
-                req.setAttribute("success", success);
-            }
+  public static final String             FORGOT_PASSWORD_JSP_PATH   = "/WEB-INF/jsp/forgotpassword/forgot_password.jsp"; // NOSONAR
 
-            req.setAttribute("tokenId", tokenId);
-            req.setAttribute("username", escapeXssCharacters(username));
+  private ServletContext                 servletContext;
 
-            return dispatch("/WEB-INF/jsp/forgotpassword/reset_password.jsp", servletContext, req, res);
+  private PasswordRecoveryService        passwordRecoveryService;
 
-        } else {
-            //.
-            if ("send".equalsIgnoreCase(requestAction)) {
-                String user = req.getParameter("username");
-                if (user != null && !user.trim().isEmpty()) {
-                    User u;
+  private ResourceBundleService          resourceBundleService;
 
-                    //
-                    try {
-                        u = findUser(orgService, user);
-                        if (u == null) {
-                            req.setAttribute("success", bundle.getString("gatein.forgotPassword.userNotExist"));
-                        }
-                    } catch (DisabledUserException e) {
-                        req.setAttribute("success", bundle.getString("gatein.forgotPassword.userDisabled"));
-                        u = null;
-                    } catch (Exception ex) {
-                        req.setAttribute("error", bundle.getString("gatein.forgotPassword.loadUserError"));
-                        u = null;
-                    }
+  private OrganizationService            organizationService;
 
-                    //
-                    if (u != null) {
-                        if (service.sendRecoverPasswordEmail(u, getCurrentLocale(), req)) {
-                            req.setAttribute("success", bundle.getString("gatein.forgotPassword.emailSendSuccessful"));
-                            user = "";
-                        } else {
-                            req.setAttribute("error", bundle.getString("gatein.forgotPassword.emailSendFailure"));
-                        }
-                    }
-
-                    req.setAttribute("username", escapeXssCharacters(user));
-                } else {
-                    req.setAttribute("error", bundle.getString("gatein.forgotPassword.emptyUserOrEmail"));
-                }
-            }
-
-            if (initURL != null) {
-                req.setAttribute("initURL", initURL);
-            }
-            return dispatch("/WEB-INF/jsp/forgotpassword/forgot_password.jsp", servletContext, req, res);
-        }
-    }
-
-    protected boolean dispatch(String path, ServletContext context, HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        RequestDispatcher dispatcher = context.getRequestDispatcher(path);
-        if (dispatcher != null) {
-            dispatcher.forward(req, res);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    protected boolean getRequiresLifeCycle() {
-        return true;
-    }
-
-    private <T> T getService(Class<T> clazz) {
-        return ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(clazz);
-    }
-
-    public static Locale getCurrentLocale() {
-        return currentLocale.get();
-    }
-
-    //TODO: how to reuse some method from LocalizationLifecycle
-    private static final String LOCALE_COOKIE = "LOCALE";
-    private static final String LOCALE_SESSION_ATTR = "org.gatein.LOCALE";
-    private Locale calculateLocale(ControllerContext context) {
-        LocalePolicy localePolicy = getService(LocalePolicy.class);
-    
-        HttpServletRequest request = HttpServletRequest.class.cast(context.getRequest());
-    
-        LocaleContextInfo localeCtx = LocaleContextInfoUtils.buildLocaleContextInfo(request);
-
-        Set<Locale> supportedLocales = LocaleContextInfoUtils.getSupportedLocales();
-        
-        Locale locale = localePolicy.determineLocale(localeCtx);
-        boolean supported = supportedLocales.contains(locale);
-
-        if (!supported && !"".equals(locale.getCountry())) {
-            locale = new Locale(locale.getLanguage());
-            supported = supportedLocales.contains(locale);
-        }
-        if (!supported) {
-            if (log.isWarnEnabled())
-                log.warn("Unsupported locale returned by LocalePolicy: " + localePolicy + ". Falling back to 'en'.");
-            locale = Locale.ENGLISH;
-        }
-
-        return locale;
-    }
-    
-    private User findUser(OrganizationService orgService, String usernameOrEmail) throws Exception {
-      if (usernameOrEmail == null || usernameOrEmail.isEmpty()) {
-          return null;
-      }
-
-      User user = null;
-      UserHandler uHandler = orgService.getUserHandler();
-      user = uHandler.findUserByName(usernameOrEmail, UserStatus.ANY);
-      if (user == null && usernameOrEmail.contains("@")) {
-          Query query = new Query();
-          query.setEmail(usernameOrEmail);
-          ListAccess<User> list = uHandler.findUsersByQuery(query, UserStatus.ANY);
-          if (list != null && list.getSize() > 0) {
-              user = list.load(0, 1)[0];
-          }
-      }
-
-      if (user != null && !user.isEnabled()) {
-          throw new DisabledUserException(user.getUserName());
-      }
-
-      return user;
+  public PasswordRecoveryHandler(PortalContainer container, // NOSONAR
+                                 PasswordRecoveryService passwordRecoveryService,
+                                 ResourceBundleService resourceBundleService,
+                                 OrganizationService organizationService,
+                                 LocaleConfigService localeConfigService,
+                                 BrandingService brandingService,
+                                 JavascriptConfigService javascriptConfigService,
+                                 SkinService skinService) {
+    super(localeConfigService, brandingService, javascriptConfigService, skinService);
+    this.servletContext = container.getPortalContext();
+    this.passwordRecoveryService = passwordRecoveryService;
+    this.resourceBundleService = resourceBundleService;
+    this.organizationService = organizationService;
   }
 
-    public String escapeXssCharacters(String message){
-        message = (message == null) ? null : message.replace("&", "&amp").replace("<","&lt;").replace(">","&gt;")
-                                    .replace("\"","&quot;")
-                                    .replace("'","&#x27;")
-                                    .replace("/","&#x2F;");
-        return message;
+  @Override
+  public boolean execute(ControllerContext controllerContext) throws Exception {// NOSONAR
+    HttpServletRequest request = controllerContext.getRequest();
+    HttpServletResponse response = controllerContext.getResponse();
+
+    Locale locale = request.getLocale();
+    ResourceBundle bundle = resourceBundleService.getResourceBundle(resourceBundleService.getSharedResourceBundleNames(),
+                                                                    locale);
+
+    String token = controllerContext.getParameter(TOKEN);
+    String initialURI = escapeXssCharacters(controllerContext.getParameter(INIT_URL));
+
+    String requestAction = request.getParameter(ACTION_PARAM);
+    Map<String, Object> parameters = new HashMap<>();
+    String contextPath = servletContext.getContextPath();
+    String forgotPasswordPath = passwordRecoveryService.getPasswordRecoverURL(token, I18N.toTagIdentifier(locale));
+    parameters.put(FORM_URL_PARAM, contextPath + forgotPasswordPath);
+
+    if (StringUtils.isNotBlank(token)) {
+      // . Check tokenID is expired or not
+      Credentials credentials = passwordRecoveryService.verifyToken(token, FORGOT_PASSWORD_TOKEN);
+      if (credentials == null) {
+        parameters.put(ACTION_PARAM, EXPIRED_ACTION_NAME);
+        // . TokenId is expired
+        return dispatch(controllerContext, request, response, parameters);
+      }
+      String tokenUsername = credentials.getUsername();
+
+      if (RESET_PASSWORD_ACTION_NAME.equalsIgnoreCase(requestAction)) {
+        String password = request.getParameter(PASSWORD_PARAM);
+        String confirmPass = request.getParameter(PASSWORD_CONFIRM_PARAM);
+        String requestedUsername = request.getParameter(USERNAME_PARAM);
+        if (validateUserAndPassword(tokenUsername, requestedUsername, password, confirmPass, parameters, bundle, locale)) {
+          if (passwordRecoveryService.changePass(token, FORGOT_PASSWORD_TOKEN, tokenUsername, password)) {
+            response.sendRedirect(contextPath + "/login");
+            return true;
+          } else {
+            parameters.put(ERROR_MESSAGE_PARAM, bundle.getString("gatein.forgotPassword.resetPasswordFailure"));
+          }
+        }
+        parameters.put(PASSWORD_PARAM, password);
+        parameters.put(PASSWORD_CONFIRM_PARAM, confirmPass);
+      }
+      parameters.put(USERNAME_PARAM, escapeXssCharacters(tokenUsername));
+      parameters.put(TOKEN_ID_PARAM, token);
+      parameters.put(ACTION_PARAM, RESET_PASSWORD_ACTION_NAME);
+    } else if (SEND_ACTION_NAME.equalsIgnoreCase(requestAction)) {
+      String username = request.getParameter(USERNAME_PARAM);
+      if (StringUtils.isBlank(username)) {
+        parameters.put(ERROR_MESSAGE_PARAM, bundle.getString("gatein.forgotPassword.emptyUserOrEmail"));
+      } else {
+        User user = findUser(username);
+        if (user == null || !user.isEnabled()) {
+          // Send a success message even when user is not found to not inform
+          // anonymous users which usernames and emails exists
+          parameters.put(SUCCESS_MESSAGE_PARAM, bundle.getString("gatein.forgotPassword.emailSendSuccessful"));
+        } else if (passwordRecoveryService.sendRecoverPasswordEmail(user, locale, request)) {
+          parameters.put(SUCCESS_MESSAGE_PARAM, bundle.getString("gatein.forgotPassword.emailSendSuccessful"));
+        } else {
+          parameters.put(ERROR_MESSAGE_PARAM, bundle.getString("gatein.forgotPassword.emailSendFailure"));
+        }
+        parameters.put(USERNAME_PARAM, escapeXssCharacters(username));
+      }
     }
+
+    if (initialURI != null) {
+      parameters.put(INITIAL_URI_PARAM, initialURI);
+    }
+    return dispatch(controllerContext, request, response, parameters);
+  }
+
+  @Override
+  public String getHandlerName() {
+    return NAME;
+  }
+
+  @Override
+  protected boolean getRequiresLifeCycle() {
+    return true;
+  }
+
+  protected void extendApplicationParameters(JSONObject applicationParameters, Map<String, Object> additionalParameters) {
+    applicationParameters.put("authenticationTitle", PropertyManager.getProperty("portal.authentication.title"));
+    applicationParameters.put("authenticationSubtitle", PropertyManager.getProperty("portal.authentication.subtitle"));
+
+    additionalParameters.forEach(applicationParameters::put);
+  }
+
+  private boolean dispatch(ControllerContext controllerContext,
+                           HttpServletRequest request,
+                           HttpServletResponse response,
+                           Map<String, Object> parameters) throws Exception {
+
+    super.prepareDispatch(controllerContext,
+                          "PORTLET/social-portlet/ForgotPassword",
+                          Collections.emptyList(),
+                          Collections.singletonList("portal/login"),
+                          params -> extendApplicationParameters(params, parameters));
+    servletContext.getRequestDispatcher(FORGOT_PASSWORD_JSP_PATH).include(request, response);
+    return true;
+  }
+
+  private boolean validateUserAndPassword(String tokenUsername,
+                                          String requestedUsername,
+                                          String password,
+                                          String confirmPass,
+                                          Map<String, Object> parameters,
+                                          ResourceBundle bundle,
+                                          Locale locale) {
+    if (requestedUsername == null || !requestedUsername.equals(tokenUsername)) {
+      String errorMessage = bundle.getString("gatein.forgotPassword.usernameChanged");
+      errorMessage = errorMessage.replace("{0}", tokenUsername);
+      parameters.put(ERROR_MESSAGE_PARAM, errorMessage);
+      return false;
+    } else if (!StringUtils.equals(password, confirmPass)) {
+      parameters.put(ERROR_MESSAGE_PARAM, bundle.getString("gatein.forgotPassword.confirmPasswordNotMatch"));
+      return false;
+    } else {
+      String errorMessage = PASSWORD_VALIDATOR.validate(locale, password);
+      if (StringUtils.isNotBlank(errorMessage)) {
+        parameters.put(ERROR_MESSAGE_PARAM, errorMessage);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private User findUser(String usernameOrEmail) throws Exception {
+    User user = organizationService.getUserHandler().findUserByName(usernameOrEmail, UserStatus.ANY);
+    if (user == null && usernameOrEmail.contains("@")) {
+      Query query = new Query();
+      query.setEmail(usernameOrEmail);
+      ListAccess<User> list = organizationService.getUserHandler().findUsersByQuery(query, UserStatus.ANY);
+      if (list != null && list.getSize() > 0) {
+        user = list.load(0, 1)[0];
+      }
+    }
+    return user;
+  }
+
+  private String escapeXssCharacters(String message) {
+    message = (message == null) ? null
+                                : message.replace("&", "&amp")
+                                         .replace("<", "&lt;")
+                                         .replace(">", "&gt;")
+                                         .replace("\"", "&quot;")
+                                         .replace("'", "&#x27;")
+                                         .replace("/", "&#x2F;");
+    return message;
+  }
 }

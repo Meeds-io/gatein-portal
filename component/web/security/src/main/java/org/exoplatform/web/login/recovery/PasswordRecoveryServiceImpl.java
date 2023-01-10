@@ -19,35 +19,49 @@
 
 package org.exoplatform.web.login.recovery;
 
-import java.io.*;
-import java.util.*;
+import static org.exoplatform.web.security.security.CookieTokenService.EXTERNAL_REGISTRATION_TOKEN;
+import static org.exoplatform.web.security.security.CookieTokenService.FORGOT_PASSWORD_TOKEN;
+import static org.exoplatform.web.security.security.CookieTokenService.ONBOARD_TOKEN;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.web.login.externalRegistration.ExternalRegistrationHandler;
-import org.exoplatform.services.log.Log;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.web.security.security.CookieTokenService;
 import org.gatein.wci.security.Credentials;
 
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.commons.utils.MailUtils;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.Constants;
 import org.exoplatform.portal.branding.BrandingService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.mail.MailService;
 import org.exoplatform.services.mail.Message;
-import org.exoplatform.services.organization.*;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.UserHandler;
+import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.controller.router.Router;
 import org.exoplatform.web.login.onboarding.OnboardingHandler;
+import org.exoplatform.web.register.ExternalRegisterHandler;
 import org.exoplatform.web.security.Token;
+import org.exoplatform.web.security.security.CookieTokenService;
 import org.exoplatform.web.security.security.RemindPasswordTokenService;
 
 /**
@@ -120,8 +134,17 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
 
   @Override
   public boolean allowChangePassword(String username) throws Exception {
-    User user = orgService.getUserHandler().findUserByName(username);// To be changed later by checking internal store information
-                                                                     // from social user profile
+    User user = orgService.getUserHandler().findUserByName(username);// To be
+                                                                     // changed
+                                                                     // later by
+                                                                     // checking
+                                                                     // internal
+                                                                     // store
+                                                                     // information
+                                                                     // from
+                                                                     // social
+                                                                     // user
+                                                                     // profile
     return user != null && (user.isInternalStore()
         || this.changePasswordConnectorMap.get(this.changePasswordConnectorName).isAllowChangeExternalPassword());
   }
@@ -168,7 +191,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
 
     Credentials credentials = new Credentials(user.getUserName(), "");
-    String tokenId = remindPasswordTokenService.createToken(credentials, remindPasswordTokenService.ONBOARD_TOKEN);
+    String tokenId = remindPasswordTokenService.createToken(credentials, ONBOARD_TOKEN);
     StringBuilder redirectUrl = new StringBuilder();
     redirectUrl.append(url);
     redirectUrl.append("/" + OnboardingHandler.NAME);
@@ -208,7 +231,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
       content = resolveLanguage(input, bundle);
     }
 
-    content = content.replaceAll("\\$\\{USER_DISPLAY_NAME\\}", user.getDisplayName());
+    content = content.replaceAll("\\$\\{USER_DISPLAY_NAME\\}", user == null ? "" : user.getDisplayName());
     content = content.replaceAll("\\$\\{COMPANY_NAME\\}", brandingService.getCompanyName());
     content = content.replaceAll("\\$\\{RESET_PASSWORD_LINK\\}", link);
 
@@ -221,23 +244,39 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
                                           Locale locale,
                                           String space,
                                           StringBuilder url) throws Exception {
+    return sendExternalRegisterEmail(sender, email, locale, space, url, true);
+  }
 
-    UserHandler uHandler = orgService.getUserHandler();
-    String senderFullName = uHandler.findUserByName(sender).getDisplayName();
+  @Override
+  public String sendExternalRegisterEmail(String sender,
+                                          String email,
+                                          Locale locale,
+                                          String space,
+                                          StringBuilder url,
+                                          boolean spaceInvitation) throws Exception {
 
     ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
 
-    Credentials credentials = new Credentials(email, "");
-    String tokenId = remindPasswordTokenService.createToken(credentials, remindPasswordTokenService.EXTERNAL_REGISTRATION_TOKEN);
+    String token = createToken(email);
+
     StringBuilder redirectUrl = new StringBuilder();
     redirectUrl.append(url);
-    redirectUrl.append("/" + ExternalRegistrationHandler.NAME);
+    redirectUrl.append("/" + ExternalRegisterHandler.NAME);
     redirectUrl.append("?lang=" + I18N.toTagIdentifier(locale));
-    redirectUrl.append("&token=" + tokenId);
+    redirectUrl.append("&token=" + token);
 
-    String emailBody = buildExternalEmailBody(senderFullName, space, redirectUrl.toString(), bundle);
-    String emailSubject = senderFullName + " " + bundle.getString("external.email.subject") + " "
-        + brandingService.getCompanyName() + " : " + space;
+    String emailBody;
+    String emailSubject;
+    if (spaceInvitation) {
+      UserHandler uHandler = orgService.getUserHandler();
+      String senderFullName = uHandler.findUserByName(sender).getDisplayName();
+      emailBody = buildExternalEmailBody(senderFullName, space, redirectUrl.toString(), bundle);
+      emailSubject = senderFullName + " " + bundle.getString("external.email.subject") + " "
+          + brandingService.getCompanyName() + (space != null ? " : " + space : "");
+    } else {
+      emailBody = buildOnboardingEmailBody(null, bundle, redirectUrl.toString());
+      emailSubject = bundle.getString("onboarding.email.header") + " " + brandingService.getCompanyName();
+    }
 
     String senderName = MailUtils.getSenderName();
     String from = MailUtils.getSenderEmail();
@@ -251,15 +290,13 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     message.setSubject(emailSubject);
     message.setBody(emailBody);
     message.setMimeType("text/html");
+    mailService.sendMessage(message);
+    return token;
+  }
 
-    try {
-      mailService.sendMessage(message);
-    } catch (Exception ex) {
-      log.error("Failure to send external user email", ex);
-      return "";
-    }
-
-    return tokenId;
+  private String createToken(String email) {
+    Credentials credentials = new Credentials(email, "");
+    return remindPasswordTokenService.createToken(credentials, EXTERNAL_REGISTRATION_TOKEN);
   }
 
   private String buildExternalEmailBody(String sender, String space, String link, ResourceBundle bundle) {
@@ -289,7 +326,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
 
       StringBuilder redirectUrl = new StringBuilder();
       redirectUrl.append(url);
-      redirectUrl.append(ExternalRegistrationHandler.LOGIN);
+      redirectUrl.append(ExternalRegisterHandler.LOGIN);
 
       String emailBody = buildExternalConfirmationAccountEmailBody(user.getDisplayName(),
                                                                    user.getUserName(),
@@ -355,7 +392,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
 
     Credentials credentials = new Credentials(user.getUserName(), "");
-    String tokenId = remindPasswordTokenService.createToken(credentials, remindPasswordTokenService.FORGOT_PASSWORD_TOKEN);
+    String tokenId = remindPasswordTokenService.createToken(credentials, FORGOT_PASSWORD_TOKEN);
 
     Router router = webController.getRouter();
     Map<QualifiedName, String> params = new HashMap<>();
@@ -482,12 +519,12 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
   public String getExternalRegistrationURL(String tokenId, String lang) {
     Router router = webController.getRouter();
     Map<QualifiedName, String> params = new HashMap<>();
-    params.put(WebAppController.HANDLER_PARAM, ExternalRegistrationHandler.NAME);
+    params.put(WebAppController.HANDLER_PARAM, ExternalRegisterHandler.NAME);
     if (tokenId != null) {
-      params.put(ExternalRegistrationHandler.TOKEN, tokenId);
+      params.put(ExternalRegisterHandler.TOKEN, tokenId);
     }
     if (lang != null) {
-      params.put(ExternalRegistrationHandler.LANG, lang);
+      params.put(ExternalRegisterHandler.LANG, lang);
     }
     return router.render(params);
   }

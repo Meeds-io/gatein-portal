@@ -31,7 +31,7 @@
   <description>GateIn web security services</description>
 
   <properties>
-    <exo.test.coverage.ratio>0.23</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.40</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
@@ -79,13 +79,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.powermock</groupId>
-      <artifactId>powermock-module-junit4</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.powermock</groupId>
-      <artifactId>powermock-api-mockito2</artifactId>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-inline</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
