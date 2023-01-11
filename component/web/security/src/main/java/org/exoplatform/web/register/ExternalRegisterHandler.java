@@ -140,6 +140,8 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
 
   public static final String             ERROR_MESSAGE_PARAM                     = "error";
 
+  public static final String             ALREADY_AUTHENTICATED_MESSAGE_PARAM     = "authenticated";
+
   public static final String             TOKEN_ID_PARAM                          = "tokenId";
 
   public static final int                CAPTCHA_WIDTH                           = 200;
@@ -211,8 +213,10 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
     HttpServletRequest request = controllerContext.getRequest();
     HttpServletResponse response = controllerContext.getResponse();
 
+    Map<String, Object> parameters = new HashMap<>();
     if (request.getRemoteUser() != null) {
-      return false;
+      parameters.put(ALREADY_AUTHENTICATED_MESSAGE_PARAM, "true");
+      return dispatch(controllerContext, request, response, parameters);
     }
 
     Locale locale = request.getLocale();
@@ -240,7 +244,6 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
       return true;
     }
 
-    Map<String, Object> parameters = new HashMap<>();
     String requestAction = request.getParameter(REQ_PARAM_ACTION);
     String initialUri = request.getParameter(INITIAL_URI_PARAM);
     if (SAVE_EXTERNAL_ACTION.equalsIgnoreCase(requestAction)) {

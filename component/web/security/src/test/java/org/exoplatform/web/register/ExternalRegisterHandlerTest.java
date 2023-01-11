@@ -21,6 +21,7 @@ import static org.exoplatform.web.register.ExternalRegisterHandler.EMAIL_PARAM;
 import static org.exoplatform.web.register.ExternalRegisterHandler.ERROR_MESSAGE_PARAM;
 import static org.exoplatform.web.register.ExternalRegisterHandler.EXPIRED_ACTION_NAME;
 import static org.exoplatform.web.register.ExternalRegisterHandler.FIRSTNAME_PARAM;
+import static org.exoplatform.web.register.ExternalRegisterHandler.ALREADY_AUTHENTICATED_MESSAGE_PARAM;
 import static org.exoplatform.web.register.ExternalRegisterHandler.LASTNAME_PARAM;
 import static org.exoplatform.web.register.ExternalRegisterHandler.LOGIN;
 import static org.exoplatform.web.register.ExternalRegisterHandler.NAME;
@@ -420,6 +421,17 @@ public class ExternalRegisterHandlerTest {
     assertEquals("external.registration.fail.create.user", applicationParameters.get(ERROR_MESSAGE_PARAM));
 
     verify(passwordRecoveryService, never()).sendExternalConfirmationAccountEmail(any(), any(), any());
+  }
+
+  @Test
+  public void testDisplayExternalRegistrationWithInfoWhenAlreadyLoggedIn() throws Exception {
+    prepareResetPasswordContext();
+
+    when(request.getRemoteUser()).thenReturn("username");
+
+    externalRegisterHandler.execute(controllerContext);
+
+    assertEquals("true", applicationParameters.get(ALREADY_AUTHENTICATED_MESSAGE_PARAM));
   }
 
   @Test
