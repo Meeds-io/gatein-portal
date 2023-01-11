@@ -245,4 +245,12 @@ public interface DataStorage {
       throw new UnsupportedOperationException();
     }
 
+    default boolean isChecksumChanged(String path, String xml) {
+      throw new UnsupportedOperationException();
+    }
+
+    default void saveChecksum(String path, String xml) {
+      throw new UnsupportedOperationException();
+    }
+
 }

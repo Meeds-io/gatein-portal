@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -76,13 +76,13 @@ public class NewPortalConfigListenerTest {
                                                                                   userACL,
                                                                                   localeConfigService);
 
-    newPortalConfigListener.createdOwners.add("global");
-    HashSet<String> predefinedOwner = new HashSet<>();
-    predefinedOwner.add("global");
+    String predefinedOwner = "global";
+
+    HashSet<String> predefinedOwners = new HashSet<>();
+    predefinedOwners.add(predefinedOwner);
 
     NewPortalConfig newPortalConfig = mock(NewPortalConfig.class);
 
-    when(newPortalConfig.getPredefinedOwner()).thenReturn(predefinedOwner);
     when(newPortalConfig.getImportMode()).thenReturn("overwrite");
     when(newPortalConfig.getOwnerType()).thenReturn(PortalConfig.PORTAL_TYPE);
 
@@ -95,7 +95,7 @@ public class NewPortalConfigListenerTest {
 
     when(pageService.loadPages(any(SiteKey.class))).thenReturn(allPages);
 
-    newPortalConfigListener.initPageDB(newPortalConfig);
+    newPortalConfigListener.createPage(newPortalConfig, predefinedOwner);
 
     verify(pageService, times(1)).destroyPage(pageKey);
 
@@ -103,7 +103,7 @@ public class NewPortalConfigListenerTest {
 
     when(newPortalConfig.getImportMode()).thenReturn("merge");
 
-    newPortalConfigListener.initPageDB(newPortalConfig);
+    newPortalConfigListener.createPage(newPortalConfig, predefinedOwner);
 
     verify(pageService, times(0)).destroyPage(pageKey);
   }

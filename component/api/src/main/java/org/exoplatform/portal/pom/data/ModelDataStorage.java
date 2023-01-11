@@ -99,4 +99,8 @@ public interface ModelDataStorage {
 
     void saveImportStatus(Status status);
 
+    boolean isChecksumChanged(String path, String xml);
+
+    void saveChecksum(String path, String xml);
+
 }

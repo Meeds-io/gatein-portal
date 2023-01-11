@@ -48,7 +48,6 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.resources.LocaleConfigService;
 
 /**
  * Created by The eXo Platform SAS Apr 19, 2007 This service is used to load the PortalConfig, Page config and Navigation config
@@ -124,7 +123,7 @@ public class UserPortalConfigService implements Startable {
 
         //
         ValueParam defaultImportModeParam = params == null ? null : params.getValueParam("default.import.mode");
-        ImportMode defaultImportMode = defaultImportModeParam == null ? ImportMode.CONSERVE : ImportMode
+        ImportMode defaultImportMode = defaultImportModeParam == null ? ImportMode.AUTO : ImportMode
                 .valueOf(defaultImportModeParam.getValue().toUpperCase().trim());
 
         //

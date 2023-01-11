@@ -21,6 +21,7 @@ package org.exoplatform.portal.mop.jdbc.service;
 import java.io.*;
 import java.util.*;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.gatein.common.io.IOTools;
 import org.jibx.runtime.BindingDirectory;
@@ -56,6 +57,8 @@ import org.exoplatform.services.log.Log;
 public class JDBCModelStorageImpl implements ModelDataStorage {
 
   private static final String  IMPORTED_STATUS = Status.class.getName();
+
+  private static final String  CHECKSUM_KEY    = "checksum";
 
   private SiteDAO              siteDAO;
 
@@ -405,6 +408,28 @@ public class JDBCModelStorageImpl implements ModelDataStorage {
                        Scope.GLOBAL.id(null),
                        IMPORTED_STATUS,
                        SettingValue.create(String.valueOf(status.status())));
+  }
+
+  @Override
+  public boolean isChecksumChanged(String path, String xml) {
+    SettingValue<?> checksumValue = settingService.get(Context.GLOBAL,
+                                                       Scope.APPLICATION.id("MOP"),
+                                                       CHECKSUM_KEY + path);
+    String checksum = checksumValue == null || checksumValue.getValue() == null ? null : checksumValue.getValue().toString();
+    if (StringUtils.isNotBlank(checksum)) {
+      String currentChecksum = DigestUtils.md5Hex(xml);
+      return StringUtils.equalsIgnoreCase(checksum, currentChecksum);
+    }
+    return false;
+  }
+
+  @Override
+  public void saveChecksum(String path, String xml) {
+    String checksum = DigestUtils.md5Hex(xml);
+    settingService.set(Context.GLOBAL,
+                       Scope.APPLICATION.id("MOP"),
+                       CHECKSUM_KEY + path,
+                       SettingValue.create(checksum));
   }
 
   private PageData buildPageData(PageEntity entity) throws Exception {

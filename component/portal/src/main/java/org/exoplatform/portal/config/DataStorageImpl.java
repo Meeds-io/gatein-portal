@@ -297,4 +297,14 @@ public class DataStorageImpl implements DataStorage {
     public void saveImportStatus(Status status) {
       delegate.saveImportStatus(status);
     }
+
+    @Override
+    public boolean isChecksumChanged(String path, String xml) {
+      return delegate.isChecksumChanged(path, xml);
+    }
+
+    @Override
+    public void saveChecksum(String path, String xml) {
+      delegate.saveChecksum(path, xml);
+    }
 }

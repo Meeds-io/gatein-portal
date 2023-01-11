@@ -44,7 +44,13 @@ public enum ImportMode {
     /**
      * Overwrite data whatsoever.
      */
-    OVERWRITE(new ImportConfig(true, true, true));
+    OVERWRITE(new ImportConfig(true, true, true)),
+
+    /**
+     * Auto which is similar to MERGE except that it will
+     * be re-imported only when files changed
+     */
+    AUTO(new ImportConfig(false, true, true));
 
     /** . */
     public final ImportConfig config;
