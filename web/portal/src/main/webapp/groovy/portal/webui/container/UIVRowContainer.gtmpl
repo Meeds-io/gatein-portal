@@ -30,7 +30,7 @@
 
   if (!uiPortalApp.isEditing()) {
 %>
-<div id="${uicomponent.id}" class="row ma-0 border-box-sizing <%=uiComponentClass%>" ${cssStyle}>
+<div id="${uicomponent.id}" class="row ma-n3 border-box-sizing <%=uiComponentClass%>" ${cssStyle}>
   <%uicomponent.renderChildren();%>
 </div>
 <%
@@ -38,7 +38,7 @@
      def reqJS = rcontext.getJavascriptManager().require("SHARED/portal", "portal");
      reqJS.addScripts("portal.UIPortal.initMouseHover('" + uicomponent.id + "');");
     %>
-<div class="UIContainer row ma-0 border-box-sizing <%=uiComponentClass%> EdittingContainer<%=uicomponent.getPermissionClasses()%>" id="${uicomponent.id}" ${cssStyle}>
+<div class="UIContainer row ma-n3 border-box-sizing <%=uiComponentClass%> EdittingContainer<%=uicomponent.getPermissionClasses()%>" id="${uicomponent.id}" ${cssStyle}>
   <div class="NormalContainerBlock UIComponentBlock">
     <div class="LAYOUT-CONTAINER LAYOUT-BLOCK">
       <div class="UIIntermediateContainer">
