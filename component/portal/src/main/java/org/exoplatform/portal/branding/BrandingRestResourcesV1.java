@@ -153,8 +153,9 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
       @ApiResponse(responseCode = "404", description = "Branding favicon not found"),
       @ApiResponse(responseCode = "500", description = "Server error when retrieving branding favicon")
   })
-  public Response getBrandingFavicon(@Context
-  Request request,
+  public Response getBrandingFavicon(
+                                     @Context
+                                     Request request,
                                      @Parameter(description = "The value of lastModified parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'")
                                      @QueryParam("lastModified")
                                      String lastModified,
