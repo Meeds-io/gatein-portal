@@ -39,8 +39,6 @@ public interface BrandingService {
 
   Logo getLogo();
 
-  Logo getDefaultLogo();
-
   /**
    * @return configured custom {@link Favicon} else returns default one
    */
@@ -50,11 +48,6 @@ public interface BrandingService {
    * @return {@link Favicon} URL to retrieve favicon image
    */
   String getFaviconPath();
-
-  /**
-   * @return default configured {@link Favicon}
-   */
-  Favicon getDefaultFavicon();
 
   void updateTopBarTheme(String style);
 

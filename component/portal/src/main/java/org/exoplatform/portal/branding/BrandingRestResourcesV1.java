@@ -231,35 +231,4 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
     return builder.cacheControl(cc).build();
   }
 
-  @GET
-  @Path("/defaultLogo")
-  @RolesAllowed("users")
-  @Operation(
-          summary = "Get Branding default logo",
-          description = "Get Branding default logo",
-          method = "GET")
-  @ApiResponses(value = {
-          @ApiResponse(responseCode = "200", description = "Branding default logo retrieved"),
-          @ApiResponse(responseCode = "404", description = "Branding default logo not found"),
-          @ApiResponse(responseCode = "500", description = "Server error when retrieving branding default logo") })
-  public Response getBrandingDefaultLogo(@Context Request request) {
-    Logo logo = brandingService.getDefaultLogo();
-    if (logo == null) {
-      throw new WebApplicationException(Response.Status.NOT_FOUND);
-    }
-    //
-    long lastUpdated = logo.getUpdatedDate();
-    EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
-    //
-    Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
-    if (builder == null) {
-      InputStream stream = new ByteArrayInputStream(logo.getData());
-      builder = Response.ok(stream, IMAGE_MIME_TYPE);
-      builder.tag(eTag);
-    }
-    CacheControl cc = new CacheControl();
-    cc.setMaxAge(86400);
-    builder.cacheControl(cc);
-    return builder.cacheControl(cc).build();
-  }
 }

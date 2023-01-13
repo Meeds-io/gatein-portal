@@ -47,9 +47,10 @@ import org.exoplatform.upload.UploadService;
 
 @SuppressWarnings("unchecked")
 public class BrandingServiceImpl implements BrandingService, Startable {
-  private static final String BRANDING_FAVICON_BASE_PATH = "/portal/rest/v1/platform/branding/favicon?v=";
 
   private static final Log     LOG                               = ExoLogger.getExoLogger(BrandingServiceImpl.class);
+
+  public static final String   BRANDING_FAVICON_BASE_PATH        = "/portal/rest/v1/platform/branding/favicon?v=";
 
   public static final String   BRANDING_COMPANY_NAME_INIT_PARAM  = "exo.branding.company.name";
 
@@ -337,7 +338,6 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     return BRANDING_FAVICON_BASE_PATH + Objects.hash(brandingFavicon.getUpdatedDate());
   }
 
-  @Override
   public Logo getDefaultLogo() {
     if (this.logo == null || this.logo.getData() == null) {
       String logoPath = defaultConfiguredLogoPath;
@@ -362,7 +362,6 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     return this.logo;
   }
 
-  @Override
   public Favicon getDefaultFavicon() {
     if (this.favicon == null || this.favicon.getData() == null) {
       String faviconPath = defaultConfiguredFaviconPath;

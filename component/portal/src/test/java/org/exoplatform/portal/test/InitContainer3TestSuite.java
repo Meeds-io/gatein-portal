@@ -1,8 +1,6 @@
 /*
  * This file is part of the Meeds project (https://meeds.io/).
- *
  * Copyright (C) 2020 - 2023 Meeds Association contact@meeds.io
- *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -15,35 +13,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package org.exoplatform.portal.branding;
+package org.exoplatform.portal.test;
 
-import java.io.Serializable;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.exoplatform.portal.config.TestImportNavigationConserve;
 
-@NoArgsConstructor
-@AllArgsConstructor
-public class Favicon implements Serializable {
-
-  private static final long serialVersionUID = 2846145296185073958L;
-
-  @Getter
-  @Setter
-  private String            uploadId;
-
-  @Getter
-  @Setter
-  private long              size;
-
-  @Getter
-  @Setter
-  private byte[]            data;
-
-  @Getter
-  @Setter
-  private long              updatedDate;
+@RunWith(Suite.class)
+@SuiteClasses({
+  TestImportNavigationConserve.class,
+})
+public class InitContainer3TestSuite {
 
 }
