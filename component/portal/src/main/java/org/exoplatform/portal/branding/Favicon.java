@@ -19,36 +19,31 @@ package org.exoplatform.portal.branding;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@XmlRootElement
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Logo implements Serializable {
+public class Favicon implements Serializable {
 
-  private static final long serialVersionUID = 5444110675143558828L;
-
-  @Getter
-  @Setter
-  private String uploadId;
+  private static final long serialVersionUID = 2846145296185073958L;
 
   @Getter
   @Setter
-  private long   size;
+  private String            uploadId;
 
   @Getter
   @Setter
-  private byte[] data;
+  private long              size;
 
   @Getter
   @Setter
-  private long updatedDate;
+  private byte[]            data;
+
+  @Getter
+  @Setter
+  private long              updatedDate;
 
 }
