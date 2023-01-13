@@ -1,87 +1,62 @@
+/*
+ * This file is part of the Meeds project (https://meeds.io/).
+ *
+ * Copyright (C) 2020 - 2023 Meeds Association contact@meeds.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
 package org.exoplatform.portal.branding;
 
 import java.io.Serializable;
 import java.util.*;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class Branding implements Serializable {
 
-  private static final long serialVersionUID = 625471892955717717L;
+  private static final long   serialVersionUID = 625471892955717717L;
 
-  private String companyName;
+  @Getter
+  @Setter
+  private String              companyName;
 
-  private String siteName;
+  @Getter
+  @Setter
+  private String              siteName;
 
-  private String companyLink;
+  @Getter
+  @Setter
+  private String              companyLink;
 
-  private String topBarTheme;
+  @Getter
+  @Setter
+  private String              topBarTheme;
 
-  private Logo logo;
+  @Getter
+  @Setter
+  private Logo                logo;
 
+  @Getter
+  @Setter
+  private Favicon             favicon;
+
+  @Getter
+  @Setter
   private Map<String, String> themeColors      = new HashMap<>();
 
+  @Getter
+  @Setter
   private long                lastUpdatedTime;
 
-  public Branding() {
-  }
-
-  public String getCompanyName() {
-    return companyName;
-  }
-
-  public void setCompanyName(String companyName) {
-    this.companyName = companyName;
-  }
-
-  public String getCompanyLink() {
-    return companyLink;
-  }
-
-  public void setCompanyLink(String companyLink) {
-    this.companyLink = companyLink;
-  }
-
-  public String getSiteName() {
-    return siteName;
-  }
-
-  public void setSiteName(String siteName) {
-    this.siteName = siteName;
-  }
-
-  public String getTopBarTheme() {
-    return topBarTheme;
-  }
-
-  public void setTopBarTheme(String topBarTheme) {
-    this.topBarTheme = topBarTheme;
-  }
-  
-  public Logo getLogo() {
-    return logo;
-  }
-  
-  public void setLogo(Logo logo) {
-    this.logo = logo;
-  }
-
-  public Map<String, String> getThemeColors() {
-    return themeColors;
-  }
-
-  public void setThemeColors(Map<String, String> themeColors) {
-    this.themeColors = themeColors;
-  }
-
-  public long getLastUpdatedTime() {
-    return lastUpdatedTime;
-  }
-
-  public void setLastUpdatedTime(long lastUpdatedTime) {
-    this.lastUpdatedTime = lastUpdatedTime;
-  }
-
-  @Override
-  public String toString() {
-    return "Branding [companyName=" + companyName + ", topBarTheme=" + topBarTheme + "]";
-  }
 }

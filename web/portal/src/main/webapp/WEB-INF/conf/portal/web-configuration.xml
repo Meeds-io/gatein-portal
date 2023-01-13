@@ -93,12 +93,12 @@
   <external-component-plugins>
     <target-component>org.exoplatform.web.filter.ExtensibleFilter</target-component>
     <component-plugin>
-      <name>Facicon And JSP filter Plugin</name>
+      <name>JSP filter Plugin</name>
       <set-method>addFilterDefinitions</set-method>
       <type>org.exoplatform.web.filter.FilterDefinitionPlugin</type>
       <init-params>
         <object-param>
-          <name>Facicon And JSP Filter</name>
+          <name>JSP Filter</name>
           <object type="org.exoplatform.web.filter.FilterDefinition">
             <field name="filter">
               <object type="org.exoplatform.web.filter.RedefinableResourceFilter"/>
@@ -107,9 +107,6 @@
               <collection type="java.util.ArrayList" item-type="java.lang.String">
                 <value>
                   <string>.*/.*\.jsp</string>
-                </value>
-                <value>
-                  <string>.*/favicon\.ico</string>
                 </value>
               </collection>
             </field>
