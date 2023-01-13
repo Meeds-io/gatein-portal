@@ -44,7 +44,7 @@ import org.exoplatform.portal.mop.navigation.Scope;
 @ConfiguredBy({})
 public abstract class AbstractImportTest extends AbstractConfigTest {
 
-  private PortalContainer container;
+  private static PortalContainer container;
 
   protected abstract ImportMode getMode();
 
@@ -70,12 +70,18 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
 
   @Override
   protected void beforeClass() {
-    // Avoid starting container
+    if (container != null) {
+      RootContainer.getInstance().stop();
+      ExoContainerContext.setCurrentContainer(null);
+    }
   }
 
   @Override
   protected void afterClass() {
-    // Avoid starting container
+    if (container != null) {
+      RootContainer.getInstance().stop();
+      ExoContainerContext.setCurrentContainer(null);
+    }
   }
 
   @Override
@@ -176,13 +182,14 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
     if (portalContainer != null) {
       RootContainer.getInstance().stop();
       ExoContainerContext.setCurrentContainer(null);
+      container = null;
     }
   }
 
   protected void bootContainer(KernelBootstrap bootstrap) {
     bootstrap.boot();
-    this.container = bootstrap.getContainer();
-    ExoContainerContext.setCurrentContainer(this.container);
+    container = bootstrap.getContainer();
+    ExoContainerContext.setCurrentContainer(container);
   }
 
   protected KernelBootstrap startContainer(boolean importFile0, boolean importFile1, boolean importFile2, boolean importFile3) {

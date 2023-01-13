@@ -1,8 +1,6 @@
 /*
  * This file is part of the Meeds project (https://meeds.io/).
- *
  * Copyright (C) 2020 - 2023 Meeds Association contact@meeds.io
- *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -17,38 +15,17 @@
  */
 package org.exoplatform.portal.branding;
 
-import java.io.Serializable;
+import org.exoplatform.container.PortalContainer;
 
-import javax.xml.bind.annotation.XmlRootElement;
+public class Utils {
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+  private Utils() {
+    // Utils class, no instance allowed
+  }
 
-@XmlRootElement
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Logo implements Serializable {
-
-  private static final long serialVersionUID = 5444110675143558828L;
-
-  @Getter
-  @Setter
-  private String uploadId;
-
-  @Getter
-  @Setter
-  private long   size;
-
-  @Getter
-  @Setter
-  private byte[] data;
-
-  @Getter
-  @Setter
-  private long updatedDate;
+  public static String getFaviconPath() {
+    BrandingService brandingService = PortalContainer.getInstance().getComponentInstanceOfType(BrandingService.class);
+    return brandingService.getFaviconPath();
+  }
 
 }
