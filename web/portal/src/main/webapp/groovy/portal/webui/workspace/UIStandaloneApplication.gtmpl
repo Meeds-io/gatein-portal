@@ -45,7 +45,7 @@
 		 	<meta name="<%=metaName%>" content="<%=metaContent%>" />
 		<% } } %>
 
-		<link rel="shortcut icon" type="image/x-icon"	href="<%=docBase%>/favicon.ico" />
+		<link rel="shortcut icon" type="image/x-icon"	href="<%= org.exoplatform.portal.branding.Utils.getFaviconPath() %>" />
 		<%for(skinConfig in portalSkins) {
 		def url = skinConfig.createURL(rcontext.controllerContext);
 		url.setOrientation(orientation);
