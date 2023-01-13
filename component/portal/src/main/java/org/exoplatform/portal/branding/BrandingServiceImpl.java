@@ -47,6 +47,8 @@ import org.exoplatform.upload.UploadService;
 
 @SuppressWarnings("unchecked")
 public class BrandingServiceImpl implements BrandingService, Startable {
+  private static final String BRANDING_FAVICON_BASE_PATH = "/portal/rest/v1/platform/branding/favicon?v=";
+
   private static final Log     LOG                               = ExoLogger.getExoLogger(BrandingServiceImpl.class);
 
   public static final String   BRANDING_COMPANY_NAME_INIT_PARAM  = "exo.branding.company.name";
@@ -73,13 +75,19 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   public static final String   BRANDING_LOGO_ID_SETTING_KEY      = "exo.branding.company.id";
 
+  public static final String   BRANDING_FAVICON_ID_SETTING_KEY      = "exo.branding.company.favicon.id";
+
   public static final String   BRANDING_LAST_UPDATED_TIME_KEY    = "branding.lastUpdatedTime";
 
   public static final String   FILE_API_NAME_SPACE               = "CompanyBranding";
 
   public static final String   LOGO_NAME                         = "logo.png";
 
-  public static final String   BRANDING_DEFAULT_LOGO_PATH        = "/images/logo/DefaultLogo.png";
+  public static final String   FAVICON_NAME                      = "favicon.ico";
+
+  public static final String   BRANDING_DEFAULT_LOGO_PATH        = "/skin/images/logo/DefaultLogo.png";
+
+  public static final String   BRANDING_DEFAULT_FAVICON_PATH     = "/skin/images/favicon.ico";
 
   public static final Context  BRANDING_CONTEXT                  = Context.GLOBAL.id("BRANDING");
 
@@ -105,6 +113,8 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   private String               defaultConfiguredLogoPath         = null;
 
+  private String               defaultConfiguredFaviconPath      = null;
+
   private String               lessFilePath                      = null;
 
   private Map<String, String>  themeVariables                    = null;
@@ -112,8 +122,10 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   private String               lessThemeContent                  = null;
 
   private String               themeCSSContent                   = null;
-  
-  private Logo                 logo                       = null;
+
+  private Logo                 logo                              = null;
+
+  private Favicon              favicon                           = null;
 
   public BrandingServiceImpl(ConfigurationManager configurationManager,
                              SettingService settingService,
@@ -156,6 +168,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     branding.setSiteName(getSiteName());
     branding.setTopBarTheme(getTopBarTheme());
     branding.setLogo(getLogo());
+    branding.setFavicon(getFavicon());
     branding.setThemeColors(getThemeColors());
     branding.setLastUpdatedTime(getLastUpdatedTime());
     return branding;
@@ -178,6 +191,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
       updateCompanyLink(branding.getCompanyLink(), false);
       updateTopBarTheme(branding.getTopBarTheme(), false);
       updateLogo(branding.getLogo(), false);
+      updateFavicon(branding.getFavicon(), false);
       updateThemeColors(branding.getThemeColors(), false);
     } finally {
       updateLastUpdatedTime(System.currentTimeMillis());
@@ -260,6 +274,18 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   }
 
   @Override
+  public Long getFaviconId() {
+    SettingValue<String> faviconId = (SettingValue<String>) settingService.get(Context.GLOBAL,
+                                                                            Scope.GLOBAL,
+                                                                            BRANDING_FAVICON_ID_SETTING_KEY);
+    if (faviconId != null && faviconId.getValue() != null) {
+      return Long.parseLong(faviconId.getValue());
+    } else {
+      return null;
+    }
+  }
+
+  @Override
   public Logo getLogo() {
     if (this.logo == null) {
       Long imageId = getLogoId();
@@ -283,6 +309,35 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   }
 
   @Override
+  public Favicon getFavicon() {
+    if (this.favicon == null) {
+      Long imageId = getFaviconId();
+      if (imageId != null) {
+        try {
+          FileItem fileItem = fileService.getFile(imageId);
+          if (fileItem != null) {
+            Favicon storedFavicon = new Favicon();
+            storedFavicon.setData(fileItem.getAsByte());
+            storedFavicon.setSize(fileItem.getFileInfo().getSize());
+            storedFavicon.setUpdatedDate(fileItem.getFileInfo().getUpdatedDate().getTime());
+            this.favicon = storedFavicon;
+            return this.favicon;
+          }
+        } catch (FileStorageException e) {
+          LOG.error("Error while retrieving branding logo", e);
+        }
+      }
+    }
+    return this.getDefaultFavicon();
+  }
+
+  @Override
+  public String getFaviconPath() {
+    Favicon brandingFavicon = getFavicon();
+    return BRANDING_FAVICON_BASE_PATH + Objects.hash(brandingFavicon.getUpdatedDate());
+  }
+
+  @Override
   public Logo getDefaultLogo() {
     if (this.logo == null || this.logo.getData() == null) {
       String logoPath = defaultConfiguredLogoPath;
@@ -292,12 +347,12 @@ public class BrandingServiceImpl implements BrandingService, Startable {
       try {
         File file = new File(logoPath);
         if (file.exists()) {
-          this.logo = new Logo(null, Files.readAllBytes(file.toPath()), file.length(), file.lastModified());
+          this.logo = new Logo(null, file.length(), Files.readAllBytes(file.toPath()), file.lastModified());
         } else {
           InputStream is = PortalContainer.getInstance().getPortalContext().getResourceAsStream(logoPath);
           if (is != null) {
             byte[] streamContentAsBytes = IOUtil.getStreamContentAsBytes(is);
-            this.logo = new Logo(null, streamContentAsBytes, streamContentAsBytes.length, DEFAULT_LAST_MODIFED);
+            this.logo = new Logo(null, streamContentAsBytes.length, streamContentAsBytes, DEFAULT_LAST_MODIFED);
           }
         }
       } catch (Exception e) {
@@ -305,6 +360,31 @@ public class BrandingServiceImpl implements BrandingService, Startable {
       }
     }
     return this.logo;
+  }
+
+  @Override
+  public Favicon getDefaultFavicon() {
+    if (this.favicon == null || this.favicon.getData() == null) {
+      String faviconPath = defaultConfiguredFaviconPath;
+      if (StringUtils.isBlank(faviconPath)) {
+        faviconPath = BRANDING_DEFAULT_FAVICON_PATH;
+      }
+      try {
+        File file = new File(faviconPath);
+        if (file.exists()) {
+          this.favicon = new Favicon(null, file.length(), Files.readAllBytes(file.toPath()), file.lastModified());
+        } else {
+          InputStream is = PortalContainer.getInstance().getPortalContext().getResourceAsStream(faviconPath);
+          if (is != null) {
+            byte[] streamContentAsBytes = IOUtil.getStreamContentAsBytes(is);
+            this.favicon = new Favicon(null, streamContentAsBytes.length, streamContentAsBytes, DEFAULT_LAST_MODIFED);
+          }
+        }
+      } catch (Exception e) {
+        LOG.warn("The file of the default configured favicon cannot be retrieved (" + faviconPath + ")", e);
+      }
+    }
+    return this.favicon;
   }
 
   @Override
@@ -514,6 +594,63 @@ public class BrandingServiceImpl implements BrandingService, Startable {
         }
       } catch (Exception e) {
         throw new IllegalStateException("Error while updating logo", e);
+      }
+    }
+    if (updateLastUpdatedTime) {
+      updateLastUpdatedTime(System.currentTimeMillis());
+    }
+  }
+
+  private void updateFavicon(Favicon favicon, boolean updateLastUpdatedTime) {
+    this.favicon = null;
+    if (favicon == null || ((favicon.getData() == null || favicon.getData().length <= 0) && StringUtils.isBlank(favicon.getUploadId()))) {
+      Long faviconId = this.getFaviconId();
+      if (faviconId != null) {
+        fileService.deleteFile(faviconId);
+        settingService.remove(Context.GLOBAL, Scope.GLOBAL, BRANDING_FAVICON_ID_SETTING_KEY);
+      }
+    } else {
+      try {
+        InputStream inputStream;
+        if (favicon.getData() != null && favicon.getData().length > 0) {
+          inputStream = new ByteArrayInputStream(favicon.getData());
+        } else if (StringUtils.isNoneBlank(favicon.getUploadId())) {
+          inputStream = getUploadDataAsStream(favicon.getUploadId());
+        } else {
+          throw new IllegalArgumentException("Cannot update branding favicon, the favicon object must contain the image data or an upload id");
+        }
+        String currentUserId = getCurrentUserId();
+        FileItem fileItem;
+        Long faviconId = this.getFaviconId();
+        if (faviconId == null) {
+          fileItem = new FileItem(null,
+                                  FAVICON_NAME,
+                                  "image/png",
+                                  FILE_API_NAME_SPACE,
+                                  favicon.getSize(),
+                                  new Date(),
+                                  currentUserId,
+                                  false,
+                                  inputStream);
+          fileItem = fileService.writeFile(fileItem);
+          settingService.set(Context.GLOBAL,
+                             Scope.GLOBAL,
+                             BRANDING_FAVICON_ID_SETTING_KEY,
+                             SettingValue.create(String.valueOf(fileItem.getFileInfo().getId())));
+        } else {
+          fileItem = new FileItem(faviconId,
+                                  FAVICON_NAME,
+                                  "image/png",
+                                  FILE_API_NAME_SPACE,
+                                  favicon.getSize(),
+                                  new Date(),
+                                  currentUserId,
+                                  false,
+                                  inputStream);
+          fileService.updateFile(fileItem);
+        }
+      } catch (Exception e) {
+        throw new IllegalStateException("Error while updating favicon", e);
       }
     }
     if (updateLastUpdatedTime) {

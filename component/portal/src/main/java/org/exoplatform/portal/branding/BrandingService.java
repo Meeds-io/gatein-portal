@@ -2,6 +2,8 @@ package org.exoplatform.portal.branding;
 
 import java.util.Map;
 
+import org.exoplatform.commons.file.model.FileItem;
+
 public interface BrandingService {
 
   Branding getBrandingInformation();
@@ -30,9 +32,29 @@ public interface BrandingService {
 
   Long getLogoId();
 
+  /**
+   * @return Branding Favicon {@link FileItem} technical identifier
+   */
+  Long getFaviconId();
+
   Logo getLogo();
 
   Logo getDefaultLogo();
+
+  /**
+   * @return configured custom {@link Favicon} else returns default one
+   */
+  Favicon getFavicon();
+
+  /**
+   * @return {@link Favicon} URL to retrieve favicon image
+   */
+  String getFaviconPath();
+
+  /**
+   * @return default configured {@link Favicon}
+   */
+  Favicon getDefaultFavicon();
 
   void updateTopBarTheme(String style);
 

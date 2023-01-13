@@ -1,9 +1,21 @@
 package org.exoplatform.portal.branding;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @XmlRootElement
-public class Logo {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Logo implements Serializable {
+
+  private static final long serialVersionUID = 5444110675143558828L;
+
   private String uploadId;
 
   private long   size;
@@ -12,45 +24,4 @@ public class Logo {
 
   private long updatedDate;
 
-  public Logo() {
-  }
-
-  public Logo(String uploadId, byte[] data, long size, long updatedDate) {
-    this.uploadId = uploadId;
-    this.size = size;
-    this.data = data;
-    this.updatedDate = updatedDate;
-  }
-
-  public String getUploadId() {
-    return uploadId;
-  }
-
-  public void setUploadId(String uploadId) {
-    this.uploadId = uploadId;
-  }
-
-  public long getSize() {
-    return size;
-  }
-
-  public void setSize(long size) {
-    this.size = size;
-  }
-
-  public byte[] getData() {
-    return data;
-  }
-
-  public void setData(byte[] data) {
-    this.data = data;
-  }
-
-  public long getUpdatedDate() {
-    return updatedDate;
-  }
-
-  public void setUpdatedDate(long updatedDate) {
-    this.updatedDate = updatedDate;
-  }
 }
