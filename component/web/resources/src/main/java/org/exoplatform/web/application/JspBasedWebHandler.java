@@ -143,6 +143,7 @@ public abstract class JspBasedWebHandler extends WebRequestHandler {
 
     request.setAttribute("brandingPrimaryColor", brandingPrimaryColor);
     request.setAttribute("brandingThemeUrl", brandingThemeUrl);
+    request.setAttribute("brandingFavicon", brandingService.getFaviconPath());
 
     List<String> skinUrls = getPageSkins(context, additionalCSSModules, localeConfig.getOrientation());
     request.setAttribute("skinUrls", skinUrls);

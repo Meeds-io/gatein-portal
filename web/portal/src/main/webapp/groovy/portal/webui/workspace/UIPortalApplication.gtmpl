@@ -79,7 +79,7 @@
 
     <% _ctx.includeTemplates("UIPortalApplication-Start-head") %>
 
-    <link rel="shortcut icon" type="image/x-icon"  href="<%=docBase%>/favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon"  href="<%= org.exoplatform.portal.branding.Utils.getFaviconPath() %>" />
 
     <!-- Styles -->
     <link id="brandingSkin" rel="stylesheet" type="text/css" href="<%=uicomponent.getBrandingUrl()%>">

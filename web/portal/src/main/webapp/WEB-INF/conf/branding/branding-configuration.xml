@@ -20,7 +20,11 @@
       </value-param>
       <value-param>
         <name>exo.branding.company.logo</name>
-        <value>${exo.branding.company.logo:/images/logo/MeedsLogo.png}</value>
+        <value>${exo.branding.company.logo:/skin/images/logo/DefaultLogo.png}</value>
+      </value-param>
+      <value-param>
+        <name>exo.branding.company.favicon</name>
+        <value>${exo.branding.company.favicon:/skin/images/favicon.ico}</value>
       </value-param>
       <value-param>
         <name>exo.branding.theme.path</name>
