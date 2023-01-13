@@ -23,7 +23,9 @@ import java.util.List;
 
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.component.test.KernelBootstrap;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.RootContainer;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.importer.ImportMode;
@@ -35,7 +37,7 @@ import org.exoplatform.portal.mop.navigation.*;
  */
 public abstract class AbstractImportTest extends AbstractConfigTest {
 
-  private PortalContainer container;
+  private static PortalContainer container;
 
   protected abstract ImportMode getMode();
 
@@ -61,12 +63,18 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
 
   @Override
   protected void beforeClass() {
-    // Avoid starting container
+    if (container != null) {
+      RootContainer.getInstance().stop();
+      ExoContainerContext.setCurrentContainer(null);
+    }
   }
 
   @Override
   protected void afterClass() {
-    // Avoid starting container
+    if (container != null) {
+      RootContainer.getInstance().stop();
+      ExoContainerContext.setCurrentContainer(null);
+    }
   }
 
   @Override
@@ -93,7 +101,7 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
 
     //
     bootstrap.boot();
-    this.container = bootstrap.getContainer();
+    container = bootstrap.getContainer();
     NavigationService service = container.getComponentInstanceOfType(NavigationService.class);
     begin();
     try {
@@ -123,7 +131,7 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
     //
     System.setProperty("import.portal.1", getConfig1());
     bootstrap.boot();
-    this.container = bootstrap.getContainer();
+    container = bootstrap.getContainer();
     NavigationService service = container.getComponentInstanceOfType(NavigationService.class);
     begin();
     try {
@@ -168,4 +176,49 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
     }
     dataStorage.saveImportStatus(Status.WANT_REIMPORT);
   }
+
+  protected void stopContainer(KernelBootstrap bootstrap) {
+    if (bootstrap != null) {
+      bootstrap.dispose();
+    }
+    PortalContainer portalContainer = PortalContainer.getInstanceIfPresent();
+    if (portalContainer != null) {
+      RootContainer.getInstance().stop();
+      ExoContainerContext.setCurrentContainer(null);
+      container = null;
+    }
+  }
+
+  protected void bootContainer(KernelBootstrap bootstrap) {
+    bootstrap.boot();
+    container = bootstrap.getContainer();
+    ExoContainerContext.setCurrentContainer(container);
+  }
+
+  protected KernelBootstrap startContainer(boolean importFile0, boolean importFile1, boolean importFile2, boolean importFile3) {
+    PortalContainer portalContainer = PortalContainer.getInstanceIfPresent();
+    if (portalContainer != null) {
+      RootContainer.getInstance().stop();
+      ExoContainerContext.setCurrentContainer(null);
+    }
+
+    KernelBootstrap bootstrap = new KernelBootstrap();
+    bootstrap.addConfiguration(ContainerScope.ROOT, "conf/configuration.xml");
+    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/portal/configuration.xml");
+    bootstrap.addConfiguration(ContainerScope.PORTAL, "conf/exo.portal.component.portal-configuration-local.xml");
+    if (importFile0) {
+      bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport0-configuration.xml");
+    }
+    if (importFile1) {
+      bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport1-configuration.xml");
+    }
+    if (importFile2) {
+      bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport2-configuration.xml");
+    }
+    if (importFile3) {
+      bootstrap.addConfiguration(ContainerScope.PORTAL, "org/exoplatform/portal/config/TestImport3-configuration.xml");
+    }
+    return bootstrap;
+  }
+
 }

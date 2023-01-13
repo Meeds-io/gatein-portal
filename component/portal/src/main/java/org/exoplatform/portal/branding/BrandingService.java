@@ -2,6 +2,8 @@ package org.exoplatform.portal.branding;
 
 import java.util.Map;
 
+import org.exoplatform.commons.file.model.FileItem;
+
 public interface BrandingService {
 
   Branding getBrandingInformation();
@@ -30,9 +32,22 @@ public interface BrandingService {
 
   Long getLogoId();
 
+  /**
+   * @return Branding Favicon {@link FileItem} technical identifier
+   */
+  Long getFaviconId();
+
   Logo getLogo();
 
-  Logo getDefaultLogo();
+  /**
+   * @return configured custom {@link Favicon} else returns default one
+   */
+  Favicon getFavicon();
+
+  /**
+   * @return {@link Favicon} URL to retrieve favicon image
+   */
+  String getFaviconPath();
 
   void updateTopBarTheme(String style);
 
@@ -44,6 +59,15 @@ public interface BrandingService {
    * @param logo The logo object
    */
   void updateLogo(Logo logo);
+
+  /**
+   * Update branding favicon. If the favicon object contains the image data, they are
+   * used, otherwise if the uploadId exists it is used to retrieve the uploaded
+   * resource. If there is no data, nor uploadId, the logo is deleted.
+   * 
+   * @param favicon The {@link Favicon} object to update
+   */
+  void updateFavicon(Favicon favicon);
 
   /**
    * @return CSS content of colors for theme

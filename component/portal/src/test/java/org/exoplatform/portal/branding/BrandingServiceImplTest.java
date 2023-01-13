@@ -320,11 +320,9 @@ public class BrandingServiceImplTest {
 
     BrandingService brandingService = new BrandingServiceImpl(configurationManager, settingService, fileService, uploadService, initParams);
 
-    Branding newBranding = new Branding();
     Logo logo = new Logo();
     logo.setData("myLogo".getBytes());
     logo.setSize(logo.getData().length);
-    newBranding.setLogo(logo);
 
     ArgumentCaptor<Context> settingContextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     ArgumentCaptor<Scope> settingScopeArgumentCaptor = ArgumentCaptor.forClass(Scope.class);
@@ -333,7 +331,7 @@ public class BrandingServiceImplTest {
     ArgumentCaptor<FileItem> fileItemArgumentCaptor = ArgumentCaptor.forClass(FileItem.class);
 
     // When
-    brandingService.updateBrandingInformation(newBranding);
+    brandingService.updateLogo(logo);
 
     // Then
     verify(settingService, times(2)).set(settingContextArgumentCaptor.capture(), settingScopeArgumentCaptor.capture(), settingKeyArgumentCaptor.capture(), settingValueArgumentCaptor.capture());
@@ -401,6 +399,141 @@ public class BrandingServiceImplTest {
     assertEquals(Context.GLOBAL, contexts.get(0));
     assertEquals(Scope.GLOBAL, scopes.get(0));
     assertEquals(BrandingServiceImpl.BRANDING_LOGO_ID_SETTING_KEY, keys.get(0));
+    assertEquals("2", values.get(0).getValue());
+    List<FileItem> fileItems = fileItemArgumentCaptor.getAllValues();
+    assertTrue(Arrays.equals(IOUtils.toByteArray(resource), fileItems.get(0).getAsByte()));
+  }
+
+  @Test
+  public void shouldUpdateFaviconWhenFaviconUpdatedByData() throws Exception {
+    // Given
+    SettingService settingService = mock(SettingService.class);
+    FileService fileService = mock(FileService.class);
+    FileInfo fileInfo = new FileInfo(1L,
+                                     "myFavicon",
+                                     "image/png",
+                                     BrandingServiceImpl.FILE_API_NAME_SPACE,
+                                     "myFavicon".getBytes().length,
+                                     new Date(),
+                                     "john",
+                                     null,
+                                     false);
+    FileItem fileItem = new FileItem(fileInfo, null);
+    when(fileService.writeFile(any(FileItem.class))).thenReturn(fileItem);
+    when(fileService.getFileInfo(anyLong())).thenReturn(fileInfo);
+    UploadService uploadService = mock(UploadService.class);
+    ConfigurationManager configurationManager = mock(ConfigurationManager.class);
+
+    InitParams initParams = new InitParams();
+    ValueParam companyName = new ValueParam();
+    companyName.setName(BrandingServiceImpl.BRANDING_COMPANY_NAME_INIT_PARAM);
+    companyName.setValue("Default Company Name");
+    initParams.addParam(companyName);
+
+    BrandingService brandingService = new BrandingServiceImpl(configurationManager,
+                                                              settingService,
+                                                              fileService,
+                                                              uploadService,
+                                                              initParams);
+
+    Branding newBranding = new Branding();
+    Favicon favicon = new Favicon();
+    favicon.setData("myFavicon".getBytes());
+    favicon.setSize(favicon.getData().length);
+    newBranding.setFavicon(favicon);
+
+    ArgumentCaptor<Context> settingContextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    ArgumentCaptor<Scope> settingScopeArgumentCaptor = ArgumentCaptor.forClass(Scope.class);
+    ArgumentCaptor<String> settingKeyArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<SettingValue> settingValueArgumentCaptor = ArgumentCaptor.forClass(SettingValue.class);
+    ArgumentCaptor<FileItem> fileItemArgumentCaptor = ArgumentCaptor.forClass(FileItem.class);
+
+    // When
+    brandingService.updateFavicon(favicon);
+
+    // Then
+    verify(settingService, times(2)).set(settingContextArgumentCaptor.capture(),
+                                         settingScopeArgumentCaptor.capture(),
+                                         settingKeyArgumentCaptor.capture(),
+                                         settingValueArgumentCaptor.capture());
+    verify(fileService, times(1)).writeFile(fileItemArgumentCaptor.capture());
+    List<Context> contexts = settingContextArgumentCaptor.getAllValues();
+    List<Scope> scopes = settingScopeArgumentCaptor.getAllValues();
+    List<String> keys = settingKeyArgumentCaptor.getAllValues();
+    List<SettingValue> values = settingValueArgumentCaptor.getAllValues();
+    assertEquals(Context.GLOBAL, contexts.get(0));
+    assertEquals(Scope.GLOBAL, scopes.get(0));
+    assertEquals(BrandingServiceImpl.BRANDING_FAVICON_ID_SETTING_KEY, keys.get(0));
+    assertEquals("1", values.get(0).getValue());
+    List<FileItem> fileItems = fileItemArgumentCaptor.getAllValues();
+    assertEquals("myFavicon", new String(fileItems.get(0).getAsByte()));
+  }
+
+  @Test
+  public void shouldUpdateFaviconWhenFaviconUpdatedByUploadId() throws Exception {
+    // Given
+    SettingService settingService = mock(SettingService.class);
+    FileService fileService = mock(FileService.class);
+    ConfigurationManager configurationManager = mock(ConfigurationManager.class);
+
+    FileInfo fileInfo = new FileInfo(2L,
+                                     "myFavicon",
+                                     "image/png",
+                                     BrandingServiceImpl.FILE_API_NAME_SPACE,
+                                     "myFavicon".getBytes().length,
+                                     new Date(),
+                                     "john",
+                                     null,
+                                     false);
+    FileItem fileItem = new FileItem(fileInfo, null);
+    when(fileService.writeFile(any(FileItem.class))).thenReturn(fileItem);
+    when(fileService.getFileInfo(anyLong())).thenReturn(fileInfo);
+    String uploadId = "1";
+    UploadService uploadService = mock(UploadService.class);
+    UploadResource uploadResource = new UploadResource(uploadId);
+    URL resource = this.getClass().getResource("/branding/favicon.ico");
+    uploadResource.setStoreLocation(resource.getPath());
+    when(uploadService.getUploadResource(eq(uploadId))).thenReturn(uploadResource);
+
+    InitParams initParams = new InitParams();
+    ValueParam companyName = new ValueParam();
+    companyName.setName(BrandingServiceImpl.BRANDING_COMPANY_NAME_INIT_PARAM);
+    companyName.setValue("Default Company Name");
+    initParams.addParam(companyName);
+
+    BrandingService brandingService = new BrandingServiceImpl(configurationManager,
+                                                              settingService,
+                                                              fileService,
+                                                              uploadService,
+                                                              initParams);
+
+    Branding newBranding = new Branding();
+    Favicon favicon = new Favicon();
+    favicon.setUploadId(uploadId);
+    newBranding.setFavicon(favicon);
+
+    ArgumentCaptor<Context> settingContextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    ArgumentCaptor<Scope> settingScopeArgumentCaptor = ArgumentCaptor.forClass(Scope.class);
+    ArgumentCaptor<String> settingKeyArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<SettingValue> settingValueArgumentCaptor = ArgumentCaptor.forClass(SettingValue.class);
+    ArgumentCaptor<FileItem> fileItemArgumentCaptor = ArgumentCaptor.forClass(FileItem.class);
+
+    // When
+    brandingService.updateBrandingInformation(newBranding);
+
+    // Then
+    verify(settingService, times(2)).set(settingContextArgumentCaptor.capture(),
+                                         settingScopeArgumentCaptor.capture(),
+                                         settingKeyArgumentCaptor.capture(),
+                                         settingValueArgumentCaptor.capture());
+    verify(fileService, times(1)).writeFile(fileItemArgumentCaptor.capture());
+    List<Context> contexts = settingContextArgumentCaptor.getAllValues();
+    List<Scope> scopes = settingScopeArgumentCaptor.getAllValues();
+    List<String> keys = settingKeyArgumentCaptor.getAllValues();
+    List<SettingValue> values = settingValueArgumentCaptor.getAllValues();
+    assertEquals(Context.GLOBAL, contexts.get(0));
+    assertEquals(Scope.GLOBAL, scopes.get(0));
+    assertEquals(BrandingServiceImpl.BRANDING_FAVICON_ID_SETTING_KEY, keys.get(0));
     assertEquals("2", values.get(0).getValue());
     List<FileItem> fileItems = fileItemArgumentCaptor.getAllValues();
     assertTrue(Arrays.equals(IOUtils.toByteArray(resource), fileItems.get(0).getAsByte()));
