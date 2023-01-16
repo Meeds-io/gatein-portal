@@ -41,7 +41,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.branding.BrandingService;
@@ -213,9 +212,6 @@ public class RegisterHandler extends JspBasedWebHandler {
       if (parameters != null) {
         parameters.forEach(params::put);
       }
-
-      params.put("authenticationTitle", PropertyManager.getProperty("portal.authentication.title"));
-      params.put("authenticationSubtitle", PropertyManager.getProperty("portal.authentication.subtitle"));
 
       List<UIParamsExtension> paramsExtensions = this.container.getComponentInstancesOfType(UIParamsExtension.class);
       if (CollectionUtils.isNotEmpty(paramsExtensions)) {

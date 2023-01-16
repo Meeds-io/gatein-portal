@@ -114,6 +114,10 @@ public abstract class JspBasedWebHandler extends WebRequestHandler {
     String brandingLogo = "/" + PortalContainer.getCurrentPortalContainerName() + "/"
         + PortalContainer.getCurrentRestContextName() + "/v1/platform/branding/logo?v=" + brandingService.getLastUpdatedTime();
     params.put("brandingLogo", brandingLogo);
+    params.put("authenticationBackground", brandingService.getLoginBackgroundPath());
+    params.put("authenticationTextColor", brandingService.getLoginBackgroundTextColor());
+    params.put("authenticationTitle", brandingService.getLoginTitle(locale));
+    params.put("authenticationSubtitle", brandingService.getLoginSubtitle(locale));
 
     if (extendUIParameters != null) {
       extendUIParameters.accept(params);

@@ -27,6 +27,18 @@
         <value>${exo.branding.company.favicon:/skin/images/favicon.ico}</value>
       </value-param>
       <value-param>
+        <name>authentication.background</name>
+        <value>${portal.authentication.background:}</value>
+      </value-param>
+      <value-param>
+        <name>authentication.title</name>
+        <value>${portal.authentication.title:UILoginForm.label.pageTitle}</value>
+      </value-param>
+      <value-param>
+        <name>authentication.subtitle</name>
+        <value>${portal.authentication.subtitle:UILoginForm.label.pageSubTitle}</value>
+      </value-param>
+      <value-param>
         <name>exo.branding.theme.path</name>
         <value>${exo.branding.theme.path:war:/conf/branding/branding.less}</value>
       </value-param>

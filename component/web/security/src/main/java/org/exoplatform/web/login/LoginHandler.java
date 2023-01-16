@@ -19,11 +19,18 @@ package org.exoplatform.web.login;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
-import javax.servlet.http.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -35,7 +42,6 @@ import org.gatein.wci.security.Credentials;
 import org.json.JSONObject;
 
 import org.exoplatform.commons.utils.ListAccess;
-import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.xml.InitParams;
@@ -43,7 +49,10 @@ import org.exoplatform.portal.branding.BrandingService;
 import org.exoplatform.portal.resource.SkinService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.organization.*;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.Query;
+import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.WebAppController;
@@ -391,9 +400,6 @@ public class LoginHandler extends JspBasedWebHandler {
 
       String forgotPasswordPath = passwordRecoveryService.getPasswordRecoverURL(null, null);
       params.put("forgotPasswordPath", request.getContextPath() + forgotPasswordPath);
-
-      params.put("authenticationTitle", PropertyManager.getProperty("portal.authentication.title"));
-      params.put("authenticationSubtitle", PropertyManager.getProperty("portal.authentication.subtitle"));
 
       if (StringUtils.isNotBlank(status.getErrorCode())) {
         params.put(ERROR_MESSAGE_PARAM, status.getErrorCode());
