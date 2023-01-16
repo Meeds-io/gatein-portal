@@ -15,35 +15,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package org.exoplatform.portal.branding;
+package org.exoplatform.portal.branding.model;
 
-import java.io.Serializable;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @NoArgsConstructor
-@AllArgsConstructor
-public class Favicon implements Serializable {
+public class Background extends BrandingFile {
 
-  private static final long serialVersionUID = 2846145296185073958L;
+  private static final long serialVersionUID = 4603820249597850279L;
 
-  @Getter
-  @Setter
-  private String            uploadId;
-
-  @Getter
-  @Setter
-  private long              size;
-
-  @Getter
-  @Setter
-  private byte[]            data;
-
-  @Getter
-  @Setter
-  private long              updatedDate;
+  public Background(String uploadId, long size, byte[] data, long updatedDate) {
+    super(uploadId, size, data, updatedDate);
+  }
 
 }
