@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package org.exoplatform.portal.branding;
+package org.exoplatform.portal.branding.model;
 
 import java.io.Serializable;
 import java.util.*;
@@ -41,6 +41,14 @@ public class Branding implements Serializable {
 
   @Getter
   @Setter
+  private String              defaultLanguage;
+
+  @Getter
+  @Setter
+  private Map<String, String> supportedLanguages;
+
+  @Getter
+  @Setter
   private String              topBarTheme;
 
   @Getter
@@ -53,7 +61,23 @@ public class Branding implements Serializable {
 
   @Getter
   @Setter
+  private Background          loginBackground;
+
+  @Getter
+  @Setter
+  private String              loginBackgroundTextColor;
+
+  @Getter
+  @Setter
   private Map<String, String> themeColors      = new HashMap<>();
+
+  @Getter
+  @Setter
+  private Map<String, String> loginTitle       = new HashMap<>();
+
+  @Getter
+  @Setter
+  private Map<String, String> loginSubtitle    = new HashMap<>();
 
   @Getter
   @Setter
