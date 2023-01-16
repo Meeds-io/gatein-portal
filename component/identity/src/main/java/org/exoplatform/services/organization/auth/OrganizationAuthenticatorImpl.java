@@ -185,6 +185,33 @@ public class OrganizationAuthenticatorImpl implements Authenticator
            }
            // No exception occurred
            lastExceptionOnValidateUser.remove();
+           if (!success) {
+              for (AuthenticatorPlugin plugin : getPlugins()) {
+                 try {
+                    String validatedUserName = plugin.validateUser(credentials);
+                    if (StringUtils.isNotBlank(validatedUserName)) {
+                       success = true;
+                       username = validatedUserName;
+                       break;
+                    }
+                 } catch (Exception e) {
+                    LOG.debug("Error while authenticating user using plugin {}", plugin.getClass());
+                 }
+              }
+           }
+
+           for (SecurityCheckAuthenticationPlugin plugin : getSecurityCheckPlugins()) {
+              if (!success) {
+                 if (username != null) {
+                    plugin.onCheckFail(username);
+                    throw new LoginException("Login failed for " + username.replace("\n", " ").replace("\r", " "));
+                 } else {
+                    throw new LoginException("Login failed for " + username);
+                 }
+              } else {
+                 plugin.onCheckSuccess(username);
+              }
+           }
         }
         catch (DisabledUserException e)
         {
@@ -206,34 +233,6 @@ public class OrganizationAuthenticatorImpl implements Authenticator
         finally
         {
            end(orgService);
-        }
-      }
-
-      if (!success) {
-        for (AuthenticatorPlugin plugin : getPlugins()) {
-          try {
-            String validatedUserName = plugin.validateUser(credentials);
-            if (StringUtils.isNotBlank(validatedUserName)) {
-              success = true;
-              username = validatedUserName;
-              break;
-            }
-          } catch (Exception e) {
-            LOG.debug("Error while authenticating user using plugin {}", plugin.getClass());
-          }
-        }
-      }
-
-      for (SecurityCheckAuthenticationPlugin plugin : getSecurityCheckPlugins()) {
-        if (!success) {
-          if (username != null) {
-            plugin.onCheckFail(username);
-            throw new LoginException("Login failed for " + username.replace("\n", " ").replace("\r", " "));
-          } else {
-            throw new LoginException("Login failed for " + username);
-          }
-        } else {
-          plugin.onCheckSuccess(username);
         }
       }
 
