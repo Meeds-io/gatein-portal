@@ -91,9 +91,11 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   public static final String   BRANDING_LOGIN_SUBTITLE_PARAM     = "authentication.subtitle";
 
-  public static final String   BRANDING_LOGIN_BG_PARAM           = "authentication.background";
+  public static final String   BRANDING_LOGIN_BG_INIT_PARAM      = "authentication.background";
 
   public static final String   BRANDING_LOGO_INIT_PARAM          = "exo.branding.company.logo";
+
+  public static final String   BRANDING_FAVICON_INIT_PARAM       = "exo.branding.company.favicon";
 
   public static final String   BRANDING_COMPANY_NAME_SETTING_KEY = "exo.branding.company.name";
 
@@ -231,6 +233,11 @@ public class BrandingServiceImpl implements BrandingService, Startable {
    */
   @Override
   public Branding getBrandingInformation() {
+    return getBrandingInformation(true);
+  }
+
+  @Override
+  public Branding getBrandingInformation(boolean retrieveBinaries) {
     Branding branding = new Branding();
     branding.setDefaultLanguage(defaultLanguage);
     branding.setSupportedLanguages(Collections.unmodifiableMap(supportedLanguages));
@@ -246,6 +253,23 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     branding.setLoginTitle(getLoginTitle());
     branding.setLoginSubtitle(getLoginSubtitle());
     branding.setLastUpdatedTime(getLastUpdatedTime());
+    if (!retrieveBinaries) {
+      if (branding.getFavicon() != null && branding.getFavicon().getData() != null) {
+        Favicon brandingFile = branding.getFavicon().clone();
+        brandingFile.setData(null);
+        branding.setFavicon(brandingFile);
+      }
+      if (branding.getLogo() != null && branding.getLogo().getData() != null) {
+        Logo brandingFile = branding.getLogo().clone();
+        brandingFile.setData(null);
+        branding.setLogo(brandingFile);
+      }
+      if (branding.getLoginBackground() != null && branding.getLoginBackground().getData() != null) {
+        Background brandingFile = branding.getLoginBackground().clone();
+        brandingFile.setData(null);
+        branding.setLoginBackground(brandingFile);
+      }
+    }
     return branding;
   }
 
@@ -398,7 +422,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     if (this.logo == null) {
       try {
         Long imageId = getLogoId();
-        if (imageId != null) {
+        if (imageId != null && imageId > 0) {
           this.logo = retrieveStoredBrandingFile(imageId, new Logo());
         } else {
           this.logo = retrieveDefaultBrandingFile(defaultConfiguredLogoPath, new Logo());
@@ -449,13 +473,15 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   @Override
   public String getLogoPath() {
     Logo brandingLogo = getLogo();
-    return BRANDING_LOGO_BASE_PATH + Objects.hash(brandingLogo.getUpdatedDate());
+    return brandingLogo == null
+        || brandingLogo.getData() == null ? null : BRANDING_LOGO_BASE_PATH + Objects.hash(brandingLogo.getUpdatedDate());
   }
 
   @Override
   public String getFaviconPath() {
     Favicon brandingFavicon = getFavicon();
-    return BRANDING_FAVICON_BASE_PATH + Objects.hash(brandingFavicon.getUpdatedDate());
+    return brandingFavicon == null
+        || brandingFavicon.getData() == null ? null : BRANDING_FAVICON_BASE_PATH + Objects.hash(brandingFavicon.getUpdatedDate());
   }
 
   @Override
@@ -602,7 +628,12 @@ public class BrandingServiceImpl implements BrandingService, Startable {
         this.defaultConfiguredLogoPath = logoParam.getValue();
       }
 
-      ValueParam loginBackgroundParam = initParams.getValueParam(BRANDING_LOGIN_BG_PARAM);
+      ValueParam favIconParam = initParams.getValueParam(BRANDING_FAVICON_INIT_PARAM);
+      if (favIconParam != null) {
+        this.defaultConfiguredFaviconPath = favIconParam.getValue();
+      }
+
+      ValueParam loginBackgroundParam = initParams.getValueParam(BRANDING_LOGIN_BG_INIT_PARAM);
       if (loginBackgroundParam != null) {
         this.defaultConfiguredLoginBgPath = loginBackgroundParam.getValue();
       }
@@ -908,12 +939,13 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     return null;
   }
 
-  private <T extends BrandingFile> T retrieveStoredBrandingFile(Long imageId, T brandingFile) throws FileStorageException {
+  private <T extends BrandingFile> T retrieveStoredBrandingFile(long imageId, T brandingFile) throws FileStorageException {
     FileItem fileItem = fileService.getFile(imageId);
     if (fileItem != null) {
       brandingFile.setData(fileItem.getAsByte());
       brandingFile.setSize(fileItem.getFileInfo().getSize());
       brandingFile.setUpdatedDate(fileItem.getFileInfo().getUpdatedDate().getTime());
+      brandingFile.setFileId(imageId);
     }
     return brandingFile;
   }

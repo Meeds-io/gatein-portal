@@ -20,12 +20,17 @@ package org.exoplatform.portal.branding.model;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class Logo extends BrandingFile {
+public class Logo extends BrandingFile implements Cloneable {
 
   private static final long serialVersionUID = -4310163668191543509L;
 
-  public Logo(String uploadId, long size, byte[] data, long updatedDate) {
-    super(uploadId, size, data, updatedDate);
+  public Logo(String uploadId, long size, byte[] data, long updatedDate, long fileId) {
+    super(uploadId, size, data, updatedDate, fileId);
   }
-  
+
+  @Override
+  public Logo clone() { // NOSONAR
+    return new Logo(getUploadId(), getSize(), getData(), getUpdatedDate(), getFileId());
+  }
+
 }

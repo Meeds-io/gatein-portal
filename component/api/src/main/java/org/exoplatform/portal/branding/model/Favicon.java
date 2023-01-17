@@ -20,12 +20,17 @@ package org.exoplatform.portal.branding.model;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class Favicon extends BrandingFile {
+public class Favicon extends BrandingFile implements Cloneable {
 
   private static final long serialVersionUID = -3591886688862197441L;
 
-  public Favicon(String uploadId, long size, byte[] data, long updatedDate) {
-    super(uploadId, size, data, updatedDate);
+  public Favicon(String uploadId, long size, byte[] data, long updatedDate, long fileId) {
+    super(uploadId, size, data, updatedDate, fileId);
+  }
+
+  @Override
+  public Favicon clone() { // NOSONAR
+    return new Favicon(getUploadId(), getSize(), getData(), getUpdatedDate(), getFileId());
   }
 
 }
