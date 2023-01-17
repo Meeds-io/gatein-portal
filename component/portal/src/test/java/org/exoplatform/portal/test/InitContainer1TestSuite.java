@@ -23,6 +23,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.exoplatform.account.setup.web.AccountSetupServiceTest;
 import org.exoplatform.portal.TestJIBXXmlMapping;
 import org.exoplatform.portal.TestXSDCorruption;
+import org.exoplatform.portal.branding.BrandingRestResourcesTest;
 import org.exoplatform.portal.branding.BrandingServiceImplTest;
 import org.exoplatform.portal.config.DefaultGroupVisibilityPluginTest;
 import org.exoplatform.portal.config.DynamicPortalLayoutMatcherPluginTest;
@@ -53,7 +54,6 @@ import org.exoplatform.portal.mop.jdbc.service.TestPageService;
 import org.exoplatform.portal.rest.MembershipTypeRestResourcesTest;
 import org.exoplatform.portal.rest.UserFieldValidatorTest;
 import org.exoplatform.portal.rest.UserRestResourcesTest;
-import org.exoplatform.portal.rest.branding.BrandingRestResourcesTest;
 import org.exoplatform.portal.tree.list.TestListTree;
 import org.exoplatform.settings.rest.SettingResourceTest;
 
