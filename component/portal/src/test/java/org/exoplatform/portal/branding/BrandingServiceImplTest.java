@@ -6,18 +6,21 @@ import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_COMPA
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_COMPANY_NAME_SETTING_KEY;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_CONTEXT;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_FAVICON_ID_SETTING_KEY;
+import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_FAVICON_INIT_PARAM;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_LOGIN_BG_ID_SETTING_KEY;
-import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_LOGIN_BG_PARAM;
+import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_LOGIN_BG_INIT_PARAM;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_LOGIN_SUBTITLE_PARAM;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_LOGIN_TITLE_PARAM;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_LOGO_ID_SETTING_KEY;
+import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_LOGO_INIT_PARAM;
+import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_RESET_ATTACHMENT_ID;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_SCOPE;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_SITE_NAME_INIT_PARAM;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_SITE_NAME_SETTING_KEY;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_SUBTITLE_SETTING_KEY;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_THEME_VARIABLES;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_TITLE_SETTING_KEY;
-import static org.exoplatform.portal.branding.BrandingServiceImpl.*;
+import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_TOPBAR_THEME_SETTING_KEY;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.FILE_API_NAME_SPACE;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.LOGIN_BACKGROUND_NAME;
 import static org.junit.Assert.assertEquals;
@@ -301,6 +304,81 @@ public class BrandingServiceImplTest {
   }
 
   @Test
+  public void shouldGetBrandingInformationWithoutBinaries() {
+
+    // Given
+    SettingService settingService = mock(SettingService.class);
+    FileService fileService = mock(FileService.class);
+    ConfigurationManager configurationManager = mock(ConfigurationManager.class);
+    PortalContainer container = mock(PortalContainer.class);
+    UploadService uploadService = mock(UploadService.class);
+    LocaleConfigService localeConfigService = mock(LocaleConfigService.class);
+    InitParams initParams = new InitParams();
+
+    String loginBgPath = "loginBgPath";
+    String faviconPath = "faviconPath";
+    String logoPath = "logoPath";
+
+    ValueParam logoPathParam = new ValueParam();
+    logoPathParam.setName(BRANDING_LOGO_INIT_PARAM);
+    logoPathParam.setValue(logoPath);
+    initParams.addParam(logoPathParam);
+
+    ValueParam faviconPathParam = new ValueParam();
+    faviconPathParam.setName(BRANDING_FAVICON_INIT_PARAM);
+    faviconPathParam.setValue(faviconPath);
+    initParams.addParam(faviconPathParam);
+
+    ValueParam loginBgPathParam = new ValueParam();
+    loginBgPathParam.setName(BRANDING_LOGIN_BG_INIT_PARAM);
+    loginBgPathParam.setValue(loginBgPath);
+    initParams.addParam(loginBgPathParam);
+
+    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
+                                                                  configurationManager,
+                                                                  settingService,
+                                                                  fileService,
+                                                                  uploadService,
+                                                                  localeConfigService,
+                                                                  initParams);
+
+    ServletContext context = mock(ServletContext.class);
+    when(container.getPortalContext()).thenReturn(context);
+    when(context.getResourceAsStream(loginBgPath)).thenReturn(new ByteArrayInputStream(new byte[] {
+        1, 2, 3
+    }));
+    when(context.getResourceAsStream(faviconPath)).thenReturn(new ByteArrayInputStream(new byte[] {
+        1, 2, 3
+    }));
+    when(container.getPortalContext()).thenReturn(context);
+    when(context.getResourceAsStream(logoPath)).thenReturn(new ByteArrayInputStream(new byte[] {
+        1, 2, 3
+    }));
+
+    assertNotNull(brandingService.getLoginBackgroundPath());
+    assertNotNull(brandingService.getLogoPath());
+    assertNotNull(brandingService.getLoginBackgroundPath());
+
+    Branding branding = brandingService.getBrandingInformation(false);
+    assertNotNull(branding);
+    assertNotNull(branding.getLogo());
+    assertNotNull(branding.getFavicon());
+    assertNotNull(branding.getLoginBackground());
+    assertNull(branding.getLogo().getData());
+    assertNull(branding.getFavicon().getData());
+    assertNull(branding.getLoginBackground().getData());
+
+    branding = brandingService.getBrandingInformation(true);
+    assertNotNull(branding);
+    assertNotNull(branding.getLogo());
+    assertNotNull(branding.getFavicon());
+    assertNotNull(branding.getLoginBackground());
+    assertNotNull(branding.getLogo().getData());
+    assertNotNull(branding.getFavicon().getData());
+    assertNotNull(branding.getLoginBackground().getData());
+  }
+
+  @Test
   public void shouldUpdateCompanyNameAndTopBarThemeWhenInformationUpdated() throws Exception {
     // Given
     SettingService settingService = mock(SettingService.class);
@@ -577,7 +655,7 @@ public class BrandingServiceImplTest {
     String imagePath = "loginBgPath";
 
     ValueParam loginBgPath = new ValueParam();
-    loginBgPath.setName(BRANDING_LOGIN_BG_PARAM);
+    loginBgPath.setName(BRANDING_LOGIN_BG_INIT_PARAM);
     loginBgPath.setValue(imagePath);
     initParams.addParam(loginBgPath);
 
@@ -597,6 +675,101 @@ public class BrandingServiceImplTest {
     Background loginBackground = brandingService.getLoginBackground();
     assertNotNull(loginBackground);
     assertEquals(3, loginBackground.getSize());
+    assertNotNull(brandingService.getLoginBackgroundPath());
+  }
+
+  @Test
+  public void testGetDefaultFavicon() throws Exception {
+    // Given
+    SettingService settingService = mock(SettingService.class);
+    FileService fileService = mock(FileService.class);
+    ConfigurationManager configurationManager = mock(ConfigurationManager.class);
+    PortalContainer container = mock(PortalContainer.class);
+    UploadService uploadService = mock(UploadService.class);
+    LocaleConfigService localeConfigService = mock(LocaleConfigService.class);
+    InitParams initParams = new InitParams();
+
+    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
+                                                                  configurationManager,
+                                                                  settingService,
+                                                                  fileService,
+                                                                  uploadService,
+                                                                  localeConfigService,
+                                                                  initParams);
+
+    assertNull(brandingService.getFaviconPath());
+
+    String imagePath = "faviconPath";
+
+    ValueParam faviconPathParam = new ValueParam();
+    faviconPathParam.setName(BRANDING_FAVICON_INIT_PARAM);
+    faviconPathParam.setValue(imagePath);
+    initParams.addParam(faviconPathParam);
+
+    brandingService = new BrandingServiceImpl(container,
+                                              configurationManager,
+                                              settingService,
+                                              fileService,
+                                              uploadService,
+                                              localeConfigService,
+                                              initParams);
+
+    ServletContext context = mock(ServletContext.class);
+    when(container.getPortalContext()).thenReturn(context);
+    when(context.getResourceAsStream(imagePath)).thenReturn(new ByteArrayInputStream(new byte[] {
+        1, 2, 3
+    }));
+    Favicon favicon = brandingService.getFavicon();
+    assertNotNull(favicon);
+    assertEquals(3, favicon.getSize());
+    assertNotNull(brandingService.getFaviconPath());
+  }
+
+  @Test
+  public void testGetDefaultLogo() throws Exception {
+    // Given
+    SettingService settingService = mock(SettingService.class);
+    FileService fileService = mock(FileService.class);
+    ConfigurationManager configurationManager = mock(ConfigurationManager.class);
+    PortalContainer container = mock(PortalContainer.class);
+    UploadService uploadService = mock(UploadService.class);
+    LocaleConfigService localeConfigService = mock(LocaleConfigService.class);
+    InitParams initParams = new InitParams();
+
+    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
+                                                                  configurationManager,
+                                                                  settingService,
+                                                                  fileService,
+                                                                  uploadService,
+                                                                  localeConfigService,
+                                                                  initParams);
+
+    assertNull(brandingService.getLogoPath());
+
+    String imagePath = "logoPath";
+
+    ValueParam logoPathParam = new ValueParam();
+    logoPathParam.setName(BRANDING_LOGO_INIT_PARAM);
+    logoPathParam.setValue(imagePath);
+    initParams.addParam(logoPathParam);
+
+    brandingService = new BrandingServiceImpl(container,
+                                              configurationManager,
+                                              settingService,
+                                              fileService,
+                                              uploadService,
+                                              localeConfigService,
+                                              initParams);
+
+    ServletContext context = mock(ServletContext.class);
+    when(container.getPortalContext()).thenReturn(context);
+    when(context.getResourceAsStream(imagePath)).thenReturn(new ByteArrayInputStream(new byte[] {
+        1, 2, 3
+    }));
+    Logo logo = brandingService.getLogo();
+    assertNotNull(logo);
+    assertEquals(3, logo.getSize());
+    assertNotNull(brandingService.getLogoPath());
   }
 
   @Test
@@ -632,7 +805,7 @@ public class BrandingServiceImplTest {
       return fileItem;
     });
 
-    Background loginBackground = new Background(uploadId, 0, null, 0);
+    Background loginBackground = new Background(uploadId, 0, null, 0, 0);
     brandingService.updateLoginBackground(loginBackground);
 
     verify(fileService, times(1)).writeFile(argThat(fileItem -> {
@@ -687,7 +860,7 @@ public class BrandingServiceImplTest {
                                      }));
     when(fileService.getFile(fileId)).thenReturn(fileItem);
 
-    Background loginBackground = new Background(BRANDING_RESET_ATTACHMENT_ID, 0, null, 0);
+    Background loginBackground = new Background(BRANDING_RESET_ATTACHMENT_ID, 0, null, 0, 0);
     brandingService.updateLoginBackground(loginBackground);
 
     verify(fileService, times(1)).deleteFile(fileId);
