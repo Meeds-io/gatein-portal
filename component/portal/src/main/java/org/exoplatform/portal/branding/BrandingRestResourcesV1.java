@@ -70,20 +70,33 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
     this.brandingService = brandingService;
   }
 
-  /**
-   * @return global settings of Branding Company Name
-   */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
   @Operation(summary = "Get Branding information", description = "Get Branding information", method = "GET")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+      @ApiResponse(responseCode = "304", description = "Resource not modified"),
       @ApiResponse(responseCode = "500", description = "Server error when retrieving branding information")
   })
-  public Response getBrandingInformation() {
+  public Response getBrandingInformation(@Context Request request) {
     try {
-      return Response.ok(brandingService.getBrandingInformation()).build();
+      long lastUpdated = brandingService.getLastUpdatedTime();
+      EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
+
+      //
+      Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
+      if (builder == null) {
+        Branding brandingInformation = brandingService.getBrandingInformation(false);
+        builder = Response.ok(brandingInformation);
+        CacheControl cc = new CacheControl();
+        cc.setMustRevalidate(true);
+        builder.tag(eTag);
+        builder.lastModified(new Date(lastUpdated));
+        builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
+        builder.cacheControl(cc);
+      }
+      return builder.build();
     } catch (Exception e) {
       LOG.error("Error when retrieving branding information", e);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -96,13 +109,13 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Update Branding information", description = "Update Branding information", method = "POST")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Branding information updated"),
+      @ApiResponse(responseCode = "204", description = "Branding information updated"),
       @ApiResponse(responseCode = "500", description = "Server error when updating branding information")
   })
   public Response updateBrandingInformation(Branding branding) {
     try {
       brandingService.updateBrandingInformation(branding);
-      return Response.ok(brandingService.getBrandingInformation()).build();
+      return Response.noContent().build();
     } catch (Exception e) {
       LOG.error("Error when updating branding information", e);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -129,7 +142,7 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
                                   String version) {
 
     Logo logo = brandingService.getLogo();
-    if (logo == null) {
+    if (logo == null || logo.getData() == null) {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
 
@@ -177,7 +190,7 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
                                      @QueryParam("v")
                                      String version) {
     Favicon favicon = brandingService.getFavicon();
-    if (favicon == null) {
+    if (favicon == null || favicon.getData() == null) {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
 
@@ -223,7 +236,7 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
                                      @QueryParam("v")
                                      String version) {
     Background loginBackground = brandingService.getLoginBackground();
-    if (loginBackground == null) {
+    if (loginBackground == null || loginBackground.getData() == null) {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
 

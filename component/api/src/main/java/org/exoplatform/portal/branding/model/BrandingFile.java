@@ -44,4 +44,8 @@ public class BrandingFile implements Serializable {
   @Setter
   private long              updatedDate;
 
+  @Getter
+  @Setter
+  private long              fileId;
+
 }

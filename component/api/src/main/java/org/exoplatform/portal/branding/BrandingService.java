@@ -12,6 +12,8 @@ public interface BrandingService {
 
   Branding getBrandingInformation();
 
+  Branding getBrandingInformation(boolean retrieveBinaries);
+
   /**
    * Update the branding information Missing information in the branding object
    * are not updated.
