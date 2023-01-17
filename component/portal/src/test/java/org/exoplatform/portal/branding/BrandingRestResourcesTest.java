@@ -1,4 +1,4 @@
-package org.exoplatform.portal.rest.branding;
+package org.exoplatform.portal.branding;
 
 import static org.mockito.Mockito.*;
 
@@ -12,7 +12,6 @@ import org.mockito.ArgumentCaptor;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.file.services.FileService;
-import org.exoplatform.portal.branding.*;
 import org.exoplatform.portal.branding.model.Branding;
 import org.exoplatform.portal.branding.model.Favicon;
 import org.exoplatform.portal.branding.model.Logo;
@@ -63,7 +62,7 @@ public class BrandingRestResourcesTest extends BaseRestServicesTestCase {
     Branding branding = new Branding();
     branding.setCompanyName("test1");
     branding.setTopBarTheme("Dark");
-    when(brandingService.getBrandingInformation()).thenReturn(branding);
+    when(brandingService.getBrandingInformation(false)).thenReturn(branding);
 
     // When
     ContainerResponse resp = launcher.service("GET", path, "", null, null, envctx);
@@ -101,7 +100,7 @@ public class BrandingRestResourcesTest extends BaseRestServicesTestCase {
     ContainerResponse resp = launcher.service("PUT", path, "", headers, jsonBranding.toString().getBytes(), envctx);
 
     // Then
-    assertEquals(200, resp.getStatus());
+    assertEquals(204, resp.getStatus());
     Object entity = resp.getEntity();
     assertNull(entity);
 
@@ -124,7 +123,7 @@ public class BrandingRestResourcesTest extends BaseRestServicesTestCase {
 
     Favicon favicon = new Favicon(null, 5, new byte[] {
         1, 2, 3
-    }, 0);
+    }, 0, 0);
     when(brandingService.getFavicon()).thenReturn(favicon);
 
     // When
@@ -150,7 +149,7 @@ public class BrandingRestResourcesTest extends BaseRestServicesTestCase {
 
     Logo logo = new Logo(null, 5, new byte[] {
         1, 2, 3
-    }, 0);
+    }, 0, 0);
     when(brandingService.getLogo()).thenReturn(logo);
 
     // When
