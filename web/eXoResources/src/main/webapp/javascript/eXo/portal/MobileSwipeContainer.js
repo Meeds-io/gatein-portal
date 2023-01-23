@@ -50,6 +50,22 @@ $(document).ready(() => {
     }
   });
 
+  document.addEventListener('drawerOpened', () => {
+    $('.UIMobileSwipe').attr('style', 'display: none !important;');
+  });
+
+  document.addEventListener('drawerClosed', () => {
+    if (!$('.v-navigation-drawer--open').length) {
+      $('.UIMobileSwipe').css('display', '');
+    } else {
+      window.setTimeout(() => {
+        if (!$('.v-navigation-drawer--open').length) {
+          $('.UIMobileSwipe').css('display', '');
+        }
+      }, 200);
+    }
+  });
+
   $('.UIMobileSwipeContainer').on('swipeleft', () => {
     const $children = $('.UIMobileSwipeContainer .UIMobileSwipeChildContainer');
     if ($children.length < 2) {
