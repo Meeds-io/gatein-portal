@@ -79,6 +79,10 @@
   <filter>
     <filter-name>RememberMeFilter</filter-name>
     <filter-class>org.exoplatform.web.login.RememberMeFilter</filter-class>
+    <init-param>
+      <param-name>ignoredPaths</param-name>
+      <param-value>/skins,/scripts,/rest,/favicon.ico</param-value>
+    </init-param>
   </filter>
 
   <!--  Uncomment ErrorLoginFilter and LoginDetectorFilter for sending mail after successive number of bad login attempts. -->

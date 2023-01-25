@@ -20,10 +20,14 @@
 package org.exoplatform.web.login;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.gatein.wci.ServletContainer;
 import org.gatein.wci.ServletContainerFactory;
 import org.gatein.wci.security.Credentials;
@@ -48,6 +52,18 @@ public class RememberMeFilter extends AbstractFilter {
     //value of this field need equals with: org.gatein.security.oauth.common.OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER_FOR_JAAS
     public static final String ATTRIBUTE_AUTHENTICATED_PORTAL_USER_FOR_JAAS = "_authenticatedPortalUserForJaas";
 
+    public List<String>      ignoredPaths                                 = null;
+
+    @Override
+    protected void afterInit(FilterConfig config) throws ServletException {
+      String ignoredPathsParameter = config.getInitParameter("ignoredPaths");
+      if (StringUtils.isBlank(ignoredPathsParameter)) {
+        this.ignoredPaths = Collections.emptyList();
+      } else {
+        this.ignoredPaths = Arrays.asList(StringUtils.split(ignoredPathsParameter, ","));
+      }
+    }
+
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
         doFilter((HttpServletRequest) req, (HttpServletResponse) resp, chain);
     }
@@ -55,7 +71,9 @@ public class RememberMeFilter extends AbstractFilter {
     private void doFilter(HttpServletRequest req, HttpServletResponse resp, FilterChain chain) throws IOException,
             ServletException {
         ExoContainerContext.setCurrentContainer(getContainer());
-        if (req.getRemoteUser() == null) {
+        String servletPath = req.getServletPath();
+        if (req.getRemoteUser() == null
+            && this.ignoredPaths.stream().noneMatch(ignoredPath -> StringUtils.startsWith(servletPath, ignoredPath))) {
             String token = LoginUtils.getRememberMeTokenCookie(req);
             if (token != null) {
                 ExoContainer container = getContainer();
