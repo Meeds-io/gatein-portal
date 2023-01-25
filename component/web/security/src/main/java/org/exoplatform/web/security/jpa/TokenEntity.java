@@ -12,8 +12,7 @@ import java.util.Date;
 @NamedQueries({
         @NamedQuery(name = "GateInToken.findByTokenId", query = "SELECT t FROM GateInToken t WHERE t.tokenId = :tokenId"),
         @NamedQuery(name = "GateInToken.findByUser", query = "SELECT t FROM GateInToken t WHERE t.username = :username"),
-        @NamedQuery(name = "GateInToken.findExpired", query = "SELECT t FROM GateInToken t WHERE t.expirationTime < :expireTime"),
-        @NamedQuery(name = "GateInToken.cleanTokens", query = "DELETE FROM GateInToken t WHERE t.expirationTime < :expireTime"),
+        @NamedQuery(name = "GateInToken.deleteExpiredTokens", query = "DELETE FROM GateInToken t WHERE t.expirationTime < :expireTime"),
         @NamedQuery(name = "GateInToken.deleteTokensByUserAndType", query="DELETE FROM GateInToken t WHERE t.username = :username AND t.tokenType = :tokenType")
 })
 public class TokenEntity implements Serializable {
