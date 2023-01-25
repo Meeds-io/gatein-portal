@@ -1,7 +1,8 @@
-package org.exoplatform.portal.rest.branding;
+package org.exoplatform.portal.branding;
 
 import static org.mockito.Mockito.*;
 
+import java.io.ByteArrayInputStream;
 import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +12,9 @@ import org.mockito.ArgumentCaptor;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.file.services.FileService;
-import org.exoplatform.portal.branding.*;
+import org.exoplatform.portal.branding.model.Branding;
+import org.exoplatform.portal.branding.model.Favicon;
+import org.exoplatform.portal.branding.model.Logo;
 import org.exoplatform.portal.rest.services.BaseRestServicesTestCase;
 import org.exoplatform.services.rest.impl.ContainerResponse;
 import org.exoplatform.services.rest.impl.EnvironmentContext;
@@ -59,7 +62,7 @@ public class BrandingRestResourcesTest extends BaseRestServicesTestCase {
     Branding branding = new Branding();
     branding.setCompanyName("test1");
     branding.setTopBarTheme("Dark");
-    when(brandingService.getBrandingInformation()).thenReturn(branding);
+    when(brandingService.getBrandingInformation(false)).thenReturn(branding);
 
     // When
     ContainerResponse resp = launcher.service("GET", path, "", null, null, envctx);
@@ -97,7 +100,7 @@ public class BrandingRestResourcesTest extends BaseRestServicesTestCase {
     ContainerResponse resp = launcher.service("PUT", path, "", headers, jsonBranding.toString().getBytes(), envctx);
 
     // Then
-    assertEquals(200, resp.getStatus());
+    assertEquals(204, resp.getStatus());
     Object entity = resp.getEntity();
     assertNull(entity);
 
@@ -107,4 +110,57 @@ public class BrandingRestResourcesTest extends BaseRestServicesTestCase {
     assertEquals("test1", caturedBranding.getCompanyName());
     assertEquals("Dark", caturedBranding.getTopBarTheme());
   }
+
+  public void testGetBrandingFavicon() throws Exception {
+    // Given
+    String path = "/v1/platform/branding/favicon?v=test";
+    EnvironmentContext envctx = new EnvironmentContext();
+    HttpServletRequest httpRequest = new MockHttpServletRequest(path, null, 0, "GET", null);
+    envctx.put(HttpServletRequest.class, httpRequest);
+
+    ContainerResponse resp = launcher.service("GET", path, "", null, null, envctx);
+    assertEquals(404, resp.getStatus());
+
+    Favicon favicon = new Favicon(null, 5, new byte[] {
+        1, 2, 3
+    }, 0, 0);
+    when(brandingService.getFavicon()).thenReturn(favicon);
+
+    // When
+    resp = launcher.service("GET", path, "", null, null, envctx);
+
+    // Then
+    assertEquals(200, resp.getStatus());
+    Object entity = resp.getEntity();
+    assertNotNull(entity);
+    assertTrue(entity instanceof ByteArrayInputStream);
+    assertEquals(3, ((ByteArrayInputStream) entity).available());
+  }
+
+  public void testGetBrandingLogo() throws Exception {
+    // Given
+    String path = "/v1/platform/branding/logo?v=test";
+    EnvironmentContext envctx = new EnvironmentContext();
+    HttpServletRequest httpRequest = new MockHttpServletRequest(path, null, 0, "GET", null);
+    envctx.put(HttpServletRequest.class, httpRequest);
+
+    ContainerResponse resp = launcher.service("GET", path, "", null, null, envctx);
+    assertEquals(404, resp.getStatus());
+
+    Logo logo = new Logo(null, 5, new byte[] {
+        1, 2, 3
+    }, 0, 0);
+    when(brandingService.getLogo()).thenReturn(logo);
+
+    // When
+    resp = launcher.service("GET", path, "", null, null, envctx);
+
+    // Then
+    assertEquals(200, resp.getStatus());
+    Object entity = resp.getEntity();
+    assertNotNull(entity);
+    assertTrue(entity instanceof ByteArrayInputStream);
+    assertEquals(3, ((ByteArrayInputStream) entity).available());
+  }
+
 }

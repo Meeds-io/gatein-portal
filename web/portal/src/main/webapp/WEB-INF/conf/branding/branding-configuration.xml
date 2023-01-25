@@ -20,7 +20,23 @@
       </value-param>
       <value-param>
         <name>exo.branding.company.logo</name>
-        <value>${exo.branding.company.logo:/images/logo/MeedsLogo.png}</value>
+        <value>${exo.branding.company.logo:/skin/images/logo/DefaultLogo.png}</value>
+      </value-param>
+      <value-param>
+        <name>exo.branding.company.favicon</name>
+        <value>${exo.branding.company.favicon:/skin/images/favicon.ico}</value>
+      </value-param>
+      <value-param>
+        <name>authentication.background</name>
+        <value>${portal.authentication.background:}</value>
+      </value-param>
+      <value-param>
+        <name>authentication.title</name>
+        <value>${portal.authentication.title:UILoginForm.label.pageTitle}</value>
+      </value-param>
+      <value-param>
+        <name>authentication.subtitle</name>
+        <value>${portal.authentication.subtitle:UILoginForm.label.pageSubTitle}</value>
       </value-param>
       <value-param>
         <name>exo.branding.theme.path</name>
