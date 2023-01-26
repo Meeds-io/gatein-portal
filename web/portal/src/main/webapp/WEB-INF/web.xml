@@ -81,7 +81,7 @@
     <filter-class>org.exoplatform.web.login.RememberMeFilter</filter-class>
     <init-param>
       <param-name>ignoredPaths</param-name>
-      <param-value>/skins,/scripts,/rest,/favicon.ico</param-value>
+      <param-value>/skins,/scripts,/favicon.ico</param-value>
     </init-param>
   </filter>
 
