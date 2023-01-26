@@ -881,6 +881,7 @@
   <module>
     <name>eCharts</name>
     <script>
+      <minify>false</minify>
       <adapter>
         (function() {
         <include>/javascript/echarts.min.js</include>
