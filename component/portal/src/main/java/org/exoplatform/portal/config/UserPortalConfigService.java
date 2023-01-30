@@ -706,4 +706,8 @@ public class UserPortalConfigService implements Startable {
         }
     }
 
+    public void reloadConfig(String ownerType, String predefinedOwner, String location, String importMode, boolean overrideMode) {
+      newPortalConfigListener_.reloadConfig(ownerType, predefinedOwner, location, importMode, overrideMode);
+    }
+
 }
