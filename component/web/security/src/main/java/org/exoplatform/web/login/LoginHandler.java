@@ -156,6 +156,9 @@ public class LoginHandler extends JspBasedWebHandler {
     }
 
     String username = request.getParameter("username");
+    if (username != null) {
+      username = username.trim();
+    }
     String password = request.getParameter("password");
 
     final String portalContextPath = servletContext.getContextPath();
