@@ -26,7 +26,7 @@
   <parent>
     <artifactId>maven-parent-pom</artifactId>
     <groupId>io.meeds</groupId>
-    <version>27-M06</version>
+    <version>27-devx-SNAPSHOT</version>
   </parent>
 
   <groupId>io.meeds.portal</groupId>
@@ -37,8 +37,8 @@
   <name>Meeds - Portal</name>
 
   <properties>
-    <io.meeds.gatein.sso.version>7.0.x-exo-SNAPSHOT</io.meeds.gatein.sso.version>
-    <io.meeds.gatein.pc.version>7.0.x-exo-SNAPSHOT</io.meeds.gatein.pc.version>
+    <io.meeds.gatein.sso.version>7.0.x-devx-SNAPSHOT</io.meeds.gatein.sso.version>
+    <io.meeds.gatein.pc.version>7.0.x-devx-SNAPSHOT</io.meeds.gatein.pc.version>
     
     <!-- Sonar properties -->
     <sonar.organization>meeds-io</sonar.organization>
