@@ -29,14 +29,24 @@ import org.exoplatform.portal.mop.SiteType;
  */
 public interface NavigationStore extends NodeStore {
 
-    List<NavigationData> loadNavigations(SiteType type);
+  /**
+   * Retrieves all the navigation nodes of a given site
+   * 
+   * @param  type {@link SiteType}
+   * @param offset offset of the query
+   * @param limit limit to fetch
+   * @return      {@link List} of {@link NavigationData}
+   */
+  default List<NavigationData> loadNavigations(SiteType type, int offset, int limit) {
+    throw new UnsupportedOperationException();
+  }
 
-    NavigationData loadNavigationData(SiteKey key);
+  NavigationData loadNavigationData(SiteKey key);
 
-    NavigationData loadNavigationData(Long nodeId);
+  NavigationData loadNavigationData(Long nodeId);
 
-    void saveNavigation(SiteKey key, NavigationState state);
+  void saveNavigation(SiteKey key, NavigationState state);
 
-    boolean destroyNavigation(NavigationData data);
+  boolean destroyNavigation(NavigationData data);
 
 }

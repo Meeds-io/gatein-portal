@@ -44,6 +44,8 @@ public class PortalConfig extends ModelObject implements Cloneable {
 
     public static final String PORTAL_TYPE = SiteType.PORTAL.getName();
 
+    public static final String SPACE_TYPE  = SiteType.SPACE.getName();
+
     public static final Container DEFAULT_LAYOUT = initDefaultLayout();
 
     private String name;

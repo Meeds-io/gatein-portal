@@ -50,11 +50,17 @@ public class JDBCNavigationServiceWrapper implements NavigationService {
   }
 
   @Override
-  public List<NavigationContext> loadNavigations(SiteType type) throws NullPointerException, NavigationServiceException {
+  @Deprecated(forRemoval = true, since = "6.4.0")
+  public List<NavigationContext> loadNavigations(SiteType type) {
     return service.loadNavigations(type);
   }
 
-  public void saveNavigation(NavigationContext navigation) throws NullPointerException, NavigationServiceException {
+  @Override
+  public List<NavigationContext> loadNavigations(SiteType type, int offset, int limit) {
+    return service.loadNavigations(type, offset, limit);
+  }
+
+  public void saveNavigation(NavigationContext navigation) throws NavigationServiceException {
     boolean created = service.loadNavigation(navigation.key) == null;
     service.saveNavigation(navigation);
 
@@ -66,7 +72,7 @@ public class JDBCNavigationServiceWrapper implements NavigationService {
     }
   }
 
-  public boolean destroyNavigation(NavigationContext navigation) throws NullPointerException, NavigationServiceException {
+  public boolean destroyNavigation(NavigationContext navigation) throws NavigationServiceException {
     notify(EventType.NAVIGATION_DESTROY, navigation.getKey());
     boolean destroyed = service.destroyNavigation(navigation);
 
@@ -98,15 +104,13 @@ public class JDBCNavigationServiceWrapper implements NavigationService {
 
   public <N> void updateNode(NodeContext<N> context,
                              Scope scope,
-                             NodeChangeListener<NodeContext<N>> listener) throws NullPointerException,
-          NavigationServiceException {
+                             NodeChangeListener<NodeContext<N>> listener) throws NavigationServiceException {
     service.updateNode(context, scope, listener);
   }
 
   public <N> void rebaseNode(NodeContext<N> context,
                              Scope scope,
-                             NodeChangeListener<NodeContext<N>> listener) throws NullPointerException,
-          NavigationServiceException {
+                             NodeChangeListener<NodeContext<N>> listener) throws NavigationServiceException {
     service.rebaseNode(context, scope, listener);
   }
 

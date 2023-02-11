@@ -42,6 +42,10 @@ public final class SiteKey implements Serializable {
         return new SiteKey(SiteType.USER, name);
     }
 
+    public static SiteKey space(String name) {
+      return new SiteKey(SiteType.SPACE, name);
+    }
+
     /** . */
     private final SiteType type;
 

@@ -19,6 +19,19 @@
 
 package org.exoplatform.portal.mop.user;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PageNavigation;
 import org.exoplatform.portal.config.model.PortalConfig;
@@ -36,16 +49,8 @@ import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.IdentityConstants;
 
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-import org.exoplatform.services.log.Log;
-import org.exoplatform.services.log.ExoLogger;
-
 /**
- * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @author  <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
 public class UserPortalImpl implements UserPortal {
@@ -53,93 +58,93 @@ public class UserPortalImpl implements UserPortal {
   public static final Comparator<UserNavigation> USER_NAVIGATION_COMPARATOR = new Comparator<UserNavigation>() {
                                                                               public int compare(UserNavigation nav1,
                                                                                                  UserNavigation nav2) {
-                                                                                                                                               /*
-                                                                                                                                                * Because
-                                                                                                                                                * we
-                                                                                                                                                * cannot
-                                                                                                                                                * tell
-                                                                                                                                                * how
-                                                                                                                                                * expensive
-                                                                                                                                                * getPriority
-                                                                                                                                                * (
-                                                                                                                                                * )
-                                                                                                                                                * is
-                                                                                                                                                * we
-                                                                                                                                                * better
-                                                                                                                                                * store
-                                                                                                                                                * the
-                                                                                                                                                * priorities
-                                                                                                                                                * into
-                                                                                                                                                * local
-                                                                                                                                                * variables
-                                                                                                                                                */
+                                                                                                                                                     /*
+                                                                                                                                                      * Because
+                                                                                                                                                      * we
+                                                                                                                                                      * cannot
+                                                                                                                                                      * tell
+                                                                                                                                                      * how
+                                                                                                                                                      * expensive
+                                                                                                                                                      * getPriority
+                                                                                                                                                      * (
+                                                                                                                                                      * )
+                                                                                                                                                      * is
+                                                                                                                                                      * we
+                                                                                                                                                      * better
+                                                                                                                                                      * store
+                                                                                                                                                      * the
+                                                                                                                                                      * priorities
+                                                                                                                                                      * into
+                                                                                                                                                      * local
+                                                                                                                                                      * variables
+                                                                                                                                                      */
                                                                                 int priority1 = nav1.getPriority();
                                                                                 int priority2 = nav2.getPriority();
                                                                                 if (priority1 == priority2) {
-                                                                                                                                               /*
-                                                                                                                                                * A
-                                                                                                                                                * fix
-                                                                                                                                                * for
-                                                                                                                                                * GTNPORTAL
-                                                                                                                                                * -
-                                                                                                                                                * 3322.
-                                                                                                                                                * The
-                                                                                                                                                * original
-                                                                                                                                                * comparator
-                                                                                                                                                * has
-                                                                                                                                                * not
-                                                                                                                                                * imposed
-                                                                                                                                                * a
-                                                                                                                                                * total
-                                                                                                                                                * ordering
-                                                                                                                                                * as
-                                                                                                                                                * required
-                                                                                                                                                * by
-                                                                                                                                                * the
-                                                                                                                                                * Comparator
-                                                                                                                                                * interface:
-                                                                                                                                                * "The
-                                                                                                                                                * implementor
-                                                                                                                                                * must
-                                                                                                                                                * ensure
-                                                                                                                                                * that
-                                                                                                                                                * sgn
-                                                                                                                                                * (
-                                                                                                                                                * compare
-                                                                                                                                                * (
-                                                                                                                                                * x,
-                                                                                                                                                * y
-                                                                                                                                                * )
-                                                                                                                                                * )
-                                                                                                                                                * ==
-                                                                                                                                                * -sgn
-                                                                                                                                                * (
-                                                                                                                                                * compare
-                                                                                                                                                * (
-                                                                                                                                                * y,
-                                                                                                                                                * x
-                                                                                                                                                * )
-                                                                                                                                                * )
-                                                                                                                                                * for
-                                                                                                                                                * all
-                                                                                                                                                * x
-                                                                                                                                                * and
-                                                                                                                                                * y
-                                                                                                                                                * .
-                                                                                                                                                * "
-                                                                                                                                                * This
-                                                                                                                                                * was
-                                                                                                                                                * not
-                                                                                                                                                * the
-                                                                                                                                                * case
-                                                                                                                                                * when
-                                                                                                                                                * comparing
-                                                                                                                                                * two
-                                                                                                                                                * nodes
-                                                                                                                                                * both
-                                                                                                                                                * having
-                                                                                                                                                * UNDEFINED_PRIORITY.
-                                                                                                                                                */
+                                                                                                                                                     /*
+                                                                                                                                                      * A
+                                                                                                                                                      * fix
+                                                                                                                                                      * for
+                                                                                                                                                      * GTNPORTAL
+                                                                                                                                                      * -
+                                                                                                                                                      * 3322.
+                                                                                                                                                      * The
+                                                                                                                                                      * original
+                                                                                                                                                      * comparator
+                                                                                                                                                      * has
+                                                                                                                                                      * not
+                                                                                                                                                      * imposed
+                                                                                                                                                      * a
+                                                                                                                                                      * total
+                                                                                                                                                      * ordering
+                                                                                                                                                      * as
+                                                                                                                                                      * required
+                                                                                                                                                      * by
+                                                                                                                                                      * the
+                                                                                                                                                      * Comparator
+                                                                                                                                                      * interface:
+                                                                                                                                                      * "The
+                                                                                                                                                      * implementor
+                                                                                                                                                      * must
+                                                                                                                                                      * ensure
+                                                                                                                                                      * that
+                                                                                                                                                      * sgn
+                                                                                                                                                      * (
+                                                                                                                                                      * compare
+                                                                                                                                                      * (
+                                                                                                                                                      * x,
+                                                                                                                                                      * y
+                                                                                                                                                      * )
+                                                                                                                                                      * )
+                                                                                                                                                      * ==
+                                                                                                                                                      * -sgn
+                                                                                                                                                      * (
+                                                                                                                                                      * compare
+                                                                                                                                                      * (
+                                                                                                                                                      * y,
+                                                                                                                                                      * x
+                                                                                                                                                      * )
+                                                                                                                                                      * )
+                                                                                                                                                      * for
+                                                                                                                                                      * all
+                                                                                                                                                      * x
+                                                                                                                                                      * and
+                                                                                                                                                      * y
+                                                                                                                                                      * .
+                                                                                                                                                      * "
+                                                                                                                                                      * This
+                                                                                                                                                      * was
+                                                                                                                                                      * not
+                                                                                                                                                      * the
+                                                                                                                                                      * case
+                                                                                                                                                      * when
+                                                                                                                                                      * comparing
+                                                                                                                                                      * two
+                                                                                                                                                      * nodes
+                                                                                                                                                      * both
+                                                                                                                                                      * having
+                                                                                                                                                      * UNDEFINED_PRIORITY.
+                                                                                                                                                      */
                                                                                   return 0;
                                                                                 } else if (priority1 == PageNavigation.UNDEFINED_PRIORITY) {
                                                                                   return 1;
@@ -150,8 +155,6 @@ public class UserPortalImpl implements UserPortal {
                                                                                 }
                                                                               }
                                                                             };
-
-  private final Log                              log                        = ExoLogger.getLogger(UserPortalImpl.class);
 
   /** . */
   final UserPortalConfigService                  service;
@@ -208,89 +211,79 @@ public class UserPortalImpl implements UserPortal {
    * Returns an immutable sorted list of the valid navigations related to the
    * user.
    *
-   * @return the navigations
+   * @return                     the navigations
    * @throws UserPortalException any user portal exception
    */
   public List<UserNavigation> getNavigations() throws UserPortalException, NavigationServiceException {
     if (navigations == null) {
-      List<UserNavigation> navigations = new ArrayList<UserNavigation>(userName == null ? 1 : 10);
+      List<UserNavigation> userNavigations = new ArrayList<>(userName == null ? 1 : 10);
       NavigationContext portalNav = service.getNavigationService()
-                                           .loadNavigation(
-                                                           new SiteKey(SiteType.PORTAL, portalName));
+                                           .loadNavigation(new SiteKey(SiteType.PORTAL, portalName));
       if (portalNav != null && portalNav.getState() != null) {
-        navigations.add(new UserNavigation(this, portalNav, service.getUserACL().hasEditPermission(portalConfig)));
+        userNavigations.add(new UserNavigation(this, portalNav, service.getUserACL().hasEditPermission(portalConfig)));
       }
-      //
       if (userName != null) {
-        // Add user nav if any
-        NavigationContext userNavigation = service.getNavigationService().loadNavigation(SiteKey.user(userName));
-        if (userNavigation != null && userNavigation.getState() != null) {
-          navigations.add(new UserNavigation(this, userNavigation, true));
-        }
-
         // Add group navigations
-        if (service.getUserACL().getSuperUser().equals(userName)) {
-          List<NavigationContext> navCtxs = service.getNavigationService().loadNavigations(SiteType.GROUP);
-          for (NavigationContext navCtx : navCtxs) {
-            if (!navCtx.getKey().getName().equals(service.getUserACL().getGuestsGroup())) {
-              navigations.add(new UserNavigation(this, navCtx, true));
+        List<String> userGroupIds = getUserGroupIds(ConversationState.getCurrent());
+        if (CollectionUtils.isNotEmpty(userGroupIds)) {
+          userGroupIds.forEach(groupId -> {
+            NavigationContext groupNavigation = service.getNavigationService()
+                                                       .loadNavigation(SiteKey.group(groupId));
+            if (groupNavigation != null && groupNavigation.getState() != null) {
+              UserNavigation userNavigation = new UserNavigation(this,
+                                                                 groupNavigation,
+                                                                 service.getUserACL()
+                                                                        .hasEditPermissionOnNavigation(groupNavigation.getKey()));
+              userNavigations.add(userNavigation);
             }
-          }
-        } else {
-          Collection<?> groups = null;
-          try {
-            ConversationState conv = ConversationState.getCurrent();
-            if (conv != null && conv.getIdentity() != null && !IdentityConstants.ANONIM.equals(conv.getIdentity().getUserId())
-                && !IdentityConstants.SYSTEM.equals(conv.getIdentity().getUserId())) {
-              groups = conv.getIdentity().getGroups();
-            } else {
-              groups = service.getOrganizationService().getGroupHandler().findGroupsOfUser(userName);
-            }
-          } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-              log.debug("Could not retrieve groups", e);
-            }
-            // throw new UserPortalException("Could not retrieve groups", e);
-          }
-
-          if (groups != null) {
-            for (Object group : groups) {
-              String groupId = null;
-              if (group instanceof Group) {
-                groupId = ((Group) group).getId().trim();
-              } else {
-                groupId = group.toString().trim();
-              }
-              if (!groupId.equals(service.getUserACL().getGuestsGroup())) {
-                NavigationContext groupNavigation = service.getNavigationService()
-                                                           .loadNavigation(
-                                                                           SiteKey.group(groupId));
-                if (groupNavigation != null && groupNavigation.getState() != null) {
-                  navigations.add(new UserNavigation(this,
-                                                     groupNavigation,
-                                                     service.getUserACL()
-                                                            .hasEditPermissionOnNavigation(groupNavigation.getKey())));
-                }
-              }
-            }
-          }
+          });
         }
 
         // Sort the list finally
-        Collections.sort(navigations, USER_NAVIGATION_COMPARATOR);
+        Collections.sort(userNavigations, USER_NAVIGATION_COMPARATOR);
       }
 
       // Add global navigation at the end
       NavigationContext globalPortalNav = service.getNavigationService()
                                                  .loadNavigation(new SiteKey(SiteType.PORTAL, service.getGlobalPortal()));
       if (globalPortalNav != null && globalPortalNav.getState() != null) {
-        navigations.add(new UserNavigation(this, globalPortalNav, false));
+        userNavigations.add(new UserNavigation(this, globalPortalNav, false));
       }
 
       //
-      this.navigations = Collections.unmodifiableList(navigations);
+      this.navigations = Collections.unmodifiableList(userNavigations);
     }
     return navigations;
+  }
+
+  private List<String> getUserGroupIds(ConversationState conversationState) {
+    Collection<?> groups = null;
+    if (conversationState != null && conversationState.getIdentity() != null
+        && !IdentityConstants.ANONIM.equals(conversationState.getIdentity().getUserId())
+        && !IdentityConstants.SYSTEM.equals(conversationState.getIdentity().getUserId())) {
+      groups = conversationState.getIdentity().getGroups();
+    } else {
+      try {
+        groups = service.getOrganizationService().getGroupHandler().findGroupsOfUser(userName);
+      } catch (Exception e) {
+        throw new IllegalStateException("Could not retrieve groups", e);
+      }
+    }
+    return getUserGroupIds(groups);
+  }
+
+  private List<String> getUserGroupIds(Collection<?> groups) {
+    String guestsGroupId = service.getUserACL().getGuestsGroup();
+    return groups.stream()
+                 .map(groupObj -> {
+                   if (groupObj instanceof Group group) {
+                     return group.getId().trim();
+                   } else {
+                     return groupObj.toString().trim();
+                   }
+                 })
+                 .filter(groupId -> !StringUtils.equals(groupId, guestsGroupId))
+                 .toList();
   }
 
   @Override
@@ -368,18 +361,18 @@ public class UserPortalImpl implements UserPortal {
 
   @Override
   public UserNode getNodeById(String userNodeId, SiteKey siteKey,
-                                              Scope scope,
-                                              UserNodeFilterConfig filterConfig,
-                                              NodeChangeListener<UserNode> listener) throws NullPointerException,
-                                                                                            UserPortalException,
-                                                                                            NavigationServiceException {
+                              Scope scope,
+                              UserNodeFilterConfig filterConfig,
+                              NodeChangeListener<UserNode> listener) throws NullPointerException,
+                                                                     UserPortalException,
+                                                                     NavigationServiceException {
     UserNavigation userNavigation = getNavigation(siteKey);
     UserNodeContext userNodeContext = new UserNodeContext(userNavigation, filterConfig);
     NodeContext<UserNode> nodeContext = service.getNavigationService()
                                                .loadNodeById(userNodeContext,
-                                                       userNodeId,
-                                                       scope,
-                                                       new UserNodeListener(listener));
+                                                             userNodeId,
+                                                             scope,
+                                                             new UserNodeListener(listener));
     if (nodeContext != null) {
       return nodeContext.getNode().filter();
     } else {

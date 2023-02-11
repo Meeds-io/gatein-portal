@@ -34,4 +34,10 @@ public interface SiteDAO extends GenericDAO<SiteEntity, Long> {
 
   List<SiteKey> findSiteKey(SiteType siteType);
 
+  List<String> findPortalSites(int offset, int limit);
+
+  List<String> findGroupSites(int offset, int limit);
+
+  List<String> findSpaceSites(int offset, int limit);
+
 }

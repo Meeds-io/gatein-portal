@@ -40,7 +40,7 @@ public class UserNavigation {
     /** . */
     private final boolean modifiable;
 
-    UserNavigation(UserPortalImpl portal, NavigationContext navigation, boolean modifiable) {
+    public UserNavigation(UserPortalImpl portal, NavigationContext navigation, boolean modifiable) {
         if (navigation == null) {
             throw new NullPointerException();
         }

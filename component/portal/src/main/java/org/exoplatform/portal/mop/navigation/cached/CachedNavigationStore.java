@@ -1,20 +1,24 @@
-package org.exoplatform.portal.mop.navigation;
+package org.exoplatform.portal.mop.navigation.cached;
 
-import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 import org.exoplatform.commons.cache.future.FutureExoCache;
 import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.jdbc.dao.NavigationDAO;
 import org.exoplatform.portal.mop.jdbc.dao.NodeDAO;
 import org.exoplatform.portal.mop.jdbc.dao.PageDAO;
 import org.exoplatform.portal.mop.jdbc.dao.SiteDAO;
+import org.exoplatform.portal.mop.navigation.NavigationData;
+import org.exoplatform.portal.mop.navigation.NavigationState;
+import org.exoplatform.portal.mop.navigation.NavigationStoreImpl;
+import org.exoplatform.portal.mop.navigation.NodeData;
+import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.services.cache.CacheService;
-import org.exoplatform.services.cache.CachedObjectSelector;
 import org.exoplatform.services.cache.ExoCache;
-import org.exoplatform.services.cache.ObjectCacheInfo;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -35,21 +39,24 @@ public class CachedNavigationStore extends NavigationStoreImpl {
 
   private final ExoCache<Long, NodeData>                              nodeCache;
 
+  private final DataStorage                                           dataStorage;
+
   public CachedNavigationStore(CacheService cacheService,
+                               DataStorage dataStorage,
                                NavigationDAO navigationDAO,
                                SiteDAO siteDAO,
                                NodeDAO nodeDAO,
-                               PageDAO pageDAO,
-                               DataStorage dataStorage) {
-    super(navigationDAO, siteDAO, nodeDAO, pageDAO, dataStorage);
+                               PageDAO pageDAO) {
+    super(navigationDAO, siteDAO, nodeDAO, pageDAO);
+    this.dataStorage = dataStorage;
     this.navigationCache = cacheService.getCacheInstance(NAVIGATION_CACHE_NAME);
     this.navigationFutureCache = new FutureExoCache<>(new Loader<NavigationKey, NavigationData, Object>() {
       @Override
       public NavigationData retrieve(Object context, NavigationKey navigationKey) throws Exception {
-        if (navigationKey.key == null) {
-          return CachedNavigationStore.super.loadNavigationData(navigationKey.nodeId);
+        if (navigationKey.getKey() == null) {
+          return CachedNavigationStore.super.loadNavigationData(navigationKey.getNodeId());
         } else {
-          return CachedNavigationStore.super.loadNavigationData(navigationKey.key);
+          return CachedNavigationStore.super.loadNavigationData(navigationKey.getKey());
         }
       }
     }, navigationCache);
@@ -125,12 +132,23 @@ public class CachedNavigationStore extends NavigationStoreImpl {
 
   @Override
   public NavigationData loadNavigationData(Long nodeId) {
-    return navigationFutureCache.get(null, new NavigationKey(null, nodeId));
+    NavigationData navigationData = navigationFutureCache.get(null, new NavigationKey(null, nodeId));
+    return navigationData == null || navigationData.getSiteKey() == null ? null : navigationData;
   }
 
   @Override
   public NavigationData loadNavigationData(SiteKey key) {
-    return navigationFutureCache.get(null, new NavigationKey(key, null));
+    NavigationData navigationData = navigationFutureCache.get(null, new NavigationKey(key, null));
+    return navigationData == null || navigationData.getSiteKey() == null ? null : navigationData;
+  }
+
+  @Override
+  public List<NavigationData> loadNavigations(SiteType type, int offset, int limit) {
+    List<String> portalNames = dataStorage.getSiteNames(type, offset, limit);
+    return portalNames.stream()
+                      .map(name -> loadNavigationData(type.key(name)))
+                      .filter(Objects::nonNull)
+                      .toList();
   }
 
   @Override
@@ -151,7 +169,7 @@ public class CachedNavigationStore extends NavigationStoreImpl {
       SiteKey siteKey = data.getSiteKey();
       clearNavigationByKey(siteKey);
       clearNodeCache(siteKey);
-      clearNodeCache(Long.parseLong(data.rootId));
+      clearNodeCache(Long.parseLong(data.getRootId()));
     }
   }
 
@@ -199,93 +217,4 @@ public class CachedNavigationStore extends NavigationStoreImpl {
     }
   }
 
-  public static class NavigationCacheSelector implements CachedObjectSelector<NavigationKey, NavigationData> {
-
-    private SiteKey key;
-
-    public NavigationCacheSelector(SiteKey key) {
-      this.key = key;
-    }
-
-    @Override
-    public boolean select(final NavigationKey navigationKey, final ObjectCacheInfo<? extends NavigationData> ocinfo) {
-      return Objects.equals(key, navigationKey.getKey()) || Objects.equals(key, ocinfo.get().getSiteKey());
-    }
-
-    @Override
-    public void onSelect(ExoCache<? extends NavigationKey, ? extends NavigationData> cache,
-                         NavigationKey key,
-                         ObjectCacheInfo<? extends NavigationData> ocinfo) throws Exception {
-      cache.remove(key);
-    }
-  }
-
-  public static class NavigationDataCacheSelector implements CachedObjectSelector<Long, NodeData> {
-
-    private SiteKey key;
-
-    private Long    nodeId;
-
-    public NavigationDataCacheSelector(SiteKey key, Long nodeId) {
-      this.key = key;
-      this.nodeId = nodeId;
-    }
-
-    @Override
-    public boolean select(final Long nodeKey, final ObjectCacheInfo<? extends NodeData> ocinfo) {
-      return Objects.equals(nodeId, nodeKey) || Objects.equals(key, ocinfo.get().getParentId())
-          || Objects.equals(key, ocinfo.get().getState().getSiteKey());
-    }
-
-    @Override
-    public void onSelect(ExoCache<? extends Long, ? extends NodeData> cache,
-                         Long key,
-                         ObjectCacheInfo<? extends NodeData> ocinfo) throws Exception {
-      cache.remove(key);
-    }
-  }
-
-  public static class NavigationKey implements Serializable {
-
-    private static final long serialVersionUID = 186446668859416892L;
-
-    private SiteKey           key;
-
-    private Long              nodeId;
-
-    public NavigationKey(SiteKey key, Long nodeId) {
-      this.key = key;
-      this.nodeId = nodeId;
-    }
-
-    public SiteKey getKey() {
-      return key;
-    }
-
-    public void setKey(SiteKey key) {
-      this.key = key;
-    }
-
-    public Long getNodeId() {
-      return nodeId;
-    }
-
-    public void setNodeId(Long nodeId) {
-      this.nodeId = nodeId;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(key, nodeId);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (!(obj instanceof NavigationKey)) {
-        return false;
-      }
-      return Objects.equals(key, ((NavigationKey) obj).key)
-          && Objects.equals(nodeId, ((NavigationKey) obj).nodeId);
-    }
-  }
 }

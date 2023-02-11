@@ -65,7 +65,7 @@ public class NavigationContext {
      * @return the navigation key
      */
     public SiteKey getKey() {
-        return data.key;
+      return data == null ? this.key : data.key;
     }
 
     /**
@@ -74,13 +74,7 @@ public class NavigationContext {
      * @return the navigation state
      */
     public NavigationState getState() {
-        if (state != null) {
-            return state;
-        } else if (data != null) {
-            return data.state;
-        } else {
-            return null;
-        }
+      return state != null || data == null ? this.state : data.state;
     }
 
     public NavigationData getData() {

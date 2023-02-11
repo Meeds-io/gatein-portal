@@ -50,6 +50,7 @@ import org.exoplatform.portal.mop.jdbc.service.TestJDBCNavigationServiceSave;
 import org.exoplatform.portal.mop.jdbc.service.TestJDBCNavigationServiceUpdate;
 import org.exoplatform.portal.mop.jdbc.service.TestJDBCNavigationServiceWrapper;
 import org.exoplatform.portal.mop.jdbc.service.TestPageService;
+import org.exoplatform.portal.mop.rest.NavigationRestTest;
 import org.exoplatform.portal.rest.MembershipTypeRestResourcesTest;
 import org.exoplatform.portal.rest.UserFieldValidatorTest;
 import org.exoplatform.portal.rest.UserRestResourcesTest;
@@ -88,6 +89,7 @@ import org.exoplatform.settings.rest.SettingResourceTest;
     TestJDBCNavigationServiceWrapper.class,
     TestPageService.class,
     BrandingRestResourcesTest.class,
+    NavigationRestTest.class,
     MembershipTypeRestResourcesTest.class,
     UserFieldValidatorTest.class,
     UserRestResourcesTest.class,

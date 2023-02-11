@@ -54,4 +54,33 @@ public class InMemorySiteDAO extends AbstractInMemoryDAO<SiteEntity> implements 
                    .toList();
   }
 
+  @Override
+  public List<String> findPortalSites(int offset, int limit) {
+    return findSiteKey(SiteType.PORTAL).stream()
+                                       .skip(offset)
+                                       .limit(limit)
+                                       .map(SiteKey::getName)
+                                       .toList();
+  }
+
+  @Override
+  public List<String> findGroupSites(int offset, int limit) {
+    return findSiteKey(SiteType.GROUP).stream()
+                                      .filter(key -> !key.getName().startsWith("/spaces/"))
+                                      .skip(offset)
+                                      .limit(limit)
+                                      .map(SiteKey::getName)
+                                      .toList();
+  }
+
+  @Override
+  public List<String> findSpaceSites(int offset, int limit) {
+    return findSiteKey(SiteType.GROUP).stream()
+                                      .filter(key -> key.getName().startsWith("/spaces/"))
+                                      .skip(offset)
+                                      .limit(limit)
+                                      .map(SiteKey::getName)
+                                      .toList();
+  }
+
 }

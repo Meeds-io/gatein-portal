@@ -20,134 +20,134 @@ package org.exoplatform.portal.mop.navigation;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 public class JDBCNavigationServiceImpl implements NavigationService {
 
-    private final NodeManager manager;
+  private static final Log  LOG = ExoLogger.getLogger(JDBCNavigationServiceImpl.class);
 
-    final NavigationStore store;
+  private final NodeManager manager;
 
-    public JDBCNavigationServiceImpl(NavigationStore store) throws NullPointerException {
-        if (store == null) {
-            throw new NullPointerException("No null persistence factory allowed");
-        }
+  final NavigationStore     store;
 
-        //
-        this.store = store;
-        this.manager = new NodeManager(store);
+  public JDBCNavigationServiceImpl(NavigationStore store) throws NullPointerException {
+    if (store == null) {
+      throw new NullPointerException("No null persistence factory allowed");
     }
 
-    public NavigationContext loadNavigation(SiteKey key) {
-        if (key == null) {
-            throw new NullPointerException();
-        }
+    //
+    this.store = store;
+    this.manager = new NodeManager(store);
+  }
 
-        //
-        NavigationData data = store.loadNavigationData(key);
-        return data != null && data != NavigationData.EMPTY ? new NavigationContext(data) : null;
+  public NavigationContext loadNavigation(SiteKey key) {
+    //
+    NavigationData data = store.loadNavigationData(key);
+    return data != null && data != NavigationData.EMPTY ? new NavigationContext(data) : null;
+  }
+
+  @Override
+  public List<NavigationContext> loadNavigations(SiteType type, int offset, int limit) {
+    if (type == null) {
+      throw new IllegalArgumentException("Site type is mandatory");
+    }
+    return store.loadNavigations(type, offset, limit)
+                .stream()
+                .map(NavigationContext::new)
+                .toList();
+  }
+
+  @Override
+  @Deprecated(forRemoval = true, since = "6.4.0")
+  public List<NavigationContext> loadNavigations(SiteType type) {
+    LOG.warn("Using a heavy method that will consume a lot of Memory, please take time to change it using pagination!");
+    return loadNavigations(type, 0, 0);
+  }
+
+  public void saveNavigation(NavigationContext navigation) throws NullPointerException, NavigationServiceException {
+    if (navigation == null) {
+      throw new NullPointerException();
     }
 
-    @Override
-    public List<NavigationContext> loadNavigations(SiteType type) throws NullPointerException, NavigationServiceException {
-        if (type == null) {
-            throw new NullPointerException();
-        }
-        List<NavigationContext> navigations = new LinkedList<NavigationContext>();
-        for (NavigationData data : store.loadNavigations(type)) {
-            navigations.add(new NavigationContext(data));
-        }
-        return navigations;
+    //
+    // Save
+    store.saveNavigation(navigation.key, navigation.getState());
+
+    // Update state
+    navigation.data = store.loadNavigationData(navigation.key);
+    navigation.state = null;
+  }
+
+  public boolean destroyNavigation(NavigationContext navigation) throws NullPointerException, NavigationServiceException {
+    if (navigation == null) {
+      throw new NullPointerException("No null navigation argument");
+    }
+    if (navigation.data == null) {
+      throw new IllegalArgumentException("Already removed");
     }
 
-    public void saveNavigation(NavigationContext navigation) throws NullPointerException, NavigationServiceException {
-        if (navigation == null) {
-            throw new NullPointerException();
-        }
-
-        //
-        try {
-            // Save
-            store.saveNavigation(navigation.key, navigation.getState());
-
-            // Update state
-            navigation.data = store.loadNavigationData(navigation.key);
-            navigation.state = null;
-        } finally {
-            store.flush();
-        }
+    if (store.destroyNavigation(navigation.data)) {
+      navigation.data = null;
+      return true;
+    } else {
+      return false;
     }
+  }
 
-    public boolean destroyNavigation(NavigationContext navigation) throws NullPointerException, NavigationServiceException {
-        if (navigation == null) {
-            throw new NullPointerException("No null navigation argument");
-        }
-        if (navigation.data == null) {
-            throw new IllegalArgumentException("Already removed");
-        }
-
-        //
-        try {
-            if (store.destroyNavigation(navigation.data)) {
-                navigation.data = null;
-                return true;
-            } else {
-                return false;
-            }
-        } finally {
-            store.flush();
-        }
+  public <N> NodeContext<N> loadNode(NodeModel<N> model, NavigationContext navigation, Scope scope,
+                                     NodeChangeListener<NodeContext<N>> listener) {
+    if (model == null) {
+      throw new NullPointerException("No null model accepted");
     }
-
-    public <N> NodeContext<N> loadNode(NodeModel<N> model, NavigationContext navigation, Scope scope,
-            NodeChangeListener<NodeContext<N>> listener) {
-        if (model == null) {
-            throw new NullPointerException("No null model accepted");
-        }
-        if (navigation == null) {
-            throw new NullPointerException("No null navigation accepted");
-        }
-        if (scope == null) {
-            throw new NullPointerException("No null scope accepted");
-        }
-        String nodeId = navigation.data.rootId;
-        if (navigation.data.rootId != null) {
-            return manager.loadNode(model, nodeId, scope, listener);
-        } else {
-            return null;
-        }
+    if (navigation == null) {
+      throw new NullPointerException("No null navigation accepted");
     }
-
-    @Override
-    public <N> NodeContext<N> loadNodeById(NodeModel<N> model, String nodeId, Scope scope,
-                                           NodeChangeListener<NodeContext<N>> listener) {
-        if (model == null) {
-            throw new NullPointerException("No null model accepted");
-        }
-        if (nodeId == null) {
-            throw new NullPointerException("No null node id accepted");
-        }
-        if (scope == null) {
-            throw new NullPointerException("No null scope accepted");
-        }
-        return manager.loadNode(model, nodeId, scope, listener);
+    if (scope == null) {
+      throw new NullPointerException("No null scope accepted");
     }
-
-    public <N> void updateNode(NodeContext<N> root, Scope scope, NodeChangeListener<NodeContext<N>> listener)
-            throws NullPointerException, IllegalArgumentException, NavigationServiceException {
-        manager.updateNode(root, scope, listener);
+    String nodeId = navigation.data.rootId;
+    if (navigation.data.rootId != null) {
+      return manager.loadNode(model, nodeId, scope, listener);
+    } else {
+      return null;
     }
+  }
 
-    public <N> void saveNode(NodeContext<N> context, NodeChangeListener<NodeContext<N>> listener) throws NullPointerException,
-            NavigationServiceException {
-        manager.saveNode(context, listener);
+  @Override
+  public <N> NodeContext<N> loadNodeById(NodeModel<N> model, String nodeId, Scope scope,
+                                         NodeChangeListener<NodeContext<N>> listener) {
+    if (model == null) {
+      throw new NullPointerException("No null model accepted");
     }
+    if (nodeId == null) {
+      throw new NullPointerException("No null node id accepted");
+    }
+    if (scope == null) {
+      throw new NullPointerException("No null scope accepted");
+    }
+    return manager.loadNode(model, nodeId, scope, listener);
+  }
 
-    public <N> void rebaseNode(NodeContext<N> context, Scope scope, NodeChangeListener<NodeContext<N>> listener)
-            throws NavigationServiceException {
-        manager.rebaseNode(context, scope, listener);
-    }
+  public <N> void updateNode(NodeContext<N> root, Scope scope, NodeChangeListener<NodeContext<N>> listener)
+                                                                                                            throws NullPointerException,
+                                                                                                            IllegalArgumentException,
+                                                                                                            NavigationServiceException {
+    manager.updateNode(root, scope, listener);
+  }
+
+  public <N> void saveNode(NodeContext<N> context, NodeChangeListener<NodeContext<N>> listener) throws NullPointerException,
+                                                                                                NavigationServiceException {
+    manager.saveNode(context, listener);
+  }
+
+  public <N> void rebaseNode(NodeContext<N> context, Scope scope, NodeChangeListener<NodeContext<N>> listener)
+                                                                                                               throws NavigationServiceException {
+    manager.rebaseNode(context, scope, listener);
+  }
 
 }

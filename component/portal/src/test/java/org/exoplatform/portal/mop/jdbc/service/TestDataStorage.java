@@ -276,17 +276,6 @@ public class TestDataStorage extends AbstractKernelTest {
     assertEquals("Theme2", app.getTheme());
   }
 
-  public void testPageRemove() throws Exception {
-    Page page = storage_.getPage("portal::test::test1");
-    assertNotNull(page);
-
-    try {
-      storage_.remove(page);
-      fail();
-    } catch (UnsupportedOperationException e) {
-    }
-  }
-
   public void testWindowMove2() throws Exception {
     Page page = storage_.getPage("portal::test::test3");
     Container container = new Container();

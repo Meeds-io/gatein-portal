@@ -1,7 +1,9 @@
 package org.exoplatform.portal.mop.rest;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -14,18 +16,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.portal.config.*;
+import org.exoplatform.portal.config.NavigationCategoryService;
+import org.exoplatform.portal.config.UserPortalConfig;
+import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
@@ -45,6 +43,13 @@ import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityConstants;
 import org.exoplatform.ws.frameworks.json.impl.JsonParserImpl;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path("/v1/navigations")
 @Tag(name = "v1/navigations", description = "Retrieve sites navigations")
@@ -77,7 +82,17 @@ public class NavigationRest implements ResourceContainer {
           @ApiResponse(responseCode = "400", description = "Invalid query input"),
           @ApiResponse(responseCode = "404", description = "Navigation does not exist"),
           @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public Response getSiteNavigation(@Context HttpServletRequest request) {
+  public Response getSiteNavigation(
+                                    @Context
+                                    HttpServletRequest request,
+                                    @Parameter(description = "Offset", required = false)
+                                    @Schema(defaultValue = "0")
+                                    @QueryParam("offset")
+                                    int offset,
+                                    @Parameter(description = "Limit, if equals to 0, it will use default limit.", required = false)
+                                    @Schema(defaultValue = "20")
+                                    @QueryParam("limit")
+                                    int limit) {
     HttpUserPortalContext userPortalContext = new HttpUserPortalContext(request);
     String portalName = portalConfigService.getDefaultPortal();
 
@@ -93,11 +108,9 @@ public class NavigationRest implements ResourceContainer {
       List<ResultUserNavigation> allNavs = userPortalConfig.getUserPortal()
                                                            .getNavigations()
                                                            .stream()
-                                                           .filter(userNavigation -> !userNavigation.getKey()
-                                                                                                    .getName()
-                                                                                                    .equals("global"))
+                                                           .filter(this::isValidNavigation)
                                                            .map(ResultUserNavigation::new)
-                                                           .collect(Collectors.toList());
+                                                           .toList();
       return Response.ok(allNavs).build();
 
     } catch (Exception e) {
@@ -140,6 +153,7 @@ public class NavigationRest implements ResourceContainer {
   @Path("/categories")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
   @Operation(
       summary = "Gets navigations categories for UI",
       description = "Gets navigations categories for UI",
@@ -163,7 +177,7 @@ public class NavigationRest implements ResourceContainer {
     }
   }
 
-  private Response getNavigations(HttpServletRequest request,
+  private Response getNavigations(HttpServletRequest request, // NOSONAR
                                   String siteTypeName,
                                   String siteName,
                                   String excludedSiteName,
@@ -275,7 +289,7 @@ public class NavigationRest implements ResourceContainer {
     }
     return visibilityNames.stream()
                           .map(visibilityName -> Visibility.valueOf(StringUtils.upperCase(visibilityName)))
-                          .collect(Collectors.toList())
+                          .toList()
                           .toArray(new Visibility[0]);
   }
 
@@ -407,6 +421,12 @@ public class NavigationRest implements ResourceContainer {
       }
     }
 
+  }
+
+  private boolean isValidNavigation(UserNavigation userNavigation) {
+    return !userNavigation.getKey()
+                          .getName()
+                          .equals(portalConfigService.getGlobalPortal());
   }
 
 }

@@ -19,7 +19,14 @@
 
 package org.exoplatform.portal.config;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.picocontainer.Startable;
@@ -35,20 +42,28 @@ import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.exoplatform.portal.config.model.*;
+import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelObject;
+import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.portal.mop.importer.ImportMode;
-import org.exoplatform.portal.mop.navigation.*;
-import org.exoplatform.portal.mop.page.*;
+import org.exoplatform.portal.mop.navigation.NavigationContext;
+import org.exoplatform.portal.mop.navigation.NavigationService;
+import org.exoplatform.portal.mop.navigation.NavigationState;
+import org.exoplatform.portal.mop.page.PageContext;
+import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserPortalContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.resources.LocaleConfigService;
 
 /**
  * Created by The eXo Platform SAS Apr 19, 2007 This service is used to load the PortalConfig, Page config and Navigation config
@@ -490,55 +505,24 @@ public class UserPortalConfigService implements Startable {
         return page;
     }
 
-    /**
-     * Returns the list of all portal site names.
-     *
-     * @return the list of all portal site names
-     * @throws Exception any exception
-     */
-    public List<String> getAllPortalNames() throws Exception {
-        return getAllSiteNames(SiteType.PORTAL);
-    }
-
-    /**
-     * Returns the list of all group site names.
-     *
-     * @return the list of all group site names
-     * @throws Exception any exception
-     */
-    public List<String> getAllGroupNames() throws Exception {
-        return getAllSiteNames(SiteType.GROUP);
-    }
-
     public String getGlobalPortal() {
       return globalPortal_;
     }
 
-    private List<String> getAllSiteNames(SiteType siteType) throws Exception {
-        List<String> list;
-        switch (siteType) {
-            case PORTAL:
-                list = storage_.getAllPortalNames();
-
-                // Avoid retrieving global portal as an accessible site via UI
-                if (StringUtils.isNotBlank(globalPortal_)) {
-                  list.remove(globalPortal_);
-                }
-                break;
-            case GROUP:
-                list = storage_.getAllGroupNames();
-                break;
-            default:
-                throw new AssertionError();
+    public List<String> getSiteNames(SiteType siteType, int offset, int limit) {
+      List<String> list = storage_.getSiteNames(siteType, offset, limit);
+      for (Iterator<String> i = list.iterator(); i.hasNext();) {
+        String name = i.next();
+        if (siteType == SiteType.PORTAL && StringUtils.equals(name, globalPortal_)) {
+          i.remove();
+          continue;
         }
-        for (Iterator<String> i = list.iterator(); i.hasNext();) {
-            String name = i.next();
-            PortalConfig config = storage_.getPortalConfig(siteType.getName(), name);
-            if (config == null || !userACL_.hasPermission(config)) {
-                i.remove();
-            }
+        PortalConfig config = storage_.getPortalConfig(siteType.getName(), name);
+        if (config == null || !userACL_.hasPermission(config)) {
+          i.remove();
         }
-        return list;
+      }
+      return list;
     }
 
     /**

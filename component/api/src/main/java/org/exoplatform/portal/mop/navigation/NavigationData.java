@@ -35,7 +35,7 @@ import org.exoplatform.portal.pom.data.MappedAttributes;
 public class NavigationData implements Serializable {
 
     /** Useful. */
-    static final NavigationData EMPTY = new NavigationData();
+    public static final NavigationData EMPTY = new NavigationData();
 
     /** . */
     final SiteKey key;

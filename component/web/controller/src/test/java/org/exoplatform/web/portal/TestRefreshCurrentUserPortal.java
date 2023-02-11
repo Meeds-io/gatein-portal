@@ -19,6 +19,7 @@
 
 package org.exoplatform.web.portal;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,6 +31,9 @@ import org.exoplatform.portal.mop.navigation.*;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.services.resources.Orientation;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
+import org.exoplatform.services.security.MembershipEntry;
 import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.web.application.URLBuilder;
 import org.exoplatform.web.url.*;
@@ -55,6 +59,13 @@ public class TestRefreshCurrentUserPortal extends AbstractKernelTest {
   protected void setUp() throws Exception {
     super.setUp();
     begin();
+    Identity identity = new Identity("root",
+                                     Arrays.asList(
+                                                   new MembershipEntry("/platform"),
+                                                   new MembershipEntry("/platform/users"),
+                                                   new MembershipEntry("/platform/administrators")));
+    ConversationState conversationState = new ConversationState(identity);
+    ConversationState.setCurrent(conversationState);
 
     UserPortalConfigService upcs = getContainer().getComponentInstanceOfType(UserPortalConfigService.class);
     UserPortalConfig upc = upcs.getUserPortalConfig("classic", "root", new SimpleUserPortalContext(Locale.ENGLISH));
@@ -106,11 +117,13 @@ public class TestRefreshCurrentUserPortal extends AbstractKernelTest {
     //
     this.userPortal = userPortal;
     this.requestContext = requestContext;
+    RequestContext.setCurrentInstance(requestContext);
   }
 
   @Override
   protected void tearDown() throws Exception {
     end();
+    ConversationState.setCurrent(null);
     super.tearDown();
   }
 
@@ -152,7 +165,7 @@ public class TestRefreshCurrentUserPortal extends AbstractKernelTest {
   }
 
   public void testDestroy() throws Exception {
-    NavigationService ns = (NavigationService) getContainer().getComponentInstanceOfType(NavigationService.class);
+    NavigationService ns = getContainer().getComponentInstanceOfType(NavigationService.class);
     NavigationContext nav = new NavigationContext(SiteKey.group("/platform"), new NavigationState(1));
     ns.saveNavigation(nav);
     List<UserNavigation> navs = userPortal.getNavigations();

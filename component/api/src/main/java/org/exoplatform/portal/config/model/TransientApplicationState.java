@@ -19,6 +19,8 @@
 
 package org.exoplatform.portal.config.model;
 
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
+
 /**
  * The transient state of an application when it has not yet been stored in the database.
  *

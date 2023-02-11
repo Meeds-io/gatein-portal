@@ -54,14 +54,25 @@ public interface NavigationService {
     NavigationContext loadNavigation(SiteKey key) throws NullPointerException, NavigationServiceException;
 
     /**
+     * Retrieves the list of navigations corresponding to the given site type
+     * 
+     * @param  type   {@link SiteType}
+     * @param  offset offset of the query
+     * @param  limit  limit to fetch
+     * @return {@link List} of {@link NavigationContext}
+     */
+    List<NavigationContext> loadNavigations(SiteType type, int offset, int limit);
+
+    /**
      * Find and returns navigations of a given type. Method use discretion is advised
      *
      * @param type the navigation type
      * @return all navigations matching type
      * @throws NullPointerException if the key is null
-     * @throws NavigationServiceException
+     * @deprecated for removal since 6.4.0
      */
-    List<NavigationContext> loadNavigations(SiteType type) throws NullPointerException, NavigationServiceException;
+    @Deprecated(forRemoval = true, since = "6.4.0")
+    List<NavigationContext> loadNavigations(SiteType type);
 
     /**
      * Create, update a navigation. When the navigation state is not null, the navigation will be created or updated depending

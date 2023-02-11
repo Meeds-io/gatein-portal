@@ -12,10 +12,13 @@ import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 
 public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
-  private PageDAO pageDAO;
-  
-  private NavigationDAO navDAO;
-  
+
+  private static final String SPACE_SITE_TYPE_PREFIX = "/spaces/";
+
+  private PageDAO             pageDAO;
+
+  private NavigationDAO       navDAO;
+
   public SiteDAOImpl(PageDAO pageDAO, NavigationDAO navDAO) {
     super();
     this.pageDAO = pageDAO;
@@ -82,4 +85,44 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
     return keys;
   }
 
+  @Override
+  public List<String> findGroupSites(int offset, int limit) {
+    TypedQuery<String> query = getEntityManager().createNamedQuery("SiteEntity.findGroupSites", String.class);
+    query.setParameter("siteType", SiteType.GROUP);
+    query.setParameter("excludeName", SPACE_SITE_TYPE_PREFIX);
+    if (offset > 0) {
+      query.setFirstResult(offset);
+    }
+    if (limit > 0) {
+      query.setMaxResults(limit);
+    }
+    return query.getResultList();
+  }
+
+  @Override
+  public List<String> findPortalSites(int offset, int limit) {
+    TypedQuery<String> query = getEntityManager().createNamedQuery("SiteEntity.findPortalSites", String.class);
+    query.setParameter("siteType", SiteType.PORTAL);
+    if (offset > 0) {
+      query.setFirstResult(offset);
+    }
+    if (limit > 0) {
+      query.setMaxResults(limit);
+    }
+    return query.getResultList();
+  }
+
+  @Override
+  public List<String> findSpaceSites(int offset, int limit) {
+    TypedQuery<String> query = getEntityManager().createNamedQuery("SiteEntity.findSpaceSites", String.class);
+    query.setParameter("siteType", SiteType.GROUP);
+    query.setParameter("includeName", SPACE_SITE_TYPE_PREFIX + "%");
+    if (offset > 0) {
+      query.setFirstResult(offset);
+    }
+    if (limit > 0) {
+      query.setMaxResults(limit);
+    }
+    return query.getResultList();
+  }
 }
