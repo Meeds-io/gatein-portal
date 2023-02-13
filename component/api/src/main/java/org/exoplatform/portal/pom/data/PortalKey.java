@@ -20,29 +20,36 @@ package org.exoplatform.portal.pom.data;
 
 import org.exoplatform.portal.pom.config.Utils;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 /**
- * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @author  <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class PortalKey extends OwnerKey {
 
-    public PortalKey(String type, String id) {
-        super(type, id);
-    }
+  private static final long serialVersionUID = -6089922297660724879L;
 
-    public static PortalKey create(String compositeId) {
-        if (compositeId == null) {
-            throw new NullPointerException();
-        }
-        String[] components = Utils.split("::", compositeId);
-        if (components.length != 2) {
-            throw new IllegalArgumentException("Wrong navigation id key format " + compositeId);
-        }
-        return new PortalKey(components[0], components[1]);
-    }
+  public PortalKey(String type, String id) {
+    super(type, id);
+  }
 
-    @Override
-    public String toString() {
-        return "PortalKey[type=" + getType() + ",id=" + getId() + "]";
+  public static PortalKey create(String compositeId) {
+    if (compositeId == null) {
+      throw new NullPointerException();
     }
+    String[] components = Utils.split("::", compositeId);
+    if (components.length != 2) {
+      throw new IllegalArgumentException("Wrong navigation id key format " + compositeId);
+    }
+    return new PortalKey(components[0], components[1]);
+  }
+
+  @Override
+  public String toString() {
+    return String.format("%s::%s", getType(), getId());
+  }
 }

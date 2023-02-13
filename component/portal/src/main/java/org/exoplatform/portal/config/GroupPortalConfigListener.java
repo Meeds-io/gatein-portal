@@ -27,7 +27,8 @@ import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
-import org.exoplatform.portal.mop.navigation.NavigationService;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.service.NavigationService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
@@ -46,17 +47,17 @@ public class GroupPortalConfigListener extends GroupEventListener {
     private final UserPortalConfigService portalConfigService;
 
     /** . */
-    private final DataStorage dataStorage;
+    private final LayoutService layoutService;
 
     /** . */
     private final OrganizationService orgService;
 
     private static Log LOG = ExoLogger.getLogger(GroupPortalConfigListener.class);
 
-    public GroupPortalConfigListener(UserPortalConfigService portalConfigService, OrganizationService orgService, DataStorage dataStorage) {
+    public GroupPortalConfigListener(UserPortalConfigService portalConfigService, OrganizationService orgService, LayoutService layoutService) {
         this.portalConfigService = portalConfigService;
         this.orgService = orgService;
-        this.dataStorage = dataStorage;
+        this.layoutService = layoutService;
     }
 
     public void preDelete(Group group) throws Exception {
@@ -115,7 +116,7 @@ public class GroupPortalConfigListener extends GroupEventListener {
             }
 
             // Create the portal from the template
-            if (dataStorage.getPortalConfig(PortalConfig.GROUP_TYPE, groupId) == null) {
+            if (layoutService.getPortalConfig(SiteKey.group(groupId)) == null) {
                 portalConfigService.createGroupSite(groupId);
             } else {
                 LOG.debug("The group site {} already exists. Ignore creating from listener", groupId);
@@ -128,7 +129,7 @@ public class GroupPortalConfigListener extends GroupEventListener {
     private void removeGroupNavigation(Group group) throws Exception {
         GroupHandler groupHandler = orgService.getGroupHandler();
         Collection<String> descendantGroups = getDescendantGroups(group, groupHandler);
-        Collection<String> deletedNavigationGroups = new ArrayList<String>();
+        Collection<String> deletedNavigationGroups = new ArrayList<>();
         deletedNavigationGroups.addAll(descendantGroups);
         deletedNavigationGroups.add(group.getId());
         for (String childGroup : deletedNavigationGroups) {

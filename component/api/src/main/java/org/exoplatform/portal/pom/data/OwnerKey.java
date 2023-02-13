@@ -20,56 +20,23 @@ package org.exoplatform.portal.pom.data;
 
 import java.io.Serializable;
 
+import lombok.Data;
 
 /**
- * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @author  <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@Data
 public abstract class OwnerKey implements Serializable {
 
-    /** . */
-    private final String type;
+  private static final long serialVersionUID = -3343492739640479242L;
 
-    /** . */
-    private final String id;
+  private final String      type;
 
-    public OwnerKey(String type, String id) {
-        if (type == null) {
-            throw new NullPointerException();
-        }
-        if (id == null) {
-            throw new NullPointerException();
-        }
-        this.type = type;
-        this.id = id;
-    }
+  private final String      id;
 
-    public String getType() {
-        return type;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode() ^ type.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-
-        // We need to use class equality here
-        if (obj != null && getClass().equals(obj.getClass())) {
-            OwnerKey that = (OwnerKey) obj;
-            return type.equals(that.type) && id.equals(that.id);
-        }
-
-        //
-        return false;
-    }
+  OwnerKey(String type, String id) {
+    this.type = type;
+    this.id = id;
+  }
 }

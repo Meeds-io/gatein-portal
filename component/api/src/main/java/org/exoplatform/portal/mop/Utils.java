@@ -26,6 +26,7 @@ import org.gatein.mop.api.workspace.Site;
 
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.page.PageState;
+import org.exoplatform.portal.pom.data.PageData;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -78,6 +79,17 @@ public class Utils {
                            page.getEditPermission(),
                            page.getMoveAppsPermissions() != null ? Arrays.asList(page.getMoveAppsPermissions()) : null,
                            page.getMoveContainersPermissions() != null ? Arrays.asList(page.getMoveContainersPermissions()) : null);
+    }
+
+    public static PageState toPageState(PageData page) {
+      return new PageState(page.getTitle(),
+                           page.getDescription(),
+                           page.isShowMaxWindow(),
+                           page.getFactoryId(),
+                           page.getAccessPermissions(),
+                           page.getEditPermission(),
+                           page.getMoveAppsPermissions(),
+                           page.getMoveContainersPermissions());
     }
 
     private static class ComparableComparator<T extends Comparable<T>> implements Comparator<T> {

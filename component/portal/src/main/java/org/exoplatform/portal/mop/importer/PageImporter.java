@@ -22,10 +22,13 @@ package org.exoplatform.portal.mop.importer;
 import java.util.HashMap;
 import java.util.List;
 
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.mop.*;
-import org.exoplatform.portal.mop.page.*;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.Utils;
+import org.exoplatform.portal.mop.page.PageContext;
+import org.exoplatform.portal.mop.page.PageState;
+import org.exoplatform.portal.mop.service.LayoutService;
 
 /**
  * @author <a href="trongtt@gmail.com">Trong Tran</a>
@@ -37,20 +40,16 @@ public class PageImporter {
     private final List<Page> list;
 
     /** . */
-    private final DataStorage service;
-
-    /** . */
-    private final PageService pageService;
+    private final LayoutService layoutService;
 
     /** . */
     private final ImportMode mode;
 
-    public PageImporter(ImportMode importMode, SiteKey siteKey, List<Page> list, DataStorage dataStorage_, PageService pageService) {
+    public PageImporter(ImportMode importMode, SiteKey siteKey, List<Page> list, LayoutService layoutService_) {
         this.siteKey = siteKey;
         this.mode = importMode;
         this.list = list;
-        this.service = dataStorage_;
-        this.pageService = pageService;
+        this.layoutService = layoutService_;
     }
 
     public void perform() throws Exception {
@@ -62,17 +61,11 @@ public class PageImporter {
         //We temporary don't support to delete user site's pages, it's risk because user site page, navigation is controlled by 
         //UserSiteLifecycle which is difference with portal site and group site
         if (mode == ImportMode.OVERWRITE && !siteKey.getType().equals(SiteType.USER)) {
-            List<PageContext> allPages = pageService.loadPages(siteKey);
-            for (PageContext currentPage : allPages) {
-                String currentPageId = currentPage.getKey().format();
-                if (!hashPageList.containsKey(currentPageId)) {
-                    pageService.destroyPage(currentPage.getKey());
-                }
-            }
+          layoutService.removePages(siteKey);
         }
         
         for (Page src : list) {
-            PageContext existingPage = pageService.loadPage(src.getPageKey());
+            PageContext existingPage = layoutService.getPageContext(src.getPageKey());
             Page dst;
             
             //
@@ -97,9 +90,7 @@ public class PageImporter {
             
             if (dst != null) {
                 PageState dstState = Utils.toPageState(dst);
-                
-                pageService.savePage(new PageContext(src.getPageKey(), dstState));
-                service.save(dst);
+                layoutService.save(new PageContext(src.getPageKey(), dstState), dst);
             }            
         }
     }

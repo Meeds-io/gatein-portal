@@ -27,10 +27,10 @@ import java.util.Locale;
 import org.exoplatform.portal.config.model.NavigationFragment;
 import org.exoplatform.portal.config.model.PageNavigation;
 import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
-import org.exoplatform.portal.mop.navigation.NavigationService;
 import org.exoplatform.portal.mop.navigation.NavigationState;
+import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.portal.mop.storage.DescriptionStorage;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -50,15 +50,15 @@ public class NavigationImporter {
     private final ImportMode mode;
 
     /** . */
-    private final DescriptionService descriptionService;
+    private final DescriptionStorage descriptionStorage;
 
     public NavigationImporter(Locale portalLocale, ImportMode mode, PageNavigation src, NavigationService service,
-            DescriptionService descriptionService) {
+                              DescriptionStorage descriptionStorage) {
         this.portalLocale = portalLocale;
         this.mode = mode;
         this.src = src;
         this.service = service;
-        this.descriptionService = descriptionService;
+        this.descriptionStorage = descriptionStorage;
     }
 
     public void perform() {
@@ -117,7 +117,7 @@ public class NavigationImporter {
 
                     //
                     NavigationFragmentImporter fragmentImporter = new NavigationFragmentImporter(path.toArray(new String[path
-                            .size()]), service, dst.getKey(), portalLocale, descriptionService, fragment, mode.config);
+                            .size()]), service, dst.getKey(), portalLocale, descriptionStorage, fragment, mode.config);
 
                     //
                     fragmentImporter.perform();
