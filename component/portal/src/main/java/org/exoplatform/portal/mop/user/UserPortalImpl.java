@@ -22,7 +22,6 @@ package org.exoplatform.portal.mop.user;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -53,28 +52,30 @@ import org.exoplatform.services.security.IdentityConstants;
  */
 public class UserPortalImpl implements UserPortal {
 
-  public static final Comparator<UserNavigation> USER_NAVIGATION_COMPARATOR = new UserNavigationComparator();
+  private static final String            SPACES_SITE_TYPE_PREFIX  = "/spaces/";
+
+  private final UserNavigationComparator userNavigationComparator = new UserNavigationComparator();
 
   /** . */
-  final UserPortalConfigService                  service;
+  final UserPortalConfigService          service;
 
   /** . */
-  private final PortalConfig                     portalConfig;
+  private final PortalConfig             portalConfig;
 
   /** . */
-  final UserPortalContext                        context;
+  final UserPortalContext                context;
 
   /** . */
-  final String                                   userName;
+  final String                           userName;
 
   /** . */
-  private List<UserNavigation>                   navigations;
+  private List<UserNavigation>           navigations;
 
   /** . */
-  private final String                           portalName;
+  private final String                   portalName;
 
   /** . */
-  private final Locale                           portalLocale;
+  private final Locale                   portalLocale;
 
   public UserPortalImpl(UserPortalConfigService service,
                         String portalName,
@@ -96,6 +97,7 @@ public class UserPortalImpl implements UserPortal {
     this.userName = userName;
     this.context = context;
     this.navigations = null;
+    this.userNavigationComparator.setGlobalPortal(service.getGlobalPortal());
   }
 
   @Override
@@ -147,7 +149,9 @@ public class UserPortalImpl implements UserPortal {
     Set<String> addedUserNodesURI = new HashSet<>();
     for (UserNavigation userNavigation : getNavigations()) {
       SiteKey siteKey = userNavigation.getKey();
-      if (siteKey.getType() != siteType) {
+      if (siteKey.getType() != siteType
+          || (siteType == SiteType.GROUP && siteKey.getName().startsWith(SPACES_SITE_TYPE_PREFIX))
+          || (siteType == SiteType.SPACE && !siteKey.getName().startsWith(SPACES_SITE_TYPE_PREFIX))) {
         continue;
       }
 
@@ -417,7 +421,7 @@ public class UserPortalImpl implements UserPortal {
                                           service.getUserACL()
                                                  .hasEditPermissionOnNavigation(navigationContext.getKey()));
       this.navigations.add(userNavigation);
-      Collections.sort(this.navigations, USER_NAVIGATION_COMPARATOR);
+      Collections.sort(this.navigations, userNavigationComparator);
     }
     return userNavigation;
   }

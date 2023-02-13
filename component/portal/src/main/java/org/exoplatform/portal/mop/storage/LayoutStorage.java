@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -106,7 +107,7 @@ public class LayoutStorage {
     } else {
       id = Safe.parseLong(((PersistentApplicationState<S>) state).getStorageId());
     }
-    WindowEntity window = windowDAO.find(id);
+    WindowEntity window = findWindow(id);
     if (window != null) {
       byte[] customization = window.getCustomization();
       if (customization != null) {
@@ -132,14 +133,14 @@ public class LayoutStorage {
     } else {
       id = Safe.parseLong(((PersistentApplicationState<S>) state).getStorageId());
     }
-    WindowEntity window = windowDAO.find(id);
+    WindowEntity window = findWindow(id);
     if (window != null) {
       if (preferences != null) {
         window.setCustomization(serialize((Serializable) preferences));
       } else {
         window.setCustomization(null);
       }
-      windowDAO.update(window);
+      updateWindow(window);
     }
 
     return state;
@@ -161,7 +162,7 @@ public class LayoutStorage {
       throw new IllegalStateException("Unrecognized Application state class type : " + state);
     }
 
-    WindowEntity window = windowDAO.find(id);
+    WindowEntity window = findWindow(id);
     if (window != null) {
       return window.getContentId();
     } else {
@@ -217,10 +218,10 @@ public class LayoutStorage {
           containerDAO.delete(container);
         }
       } else if (TYPE.WINDOW.equals(t)) {
-        WindowEntity window = windowDAO.find(id);
+        WindowEntity window = findWindow(id);
         if (window != null) {
           permissionDAO.deletePermissions(WindowEntity.class.getName(), window.getId());
-          windowDAO.delete(window);
+          deleteWindow(window);
         }
       } else {
         throw new IllegalArgumentException("Can't delete child with type: " + t);
@@ -274,10 +275,10 @@ public class LayoutStorage {
         results.add(dstC);
         break;
       case WINDOW:
-        WindowEntity srcW = windowDAO.find(id);
+        WindowEntity srcW = findWindow(id);
         WindowEntity dstW = clone(srcW);
 
-        windowDAO.create(dstW);
+        dstW = createWindow(dstW);
         clonePermissions(objectType, dstW.getId(), srcW.getId());
         results.add(dstW);
         break;
@@ -305,6 +306,26 @@ public class LayoutStorage {
 
   public void deletePermissions(String objectType, Long objectId) {
     permissionDAO.deletePermissions(objectType, objectId);
+  }
+
+  protected WindowEntity createWindow(WindowEntity dstW) {
+    return windowDAO.create(dstW);
+  }
+
+  protected WindowEntity updateWindow(WindowEntity window) {
+    return windowDAO.update(window);
+  }
+
+  protected WindowEntity findWindow(Long id) {
+    return windowDAO.find(id);
+  }
+
+  protected void deleteWindow(WindowEntity window) {
+    windowDAO.delete(window);
+  }
+
+  protected void deleteWindowById(Long id) {
+    windowDAO.deleteById(id);
   }
 
   private WindowEntity clone(WindowEntity src) {
@@ -360,7 +381,7 @@ public class LayoutStorage {
     filterBodyContainerIds(body, TYPE.WINDOW, windowIds);
     for (Long id : windowIds) {
       if (findById(id, TYPE.WINDOW, children) == null) {
-        windowDAO.deleteById(id);
+        deleteWindowById(id);
       }
     }
 
@@ -611,13 +632,13 @@ public class LayoutStorage {
             containerDAO.update((ContainerEntity) dstChild);
           }
         } else if (srcChild instanceof ApplicationData appData) {
-          dstChild = windowDAO.find(srcChildId);
+          dstChild = findWindow(srcChildId);
           if (dstChild != null) {
             dstChild = buildWindowEntity((WindowEntity) dstChild, appData);
             if (dstChild == null) {
               continue;
             }
-            windowDAO.update((WindowEntity) dstChild);
+            dstChild = updateWindow((WindowEntity) dstChild);
           }
         } else if (srcChild instanceof BodyData) {
           // nothing to update on body data
@@ -636,7 +657,7 @@ public class LayoutStorage {
           if (dstChild == null) {
             continue;
           }
-          dstChild = windowDAO.create((WindowEntity) dstChild);
+          dstChild = createWindow((WindowEntity) dstChild);
         } else if (srcChild instanceof BodyData srcChildBody) {
           dstChild = buildContainerEntity(srcChildBody);
           dstChild = containerDAO.create((ContainerEntity) dstChild);
@@ -690,7 +711,10 @@ public class LayoutStorage {
   private Map<Long, WindowEntity> getWindowEntities(JSONArray jsonBody) {
     Set<Long> ids = new HashSet<>();
     filterBodyContainerIds(jsonBody, TYPE.WINDOW, ids);
-    List<WindowEntity> entities = windowDAO.findByIds(new LinkedList<>(ids));
+    List<WindowEntity> entities = ids.stream()
+                                     .map(this::findWindow)
+                                     .filter(Objects::nonNull)
+                                     .toList();
 
     Map<Long, WindowEntity> results = new HashMap<>();
     for (WindowEntity entity : entities) {

@@ -76,7 +76,8 @@
   </component>
 
   <component>
-    <type>org.exoplatform.portal.mop.storage.LayoutStorage</type>
+    <key>org.exoplatform.portal.mop.storage.LayoutStorage</key>
+    <type>org.exoplatform.portal.mop.storage.cache.CacheLayoutStorage</type>
   </component>
 
   <component>

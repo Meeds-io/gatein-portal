@@ -17,12 +17,25 @@ package org.exoplatform.portal.mop.user;
 
 import java.util.Comparator;
 
+import org.apache.commons.codec.binary.StringUtils;
+
 import org.exoplatform.portal.config.model.PageNavigation;
+import org.exoplatform.portal.mop.SiteType;
+
+import lombok.Setter;
 
 public class UserNavigationComparator implements Comparator<UserNavigation> {
 
+  @Setter
+  private String globalPortal;
+
   public int compare(UserNavigation nav1,
                      UserNavigation nav2) {
+    if (nav1.getKey().getType() == SiteType.PORTAL && StringUtils.equals(globalPortal, nav1.getKey().getName())) {
+      return 1;
+    } else if (nav2.getKey().getType() == SiteType.PORTAL && StringUtils.equals(globalPortal, nav2.getKey().getName())) {
+      return -1;
+    }
     int priority1 = nav1.getPriority();
     int priority2 = nav2.getPriority();
     if (priority1 == priority2) {
