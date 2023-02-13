@@ -30,7 +30,17 @@ import org.exoplatform.portal.mop.dao.DescriptionDAO;
 
 public class DescriptionStorageImpl implements DescriptionStorage {
 
-  private DescriptionDAO descriptionDAO;
+  private static final String DESCRIPTION_IDENTIFIER_IS_MANDATORY = "Description identifier is mandatory";
+
+  private static final String NO_VARIANT_CAB_BE_SET_ON_LOCALE     = "No variant cab be set on locale";
+
+  private static final String NO_LANGUAGE_SET_ON_LOCALE           = "No language set on locale";
+
+  private static final String NO_NULL_LOCALE_ACCEPTED             = "No null locale accepted";
+
+  private static final String NO_NULL_ID_ACCEPTED                 = "No null id accepted";
+
+  private DescriptionDAO      descriptionDAO;
 
   public DescriptionStorageImpl(DescriptionDAO descriptionDAO) {
     this.descriptionDAO = descriptionDAO;
@@ -60,7 +70,7 @@ public class DescriptionStorageImpl implements DescriptionStorage {
 
   public Map<Locale, org.exoplatform.portal.mop.State> getDescriptions(String id) {
     if (id == null) {
-      throw new NullPointerException("No null id accepted");
+      throw new NullPointerException(NO_NULL_ID_ACCEPTED);
     }
     Map<Locale, org.exoplatform.portal.mop.State> names = null;
 
@@ -83,16 +93,16 @@ public class DescriptionStorageImpl implements DescriptionStorage {
 
   public void setDescription(String id, Locale locale, org.exoplatform.portal.mop.State description) {
     if (id == null) {
-      throw new NullPointerException("No null id accepted");
+      throw new NullPointerException(NO_NULL_ID_ACCEPTED);
     }
     if (locale == null) {
-      throw new NullPointerException("No null locale accepted");
+      throw new NullPointerException(NO_NULL_LOCALE_ACCEPTED);
     }
     if (locale.getLanguage().length() == 0) {
-      throw new IllegalArgumentException("No language set on locale");
+      throw new IllegalArgumentException(NO_LANGUAGE_SET_ON_LOCALE);
     }
     if (locale.getVariant().length() > 0) {
-      throw new IllegalArgumentException("No variant cab be set on locale");
+      throw new IllegalArgumentException(NO_VARIANT_CAB_BE_SET_ON_LOCALE);
     }
 
     Map<String, DescriptionState> state = new HashMap<>();
@@ -113,7 +123,7 @@ public class DescriptionStorageImpl implements DescriptionStorage {
 
   public void setDescription(String id, org.exoplatform.portal.mop.State description) {
     if (id == null) {
-      throw new NullPointerException("No null id accepted");
+      throw new NullPointerException(NO_NULL_ID_ACCEPTED);
     }
 
     if (description != null) {
@@ -125,7 +135,7 @@ public class DescriptionStorageImpl implements DescriptionStorage {
 
   public void setDescriptions(String id, Map<Locale, org.exoplatform.portal.mop.State> descriptions) {
     if (id == null) {
-      throw new NullPointerException("No null id accepted");
+      throw new NullPointerException(NO_NULL_ID_ACCEPTED);
     }
     if (descriptions != null) {
       Map<String, DescriptionState> localized = new HashMap<>(descriptions.size());
@@ -133,10 +143,10 @@ public class DescriptionStorageImpl implements DescriptionStorage {
         Locale locale = entry.getKey();
         org.exoplatform.portal.mop.State state = entry.getValue();
         if (locale.getLanguage().length() == 0) {
-          throw new IllegalArgumentException("No language set on locale");
+          throw new IllegalArgumentException(NO_LANGUAGE_SET_ON_LOCALE);
         }
         if (locale.getVariant().length() > 0) {
-          throw new IllegalArgumentException("No variant cab be set on locale");
+          throw new IllegalArgumentException(NO_VARIANT_CAB_BE_SET_ON_LOCALE);
         }
         localized.put(I18N.toTagIdentifier(locale), new DescriptionState(state.getName(), state.getDescription()));
       }
@@ -151,7 +161,7 @@ public class DescriptionStorageImpl implements DescriptionStorage {
                                                          Locale locale,
                                                          boolean checkParent) {
     if (id == null) {
-      throw new IllegalArgumentException("Description identifier is mandatory");
+      throw new IllegalArgumentException(DESCRIPTION_IDENTIFIER_IS_MANDATORY);
     }
     DescriptionEntity desc = descriptionDAO.getByRefId(id);
     if (desc != null) {

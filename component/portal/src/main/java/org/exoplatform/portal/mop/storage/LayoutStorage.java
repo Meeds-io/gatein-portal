@@ -67,13 +67,19 @@ import org.exoplatform.services.log.Log;
 
 public class LayoutStorage {
 
-  private static final Log LOG = ExoLogger.getExoLogger(LayoutStorage.class);
+  private static final String TYPE_PROP     = MappedAttributes.TYPE.getName();
 
-  private WindowDAO        windowDAO;
+  private static final String ID_PROP       = MappedAttributes.ID.getName();
 
-  private ContainerDAO     containerDAO;
+  private static final String CHILDREN_PROP = "children";
 
-  private PermissionDAO    permissionDAO;
+  private static final Log    LOG           = ExoLogger.getExoLogger(LayoutStorage.class);
+
+  private WindowDAO           windowDAO;
+
+  private ContainerDAO        containerDAO;
+
+  private PermissionDAO       permissionDAO;
 
   public LayoutStorage(WindowDAO windowDAO,
                        ContainerDAO containerDAO,
@@ -193,11 +199,11 @@ public class LayoutStorage {
   public void deleteChildren(JSONArray children) {
     for (Object child : children) {
       JSONObject c = (JSONObject) child;
-      Long id = Safe.parseLong(c.get("id").toString());
-      TYPE t = TYPE.valueOf(c.get("type").toString());
+      Long id = Safe.parseLong(c.get(ID_PROP).toString());
+      TYPE t = TYPE.valueOf(c.get(TYPE_PROP).toString());
 
       if (TYPE.CONTAINER.equals(t)) {
-        JSONArray descendants = (JSONArray) c.get("children");
+        JSONArray descendants = (JSONArray) c.get(CHILDREN_PROP);
         if (descendants != null) {
           deleteChildren(descendants);
         }
@@ -247,8 +253,8 @@ public class LayoutStorage {
 
     for (Object child : children) {
       JSONObject c = (JSONObject) child;
-      Long id = Safe.parseLong(c.get("id").toString());
-      TYPE type = TYPE.valueOf(c.get("type").toString());
+      Long id = Safe.parseLong(c.get(ID_PROP).toString());
+      TYPE type = TYPE.valueOf(c.get(TYPE_PROP).toString());
 
       switch (type) {
       case CONTAINER:
@@ -259,9 +265,9 @@ public class LayoutStorage {
         if (CollectionUtils.isNotEmpty(descendants)) {
           dstC.setChildren(clone(objectType, srcC.getContainerBody()));
         } else {
-          dstC.setChildren(clone(objectType, ((JSONArray) c.get("children")).toJSONString()));
+          dstC.setChildren(clone(objectType, ((JSONArray) c.get(CHILDREN_PROP)).toJSONString()));
         }
-        dstC.setContainerBody(((JSONArray) dstC.toJSON().get("children")).toJSONString());
+        dstC.setContainerBody(((JSONArray) dstC.toJSON().get(CHILDREN_PROP)).toJSONString());
 
         containerDAO.create(dstC);
         clonePermissions(objectType, dstC.getId(), srcC.getId());
@@ -510,7 +516,7 @@ public class LayoutStorage {
                                        JSONObject attrs,
                                        Map<Long, ContainerEntity> containers,
                                        Map<Long, WindowEntity> windows) {
-    List<ComponentData> children = buildChildren((JSONArray) jsonComponent.get("children"),
+    List<ComponentData> children = buildChildren((JSONArray) jsonComponent.get(CHILDREN_PROP),
                                                  containers,
                                                  windows);
 
@@ -563,8 +569,8 @@ public class LayoutStorage {
     if (jsonBody != null) {
       for (Object component : jsonBody) {
         JSONObject jsonComponent = (JSONObject) component;
-        Long id = Safe.parseLong(jsonComponent.get("id").toString());
-        TYPE type = TYPE.valueOf(jsonComponent.get("type").toString());
+        Long id = Safe.parseLong(jsonComponent.get(ID_PROP).toString());
+        TYPE type = TYPE.valueOf(jsonComponent.get(TYPE_PROP).toString());
 
         if (type == TYPE.WINDOW) {
           results.add(buildWindow(windows.get(id)));
@@ -703,12 +709,12 @@ public class LayoutStorage {
     if (jsonBody != null) {
       for (Object obj : jsonBody) {
         JSONObject component = (JSONObject) obj;
-        TYPE componentType = TYPE.valueOf(component.get("type").toString());
+        TYPE componentType = TYPE.valueOf(component.get(TYPE_PROP).toString());
         if (componentType.equals(type)) {
-          ids.add(Safe.parseLong(component.get("id").toString()));
+          ids.add(Safe.parseLong(component.get(ID_PROP).toString()));
         }
         if (TYPE.CONTAINER.equals(componentType)) {
-          filterBodyContainerIds((JSONArray) component.get("children"), type, ids);
+          filterBodyContainerIds((JSONArray) component.get(CHILDREN_PROP), type, ids);
         }
       }
     }

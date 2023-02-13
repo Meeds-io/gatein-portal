@@ -87,8 +87,8 @@ public abstract class ModelAdapter<S, C extends Serializable> {
                 transientState.setContentState(builder.build());
                 return transientState;
             } else {
-                LayoutService dataStorage = (LayoutService) container.getComponentInstanceOfType(LayoutService.class);
-                return dataStorage.save(applicationState, builder.build());
+                LayoutService layoutService = container.getComponentInstanceOfType(LayoutService.class);
+                return layoutService.save(applicationState, builder.build());
             }
         }
 
@@ -111,8 +111,8 @@ public abstract class ModelAdapter<S, C extends Serializable> {
                 }
                 return pref;
             } else {
-                LayoutService dataStorage = (LayoutService) container.getComponentInstanceOfType(LayoutService.class);
-                Portlet pref = dataStorage.load(applicationState, ApplicationType.PORTLET);
+                LayoutService layoutService = container.getComponentInstanceOfType(LayoutService.class);
+                Portlet pref = layoutService.load(applicationState, ApplicationType.PORTLET);
                 if (pref == null) {
                     pref = new Portlet();
                 }

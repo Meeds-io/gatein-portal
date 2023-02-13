@@ -33,6 +33,8 @@ import org.exoplatform.services.listener.ListenerService;
 
 public class PageStorageImpl extends AbstractPageStorage {
 
+  private static final String NO_NULL_KEY_ACCEPTED = "No null key accepted";
+
   public PageStorageImpl(ListenerService listenerService,
                          LayoutStorage layoutStorage,
                          SiteDAO siteDAO,
@@ -49,7 +51,7 @@ public class PageStorageImpl extends AbstractPageStorage {
   @Override
   public Page getPage(PageKey key) {
     if (key == null) {
-      throw new IllegalArgumentException("No null key accepted");
+      throw new IllegalArgumentException(NO_NULL_KEY_ACCEPTED);
     }
     PageData pageData = getPage(key.toPomPageKey());
     if (pageData == null) {
@@ -62,7 +64,7 @@ public class PageStorageImpl extends AbstractPageStorage {
   @Override
   public PageContext loadPage(PageKey key) {
     if (key == null) {
-      throw new IllegalArgumentException("No null key accepted");
+      throw new IllegalArgumentException(NO_NULL_KEY_ACCEPTED);
     }
 
     PageData pageData = getPage(key.toPomPageKey());
@@ -168,22 +170,27 @@ public class PageStorageImpl extends AbstractPageStorage {
     PageEntity pageSrc = pageDAO.findByKey(srcPageKey);
     if (pageSrc == null) {
       throw new PageServiceException(PageError.CLONE_NO_SRC_PAGE,
-                                     "Could not clone non existing page " + srcPageKey.getName() + " from site of type "
-                                         + srcPageKey.getSite().getType() + " with id " + srcPageKey.getSite().getName());
+                                     String.format("Could not clone non existing page %s from site of type %s with id %s",
+                                                   srcPageKey.getName(),
+                                                   srcPageKey.getSite().getType(),
+                                                   srcPageKey.getSite().getName()));
     } else {
       PageEntity pageDst = pageDAO.findByKey(dstPageKey);
       if (pageDst != null) {
         throw new PageServiceException(PageError.CLONE_DST_ALREADY_EXIST,
-                                       "Could not clone page " + dstPageKey.getName() + "to existing page "
-                                           + dstPageKey.getSite().getType()
-                                           + " with id " + dstPageKey.getSite().getName());
+                                       String.format("Could not clone page %s to existing page %s with id %s",
+                                                     dstPageKey.getName(),
+                                                     dstPageKey.getSite().getType(),
+                                                     dstPageKey.getSite().getName()));
       } else {
         SiteKey siteKey = dstPageKey.getSite();
         SiteEntity owner = siteDAO.findByKey(siteKey);
         if (owner == null) {
           throw new PageServiceException(PageError.CLONE_NO_DST_SITE,
-                                         "Could not clone page " + siteKey.getName() + "to non existing site of type "
-                                             + siteKey.getTypeName() + " with id " + siteKey.getName());
+                                         String.format("Could not clone page %s to non existing site of type %s with id %s",
+                                                       dstPageKey.getName(),
+                                                       siteKey.getTypeName(),
+                                                       siteKey.getName()));
         }
 
         pageDst = new PageEntity();

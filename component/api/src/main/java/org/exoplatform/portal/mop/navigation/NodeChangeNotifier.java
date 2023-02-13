@@ -28,10 +28,10 @@ public class NodeChangeNotifier<N> implements NodeChangeListener<NodeContext<N>>
 
   private ListenerService                    listenerService;
 
-  private NavigationService                  navigationService;
+  private org.exoplatform.portal.mop.service.NavigationService                  navigationService;
 
   public NodeChangeNotifier(NodeChangeListener<NodeContext<N>> listener,
-                            NavigationService navigationService,
+                            org.exoplatform.portal.mop.service.NavigationService navigationService,
                             ListenerService listenerService) {
     this.listener = listener;
     this.listenerService = listenerService;

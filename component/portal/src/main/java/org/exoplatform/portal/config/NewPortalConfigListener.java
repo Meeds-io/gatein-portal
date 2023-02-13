@@ -75,7 +75,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
     private ConfigurationManager cmanager_;
 
     /** . */
-    private LayoutService                layoutService_;
+    private LayoutService                layoutService;
 
     /** . */
     private volatile List<NewPortalConfig> configs;
@@ -112,7 +112,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
     private NavigationService            navigationService_;
 
     /** . */
-    private DescriptionStorage           descriptionStorage_;
+    private DescriptionStorage           descriptionStorage;
 
     /** . */
     private LocaleConfigService          localeConfigService_;
@@ -124,21 +124,20 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
 
     private boolean isFirstStartup = false;
 
-    public NewPortalConfigListener(UserPortalConfigService owner,
+    public NewPortalConfigListener(UserPortalConfigService owner, // NOSONAR
                                    LayoutService layoutService,
                                    ConfigurationManager cmanager,
                                    InitParams params,
                                    NavigationService navigationService,
                                    DescriptionStorage descriptionStorage,
                                    UserACL userACL,
-                                   LocaleConfigService localeConfigService)
-        throws Exception {
+                                   LocaleConfigService localeConfigService) {
 
         this.owner_ = owner;
         this.cmanager_ = cmanager;
-        this.layoutService_ = layoutService;
+        this.layoutService = layoutService;
         this.navigationService_ = navigationService;
-        this.descriptionStorage_ = descriptionStorage;
+        this.descriptionStorage = descriptionStorage;
         this.userACL_ = userACL;
         this.localeConfigService_ = localeConfigService;
 
@@ -190,7 +189,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
     private void touchImport() {
         RequestLifeCycle.begin(PortalContainer.getInstance());
         try {
-            layoutService_.saveImportStatus(Status.DONE);
+            layoutService.saveImportStatus(Status.DONE);
         } finally {
             RequestLifeCycle.end();
         }
@@ -201,13 +200,13 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         try {
             boolean perform = true;
 
-            Status st = layoutService_.getImportStatus();
+            Status st = layoutService.getImportStatus();
             if (st != null) {
                 perform = (Status.WANT_REIMPORT == st);
             } else {
-                if (layoutService_.getPortalConfig(defaultPortal) != null) {
+                if (layoutService.getPortalConfig(defaultPortal) != null) {
                     perform = false;
-                    layoutService_.saveImportStatus(Status.DONE);
+                    layoutService.saveImportStatus(Status.DONE);
                 } else {
                     isFirstStartup = true;
                 }
@@ -453,7 +452,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         if (config.isUseDefaultPortalLayout()) {
           // If PortalConfig already exists, no need to erase the data with empty
           // and predefined data
-          PortalConfig persistedPortalConfig = layoutService_.getPortalConfig(type, fixedOwnerName);
+          PortalConfig persistedPortalConfig = layoutService.getPortalConfig(type, fixedOwnerName);
           if (persistedPortalConfig != null) {
             return true;
           }
@@ -471,7 +470,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
 
           // If no XML configuration
           if (pConfig == null) {
-            PortalConfig persistedPortalConfig = layoutService_.getPortalConfig(type, fixedOwnerName);
+            PortalConfig persistedPortalConfig = layoutService.getPortalConfig(type, fixedOwnerName);
             // PortalConfig exists in storage => Do not reimport
             if (persistedPortalConfig != null) {
               return true;
@@ -485,7 +484,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         // If XML configuration of PortalConfig exists or PortalConfig doesn't exist
         // in storage, import PortalConfig switch default ImportMode
         ImportMode importMode = getRightMode(config.getImportMode());
-        PortalConfigImporter portalImporter = new PortalConfigImporter(importMode, pConfig, layoutService_);
+        PortalConfigImporter portalImporter = new PortalConfigImporter(importMode, pConfig, layoutService);
         try {
             portalImporter.perform();
             return true;
@@ -504,7 +503,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         PageImporter importer = new PageImporter(importMode,
                                                  new SiteKey(config.getOwnerType(), owner),
                                                  list,
-                                                 layoutService_);
+                                                 layoutService);
         importer.perform();
       } finally {
         RequestLifeCycle.end();
@@ -525,7 +524,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
 
         //
         Locale locale;
-        PortalConfig portalConfig = layoutService_.getPortalConfig(config.getOwnerType(), owner);
+        PortalConfig portalConfig = layoutService.getPortalConfig(config.getOwnerType(), owner);
         if (portalConfig != null && portalConfig.getLocale() != null) {
             locale = new Locale(portalConfig.getLocale());
         } else {
@@ -534,7 +533,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
 
         //
         NavigationImporter merge = new NavigationImporter(locale, importMode, navigation, navigationService_,
-                descriptionStorage_);
+                descriptionStorage);
 
         //
         merge.perform();

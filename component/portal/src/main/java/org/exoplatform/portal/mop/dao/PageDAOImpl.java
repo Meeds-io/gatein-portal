@@ -27,14 +27,24 @@ import org.exoplatform.portal.mop.page.PageKey;
 
 public class PageDAOImpl extends AbstractDAO<PageEntity> implements PageDAO {
 
+  private static final String SITE_TYPE    = "siteType";
+
+  private static final String DISPLAY_NAME = "displayName";
+
+  private static final String NAME         = "name";
+
+  private static final String OWNER_ID     = "ownerId";
+
+  private static final String OWNER_TYPE   = "ownerType";
+
   @Override
   public PageEntity findByKey(PageKey pageKey) {
     TypedQuery<PageEntity> query = getEntityManager().createNamedQuery("PageEntity.findByKey", PageEntity.class);
 
     SiteKey siteKey = pageKey.getSite();
-    query.setParameter("ownerType", siteKey.getType());
-    query.setParameter("ownerId", siteKey.getName());
-    query.setParameter("name", pageKey.getName());
+    query.setParameter(OWNER_TYPE, siteKey.getType());
+    query.setParameter(OWNER_ID, siteKey.getName());
+    query.setParameter(NAME, pageKey.getName());
     try {
       return query.getSingleResult();
     } catch (NoResultException ex) {
@@ -47,7 +57,7 @@ public class PageDAOImpl extends AbstractDAO<PageEntity> implements PageDAO {
   public void deleteByOwner(long id) {
     Query query = getEntityManager().createNamedQuery("PageEntity.deleteByOwner");
 
-    query.setParameter("ownerId", id);
+    query.setParameter(OWNER_ID, id);
     query.executeUpdate();
   }
 
@@ -80,22 +90,22 @@ public class PageDAOImpl extends AbstractDAO<PageEntity> implements PageDAO {
     Root<PageEntity> pageEntity = criteria.from(PageEntity.class);
     Join<PageEntity, SiteEntity> join = pageEntity.join("owner");
 
-    CriteriaQuery<PageKey> select = criteria.multiselect(join.get("siteType"), join.get("name"), pageEntity.get("name"));
+    CriteriaQuery<PageKey> select = criteria.multiselect(join.get(SITE_TYPE), join.get(NAME), pageEntity.get(NAME));
     select.distinct(true);
 
     List<Predicate> predicates = new LinkedList<>();
 
     if (query.getSiteType() != null && query.getSiteName() != null) {
       if (query.getSiteType() != null) {
-        predicates.add(cb.equal(join.get("siteType"), convertSiteType(query.getSiteType())));
+        predicates.add(cb.equal(join.get(SITE_TYPE), convertSiteType(query.getSiteType())));
       }
       if (query.getSiteName() != null) {
-        predicates.add(cb.equal(join.get("name"), query.getSiteName()));
+        predicates.add(cb.equal(join.get(NAME), query.getSiteName()));
       }
     }
 
     if (query.getDisplayName() != null) {
-      predicates.add(cb.like(cb.lower(pageEntity.get("displayName")),
+      predicates.add(cb.like(cb.lower(pageEntity.get(DISPLAY_NAME)),
                              "%" + query.getDisplayName().toLowerCase() + "%"));
     }
 
@@ -105,7 +115,7 @@ public class PageDAOImpl extends AbstractDAO<PageEntity> implements PageDAO {
     TypedQuery<PageKey> typedQuery = em.createQuery(select);
     Pagination pagination = query.getPagination();
     if (pagination != null && pagination.getLimit() > 0) {
-      select.orderBy(cb.desc(join.get("siteType")), cb.asc(join.get("name")), cb.asc(pageEntity.get("name")));
+      select.orderBy(cb.desc(join.get(SITE_TYPE)), cb.asc(join.get(NAME)), cb.asc(pageEntity.get(NAME)));
       typedQuery.setFirstResult(pagination.getOffset());
       typedQuery.setMaxResults(pagination.getLimit());
     }

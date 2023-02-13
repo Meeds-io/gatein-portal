@@ -47,6 +47,8 @@ import org.exoplatform.portal.pom.data.PortalData;
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  */
 public class SiteImpl implements Site {
+    private static final long serialVersionUID = -5352376442491205465L;
+
     private final SiteId id;
     private transient PortalConfig portalConfig;
 

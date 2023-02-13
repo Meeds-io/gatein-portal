@@ -195,7 +195,7 @@ public class UIPortalComposer extends UIContainer {
             portalConfig.setDefaultLayout(false);
           }
         }
-        LayoutService dataStorage = getApplicationComponent(LayoutService.class);
+        LayoutService layoutService = getApplicationComponent(LayoutService.class);
         UserACL acl = getApplicationComponent(UserACL.class);
 
         if (!isPortalExist(editPortal)) {
@@ -205,14 +205,14 @@ public class UIPortalComposer extends UIContainer {
         SkinService skinService = getApplicationComponent(SkinService.class);
         skinService.removeSkin(editPortal.getName(), editPortal.getSkin());
         try {
-            dataStorage.save(portalConfig);
+            layoutService.save(portalConfig);
         } catch (StaleModelException ex) {
             // Temporary solution for concurrency-related issue. The StaleModelException should be
             // caught in the ApplicationLifecycle
-            rebuildUIPortal(uiPortalApp, editPortal, dataStorage);
+            rebuildUIPortal(uiPortalApp, editPortal);
         }
         uiPortalApp.reloadPortalProperties();
-        PortalConfig pConfig = dataStorage.getPortalConfig(portalName);
+        PortalConfig pConfig = layoutService.getPortalConfig(portalName);
         if (pConfig != null) {
             editPortal.setModifiable(acl.hasEditPermission(pConfig));
         } else {
@@ -244,7 +244,7 @@ public class UIPortalComposer extends UIContainer {
         prContext.refreshResourceBundle();
     }
 
-    private void rebuildUIPortal(UIPortalApplication uiPortalApp, UIPortal uiPortal, LayoutService storage) throws Exception {
+    private void rebuildUIPortal(UIPortalApplication uiPortalApp, UIPortal uiPortal) throws Exception {
         PortalConfig portalConfig = Util.getPortalRequestContext().getDynamicPortalConfig();
         UserPortalConfig userPortalConfig = Util.getPortalRequestContext().getUserPortalConfig();
         userPortalConfig.setPortalConfig(portalConfig);
@@ -272,9 +272,8 @@ public class UIPortalComposer extends UIContainer {
             portalOwner = Util.getPortalRequestContext().getPortalOwner();
         }
 
-        UserPortalConfigService configService = getApplicationComponent(UserPortalConfigService.class);
-
-        return configService.getUserPortalConfig(portalOwner, remoteUser) != null;
+        LayoutService layoutService = getApplicationComponent(LayoutService.class);
+        return layoutService.getPortalConfig(portalOwner, remoteUser) != null;
     }
 
     /**

@@ -92,7 +92,7 @@ public class PortalImpl implements Portal {
 
   private final UserPortalConfigService    userPortalConfigService;
 
-  public PortalImpl(LayoutService layoutService,
+  public PortalImpl(LayoutService layoutService, // NOSONAR
                     NavigationService navigationService,
                     DescriptionStorage descriptionStorage,
                     ResourceBundleManager bundleManager,

@@ -135,7 +135,6 @@ public class NavigationRest implements ResourceContainer {
           @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response getSiteTypeNavigations(@Context HttpServletRequest request,
                                          @Parameter(description = "Portal site type, possible values: PORTAL, GROUP or USER", required = true) @PathParam("siteType") String siteTypeName,
-                                         @Parameter(description = "Site names regex to exclude from results", required = false) @QueryParam("exclude") String excludedSiteName,
                                          @Parameter(description = "Portal site name", required = true) @QueryParam("siteName") String siteName,
                                          @Parameter(description = "Scope of navigations tree to retrieve, possible values: ALL, CHILDREN, GRANDCHILDREN, SINGLE", required = false)
                                          @Schema(defaultValue = "ALL") @QueryParam("scope") String scopeName,
@@ -147,7 +146,7 @@ public class NavigationRest implements ResourceContainer {
       return Response.status(400).build();
     }
 
-    return getNavigations(request, siteTypeName, siteName, excludedSiteName, scopeName, nodeId, visibilityNames);
+    return getNavigations(request, siteTypeName, siteName, scopeName, nodeId, visibilityNames);
   }
 
   @Path("/categories")
@@ -180,7 +179,6 @@ public class NavigationRest implements ResourceContainer {
   private Response getNavigations(HttpServletRequest request, // NOSONAR
                                   String siteTypeName,
                                   String siteName,
-                                  String excludedSiteName,
                                   String scopeName,
                                   String nodeId,
                                   List<String> visibilityNames) {
@@ -241,7 +239,7 @@ public class NavigationRest implements ResourceContainer {
         UserNode userNode = userPortal.getNodeById(nodeId, siteKey, scope, userFilterConfig, null);
         nodes.add(userNode);
       } else if (siteType == SiteType.PORTAL || StringUtils.isBlank(siteName)) {
-        nodes = userPortal.getNodes(siteType, excludedSiteName, scope, userFilterConfig);
+        nodes = userPortal.getNodes(siteType, scope, userFilterConfig);
       } else {
         UserNavigation navigation = userPortal.getNavigation(new SiteKey(siteType, siteName));
         if (navigation == null) {

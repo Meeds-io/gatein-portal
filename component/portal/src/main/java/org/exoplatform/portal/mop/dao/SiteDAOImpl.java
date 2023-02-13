@@ -13,6 +13,10 @@ import org.exoplatform.portal.mop.SiteType;
 
 public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
 
+  private static final String NAME                   = "name";
+
+  private static final String SITE_TYPE              = "siteType";
+
   private static final String SPACE_SITE_TYPE_PREFIX = "/spaces/";
 
   private PageDAO             pageDAO;
@@ -51,8 +55,8 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
   public SiteEntity findByKey(SiteKey siteKey) {
     TypedQuery<SiteEntity> query = getEntityManager().createNamedQuery("SiteEntity.findByKey", SiteEntity.class);
 
-    query.setParameter("siteType", siteKey.getType());
-    query.setParameter("name", siteKey.getName());
+    query.setParameter(SITE_TYPE, siteKey.getType());
+    query.setParameter(NAME, siteKey.getName());
     try {
       return query.getSingleResult();
     } catch (NoResultException ex) {
@@ -63,7 +67,7 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
   @Override
   public List<SiteEntity> findByType(SiteType siteType) {
     TypedQuery<SiteEntity> query = getEntityManager().createNamedQuery("SiteEntity.findByType", SiteEntity.class);
-    query.setParameter("siteType", siteType);
+    query.setParameter(SITE_TYPE, siteType);
 
     return query.getResultList();
   }
@@ -73,7 +77,7 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
     List<SiteKey> keys = new ArrayList<>();
 
     TypedQuery<String> query = getEntityManager().createNamedQuery("SiteEntity.findSiteKey", String.class);
-    query.setParameter("siteType", siteType);
+    query.setParameter(SITE_TYPE, siteType);
 
     for (String name : query.getResultList()) {
       keys.add(new SiteKey(siteType, name));
@@ -84,7 +88,7 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
   @Override
   public List<String> findGroupSites(int offset, int limit) {
     TypedQuery<String> query = getEntityManager().createNamedQuery("SiteEntity.findGroupSites", String.class);
-    query.setParameter("siteType", SiteType.GROUP);
+    query.setParameter(SITE_TYPE, SiteType.GROUP);
     query.setParameter("excludeName", SPACE_SITE_TYPE_PREFIX);
     if (offset > 0) {
       query.setFirstResult(offset);
@@ -98,7 +102,7 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
   @Override
   public List<String> findSpaceSites(int offset, int limit) {
     TypedQuery<String> query = getEntityManager().createNamedQuery("SiteEntity.findSpaceSites", String.class);
-    query.setParameter("siteType", SiteType.GROUP);
+    query.setParameter(SITE_TYPE, SiteType.GROUP);
     query.setParameter("includeName", SPACE_SITE_TYPE_PREFIX + "%");
     if (offset > 0) {
       query.setFirstResult(offset);
@@ -121,7 +125,7 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
 
   private List<String> getSiteNames(SiteType siteType, int offset, int limit) {
     TypedQuery<String> query = getEntityManager().createNamedQuery("SiteEntity.findPortalSites", String.class);
-    query.setParameter("siteType", siteType);
+    query.setParameter(SITE_TYPE, siteType);
     if (offset > 0) {
       query.setFirstResult(offset);
     }

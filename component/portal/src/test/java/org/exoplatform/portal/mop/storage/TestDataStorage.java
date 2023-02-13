@@ -588,7 +588,8 @@ public class TestDataStorage extends AbstractKernelTest {
     List<String> transientNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
     assertTrue("Was expecting " + transientNames + " to contain " + names, transientNames.containsAll(names));
     transientNames.removeAll(names);
-    assertEquals(Collections.singletonList("testGetAllSiteNames"), transientNames);
+    assertEquals(1, transientNames.size());
+    assertEquals("testGetAllSiteNames", transientNames.get(0));
 
     // Test we have not seen anything yet outside of tx
     final CountDownLatch addSync = new CountDownLatch(1);
@@ -642,7 +643,7 @@ public class TestDataStorage extends AbstractKernelTest {
           List<String> isolatedNames = (List<String>) storage_.getClass().getMethod(methodName).invoke(storage_);
           assertTrue("Was expecting " + isolatedNames + " to contain " + names, isolatedNames.containsAll(names));
           isolatedNames.removeAll(names);
-          assertEquals(Collections.emptyList(), isolatedNames);
+          assertTrue(isolatedNames.isEmpty());
         } catch (Throwable t) {
           error.set(t);
         } finally {

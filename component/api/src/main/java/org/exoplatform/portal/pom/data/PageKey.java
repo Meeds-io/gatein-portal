@@ -18,8 +18,6 @@
  */
 package org.exoplatform.portal.pom.data;
 
-import org.gatein.api.site.SiteType;
-
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.pom.config.Utils;
 
@@ -28,6 +26,8 @@ import org.exoplatform.portal.pom.config.Utils;
  * @version $Revision$
  */
 public class PageKey extends OwnerKey {
+
+    private static final long serialVersionUID = -7843836004063037149L;
 
     /** . */
     private final String name;
@@ -58,8 +58,7 @@ public class PageKey extends OwnerKey {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof PageKey) {
-            PageKey that = (PageKey) obj;
+        if (obj instanceof PageKey that) {
             return super.equals(that) && name.equals(that.name);
         }
         return false;

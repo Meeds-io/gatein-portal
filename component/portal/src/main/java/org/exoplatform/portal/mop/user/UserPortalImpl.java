@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -138,12 +137,17 @@ public class UserPortalImpl implements UserPortal {
                                        String excludedSiteName,
                                        Scope scope,
                                        UserNodeFilterConfig filterConfig) {
+    return getNodes(siteType, scope, filterConfig);
+  }
+
+  @Override
+  public Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig filterConfig) {
+
     Collection<UserNode> resultUserNodes = new ArrayList<>();
     Set<String> addedUserNodesURI = new HashSet<>();
     for (UserNavigation userNavigation : getNavigations()) {
       SiteKey siteKey = userNavigation.getKey();
-      if (siteKey.getType() != siteType
-          || (StringUtils.isNotBlank(excludedSiteName) && Pattern.matches(excludedSiteName, siteKey.getName()))) {
+      if (siteKey.getType() != siteType) {
         continue;
       }
 
@@ -158,11 +162,6 @@ public class UserPortalImpl implements UserPortal {
       }
     }
     return resultUserNodes;
-  }
-
-  @Override
-  public Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig filterConfig) {
-    return getNodes(siteType, null, scope, filterConfig);
   }
 
   @Override

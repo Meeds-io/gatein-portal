@@ -131,11 +131,9 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     assertEquals(500, resp.getStatus());
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testGetNavigationCategories() throws Exception {
     String path = "/v1/navigations/categories";
-    String portalName = "test";
 
     EnvironmentContext envctx = new EnvironmentContext();
     HttpServletRequest httpRequest = new MockHttpServletRequest(path, null, 0, "GET", null);

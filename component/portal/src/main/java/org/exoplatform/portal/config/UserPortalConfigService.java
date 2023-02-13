@@ -122,14 +122,14 @@ public class UserPortalConfigService implements Startable {
 
     private Log log = ExoLogger.getLogger("Portal:UserPortalConfigService");
 
-    public UserPortalConfigService(UserACL userACL,
+    public UserPortalConfigService(UserACL userACL, // NOSONAR
                                    LayoutService storage,
                                    OrganizationService orgService,
                                    NavigationService navService,
                                    DescriptionStorage descriptionService,
                                    PageStorage pageStorage,
                                    SettingService settingService,
-                                   InitParams params) throws Exception {
+                                   InitParams params) {
 
         //
         ValueParam createUserPortalParam = params == null ? null : params.getValueParam("create.user.portal");
