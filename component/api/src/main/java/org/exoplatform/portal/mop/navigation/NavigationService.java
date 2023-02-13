@@ -64,17 +64,6 @@ public interface NavigationService {
     List<NavigationContext> loadNavigations(SiteType type, int offset, int limit);
 
     /**
-     * Find and returns navigations of a given type. Method use discretion is advised
-     *
-     * @param type the navigation type
-     * @return all navigations matching type
-     * @throws NullPointerException if the key is null
-     * @deprecated for removal since 6.4.0
-     */
-    @Deprecated(forRemoval = true, since = "6.4.0")
-    List<NavigationContext> loadNavigations(SiteType type);
-
-    /**
      * Create, update a navigation. When the navigation state is not null, the navigation will be created or updated depending
      * on whether or not the navigation already exists.
      *
@@ -127,6 +116,7 @@ public interface NavigationService {
                                             NodeChangeListener<NodeContext<N>> listener) {
         throw new UnsupportedOperationException();
     }
+
     /**
      * <p>
      * Save the specified context state to the persistent storage. The operation takes the pending changes done to the tree and
@@ -136,11 +126,9 @@ public interface NavigationService {
      *
      * @param context the context to save
      * @param listener the optional listener
-     * @throws NullPointerException if the context argument is null
      * @throws NavigationServiceException anything that would prevent the operation to succeed
      */
-    <N> void saveNode(NodeContext<N> context, NodeChangeListener<NodeContext<N>> listener) throws NullPointerException,
-            NavigationServiceException;
+    <N> void saveNode(NodeContext<N> context, NodeChangeListener<NodeContext<N>> listener) throws NavigationServiceException;
 
     /**
      * <p>
@@ -166,12 +154,11 @@ public interface NavigationService {
      * @param scope the optional scope
      * @param listener the optional node change listener
      * @param <N> the node generic type
-     * @throws NullPointerException if the context argument is null
      * @throws NavigationServiceException anything that would prevent the operation to succeed
      * @throws IllegalArgumentException if the context argument has pending changes
      */
     <N> void updateNode(NodeContext<N> context, Scope scope, NodeChangeListener<NodeContext<N>> listener)
-            throws NullPointerException, IllegalArgumentException, NavigationServiceException;
+            throws IllegalArgumentException, NavigationServiceException;
 
     /**
      * <p>
@@ -198,9 +185,9 @@ public interface NavigationService {
      * @param scope the optional scope
      * @param listener the option node change listener @throws NullPointerException if the context argument is null
      * @param <N> the node generic type
-     * @throws NullPointerException if the context argument is null
      * @throws NavigationServiceException anything that would prevent the operation to succeed
      */
     <N> void rebaseNode(NodeContext<N> context, Scope scope, NodeChangeListener<NodeContext<N>> listener)
-            throws NullPointerException, NavigationServiceException;
+            throws  NavigationServiceException;
+
 }

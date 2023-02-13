@@ -177,7 +177,7 @@ public abstract class AbstractApiTest {
 
         for (SiteType type : types) {
             Query<PortalConfig> q = new Query<PortalConfig>(type.getName(), null, PortalConfig.class);
-            ListAccess<PortalConfig> la = dataStorage.find2(q);
+            ListAccess<PortalConfig> la = dataStorage.find2(q, null);
             for (PortalConfig portalConfig : la.load(0, la.getSize())) {
                 dataStorage.remove(portalConfig);
             }

@@ -940,13 +940,6 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
         return adapter.getstateFromClonedContext(this.getPortletContext(), clonedContext);
     }
 
-    /** This is used by the dashboard portlet and should not be used else where. It will be removed some day. */
-    private static final ThreadLocal<UIPortlet> currentPortlet = new ThreadLocal<UIPortlet>();
-
-    public static UIPortlet getCurrentUIPortlet() {
-        return currentPortlet.get();
-    }
-
     /**
      * Performs an invocation on this portlet.
      *
@@ -956,12 +949,7 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
      */
     public PortletInvocationResponse invoke(PortletInvocation invocation) throws PortletInvokerException {
         PortletInvoker portletInvoker = getApplicationComponent(PortletInvoker.class);
-        currentPortlet.set(this);
-        try {
-            return portletInvoker.invoke(invocation);
-        } finally {
-            currentPortlet.set(null);
-        }
+        return portletInvoker.invoke(invocation);
     }
 
     /**

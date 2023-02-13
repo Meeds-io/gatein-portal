@@ -1,125 +1,82 @@
 package org.exoplatform.portal.mop.page;
 
 import java.io.Serializable;
-import java.util.HashMap;
+
+import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+
+import lombok.Data;
 
 /**
  * The immutable key for a page.
  *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
+@Data
 public class PageKey implements Serializable {
 
-    private static final long serialVersionUID = -5005776237959733435L;
+  private static final long serialVersionUID = -5005776237959733435L;
 
-    /** . */
-    private static final HashMap<String, SiteType> map = new HashMap<String, SiteType>();
-
-    static {
-        map.put("portal", SiteType.PORTAL);
-        map.put("group", SiteType.GROUP);
-        map.put("user", SiteType.USER);
+  /**
+   * Parse the string representation of a page key.
+   *
+   * @param  pageKey the string representation
+   * @return         the corresponding page key
+   */
+  public static PageKey parse(String pageKey) {
+    if (StringUtils.isBlank(pageKey)) {
+      throw new IllegalArgumentException("No null string argument allowed");
     }
-
-    /**
-     * Parse the string representation of a page key.
-     *
-     * @param s the string representation
-     * @return the corresponding page key
-     * @throws NullPointerException if the string argument is null
-     * @throws IllegalArgumentException if the key does not have the good format
-     */
-    public static PageKey parse(String s) throws NullPointerException, IllegalArgumentException {
-        if (s == null) {
-            throw new NullPointerException("No null string argument allowed");
-        }
-        int pos1 = s.indexOf("::");
-        if (pos1 != -1) {
-            SiteType siteType = map.get(s.substring(0, pos1));
-            if (siteType != null) {
-                pos1 += 2;
-                int pos2 = s.indexOf("::", pos1);
-                if (pos2 != -1) {
-                    String siteName = s.substring(pos1, pos2);
-                    pos2 += 2;
-                    if (pos2 > pos1 && pos2 < s.length()) {
-                        String pageName = s.substring(pos2);
-                        return siteType.key(siteName).page(pageName);
-                    }
-                }
-            }
-        }
-        throw new IllegalArgumentException("Invalid page reference: " + s);
+    String[] pageKeyParts = StringUtils.split(pageKey, "::");
+    if (pageKeyParts.length != 3) {
+      throw new IllegalArgumentException("Format should be SITE_TYPE::SITE_NAME::PAGE_NAME");
     }
+    return SiteType.valueOf(pageKeyParts[0].toUpperCase()).key(pageKeyParts[1]).page(pageKeyParts[2]);
+  }
 
-    /** . */
-    final SiteKey site;
+  final SiteKey  site;
 
-    /** . */
-    final String name;
+  final String   name;
 
-    /** . */
-    private String ref;
+  private String ref;
 
-    public PageKey(SiteKey site, String name) throws NullPointerException {
-        if (site == null) {
-            throw new NullPointerException("No null site accepted");
-        }
-        if (name == null) {
-            throw new NullPointerException("No null name accepted");
-        }
+  public PageKey(String siteType, String siteName, String name) {
+    this(SiteType.valueOf(siteType.toUpperCase()).key(siteName), name);
+  }
 
-        //
-        this.site = site;
-        this.name = name;
-        this.ref = null;
+  public PageKey(SiteType siteType, String siteName, String name) {
+    this(siteType.key(siteName), name);
+  }
+
+  public PageKey(SiteKey site, String name) {
+    this.site = site;
+    this.name = name;
+  }
+
+  public PageKey sibling(String name) {
+    return new PageKey(site, name);
+  }
+
+  public String format() {
+    if (ref == null) {
+      ref = String.format("%s::%s::%s",
+                          site.getType().getName(),
+                          site.getName(),
+                          name);
     }
+    return ref;
+  }
 
-    public SiteKey getSite() {
-        return site;
-    }
+  public org.exoplatform.portal.pom.data.PageKey toPomPageKey() {
+    return new org.exoplatform.portal.pom.data.PageKey(site.getType().getName(),
+                                                       site.getName(),
+                                                       name);
+  }
 
-    public String getName() {
-        return name;
-    }
-
-    public PageKey sibling(String name) {
-        return new PageKey(site, name);
-    }
-
-    public String format() {
-        if (ref == null) {
-            ref = site.getType().getName() + "::" + site.getName() + "::" + name;
-        }
-        return ref;
-    }
-
-    @Override
-    public int hashCode() {
-        return site.getName().hashCode() ^ name.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-
-        // We need to use class equality here
-        if (obj != null && getClass().equals(obj.getClass())) {
-            PageKey that = (PageKey) obj;
-            return site.getName().equals(that.site.getName()) && name.equals(that.name);
-        }
-
-        //
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return "PageKey[site=" + site + ",name=" + name + "]";
-    }
+  @Override
+  public String toString() {
+    return format();
+  }
 }

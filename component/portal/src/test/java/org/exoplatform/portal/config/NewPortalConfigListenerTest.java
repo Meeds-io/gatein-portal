@@ -88,9 +88,6 @@ public class NewPortalConfigListenerTest {
     when(newPortalConfig.getOwnerType()).thenReturn(PortalConfig.PORTAL_TYPE);
 
     PageContext pageContext = mock(PageContext.class);
-    PageKey pageKey = mock(PageKey.class);
-    when(pageContext.getKey()).thenReturn(pageKey);
-    when(pageKey.format()).thenReturn("pageKey");
     List<PageContext> allPages = new ArrayList<>();
     allPages.add(pageContext);
 
@@ -98,7 +95,7 @@ public class NewPortalConfigListenerTest {
 
     newPortalConfigListener.initPageDB(newPortalConfig);
 
-    verify(pageService, times(1)).destroyPage(pageKey);
+    verify(pageService, times(1)).destroyPages(any());
 
     Mockito.reset(pageService);
 
@@ -106,7 +103,7 @@ public class NewPortalConfigListenerTest {
 
     newPortalConfigListener.initPageDB(newPortalConfig);
 
-    verify(pageService, times(0)).destroyPage(pageKey);
+    verify(pageService, times(0)).destroyPages(any());
   }
 
   @Test

@@ -21,6 +21,7 @@ package org.exoplatform.portal.mop.user;
 
 import java.util.ResourceBundle;
 
+import org.exoplatform.portal.config.model.PageNavigation;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.gatein.common.util.EmptyResourceBundle;
@@ -68,7 +69,7 @@ public class UserNavigation {
 
     public int getPriority() {
         Integer priority = navigation.getState().getPriority();
-        return priority != null ? priority : 1;
+        return priority != null ? priority : PageNavigation.UNDEFINED_PRIORITY;
     }
 
     public boolean isModifiable() {

@@ -115,7 +115,7 @@ public class GroupPortalConfigListener extends GroupEventListener {
             }
 
             // Create the portal from the template
-            if (dataStorage.getPortalConfig(PortalConfig.GROUP_TYPE, groupId) == null) {
+            if (dataStorage.getPortalConfig(SiteKey.group(groupId)) == null) {
                 portalConfigService.createGroupSite(groupId);
             } else {
                 LOG.debug("The group site {} already exists. Ignore creating from listener", groupId);
@@ -128,7 +128,7 @@ public class GroupPortalConfigListener extends GroupEventListener {
     private void removeGroupNavigation(Group group) throws Exception {
         GroupHandler groupHandler = orgService.getGroupHandler();
         Collection<String> descendantGroups = getDescendantGroups(group, groupHandler);
-        Collection<String> deletedNavigationGroups = new ArrayList<String>();
+        Collection<String> deletedNavigationGroups = new ArrayList<>();
         deletedNavigationGroups.addAll(descendantGroups);
         deletedNavigationGroups.add(group.getId());
         for (String childGroup : deletedNavigationGroups) {

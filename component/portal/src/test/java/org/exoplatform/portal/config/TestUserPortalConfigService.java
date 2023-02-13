@@ -231,7 +231,7 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
         String originalGlobalPortal = userPortalConfigSer_.globalPortal_;
         userPortalConfigSer_.globalPortal_ = "system";
         try {
-          userPortalCfg = userPortalConfigSer_.getUserPortalConfig("classic", "john");
+          userPortalCfg = userPortalConfigSer_.getUserPortalConfig("classic", "root");
           userPortal = userPortalCfg.getUserPortal();
           navigations = toMap(userPortal);
 
@@ -241,7 +241,7 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
           userPortalConfigSer_.globalPortal_ = originalGlobalPortal;
         }
       }
-    }.execute("john");
+    }.execute("root");
   }
 
   public void testGetGlobalUserNodes() {
@@ -268,7 +268,7 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
         String originalGlobalPortal = userPortalConfigSer_.globalPortal_;
         userPortalConfigSer_.globalPortal_ = "systemtest";
         try {
-          userPortalCfg = userPortalConfigSer_.getUserPortalConfig("classic", "john");
+          userPortalCfg = userPortalConfigSer_.getUserPortalConfig("classic", "root");
           portalCfg = userPortalCfg.getPortalConfig();
           userPortal = userPortalCfg.getUserPortal();
           nodes = userPortal.getNodes(SiteType.PORTAL, Scope.ALL, filterConfig);
@@ -286,7 +286,7 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
           userPortalConfigSer_.globalPortal_ = originalGlobalPortal;
         }
       }
-    }.execute("john");
+    }.execute("root");
   }
 
   public void testGetGlobalUserNode() {
@@ -324,7 +324,7 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
           userPortalConfigSer_.globalPortal_ = originalGlobalPortal;
         }
       }
-    }.execute("john");
+    }.execute("root");
   }
 
   public void testJohnGetUserPortalConfig() {

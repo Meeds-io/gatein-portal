@@ -18,6 +18,9 @@
  */
 package org.exoplatform.portal.pom.data;
 
+import org.gatein.api.site.SiteType;
+
+import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.pom.config.Utils;
 
 /**
@@ -73,8 +76,12 @@ public class PageKey extends OwnerKey {
         return new PageKey(components[0], components[1], components[2]);
     }
 
+    public org.exoplatform.portal.mop.page.PageKey toMopPageKey() {
+      return new SiteKey(getType(), getId()).page(name);
+    }
+
     @Override
     public String toString() {
-        return "PageKey[type=" + getType() + ",id=" + getId() + ",name=" + name + "]";
+      return "PageKey[type=" + getType() + ",id=" + getId() + ",name=" + name + "]";
     }
 }

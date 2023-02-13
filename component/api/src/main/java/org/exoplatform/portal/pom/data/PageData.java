@@ -20,11 +20,16 @@ package org.exoplatform.portal.pom.data;
 
 import java.util.List;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class PageData extends ContainerData {
 
     private static final long serialVersionUID = 2741613958131096156L;
@@ -94,10 +99,6 @@ public class PageData extends ContainerData {
         this.showMaxWindow = showMaxWindow;
     }
 
-    public PageKey getKey() {
-        return key;
-    }
-
     public String getOwnerType() {
         return key.getType();
     }
@@ -106,30 +107,4 @@ public class PageData extends ContainerData {
         return key.getId();
     }
 
-    public String getEditPermission() {
-        return editPermission;
-    }
-
-    public boolean isShowMaxWindow() {
-        return showMaxWindow;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PageData)) return false;
-        if (!super.equals(o)) return false;
-
-        PageData pageData = (PageData) o;
-
-        return key != null ? key.equals(pageData.key) : pageData.key == null;
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (key != null ? key.hashCode() : 0);
-        return result;
-    }
 }

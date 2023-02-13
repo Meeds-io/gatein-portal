@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.portal.application.PortletPreferences;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
@@ -38,15 +39,16 @@ import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.Status;
-import org.exoplatform.portal.mop.jdbc.service.PageServiceImpl;
-import org.exoplatform.portal.pom.data.ApplicationData;
+import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.portal.mop.storage.LayoutStorage;
 import org.exoplatform.portal.pom.data.ModelChange;
 import org.exoplatform.portal.pom.data.ModelData;
 import org.exoplatform.portal.pom.data.ModelDataStorage;
 import org.exoplatform.portal.pom.data.PageData;
-import org.exoplatform.portal.pom.data.PageKey;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
 import org.exoplatform.services.listener.ListenerService;
@@ -59,62 +61,128 @@ import org.exoplatform.services.log.Log;
  */
 public class DataStorageImpl implements DataStorage {
 
-  private static Log             LOG           = ExoLogger.getExoLogger(PageServiceImpl.class);
+  private static final Log  LOG = ExoLogger.getLogger(DataStorageImpl.class);
 
   private static final int       DEFAULT_LIMIT = 50;
 
-  private ModelDataStorage       delegate;
-
   private ListenerService        listenerService;
+
+  private ModelDataStorage       siteStorage;
+
+  private PageService            pageStorage;
+
+  private LayoutStorage          layoutStorage;
 
   private Map<String, Container> sharedLayouts = new HashMap<>();
 
-  public DataStorageImpl(ModelDataStorage delegate, ListenerService listenerService) {
-    this.delegate = delegate;
+  public DataStorageImpl(ListenerService listenerService,
+                         ModelDataStorage siteStorage,
+                         PageService pageStorage,
+                         LayoutStorage layoutStorage) {
     this.listenerService = listenerService;
+    this.siteStorage = siteStorage;
+    this.pageStorage = pageStorage;
+    this.layoutStorage = layoutStorage;
   }
 
+  @Override
   public void create(PortalConfig config) {
-    delegate.create(config.build());
-    broadcastEvent(config, PORTAL_CONFIG_CREATED);
+    siteStorage.create(config.build());
   }
 
+  @Override
   public void save(PortalConfig config) {
-    delegate.save(config.build());
-    broadcastEvent(config, PORTAL_CONFIG_UPDATED);
+    siteStorage.save(config);
   }
 
+  @Override
   public void remove(PortalConfig config) {
-    delegate.remove(config.build());
-    broadcastEvent(config, PORTAL_CONFIG_REMOVED);
+    siteStorage.remove(config);
+  }
+
+  @Override
+  public PortalConfig getPortalConfig(String portalName) {
+    return getPortalConfig(PortalConfig.PORTAL_TYPE, portalName);
+  }
+
+  @Override
+  public PortalConfig getPortalConfig(SiteKey siteKey) {
+    PortalData portalData = siteStorage.getPortalConfig(siteKey);
+    return portalData == null ? null : new PortalConfig(portalData);
+  }
+
+  @Override
+  public PortalConfig getPortalConfig(String ownerType, String portalName) {
+    return siteStorage.getPortalConfig(ownerType, portalName);
   }
 
   @Override
   public List<String> getSiteNames(SiteType siteType, int offset, int limit) {
-    return delegate.getSiteNames(siteType, offset, limit);
+    return siteStorage.getSiteNames(siteType, offset, limit);
   }
 
+  @Override
+  public void create(Page page) {
+    pageStorage.save(page.build());
+    broadcastEvent(PAGE_CREATED, page);
+  }
+
+  @Override
   public List<ModelChange> save(Page page) {
-    List<ModelChange> changes = delegate.save(page.build());
-    broadcastEvent(page, PAGE_UPDATED);
-    return changes;
+    pageStorage.save(page.build());
+    broadcastEvent(PAGE_UPDATED, page);
+    // Not used, kept as is to not break the API definition
+    return Collections.<ModelChange> emptyList();
   }
 
+  @Override
+  public Page getPage(String pageId) {
+    return pageStorage.getPage(pageId);
+  }
+
+  @Override
+  public Page getPage(PageKey pageKey) {
+    return pageStorage.getPage(pageKey);
+  }
+
+  @Override
+  public void remove(PageKey pageKey) {
+    pageStorage.destroyPage(pageKey);
+  }
+
+  @Override
+  public void remove(Page page) {
+    pageStorage.destroyPage(page.getPageKey());
+  }
+
+  @Override
   public <S> S load(ApplicationState<S> state, ApplicationType<S> type) {
-    return delegate.load(state, type);
+    return layoutStorage.load(state, type);
   }
 
+  @Override
   public <S> ApplicationState<S> save(ApplicationState<S> state, S preferences) {
-    return delegate.save(state, preferences);
+    return layoutStorage.save(state, preferences);
   }
 
+  @Override
+  public <S> String getId(ApplicationState<S> state) {
+    return layoutStorage.getId(state);
+  }
+
+  @Override
+  public <S> Application<S> getApplicationModel(String applicationStorageId) {
+    return layoutStorage.getApplicationModel(applicationStorageId);
+  }
+
+  @Override
   public Container getSharedLayout(String siteName) {
     String cacheKey = siteName;
     if (StringUtils.isBlank(cacheKey)) {
       cacheKey = "DEFAULT-SITE";
     }
     if (PropertyManager.isDevelopping() || !sharedLayouts.containsKey(cacheKey)) {
-      Container sharedLayout = delegate.getSharedLayout(siteName);
+      Container sharedLayout = siteStorage.getSharedLayout(siteName);
       if (sharedLayout == null && StringUtils.isNotBlank(siteName)) {
         // Return default shared layout if dedicated shared layout wasn't found
         return getSharedLayout(null);
@@ -125,16 +193,152 @@ public class DataStorageImpl implements DataStorage {
     return sharedLayouts.get(cacheKey);
   }
 
-  public PortalConfig getPortalConfig(String portalName) {
-    return getPortalConfig(PortalConfig.PORTAL_TYPE, portalName);
+  @Override
+  public Status getImportStatus() {
+    return siteStorage.getImportStatus();
   }
 
-  public Page getPage(String pageId) {
-    PageKey key = PageKey.create(pageId);
-    PageData data = delegate.getPage(key);
-    return data != null ? new Page(data) : null;
+  @Override
+  public void saveImportStatus(Status status) {
+    siteStorage.saveImportStatus(status);
   }
 
+  @Override
+  @Deprecated(forRemoval = true)
+  public List<String> getAllPortalNames() {
+    return siteStorage.getSiteNames(SiteType.PORTAL, 0, DEFAULT_LIMIT);
+  }
+
+  @Override
+  @Deprecated(forRemoval = true)
+  public List<String> getAllGroupNames() {
+    return siteStorage.getSiteNames(SiteType.GROUP, 0, DEFAULT_LIMIT);
+  }
+
+  @Override
+  @Deprecated(forRemoval = true)
+  public <T> LazyPageList<T> find(Query<T> q, Comparator<T> sortComparator) {
+    return new LazyPageList<T>(find2(q, sortComparator), 10);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  @Deprecated(forRemoval = true)
+  public <T> ListAccess<T> find2(Query<T> q, Comparator<T> sortComparator) {
+    Class<T> type = q.getClassType();
+    if (type == Page.class) {
+      Bilto<Page, PageData> bilto = new Bilto<Page, PageData>((Query<Page>) q,
+                                                              PageData.class,
+                                                              (Comparator<Page>) sortComparator) {
+        @Override
+        protected Page create(PageData pageData) {
+          return new Page(pageData);
+        }
+      };
+      return (ListAccess<T>) bilto.execute();
+    } else if (type == PortalConfig.class) {
+      Bilto<PortalConfig, PortalData> bilto = new Bilto<PortalConfig, PortalData>((Query<PortalConfig>) q,
+                                                                                  PortalData.class,
+                                                                                  (Comparator<PortalConfig>) sortComparator) {
+        @Override
+        protected PortalConfig create(PortalData portalData) {
+          return new PortalConfig(portalData);
+        }
+      };
+      return (ListAccess<T>) bilto.execute();
+    } else {
+      throw new UnsupportedOperationException("Cannot query type " + type);
+    }
+  }
+
+  @SuppressWarnings({
+      "unchecked", "rawtypes"
+  })
+  public <T> LazyPageList<T> findLazyPageList(Query<T> q) {
+    Class<T> type = q.getClassType();
+    if (PageData.class.equals(type)) {
+      throw new UnsupportedOperationException("Use PageService.findPages to instead of");
+    } else if (PortletPreferences.class.equals(type)) {
+      // this task actually return empty portlet preferences
+      return new LazyPageList<>(new ListAccess<T>() {
+        public T[] load(int index, int length) throws Exception {
+          throw new AssertionError();
+        }
+
+        public int getSize() throws Exception {
+          return 0;
+        }
+      }, 10);
+    } else if (PortalData.class.equals(type)) {
+      String ownerType = q.getOwnerType();
+
+      ListAccess<PortalData> la = new ListAccess<PortalData>() {
+
+        private int cacheOffset;
+
+        private int cacheLimit;
+
+        private List<String> siteNames;
+
+        public PortalData[] load(int offset, int limit) throws Exception {
+          return getSiteNames(offset, limit).stream()
+                                            .map(siteName -> siteStorage.getPortalConfig(new SiteKey(ownerType, siteName)))
+                                            .toList()
+                                            .toArray(new PortalData[siteNames.size()]);
+        }
+
+        public int getSize() throws Exception {
+          return getSiteNames(0, -1).size();
+        }
+
+        private List<String> getSiteNames(int offset, int limit) {
+          if (siteNames == null || cacheOffset != offset || cacheLimit != limit) {
+            SiteType siteType = SiteType.PORTAL;
+            if (ownerType != null) {
+              siteType = SiteType.valueOf(ownerType.toUpperCase());
+            }
+            siteNames = siteStorage.getSiteNames(siteType, offset, limit);
+            cacheOffset = offset;
+            cacheLimit = limit;
+          }
+          return siteNames;
+        }
+      };
+      return new LazyPageList(la, 10);
+    } else if (PortalKey.class.equals(type) && ("portal".equals(q.getOwnerType()) || "group".equals(q.getOwnerType()))) {
+      String ownerType = q.getOwnerType();
+      ListAccess<PortalKey> la = new ListAccess<PortalKey>() {
+        private List<String> siteNames;
+
+        public PortalKey[] load(int offset, int limit) throws Exception {
+          return getSiteNames(offset, limit).stream()
+                                            .map(siteName -> new PortalKey(ownerType, siteName))
+                                            .toList()
+                                            .toArray(new PortalKey[siteNames.size()]);
+        }
+
+        public int getSize() throws Exception {
+          return getSiteNames(0, -1).size();
+        }
+
+        private List<String> getSiteNames(int offset, int limit) {
+          if (siteNames == null) {
+            SiteType siteType = SiteType.PORTAL;
+            if (ownerType != null) {
+              siteType = SiteType.valueOf(ownerType.toUpperCase());
+            }
+            siteNames = siteStorage.getSiteNames(siteType, offset, limit);
+          }
+          return siteNames;
+        }
+      };
+      return new LazyPageList(la, 10);
+    } else {
+      throw new UnsupportedOperationException("Could not perform search on query " + q);
+    }
+  }
+
+  @Deprecated(forRemoval = true)
   private abstract class Bilto<O extends ModelObject, D extends ModelData> {
 
     final Query<O>      q;
@@ -142,12 +346,6 @@ public class DataStorageImpl implements DataStorage {
     final Class<D>      dataType;
 
     final Comparator<O> cp;
-
-    Bilto(Query<O> q, Class<D> dataType) {
-      this.q = q;
-      this.dataType = dataType;
-      this.cp = null;
-    }
 
     Bilto(Query<O> q, Class<D> dataType, Comparator<O> cp) {
       this.q = q;
@@ -159,7 +357,7 @@ public class DataStorageImpl implements DataStorage {
 
     ListAccess<O> execute() {
       Query<D> delegateQ = new Query<D>(q, dataType);
-      LazyPageList<D> r = delegate.find(delegateQ, null);
+      LazyPageList<D> r = findLazyPageList(delegateQ);
       List<D> tmp;
       try {
         tmp = r.getAll();
@@ -203,87 +401,11 @@ public class DataStorageImpl implements DataStorage {
     }
   }
 
-  @Deprecated(forRemoval = true)
-  public List<String> getAllPortalNames() {
-    return delegate.getSiteNames(SiteType.PORTAL, 0, DEFAULT_LIMIT);
-  }
-
-  @Deprecated(forRemoval = true)
-  public List<String> getAllGroupNames() {
-    return delegate.getSiteNames(SiteType.GROUP, 0, DEFAULT_LIMIT);
-  }
-
-  public <T> LazyPageList<T> find(Query<T> q) {
-    return find(q, null);
-  }
-
-  public <T> LazyPageList<T> find(Query<T> q, Comparator<T> sortComparator) {
-    return new LazyPageList<T>(find2(q, sortComparator), 10);
-  }
-
-  public <T> ListAccess<T> find2(Query<T> q) {
-    return find2(q, null);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> ListAccess<T> find2(Query<T> q, Comparator<T> sortComparator) {
-    Class<T> type = q.getClassType();
-    if (type == Page.class) {
-      Bilto<Page, PageData> bilto = new Bilto<Page, PageData>((Query<Page>) q,
-                                                              PageData.class,
-                                                              (Comparator<Page>) sortComparator) {
-        @Override
-        protected Page create(PageData pageData) {
-          return new Page(pageData);
-        }
-      };
-      return (ListAccess<T>) bilto.execute();
-    } else if (type == PortalConfig.class) {
-      Bilto<PortalConfig, PortalData> bilto = new Bilto<PortalConfig, PortalData>((Query<PortalConfig>) q,
-                                                                                  PortalData.class,
-                                                                                  (Comparator<PortalConfig>) sortComparator) {
-        @Override
-        protected PortalConfig create(PortalData portalData) {
-          return new PortalConfig(portalData);
-        }
-      };
-      return (ListAccess<T>) bilto.execute();
-    } else {
-      throw new UnsupportedOperationException("Cannot query type " + type);
-    }
-  }
-
-  public <S> String getId(ApplicationState<S> state) {
-    return delegate.getId(state);
-  }
-
-  public PortalConfig getPortalConfig(String ownerType, String portalName) {
-    PortalKey key = new PortalKey(ownerType, portalName);
-    PortalData data = delegate.getPortalConfig(key);
-    return data != null ? new PortalConfig(data) : null;
-  }
-
-  public <S> Application<S> getApplicationModel(String applicationStorageId) {
-    ApplicationData<S> applicationData = delegate.getApplicationData(applicationStorageId);
-    return new Application<>(applicationData);
-  }
-
-  @Override
-  public Status getImportStatus() {
-    return delegate.getImportStatus();
-  }
-
-  @Override
-  public void saveImportStatus(Status status) {
-    delegate.saveImportStatus(status);
-  }
-
-  private void broadcastEvent(Object data, String eventName) {
+  protected void broadcastEvent(String eventName, Page page) {
     try {
-      listenerService.broadcast(eventName, this, data);
+      listenerService.broadcast(eventName, this, page);
     } catch (Exception e) {
-      LOG.warn("Error while broadcasting event {} on config {}. Operation will continue processing.", eventName, data, e);
+      LOG.warn("Error when broadcasting notification " + eventName + " for page " + page.getPageKey(), e);
     }
   }
-
 }

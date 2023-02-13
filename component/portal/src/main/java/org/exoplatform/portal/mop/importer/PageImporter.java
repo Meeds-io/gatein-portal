@@ -62,13 +62,7 @@ public class PageImporter {
         //We temporary don't support to delete user site's pages, it's risk because user site page, navigation is controlled by 
         //UserSiteLifecycle which is difference with portal site and group site
         if (mode == ImportMode.OVERWRITE && !siteKey.getType().equals(SiteType.USER)) {
-            List<PageContext> allPages = pageService.loadPages(siteKey);
-            for (PageContext currentPage : allPages) {
-                String currentPageId = currentPage.getKey().format();
-                if (!hashPageList.containsKey(currentPageId)) {
-                    pageService.destroyPage(currentPage.getKey());
-                }
-            }
+            pageService.destroyPages(siteKey);
         }
         
         for (Page src : list) {

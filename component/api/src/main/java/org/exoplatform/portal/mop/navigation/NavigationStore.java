@@ -32,14 +32,12 @@ public interface NavigationStore extends NodeStore {
   /**
    * Retrieves all the navigation nodes of a given site
    * 
-   * @param  type {@link SiteType}
-   * @param offset offset of the query
-   * @param limit limit to fetch
-   * @return      {@link List} of {@link NavigationData}
+   * @param  type   {@link SiteType}
+   * @param  offset offset of the query
+   * @param  limit  limit to fetch
+   * @return        {@link List} of {@link NavigationData}
    */
-  default List<NavigationData> loadNavigations(SiteType type, int offset, int limit) {
-    throw new UnsupportedOperationException();
-  }
+  List<NavigationData> loadNavigations(SiteType type, int offset, int limit);
 
   NavigationData loadNavigationData(SiteKey key);
 
@@ -48,5 +46,7 @@ public interface NavigationStore extends NodeStore {
   void saveNavigation(SiteKey key, NavigationState state);
 
   boolean destroyNavigation(NavigationData data);
+
+  boolean destroyNavigation(SiteKey siteKey);
 
 }

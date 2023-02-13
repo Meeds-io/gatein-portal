@@ -20,11 +20,16 @@ package org.exoplatform.portal.pom.data;
 
 import java.util.List;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class ContainerData extends ComponentData {
 
     private static final long serialVersionUID = 7328080023001711540L;
@@ -128,72 +133,6 @@ public class ContainerData extends ComponentData {
         this.moveAppsPermissions = moveAppsPermissions;
         this.moveContainersPermissions = moveContainersPermissions;
         this.children = children;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public String getTemplate() {
-        return template;
-    }
-
-    public String getFactoryId() {
-        return factoryId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getWidth() {
-        return width;
-    }
-
-    public String getHeight() {
-        return height;
-    }
-
-    public List<String> getAccessPermissions() {
-        return accessPermissions;
-    }
-
-    public List<ComponentData> getChildren() {
-        return children;
-    }
-
-    /**
-     * @return the moveAppsPermissions
-     */
-    public List<String> getMoveAppsPermissions() {
-        return moveAppsPermissions;
-    }
-
-    /**
-     * @return the moveContainersPermissions
-     */
-    public List<String> getMoveContainersPermissions() {
-        return moveContainersPermissions;
-    }
-  
-    public String getCssClass() {
-      return cssClass;
-    }
-
-    public String getProfiles() {
-      return profiles;
     }
 
 }

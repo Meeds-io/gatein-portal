@@ -52,7 +52,7 @@ public class NavigationData implements Serializable {
         this.rootId = null;
     }
 
-    NavigationData(SiteKey key, Navigation node) {
+    public NavigationData(SiteKey key, Navigation node) {
         String rootId = node.getObjectId();
         NavigationState state = new NavigationState(node.getAttributes().getValue(MappedAttributes.PRIORITY, 1));
 
@@ -62,7 +62,7 @@ public class NavigationData implements Serializable {
         this.rootId = rootId;
     }
 
-    NavigationData(SiteKey key, NavigationState state, String rootId) {
+    public NavigationData(SiteKey key, NavigationState state, String rootId) {
         this.key = key;
         this.state = state;
         this.rootId = rootId;

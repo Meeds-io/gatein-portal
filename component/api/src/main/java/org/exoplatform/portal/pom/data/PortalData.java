@@ -18,171 +18,130 @@
  */
 package org.exoplatform.portal.pom.data;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.List;
 import java.util.Map;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
- * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @author  <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class PortalData extends ModelData {
 
-    public static final PortalData NULL_OBJECT = new PortalData();
+  private static final long         serialVersionUID = 5245652127699244955L;
 
-    /** . */
-    private final PortalKey key;
+  public static final PortalData    NULL_OBJECT      = new PortalData();
 
-    /** . */
-    private final String locale;
+  /** . */
+  private final PortalKey           key;
 
-    /** . */
-    private final List<String> accessPermissions;
+  /** . */
+  private final String              locale;
 
-    /** . */
-    private final String editPermission;
+  /** . */
+  private final List<String>        accessPermissions;
 
-    /** . */
-    private final Map<String, String> properties;
+  /** . */
+  private final String              editPermission;
 
-    /** . */
-    private final String skin;
+  /** . */
+  private final Map<String, String> properties;
 
-    /** . */
-    private final ContainerData portalLayout;
+  /** . */
+  private final String              skin;
 
-    private final boolean defaultLayout;
+  /** . */
+  private final ContainerData       portalLayout;
 
-    private final String label;
+  private final boolean             defaultLayout;
 
-    private final String description;
+  private final String              label;
 
-    private final List<RedirectData> redirects;
+  private final String              description;
 
-    private PortalData() {
-      super(null, null);
-      this.key = null;
-      this.locale = null;
-      this.label = null;
-      this.description = null;
-      this.accessPermissions = null;
-      this.editPermission = null;
-      this.properties = null;
-      this.skin = null;
-      this.portalLayout = null;
-      this.redirects = null;
-      this.defaultLayout = false;
-    }
+  private final List<RedirectData>  redirects;
 
-    public PortalData(String storageId, String name, String type, String locale, String label, String description,
-            List<String> accessPermissions, String editPermission, Map<String, String> properties, String skin,
-            ContainerData portalLayout, List<RedirectData> redirects) {
-      this(storageId,
-           name,
-           type,
-           locale,
-           label,
-           description,
-           accessPermissions,
-           editPermission,
-           properties,
-           skin,
-           portalLayout,
-           false,
-           redirects);
+  private PortalData() {
+    super(null, null);
+    this.key = null;
+    this.locale = null;
+    this.label = null;
+    this.description = null;
+    this.accessPermissions = null;
+    this.editPermission = null;
+    this.properties = null;
+    this.skin = null;
+    this.portalLayout = null;
+    this.redirects = null;
+    this.defaultLayout = false;
   }
 
-    public PortalData(String storageId, String name, String type, String locale, String label, String description,
-                      List<String> accessPermissions, String editPermission, Map<String, String> properties, String skin,
-                      ContainerData portalLayout, boolean defaultLayout, List<RedirectData> redirects) {
-      super(storageId, null);
+  public PortalData(String storageId, // NOSONAR
+                    String name,
+                    String type,
+                    String locale,
+                    String label,
+                    String description,
+                    List<String> accessPermissions,
+                    String editPermission,
+                    Map<String, String> properties,
+                    String skin,
+                    ContainerData portalLayout,
+                    List<RedirectData> redirects) {
+    this(storageId,
+         name,
+         type,
+         locale,
+         label,
+         description,
+         accessPermissions,
+         editPermission,
+         properties,
+         skin,
+         portalLayout,
+         false,
+         redirects);
+  }
 
-        //
-        this.key = new PortalKey(type, name);
-        this.locale = locale;
-        this.label = label;
-        this.description = description;
-        this.accessPermissions = accessPermissions;
-        this.editPermission = editPermission;
-        this.properties = properties;
-        this.skin = skin;
-        this.portalLayout = portalLayout;
-        this.redirects = redirects;
-        this.defaultLayout = defaultLayout;
-    }
+  public PortalData(String storageId, // NOSONAR
+                    String name,
+                    String type,
+                    String locale,
+                    String label,
+                    String description,
+                    List<String> accessPermissions,
+                    String editPermission,
+                    Map<String, String> properties,
+                    String skin,
+                    ContainerData portalLayout,
+                    boolean defaultLayout,
+                    List<RedirectData> redirects) {
+    super(storageId, null);
 
-    public PortalKey getKey() {
-        return key;
-    }
+    //
+    this.key = new PortalKey(type, name);
+    this.locale = locale;
+    this.label = label;
+    this.description = description;
+    this.accessPermissions = accessPermissions;
+    this.editPermission = editPermission;
+    this.properties = properties;
+    this.skin = skin;
+    this.portalLayout = portalLayout;
+    this.redirects = redirects;
+    this.defaultLayout = defaultLayout;
+  }
 
-    public String getName() {
-        return key.getId();
-    }
+  public String getName() {
+    return key.getId();
+  }
 
-    public String getType() {
-        return key.getType();
-    }
+  public String getType() {
+    return key.getType();
+  }
 
-    public String getLocale() {
-        return locale;
-    }
-
-    public List<String> getAccessPermissions() {
-        return accessPermissions;
-    }
-
-    public String getEditPermission() {
-        return editPermission;
-    }
-
-    public Map<String, String> getProperties() {
-        return properties;
-    }
-
-    public String getSkin() {
-        return skin;
-    }
-
-    public ContainerData getPortalLayout() {
-        return portalLayout;
-    }
-
-    public List<RedirectData> getRedirects() {
-        return redirects;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public boolean isDefaultLayout() {
-      return defaultLayout;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PortalData)) return false;
-        if (!super.equals(o)) return false;
-
-        PortalData that = (PortalData) o;
-
-        if (key != null ? !key.equals(that.key) : that.key != null) return false;
-        return StringUtils.equals(locale, that.locale);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (key != null ? key.hashCode() : 0);
-        result = 31 * result + (locale != null ? locale.hashCode() : 0);
-        return result;
-    }
 }

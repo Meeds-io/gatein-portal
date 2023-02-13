@@ -36,7 +36,7 @@ public class NavigationContext {
     /** . */
     NavigationData data;
 
-    NavigationContext(NavigationData data) {
+    public NavigationContext(NavigationData data) {
         if (data == null) {
             throw new NullPointerException();
         }
@@ -81,6 +81,10 @@ public class NavigationContext {
         return this.data;
     }
 
+    public void setData(NavigationData data) {
+      this.data = data;
+    }
+
     /**
      * Updates the navigation state the behavior is not the same wether or not the navigation is persistent:
      * When the navigation is persistent, any state is allowed:
@@ -94,9 +98,6 @@ public class NavigationContext {
      * @throws IllegalStateException when the state is cleared and the navigation is not persistent
      */
     public void setState(NavigationState state) throws IllegalStateException {
-        if (data == null && state == null) {
-            throw new IllegalStateException("Cannot clear state on a transient navigation");
-        }
         this.state = state;
     }
 }

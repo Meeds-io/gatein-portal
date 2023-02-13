@@ -19,14 +19,11 @@
 
 package org.exoplatform.portal.pom.data;
 
-import java.util.Comparator;
 import java.util.List;
 
-import org.exoplatform.commons.utils.LazyPageList;
-import org.exoplatform.portal.config.Query;
-import org.exoplatform.portal.config.model.ApplicationState;
-import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.Status;
 
@@ -36,55 +33,40 @@ import org.exoplatform.portal.mop.importer.Status;
  */
 public interface ModelDataStorage {
 
+  void create(PortalConfig config);
+
   void create(PortalData config);
+
+  void save(PortalConfig config);
 
   void save(PortalData config);
 
+  void remove(PortalConfig config);
+
   void remove(PortalData config);
 
+  void remove(SiteKey siteKey);
+
+  PortalData getPortalConfig(SiteKey siteKey);
+
   PortalData getPortalConfig(PortalKey key);
+
+  PortalConfig getPortalConfig(String ownerType, String portalName);
 
   /**
    * Retrieves the list of site names of a designated type
    * 
    * @param  siteType {@link SiteType}
-   * @param  offset offset of the query
-   * @param  limit limit to fetch
-   * @return {@link List} of site names
+   * @param  offset   offset of the query
+   * @param  limit    limit to fetch
+   * @return          {@link List} of site names
    */
   List<String> getSiteNames(SiteType siteType, int offset, int limit);
-
-  /**
-   * Saves a page. If a page with the same id already exists then a merge
-   * operation will occur, otherwise it throws {@link IllegalStateException}
-   * From PLF 5.3.x (RDBMS implementation) we drop support return the change
-   * list as it's not used any where. So the method always return the empty
-   * list.
-   *
-   * @param  page      the page to save
-   * @return           the list of model changes that occured during the save
-   *                   operation
-   */
-  List<ModelChange> save(PageData page);
-
-  PageData getPage(PageKey key);
-
-  <S> String getId(ApplicationState<S> state);
-
-  <S> S load(ApplicationState<S> state, ApplicationType<S> type);
-
-  <S> ApplicationState<S> save(ApplicationState<S> state, S preferences);
-
-  <S> ApplicationData<S> getApplicationData(String applicationStorageId);
 
   Status getImportStatus();
 
   void saveImportStatus(Status status);
 
   Container getSharedLayout(String siteName);
-
-  <T> LazyPageList<T> find(Query<T> q);
-
-  <T> LazyPageList<T> find(Query<T> q, Comparator<T> sortComparator);
 
 }

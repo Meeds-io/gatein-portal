@@ -313,7 +313,7 @@ public class UserPortalConfigService implements Startable {
             if (withSite) {
                 existingNames = new HashSet<String>();
                 Query<PortalConfig> q = new Query<PortalConfig>("group", null, PortalConfig.class);
-                LazyPageList<PortalConfig> lpl = storage_.find(q);
+                LazyPageList<PortalConfig> lpl = storage_.find(q, null);
                 for (PortalConfig groupSite : lpl.getAll()) {
                     existingNames.add(groupSite.getName());
                 }

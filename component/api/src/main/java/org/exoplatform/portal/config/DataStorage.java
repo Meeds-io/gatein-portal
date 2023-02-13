@@ -30,8 +30,10 @@ import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.Status;
+import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.pom.data.ModelChange;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
@@ -88,6 +90,14 @@ public interface DataStorage {
   PortalConfig getPortalConfig(String ownerType, String portalName);
 
   /**
+   * Retrieves {@link PortalConfig} of designated {@link SiteKey}
+   * 
+   * @param siteKey {@link SiteKey}
+   * @return null if not found, else {@link PortalConfig}
+   */
+  PortalConfig getPortalConfig(SiteKey siteKey);
+
+  /**
    * Remove the PortalConfig from the database <br>
    * Then broadcast PORTAL_CONFIG_REMOVED event
    *
@@ -104,6 +114,26 @@ public interface DataStorage {
    * @return        {@link Page}
    */
   Page getPage(String pageId);
+
+  /**
+   * Retrieves Page designated by its key
+   * 
+   * @param pageKey {@link PageKey}
+   * @return {@link Page}
+   */
+  Page getPage(PageKey pageKey);
+
+  void remove(Page page);
+
+  void remove(PageKey pageKey);
+
+  /**
+   * This method should create or update the given page object <br>
+   * Then broasdcast PAGE_CREATED event
+   *
+   * @param page
+   */
+  void create(Page page);
 
   /**
    * Saves a page. If a page with the same id already exists then a merge
@@ -163,15 +193,6 @@ public interface DataStorage {
   <S> ApplicationState<S> save(ApplicationState<S> state, S preferences);
 
   /**
-   * Return LazyPageList of object (unsorted) which type and other info
-   * determined in Query object
-   *
-   * @param q - Query object
-   */
-  @Deprecated(forRemoval = true)
-  <T> LazyPageList<T> find(Query<T> q);
-
-  /**
    * Return LazyPageList of object (sorted) which type and other info determined
    * in Query object
    *
@@ -182,20 +203,13 @@ public interface DataStorage {
   <T> LazyPageList<T> find(Query<T> q, Comparator<T> sortComparator);
 
   /**
-   * Return ListAccess, we can retrieved array of object (unsorted) in database
-   * through this.
-   *
-   * @param q - Query object
-   */
-  <T> ListAccess<T> find2(Query<T> q);
-
-  /**
    * Return ListAccess, we can retrieved array of object (sorted) in database
    * through this.
    *
    * @param q              - Query object
    * @param sortComparator - Comparator object, used to sort the result list
    */
+  @Deprecated(forRemoval = true, since = "6.4.0")
   <T> ListAccess<T> find2(Query<T> q, Comparator<T> sortComparator);
 
   /**

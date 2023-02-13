@@ -46,26 +46,27 @@ import org.exoplatform.portal.mop.SiteType;
   name = "SiteEntity.findSiteKey",
   query = "SELECT s.name FROM GateInSite s"
         + " WHERE s.siteType = :siteType"
+        + " ORDER BY s.name ASC"
 )
 @NamedQuery(
   name = "SiteEntity.findGroupSites",
   query = "SELECT s.name FROM GateInSite s"
         + " WHERE s.siteType = :siteType"
         + " AND NOT(s.name LIKE :excludeName)"
-        + " ORDER BY s.id ASC"
+        + " ORDER BY s.name ASC"
 )
 @NamedQuery(
   name = "SiteEntity.findSpaceSites",
   query = "SELECT s.name FROM GateInSite s"
         + " WHERE s.siteType = :siteType"
         + " AND s.name LIKE :includeName"
-        + " ORDER BY s.id ASC"
+        + " ORDER BY s.name ASC"
 )
 @NamedQuery(
   name = "SiteEntity.findPortalSites",
   query = "SELECT s.name FROM GateInSite s"
         + " WHERE s.siteType = :siteType"
-        + " ORDER BY s.id ASC"
+        + " ORDER BY s.name ASC"
 )
 public class SiteEntity extends ComponentEntity {
 
