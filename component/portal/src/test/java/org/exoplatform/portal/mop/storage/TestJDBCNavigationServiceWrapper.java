@@ -19,17 +19,31 @@
 
 package org.exoplatform.portal.mop.storage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 
-import org.exoplatform.component.test.*;
+import org.exoplatform.component.test.AbstractKernelTest;
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.mop.*;
-import org.exoplatform.portal.mop.navigation.*;
-import org.exoplatform.portal.mop.storage.SiteStorageImpl;
+import org.exoplatform.portal.mop.EventType;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.navigation.NavigationContext;
+import org.exoplatform.portal.mop.navigation.NavigationState;
+import org.exoplatform.portal.mop.navigation.Node;
+import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.NodeState;
+import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.service.NavigationService;
 import org.exoplatform.portal.pom.data.ContainerData;
 import org.exoplatform.portal.pom.data.PortalData;
-import org.exoplatform.services.listener.*;
+import org.exoplatform.services.listener.Event;
+import org.exoplatform.services.listener.Listener;
+import org.exoplatform.services.listener.ListenerService;
 
 @ConfiguredBy({
   @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
@@ -39,7 +53,7 @@ public class TestJDBCNavigationServiceWrapper extends AbstractKernelTest {
     /** . */
     private NavigationService navigationService;
 
-    private SiteStorageImpl modelStorage;
+    private SiteStorage modelStorage;
 
     /** . */
     private ListenerService listenerService;
@@ -52,7 +66,7 @@ public class TestJDBCNavigationServiceWrapper extends AbstractKernelTest {
         //
         listenerService = container.getComponentInstanceOfType(ListenerService.class);
         navigationService = container.getComponentInstanceOfType(NavigationService.class);
-        this.modelStorage = container.getComponentInstanceOfType(SiteStorageImpl.class);
+        modelStorage = container.getComponentInstanceOfType(SiteStorage.class);
 
         //
         super.setUp();

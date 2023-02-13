@@ -19,14 +19,23 @@
 
 package org.exoplatform.portal.mop.storage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 
-import org.exoplatform.component.test.*;
+import org.exoplatform.component.test.AbstractKernelTest;
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.navigation.*;
-import org.exoplatform.portal.mop.storage.SiteStorageImpl;
+import org.exoplatform.portal.mop.navigation.NavigationContext;
+import org.exoplatform.portal.mop.navigation.NavigationState;
+import org.exoplatform.portal.mop.navigation.Node;
+import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.service.NavigationService;
 import org.exoplatform.portal.pom.data.ContainerData;
 import org.exoplatform.portal.pom.data.PortalData;
 
@@ -39,13 +48,13 @@ public class TestJDBCNavigationService extends AbstractKernelTest {
     /** . */
     protected NavigationService  service;
 
-    private SiteStorageImpl modelStorage;
+    private SiteStorage modelStorage;
 
     protected void setUp() throws Exception {
         super.setUp();
         PortalContainer container = PortalContainer.getInstance();
-        this.service = (NavigationService) container.getComponentInstanceOfType(NavigationService.class);
-        this.modelStorage = container.getComponentInstanceOfType(SiteStorageImpl.class);
+        this.service = container.getComponentInstanceOfType(NavigationService.class);
+        this.modelStorage = container.getComponentInstanceOfType(SiteStorage.class);
         begin();
     }
 
