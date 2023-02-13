@@ -26,7 +26,6 @@ import org.exoplatform.portal.mop.dao.SiteDAO;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageError;
 import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.mop.page.PageServiceException;
 import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.pom.data.PageData;
@@ -39,6 +38,12 @@ public class PageStorageImpl extends AbstractPageStorage {
                          SiteDAO siteDAO,
                          PageDAO pageDAO) {
     super(listenerService, layoutStorage, siteDAO, pageDAO);
+  }
+
+  @Override
+  public Page getPage(String pageKey) {
+    PageKey key = PageKey.parse(pageKey);
+    return getPage(key);
   }
 
   @Override
@@ -73,7 +78,7 @@ public class PageStorageImpl extends AbstractPageStorage {
    * Load all the pages of a specific site. Note that this method can
    * potentially raise performance issues if the number of pages is very large
    * and should be used with cautions. That's the motiviation for not having
-   * this method on the {@link PageService} interface.
+   * this method on the {@link PageStorage} interface.
    * </p>
    *
    * @param  siteKey              the site key
@@ -81,7 +86,7 @@ public class PageStorageImpl extends AbstractPageStorage {
    * @throws PageServiceException anything that would prevent the operation to
    *                                succeed
    */
-  public List<PageContext> loadPages(SiteKey siteKey) throws PageServiceException {
+  public List<PageContext> loadPages(SiteKey siteKey) {
     if (siteKey == null) {
       throw new IllegalArgumentException("No null site key accepted");
     }

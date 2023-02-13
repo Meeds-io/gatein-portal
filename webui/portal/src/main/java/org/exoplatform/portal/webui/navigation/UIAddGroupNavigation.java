@@ -27,13 +27,13 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
-import org.exoplatform.portal.mop.navigation.NavigationService;
 import org.exoplatform.portal.mop.navigation.NavigationState;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.service.NavigationService;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.portal.webui.workspace.UIMaskWorkspace;
 import org.exoplatform.portal.webui.workspace.UIPortalApplication;
@@ -162,8 +162,8 @@ public class UIAddGroupNavigation extends UIContainer {
                         new String[] { ownerId }));
             } else {
                 // Create portal config of the group when it does not exist
-                DataStorage dataService = uicomp.getApplicationComponent(DataStorage.class);
-                if (dataService.getPortalConfig("group", ownerId) == null) {
+                LayoutService layoutService = uicomp.getApplicationComponent(LayoutService.class);
+                if (layoutService.getPortalConfig("group", ownerId) == null) {
                     UserPortalConfigService configService = uicomp.getApplicationComponent(UserPortalConfigService.class);
                     configService.createGroupSite(ownerId);
                 }

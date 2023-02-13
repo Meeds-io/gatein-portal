@@ -48,7 +48,6 @@ import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.container.configuration.ConfigurationManager;
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.NoSuchDataException;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.PortalConfig;
@@ -59,19 +58,15 @@ import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.dao.SiteDAO;
 import org.exoplatform.portal.mop.importer.Status;
-import org.exoplatform.portal.mop.navigation.NavigationStore;
-import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.pom.data.ComponentData;
 import org.exoplatform.portal.pom.data.ContainerData;
-import org.exoplatform.portal.pom.data.ModelDataStorage;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
 import org.exoplatform.portal.pom.data.RedirectData;
-import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-public class SiteStorageImpl implements ModelDataStorage {
+public class SiteStorageImpl implements SiteStorage {
 
   private static final String  DEFAULT_SHAREDLAYOUT_PATH = "war:/conf/portal/portal/sharedlayout.xml";   // NOSONAR
 
@@ -79,33 +74,29 @@ public class SiteStorageImpl implements ModelDataStorage {
 
   private static final Log     LOG                       = ExoLogger.getExoLogger(SiteStorageImpl.class);
 
-  private ListenerService      listenerService;
-
   private SettingService       settingService;
 
-  private ConfigurationManager confManager;
+  private ConfigurationManager configurationManager;
 
-  private NavigationStore      navigationStorage;
+  private NavigationStorage    navigationStorage;
 
-  private PageService          pageStorage;
+  private PageStorage          pageStorage;
 
   private LayoutStorage        layoutStorage;
 
   private SiteDAO              siteDAO;
 
   public SiteStorageImpl(SettingService settingService,
-                         ListenerService listenerService,
-                         ConfigurationManager confManager,
-                         NavigationStore navigationStorage,
-                         PageService pageStorage,
+                         ConfigurationManager configurationManager,
+                         NavigationStorage navigationStorage,
+                         PageStorage pageStorage,
                          LayoutStorage layoutStorage,
                          SiteDAO siteDAO) {
-    this.listenerService = listenerService;
     this.navigationStorage = navigationStorage;
     this.pageStorage = pageStorage;
     this.layoutStorage = layoutStorage;
     this.settingService = settingService;
-    this.confManager = confManager;
+    this.configurationManager = configurationManager;
     this.siteDAO = siteDAO;
   }
 
@@ -120,7 +111,6 @@ public class SiteStorageImpl implements ModelDataStorage {
     buildSiteEntity(entity, config);
     entity = siteDAO.create(entity);
     savePermissions(entity.getId(), config);
-    broadcastEvent(new PortalConfig(config), DataStorage.PORTAL_CONFIG_CREATED);
   }
 
   @Override
@@ -138,7 +128,6 @@ public class SiteStorageImpl implements ModelDataStorage {
     buildSiteEntity(entity, config);
     entity = siteDAO.update(entity);
     savePermissions(entity.getId(), config);
-    broadcastEvent(new PortalConfig(config), DataStorage.PORTAL_CONFIG_UPDATED);
   }
 
   @Override
@@ -168,7 +157,6 @@ public class SiteStorageImpl implements ModelDataStorage {
     } else {
       throw new NoSuchDataException("Could not remove non existing portal " + siteKey);
     }
-    broadcastEvent(new PortalConfig(config), DataStorage.PORTAL_CONFIG_REMOVED);
   }
 
   @Override
@@ -239,7 +227,7 @@ public class SiteStorageImpl implements ModelDataStorage {
       path = "war:/conf/portal/portal/sharedlayout-" + siteName + ".xml";
     }
     try {
-      InputStream inputStream = confManager.getInputStream(path);
+      InputStream inputStream = configurationManager.getInputStream(path);
       String out = IOUtil.getStreamContentAsString(inputStream);
       ByteArrayInputStream is = new ByteArrayInputStream(out.getBytes(StandardCharsets.UTF_8));
       IBindingFactory bfact = BindingDirectory.getFactory(Container.class);
@@ -343,14 +331,6 @@ public class SiteStorageImpl implements ModelDataStorage {
                                   id,
                                   PermissionEntity.TYPE.EDIT,
                                   Arrays.asList(config.getEditPermission()));
-  }
-
-  private void broadcastEvent(PortalConfig data, String eventName) {
-    try {
-      listenerService.broadcast(eventName, this, data);
-    } catch (Exception e) {
-      LOG.warn("Error while broadcasting event {} on config {}. Operation will continue processing.", eventName, data, e);
-    }
   }
 
 }

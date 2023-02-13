@@ -23,7 +23,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.json.simple.JSONArray;
 
 import org.exoplatform.portal.config.NoSuchDataException;
-import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.jdbc.entity.ComponentEntity;
 import org.exoplatform.portal.jdbc.entity.PageEntity;
 import org.exoplatform.portal.jdbc.entity.PermissionEntity;
@@ -31,7 +30,6 @@ import org.exoplatform.portal.mop.EventType;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.dao.PageDAO;
 import org.exoplatform.portal.mop.dao.SiteDAO;
-import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.pom.data.ComponentData;
 import org.exoplatform.portal.pom.data.PageData;
 import org.exoplatform.portal.pom.data.PageKey;
@@ -39,7 +37,7 @@ import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-public abstract class AbstractPageStorage implements PageService {
+public abstract class AbstractPageStorage implements PageStorage {
 
   private static final Log  LOG = ExoLogger.getLogger(AbstractPageStorage.class);
 
@@ -88,13 +86,6 @@ public abstract class AbstractPageStorage implements PageService {
     org.exoplatform.portal.mop.page.PageKey pageKey = new org.exoplatform.portal.mop.page.PageKey(siteKey, key.getName());
     PageEntity entity = pageDAO.findByKey(pageKey);
     return buildPageData(entity);
-  }
-
-  @Override
-  public Page getPage(String pageKey) {
-    PageKey key = PageKey.create(pageKey);
-    PageData data = getPage(key);
-    return data != null ? new Page(data) : null;
   }
 
   protected PageData buildPageData(PageEntity entity) {

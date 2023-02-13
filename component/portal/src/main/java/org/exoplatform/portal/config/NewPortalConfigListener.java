@@ -20,13 +20,16 @@
 package org.exoplatform.portal.config;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.services.log.Log;
-import org.exoplatform.services.log.ExoLogger;
 import org.jibx.runtime.JiBXException;
 
 import org.exoplatform.commons.utils.IOUtil;
@@ -36,14 +39,27 @@ import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.exoplatform.portal.config.model.*;
+import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelUnmarshaller;
+import org.exoplatform.portal.config.model.NavigationFragment;
+import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.Page.PageSet;
+import org.exoplatform.portal.config.model.PageNavigation;
+import org.exoplatform.portal.config.model.PageNode;
+import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.config.model.UnmarshalledObject;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.description.DescriptionService;
-import org.exoplatform.portal.mop.importer.*;
-import org.exoplatform.portal.mop.navigation.NavigationService;
-import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.portal.mop.importer.ImportMode;
+import org.exoplatform.portal.mop.importer.NavigationImporter;
+import org.exoplatform.portal.mop.importer.PageImporter;
+import org.exoplatform.portal.mop.importer.PortalConfigImporter;
+import org.exoplatform.portal.mop.importer.Status;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.portal.mop.storage.DescriptionStorage;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.LocaleConfigService;
 
 /**
@@ -59,10 +75,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
     private ConfigurationManager cmanager_;
 
     /** . */
-    private DataStorage dataStorage_;
-
-    /** . */
-    private PageService pageService_;
+    private LayoutService                layoutService_;
 
     /** . */
     private volatile List<NewPortalConfig> configs;
@@ -96,13 +109,13 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
     private Log                          log                    = ExoLogger.getLogger(getClass());
 
     /** . */
-    private NavigationService navigationService_;
+    private NavigationService            navigationService_;
 
     /** . */
-    private DescriptionService descriptionService_;
+    private DescriptionStorage           descriptionStorage_;
 
     /** . */
-    private LocaleConfigService localeConfigService_;
+    private LocaleConfigService          localeConfigService_;
 
     /** . */
     private UserACL userACL_;
@@ -111,17 +124,23 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
 
     private boolean isFirstStartup = false;
 
-    public NewPortalConfigListener(UserPortalConfigService owner, DataStorage dataStorage,
-            PageService pageService, ConfigurationManager cmanager, InitParams params, NavigationService navigationService,
-            DescriptionService descriptionService, UserACL userACL, LocaleConfigService localeConfigService) throws Exception {
-        owner_ = owner;
-        cmanager_ = cmanager;
-        dataStorage_ = dataStorage;
-        pageService_ = pageService;
-        navigationService_ = navigationService;
-        descriptionService_ = descriptionService;
-        userACL_ = userACL;
-        localeConfigService_ = localeConfigService;
+    public NewPortalConfigListener(UserPortalConfigService owner,
+                                   LayoutService layoutService,
+                                   ConfigurationManager cmanager,
+                                   InitParams params,
+                                   NavigationService navigationService,
+                                   DescriptionStorage descriptionStorage,
+                                   UserACL userACL,
+                                   LocaleConfigService localeConfigService)
+        throws Exception {
+
+        this.owner_ = owner;
+        this.cmanager_ = cmanager;
+        this.layoutService_ = layoutService;
+        this.navigationService_ = navigationService;
+        this.descriptionStorage_ = descriptionStorage;
+        this.userACL_ = userACL;
+        this.localeConfigService_ = localeConfigService;
 
         ValueParam valueParam = params.getValueParam("page.templates.location");
         if (valueParam != null)
@@ -171,7 +190,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
     private void touchImport() {
         RequestLifeCycle.begin(PortalContainer.getInstance());
         try {
-            dataStorage_.saveImportStatus(Status.DONE);
+            layoutService_.saveImportStatus(Status.DONE);
         } finally {
             RequestLifeCycle.end();
         }
@@ -182,13 +201,13 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         try {
             boolean perform = true;
 
-            Status st = dataStorage_.getImportStatus();
+            Status st = layoutService_.getImportStatus();
             if (st != null) {
                 perform = (Status.WANT_REIMPORT == st);
             } else {
-                if (dataStorage_.getPortalConfig(defaultPortal) != null) {
+                if (layoutService_.getPortalConfig(defaultPortal) != null) {
                     perform = false;
-                    dataStorage_.saveImportStatus(Status.DONE);
+                    layoutService_.saveImportStatus(Status.DONE);
                 } else {
                     isFirstStartup = true;
                 }
@@ -434,7 +453,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         if (config.isUseDefaultPortalLayout()) {
           // If PortalConfig already exists, no need to erase the data with empty
           // and predefined data
-          PortalConfig persistedPortalConfig = dataStorage_.getPortalConfig(type, fixedOwnerName);
+          PortalConfig persistedPortalConfig = layoutService_.getPortalConfig(type, fixedOwnerName);
           if (persistedPortalConfig != null) {
             return true;
           }
@@ -452,7 +471,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
 
           // If no XML configuration
           if (pConfig == null) {
-            PortalConfig persistedPortalConfig = dataStorage_.getPortalConfig(type, fixedOwnerName);
+            PortalConfig persistedPortalConfig = layoutService_.getPortalConfig(type, fixedOwnerName);
             // PortalConfig exists in storage => Do not reimport
             if (persistedPortalConfig != null) {
               return true;
@@ -466,7 +485,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         // If XML configuration of PortalConfig exists or PortalConfig doesn't exist
         // in storage, import PortalConfig switch default ImportMode
         ImportMode importMode = getRightMode(config.getImportMode());
-        PortalConfigImporter portalImporter = new PortalConfigImporter(importMode, pConfig, dataStorage_);
+        PortalConfigImporter portalImporter = new PortalConfigImporter(importMode, pConfig, layoutService_);
         try {
             portalImporter.perform();
             return true;
@@ -485,8 +504,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         PageImporter importer = new PageImporter(importMode,
                                                  new SiteKey(config.getOwnerType(), owner),
                                                  list,
-                                                 dataStorage_,
-                                                 pageService_);
+                                                 layoutService_);
         importer.perform();
       } finally {
         RequestLifeCycle.end();
@@ -507,7 +525,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
 
         //
         Locale locale;
-        PortalConfig portalConfig = dataStorage_.getPortalConfig(config.getOwnerType(), owner);
+        PortalConfig portalConfig = layoutService_.getPortalConfig(config.getOwnerType(), owner);
         if (portalConfig != null && portalConfig.getLocale() != null) {
             locale = new Locale(portalConfig.getLocale());
         } else {
@@ -516,7 +534,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
 
         //
         NavigationImporter merge = new NavigationImporter(locale, importMode, navigation, navigationService_,
-                descriptionService_);
+                descriptionStorage_);
 
         //
         merge.perform();

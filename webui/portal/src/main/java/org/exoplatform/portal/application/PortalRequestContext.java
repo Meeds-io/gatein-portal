@@ -51,6 +51,7 @@ import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserNode;
 import org.exoplatform.portal.mop.user.UserPortal;
@@ -163,7 +164,7 @@ public class PortalRequestContext extends WebuiRequestContext {
 
     private final UserPortalConfigService portalConfigService;
 
-    private final DataStorage dataStorage;
+    private final LayoutService layoutService;
 
     private UserPortalConfig userPortalConfig;
 
@@ -192,7 +193,7 @@ public class PortalRequestContext extends WebuiRequestContext {
         this.controllerContext = controllerContext;
         this.jsmanager_ = new JavascriptManager();
         this.portalLayoutService = ExoContainerContext.getService(DynamicPortalLayoutService.class);
-        this.dataStorage = ExoContainerContext.getService(DataStorage.class);
+        this.layoutService = ExoContainerContext.getService(LayoutService.class);
         this.portalConfigService = ExoContainerContext.getService(UserPortalConfigService.class);
 
         //
@@ -287,8 +288,7 @@ public class PortalRequestContext extends WebuiRequestContext {
             String portalName = getCurrentPortalSite();
             HttpSession session = request_.getSession();
             try {
-                userPortalConfig = portalConfigService.getUserPortalConfig(portalName, remoteUser,
-                        PortalRequestContext.USER_PORTAL_CONTEXT);
+                userPortalConfig = portalConfigService.getUserPortalConfig(portalName, remoteUser, PortalRequestContext.USER_PORTAL_CONTEXT);
                 if (userPortalConfig != null) {
                     session.setAttribute(LAST_PORTAL_NAME, portalName);
                 }
@@ -378,7 +378,7 @@ public class PortalRequestContext extends WebuiRequestContext {
         SiteKey displayingSiteKey = getSiteKey();
 
         if (portalLayoutService == null) {
-          this.currentPortalConfig = dataStorage.getPortalConfig(displayingSiteKey.getTypeName(), displayingSiteKey.getName());
+          this.currentPortalConfig = layoutService.getPortalConfig(displayingSiteKey.getTypeName(), displayingSiteKey.getName());
         } else {
           this.currentPortalConfig = portalLayoutService.getPortalConfigWithDynamicLayout(displayingSiteKey, getCurrentPortalSite());
         }

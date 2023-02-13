@@ -13,23 +13,21 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package org.exoplatform.portal.mop.cache.model;
+package org.exoplatform.portal.mop.storage;
 
-import java.io.Serializable;
-import java.util.Locale;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.navigation.NavigationData;
+import org.exoplatform.portal.mop.navigation.NavigationState;
+import org.exoplatform.portal.mop.navigation.NavigationStore;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+public interface NavigationStorage extends NavigationStore {
 
-@Data
-@AllArgsConstructor
-public class DescriptionCacheKey implements Serializable {
+  NavigationData loadNavigationData(SiteKey key);
 
-  private static final long serialVersionUID = -6471600751940922742L;
+  void saveNavigation(SiteKey key, NavigationState state);
 
-  private String            id;
+  boolean destroyNavigation(NavigationData data);
 
-  private Locale            locale;
+  boolean destroyNavigation(SiteKey siteKey);
 
-  private boolean           includeParent;
 }

@@ -6,6 +6,7 @@ import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.storage.PageStorage;
 
 /**
  * <p>
@@ -14,8 +15,11 @@ import org.exoplatform.portal.mop.SiteType;
  * with the page.
  * </p>
  *
- * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @author     <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @deprecated use {@link PageStorage} instead since this is a storage layer and
+ *             the name is ambiguous
  */
+@Deprecated(forRemoval = true, since = "6.5")
 public interface PageService {
 
   /**
@@ -98,7 +102,7 @@ public interface PageService {
    * list as it's not used any where. So the method always return the empty
    * list.
    *
-   * @param  page the page to save
+   * @param page the page to save
    */
   void save(org.exoplatform.portal.pom.data.PageData page);
 

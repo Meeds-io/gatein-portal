@@ -19,29 +19,18 @@
 
 package org.exoplatform.portal.mop.navigation;
 
-import java.util.List;
-
 import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.storage.NavigationStorage;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @deprecated use {@link NavigationStorage} instead since this is a storage layer and
+ *             the name is ambiguous
  */
+@Deprecated(forRemoval = true, since = "6.5")
 public interface NavigationStore extends NodeStore {
 
-  /**
-   * Retrieves all the navigation nodes of a given site
-   * 
-   * @param  type   {@link SiteType}
-   * @param  offset offset of the query
-   * @param  limit  limit to fetch
-   * @return        {@link List} of {@link NavigationData}
-   */
-  List<NavigationData> loadNavigations(SiteType type, int offset, int limit);
-
   NavigationData loadNavigationData(SiteKey key);
-
-  NavigationData loadNavigationData(Long nodeId);
 
   void saveNavigation(SiteKey key, NavigationState state);
 

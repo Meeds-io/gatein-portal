@@ -1,4 +1,4 @@
-package org.exoplatform.portal.mop.cache.model;
+package org.exoplatform.portal.mop.storage.cache.model;
 
 import java.util.Objects;
 

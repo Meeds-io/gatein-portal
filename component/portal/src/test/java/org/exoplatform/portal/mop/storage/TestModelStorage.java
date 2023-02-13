@@ -1,14 +1,24 @@
 package org.exoplatform.portal.mop.storage;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 import javax.persistence.EntityTransaction;
 
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
-import org.exoplatform.component.test.*;
-import org.exoplatform.portal.config.DataStorage;
-import org.exoplatform.portal.config.model.*;
-import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
+import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.ApplicationState;
+import org.exoplatform.portal.config.model.ApplicationType;
+import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PersistentApplicationState;
+import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.pom.data.ModelChange;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
@@ -19,12 +29,11 @@ import org.exoplatform.portal.pom.spi.portlet.Portlet;
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.settings-configuration-local-jta.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/portal/mop/navigation/configuration.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/portal/config/conf/configuration.xml"),
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/test.mop.portal.configuration.xml") })
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/test.mop.portal.configuration.xml")
+})
 public class TestModelStorage extends TestDataStorage {
 
-  private PageService pageService;
-
-  private DataStorage storage_;
+  private LayoutService storage_;
 
   public TestModelStorage(String name) {
     super(name);
@@ -33,8 +42,7 @@ public class TestModelStorage extends TestDataStorage {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    this.pageService = getContainer().getComponentInstanceOfType(PageService.class);
-    storage_ = (DataStorage) getContainer().getComponentInstanceOfType(DataStorage.class);
+    storage_ = getContainer().getComponentInstanceOfType(LayoutService.class);
   }
 
   protected void end(boolean save) {
@@ -238,14 +246,14 @@ public class TestModelStorage extends TestDataStorage {
     Page page = storage_.getPage("portal::test::test4");
     Application<Portlet> app = (Application<Portlet>) page.getChildren().get(0);
     PersistentApplicationState<Portlet> state = (PersistentApplicationState) app.getState();
-    
+
     //
     Portlet prefs = storage_.load(state, ApplicationType.PORTLET);
-    
+
     //
     prefs.setValue("template", null);
     storage_.save(state, prefs);
-    
+
     //
     prefs = storage_.load(state, ApplicationType.PORTLET);
     assertNotNull(prefs);

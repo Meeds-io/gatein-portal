@@ -19,15 +19,18 @@
 
 package org.exoplatform.portal.mop.user;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import org.exoplatform.commons.utils.ExpressionUtil;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.portal.mop.Visibility;
-import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.portal.mop.navigation.NodeContext;
 import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.storage.DescriptionStorage;
 
 /**
  * A navigation node as seen by a user.
@@ -157,8 +160,8 @@ public class UserNode {
     } else if (id != null) {
       Locale userLocale = owner.navigation.portal.context.getUserLocale();
       Locale portalLocale = owner.navigation.portal.getLocale();
-      DescriptionService descriptionService = owner.navigation.portal.service.getDescriptionService();
-      org.exoplatform.portal.mop.State description = descriptionService.resolveDescription(id, portalLocale, userLocale);
+      DescriptionStorage descriptionStorage = owner.navigation.portal.service.getDescriptionService();
+      org.exoplatform.portal.mop.State description = descriptionStorage.resolveDescription(id, portalLocale, userLocale);
       if (description != null) {
         resolvedLabel = description.getName();
       }
@@ -176,11 +179,11 @@ public class UserNode {
   public void setResolvedLabel(String label) {
     String id = context.getId();
     Locale userLocale = owner.navigation.portal.context.getUserLocale();
-    DescriptionService descriptionService = owner.navigation.portal.service.getDescriptionService();
+    DescriptionStorage descriptionStorage = owner.navigation.portal.service.getDescriptionService();
 
     org.exoplatform.portal.mop.State description = new org.exoplatform.portal.mop.State(label, null);
 
-    descriptionService.setDescription(id, userLocale, description);
+    descriptionStorage.setDescription(id, userLocale, description);
   }
 
   public String getEncodedResolvedLabel() {

@@ -19,24 +19,22 @@ import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.portal.mop.dao.SiteDAO;
 import org.exoplatform.portal.mop.importer.Status;
-import org.exoplatform.portal.mop.navigation.NavigationStore;
-import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.mop.storage.LayoutStorage;
+import org.exoplatform.portal.mop.storage.NavigationStorage;
+import org.exoplatform.portal.mop.storage.PageStorage;
 import org.exoplatform.portal.mop.storage.SiteStorageImpl;
-import org.exoplatform.services.listener.ListenerService;
 
 public class InMemorySiteStorage extends SiteStorageImpl {
 
   private static Status status;
 
   public InMemorySiteStorage(SettingService settingService,
-                             ListenerService listenerService,
                              ConfigurationManager confManager,
-                             NavigationStore navigationStorage,
-                             PageService pageStorage,
+                             NavigationStorage navigationStorage,
+                             PageStorage pageStorage,
                              LayoutStorage layoutStorage,
                              SiteDAO siteDAO) {
-    super(settingService, listenerService, confManager, navigationStorage, pageStorage, layoutStorage, siteDAO);
+    super(settingService, confManager, navigationStorage, pageStorage, layoutStorage, siteDAO);
   }
 
   @Override

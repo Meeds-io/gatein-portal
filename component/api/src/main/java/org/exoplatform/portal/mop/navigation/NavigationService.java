@@ -19,28 +19,29 @@
 
 package org.exoplatform.portal.mop.navigation;
 
-import java.util.List;
-
 import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.SiteType;
 
 /**
  * <p>
- * The navigation service takes care of managing the various portal navigations and their nodes. In order to manage an efficient
- * loading of the nodes, a {@link Scope} is used to describe the set of nodes that should be retrieved when a loading operation
- * is performed.
+ * The navigation service takes care of managing the various portal navigations
+ * and their nodes. In order to manage an efficient loading of the nodes, a
+ * {@link Scope} is used to describe the set of nodes that should be retrieved
+ * when a loading operation is performed.
  * </p>
- *
  * <p>
- * The node operations does not provide a model per se, but instead use the {@link NodeModel} interface to plug an API model.
- * Various node operations are quite complex and any API in front of this service would need to perform a manual, error prone
- * and tedious synchronization. Instead the model interface allows the navigation service to operate directly on an existing
- * model.
+ * The node operations does not provide a model per se, but instead use the
+ * {@link NodeModel} interface to plug an API model. Various node operations are
+ * quite complex and any API in front of this service would need to perform a
+ * manual, error prone and tedious synchronization. Instead the model interface
+ * allows the navigation service to operate directly on an existing model.
  * </p>
  *
- * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
- * @version $Revision$
+ * @author     <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @version    $Revision$
+ * @deprecated user {@link org.exoplatform.portal.mop.service.NavigationService}
+ *             instead since the new one helps on layer separations and naming
  */
+@Deprecated(forRemoval = true, since = "6.5")
 public interface NavigationService {
 
     /**
@@ -52,16 +53,6 @@ public interface NavigationService {
      * @throws NavigationServiceException anything that would prevent the operation to succeed
      */
     NavigationContext loadNavigation(SiteKey key) throws NullPointerException, NavigationServiceException;
-
-    /**
-     * Retrieves the list of navigations corresponding to the given site type
-     * 
-     * @param  type   {@link SiteType}
-     * @param  offset offset of the query
-     * @param  limit  limit to fetch
-     * @return {@link List} of {@link NavigationContext}
-     */
-    List<NavigationContext> loadNavigations(SiteType type, int offset, int limit);
 
     /**
      * Create, update a navigation. When the navigation state is not null, the navigation will be created or updated depending

@@ -19,13 +19,30 @@
 
 package org.exoplatform.portal.mop.storage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 
-import org.exoplatform.component.test.*;
+import org.exoplatform.component.test.AbstractKernelTest;
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.mop.*;
-import org.exoplatform.portal.mop.navigation.*;
-import org.exoplatform.portal.pom.data.*;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.navigation.HierarchyError;
+import org.exoplatform.portal.mop.navigation.HierarchyException;
+import org.exoplatform.portal.mop.navigation.NavigationContext;
+import org.exoplatform.portal.mop.navigation.NavigationState;
+import org.exoplatform.portal.mop.navigation.Node;
+import org.exoplatform.portal.mop.navigation.NodeChange;
+import org.exoplatform.portal.mop.navigation.NodeChangeQueue;
+import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.NodeState;
+import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.portal.pom.data.ContainerData;
+import org.exoplatform.portal.pom.data.PortalData;
 
 @ConfiguredBy({
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
@@ -35,12 +52,12 @@ public class TestJDBCNavigationServiceUpdate extends AbstractKernelTest {
   /** . */
   protected NavigationService  service;
 
-  private ModelDataStorage modelStorage;
+  private SiteStorage siteStorage;
 
   protected void setUp() throws Exception {
     begin();
     this.service = getContainer().getComponentInstanceOfType(NavigationService.class);
-    this.modelStorage = getContainer().getComponentInstanceOfType(ModelDataStorage.class);
+    this.siteStorage = getContainer().getComponentInstanceOfType(SiteStorage.class);
   }
 
   @Override
@@ -77,7 +94,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractKernelTest {
                                        null,
                                        container,
                                        null);
-    this.modelStorage.create(portal);
+    this.siteStorage.create(portal);
 
     restartTransaction();
   }

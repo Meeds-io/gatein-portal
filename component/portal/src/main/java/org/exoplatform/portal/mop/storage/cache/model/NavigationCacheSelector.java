@@ -1,4 +1,4 @@
-package org.exoplatform.portal.mop.cache.model;
+package org.exoplatform.portal.mop.storage.cache.model;
 
 import java.util.Objects;
 
@@ -11,7 +11,7 @@ import org.exoplatform.services.cache.ObjectCacheInfo;
 import lombok.Data;
 
 @Data
-public class NavigationCacheSelector implements CachedObjectSelector<NavigationKey, NavigationData> {
+public class NavigationCacheSelector implements CachedObjectSelector<SiteKey, NavigationData> {
 
   private SiteKey key;
 
@@ -20,13 +20,13 @@ public class NavigationCacheSelector implements CachedObjectSelector<NavigationK
   }
 
   @Override
-  public boolean select(final NavigationKey navigationKey, final ObjectCacheInfo<? extends NavigationData> ocinfo) {
-    return Objects.equals(key, navigationKey.getKey()) || Objects.equals(key, ocinfo.get().getSiteKey());
+  public boolean select(final SiteKey siteKey, final ObjectCacheInfo<? extends NavigationData> ocinfo) {
+    return Objects.equals(key, siteKey) || Objects.equals(key, ocinfo.get().getSiteKey());
   }
 
   @Override
-  public void onSelect(ExoCache<? extends NavigationKey, ? extends NavigationData> cache,
-                       NavigationKey key,
+  public void onSelect(ExoCache<? extends SiteKey, ? extends NavigationData> cache,
+                       SiteKey key,
                        ObjectCacheInfo<? extends NavigationData> ocinfo) throws Exception {
     cache.remove(key);
   }

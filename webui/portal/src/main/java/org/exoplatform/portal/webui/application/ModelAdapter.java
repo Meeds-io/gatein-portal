@@ -23,11 +23,15 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.gatein.pc.api.*;
+import org.gatein.pc.api.PortletContext;
+import org.gatein.pc.api.PortletInvoker;
+import org.gatein.pc.api.StatefulPortletContext;
 
 import org.exoplatform.container.ExoContainer;
-import org.exoplatform.portal.config.DataStorage;
-import org.exoplatform.portal.config.model.*;
+import org.exoplatform.portal.config.model.ApplicationState;
+import org.exoplatform.portal.config.model.ApplicationType;
+import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.pc.ExoPortletState;
 import org.exoplatform.portal.pc.ExoPortletStateType;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
@@ -57,8 +61,8 @@ public abstract class ModelAdapter<S, C extends Serializable> {
         @Override
         public StatefulPortletContext<ExoPortletState> getPortletContext(ExoContainer container, String applicationId,
                 ApplicationState<Portlet> applicationState) throws Exception {
-            DataStorage dataStorage = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
-            Portlet preferences = dataStorage.load(applicationState, ApplicationType.PORTLET);
+            LayoutService layoutService = container.getComponentInstanceOfType(LayoutService.class);
+            Portlet preferences = layoutService.load(applicationState, ApplicationType.PORTLET);
             PortletContext producerOfferedPortletContext = getProducerOfferedPortletContext(applicationId);
             ExoPortletState map = new ExoPortletState(producerOfferedPortletContext.getId());
             if (preferences != null) {
@@ -83,7 +87,7 @@ public abstract class ModelAdapter<S, C extends Serializable> {
                 transientState.setContentState(builder.build());
                 return transientState;
             } else {
-                DataStorage dataStorage = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
+                LayoutService dataStorage = (LayoutService) container.getComponentInstanceOfType(LayoutService.class);
                 return dataStorage.save(applicationState, builder.build());
             }
         }
@@ -107,7 +111,7 @@ public abstract class ModelAdapter<S, C extends Serializable> {
                 }
                 return pref;
             } else {
-                DataStorage dataStorage = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
+                LayoutService dataStorage = (LayoutService) container.getComponentInstanceOfType(LayoutService.class);
                 Portlet pref = dataStorage.load(applicationState, ApplicationType.PORTLET);
                 if (pref == null) {
                     pref = new Portlet();

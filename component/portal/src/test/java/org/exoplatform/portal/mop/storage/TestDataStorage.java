@@ -19,27 +19,57 @@
 
 package org.exoplatform.portal.mop.storage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.gatein.common.transaction.JTAUserTransactionLifecycleService;
 
-import org.exoplatform.component.test.*;
+import org.exoplatform.component.test.AbstractKernelTest;
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.config.*;
-import org.exoplatform.portal.config.model.*;
-import org.exoplatform.portal.mop.*;
-import org.exoplatform.portal.mop.navigation.*;
+import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.ApplicationState;
+import org.exoplatform.portal.config.model.ApplicationType;
+import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelObject;
+import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PersistentApplicationState;
+import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.mop.EventType;
+import org.exoplatform.portal.mop.QueryResult;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.navigation.NavigationContext;
+import org.exoplatform.portal.mop.navigation.NavigationState;
+import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.NodeModel;
+import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.page.PageService;
-import org.exoplatform.portal.pom.data.*;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.portal.pom.data.ContainerData;
+import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
-import org.exoplatform.services.listener.*;
-import org.exoplatform.services.organization.*;
+import org.exoplatform.services.listener.Event;
+import org.exoplatform.services.listener.Listener;
+import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.GroupHandler;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.UserHandler;
 
 import junit.framework.AssertionFailedError;
 
@@ -59,13 +89,13 @@ public class TestDataStorage extends AbstractKernelTest {
   private final String                       testPage = "portal::classic::testPage";
 
   /** . */
-  private DataStorage                        storage_;
+  private LayoutService                        storage_;
   
   /** . */
-  private ModelDataStorage                   modelStorage;
+  private SiteStorage                   modelStorage;
 
   /** . */
-  private PageService                        pageService;
+  private PageStorage                        pageService;
 
   /** . */
   private NavigationService                  navService;
@@ -96,10 +126,10 @@ public class TestDataStorage extends AbstractKernelTest {
     //
     super.setUp();
     PortalContainer container = PortalContainer.getInstance();
-    storage_ = (DataStorage) container.getComponentInstanceOfType(DataStorage.class);
-    pageService = (PageService) container.getComponentInstanceOfType(PageService.class);
+    storage_ = (LayoutService) container.getComponentInstanceOfType(LayoutService.class);
+    pageService = (PageStorage) container.getComponentInstanceOfType(PageStorage.class);
     navService = (NavigationService) container.getComponentInstanceOfType(NavigationService.class);
-    modelStorage = container.getComponentInstanceOfType(ModelDataStorage.class);
+    modelStorage = container.getComponentInstanceOfType(SiteStorage.class);
     events = new LinkedList<Event>();
     listenerService = (ListenerService) container.getComponentInstanceOfType(ListenerService.class);
     org = container.getComponentInstanceOfType(OrganizationService.class);
@@ -108,13 +138,13 @@ public class TestDataStorage extends AbstractKernelTest {
     //
     listenerService.addListener(EventType.PAGE_CREATED, listener);
     listenerService.addListener(EventType.PAGE_DESTROYED, listener);
-    listenerService.addListener(DataStorage.PAGE_UPDATED, listener);
+    listenerService.addListener(LayoutService.PAGE_UPDATED, listener);
     listenerService.addListener(EventType.NAVIGATION_CREATED, listener);
     listenerService.addListener(EventType.NAVIGATION_DESTROYED, listener);
     listenerService.addListener(EventType.NAVIGATION_UPDATED, listener);
-    listenerService.addListener(DataStorage.PORTAL_CONFIG_CREATED, listener);
-    listenerService.addListener(DataStorage.PORTAL_CONFIG_UPDATED, listener);
-    listenerService.addListener(DataStorage.PORTAL_CONFIG_REMOVED, listener);
+    listenerService.addListener(LayoutService.PORTAL_CONFIG_CREATED, listener);
+    listenerService.addListener(LayoutService.PORTAL_CONFIG_UPDATED, listener);
+    listenerService.addListener(LayoutService.PORTAL_CONFIG_REMOVED, listener);
 
     //
     begin();
@@ -187,7 +217,7 @@ public class TestDataStorage extends AbstractKernelTest {
     assertNotNull(portal);
 
     storage_.remove(portal);
-    assertEquals(1, events.stream().filter(event -> event.getEventName().equals(DataStorage.PORTAL_CONFIG_REMOVED)).count());
+    assertEquals(1, events.stream().filter(event -> event.getEventName().equals(LayoutService.PORTAL_CONFIG_REMOVED)).count());
     assertNull(storage_.getPortalConfig("portal", siteName));
 
     try {

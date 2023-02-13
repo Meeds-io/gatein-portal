@@ -22,11 +22,16 @@ package org.exoplatform.portal.mop.description;
 import java.util.Locale;
 import java.util.Map;
 
+import org.exoplatform.portal.mop.storage.DescriptionStorage;
+
 /**
  * The description service provides configuration and runtime interaction of described objects.
  *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @deprecated use {@link DescriptionStorage} instead since this is a storage layer and
+ *             the name is ambiguous
  */
+@Deprecated(forRemoval = true, since = "6.5")
 public interface DescriptionService {
 
     /**

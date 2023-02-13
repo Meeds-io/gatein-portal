@@ -1,71 +1,66 @@
 /*
- * Copyright (C) 2016 eXo Platform SAS.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
+ * This file is part of the Meeds project (https://meeds.io/).
+ * 
+ * Copyright (C) 2023 Meeds Association contact@meeds.io
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.exoplatform.portal.mop.navigation;
-
-import java.util.List;
+package org.exoplatform.portal.mop.service;
 
 import org.exoplatform.portal.mop.EventType;
 import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.navigation.NavigationContext;
+import org.exoplatform.portal.mop.navigation.NavigationData;
+import org.exoplatform.portal.mop.navigation.NodeChangeListener;
+import org.exoplatform.portal.mop.navigation.NodeChangeNotifier;
+import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.NodeManager;
+import org.exoplatform.portal.mop.navigation.NodeModel;
+import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.storage.NavigationStorage;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-public class NavigationStorageWrapper implements NavigationService {
+public class NavigationServiceImpl implements NavigationService {
 
-  private static final Log  LOG = ExoLogger.getLogger(NavigationStorageWrapper.class);
+  private static final Log  LOG = ExoLogger.getLogger(NavigationServiceImpl.class);
 
   private final NodeManager nodeManager;
 
   final ListenerService     listenerService;
 
-  final NavigationStore     navigationStore;
+  final NavigationStorage   navigationStorage;
 
-  public NavigationStorageWrapper(ListenerService listenerService,
-                                  NavigationStore navigationStore) {
+  public NavigationServiceImpl(ListenerService listenerService,
+                               NavigationStorage navigationStorage) {
     this.listenerService = listenerService;
-    this.navigationStore = navigationStore;
-    this.nodeManager = new NodeManager(navigationStore);
+    this.navigationStorage = navigationStorage;
+    this.nodeManager = new NodeManager(navigationStorage);
   }
 
   public NavigationContext loadNavigation(SiteKey key) {
     //
-    NavigationData navigationData = navigationStore.loadNavigationData(key);
+    NavigationData navigationData = navigationStorage.loadNavigationData(key);
     return navigationData != null && navigationData != NavigationData.EMPTY ? new NavigationContext(navigationData) : null;
   }
 
-  @Override
-  public List<NavigationContext> loadNavigations(SiteType type, int offset, int limit) {
-    if (type == null) {
-      throw new IllegalArgumentException("Site type is mandatory");
-    }
-    return navigationStore.loadNavigations(type, offset, limit)
-                          .stream()
-                          .map(NavigationContext::new)
-                          .toList();
-  }
-
-  public void saveNavigation(NavigationContext navigation) throws NullPointerException, NavigationServiceException {
+  public void saveNavigation(NavigationContext navigation) {
     boolean created = loadNavigation(navigation.getKey()) == null;
 
-    navigationStore.saveNavigation(navigation.getKey(), navigation.getState());
-    navigation.setData(navigationStore.loadNavigationData(navigation.getKey()));
+    navigationStorage.saveNavigation(navigation.getKey(), navigation.getState());
+    navigation.setData(navigationStorage.loadNavigationData(navigation.getKey()));
     navigation.setState(null);
 
     if (created) {
@@ -75,7 +70,7 @@ public class NavigationStorageWrapper implements NavigationService {
     }
   }
 
-  public boolean destroyNavigation(NavigationContext navigation) throws NullPointerException, NavigationServiceException {
+  public boolean destroyNavigation(NavigationContext navigation) {
     if (navigation == null) {
       throw new IllegalArgumentException("NavigationContext is mandatory");
     }
@@ -84,7 +79,7 @@ public class NavigationStorageWrapper implements NavigationService {
     }
 
     notify(EventType.NAVIGATION_DESTROY, navigation.getKey());
-    if (navigationStore.destroyNavigation(navigation.getData())) {
+    if (navigationStorage.destroyNavigation(navigation.getData())) {
       navigation.setData(null);
       notify(EventType.NAVIGATION_DESTROYED, navigation.getKey());
       return true;
@@ -127,20 +122,15 @@ public class NavigationStorageWrapper implements NavigationService {
     return nodeManager.loadNode(model, nodeId, scope, new NodeChangeNotifier<>(listener, this, listenerService));
   }
 
-  public <N> void updateNode(NodeContext<N> root, Scope scope, NodeChangeListener<NodeContext<N>> listener)
-                                                                                                            throws NullPointerException,
-                                                                                                            IllegalArgumentException,
-                                                                                                            NavigationServiceException {
+  public <N> void updateNode(NodeContext<N> root, Scope scope, NodeChangeListener<NodeContext<N>> listener) {
     nodeManager.updateNode(root, scope, new NodeChangeNotifier<>(listener, this, listenerService));
   }
 
-  public <N> void saveNode(NodeContext<N> context, NodeChangeListener<NodeContext<N>> listener) throws NullPointerException,
-                                                                                                NavigationServiceException {
+  public <N> void saveNode(NodeContext<N> context, NodeChangeListener<NodeContext<N>> listener) {
     nodeManager.saveNode(context, new NodeChangeNotifier<>(listener, this, listenerService));
   }
 
-  public <N> void rebaseNode(NodeContext<N> context, Scope scope, NodeChangeListener<NodeContext<N>> listener)
-                                                                                                               throws NavigationServiceException {
+  public <N> void rebaseNode(NodeContext<N> context, Scope scope, NodeChangeListener<NodeContext<N>> listener) {
     nodeManager.rebaseNode(context, scope, new NodeChangeNotifier<>(listener, this, listenerService));
   }
 

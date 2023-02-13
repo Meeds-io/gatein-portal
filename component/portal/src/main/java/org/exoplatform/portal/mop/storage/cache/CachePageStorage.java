@@ -1,4 +1,4 @@
-package org.exoplatform.portal.mop.cache;
+package org.exoplatform.portal.mop.storage.cache;
 
 import org.exoplatform.commons.cache.future.FutureExoCache;
 import org.exoplatform.commons.cache.future.Loader;

@@ -1,22 +1,22 @@
-/**
- * Copyright (C) 2009 eXo Platform SAS.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
+/*
+ * This file is part of the Meeds project (https://meeds.io/).
+ * 
+ * Copyright (C) 2023 Meeds Association contact@meeds.io
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.exoplatform.portal.config;
+package org.exoplatform.portal.mop.service;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -32,6 +32,7 @@ import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.portal.application.PortletPreferences;
+import org.exoplatform.portal.config.Query;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
@@ -39,15 +40,17 @@ import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.Status;
+import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.mop.storage.LayoutStorage;
+import org.exoplatform.portal.mop.storage.PageStorage;
+import org.exoplatform.portal.mop.storage.SiteStorage;
 import org.exoplatform.portal.pom.data.ModelChange;
 import org.exoplatform.portal.pom.data.ModelData;
-import org.exoplatform.portal.pom.data.ModelDataStorage;
 import org.exoplatform.portal.pom.data.PageData;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
@@ -55,30 +58,24 @@ import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-/**
- * @author  <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
- * @version $Revision$
- */
-public class DataStorageImpl implements DataStorage {
+public class LayoutServiceImpl implements LayoutService {
 
-  private static final Log  LOG = ExoLogger.getLogger(DataStorageImpl.class);
-
-  private static final int       DEFAULT_LIMIT = 50;
+  private static final Log       LOG           = ExoLogger.getLogger(LayoutServiceImpl.class);
 
   private ListenerService        listenerService;
 
-  private ModelDataStorage       siteStorage;
+  private SiteStorage            siteStorage;
 
-  private PageService            pageStorage;
+  private PageStorage            pageStorage;
 
   private LayoutStorage          layoutStorage;
 
   private Map<String, Container> sharedLayouts = new HashMap<>();
 
-  public DataStorageImpl(ListenerService listenerService,
-                         ModelDataStorage siteStorage,
-                         PageService pageStorage,
-                         LayoutStorage layoutStorage) {
+  public LayoutServiceImpl(ListenerService listenerService,
+                           SiteStorage siteStorage,
+                           PageStorage pageStorage,
+                           LayoutStorage layoutStorage) {
     this.listenerService = listenerService;
     this.siteStorage = siteStorage;
     this.pageStorage = pageStorage;
@@ -88,16 +85,19 @@ public class DataStorageImpl implements DataStorage {
   @Override
   public void create(PortalConfig config) {
     siteStorage.create(config.build());
+    broadcastEvent(PORTAL_CONFIG_CREATED, config);
   }
 
   @Override
   public void save(PortalConfig config) {
     siteStorage.save(config);
+    broadcastEvent(PORTAL_CONFIG_UPDATED, config);
   }
 
   @Override
   public void remove(PortalConfig config) {
     siteStorage.remove(config);
+    broadcastEvent(PORTAL_CONFIG_REMOVED, config);
   }
 
   @Override
@@ -136,6 +136,36 @@ public class DataStorageImpl implements DataStorage {
   }
 
   @Override
+  public void save(PageContext pageContext, Page page) {
+    pageStorage.savePage(pageContext);
+    pageStorage.save(page.build());
+    broadcastEvent(PAGE_UPDATED, page);
+  }
+
+  @Override
+  public void save(PageContext pageContext) {
+    pageStorage.savePage(pageContext);
+    broadcastEvent(PAGE_UPDATED, pageStorage.getPage(pageContext.getKey()));
+  }
+
+  @Override
+  public void removePages(SiteKey siteKey) {
+    List<PageContext> pages = pageStorage.loadPages(siteKey);
+    pages.forEach(context -> remove(context.getKey()));
+  }
+
+  @Override
+  public void remove(PageKey pageKey) {
+    Page page = pageStorage.getPage(pageKey);
+    remove(page);
+  }
+
+  @Override
+  public void remove(Page page) {
+    pageStorage.destroyPage(page.getPageKey());
+  }
+
+  @Override
   public Page getPage(String pageId) {
     return pageStorage.getPage(pageId);
   }
@@ -146,13 +176,23 @@ public class DataStorageImpl implements DataStorage {
   }
 
   @Override
-  public void remove(PageKey pageKey) {
-    pageStorage.destroyPage(pageKey);
+  public PageContext getPageContext(PageKey pageKey) {
+    return pageStorage.loadPage(pageKey);
   }
 
   @Override
-  public void remove(Page page) {
-    pageStorage.destroyPage(page.getPageKey());
+  public List<PageContext> findPages(SiteKey siteKey) {
+    return pageStorage.loadPages(siteKey);
+  }
+
+  @Override
+  public QueryResult<PageContext> findPages(int offset,
+                                            int limit,
+                                            SiteType siteKey,
+                                            String siteName,
+                                            String pageName,
+                                            String pageTitle) {
+    return pageStorage.findPages(offset, limit, siteKey, siteName, pageName, pageTitle);
   }
 
   @Override
@@ -204,26 +244,12 @@ public class DataStorageImpl implements DataStorage {
   }
 
   @Override
-  @Deprecated(forRemoval = true)
-  public List<String> getAllPortalNames() {
-    return siteStorage.getSiteNames(SiteType.PORTAL, 0, DEFAULT_LIMIT);
-  }
-
-  @Override
-  @Deprecated(forRemoval = true)
-  public List<String> getAllGroupNames() {
-    return siteStorage.getSiteNames(SiteType.GROUP, 0, DEFAULT_LIMIT);
-  }
-
-  @Override
-  @Deprecated(forRemoval = true)
   public <T> LazyPageList<T> find(Query<T> q, Comparator<T> sortComparator) {
-    return new LazyPageList<T>(find2(q, sortComparator), 10);
+    return new LazyPageList<>(find2(q, sortComparator), 10);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  @Deprecated(forRemoval = true)
   public <T> ListAccess<T> find2(Query<T> q, Comparator<T> sortComparator) {
     Class<T> type = q.getClassType();
     if (type == Page.class) {
@@ -254,7 +280,7 @@ public class DataStorageImpl implements DataStorage {
   @SuppressWarnings({
       "unchecked", "rawtypes"
   })
-  public <T> LazyPageList<T> findLazyPageList(Query<T> q) {
+  public <T> LazyPageList<T> findLazyPageList(Query<T> q) { // NOSONAR
     Class<T> type = q.getClassType();
     if (PageData.class.equals(type)) {
       throw new UnsupportedOperationException("Use PageService.findPages to instead of");
@@ -274,9 +300,9 @@ public class DataStorageImpl implements DataStorage {
 
       ListAccess<PortalData> la = new ListAccess<PortalData>() {
 
-        private int cacheOffset;
+        private int          cacheOffset;
 
-        private int cacheLimit;
+        private int          cacheLimit;
 
         private List<String> siteNames;
 
@@ -338,7 +364,6 @@ public class DataStorageImpl implements DataStorage {
     }
   }
 
-  @Deprecated(forRemoval = true)
   private abstract class Bilto<O extends ModelObject, D extends ModelData> {
 
     final Query<O>      q;
@@ -356,7 +381,7 @@ public class DataStorageImpl implements DataStorage {
     protected abstract O create(D d);
 
     ListAccess<O> execute() {
-      Query<D> delegateQ = new Query<D>(q, dataType);
+      Query<D> delegateQ = new Query<>(q, dataType);
       LazyPageList<D> r = findLazyPageList(delegateQ);
       List<D> tmp;
       try {
@@ -401,11 +426,11 @@ public class DataStorageImpl implements DataStorage {
     }
   }
 
-  protected void broadcastEvent(String eventName, Page page) {
+  protected void broadcastEvent(String eventName, Object data) {
     try {
-      listenerService.broadcast(eventName, this, page);
+      listenerService.broadcast(eventName, this, data);
     } catch (Exception e) {
-      LOG.warn("Error when broadcasting notification " + eventName + " for page " + page.getPageKey(), e);
+      LOG.warn("Error when broadcasting notification " + eventName + " for " + data, e);
     }
   }
 }

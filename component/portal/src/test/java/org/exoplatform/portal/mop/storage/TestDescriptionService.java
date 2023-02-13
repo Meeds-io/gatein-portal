@@ -30,11 +30,10 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.AbstractConfigTest;
 import org.exoplatform.portal.mop.State;
 import org.exoplatform.portal.mop.dao.DescriptionDAO;
-import org.exoplatform.portal.mop.description.DescriptionService;
 
 public class TestDescriptionService extends AbstractConfigTest {
 
-  private DescriptionService service;
+  private DescriptionStorage service;
   
   private DescriptionDAO descDAO;
   
@@ -46,7 +45,7 @@ public class TestDescriptionService extends AbstractConfigTest {
 
     //
     PortalContainer container = PortalContainer.getInstance();
-    service = container.getComponentInstanceOfType(DescriptionService.class);
+    service = container.getComponentInstanceOfType(DescriptionStorage.class);
     descDAO = getContainer().getComponentInstanceOfType(DescriptionDAO.class);
 
     //

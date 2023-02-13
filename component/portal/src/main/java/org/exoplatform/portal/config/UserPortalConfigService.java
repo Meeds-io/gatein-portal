@@ -50,14 +50,15 @@ import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.portal.mop.importer.ImportMode;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
-import org.exoplatform.portal.mop.navigation.NavigationService;
 import org.exoplatform.portal.mop.navigation.NavigationState;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.portal.mop.storage.DescriptionStorage;
+import org.exoplatform.portal.mop.storage.PageStorage;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserPortalContext;
 import org.exoplatform.services.log.ExoLogger;
@@ -81,7 +82,7 @@ public class UserPortalConfigService implements Startable {
 
   public static final String      DEFAULT_USER_SITE_TEMPLATE  = "user";
 
-    DataStorage storage_;
+    LayoutService layoutService;
 
     UserACL userACL_;
 
@@ -92,13 +93,12 @@ public class UserPortalConfigService implements Startable {
     private NewPortalConfigListener newPortalConfigListener_;
 
     /** . */
-    final NavigationService navService;
+    final NavigationService navigationService;
 
     /** . */
-    final DescriptionService descriptionService;
+    final DescriptionStorage descriptionStorage;
 
-    /** . */
-    final PageService pageService;
+    final PageStorage        pageStorage;
 
     /** . */
     boolean createUserPortal;
@@ -122,10 +122,14 @@ public class UserPortalConfigService implements Startable {
 
     private Log log = ExoLogger.getLogger("Portal:UserPortalConfigService");
 
-    public UserPortalConfigService(UserACL userACL, DataStorage storage, OrganizationService orgService,
-            NavigationService navService, DescriptionService descriptionService, PageService pageService,
-            SettingService settingService, InitParams params)
-            throws Exception {
+    public UserPortalConfigService(UserACL userACL,
+                                   LayoutService storage,
+                                   OrganizationService orgService,
+                                   NavigationService navService,
+                                   DescriptionStorage descriptionService,
+                                   PageStorage pageStorage,
+                                   SettingService settingService,
+                                   InitParams params) throws Exception {
 
         //
         ValueParam createUserPortalParam = params == null ? null : params.getValueParam("create.user.portal");
@@ -154,13 +158,13 @@ public class UserPortalConfigService implements Startable {
         String defaultUserSiteTemplate = defaultUserSiteTemplateParam == null ? DEFAULT_USER_SITE_TEMPLATE : defaultUserSiteTemplateParam.getValue();
 
         //
-        this.storage_ = storage;
+        this.layoutService = storage;
         this.orgService_ = orgService;
         this.settingService = settingService;
         this.userACL_ = userACL;
-        this.navService = navService;
-        this.pageService = pageService;
-        this.descriptionService = descriptionService;
+        this.navigationService = navService;
+        this.descriptionStorage = descriptionService;
+        this.pageStorage = pageStorage;
         this.createUserPortal = createUserPortal;
         this.destroyUserPortal = destroyUserPortal;
         this.defaultImportMode = defaultImportMode;
@@ -168,12 +172,12 @@ public class UserPortalConfigService implements Startable {
         this.defaultUserSiteTemplate = defaultUserSiteTemplate;
     }
 
-    public PageService getPageService() {
-        return pageService;
+    public PageStorage getPageService() {
+        return pageStorage;
     }
 
-    public DataStorage getDataStorage() {
-        return storage_;
+    public LayoutService getDataStorage() {
+        return layoutService;
     }
 
     public ImportMode getDefaultImportMode() {
@@ -218,11 +222,11 @@ public class UserPortalConfigService implements Startable {
      * @return the navigation service;
      */
     public NavigationService getNavigationService() {
-        return navService;
+        return navigationService;
     }
 
-    public DescriptionService getDescriptionService() {
-        return descriptionService;
+    public DescriptionStorage getDescriptionService() {
+        return descriptionStorage;
     }
 
     public UserACL getUserACL() {
@@ -280,7 +284,7 @@ public class UserPortalConfigService implements Startable {
 
     public UserPortalConfig getUserPortalConfig(String portalName, String accessUser, UserPortalContext userPortalContext)
             throws Exception {
-        PortalConfig portal = storage_.getPortalConfig(portalName);
+        PortalConfig portal = layoutService.getPortalConfig(portalName);
         if (portal == null || !userACL_.hasPermission(portal)) {
             return null;
         }
@@ -313,7 +317,7 @@ public class UserPortalConfigService implements Startable {
             if (withSite) {
                 existingNames = new HashSet<String>();
                 Query<PortalConfig> q = new Query<PortalConfig>("group", null, PortalConfig.class);
-                LazyPageList<PortalConfig> lpl = storage_.find(q, null);
+                LazyPageList<PortalConfig> lpl = layoutService.find(q, null);
                 for (PortalConfig groupSite : lpl.getAll()) {
                     existingNames.add(groupSite.getName());
                 }
@@ -352,7 +356,7 @@ public class UserPortalConfigService implements Startable {
             if (groups != null && groups.size() > 0) {
                   if (withSite) {
                       for (Group group : groups) {
-                        PortalConfig cfg = storage_.getPortalConfig(PortalConfig.GROUP_TYPE, group.getId());
+                        PortalConfig cfg = layoutService.getPortalConfig(PortalConfig.GROUP_TYPE, group.getId());
                         if (cfg != null) {
                           hasNav = true;
                           break;
@@ -383,19 +387,19 @@ public class UserPortalConfigService implements Startable {
         createUserPortalConfig(PortalConfig.USER_TYPE, userName, getDefaultUserSiteTemplate());
 
         // Need to insert the corresponding user site if needed
-        PortalConfig cfg = storage_.getPortalConfig(PortalConfig.USER_TYPE, userName);
+        PortalConfig cfg = layoutService.getPortalConfig(PortalConfig.USER_TYPE, userName);
         if (cfg == null) {
             cfg = new PortalConfig(PortalConfig.USER_TYPE, userName);
             cfg.useDefaultPortalLayout();
-            storage_.create(cfg);
+            layoutService.create(cfg);
         }
 
         // Create a blank navigation if needed
         SiteKey key = SiteKey.user(userName);
-        NavigationContext nav = navService.loadNavigation(key);
+        NavigationContext nav = navigationService.loadNavigation(key);
         if (nav == null) {
             nav = new NavigationContext(key, new NavigationState(5));
-            navService.saveNavigation(nav);
+            navigationService.saveNavigation(nav);
         }
     }
 
@@ -415,11 +419,11 @@ public class UserPortalConfigService implements Startable {
         createUserPortalConfig(PortalConfig.GROUP_TYPE, groupId, getDefaultGroupSiteTemplate());
 
         // Need to insert the corresponding group site
-        PortalConfig cfg = storage_.getPortalConfig(PortalConfig.GROUP_TYPE, groupId);
+        PortalConfig cfg = layoutService.getPortalConfig(PortalConfig.GROUP_TYPE, groupId);
         if (cfg == null) {
             cfg = new PortalConfig(PortalConfig.GROUP_TYPE, groupId);
             cfg.useDefaultPortalLayout();
-            storage_.create(cfg);
+            layoutService.create(cfg);
         }
     }
 
@@ -466,9 +470,9 @@ public class UserPortalConfigService implements Startable {
      * @throws Exception any exception
      */
     public void removeUserPortalConfig(String ownerType, String ownerId) throws Exception {
-        PortalConfig config = storage_.getPortalConfig(ownerType, ownerId);
+        PortalConfig config = layoutService.getPortalConfig(ownerType, ownerId);
         if (config != null) {
-            storage_.remove(config);
+            layoutService.remove(config);
         }
     }
 
@@ -483,7 +487,7 @@ public class UserPortalConfigService implements Startable {
             return null;
         }
 
-        PageContext page = pageService.loadPage(pageRef);
+        PageContext page = layoutService.getPageContext(pageRef);
         if (page == null || !userACL_.hasPermission(page)) {
             return null;
         }
@@ -510,14 +514,14 @@ public class UserPortalConfigService implements Startable {
     }
 
     public List<String> getSiteNames(SiteType siteType, int offset, int limit) {
-      List<String> list = storage_.getSiteNames(siteType, offset, limit);
+      List<String> list = layoutService.getSiteNames(siteType, offset, limit);
       for (Iterator<String> i = list.iterator(); i.hasNext();) {
         String name = i.next();
         if (siteType == SiteType.PORTAL && StringUtils.equals(name, globalPortal_)) {
           i.remove();
           continue;
         }
-        PortalConfig config = storage_.getPortalConfig(siteType.getName(), name);
+        PortalConfig config = layoutService.getPortalConfig(siteType.getName(), name);
         if (config == null || !userACL_.hasPermission(config)) {
           i.remove();
         }

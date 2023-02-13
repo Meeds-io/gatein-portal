@@ -27,9 +27,8 @@ import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.portal.jdbc.entity.DescriptionEntity;
 import org.exoplatform.portal.jdbc.entity.DescriptionState;
 import org.exoplatform.portal.mop.dao.DescriptionDAO;
-import org.exoplatform.portal.mop.description.DescriptionService;
 
-public class DescriptionStorageImpl implements DescriptionService {
+public class DescriptionStorageImpl implements DescriptionStorage {
 
   private DescriptionDAO descriptionDAO;
 

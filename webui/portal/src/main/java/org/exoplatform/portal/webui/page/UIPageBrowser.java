@@ -19,36 +19,61 @@
 
 package org.exoplatform.portal.webui.page;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.portlet.ActionResponse;
 import javax.xml.namespace.QName;
 
 import org.exoplatform.commons.serialization.api.annotations.Serialized;
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.*;
-import org.exoplatform.portal.config.model.*;
+import org.exoplatform.portal.config.Query;
+import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.config.model.ModelObject;
+import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.Utils;
 import org.exoplatform.portal.mop.navigation.Scope;
-import org.exoplatform.portal.mop.page.*;
-import org.exoplatform.portal.mop.user.*;
+import org.exoplatform.portal.mop.page.PageContext;
+import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.page.PageState;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.storage.PageStorage;
+import org.exoplatform.portal.mop.user.UserNavigation;
+import org.exoplatform.portal.mop.user.UserNode;
+import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.portal.PageNodeEvent;
 import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
 import org.exoplatform.portal.webui.util.Util;
-import org.exoplatform.portal.webui.workspace.*;
+import org.exoplatform.portal.webui.workspace.UIMaskWorkspace;
+import org.exoplatform.portal.webui.workspace.UIPortalApplication;
+import org.exoplatform.portal.webui.workspace.UIWorkingWorkspace;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.application.WebuiRequestContext;
-import org.exoplatform.webui.config.annotation.*;
-import org.exoplatform.webui.core.*;
+import org.exoplatform.webui.config.annotation.ComponentConfig;
+import org.exoplatform.webui.config.annotation.ComponentConfigs;
+import org.exoplatform.webui.config.annotation.EventConfig;
+import org.exoplatform.webui.config.annotation.ParamConfig;
+import org.exoplatform.webui.core.UIApplication;
+import org.exoplatform.webui.core.UIComponent;
+import org.exoplatform.webui.core.UIContainer;
+import org.exoplatform.webui.core.UIPopupWindow;
+import org.exoplatform.webui.core.UIRepeater;
+import org.exoplatform.webui.core.UIVirtualList;
 import org.exoplatform.webui.core.lifecycle.UIFormLifecycle;
 import org.exoplatform.webui.core.model.SelectItemOption;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.Event.Phase;
 import org.exoplatform.webui.event.EventListener;
-import org.exoplatform.webui.form.*;
+import org.exoplatform.webui.form.UIForm;
+import org.exoplatform.webui.form.UIFormInputSet;
+import org.exoplatform.webui.form.UIFormSelectBox;
+import org.exoplatform.webui.form.UIFormStringInput;
 
 @ComponentConfigs({
         @ComponentConfig(template = "system:/groovy/portal/webui/page/UIPageBrowser.gtmpl", events = {
@@ -367,11 +392,10 @@ public class UIPageBrowser extends UIContainer {
             UIPage uiPage = uiPageForm.getUIPage();
             Page page = new Page();
             uiPageForm.invokeSetBindingBean(page);
-            DataStorage dataService = uiPageForm.getApplicationComponent(DataStorage.class);
+            LayoutService layoutService = uiPageForm.getApplicationComponent(LayoutService.class);
             // create new page
             if (uiPage == null) {
-                PageService pageService = uiPageForm.getApplicationComponent(PageService.class);
-                PageContext existPage = pageService.loadPage(page.getPageKey());
+                PageContext existPage = layoutService.getPageContext(page.getPageKey());
                 if (existPage != null) {
                     uiPortalApp.addMessage(new ApplicationMessage("UIPageForm.msg.sameName", null));
                     return;
@@ -383,10 +407,9 @@ public class UIPageBrowser extends UIContainer {
 
                 //
                 PageState pageState = Utils.toPageState(page);
-                pageService.savePage(new PageContext(page.getPageKey(), pageState));
 
                 //
-                dataService.save(page);
+                layoutService.save(new PageContext(page.getPageKey(), pageState), page);
                 postSave(uiPortalApp, pcontext);
                 return;
             }

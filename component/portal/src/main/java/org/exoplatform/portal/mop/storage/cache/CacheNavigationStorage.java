@@ -1,11 +1,8 @@
-package org.exoplatform.portal.mop.cache;
+package org.exoplatform.portal.mop.storage.cache;
 
 import org.exoplatform.commons.cache.future.FutureExoCache;
 import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.cache.model.NavigationCacheSelector;
-import org.exoplatform.portal.mop.cache.model.NavigationDataCacheSelector;
-import org.exoplatform.portal.mop.cache.model.NavigationKey;
 import org.exoplatform.portal.mop.dao.NavigationDAO;
 import org.exoplatform.portal.mop.dao.NodeDAO;
 import org.exoplatform.portal.mop.dao.PageDAO;
@@ -15,6 +12,8 @@ import org.exoplatform.portal.mop.navigation.NavigationState;
 import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.portal.mop.storage.NavigationStorageImpl;
+import org.exoplatform.portal.mop.storage.cache.model.NavigationCacheSelector;
+import org.exoplatform.portal.mop.storage.cache.model.NavigationDataCacheSelector;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.log.ExoLogger;
@@ -22,20 +21,20 @@ import org.exoplatform.services.log.Log;
 
 public class CacheNavigationStorage extends NavigationStorageImpl {
 
-  private static final Log                                            LOG                   =
-                                                                          ExoLogger.getExoLogger(CacheNavigationStorage.class);
+  private static final Log                                      LOG                   =
+                                                                    ExoLogger.getExoLogger(CacheNavigationStorage.class);
 
-  public static final String                                          NAVIGATION_CACHE_NAME = "portal.NavigationService";
+  public static final String                                    NAVIGATION_CACHE_NAME = "portal.NavigationService";
 
-  public static final String                                          NODE_CACHE_NAME       = "portal.NavigationNode";
+  public static final String                                    NODE_CACHE_NAME       = "portal.NavigationNode";
 
-  private final FutureExoCache<NavigationKey, NavigationData, Object> navigationFutureCache;
+  private final FutureExoCache<SiteKey, NavigationData, Object> navigationFutureCache;
 
-  private final ExoCache<NavigationKey, NavigationData>               navigationCache;
+  private final ExoCache<SiteKey, NavigationData>               navigationCache;
 
-  private final FutureExoCache<Long, NodeData, Object>                nodeFutureCache;
+  private final FutureExoCache<Long, NodeData, Object>          nodeFutureCache;
 
-  private final ExoCache<Long, NodeData>                              nodeCache;
+  private final ExoCache<Long, NodeData>                        nodeCache;
 
   public CacheNavigationStorage(CacheService cacheService,
                                 NavigationDAO navigationDAO,
@@ -44,14 +43,10 @@ public class CacheNavigationStorage extends NavigationStorageImpl {
                                 PageDAO pageDAO) {
     super(navigationDAO, siteDAO, nodeDAO, pageDAO);
     this.navigationCache = cacheService.getCacheInstance(NAVIGATION_CACHE_NAME);
-    this.navigationFutureCache = new FutureExoCache<>(new Loader<NavigationKey, NavigationData, Object>() {
+    this.navigationFutureCache = new FutureExoCache<>(new Loader<SiteKey, NavigationData, Object>() {
       @Override
-      public NavigationData retrieve(Object context, NavigationKey navigationKey) throws Exception {
-        if (navigationKey.getKey() == null) {
-          return CacheNavigationStorage.super.loadNavigationData(navigationKey.getNodeId());
-        } else {
-          return CacheNavigationStorage.super.loadNavigationData(navigationKey.getKey());
-        }
+      public NavigationData retrieve(Object context, SiteKey siteKey) throws Exception {
+        return CacheNavigationStorage.super.loadNavigationData(siteKey);
       }
     }, navigationCache);
 
@@ -125,14 +120,8 @@ public class CacheNavigationStorage extends NavigationStorageImpl {
   }
 
   @Override
-  public NavigationData loadNavigationData(Long nodeId) {
-    NavigationData navigationData = navigationFutureCache.get(null, new NavigationKey(null, nodeId));
-    return navigationData == null || navigationData.getSiteKey() == null ? null : navigationData;
-  }
-
-  @Override
-  public NavigationData loadNavigationData(SiteKey key) {
-    NavigationData navigationData = navigationFutureCache.get(null, new NavigationKey(key, null));
+  public NavigationData loadNavigationData(SiteKey siteKey) {
+    NavigationData navigationData = navigationFutureCache.get(null, siteKey);
     return navigationData == null || navigationData.getSiteKey() == null ? null : navigationData;
   }
 
@@ -165,7 +154,9 @@ public class CacheNavigationStorage extends NavigationStorageImpl {
         SiteKey siteKey = data.getSiteKey();
         clearNavigationByKey(siteKey);
         clearNodeCache(siteKey);
-        clearNodeCache(Long.parseLong(data.getRootId()));
+        if (data.getRootId() != null) {
+          clearNodeCache(Long.parseLong(data.getRootId()));
+        }
       }
     }
   }

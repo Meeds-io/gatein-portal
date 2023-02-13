@@ -22,24 +22,24 @@ import org.exoplatform.portal.mop.dao.SiteDAO;
 import org.exoplatform.portal.mop.dao.WindowDAO;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.page.PageService;
 
 public class TestPageService extends AbstractConfigTest {
-  private PageService pageService;
-  
-  private SiteDAO siteDAO;
-  
-  private PageDAO pageDAO;
-  
+
+  private PageStorage  pageService;
+
+  private SiteDAO      siteDAO;
+
+  private PageDAO      pageDAO;
+
   private ContainerDAO containerDAO;
-  
-  private WindowDAO windowDAO;
-  
+
+  private WindowDAO    windowDAO;
+
   @Override
   protected void setUp() throws Exception {    
     begin();
     super.setUp();
-    this.pageService = getContainer().getComponentInstanceOfType(PageService.class);
+    this.pageService = getContainer().getComponentInstanceOfType(PageStorage.class);
     this.pageDAO = getContainer().getComponentInstanceOfType(PageDAO.class);
     this.containerDAO = getContainer().getComponentInstanceOfType(ContainerDAO.class);
     this.windowDAO = getContainer().getComponentInstanceOfType(WindowDAO.class);
@@ -58,7 +58,7 @@ public class TestPageService extends AbstractConfigTest {
     super.tearDown();
     end();
   }
-  
+
   public void testClonePage() throws Exception {
     WindowEntity app1 = createWindow("win1");
     windowDAO.create(app1);

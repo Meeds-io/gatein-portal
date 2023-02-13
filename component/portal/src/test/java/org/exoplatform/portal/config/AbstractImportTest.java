@@ -32,11 +32,12 @@ import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.importer.ImportMode;
 import org.exoplatform.portal.mop.importer.Status;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
-import org.exoplatform.portal.mop.navigation.NavigationService;
 import org.exoplatform.portal.mop.navigation.Node;
 import org.exoplatform.portal.mop.navigation.NodeContext;
 import org.exoplatform.portal.mop.navigation.NodeModel;
 import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.service.NavigationService;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -160,7 +161,7 @@ public abstract class AbstractImportTest extends AbstractConfigTest {
   }
 
   private void clearPortalData(PortalContainer container) throws Exception {
-    DataStorage dataStorage = container.getComponentInstanceOfType(DataStorage.class);
+    LayoutService dataStorage = container.getComponentInstanceOfType(LayoutService.class);
     List<String> portalNames = dataStorage.getAllGroupNames();
     for (String portalName : portalNames) {
       PortalConfig portalConfig = dataStorage.getPortalConfig(PortalConfig.GROUP_TYPE, portalName);

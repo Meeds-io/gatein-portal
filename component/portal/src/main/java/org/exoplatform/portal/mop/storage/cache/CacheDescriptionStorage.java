@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package org.exoplatform.portal.mop.cache;
+package org.exoplatform.portal.mop.storage.cache;
 
 import java.util.Locale;
 import java.util.Map;
@@ -21,10 +21,10 @@ import java.util.Map;
 import org.exoplatform.commons.cache.future.FutureExoCache;
 import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.portal.mop.State;
-import org.exoplatform.portal.mop.cache.model.DescriptionCacheKey;
-import org.exoplatform.portal.mop.cache.model.DescriptionCacheSelector;
 import org.exoplatform.portal.mop.dao.DescriptionDAO;
 import org.exoplatform.portal.mop.storage.DescriptionStorageImpl;
+import org.exoplatform.portal.mop.storage.cache.model.DescriptionCacheKey;
+import org.exoplatform.portal.mop.storage.cache.model.DescriptionCacheSelector;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.log.ExoLogger;

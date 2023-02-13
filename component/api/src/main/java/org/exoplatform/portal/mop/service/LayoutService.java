@@ -1,54 +1,44 @@
-/**
- * Copyright (C) 2009 eXo Platform SAS.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
+/*
+ * This file is part of the Meeds project (https://meeds.io/).
+ * Copyright (C) 2020 - 2023 Meeds Association contact@meeds.io
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-
-package org.exoplatform.portal.config;
+package org.exoplatform.portal.mop.service;
 
 import java.util.Comparator;
 import java.util.List;
 
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.portal.config.DataStorage;
+import org.exoplatform.portal.config.Query;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.Status;
+import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.pom.data.ModelChange;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
-/**
- * Created by The eXo Platform SAS Apr 19, 2007 This interface is used to load
- * the PortalConfig, Page config and Navigation config from the database
- * 
- * @deprecated use {@link LayoutService} since this is service layout and this
- *             interface name is ambiguous with storage layer
- */
-@Deprecated(forRemoval = true, since = "6.5")
-public interface DataStorage {
-
-  int    DEFAULT_LIMIT         = 50;
+public interface LayoutService extends DataStorage {
 
   String PAGE_CREATED          = "org.exoplatform.portal.config.DataStorage.pageCreated".intern();
 
@@ -100,8 +90,8 @@ public interface DataStorage {
   /**
    * Retrieves {@link PortalConfig} of designated {@link SiteKey}
    * 
-   * @param siteKey {@link SiteKey}
-   * @return null if not found, else {@link PortalConfig}
+   * @param  siteKey {@link SiteKey}
+   * @return         null if not found, else {@link PortalConfig}
    */
   PortalConfig getPortalConfig(SiteKey siteKey);
 
@@ -112,6 +102,13 @@ public interface DataStorage {
    * @param config @
    */
   void remove(PortalConfig config);
+
+  /**
+   * Removes all pages of a given site
+   * 
+   * @param siteKey {@link SiteKey}
+   */
+  void removePages(SiteKey siteKey);
 
   /**
    * This method should load the Page object from the database according to the
@@ -126,13 +123,57 @@ public interface DataStorage {
   /**
    * Retrieves Page designated by its key
    * 
-   * @param pageKey {@link PageKey}
-   * @return {@link Page}
+   * @param  pageKey {@link PageKey}
+   * @return         {@link Page}
    */
   Page getPage(PageKey pageKey);
 
+  /**
+   * retrieves {@link PageContext} switch its key
+   * 
+   * @param  pageKey {@link PageKey}
+   * @return         {@link PageContext}
+   */
+  PageContext getPageContext(PageKey pageKey);
+
+  /**
+   * Retrieves the list of pages in a give site
+   * 
+   * @param siteKey {@link SiteKey}
+   * @return {@link List} of type {@link PageContext}
+   */
+  List<PageContext> findPages(SiteKey siteKey);
+
+  /**
+   * Search for pages using some criteria and pagination options
+   * 
+   * @param offset pagination offset
+   * @param limit pagination limit
+   * @param siteType {@link SiteType}
+   * @param siteName site name
+   * @param pageName page name search term
+   * @param pageTitle page title search term
+   * @return {@link QueryResult} containing list of pages
+   */
+  QueryResult<PageContext> findPages(int offset,
+                                     int limit,
+                                     SiteType siteType,
+                                     String siteName,
+                                     String pageName,
+                                     String pageTitle);
+
+  /**
+   * Removes a given page from store
+   * 
+   * @param page {@link Page}
+   */
   void remove(Page page);
 
+  /**
+   * Removes a page from store designated by its {@link PageKey}
+   * 
+   * @param pageKey {@link PageKey}
+   */
   void remove(PageKey pageKey);
 
   /**
@@ -155,6 +196,22 @@ public interface DataStorage {
    * @return      the list of model changes that occurred during the save
    */
   List<ModelChange> save(Page page);
+
+  /**
+   * Saves a {@link PageContext} with its {@link PageState} in addition to the
+   * layout defined in {@link Page} object
+   * 
+   * @param pageContext {@link PageContext} with title, description and permissions
+   * @param page {@link Page} to save page layout and structure
+   */
+  void save(PageContext pageContext, Page page);
+
+  /**
+   * Saves a {@link PageContext} with its {@link PageState}
+   * 
+   * @param pageContext {@link PageContext} with title, description and permissions
+   */
+  void save(PageContext pageContext);
 
   /**
    * Retrieved {@link Application} model switch its storage identifier
@@ -196,29 +253,31 @@ public interface DataStorage {
    *                       CloneApplicationState or PersistentApplicationState
    *                       object
    * @param  preferences - object to be saved
-   * @return {@link ApplicationState} typed with {@link Portlet}
+   * @return             {@link ApplicationState} typed with {@link Portlet}
    */
   <S> ApplicationState<S> save(ApplicationState<S> state, S preferences);
 
   /**
    * Return LazyPageList of object (sorted) which type and other info determined
    * in Query object
-   * @param <T> could be of type {@link Page} or {@link PortalConfig}
-   *
-   * @param q - Query object
-   * @param sortComparator {@link Comparator} used for sorting results
-   * @return {@link LazyPageList} of <T>
+   * 
+   * @param  <T>            could be of type {@link Page} or
+   *                          {@link PortalConfig}
+   * @param  q              - Query object
+   * @param  sortComparator {@link Comparator} used for sorting results
+   * @return                {@link LazyPageList} of <T>
    */
   <T> LazyPageList<T> find(Query<T> q, Comparator<T> sortComparator);
 
   /**
    * Return ListAccess, we can retrieved array of object (sorted) in database
    * through this.
-   * @param <T> could be of type {@link Page} or {@link PortalConfig}
-   *
-   * @param q              - Query object
-   * @param sortComparator - Comparator object, used to sort the result list
-   * @return {@link LazyPageList} of <T>
+   * 
+   * @param  <T>            could be of type {@link Page} or
+   *                          {@link PortalConfig}
+   * @param  q              - Query object
+   * @param  sortComparator - Comparator object, used to sort the result list
+   * @return                {@link LazyPageList} of <T>
    */
   <T> ListAccess<T> find2(Query<T> q, Comparator<T> sortComparator);
 
@@ -234,38 +293,21 @@ public interface DataStorage {
   Container getSharedLayout(String siteName);
 
   /**
-   * @return All portal site names
-   * @deprecated since 6.4.0, use {@link #getSiteNames(SiteType, int, int)} instead
-   */
-  @Deprecated(forRemoval = true, since = "6.5")
-  default List<String> getAllPortalNames() {
-    return getSiteNames(SiteType.PORTAL, 0, DEFAULT_LIMIT);
-  }
-
-  /**
-   * @return All group site names
-   * @deprecated since 6.4.0, use {@link #getSiteNames(SiteType, int, int)} instead
-   */
-  @Deprecated(forRemoval = true, since = "6.5")
-  default List<String> getAllGroupNames() {
-    return getSiteNames(SiteType.GROUP, 0, DEFAULT_LIMIT);
-  }
-
-  /**
    * Retrieves all site type names with pagination.
    * 
-   * @param siteType {@link SiteType}
-   * @param offset offset of the query
-   * @param limit limit of the list to fetch
-   * @return {@link List} of corresponding site names, else empty list if not found
+   * @param  siteType {@link SiteType}
+   * @param  offset   offset of the query
+   * @param  limit    limit of the list to fetch
+   * @return          {@link List} of corresponding site names, else empty list
+   *                  if not found
    */
   List<String> getSiteNames(SiteType siteType, int offset, int limit);
 
-  default Status getImportStatus() {
+  default Status getImportStatus() { // NOSONAR
     throw new UnsupportedOperationException();
   }
 
-  default void saveImportStatus(Status status) {
+  default void saveImportStatus(Status status) { // NOSONAR
     throw new UnsupportedOperationException();
   }
 

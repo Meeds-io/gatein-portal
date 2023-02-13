@@ -24,27 +24,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import org.exoplatform.commons.utils.Safe;
 import org.exoplatform.portal.jdbc.entity.NavigationEntity;
 import org.exoplatform.portal.jdbc.entity.NodeEntity;
 import org.exoplatform.portal.jdbc.entity.PageEntity;
-import org.exoplatform.portal.jdbc.entity.SiteEntity;
 import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.dao.NavigationDAO;
 import org.exoplatform.portal.mop.dao.NodeDAO;
 import org.exoplatform.portal.mop.dao.PageDAO;
 import org.exoplatform.portal.mop.dao.SiteDAO;
 import org.exoplatform.portal.mop.navigation.NavigationData;
-import org.exoplatform.portal.mop.navigation.NavigationError;
-import org.exoplatform.portal.mop.navigation.NavigationServiceException;
 import org.exoplatform.portal.mop.navigation.NavigationState;
-import org.exoplatform.portal.mop.navigation.NavigationStore;
 import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.portal.mop.page.PageKey;
 
-public class NavigationStorageImpl implements NavigationStore {
+public class NavigationStorageImpl implements NavigationStorage {
 
   private NavigationDAO navigationDAO;
 
@@ -230,15 +224,6 @@ public class NavigationStorageImpl implements NavigationStore {
   }
 
   @Override
-  public List<NavigationData> loadNavigations(SiteType type, int offset, int limit) {
-    List<String> portalNames = getSiteNames(type, offset, limit);
-    return portalNames.stream()
-                      .map(name -> loadNavigationData(type.key(name)))
-                      .filter(Objects::nonNull)
-                      .toList();
-  }
-
-  @Override
   public NavigationData loadNavigationData(SiteKey key) {
     NavigationEntity navEntity = navigationDAO.findByOwner(key.getType(), key.getName());
     if (navEntity != null) {
@@ -247,23 +232,6 @@ public class NavigationStorageImpl implements NavigationStore {
     } else {
       return NavigationData.EMPTY;
     }
-  }
-
-  @Override
-  public NavigationData loadNavigationData(Long nodeId) {
-    NodeData root = this.buildNodeData(this.getRootNode(nodeId));
-    if (root == null) {
-      return NavigationData.EMPTY;
-    }
-    NavigationEntity navEntity = navigationDAO.findByRootNode(Safe.parseLong(root.getId()));
-    if (navEntity != null) {
-      SiteEntity siteEntity = navEntity.getOwner();
-      SiteKey key = siteEntity.getSiteType().key(siteEntity.getName());
-      NavigationState navigationState = new NavigationState(navEntity.getPriority());
-      return new NavigationData(key, navigationState, String.valueOf(navEntity.getRootNode().getId()));
-    }
-
-    return NavigationData.EMPTY;
   }
 
   private NodeEntity getRootNode(Long nodeId) {
@@ -276,11 +244,6 @@ public class NavigationStorageImpl implements NavigationStore {
 
   @Override
   public void saveNavigation(SiteKey key, NavigationState state) {
-    SiteEntity owner = siteDAO.findByKey(key);
-    if (owner == null) {
-      throw new NavigationServiceException(NavigationError.NAVIGATION_NO_SITE);
-    }
-
     NavigationEntity navEntity = navigationDAO.findByOwner(key.getType(), key.getName());
     navEntity = buildNavEntity(navEntity, key, state.getPriority());
     if (navEntity.getId() == null) {
@@ -294,11 +257,6 @@ public class NavigationStorageImpl implements NavigationStore {
   @Override
   public boolean destroyNavigation(NavigationData data) {
     SiteKey siteKey = data.getSiteKey();
-    SiteEntity owner = siteDAO.findByKey(siteKey);
-    if (owner == null) {
-      throw new NavigationServiceException(NavigationError.NAVIGATION_NO_SITE);
-    }
-
     NavigationEntity navEntity = navigationDAO.findByOwner(siteKey.getType(), siteKey.getName());
     if (navEntity != null) {
       navigationDAO.delete(navEntity);
@@ -389,15 +347,6 @@ public class NavigationStorageImpl implements NavigationStore {
                         node.getName(),
                         state,
                         children.toArray(new String[children.size()]));
-  }
-
-  public List<String> getSiteNames(SiteType siteType, int offset, int limit) {
-    return switch (siteType) {
-    case PORTAL -> siteDAO.findPortalSites(offset, limit);
-    case GROUP -> siteDAO.findGroupSites(offset, limit);
-    case SPACE -> siteDAO.findSpaceSites(offset, limit);
-    default -> throw new IllegalArgumentException("Unexpected value: " + siteType);
-    };
   }
 
   private SiteKey getSiteKey(Long nodeId) {

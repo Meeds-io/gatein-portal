@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package org.exoplatform.portal.mop.cache;
+package org.exoplatform.portal.mop.storage.cache;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.cache.future.FutureExoCache;
@@ -21,15 +21,14 @@ import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.dao.SiteDAO;
-import org.exoplatform.portal.mop.navigation.NavigationStore;
-import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.mop.storage.LayoutStorage;
+import org.exoplatform.portal.mop.storage.NavigationStorage;
+import org.exoplatform.portal.mop.storage.PageStorage;
 import org.exoplatform.portal.mop.storage.SiteStorageImpl;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
-import org.exoplatform.services.listener.ListenerService;
 
 public class CacheSiteStorage extends SiteStorageImpl {
 
@@ -41,13 +40,12 @@ public class CacheSiteStorage extends SiteStorageImpl {
 
   public CacheSiteStorage(CacheService cacheService, // NOSONAR
                           SettingService settingService,
-                          ListenerService listenerService,
-                          ConfigurationManager confManager,
-                          NavigationStore navigationStorage,
-                          PageService pageStorage,
+                          ConfigurationManager configurationManager,
+                          NavigationStorage navigationStorage,
+                          PageStorage pageStorage,
                           LayoutStorage layoutStorage,
                           SiteDAO siteDAO) {
-    super(settingService, listenerService, confManager, navigationStorage, pageStorage, layoutStorage, siteDAO);
+    super(settingService, configurationManager, navigationStorage, pageStorage, layoutStorage, siteDAO);
     this.siteCache = cacheService.getCacheInstance(SITE_CACHE_NAME);
     this.siteFutureCache = new FutureExoCache<>(new Loader<SiteKey, PortalData, Object>() {
       @Override
