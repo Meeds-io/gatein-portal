@@ -19,31 +19,44 @@
 
 package org.exoplatform.portal.webui.page;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Utils;
-import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.portal.mop.navigation.NavigationServiceException;
-import org.exoplatform.portal.mop.page.*;
-import org.exoplatform.portal.mop.user.*;
+import org.exoplatform.portal.mop.page.PageContext;
+import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.page.PageState;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.storage.DescriptionStorage;
+import org.exoplatform.portal.mop.storage.PageStorage;
+import org.exoplatform.portal.mop.user.UserNavigation;
+import org.exoplatform.portal.mop.user.UserNode;
+import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.portal.webui.navigation.UIPageNodeSelector;
 import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.portal.webui.portal.UIPortalComposer;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
 import org.exoplatform.portal.webui.util.Util;
-import org.exoplatform.portal.webui.workspace.*;
+import org.exoplatform.portal.webui.workspace.UIPortalApplication;
 import org.exoplatform.portal.webui.workspace.UIPortalApplication.EditMode;
+import org.exoplatform.portal.webui.workspace.UIPortalToolPanel;
+import org.exoplatform.portal.webui.workspace.UIWorkingWorkspace;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.web.url.navigation.NodeURL;
 import org.exoplatform.webui.application.WebuiRequestContext;
-import org.exoplatform.webui.config.annotation.*;
+import org.exoplatform.webui.config.annotation.ComponentConfig;
+import org.exoplatform.webui.config.annotation.ComponentConfigs;
+import org.exoplatform.webui.config.annotation.EventConfig;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.EventListener;
@@ -104,18 +117,14 @@ public class UIPageCreationWizard extends UIPageWizard {
         createdNode.setPageRef(page.getPageKey());
 
         //
-        PageService pageService = getApplicationComponent(PageService.class);
+        LayoutService layoutService = getApplicationComponent(LayoutService.class);
         PageState pageState = Utils.toPageState(page);
-        pageService.savePage(new PageContext(page.getPageKey(), pageState));
-
-        //
-        DataStorage dataService = getApplicationComponent(DataStorage.class);
-        dataService.save(page);
+        layoutService.save(new PageContext(page.getPageKey(), pageState), page);
 
         UserPortal userPortal = Util.getPortalRequestContext().getUserPortalConfig().getUserPortal();
         userPortal.saveNode(selectedNode, null);
 
-        DescriptionService descriptionService = getApplicationComponent(DescriptionService.class);
+        DescriptionStorage descriptionService = getApplicationComponent(DescriptionStorage.class);
         Map<Locale, org.exoplatform.portal.mop.State> descriptions = new HashMap<Locale, org.exoplatform.portal.mop.State>();
         Map<String, String> cachedLabels = uiPageInfo.getCachedLabels();
 
@@ -326,7 +335,7 @@ public class UIPageCreationWizard extends UIPageWizard {
             String pageId = ownerType + "::" + ownerId + "::" + page.getName();
 
             // check page is exist
-            PageService pageService = uiWizard.getApplicationComponent(PageService.class);
+            PageStorage pageService = uiWizard.getApplicationComponent(PageStorage.class);
             if (pageService.loadPage(PageKey.parse(pageId)) != null) {
                 uiPortalApp.addMessage(new ApplicationMessage("UIPageCreationWizard.msg.NameNotSame", null));
                 uiWizard.viewStep(FIRST_STEP);
@@ -361,7 +370,6 @@ public class UIPageCreationWizard extends UIPageWizard {
         private UIPortal prepareUIPortal(UIPortalApplication uiPortalApp, PortalRequestContext pcontext, UIWorkingWorkspace uiWorkingWS, Page page) throws Exception {
 
 //            UIPortal currentPortal = uiPortalApp.getCurrentSite();
-            DataStorage dataStorage = uiPortalApp.getApplicationComponent(DataStorage.class);
             PortalConfig portalConfig = pcontext.getDynamicPortalConfig();
             UIPortal transientPortal = uiWorkingWS.createUIComponent(UIPortal.class, null, null);
             PortalDataMapper.toUIPortal(transientPortal, portalConfig);

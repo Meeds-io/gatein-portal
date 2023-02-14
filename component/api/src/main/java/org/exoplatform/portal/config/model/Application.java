@@ -21,7 +21,7 @@ package org.exoplatform.portal.config.model;
 
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.application.Preference;
-import org.exoplatform.portal.config.DataStorage;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.ApplicationData;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
@@ -246,7 +246,7 @@ public class Application<S> extends ModelObject implements Cloneable {
     public void resetStorage() {
       if (!(this.state instanceof TransientApplicationState)) {
         try {
-          DataStorage dataStorage = ExoContainerContext.getService(DataStorage.class);
+          LayoutService dataStorage = ExoContainerContext.getService(LayoutService.class);
           Portlet preferences = (Portlet) dataStorage.load(this.state, this.type);
           String contentId = dataStorage.getId(this.state);
 

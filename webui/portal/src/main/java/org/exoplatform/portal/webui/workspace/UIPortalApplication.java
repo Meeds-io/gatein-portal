@@ -27,12 +27,12 @@ import org.exoplatform.portal.Constants;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.application.RequestNavigationData;
 import org.exoplatform.portal.branding.BrandingService;
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.resource.*;
 import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.page.UIPageActionListener.ChangeNodeActionListener;
@@ -183,7 +183,7 @@ public class UIPortalApplication extends UIApplication {
 
     private SkinVisitor skinVisitor;
 
-    private DataStorage dataStorage;
+    private LayoutService layoutService;
 
     private String skin_;
 
@@ -260,7 +260,7 @@ public class UIPortalApplication extends UIApplication {
         PortalRequestContext context = PortalRequestContext.getCurrentInstance();
         skinService = getApplicationComponent(SkinService.class);
         skinVisitor = getApplicationComponent(SkinVisitor.class);
-        dataStorage = getApplicationComponent(DataStorage.class);
+        layoutService = getApplicationComponent(LayoutService.class);
 
         // userPortalConfig_ = (UserPortalConfig)context.getAttribute(UserPortalConfig.class);
         // if (userPortalConfig_ == null)
@@ -780,7 +780,7 @@ public class UIPortalApplication extends UIApplication {
     }
 
     private void initSharedLayout() throws Exception {
-      Container container = dataStorage.getSharedLayout(this.lastPortalOwner);
+      Container container = layoutService.getSharedLayout(this.lastPortalOwner);
       if (container != null) {
           org.exoplatform.portal.webui.container.UIContainer uiContainer = createUIComponent(
                   org.exoplatform.portal.webui.container.UIContainer.class, null, null);

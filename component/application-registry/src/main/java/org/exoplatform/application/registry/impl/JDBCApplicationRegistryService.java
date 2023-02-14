@@ -18,7 +18,18 @@
  */
 package org.exoplatform.application.registry.impl;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.gatein.common.i18n.LocalizedString;
 import org.gatein.mop.api.content.ContentType;
@@ -28,7 +39,10 @@ import org.gatein.pc.api.info.MetaInfo;
 import org.gatein.pc.api.info.PortletInfo;
 import org.picocontainer.Startable;
 
-import org.exoplatform.application.registry.*;
+import org.exoplatform.application.registry.Application;
+import org.exoplatform.application.registry.ApplicationCategoriesPlugins;
+import org.exoplatform.application.registry.ApplicationCategory;
+import org.exoplatform.application.registry.ApplicationRegistryService;
 import org.exoplatform.application.registry.dao.ApplicationDAO;
 import org.exoplatform.application.registry.dao.CategoryDAO;
 import org.exoplatform.application.registry.entity.ApplicationEntity;
@@ -40,9 +54,8 @@ import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.ApplicationType;
-import org.exoplatform.portal.jdbc.entity.PermissionEntity;
 import org.exoplatform.portal.jdbc.entity.PermissionEntity.TYPE;
-import org.exoplatform.portal.mop.jdbc.dao.PermissionDAO;
+import org.exoplatform.portal.mop.storage.LayoutStorage;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -53,11 +66,11 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
   private static final Log                   log                           =
                                                  ExoLogger.getExoLogger(JDBCApplicationRegistryService.class);
 
+  private LayoutStorage                      layoutStorage;
+
   private CategoryDAO                        catDAO;
 
   private ApplicationDAO                     appDAO;
-
-  private PermissionDAO                      permissionDAO;
 
   private String                             anyOfAdminGroup;
 
@@ -71,20 +84,20 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
 
   public static final String                 PRODUCER_CATEGORY_NAME_SUFFIX = " Producer";
 
-  public JDBCApplicationRegistryService(CategoryDAO catDAO,
+  public JDBCApplicationRegistryService(LayoutStorage layoutStorage,
+                                        CategoryDAO catDAO,
                                         ApplicationDAO appDAO,
-                                        PermissionDAO permissionDAO,
                                         UserACL userACL) {
+    this.layoutStorage = layoutStorage;
     this.catDAO = catDAO;
     this.appDAO = appDAO;
-    this.permissionDAO = permissionDAO;
     this.anyOfAdminGroup = new MembershipEntry(userACL.getAdminGroups()).toString();
   }
 
   public List<ApplicationCategory> getApplicationCategories(Comparator<ApplicationCategory> sortComparator,
                                                             String accessUser,
                                                             ApplicationType<?>... appTypes) {
-    List<ApplicationCategory> categories = new ArrayList<ApplicationCategory>();
+    List<ApplicationCategory> categories = new ArrayList<>();
 
     //
     for (CategoryEntity catEntity : catDAO.findAll()) {
@@ -119,7 +132,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     } else {
       catDAO.update(catEntity);
     }
-    permissionDAO.savePermissions(CategoryEntity.class.getName(), catEntity.getId(), TYPE.ACCESS, category.getAccessPermissions());
+    layoutStorage.savePermissions(CategoryEntity.class.getName(), catEntity.getId(), TYPE.ACCESS, category.getAccessPermissions());
   }
 
   public void remove(ApplicationCategory category) {
@@ -135,14 +148,14 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     }
 
     for (Long id : ids) {
-      permissionDAO.deletePermissions(ApplicationEntity.class.getName(), id);
+      layoutStorage.deletePermissions(ApplicationEntity.class.getName(), id);
     }
   }
 
   public List<Application> getApplications(ApplicationCategory category,
                                            Comparator<Application> sortComparator,
                                            ApplicationType<?>... appTypes) {
-    List<Application> apps = new ArrayList<Application>();
+    List<Application> apps = new ArrayList<>();
 
     CategoryEntity catEntity = catDAO.findByName(category.getName());
     if (catEntity != null) {
@@ -157,7 +170,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
   }
 
   public List<Application> getAllApplications() throws Exception {
-    List<Application> apps = new ArrayList<Application>();
+    List<Application> apps = new ArrayList<>();
 
     for (ApplicationEntity appEntity : appDAO.findAll()) {
       apps.add(buildApplication(appEntity));
@@ -191,7 +204,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     } else {
       appDAO.update(appEntity);
     }
-    permissionDAO.savePermissions(ApplicationEntity.class.getName(), appEntity.getId(), TYPE.ACCESS, application.getAccessPermissions());
+    layoutStorage.savePermissions(ApplicationEntity.class.getName(), appEntity.getId(), TYPE.ACCESS, application.getAccessPermissions());
   }
 
   public void update(Application application) {
@@ -207,7 +220,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
   public void remove(Application app) {
     ApplicationEntity appEntity = appDAO.find(Safe.parseLong(app.getStorageId()));
     if (appEntity != null) {
-      permissionDAO.deletePermissions(ApplicationEntity.class.getName(), appEntity.getId());
+      layoutStorage.deletePermissions(ApplicationEntity.class.getName(), appEntity.getId());
       appDAO.delete(appEntity);
     }
   }
@@ -333,7 +346,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
           category.setName(categoryName);
           category.setDisplayName(categoryName);
           catDAO.create(category);
-          permissionDAO.savePermissions(CategoryEntity.class.getName(), category.getId(), TYPE.ACCESS, permissions);
+          layoutStorage.savePermissions(CategoryEntity.class.getName(), category.getId(), TYPE.ACCESS, permissions);
         }
 
         //
@@ -376,7 +389,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
             app.setDisplayName(displayName);
             app.setDescription(getLocalizedStringValue(descriptionLS, portletName));
             appDAO.create(app);
-            permissionDAO.savePermissions(ApplicationEntity.class.getName(), app.getId(), TYPE.ACCESS, permissions);
+            layoutStorage.savePermissions(ApplicationEntity.class.getName(), app.getId(), TYPE.ACCESS, permissions);
           }
         }
       }
@@ -391,7 +404,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     category.setDisplayName(catEntity.getDisplayName());
     category.setDescription(catEntity.getDescription());
 
-    List<String> access = buildPermission(permissionDAO.getPermissions(CategoryEntity.class.getName(), catEntity.getId(), TYPE.ACCESS));
+    List<String> access = layoutStorage.getPermissions(CategoryEntity.class.getName(), catEntity.getId(), TYPE.ACCESS);
     category.setAccessPermissions(access);
 
     category.setCreatedDate(new Date(catEntity.getCreatedDate()));
@@ -407,17 +420,6 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
 
     //
     return category;
-  }
-
-  private List<String> buildPermission(List<PermissionEntity> permissions) {
-    List<String> results = new ArrayList<String>();
-
-    if (permissions != null) {
-      for (PermissionEntity permission : permissions) {
-        results.add(permission.getPermission());
-      }
-    }
-    return results;
   }
 
   private boolean isApplicationType(Application app, ApplicationType<?>... appTypes) {
@@ -445,7 +447,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     application.setDisplayName(appEntity.getDisplayName());
     application.setDescription(appEntity.getDescription());
 
-    List<String> access = buildPermission(permissionDAO.getPermissions(ApplicationEntity.class.getName(), appEntity.getId(), TYPE.ACCESS));
+    List<String> access = layoutStorage.getPermissions(ApplicationEntity.class.getName(), appEntity.getId(), TYPE.ACCESS);
     application.setAccessPermissions(new ArrayList<String>(access));
 
     application.setCreatedDate(new Date(appEntity.getCreatedDate()));

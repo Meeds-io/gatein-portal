@@ -23,20 +23,20 @@
 
   <component>
     <key>org.exoplatform.commons.file.storage.dao.FileInfoDAO</key>
-    <type>org.exoplatform.commons.file.storage.dao.impl.FileInfoDAOImpl</type>
+    <type>org.exoplatform.commons.file.dao.mock.InMemoryFileInfoDAO</type>
   </component>
   <component>
     <key>org.exoplatform.commons.file.storage.dao.NameSpaceDAO</key>
-    <type>org.exoplatform.commons.file.storage.dao.impl.NameSpaceDAOImpl</type>
+    <type>org.exoplatform.commons.file.dao.mock.InMemoryNameSpaceDAO</type>
   </component>
   <component>
     <key>org.exoplatform.commons.file.storage.dao.OrphanFileDAO</key>
-    <type>org.exoplatform.commons.file.storage.dao.impl.OrphanFileDAOImpl</type>
+    <type>org.exoplatform.commons.file.dao.mock.InMemoryOrphanFileDAO</type>
   </component>
 
   <component>
     <key>org.exoplatform.commons.file.storage.dao.FileBinaryDAO</key>
-    <type>org.exoplatform.commons.file.storage.dao.impl.FileBinaryDAOImpl</type>
+    <type>org.exoplatform.commons.file.dao.mock.InMemoryFileBinaryDAO</type>
   </component>
 
   <component>
@@ -64,7 +64,7 @@
     <init-params>
       <value-param>
         <name>storageType</name>
-        <value>${exo.files.binaries.storage.type:fs}</value>
+        <value>${exo.files.binaries.storage.type:rdbms}</value>
       </value-param>
     </init-params>
   </component>
@@ -85,38 +85,11 @@
     </init-params>
   </component>
 
-  <external-component-plugins>
-    <target-component>org.exoplatform.commons.file.services.NameSpaceService</target-component>
-    <component-plugin>
-      <name>WikiNameSpacePlugin</name>
-      <set-method>addNameSpacePlugin</set-method>
-      <type>org.exoplatform.commons.file.services.NameSpacePlugin</type>
-      <init-params>
-        <properties-param>
-          <name>fileNameSpace.params</name>
-          <property name="name" value="wiki" />
-          <property name="description" value="Wiki" />
-        </properties-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
+  <component>
+    <key>org.exoplatform.commons.file.services.checker.FileStorageCheckController</key>
+    <type>org.exoplatform.commons.file.services.checker.FileStorageCheckController</type>
+  </component>
 
-    <!-- Data Initialization for ES -->
-  <external-component-plugins>
-    <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
-    <component-plugin>
-      <name>WikiChangeLogsPlugin</name>
-      <set-method>addChangeLogsPlugin</set-method>
-      <type>org.exoplatform.commons.persistence.impl.ChangeLogsPlugin</type>
-      <init-params>
-        <values-param>
-          <name>changelogs</name>
-          <description>Change logs of wiki</description>
-          <value>db/changelog/file.db.changelog-1.0.0.xml</value>
-        </values-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
   <external-component-plugins>
     <target-component>org.exoplatform.commons.file.resource.BinaryProvider</target-component>
     <component-plugin>
