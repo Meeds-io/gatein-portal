@@ -81,7 +81,14 @@ public class DynamicPortalLayoutMatcherPluginTest {
     assertNull(dynamicPortalLayoutMatcherPlugin.getLayoutTemplate());
 
     try {
-      when(configurationManager.getInputStream(eq("NonExistingPath"))).thenThrow(new Exception("Just Testing, no bug !"));
+      when(configurationManager.getInputStream("NonExistingPath")).thenThrow(new IllegalStateException("Just Testing, no bug !") {
+        private static final long serialVersionUID = -3930575563406989213L;
+
+        @Override
+        public StackTraceElement[] getStackTrace() {
+          return new StackTraceElement[0];
+        }
+      });
     } catch (Exception e) {
       throw new AssertionError("Error while mocking configurationManager", e);
     }

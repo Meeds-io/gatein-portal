@@ -32,7 +32,9 @@ import org.gatein.mop.api.content.ContentType;
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
-public final class Portlet implements Iterable<Preference>, Serializable {
+public class Portlet implements Iterable<Preference>, Serializable {
+
+    private static final long serialVersionUID = -4571832137663336152L;
 
     /** . */
     public static final ContentType<Portlet> CONTENT_TYPE = new ContentType<Portlet>("application/portlet", Portlet.class);

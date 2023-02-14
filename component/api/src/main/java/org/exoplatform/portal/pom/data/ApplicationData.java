@@ -24,11 +24,19 @@ import java.util.Map;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
+ * @param <S> can be of type org.exoplatform.portal.pom.spi.portlet.Portlet only, see {@link ApplicationType}
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class ApplicationData<S> extends ComponentData {
+
+    private static final long serialVersionUID = -9136595444062927185L;
 
     /** . */
     private final ApplicationType<S> type;
@@ -93,61 +101,5 @@ public class ApplicationData<S> extends ComponentData {
         this.height = height;
         this.properties = properties;
         this.accessPermissions = accessPermissions;
-    }
-
-    public ApplicationType<S> getType() {
-        return type;
-    }
-
-    public ApplicationState<S> getState() {
-        return state;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public boolean isShowInfoBar() {
-        return showInfoBar;
-    }
-
-    public boolean isShowApplicationState() {
-        return showApplicationState;
-    }
-
-    public boolean isShowApplicationMode() {
-        return showApplicationMode;
-    }
-
-    public String getTheme() {
-        return theme;
-    }
-
-    public String getWidth() {
-        return width;
-    }
-
-    public String getHeight() {
-        return height;
-    }
-
-    public Map<String, String> getProperties() {
-        return properties;
-    }
-
-    public List<String> getAccessPermissions() {
-        return accessPermissions;
     }
 }

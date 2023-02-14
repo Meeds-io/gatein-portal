@@ -19,8 +19,8 @@
 
 package org.exoplatform.portal.mop.importer;
 
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -36,12 +36,12 @@ public class PortalConfigImporter {
     private final PortalConfig src;
 
     /** . */
-    private final DataStorage service;
+    private final LayoutService service;
 
     /** . */
     private final ImportMode mode;
 
-    public PortalConfigImporter(ImportMode importMode, PortalConfig portal, DataStorage dataStorage_) {
+    public PortalConfigImporter(ImportMode importMode, PortalConfig portal, LayoutService dataStorage_) {
         this.mode = importMode;
         this.src = portal;
         this.service = dataStorage_;
