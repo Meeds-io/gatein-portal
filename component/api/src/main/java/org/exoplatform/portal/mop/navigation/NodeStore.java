@@ -43,5 +43,4 @@ public interface NodeStore {
 
     NodeData[] renameNode(Long targetId, Long parentId, String name);
 
-    void flush();
 }
