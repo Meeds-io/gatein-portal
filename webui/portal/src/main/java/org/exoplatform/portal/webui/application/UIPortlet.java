@@ -54,7 +54,7 @@ import org.exoplatform.container.ExoContainer;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.application.UserProfileLifecycle;
 import org.exoplatform.portal.application.state.ContextualPropertyManager;
-import org.exoplatform.portal.config.DataStorage;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.config.NoSuchDataException;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.module.ModuleRegistry;
@@ -848,8 +848,8 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
         if (state != null) {
             try {
                 PortletInvoker portletInvoker = getApplicationComponent(PortletInvoker.class);
-                DataStorage dataStorage = getApplicationComponent(DataStorage.class);
-                String applicationId = dataStorage.getId(state.getApplicationState());
+                LayoutService layoutService = getApplicationComponent(LayoutService.class);
+                String applicationId = layoutService.getId(state.getApplicationState());
                 ModelAdapter<S, C> adapter = ModelAdapter.getAdapter(state.getApplicationType());
                 PortletContext producerOfferedPortletContext = adapter.getProducerOfferedPortletContext(applicationId);
 
@@ -940,13 +940,6 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
         return adapter.getstateFromClonedContext(this.getPortletContext(), clonedContext);
     }
 
-    /** This is used by the dashboard portlet and should not be used else where. It will be removed some day. */
-    private static final ThreadLocal<UIPortlet> currentPortlet = new ThreadLocal<UIPortlet>();
-
-    public static UIPortlet getCurrentUIPortlet() {
-        return currentPortlet.get();
-    }
-
     /**
      * Performs an invocation on this portlet.
      *
@@ -956,12 +949,7 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
      */
     public PortletInvocationResponse invoke(PortletInvocation invocation) throws PortletInvokerException {
         PortletInvoker portletInvoker = getApplicationComponent(PortletInvoker.class);
-        currentPortlet.set(this);
-        try {
-            return portletInvoker.invoke(invocation);
-        } finally {
-            currentPortlet.set(null);
-        }
+        return portletInvoker.invoke(invocation);
     }
 
     /**

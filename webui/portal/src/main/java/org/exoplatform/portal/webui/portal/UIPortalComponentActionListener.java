@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.exoplatform.application.registry.Application;
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.ApplicationState;
@@ -32,6 +31,7 @@ import org.exoplatform.portal.config.model.CloneApplicationState;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.webui.application.PortletState;
 import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.container.UIComponentFactory;
@@ -327,8 +327,8 @@ public class UIPortalComponentActionListener {
                 // TODO Wait to fix issue EXOGTN-213 and then
                 // we should get "showInfobar" from current UI portal instead of Storage service
                 UIPortal currentPortal = Util.getUIPortal();
-                DataStorage storage = uiApp.getApplicationComponent(DataStorage.class);
-                uiPortlet.setShowInfoBar(storage.getPortalConfig(currentPortal.getSiteKey().getTypeName(),
+                LayoutService layoutService = uiApp.getApplicationComponent(LayoutService.class);
+                uiPortlet.setShowInfoBar(layoutService.getPortalConfig(currentPortal.getSiteKey().getTypeName(),
                         currentPortal.getSiteKey().getName()).isShowInfobar());
                 uiSource = uiPortlet;
             }

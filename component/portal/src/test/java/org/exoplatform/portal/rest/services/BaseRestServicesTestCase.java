@@ -60,11 +60,11 @@ public abstract class BaseRestServicesTestCase extends AbstractKernelTest {
     return clazz.cast(this.container.getComponentInstanceOfType(clazz));
   }
 
-  private void registry(Class<?> resourceClass) throws Exception {
+  protected void registry(Class<?> resourceClass) throws Exception {
     binder.addResource(resourceClass, null);
   }
 
-  private void unregistry(Class<?> resourceClass) {
+  protected void unregistry(Class<?> resourceClass) {
     binder.removeResource(resourceClass);
   }
 

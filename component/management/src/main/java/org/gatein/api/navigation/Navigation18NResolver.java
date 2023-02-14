@@ -25,26 +25,28 @@ package org.gatein.api.navigation;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.gatein.api.*;
+import org.gatein.api.ApiException;
+import org.gatein.api.PortalRequest;
+import org.gatein.api.Util;
 import org.gatein.api.site.SiteId;
 
 import org.exoplatform.commons.utils.ExpressionUtil;
 import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.description.DescriptionService;
+import org.exoplatform.portal.mop.storage.DescriptionStorage;
 import org.exoplatform.services.resources.ResourceBundleManager;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  */
 public class Navigation18NResolver {
-    private final DescriptionService service;
+    private final DescriptionStorage descriptionStorage;
     private final ResourceBundleManager bundleManager;
     private final Locale siteLocale;
     private final SiteId siteId;
 
-    public Navigation18NResolver(DescriptionService service, ResourceBundleManager bundleManager, Locale siteLocale,
+    public Navigation18NResolver(DescriptionStorage descriptionStorage, ResourceBundleManager bundleManager, Locale siteLocale,
             SiteId siteId) {
-        this.service = service;
+        this.descriptionStorage = descriptionStorage;
         this.bundleManager = bundleManager;
         this.siteLocale = siteLocale;
         this.siteId = siteId;
@@ -87,9 +89,9 @@ public class Navigation18NResolver {
             org.exoplatform.portal.mop.State described;
             try {
                 if (userLocale != null) {
-                    described = service.resolveDescription(descriptionId, siteLocale, userLocale);
+                    described = descriptionStorage.resolveDescription(descriptionId, siteLocale, userLocale);
                 } else {
-                    described = service.resolveDescription(descriptionId, siteLocale);
+                    described = descriptionStorage.resolveDescription(descriptionId, siteLocale);
                 }
             } catch (Throwable t) {
                 throw new ApiException("Failed to resolve description", t);

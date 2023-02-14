@@ -21,11 +21,11 @@ package org.exoplatform.portal.webui.portal;
 
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserNode;
 import org.exoplatform.portal.webui.container.UIContainer;
@@ -93,7 +93,7 @@ public class UIPortal extends UIContainer {
     public UIPortal() {
       // Listen to storage to update cached pages when updated
       ListenerService listenerService = ExoContainerContext.getService(ListenerService.class);
-      listenerService.addListener(DataStorage.PAGE_UPDATED, new RefreshUIPageListener());
+      listenerService.addListener(LayoutService.PAGE_UPDATED, new RefreshUIPageListener());
     }
 
     public boolean isUseDynamicLayout() {
@@ -403,9 +403,9 @@ public class UIPortal extends UIContainer {
     }
 
     @Asynchronous
-    public class RefreshUIPageListener extends Listener<DataStorage, Page> {
+    public class RefreshUIPageListener extends Listener<LayoutService, Page> {
       @Override
-      public void onEvent(org.exoplatform.services.listener.Event<DataStorage, Page> event) throws Exception {
+      public void onEvent(org.exoplatform.services.listener.Event<LayoutService, Page> event) throws Exception {
         Page page = event.getData();
         if (page == null) {
           return;

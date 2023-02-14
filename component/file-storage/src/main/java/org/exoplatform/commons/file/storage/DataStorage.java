@@ -89,7 +89,7 @@ public class DataStorage {
   }
 
   public void createNameSpaces(List<NameSpace> listNameSpace) {
-    List<NameSpaceEntity> entityList = new ArrayList<NameSpaceEntity>();
+    List<NameSpaceEntity> entityList = new ArrayList<>();
     for (NameSpace s : listNameSpace) {
       NameSpaceEntity n = new NameSpaceEntity(s.getName(), s.getDescription());
       entityList.add(n);

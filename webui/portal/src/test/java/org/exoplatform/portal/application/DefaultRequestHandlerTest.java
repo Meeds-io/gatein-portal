@@ -44,7 +44,7 @@ public class DefaultRequestHandlerTest {
     try {
       String defaultSite = "site2";
       when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
-      when(portalConfigService.getAllPortalNames()).thenReturn(Arrays.asList("site1", defaultSite));
+      when(portalConfigService.getSiteNames(eq(SiteType.PORTAL), anyInt(), anyInt())).thenReturn(Arrays.asList("site1", defaultSite));
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
 
@@ -106,7 +106,7 @@ public class DefaultRequestHandlerTest {
     try {
       String defaultSite = "site2";
       when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
-      when(portalConfigService.getAllPortalNames()).thenReturn(Arrays.asList("site1", defaultSite));
+      when(portalConfigService.getSiteNames(eq(SiteType.PORTAL), anyInt(), anyInt())).thenReturn(Arrays.asList("site1", defaultSite));
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
       when(request.getRemoteUser()).thenReturn("user");
@@ -140,7 +140,7 @@ public class DefaultRequestHandlerTest {
     try {
       String defaultSite = "site2";
       when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
-      when(portalConfigService.getAllPortalNames()).thenReturn(Arrays.asList("site1"));
+      when(portalConfigService.getSiteNames(eq(SiteType.PORTAL), anyInt(), anyInt())).thenReturn(Arrays.asList("site1"));
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
 
@@ -202,7 +202,7 @@ public class DefaultRequestHandlerTest {
     try {
       String defaultSite = "site2";
       when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
-      when(portalConfigService.getAllPortalNames()).thenReturn(Arrays.asList());
+      when(portalConfigService.getSiteNames(eq(SiteType.PORTAL), anyInt(), anyInt())).thenReturn(Arrays.asList());
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
 
