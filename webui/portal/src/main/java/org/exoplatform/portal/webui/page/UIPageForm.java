@@ -26,7 +26,6 @@ import java.util.List;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
@@ -34,6 +33,7 @@ import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.container.UIContainer;
 import org.exoplatform.portal.webui.portal.UIPortalComposer;
@@ -192,9 +192,9 @@ public class UIPageForm extends UIFormTabPane {
 
     public void buildForm(UIPage uiPage) throws Exception {
         PortalRequestContext pcontext = Util.getPortalRequestContext();
-        DataStorage dataStorage = getApplicationComponent(DataStorage.class);
+        LayoutService layoutService = getApplicationComponent(LayoutService.class);
 
-        PortalConfig pConfig = dataStorage.getPortalConfig(pcontext.getPortalOwner());
+        PortalConfig pConfig = layoutService.getPortalConfig(pcontext.getPortalOwner());
         ExoContainer container = ExoContainerContext.getCurrentContainer();
         UserACL acl = (UserACL) container.getComponentInstanceOfType(UserACL.class);
 

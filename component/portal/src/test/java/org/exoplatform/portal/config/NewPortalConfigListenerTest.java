@@ -1,23 +1,21 @@
 package org.exoplatform.portal.config;
 
-import liquibase.pro.packaged.N;
 import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.description.DescriptionService;
-import org.exoplatform.portal.mop.navigation.NavigationService;
 import org.exoplatform.portal.mop.page.PageContext;
-import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.portal.mop.storage.DescriptionStorage;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,10 +30,7 @@ public class NewPortalConfigListenerTest {
   private UserPortalConfigService owner;
 
   @Mock
-  private DataStorage             dataStorage;
-
-  @Mock
-  private PageService             pageService;
+  private LayoutService           layoutService;
 
   @Mock
   private ConfigurationManager    configurationManager;
@@ -47,7 +42,7 @@ public class NewPortalConfigListenerTest {
   private InitParams              initParams;
 
   @Mock
-  private DescriptionService      descriptionService;
+  private DescriptionStorage      descriptionStorage;
 
   @Mock
   private UserACL                 userACL;
@@ -69,12 +64,11 @@ public class NewPortalConfigListenerTest {
     when(initParams.getValueParam("page.templates.location")).thenReturn(valueParam1);
 
     NewPortalConfigListener newPortalConfigListener = new NewPortalConfigListener(owner,
-                                                                                  dataStorage,
-                                                                                  pageService,
+                                                                                  layoutService,
                                                                                   configurationManager,
                                                                                   initParams,
                                                                                   navigationService,
-                                                                                  descriptionService,
+                                                                                  descriptionStorage,
                                                                                   userACL,
                                                                                   localeConfigService);
 
@@ -89,25 +83,22 @@ public class NewPortalConfigListenerTest {
     when(newPortalConfig.getOwnerType()).thenReturn(PortalConfig.PORTAL_TYPE);
 
     PageContext pageContext = mock(PageContext.class);
-    PageKey pageKey = mock(PageKey.class);
-    when(pageContext.getKey()).thenReturn(pageKey);
-    when(pageKey.format()).thenReturn("pageKey");
     List<PageContext> allPages = new ArrayList<>();
     allPages.add(pageContext);
 
-    when(pageService.loadPages(any(SiteKey.class))).thenReturn(allPages);
+    when(layoutService.findPages(any(SiteKey.class))).thenReturn(allPages);
 
     newPortalConfigListener.initPageDB(newPortalConfig);
 
-    verify(pageService, times(1)).destroyPage(pageKey);
+    verify(layoutService, times(1)).removePages(any());
 
-    Mockito.reset(pageService);
+    Mockito.reset(layoutService);
 
     when(newPortalConfig.getImportMode()).thenReturn("merge");
 
     newPortalConfigListener.initPageDB(newPortalConfig);
 
-    verify(pageService, times(0)).destroyPage(pageKey);
+    verify(layoutService, times(0)).removePages(any());
   }
 
   @Test
@@ -142,7 +133,7 @@ public class NewPortalConfigListenerTest {
     configs.add(newPortalConfig);
     when(initParams.getObjectParamValues(NewPortalConfig.class)).thenReturn(configs);
 
-    when(dataStorage.getPortalConfig("portal","global")).thenReturn(new PortalConfig());
+    when(layoutService.getPortalConfig("portal","global")).thenReturn(new PortalConfig());
 
     Mockito.mockStatic(IOUtil.class);
     when(IOUtil.getStreamContentAsString(any())).thenReturn(null,
@@ -175,12 +166,11 @@ public class NewPortalConfigListenerTest {
                                                                 + "</node-navigation>");
 
     NewPortalConfigListener newPortalConfigListener = new NewPortalConfigListener(owner,
-                                                                                  dataStorage,
-                                                                                  pageService,
+                                                                                  layoutService,
                                                                                   configurationManager,
                                                                                   initParams,
                                                                                   navigationService,
-                                                                                  descriptionService,
+                                                                                  descriptionStorage,
                                                                                   userACL,
                                                                                   localeConfigService);
 
@@ -195,7 +185,7 @@ public class NewPortalConfigListenerTest {
       //as we want to test only if navigationService.saveNavigation is called
       //we catch the exception here, and only check that saveNavigation is called once
     }
-    verify(pageService, times(1)).savePage(any());
+    verify(layoutService, times(1)).save(any(PageContext.class), any());
     verify(navigationService, times(1)).saveNavigation(any());
   }
 }

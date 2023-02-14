@@ -26,17 +26,35 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.exoplatform.portal.Constants;
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.*;
-import org.exoplatform.portal.config.model.*;
-import org.exoplatform.portal.mop.*;
-import org.exoplatform.portal.mop.page.*;
+import org.exoplatform.portal.config.StaleModelException;
+import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.portal.config.UserPortalConfig;
+import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.config.model.PortalProperties;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.Utils;
+import org.exoplatform.portal.mop.page.PageContext;
+import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.page.PageState;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.user.UserNode;
 import org.exoplatform.portal.resource.SkinService;
-import org.exoplatform.portal.webui.page.*;
+import org.exoplatform.portal.webui.page.UIPage;
+import org.exoplatform.portal.webui.page.UIPageCreationWizard;
+import org.exoplatform.portal.webui.page.UIPageForm;
+import org.exoplatform.portal.webui.page.UIPagePreview;
+import org.exoplatform.portal.webui.page.UISiteBody;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
 import org.exoplatform.portal.webui.util.Util;
-import org.exoplatform.portal.webui.workspace.*;
+import org.exoplatform.portal.webui.workspace.UIEditInlineWorkspace;
+import org.exoplatform.portal.webui.workspace.UIMaskWorkspace;
+import org.exoplatform.portal.webui.workspace.UIPortalApplication;
 import org.exoplatform.portal.webui.workspace.UIPortalApplication.EditLevel;
+import org.exoplatform.portal.webui.workspace.UIPortalToolPanel;
+import org.exoplatform.portal.webui.workspace.UIWorkingWorkspace;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.resources.LocaleConfig;
@@ -44,8 +62,14 @@ import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.web.login.LogoutControl;
 import org.exoplatform.webui.application.WebuiRequestContext;
-import org.exoplatform.webui.config.annotation.*;
-import org.exoplatform.webui.core.*;
+import org.exoplatform.webui.config.annotation.ComponentConfig;
+import org.exoplatform.webui.config.annotation.ComponentConfigs;
+import org.exoplatform.webui.config.annotation.EventConfig;
+import org.exoplatform.webui.core.UIApplication;
+import org.exoplatform.webui.core.UIComponent;
+import org.exoplatform.webui.core.UIContainer;
+import org.exoplatform.webui.core.UITabPane;
+import org.exoplatform.webui.core.UIWizard;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.Event.Phase;
 import org.exoplatform.webui.event.EventListener;
@@ -171,7 +195,7 @@ public class UIPortalComposer extends UIContainer {
             portalConfig.setDefaultLayout(false);
           }
         }
-        DataStorage dataStorage = getApplicationComponent(DataStorage.class);
+        LayoutService layoutService = getApplicationComponent(LayoutService.class);
         UserACL acl = getApplicationComponent(UserACL.class);
 
         if (!isPortalExist(editPortal)) {
@@ -181,14 +205,14 @@ public class UIPortalComposer extends UIContainer {
         SkinService skinService = getApplicationComponent(SkinService.class);
         skinService.removeSkin(editPortal.getName(), editPortal.getSkin());
         try {
-            dataStorage.save(portalConfig);
+            layoutService.save(portalConfig);
         } catch (StaleModelException ex) {
             // Temporary solution for concurrency-related issue. The StaleModelException should be
             // caught in the ApplicationLifecycle
-            rebuildUIPortal(uiPortalApp, editPortal, dataStorage);
+            rebuildUIPortal(uiPortalApp, editPortal);
         }
         uiPortalApp.reloadPortalProperties();
-        PortalConfig pConfig = dataStorage.getPortalConfig(portalName);
+        PortalConfig pConfig = layoutService.getPortalConfig(portalName);
         if (pConfig != null) {
             editPortal.setModifiable(acl.hasEditPermission(pConfig));
         } else {
@@ -220,7 +244,7 @@ public class UIPortalComposer extends UIContainer {
         prContext.refreshResourceBundle();
     }
 
-    private void rebuildUIPortal(UIPortalApplication uiPortalApp, UIPortal uiPortal, DataStorage storage) throws Exception {
+    private void rebuildUIPortal(UIPortalApplication uiPortalApp, UIPortal uiPortal) throws Exception {
         PortalConfig portalConfig = Util.getPortalRequestContext().getDynamicPortalConfig();
         UserPortalConfig userPortalConfig = Util.getPortalRequestContext().getUserPortalConfig();
         userPortalConfig.setPortalConfig(portalConfig);
@@ -248,9 +272,8 @@ public class UIPortalComposer extends UIContainer {
             portalOwner = Util.getPortalRequestContext().getPortalOwner();
         }
 
-        UserPortalConfigService configService = getApplicationComponent(UserPortalConfigService.class);
-
-        return configService.getUserPortalConfig(portalOwner, remoteUser) != null;
+        LayoutService layoutService = getApplicationComponent(LayoutService.class);
+        return layoutService.getPortalConfig(portalOwner, remoteUser) != null;
     }
 
     /**
@@ -684,12 +707,10 @@ public class UIPortalComposer extends UIContainer {
             }
 
             // Perform model update
-            DataStorage dataService = uiWorkingWS.getApplicationComponent(DataStorage.class);
-            PageService pageService = uiWorkingWS.getApplicationComponent(PageService.class);
+            LayoutService layoutService = uiWorkingWS.getApplicationComponent(LayoutService.class);
             try {
                 PageState pageState = Utils.toPageState(page);
-                pageService.savePage(new PageContext(pageKey, pageState));
-                dataService.save(page);
+                layoutService.save(new PageContext(pageKey, pageState), page);
             } catch (StaleModelException ex) {
                 // Temporary solution to concurrency-related issue
                 // This catch block should be put in an appropriate ApplicationLifecyclec

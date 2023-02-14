@@ -18,6 +18,7 @@
  */
 package org.exoplatform.portal.pom.data;
 
+import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.pom.config.Utils;
 
 /**
@@ -25,6 +26,8 @@ import org.exoplatform.portal.pom.config.Utils;
  * @version $Revision$
  */
 public class PageKey extends OwnerKey {
+
+    private static final long serialVersionUID = -7843836004063037149L;
 
     /** . */
     private final String name;
@@ -55,8 +58,7 @@ public class PageKey extends OwnerKey {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof PageKey) {
-            PageKey that = (PageKey) obj;
+        if (obj instanceof PageKey that) {
             return super.equals(that) && name.equals(that.name);
         }
         return false;
@@ -73,8 +75,12 @@ public class PageKey extends OwnerKey {
         return new PageKey(components[0], components[1], components[2]);
     }
 
+    public org.exoplatform.portal.mop.page.PageKey toMopPageKey() {
+      return new SiteKey(getType(), getId()).page(name);
+    }
+
     @Override
     public String toString() {
-        return "PageKey[type=" + getType() + ",id=" + getId() + ",name=" + name + "]";
+      return "PageKey[type=" + getType() + ",id=" + getId() + ",name=" + name + "]";
     }
 }

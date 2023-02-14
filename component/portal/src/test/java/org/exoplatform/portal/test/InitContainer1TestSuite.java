@@ -36,20 +36,21 @@ import org.exoplatform.portal.config.TestSerialization;
 import org.exoplatform.portal.config.TestSiteDataImportConserve;
 import org.exoplatform.portal.config.TestSiteDataImportMerge;
 import org.exoplatform.portal.config.TestSiteDataImportOverwrite;
-import org.exoplatform.portal.mop.jdbc.dao.ContainerDAOTest;
-import org.exoplatform.portal.mop.jdbc.dao.DescriptionDAOTest;
-import org.exoplatform.portal.mop.jdbc.dao.NavigationDAOTest;
-import org.exoplatform.portal.mop.jdbc.dao.PageDAOTest;
-import org.exoplatform.portal.mop.jdbc.dao.PermissionDAOTest;
-import org.exoplatform.portal.mop.jdbc.dao.SiteDAOTest;
-import org.exoplatform.portal.mop.jdbc.dao.WindowDAOTest;
-import org.exoplatform.portal.mop.jdbc.service.TestDescriptionService;
-import org.exoplatform.portal.mop.jdbc.service.TestJCBCNavigationServiceRebase;
-import org.exoplatform.portal.mop.jdbc.service.TestJDBCNavigationService;
-import org.exoplatform.portal.mop.jdbc.service.TestJDBCNavigationServiceSave;
-import org.exoplatform.portal.mop.jdbc.service.TestJDBCNavigationServiceUpdate;
-import org.exoplatform.portal.mop.jdbc.service.TestJDBCNavigationServiceWrapper;
-import org.exoplatform.portal.mop.jdbc.service.TestPageService;
+import org.exoplatform.portal.mop.dao.ContainerDAOTest;
+import org.exoplatform.portal.mop.dao.DescriptionDAOTest;
+import org.exoplatform.portal.mop.dao.NavigationDAOTest;
+import org.exoplatform.portal.mop.dao.PageDAOTest;
+import org.exoplatform.portal.mop.dao.PermissionDAOTest;
+import org.exoplatform.portal.mop.dao.SiteDAOTest;
+import org.exoplatform.portal.mop.dao.WindowDAOTest;
+import org.exoplatform.portal.mop.rest.NavigationRestTest;
+import org.exoplatform.portal.mop.storage.TestDescriptionService;
+import org.exoplatform.portal.mop.storage.TestJCBCNavigationServiceRebase;
+import org.exoplatform.portal.mop.storage.TestJDBCNavigationService;
+import org.exoplatform.portal.mop.storage.TestJDBCNavigationServiceSave;
+import org.exoplatform.portal.mop.storage.TestJDBCNavigationServiceUpdate;
+import org.exoplatform.portal.mop.storage.TestJDBCNavigationServiceWrapper;
+import org.exoplatform.portal.mop.storage.TestPageService;
 import org.exoplatform.portal.rest.MembershipTypeRestResourcesTest;
 import org.exoplatform.portal.rest.UserFieldValidatorTest;
 import org.exoplatform.portal.rest.UserRestResourcesTest;
@@ -88,6 +89,7 @@ import org.exoplatform.settings.rest.SettingResourceTest;
     TestJDBCNavigationServiceWrapper.class,
     TestPageService.class,
     BrandingRestResourcesTest.class,
+    NavigationRestTest.class,
     MembershipTypeRestResourcesTest.class,
     UserFieldValidatorTest.class,
     UserRestResourcesTest.class,

@@ -21,15 +21,27 @@ package org.exoplatform.portal.config;
 
 import static org.junit.Assert.assertArrayEquals;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.TimeZone;
 
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.config.model.*;
+import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelObject;
+import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.Visibility;
-import org.exoplatform.portal.mop.navigation.*;
+import org.exoplatform.portal.mop.navigation.NavigationContext;
+import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.NodeModel;
+import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.page.PageContext;
-import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.portal.mop.storage.PageStorage;
 
 /**
  * Created by The eXo Platform SARL Author : Tung Pham thanhtungty@gmail.com Nov
@@ -38,13 +50,10 @@ import org.exoplatform.portal.mop.page.PageService;
 public class TestLoadedPOM extends AbstractConfigTest {
 
   /** . */
-  private UserPortalConfigService portalConfigService;
+  private LayoutService           layoutService;
 
   /** . */
-  private DataStorage             storage;
-
-  /** . */
-  private PageService             pageService;
+  private PageStorage             pageStorage;
 
   /** . */
   private NavigationService       navService;
@@ -52,9 +61,8 @@ public class TestLoadedPOM extends AbstractConfigTest {
   public void setUp() throws Exception {
     super.setUp();
     PortalContainer container = getContainer();
-    portalConfigService = container.getComponentInstanceOfType(UserPortalConfigService.class);
-    storage = container.getComponentInstanceOfType(DataStorage.class);
-    pageService = container.getComponentInstanceOfType(PageService.class);
+    layoutService = container.getComponentInstanceOfType(LayoutService.class);
+    pageStorage = container.getComponentInstanceOfType(PageStorage.class);
     navService = container.getComponentInstanceOfType(NavigationService.class);
   }
 
@@ -66,7 +74,7 @@ public class TestLoadedPOM extends AbstractConfigTest {
     NodeContext<?> node = root.get(0);
     assertEquals(SiteKey.group("/test/legacy").page("register"), node.getState().getPageRef());
 
-    Page page = storage.getPage("group::/test/legacy::register");
+    Page page = layoutService.getPage("group::/test/legacy::register");
     assertNotNull(page);
     assertEquals("group::/test/legacy::register", page.getPageId());
     assertEquals("/test/legacy", page.getOwnerId());
@@ -80,7 +88,7 @@ public class TestLoadedPOM extends AbstractConfigTest {
     NodeContext<?> node = root.get(0);
     assertEquals(SiteKey.group("/test/normalized").page("register"), node.getState().getPageRef());
 
-    Page page = storage.getPage("group::/test/normalized::register");
+    Page page = layoutService.getPage("group::/test/normalized::register");
     assertNotNull(page);
     assertEquals("group::/test/normalized::register", page.getPageId());
     assertEquals("/test/normalized", page.getOwnerId());
@@ -114,7 +122,7 @@ public class TestLoadedPOM extends AbstractConfigTest {
   }
 
   public void testPortal() throws Exception {
-    PortalConfig portal = storage.getPortalConfig("test");
+    PortalConfig portal = layoutService.getPortalConfig("test");
     assertNotNull(portal);
 
     assertEquals("test", portal.getName());
@@ -126,7 +134,7 @@ public class TestLoadedPOM extends AbstractConfigTest {
   }
 
   public void testPageWithoutPageId() throws Exception {
-    Page page = storage.getPage("portal::test::test2");
+    Page page = layoutService.getPage("portal::test::test2");
     assertNotNull(page);
     assertEquals("portal::test::test2", page.getPageId());
     assertEquals("test", page.getOwnerId());
@@ -135,10 +143,10 @@ public class TestLoadedPOM extends AbstractConfigTest {
   }
 
   public void testPage() throws Exception {
-    Page page = storage.getPage("portal::test::test1");
+    Page page = layoutService.getPage("portal::test::test1");
     assertNotNull(page);
 
-    PageContext pageContext = pageService.loadPage(page.getPageKey());
+    PageContext pageContext = pageStorage.loadPage(page.getPageKey());
     assertNotNull(pageContext);
 
     //

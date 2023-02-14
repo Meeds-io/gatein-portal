@@ -24,8 +24,10 @@ import org.exoplatform.container.ExoContainerContext;
 /**
  * TODO do not use BaseExoTestCase to not be stuck with Junit 3
  */
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/files-configuration.xml"),
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-configuration.xml") })
+@ConfiguredBy({
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.file-storage-local-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-configuration.xml")
+})
 public class FileServiceImplIntegrationTest extends AbstractKernelTest {
 
   private ExecutorService executorService = Executors.newFixedThreadPool(3);

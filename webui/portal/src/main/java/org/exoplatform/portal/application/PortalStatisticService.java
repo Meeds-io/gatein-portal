@@ -75,21 +75,6 @@ public class PortalStatisticService implements Startable {
     }
 
     /*
-     * Returns the list of the known portal names.
-     */
-    @Managed
-    @ManagedDescription("The list of identifier of the known portals")
-    public String[] getPortalList() {
-        try {
-            List<String> names = configService.getAllPortalNames();
-            return names.toArray(new String[names.size()]);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return new String[0];
-        }
-    }
-
-    /*
      * Get PortalStatistic, if it doesn't exits, create a new one.
      */
     public PortalStatistic getPortalStatistic(String appId) {
