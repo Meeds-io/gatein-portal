@@ -24,6 +24,8 @@ import org.exoplatform.portal.config.model.*;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.ImportMode;
 import org.exoplatform.portal.mop.page.*;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.storage.PageStorage;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
 /**
@@ -41,28 +43,28 @@ public class TestSiteDataImportOverwrite extends AbstractSiteDataImportTest {
   protected void afterOneBootWithExtention(PortalContainer container) throws Exception {
     begin();
     // Test portal
-    DataStorage dataStorage = container.getComponentInstanceOfType(DataStorage.class);
-    PageService pageService = container.getComponentInstanceOfType(PageService.class);
-    PortalConfig portal = dataStorage.getPortalConfig("classic");
+    LayoutService layoutService = container.getComponentInstanceOfType(LayoutService.class);
+    PageStorage pageStorage = container.getComponentInstanceOfType(PageStorage.class);
+    PortalConfig portal = layoutService.getPortalConfig("classic");
     Container layout = portal.getPortalLayout();
     assertEquals(1, layout.getChildren().size());
     Application<Portlet> layoutPortlet = (Application<Portlet>) layout.getChildren().get(0);
-    assertEquals("site2/layout", dataStorage.getId(layoutPortlet.getState()));
-    PageContext page = pageService.loadPage(PageKey.parse("portal::classic::home"));
+    assertEquals("site2/layout", layoutService.getId(layoutPortlet.getState()));
+    PageContext page = pageStorage.loadPage(PageKey.parse("portal::classic::home"));
     assertNull(page);
-    page = pageService.loadPage(PageKey.parse("portal::classic::page1"));
+    page = pageStorage.loadPage(PageKey.parse("portal::classic::page1"));
     assertNotNull(page);
     assertEquals("site 2", page.getState().getDisplayName());
-    page = pageService.loadPage(PageKey.parse("portal::classic::page2"));
+    page = pageStorage.loadPage(PageKey.parse("portal::classic::page2"));
     assertNotNull(page);
     assertEquals("site 2", page.getState().getDisplayName());
     // Test group
-    portal = dataStorage.getPortalConfig(SiteType.GROUP.getName(), "/platform/administrators");
+    portal = layoutService.getPortalConfig(SiteType.GROUP.getName(), "/platform/administrators");
     layout = portal.getPortalLayout();
     assertEquals(1, layout.getChildren().size());
     layoutPortlet = (Application<Portlet>) layout.getChildren().get(0);
-    assertEquals("site1/layout", dataStorage.getId(layoutPortlet.getState()));
-    page = pageService.loadPage(PageKey.parse("group::/platform/administrators::page1"));
+    assertEquals("site1/layout", layoutService.getId(layoutPortlet.getState()));
+    page = pageStorage.loadPage(PageKey.parse("group::/platform/administrators::page1"));
     assertNotNull(page);
     assertEquals("site 2", page.getState().getDisplayName());
 
@@ -73,23 +75,23 @@ public class TestSiteDataImportOverwrite extends AbstractSiteDataImportTest {
   protected void afterSecondBootWithOverride(PortalContainer container) throws Exception {
     begin();
 
-    DataStorage dataStorage = container.getComponentInstanceOfType(DataStorage.class);
-    PageService pageService = container.getComponentInstanceOfType(PageService.class);
-    PortalConfig portal = dataStorage.getPortalConfig("classic");
+    LayoutService layoutService = container.getComponentInstanceOfType(LayoutService.class);
+    PageStorage pageStorage = container.getComponentInstanceOfType(PageStorage.class);
+    PortalConfig portal = layoutService.getPortalConfig("classic");
     Container layout = portal.getPortalLayout();
     assertEquals(1, layout.getChildren().size());
     Application<Portlet> layoutPortlet = (Application<Portlet>) layout.getChildren().get(0);
-    assertEquals("site2/layout", dataStorage.getId(layoutPortlet.getState()));
+    assertEquals("site2/layout", layoutService.getId(layoutPortlet.getState()));
 
     //
-    PageContext home = pageService.loadPage(PageKey.parse("portal::classic::home"));
+    PageContext home = pageStorage.loadPage(PageKey.parse("portal::classic::home"));
     assertNull(home);
 
-    PageContext page1 = pageService.loadPage(PageKey.parse("portal::classic::page1"));
+    PageContext page1 = pageStorage.loadPage(PageKey.parse("portal::classic::page1"));
     assertNotNull(page1);
     assertEquals("site 2", page1.getState().getDisplayName());
 
-    PageContext page2 = pageService.loadPage(PageKey.parse("portal::classic::page2"));
+    PageContext page2 = pageStorage.loadPage(PageKey.parse("portal::classic::page2"));
     assertNotNull(page2);
     assertEquals("site 2", page2.getState().getDisplayName());
 

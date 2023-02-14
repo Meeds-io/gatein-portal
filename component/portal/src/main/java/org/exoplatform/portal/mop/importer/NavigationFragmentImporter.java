@@ -19,13 +19,31 @@
 
 package org.exoplatform.portal.mop.importer;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-import org.exoplatform.portal.config.model.*;
+import org.exoplatform.portal.config.model.I18NString;
+import org.exoplatform.portal.config.model.PageNode;
+import org.exoplatform.portal.config.model.PageNodeContainer;
 import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.description.DescriptionService;
-import org.exoplatform.portal.mop.navigation.*;
-import org.exoplatform.portal.tree.diff.*;
+import org.exoplatform.portal.mop.navigation.GenericScope;
+import org.exoplatform.portal.mop.navigation.NavigationContext;
+import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.NodeModel;
+import org.exoplatform.portal.mop.navigation.NodeState;
+import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.portal.mop.storage.DescriptionStorage;
+import org.exoplatform.portal.tree.diff.Adapters;
+import org.exoplatform.portal.tree.diff.ListAdapter;
+import org.exoplatform.portal.tree.diff.ListChangeIterator;
+import org.exoplatform.portal.tree.diff.ListChangeType;
+import org.exoplatform.portal.tree.diff.ListDiff;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -86,7 +104,7 @@ public class NavigationFragmentImporter {
     private final Locale portalLocale;
 
     /** . */
-    private final DescriptionService descriptionService;
+    private final DescriptionStorage descriptionStorage;
 
     /** . */
     private final PageNodeContainer src;
@@ -95,12 +113,12 @@ public class NavigationFragmentImporter {
     private final ImportConfig config;
 
     public NavigationFragmentImporter(String[] path, NavigationService navigationService, SiteKey navigationKey,
-            Locale portalLocale, DescriptionService descriptionService, PageNodeContainer src, ImportConfig config) {
+            Locale portalLocale, DescriptionStorage descriptionService, PageNodeContainer src, ImportConfig config) {
         this.path = path;
         this.navigationService = navigationService;
         this.navigationKey = navigationKey;
         this.portalLocale = portalLocale;
-        this.descriptionService = descriptionService;
+        this.descriptionStorage = descriptionService;
         this.src = src;
         this.config = config;
     }
@@ -140,7 +158,7 @@ public class NavigationFragmentImporter {
             //
             for (Map.Entry<NodeContext<?>, Map<Locale, org.exoplatform.portal.mop.State>> entry : labelMap.entrySet()) {
                 String id = entry.getKey().getId();
-                descriptionService.setDescriptions(id, entry.getValue());
+                descriptionStorage.setDescriptions(id, entry.getValue());
             }
 
             //

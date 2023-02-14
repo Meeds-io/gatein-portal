@@ -68,11 +68,11 @@ public class DefaultRequestHandler extends WebRequestHandler {
 
         if (StringUtils.isBlank(defaultUri)) {
           String defaultPortal = configService.getDefaultPortal();
-          List<String> allPortalNames = configService.getAllPortalNames();
-          boolean emptyPortalList = allPortalNames == null || allPortalNames.isEmpty();
-          boolean canAccessDefaultPortal = allPortalNames != null && allPortalNames.contains(defaultPortal);
+          List<String> portalNames = configService.getSiteNames(SiteType.PORTAL, 0, 10);
+          boolean emptyPortalList = portalNames == null || portalNames.isEmpty();
+          boolean canAccessDefaultPortal = portalNames != null && portalNames.contains(defaultPortal);
           if (!emptyPortalList && !canAccessDefaultPortal) {
-            defaultPortal = allPortalNames.get(0);
+            defaultPortal = portalNames.get(0);
           } else if (emptyPortalList) {
             HttpServletResponse resp = context.getResponse();
             String currentPortalContainerName = PortalContainer.getCurrentPortalContainerName();

@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import org.exoplatform.portal.mop.jdbc.service.TestModelStorage;
+import org.exoplatform.portal.mop.storage.TestModelStorage;
 
 @RunWith(Suite.class)
 @SuiteClasses({
