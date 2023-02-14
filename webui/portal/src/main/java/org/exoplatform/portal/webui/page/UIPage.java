@@ -26,13 +26,13 @@ import javax.portlet.WindowState;
 
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.storage.PageStorage;
 import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.container.UIContainer;
 import org.exoplatform.portal.webui.portal.UIPortalComponentActionListener.MoveChildActionListener;
@@ -171,17 +171,17 @@ public class UIPage extends UIContainer {
     }
 
     public void switchToEditMode() throws Exception {
-        PageService pageService = this.getApplicationComponent(PageService.class);
-        DataStorage dataStorage = this.getApplicationComponent(DataStorage.class);
+        PageStorage pageStorage = this.getApplicationComponent(PageStorage.class);
+        LayoutService layoutService = this.getApplicationComponent(LayoutService.class);
 
         PageKey pageKey = new PageKey(getSiteKey(), getName());
-        PageContext pageContext = pageService.loadPage(pageKey);
+        PageContext pageContext = pageStorage.loadPage(pageKey);
         if (pageContext == null) {
             UIPortalApplication uiApp = Util.getUIPortalApplication();
             ApplicationMessage msg = new ApplicationMessage("UIPageBrowser.msg.PageNotExist", new String[] { pageKey.format() }, 1);
             uiApp.addMessage(msg);
         } else {
-            Page page = dataStorage.getPage(pageKey.format());
+            Page page = layoutService.getPage(pageKey.format());
             pageContext.update(page);
             switchToEditMode(page);
         }

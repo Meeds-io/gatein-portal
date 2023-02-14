@@ -28,7 +28,7 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageContext;
-import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.portal.mop.storage.PageStorage;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Hai Thanh Nguyen</a>
@@ -61,7 +61,7 @@ public class PageIterator implements Serializable, Iterator<List<?>> {
     public boolean hasNext() {
         if (hasNext && currentIndex == 0) {
             ExoContainer container = PortalContainer.getInstance();
-            PageService pageService = (PageService) container.getComponentInstance(PageService.class);
+            PageStorage pageService = container.getComponentInstanceOfType(PageStorage.class);
             QueryResult<PageContext> result = pageService.findPages(0, 1, SiteType.valueOf(ownerType.toUpperCase()), ownerId,
                     name, title);
 
@@ -78,7 +78,7 @@ public class PageIterator implements Serializable, Iterator<List<?>> {
      */
     public List<PageModel> next() {
         ExoContainer container = PortalContainer.getInstance();
-        PageService pageService = (PageService) container.getComponentInstance(PageService.class);
+        PageStorage pageService = container.getComponentInstanceOfType(PageStorage.class);
         QueryResult<PageContext> result = pageService.findPages(currentIndex, pageSize + 1,
                 SiteType.valueOf(ownerType.toUpperCase()), ownerId, name, title);
 

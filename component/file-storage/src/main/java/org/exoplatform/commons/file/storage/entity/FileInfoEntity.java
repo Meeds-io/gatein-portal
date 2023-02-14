@@ -22,7 +22,7 @@ public class FileInfoEntity {
   @Column(name = "FILE_ID")
   @SequenceGenerator(name = "SEQ_FILES_FILES_FILE_ID", sequenceName = "SEQ_FILES_FILES_FILE_ID", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_FILES_FILES_FILE_ID")
-  private long            id;
+  private Long            id;
 
   @Column(name = "NAME")
   private String          name;
@@ -81,11 +81,11 @@ public class FileInfoEntity {
     this.id = id;
   }
 
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

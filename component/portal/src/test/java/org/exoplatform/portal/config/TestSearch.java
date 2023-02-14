@@ -19,12 +19,12 @@
 
 package org.exoplatform.portal.config;
 
-import org.exoplatform.component.test.*;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageContext;
-import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.storage.PageStorage;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -33,16 +33,16 @@ import org.exoplatform.portal.mop.page.PageService;
 public class TestSearch extends AbstractConfigTest {
 
   /** . */
-  private DataStorage storage;
+  private LayoutService layoutService;
 
   /** . */
-  private PageService pageService;
+  private PageStorage pageStorage;
 
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    storage = getContainer().getComponentInstanceOfType(DataStorage.class);
-    pageService = getContainer().getComponentInstanceOfType(PageService.class);
+    layoutService = getContainer().getComponentInstanceOfType(LayoutService.class);
+    pageStorage = getContainer().getComponentInstanceOfType(PageStorage.class);
   }
 
   private void assertPageFound(int offset,
@@ -52,24 +52,24 @@ public class TestSearch extends AbstractConfigTest {
                                String pageName,
                                String title,
                                String expectedPage) {
-    QueryResult<PageContext> res = pageService.findPages(offset, limit, siteType, siteName, pageName, title);
+    QueryResult<PageContext> res = pageStorage.findPages(offset, limit, siteType, siteName, pageName, title);
     assertEquals(1, res.getSize());
     assertEquals(expectedPage, res.iterator().next().getKey().format());
   }
 
   private void assertPageNotFound(int offset, int limit, SiteType siteType, String siteName, String pageName, String title) {
-    QueryResult<PageContext> res = pageService.findPages(offset, limit, siteType, siteName, pageName, title);
+    QueryResult<PageContext> res = pageStorage.findPages(offset, limit, siteType, siteName, pageName, title);
     assertEquals(0, res.getSize());
   }
 
   public void testSearchPage() {
     Page page = new Page();
     page.setPageId("portal::test::searchedpage");
-    pageService.savePage(new PageContext(page.getPageKey(), null));
+    pageStorage.savePage(new PageContext(page.getPageKey(), null));
 
-    PageContext pageContext = pageService.loadPage(page.getPageKey());
+    PageContext pageContext = pageStorage.loadPage(page.getPageKey());
     pageContext.setState(pageContext.getState().builder().displayName("Juuu Ziii").build());
-    pageService.savePage(pageContext);
+    pageStorage.savePage(pageContext);
 
     //
     assertPageFound(0, 10, null, null, null, "Juuu Ziii", "portal::test::searchedpage");
@@ -88,19 +88,19 @@ public class TestSearch extends AbstractConfigTest {
   }
 
   public void testSearchPageByOwnerID() {
-    QueryResult<PageContext> res = pageService.findPages(0, 10, null, "foo", null, null);
+    QueryResult<PageContext> res = pageStorage.findPages(0, 10, null, "foo", null, null);
     assertEquals(0, res.getSize());
 
-    res = pageService.findPages(0, 10, null, "test", null, null);
+    res = pageStorage.findPages(0, 10, null, "test", null, null);
     int pageNum = res.getSize();
     assertTrue(pageNum > 0);
 
     // Test trim ownerID
-    res = pageService.findPages(0, 10, null, "   test   ", null, null);
+    res = pageStorage.findPages(0, 10, null, "   test   ", null, null);
     assertEquals(pageNum, res.getSize());
 
     // This should returns all pages
-    res = pageService.findPages(0, 10, null, null, null, null);
+    res = pageStorage.findPages(0, 10, null, null, null, null);
     assertTrue(res.getSize() > 0);
   }
 }

@@ -20,10 +20,12 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import org.exoplatform.portal.config.TestUserPortalConfigService;
+import org.exoplatform.portal.mop.user.UserPortalTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
   TestUserPortalConfigService.class,
+  UserPortalTest.class,
 })
 public class InitContainer6TestSuite {
 

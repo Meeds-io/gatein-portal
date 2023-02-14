@@ -34,76 +34,77 @@ import org.exoplatform.portal.pom.data.MappedAttributes;
  */
 public class NavigationData implements Serializable {
 
-    /** Useful. */
-    static final NavigationData EMPTY = new NavigationData();
+  public static final NavigationData NULL_OBJECT            = new NavigationData();
 
-    /** . */
-    final SiteKey key;
+  private static final long          serialVersionUID = 6835338087157729952L;
 
-    /** . */
-    final NavigationState state;
+  /** . */
+  final SiteKey                      key;
 
-    /** . */
-    final String rootId;
+  /** . */
+  final NavigationState              state;
 
-    private NavigationData() {
-        this.key = null;
-        this.state = null;
-        this.rootId = null;
-    }
+  /** . */
+  final String                       rootId;
 
-    NavigationData(SiteKey key, Navigation node) {
-        String rootId = node.getObjectId();
-        NavigationState state = new NavigationState(node.getAttributes().getValue(MappedAttributes.PRIORITY, 1));
+  private NavigationData() {
+    this.key = null;
+    this.state = null;
+    this.rootId = null;
+  }
 
-        //
-        this.key = key;
-        this.state = state;
-        this.rootId = rootId;
-    }
+  public NavigationData(SiteKey key, Navigation node) {
+    String rootId = node.getObjectId();
+    NavigationState state = new NavigationState(node.getAttributes().getValue(MappedAttributes.PRIORITY, 1));
 
-    NavigationData(SiteKey key, NavigationState state, String rootId) {
-        this.key = key;
-        this.state = state;
-        this.rootId = rootId;
-    }
+    //
+    this.key = key;
+    this.state = state;
+    this.rootId = rootId;
+  }
 
-    protected Object readResolve() {
-        if (key == null && state == null && rootId == null) {
-            return EMPTY;
-        } else {
-            return this;
-        }
-    }
+  public NavigationData(SiteKey key, NavigationState state, String rootId) {
+    this.key = key;
+    this.state = state;
+    this.rootId = rootId;
+  }
 
-    public NavigationState getState() {
-        return this.state;
-    }
+  public NavigationState getState() {
+    return this.state;
+  }
 
-    public String getRootId() {
-        return rootId;
-    }
+  public String getRootId() {
+    return rootId;
+  }
 
-    public SiteKey getSiteKey() {
-        return this.key;
-    }
+  public SiteKey getSiteKey() {
+    return this.key;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof NavigationData)) return false;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (!(o instanceof NavigationData))
+      return false;
 
-        NavigationData that = (NavigationData) o;
+    NavigationData that = (NavigationData) o;
 
-        if (key != null ? !key.equals(that.key) : that.key != null) return false;
-        return StringUtils.equals(rootId,that.rootId);
+    if (key != null ? !key.equals(that.key) : that.key != null)
+      return false;
+    return StringUtils.equals(rootId, that.rootId);
 
-    }
+  }
 
-    @Override
-    public int hashCode() {
-        int result = key != null ? key.hashCode() : 0;
-        result = 31 * result + (rootId != null ? rootId.hashCode() : 0);
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    int result = key != null ? key.hashCode() : 0;
+    result = 31 * result + (rootId != null ? rootId.hashCode() : 0);
+    return result;
+  }
+
+  public boolean isNull() {
+    return this.key == null && this.state == null && this.rootId == null;
+  }
+
 }

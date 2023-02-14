@@ -29,13 +29,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import org.exoplatform.container.RootContainer;
-import org.exoplatform.container.monitor.jvm.J2EEServerInfo;
-import org.exoplatform.portal.config.DataStorage;
-import org.exoplatform.portal.config.UserPortalConfigService;
-import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.pom.data.PortalData;
 import org.gatein.api.ApiException;
 import org.gatein.api.EntityAlreadyExistsException;
 import org.gatein.api.Util;
@@ -44,10 +37,18 @@ import org.gatein.api.internal.ObjectToStringBuilder;
 import org.gatein.api.internal.Parameters;
 import org.gatein.api.security.Permission;
 
+import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.pom.data.PortalData;
+
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  */
 public class SiteImpl implements Site {
+    private static final long serialVersionUID = -5352376442491205465L;
+
     private final SiteId id;
     private transient PortalConfig portalConfig;
 
@@ -175,7 +176,7 @@ public class SiteImpl implements Site {
         portalConfig.setEditPermission(permissions[0]);
     }
 
-    public void save(DataStorage storage, UserPortalConfigService service) {
+    public void save(LayoutService storage, UserPortalConfigService service) {
         if (create) {
             try {
                 PortalConfig existing = storage.getPortalConfig(portalConfig.getType(), portalConfig.getName());
