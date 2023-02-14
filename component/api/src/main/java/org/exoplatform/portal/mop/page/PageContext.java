@@ -4,7 +4,10 @@ import java.util.List;
 
 import org.exoplatform.portal.config.model.Page;
 
+import lombok.Data;
+
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
+@Data
 public class PageContext {
 
     /** . */

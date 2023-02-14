@@ -44,18 +44,14 @@ public class NodeManager {
             String nodeId,
             Scope scope,
             NodeChangeListener<NodeContext<N>> listener) {
-        try {
-            NodeData data = store.loadNode(Safe.parseLong(nodeId));
-            if (data != null) {
-                NodeContext<N> context = new NodeContext<N>(model, data);
-                updateNode(context, scope, listener);
-                return context;
-            } else {
-                return null;
-            }
-        } finally {
-            store.flush();
-        }
+      NodeData data = store.loadNode(Safe.parseLong(nodeId));
+      if (data != null) {
+        NodeContext<N> context = new NodeContext<N>(model, data);
+        updateNode(context, scope, listener);
+        return context;
+      } else {
+        return null;
+      }
     }
 
     public <N> void diff(ModelAdapter<N> adapter, N node, NodeContext<N> context) {
@@ -108,26 +104,22 @@ public class NodeManager {
         if (tree.hasChanges()) {
             throw new IllegalArgumentException("For now we don't accept to update a context that has pending changes");
         }
+        NodeData data = store.loadNode(Safe.parseLong(tree.root.data.id));
+        if (data == null) {
+            throw new HierarchyException(HierarchyError.UPDATE_CONCURRENTLY_REMOVED_NODE);
+        }
+
+        // Switch to edit mode
+        tree.editMode = true;
+
+        // Apply diff changes to the model
         try {
-            NodeData data = store.loadNode(Safe.parseLong(tree.root.data.id));
-            if (data == null) {
-                throw new HierarchyException(HierarchyError.UPDATE_CONCURRENTLY_REMOVED_NODE);
-            }
 
-            // Switch to edit mode
-            tree.editMode = true;
-
-            // Apply diff changes to the model
-            try {
-
-                TreeUpdate.perform(tree, NodeContextUpdateAdapter.<N> create(), data,
-                        NodeDataUpdateAdapter.create(store), listener, visitor);
-            } finally {
-                // Disable edit mode
-                tree.editMode = false;
-            }
+            TreeUpdate.perform(tree, NodeContextUpdateAdapter.<N> create(), data,
+                    NodeDataUpdateAdapter.create(store), listener, visitor);
         } finally {
-            store.flush();
+            // Disable edit mode
+            tree.editMode = false;
         }
     }
 
@@ -148,82 +140,74 @@ public class NodeManager {
     private <N> TreeContext<N> rebase(
             TreeContext<N> tree,
             Scope.Visitor visitor) throws HierarchyException {
-        try {
-            NodeData data = store.loadNode(Safe.parseLong(tree.root.getId()));
-            if (data == null) {
-                throw new HierarchyException(HierarchyError.UPDATE_CONCURRENTLY_REMOVED_NODE);
-            }
-
-            //
-            TreeContext<N> rebased = new NodeContext<N>(tree.model, data).tree;
-
-            //
-            TreeUpdate.perform(rebased, NodeContextUpdateAdapter.<N> create(), data,
-                    NodeDataUpdateAdapter.create(store), null, visitor);
-
-            //
-            NodeChangeQueue<NodeContext<N>> changes = tree.getChanges();
-
-            //
-            NodeChangeListener<NodeContext<N>> merger = new TreeMerge<N>(rebased, rebased);
-
-            //
-            if (changes != null) {
-                changes.broadcast(merger);
-            }
-
-            //
-            return rebased;
-        } finally {
-            store.flush();
+        NodeData data = store.loadNode(Safe.parseLong(tree.root.getId()));
+        if (data == null) {
+            throw new HierarchyException(HierarchyError.UPDATE_CONCURRENTLY_REMOVED_NODE);
         }
+
+        //
+        TreeContext<N> rebased = new NodeContext<N>(tree.model, data).tree;
+
+        //
+        TreeUpdate.perform(rebased, NodeContextUpdateAdapter.<N> create(), data,
+                NodeDataUpdateAdapter.create(store), null, visitor);
+
+        //
+        NodeChangeQueue<NodeContext<N>> changes = tree.getChanges();
+
+        //
+        NodeChangeListener<NodeContext<N>> merger = new TreeMerge<N>(rebased, rebased);
+
+        //
+        if (changes != null) {
+            changes.broadcast(merger);
+        }
+
+        //
+        return rebased;
     }
 
     private <N> void saveTree(TreeContext<N> tree, NodeChangeListener<NodeContext<N>> listener) throws NullPointerException,
             HierarchyException {
 
-        try {
-            NodeData data = store.loadNode(Safe.parseLong(tree.root.data.id));
-            if (data == null) {
-                throw new HierarchyException(HierarchyError.UPDATE_CONCURRENTLY_REMOVED_NODE);
-            }
-
-            // Attempt to rebase
-            TreeContext<N> rebased = rebase(tree, tree.origin());
-
-            //
-            NodePersister<N> persister = new NodePersister<N>(store);
-
-            //
-            NodeChangeQueue<NodeContext<N>> changes = rebased.getChanges();
-            if (changes != null) {
-                changes.broadcast(persister);
-                changes.broadcast(listener);
-
-                // Update the tree handles to the persistent values
-                for (Map.Entry<String, String> entry : persister.toPersist.entrySet()) {
-                    NodeContext<N> a = tree.getNode(entry.getKey());
-                    a.handle = entry.getValue();
-                }
-
-                // Update data
-                for (String ddd : persister.toUpdate) {
-                    NodeContext<N> a = tree.getNode(ddd);
-                    a.data = new NodeData(a);
-                    a.name = null;
-                    a.state = null;
-                }
-
-                // Clear changes
-                changes.clear();
-                tree.getChanges().clear();
-            }
-
-            // Update
-            TreeUpdate.perform(tree, NodeContextUpdateAdapter.<N> create(), rebased.root, NodeContextUpdateAdapter.<N> create(),
-                    null, rebased);
-        } finally {
-            store.flush();
+        NodeData data = store.loadNode(Safe.parseLong(tree.root.data.id));
+        if (data == null) {
+            throw new HierarchyException(HierarchyError.UPDATE_CONCURRENTLY_REMOVED_NODE);
         }
+
+        // Attempt to rebase
+        TreeContext<N> rebased = rebase(tree, tree.origin());
+
+        //
+        NodePersister<N> persister = new NodePersister<N>(store);
+
+        //
+        NodeChangeQueue<NodeContext<N>> changes = rebased.getChanges();
+        if (changes != null) {
+            changes.broadcast(persister);
+            changes.broadcast(listener);
+
+            // Update the tree handles to the persistent values
+            for (Map.Entry<String, String> entry : persister.toPersist.entrySet()) {
+                NodeContext<N> a = tree.getNode(entry.getKey());
+                a.handle = entry.getValue();
+            }
+
+            // Update data
+            for (String ddd : persister.toUpdate) {
+                NodeContext<N> a = tree.getNode(ddd);
+                a.data = new NodeData(a);
+                a.name = null;
+                a.state = null;
+            }
+
+            // Clear changes
+            changes.clear();
+            tree.getChanges().clear();
+        }
+
+        // Update
+        TreeUpdate.perform(tree, NodeContextUpdateAdapter.<N> create(), rebased.root, NodeContextUpdateAdapter.<N> create(),
+                null, rebased);
     }
 }

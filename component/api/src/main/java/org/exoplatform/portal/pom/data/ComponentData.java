@@ -18,13 +18,22 @@
  */
 package org.exoplatform.portal.pom.data;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 public abstract class ComponentData extends ModelData {
 
-    public ComponentData(String storageId, String storageName) {
+    private static final long serialVersionUID = 7604813006448463333L;
+
+    ComponentData(String storageId, String storageName) {
         super(storageId, storageName);
     }
 }

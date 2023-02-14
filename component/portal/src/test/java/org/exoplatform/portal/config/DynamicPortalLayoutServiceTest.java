@@ -1,19 +1,30 @@
 package org.exoplatform.portal.config;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.exoplatform.portal.config.model.*;
+import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelObject;
+import org.exoplatform.portal.config.model.PageBody;
+import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.service.LayoutService;
 
 public class DynamicPortalLayoutServiceTest {
 
@@ -357,7 +368,7 @@ public class DynamicPortalLayoutServiceTest {
       params.addParameter(ignoreStoredLayoutParam);
 
       ConfigurationManager configurationManager = mock(ConfigurationManager.class);
-      DataStorage dataStorage = mock(DataStorage.class);
+      LayoutService dataStorage = mock(LayoutService.class);
 
       PortalConfig portalPortalConfig = new PortalConfig(SiteType.PORTAL.getName(), EXISTING_PORTAL_SITE_NAME);
       Container portalLayout = new Container();
