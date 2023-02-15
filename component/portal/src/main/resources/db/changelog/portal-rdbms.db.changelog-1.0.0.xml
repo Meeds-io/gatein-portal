@@ -329,4 +329,18 @@
     <createSequence sequenceName="SEQ_PORTAL_PERMISSIONS_ID" startValue="1" />
   </changeSet>
 
+  <changeSet author="portal" id="1.0.0-30" dbms="postgresql">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="bytea">
+        SELECT DATA_TYPE FROM information_schema.columns where table_name = 'portal_windows' and column_name = 'customization'
+      </sqlCheck>
+    </preConditions>
+    <sql>
+      ALTER TABLE PORTAL_WINDOWS ADD COLUMN customization_oid oid;
+      UPDATE PORTAL_WINDOWS SET customization_oid = lo_from_bytea(0, customization);
+      ALTER TABLE PORTAL_WINDOWS DROP COLUMN customization;
+      ALTER TABLE PORTAL_WINDOWS RENAME COLUMN customization_oid TO customization;
+    </sql>
+  </changeSet>
+
 </databaseChangeLog>
