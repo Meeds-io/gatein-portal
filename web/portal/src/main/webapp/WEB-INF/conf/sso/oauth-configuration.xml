@@ -157,7 +157,7 @@
       </value-param>
       <value-param>
         <name>wellKnownConfigurationUrl</name>
-        <value>${exo.oauth.openid.wellKnownConfigurationUrl:}</value>
+        <value>${exo.oauth.openid.wellKnownConfigurationUrl}</value>
       </value-param>
     </init-params>
   </component>
