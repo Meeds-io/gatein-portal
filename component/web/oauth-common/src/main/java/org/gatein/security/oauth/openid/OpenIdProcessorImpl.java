@@ -429,7 +429,7 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
   @Override
   public void start() {
     if (StringUtils.isBlank(this.wellKnownConfigurationUrl)) {
-      log.error("wellKnownConfigurationUrl is not configured");
+      log.info("wellKnownConfigurationUrl is not configured");
       return;
     }
     try {
