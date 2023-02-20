@@ -7,7 +7,7 @@ function installScrollControlListener() {
     const shadowBox = document.createElement('div');
     shadowBox.id = 'TopBarBoxShadow';
     shadowBox.style.boxShadow = '0 6px 4px -4px rgb(0 0 0 / 30%)';
-    shadowBox.style.position = 'fixed';
+    shadowBox.style.position = 'absolute';
     shadowBox.style.width = '100vw';
     shadowBox.style.height = '56px';
     shadowBox.style.top = 0;
