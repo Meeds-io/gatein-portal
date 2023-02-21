@@ -55,6 +55,14 @@
   def metaInformation = rcontext.getMetaInformation();
 
   def bodyClasses = session.getAttribute("UIPortalApplication.body.class");
+  if (bodyClasses == null) {
+    bodyClasses = "";
+  }
+  def userHomeLink = uicomponent.getUserHomePage();
+  def stickyMenu = uicomponent.isMenuSticky();
+  if (stickyMenu) {
+    bodyClasses += " HamburgerMenuSticky";
+  }
 %>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="$language" lang="$language" dir="$dir">
   <head id="head">
@@ -118,6 +126,8 @@
      eXo.env.portal.context = "<%=docBase%>";
      eXo.env.portal.accessMode = "<%= rcontext.getAccessPath() == 0 ? "public" : "private" %>";
      eXo.env.portal.portalName = "<%=rcontext.getPortalOwner()%>";
+     eXo.env.portal.homeLink = "<%=userHomeLink%>";
+     eXo.env.portal.stickyMenu = <%=stickyMenu%>;
      eXo.env.portal.containerName = "<%=PortalContainer.getInstance().getName()%>";
      eXo.env.portal.userName='<%= userName %>';
      eXo.env.portal.language='<%= language %>';

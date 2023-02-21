@@ -20,6 +20,11 @@
 package org.exoplatform.portal.webui.workspace;
 
 import org.apache.commons.lang.StringUtils;
+
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.commons.utils.Safe;
 import org.exoplatform.container.PortalContainer;
@@ -29,6 +34,7 @@ import org.exoplatform.portal.application.RequestNavigationData;
 import org.exoplatform.portal.branding.BrandingService;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserPortalConfig;
+import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
@@ -1085,6 +1091,26 @@ public class UIPortalApplication extends UIApplication {
         }
 
         
+    }
+
+    /**
+     * @return User Home page preference
+     */
+    public String getUserHomePage() {
+      PortalRequestContext context = Util.getPortalRequestContext();
+      return getApplicationComponent(UserPortalConfigService.class).getUserHomePage(context.getRemoteUser());
+    }
+
+    /**
+     * @return true if user prefers sticky menu, else false
+     */
+    public boolean isMenuSticky() {
+      PortalRequestContext context = Util.getPortalRequestContext();
+      SettingValue<?> stickySettingValue = getApplicationComponent(SettingService.class).get(Context.USER.id(context.getRemoteUser()),
+                                                                                             Scope.APPLICATION.id("HamburgerMenu"),
+                                                                                             "Sticky");
+      return stickySettingValue == null ? Boolean.parseBoolean(System.getProperty("io.meeds.userPrefs.HamburgerMenu.sticky", "false"))
+                                        : Boolean.parseBoolean(stickySettingValue.getValue().toString());
     }
 
     /**
