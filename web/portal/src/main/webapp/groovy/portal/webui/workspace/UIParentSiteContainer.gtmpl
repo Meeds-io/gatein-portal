@@ -1,14 +1,16 @@
-<div class="VuetifyApp">
-  <div class="v-application v-application--is-ltr transparent theme--light">
-    <div id="ParentSiteContainer" class="d-flex flex-row flex">
-      <div id="ParentSiteLeftContainer" class="flex-grow-0 flex-shrink-0 position-relative">
+<div id="ParentSiteContainer">
+  <div id="ParentSiteLeftContainer">
+    <div class="VuetifyApp">
+      <div class="v-application <%=orientation.isLT() ? "v-application--is-ltr" : "v-application--is-rtl" %> transparent theme--light">
+        <div id="ParentSiteStickyMenu">
         
-      </div>
-      <div id="ParentSiteRightContainer" class="flex-grow-1 flex-shrink-1 position-relative">
-        <div id="ParentSiteContainerChildren">
-          <%uicomponent.renderChildren();%>
         </div>
       </div>
+    </div>
+  </div>
+  <div id="ParentSiteRightContainer">
+    <div id="ParentSiteContainerChildren">
+      <%uicomponent.renderChildren();%>
     </div>
   </div>
 </div>
