@@ -445,9 +445,9 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
           this.remoteJwkSigningKeyResolver = new RemoteJwkSigningKeyResolver(this.wellKnownConfigurationUrl);
         }
       } catch (JSONException e) {
-        log.error("Unable to read webKnownUrl content : " + this.wellKnownConfigurationUrl);
+        log.error("Unable to read webKnownUrl content : " + this.wellKnownConfigurationUrl, e);
       } catch (MalformedURLException e) {
-        log.error("WellKnowConfigurationUrl malformed : url" + this.wellKnownConfigurationUrl);
+        log.error("WellKnowConfigurationUrl malformed : url" + this.wellKnownConfigurationUrl, e);
       }
     }
   }
