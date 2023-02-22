@@ -428,24 +428,27 @@ public class OpenIdProcessorImpl implements OpenIdProcessor, Startable {
 
   @Override
   public void start() {
-    if (StringUtils.isBlank(this.wellKnownConfigurationUrl)) {
-      log.error("wellKnownConfigurationUrl is not configured");
-      return;
-    }
-    try {
-      String wellKnownConfigurationContent = readUrl(new URL(this.wellKnownConfigurationUrl));
-      if (wellKnownConfigurationContent != null) {
-        JSONObject json = new JSONObject(wellKnownConfigurationContent);
-        this.authenticationURL = json.getString("authorization_endpoint");
-        this.accessTokenURL = json.getString("token_endpoint");
-        this.userInfoURL = json.getString("userinfo_endpoint");
-        this.issuer = json.getString("issuer");
-        this.remoteJwkSigningKeyResolver = new RemoteJwkSigningKeyResolver(this.wellKnownConfigurationUrl);
+    boolean openIdEnabled = Boolean.parseBoolean(System.getProperty("exo.oauth.openid.enabled"));
+    if (openIdEnabled) {
+      if (StringUtils.isBlank(this.wellKnownConfigurationUrl)) {
+        log.error("wellKnownConfigurationUrl is not configured");
+        return;
       }
-    } catch (JSONException e) {
-      log.error("Unable to read webKnownUrl content : " + this.wellKnownConfigurationUrl);
-    } catch (MalformedURLException e) {
-      log.error("WellKnowConfigurationUrl malformed : url" + this.wellKnownConfigurationUrl);
+      try {
+        String wellKnownConfigurationContent = readUrl(new URL(this.wellKnownConfigurationUrl));
+        if (wellKnownConfigurationContent != null) {
+          JSONObject json = new JSONObject(wellKnownConfigurationContent);
+          this.authenticationURL = json.getString("authorization_endpoint");
+          this.accessTokenURL = json.getString("token_endpoint");
+          this.userInfoURL = json.getString("userinfo_endpoint");
+          this.issuer = json.getString("issuer");
+          this.remoteJwkSigningKeyResolver = new RemoteJwkSigningKeyResolver(this.wellKnownConfigurationUrl);
+        }
+      } catch (JSONException e) {
+        log.error("Unable to read webKnownUrl content : " + this.wellKnownConfigurationUrl, e);
+      } catch (MalformedURLException e) {
+        log.error("WellKnowConfigurationUrl malformed : url" + this.wellKnownConfigurationUrl, e);
+      }
     }
   }
 
