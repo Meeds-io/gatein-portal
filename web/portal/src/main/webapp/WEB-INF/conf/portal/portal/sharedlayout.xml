@@ -24,7 +24,7 @@
     xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_objects_1_6 http://www.gatein.org/xml/ns/gatein_objects_1_6"
     xmlns="http://www.gatein.org/xml/ns/gatein_objects_1_6"
     id="ParentSiteContainer"
-    template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
+    template="system:/groovy/portal/webui/workspace/UIParentSiteContainer.gtmpl">
 
   <container id="UITopBarContainer" template="system:/groovy/portal/webui/container/UITopBarContainer.gtmpl">
     <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
@@ -32,12 +32,9 @@
       <name>left-topNavigation-container</name>
       <factory-id>addonContainer</factory-id>
     </container>
-    <container id="HamburgerMenuContainer" template="system:/groovy/portal/webui/container/UIHamburgerMenuContainer.gtmpl">
-      <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
-      <container id="hamburger-menu-items-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
-        <name>hamburger-menu-items-container</name>
-        <factory-id>addonContainer</factory-id>
-      </container>
+    <container id="hamburger-menu-items-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
+      <name>hamburger-menu-items-container</name>
+      <factory-id>addonContainer</factory-id>
     </container>
     <container id="top-bar-logo-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
       <name>top-bar-logo-container</name>
