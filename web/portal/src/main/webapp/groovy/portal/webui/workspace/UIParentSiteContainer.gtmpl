@@ -1,0 +1,16 @@
+<div id="ParentSiteContainer">
+  <div id="ParentSiteLeftContainer">
+    <div class="VuetifyApp">
+      <div class="v-application <%=orientation.isLT() ? "v-application--is-ltr" : "v-application--is-rtl" %> transparent theme--light">
+        <div id="ParentSiteStickyMenu">
+        
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="ParentSiteRightContainer">
+    <div id="ParentSiteContainerChildren">
+      <%uicomponent.renderChildren();%>
+    </div>
+  </div>
+</div>
