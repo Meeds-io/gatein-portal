@@ -29,7 +29,7 @@
   <name>GateIn Portal WebUI Portal</name>
 
   <properties>
-    <exo.test.coverage.ratio>0.02</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.05</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
@@ -76,4 +76,16 @@
       <artifactId>simplecaptcha</artifactId>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <forkMode>always</forkMode>
+          <runOrder>alphabetical</runOrder>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
