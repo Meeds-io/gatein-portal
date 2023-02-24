@@ -11968,7 +11968,7 @@ background-image: url('/eXoResources/skin/PortletThemes/background/DefaultTheme.
 }
 
 .MacTheme .WindowBarCenter .PortletIcon {
-	background: url('/eXoSkinMac/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
+	background: url('/platform-ui/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
 }
 
 .MacTheme .WindowBarCenter .ControlIcon {
@@ -12125,7 +12125,7 @@ background-image: url('/eXoResources/skin/PortletThemes/background/MacTheme.png'
 }
 
 .MacGray .WindowBarCenter .PortletIcon {
-	background: url('/eXoSkinMac/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
+	background: url('/platform-ui/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
 }
 
 .MacGray .WindowBarCenter .ControlIcon {
@@ -12282,7 +12282,7 @@ background-image: url('/eXoResources/skin/PortletThemes/background/MacGray.png')
 }
 
 .MacBlack .WindowBarCenter .PortletIcon {
-	background: url('/eXoSkinMac/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
+	background: url('/platform-ui/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
 }
 
 .MacBlack .WindowBarCenter .ControlIcon {
@@ -12439,7 +12439,7 @@ background-image: url('/eXoResources/skin/PortletThemes/background/MacBlack.png'
 }
 
 .MacGreenSteel .WindowBarCenter .PortletIcon {
-	background: url('/eXoSkinMac/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
+	background: url('/platform-ui/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
 }
 
 .MacGreenSteel .WindowBarCenter .ControlIcon {
@@ -12590,7 +12590,7 @@ background-image: url('/eXoResources/skin/PortletThemes/background/MacGreen.png'
 }
 
 .VistaTheme .WindowBarCenter .PortletIcon {
-	background: url('/eXoSkinVista/skin/VistaSkin/skinIcons/16x16/icons/PortletIcon.png') no-repeat left 3px; /* orientation=lt */
+	background: url('/platform-ui/skin/VistaSkin/skinIcons/16x16/icons/PortletIcon.png') no-repeat left 3px; /* orientation=lt */
 }
 
 .VistaTheme .WindowBarCenter .ControlIcon {
@@ -12657,7 +12657,7 @@ background-image: url('/eXoResources/skin/PortletThemes/background/VistaTheme.pn
 	float: right; /* orientation=lt */
 	width: 9px; height: 12px;
 	cursor: nw-resize;
-	background: url('/eXoSkinVista/skin/VistaSkin/skinIcons/16x16/icons/ResizeBG.gif') no-repeat bottom right; /* orientation=lt */
+	background: url('/platform-ui/skin/VistaSkin/skinIcons/16x16/icons/ResizeBG.gif') no-repeat bottom right; /* orientation=lt */
 }
 
 .VistaTheme .MiddleDecoratorLeft {
@@ -12753,7 +12753,7 @@ background-image: url('/eXoResources/skin/PortletThemes/background/VistaTheme.pn
 }
 
 .VistaBlue .WindowBarCenter .PortletIcon {
-	background: url('/eXoSkinVista/skin/VistaSkin/skinIcons/16x16/icons/PortletIcon.png') no-repeat left 3px; /* orientation=lt */
+	background: url('/platform-ui/skin/VistaSkin/skinIcons/16x16/icons/PortletIcon.png') no-repeat left 3px; /* orientation=lt */
 }
 
 .VistaBlue .WindowBarCenter .ControlIcon {
@@ -12822,7 +12822,7 @@ background-image: url('/eXoResources/skin/PortletThemes/background/VistaBlue.png
 	float: right; /* orientation=lt */
 	width: 9px; height: 12px;
 	cursor: nw-resize;
-	background: url('/eXoSkinVista/skin/VistaSkin/skinIcons/16x16/icons/ResizeBG.gif') no-repeat bottom right;
+	background: url('/platform-ui/skin/VistaSkin/skinIcons/16x16/icons/ResizeBG.gif') no-repeat bottom right;
 }
 
 .VistaBlue .MiddleDecoratorLeft {

@@ -184,8 +184,8 @@
 }
 
 .MacTheme .WindowBarCenter .PortletIcon {
-	background: url('/eXoSkinMac/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
-	background: url('/eXoSkinMac/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat right top; /* orientation=rt */
+	background: url('/platform-ui/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
+	background: url('/platform-ui/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat right top; /* orientation=rt */
 }
 
 .MacTheme .WindowBarCenter .ControlIcon {
@@ -341,8 +341,8 @@
 }
 
 .MacGray .WindowBarCenter .PortletIcon {
-	background: url('/eXoSkinMac/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
-	background: url('/eXoSkinMac/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat right top; /* orientation=rt */
+	background: url('/platform-ui/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
+	background: url('/platform-ui/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat right top; /* orientation=rt */
 }
 
 .MacGray .WindowBarCenter .ControlIcon {
@@ -499,8 +499,8 @@
 }
 
 .MacBlack .WindowBarCenter .PortletIcon {
-	background: url('/eXoSkinMac/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
-	background: url('/eXoSkinMac/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat right top; /* orientation=rt */
+	background: url('/platform-ui/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
+	background: url('/platform-ui/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat right top; /* orientation=rt */
 }
 
 .MacBlack .WindowBarCenter .ControlIcon {
@@ -657,8 +657,8 @@
 }
 
 .MacGreenSteel .WindowBarCenter .PortletIcon {
-	background: url('/eXoSkinMac/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
-	background: url('/eXoSkinMac/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat right top; /* orientation=rt */
+	background: url('/platform-ui/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat left top; /* orientation=lt */
+	background: url('/platform-ui/skin/MacSkin/skinIcons/16x16/icons/DefaultPortletIcon.png') no-repeat right top; /* orientation=rt */
 }
 
 .MacGreenSteel .WindowBarCenter .ControlIcon {
@@ -810,8 +810,8 @@
 }
 
 .VistaTheme .WindowBarCenter .PortletIcon {
-	background: url('/eXoSkinVista/skin/VistaSkin/skinIcons/16x16/icons/PortletIcon.png') no-repeat left 3px; /* orientation=lt */
-	background: url('/eXoSkinVista/skin/VistaSkin/skinIcons/16x16/icons/PortletIcon-rt.png') no-repeat right 3px; /* orientation=rt */
+	background: url('/platform-ui/skin/VistaSkin/skinIcons/16x16/icons/PortletIcon.png') no-repeat left 3px; /* orientation=lt */
+	background: url('/platform-ui/skin/VistaSkin/skinIcons/16x16/icons/PortletIcon-rt.png') no-repeat right 3px; /* orientation=rt */
 }
 
 .VistaTheme .WindowBarCenter .ControlIcon {
@@ -974,8 +974,8 @@
 }
 
 .VistaBlue .WindowBarCenter .PortletIcon {
-	background: url('/eXoSkinVista/skin/VistaSkin/skinIcons/16x16/icons/PortletIcon.png') no-repeat left 3px; /* orientation=lt */
-	background: url('/eXoSkinVista/skin/VistaSkin/skinIcons/16x16/icons/PortletIcon-rt.png') no-repeat right 3px; /* orientation=rt */
+	background: url('/platform-ui/skin/VistaSkin/skinIcons/16x16/icons/PortletIcon.png') no-repeat left 3px; /* orientation=lt */
+	background: url('/platform-ui/skin/VistaSkin/skinIcons/16x16/icons/PortletIcon-rt.png') no-repeat right 3px; /* orientation=rt */
 }
 
 .VistaBlue .WindowBarCenter .ControlIcon {
