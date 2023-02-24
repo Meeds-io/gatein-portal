@@ -39,6 +39,8 @@ public abstract class UIApplication extends UIContainer {
 
     protected static Log log = ExoLogger.getLogger("portal:UIApplication");
 
+    public static final boolean POPUP_ALLOWED = Boolean.parseBoolean(System.getProperty("io.meeds.webuiPopupAllowed", "true"));
+
     private String owner;
 
     private long lastAccessApplication_;
@@ -65,7 +67,7 @@ public abstract class UIApplication extends UIContainer {
      * @return UIPopupMessages
      */
     public UIPopupMessages getUIPopupMessages() {
-        if (uiPopupMessages_ == null) {
+        if (POPUP_ALLOWED && uiPopupMessages_ == null) {
             try {
                 uiPopupMessages_ = createUIComponent(UIPopupMessages.class, null, null);
                 uiPopupMessages_.setId("_" + uiPopupMessages_.hashCode());
@@ -77,15 +79,21 @@ public abstract class UIApplication extends UIContainer {
     }
 
     public void addMessage(AbstractApplicationMessage message) {
+      if (POPUP_ALLOWED) {
         getUIPopupMessages().addMessage(message);
+      }
     }
 
     public void addMessage(ApplicationMessage message) {
+      if (POPUP_ALLOWED) {
         addMessage((AbstractApplicationMessage) message);
+      }
     }
 
     public void clearMessages() {
+      if (POPUP_ALLOWED) {
         getUIPopupMessages().clearMessages();
+      }
     }
 
     public long getLastAccessApplication() {
@@ -102,15 +110,16 @@ public abstract class UIApplication extends UIContainer {
 
     @SuppressWarnings("unchecked")
     public <T extends UIComponent> T findComponentById(String lookupId) {
-        if (getUIPopupMessages().getId().equals(lookupId))
+        if (POPUP_ALLOWED && getUIPopupMessages().getId().equals(lookupId))
             return (T) getUIPopupMessages();
         return (T) super.findComponentById(lookupId);
     }
 
     public void renderChildren() throws Exception {
         super.renderChildren();
-        if (getUIPopupMessages() == null)
+        if (!POPUP_ALLOWED || getUIPopupMessages() == null) {
             return;
+        }
         WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
         getUIPopupMessages().processRender(context);
     }

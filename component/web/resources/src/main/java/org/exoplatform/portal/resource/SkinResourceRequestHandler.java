@@ -63,7 +63,6 @@ public class SkinResourceRequestHandler extends WebRequestHandler {
         } else {
             //
             response.setContentType("text/css");
-            response.setHeader("Content-Encoding", "UTF-8");
 
             final OutputStream out = response.getOutputStream();
             final BinaryOutput output = new BinaryOutput() {
@@ -143,8 +142,9 @@ public class SkinResourceRequestHandler extends WebRequestHandler {
 
       public void setExpiration(long seconds) {
         if (seconds > 0) {
-          response.setHeader("Cache-Control", "public,max-age=" + seconds);
+          response.setHeader("Cache-Control", "public, no-transform, " + seconds);
           response.setDateHeader(EXPIRES, (System.currentTimeMillis() + seconds * 1000L));
+          response.setHeader("Etag", ResourceRequestHandler.VERSION_E_TAG);
         } else {
           response.setHeader("Cache-Control", "no-cache");
         }

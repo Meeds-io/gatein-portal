@@ -92,7 +92,7 @@
         <factory-id>ColumnContainer</factory-id>
         <portlet-application>
           <portlet>
-            <application-ref>exoadmin</application-ref>
+            <application-ref>portletapplication</application-ref>
             <portlet-ref>AccountPortlet</portlet-ref>
           </portlet>
           <theme>Default:DefaultTheme::Vista:VistaTheme::Mac:MacTheme</theme>

@@ -60,7 +60,6 @@
   <modules>
     <module>component</module>
     <module>webui</module>
-    <module>portlet</module>
     <module>web</module>
   </modules>
 
@@ -396,21 +395,10 @@
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.portlet.web</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-      </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.web.rest</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.portlet.exoadmin</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>

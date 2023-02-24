@@ -80,6 +80,8 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
     /** . */
     public static final String VERSION;
 
+    public static final String VERSION_E_TAG;
+
     public static final long MAX_AGE;
 
     static {
@@ -111,6 +113,7 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
         //
         log.info("Use version \"" + version + "\" for resource serving");
         VERSION = version;
+        VERSION_E_TAG = "W/\"" + Math.abs(version.hashCode()) + "\"";
 
         long seconds = 31536000L;
         String propValue = PropertyManager.getProperty("gatein.assets.script.max-age");
@@ -207,12 +210,12 @@ public class ResourceRequestHandler extends WebRequestHandler implements WebAppL
 
                 long ifModifiedSince = request.getDateHeader(IF_MODIFIED_SINCE);
                 if (resolved.isModified(ifModifiedSince)) {
-                    response.setHeader("Cache-Control", "public,max-age=" + MAX_AGE);
+                    response.setHeader("Cache-Control", "public, no-transform, " + MAX_AGE);
                     response.setDateHeader(ResourceRequestFilter.EXPIRES, System.currentTimeMillis() + MAX_AGE * 1000);
                     response.setDateHeader(ResourceRequestFilter.LAST_MODIFIED, resolved.lastModified);
                     // Content type + charset
                     response.setContentType("text/javascript");
-                    response.setHeader("Content-Encoding", "UTF-8");
+                    response.setHeader("Etag", ResourceRequestHandler.VERSION_E_TAG);
 
                     // Set content length
                     response.setContentLength(resolved.bytes.length);

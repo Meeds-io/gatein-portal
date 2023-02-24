@@ -44,6 +44,8 @@ public class DefaultUIContainerFactory extends UIComponentFactory<UIContainer> {
       containerType = UIColumnContainer.class;
     } else if (UISimpleColumnContainer.SIMPLE_COLUMN_CONTAINER.equals(factoryID)) {
       containerType = UISimpleColumnContainer.class;
+    } else if (UIAddOnContainer.ADDON_CONTAINER.equals(factoryID)) {
+      containerType = UIAddOnContainer.class;
     }
 
     if (containerType != null) {
