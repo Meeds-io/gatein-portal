@@ -56,6 +56,7 @@ import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.application.JavascriptManager;
+import org.exoplatform.web.application.RequireJS;
 import org.exoplatform.web.application.javascript.JavascriptConfigParser;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.exoplatform.web.url.MimeType;
@@ -776,7 +777,9 @@ public class UIPortalApplication extends UIApplication {
           this.removeChildById(UIPortalApplication.UI_WORKING_WS_ID);
         }
         this.uiWorkingWorkspace = this.addChild(UIWorkingWorkspace.class, UIPortalApplication.UI_WORKING_WS_ID, null);
-        this.uiWorkingWorkspace.addChild(UIEditInlineWorkspace.class, null, UI_EDITTING_WS_ID).setRendered(false);
+        if (USE_WEBUI_RESOURCES) {
+          this.uiWorkingWorkspace.addChild(UIEditInlineWorkspace.class, null, UI_EDITTING_WS_ID).setRendered(false);
+        }
         this.uiViewWorkingWorkspace = this.uiWorkingWorkspace.addChild(UIComponentDecorator.class, null, UI_VIEWING_WS_ID);
 
         if (this.getChildById(UIPortalApplication.UI_MASK_WS_ID) == null) {
@@ -852,7 +855,12 @@ public class UIPortalApplication extends UIApplication {
             js.append("eXo.env.server.portalURLTemplate=\"");
             js.append(url).append("\";");
 
-            pcontext.getJavascriptManager().require("SHARED/base").addScripts(js.toString());
+            JavascriptManager javascriptManager = pcontext.getJavascriptManager();
+            if (USE_WEBUI_RESOURCES) {
+              javascriptManager.require("SHARED/base").addScripts(js.toString());
+            } else {
+              javascriptManager.addJavascript(js.toString());
+            }
 
             SiteKey siteKey = pcontext.getSiteKey();
             PageNodeEvent<UIPortalApplication> pnevent = new PageNodeEvent<UIPortalApplication>(this,
@@ -918,7 +926,7 @@ public class UIPortalApplication extends UIApplication {
             UIMaskWorkspace uiMaskWS = getChildById(UIPortalApplication.UI_MASK_WS_ID);
             if (uiMaskWS.isUpdated())
                 pcontext.addUIComponentToUpdateByAjax(uiMaskWS);
-            if (getUIPopupMessages().hasMessage()) {
+            if (USE_WEBUI_RESOURCES && getUIPopupMessages().hasMessage()) {
                 pcontext.addUIComponentToUpdateByAjax(getUIPopupMessages());
             }
 

@@ -31,7 +31,7 @@
       <container template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
         <portlet-application>
           <portlet>
-            <application-ref>exoadmin</application-ref>
+            <application-ref>portletapplication</application-ref>
             <portlet-ref>AccountPortlet</portlet-ref>
           </portlet>
           <title>New Account</title>

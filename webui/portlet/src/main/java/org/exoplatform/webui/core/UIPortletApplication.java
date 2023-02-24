@@ -69,9 +69,13 @@ public abstract class UIPortletApplication extends UIApplication {
 
     @Override
     public UIPopupMessages getUIPopupMessages() {
+      if (USE_WEBUI_RESOURCES) {
         WebuiRequestContext context = PortletRequestContext.getCurrentInstance();
         WebuiRequestContext portalContext = (WebuiRequestContext) context.getParentAppRequestContext();
         return portalContext.getUIApplication().getUIPopupMessages();
+      } else {
+        return null;
+      }
     }
 
     @Deprecated

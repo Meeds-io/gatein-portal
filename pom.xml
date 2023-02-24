@@ -27,7 +27,6 @@
     <artifactId>maven-parent-pom</artifactId>
     <groupId>org.exoplatform</groupId>
     <version>26-M01</version>
-    <relativePath/>
   </parent>
 
   <groupId>org.exoplatform.gatein.portal</groupId>
@@ -60,8 +59,8 @@
   <modules>
     <module>component</module>
     <module>webui</module>
-    <module>portlet</module>
     <module>web</module>
+    <module>portlet</module>
   </modules>
 
   <dependencyManagement>
@@ -136,6 +135,41 @@
         <version>${project.version}</version>
         <classifier>source-release</classifier>
         <type>zip</type>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.portlet</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.web</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.webui</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.web</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
       </dependency>
 
       <dependency>
@@ -396,12 +430,7 @@
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.portlet.web</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-      </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.web.rest</artifactId>
@@ -420,6 +449,24 @@
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.web.eXoResources</artifactId>
+        <version>${project.version}</version>
+        <classifier>sources</classifier>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.web.eXoSkin</artifactId>
+        <version>${project.version}</version>
+        <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.web.eXoSkin</artifactId>
+        <version>${project.version}</version>
+        <classifier>sources</classifier>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -431,6 +478,7 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
+            <runOrder>alphabetical</runOrder>
             <systemPropertyVariables>
               <gatein.test.output.path>${project.build.directory}</gatein.test.output.path>
               <org.apache.commons.logging.Log>org.apache.commons.logging.impl.SimpleLog</org.apache.commons.logging.Log>

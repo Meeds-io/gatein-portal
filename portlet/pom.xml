@@ -36,7 +36,6 @@
 
   <modules>
     <module>exoadmin</module>
-    <module>web</module>
   </modules>
 
   <build>

@@ -33,7 +33,7 @@
     <edit-permission>*:/platform/administrators</edit-permission>
     <portlet-application>
       <portlet>
-        <application-ref>exoadmin</application-ref>
+        <application-ref>portletapplication</application-ref>
         <portlet-ref>AccountPortlet</portlet-ref>
       </portlet>
       <title>New Account</title>

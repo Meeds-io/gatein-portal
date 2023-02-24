@@ -32,7 +32,7 @@
     <edit-permission>manager:/organization/management/executive-board</edit-permission>
     <portlet-application>
       <portlet>
-        <application-ref>exoadmin</application-ref>
+        <application-ref>portletapplication</application-ref>
         <portlet-ref>AccountPortlet</portlet-ref>
       </portlet>
       <title>New Staff</title>
@@ -48,7 +48,7 @@
     <edit-permission>manager:/organization/management/executive-board</edit-permission>
     <portlet-application>
       <portlet>
-        <application-ref>exoadmin</application-ref>
+        <application-ref>portletapplication</application-ref>
         <portlet-ref>OrganizationPortlet</portlet-ref>
       </portlet>
       <title>Organization Management</title>
