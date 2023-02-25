@@ -52,7 +52,7 @@ public class UIExtensionManagerTest extends TestCase {
   public void setUp() throws Exception {
     StandaloneContainer.setConfigurationURL(Thread.currentThread()
                                                   .getContextClassLoader()
-                                                  .getResource("conf/standalone/test-extension-configuration.xml")
+                                                  .getResource("conf/portal/test-configuration.xml")
                                                   .toString());
     StandaloneContainer container = StandaloneContainer.getInstance();
     manager = (UIExtensionManagerImpl) container.getComponentInstanceOfType(UIExtensionManager.class);

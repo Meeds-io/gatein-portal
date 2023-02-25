@@ -24,6 +24,11 @@
    xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
+    <key>org.exoplatform.commons.addons.AddOnService</key>
+    <type>org.exoplatform.commons.addons.AddOnServiceImpl</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.webui.ext.UIExtensionManager</key>
     <type>org.exoplatform.webui.ext.impl.UIExtensionManagerImpl</type>
   </component>

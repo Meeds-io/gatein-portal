@@ -135,6 +135,8 @@ public class UIPortalApplication extends UIApplication {
         };
     };
 
+    public static final boolean EDIT_INLINE_ALLOWED = Boolean.parseBoolean(System.getProperty("io.meeds.editLayoutAllowed", "true"));
+
     public static final String UI_WORKING_WS_ID = "UIWorkingWorkspace";
 
     public static final String UI_VIEWING_WS_ID = "UIViewWS";
@@ -776,7 +778,9 @@ public class UIPortalApplication extends UIApplication {
           this.removeChildById(UIPortalApplication.UI_WORKING_WS_ID);
         }
         this.uiWorkingWorkspace = this.addChild(UIWorkingWorkspace.class, UIPortalApplication.UI_WORKING_WS_ID, null);
-        this.uiWorkingWorkspace.addChild(UIEditInlineWorkspace.class, null, UI_EDITTING_WS_ID).setRendered(false);
+        if (EDIT_INLINE_ALLOWED) {
+          this.uiWorkingWorkspace.addChild(UIEditInlineWorkspace.class, null, UI_EDITTING_WS_ID).setRendered(false);
+        }
         this.uiViewWorkingWorkspace = this.uiWorkingWorkspace.addChild(UIComponentDecorator.class, null, UI_VIEWING_WS_ID);
 
         if (this.getChildById(UIPortalApplication.UI_MASK_WS_ID) == null) {
@@ -918,7 +922,7 @@ public class UIPortalApplication extends UIApplication {
             UIMaskWorkspace uiMaskWS = getChildById(UIPortalApplication.UI_MASK_WS_ID);
             if (uiMaskWS.isUpdated())
                 pcontext.addUIComponentToUpdateByAjax(uiMaskWS);
-            if (getUIPopupMessages().hasMessage()) {
+            if (POPUP_ALLOWED && getUIPopupMessages().hasMessage()) {
                 pcontext.addUIComponentToUpdateByAjax(getUIPopupMessages());
             }
 

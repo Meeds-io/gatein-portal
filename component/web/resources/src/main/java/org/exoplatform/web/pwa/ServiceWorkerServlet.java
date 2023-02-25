@@ -65,9 +65,10 @@ public class ServiceWorkerServlet extends AbstractHttpServlet {
 
     try {
       resp.setHeader("Service-Worker-Allowed", "/");
-      resp.setHeader("Cache-Control", "max-age=" +  + ResourceRequestHandler.MAX_AGE);
+      resp.setHeader("Cache-Control", "public, no-transform, " +  + ResourceRequestHandler.MAX_AGE);
       resp.setDateHeader("Expires", System.currentTimeMillis() +  + ResourceRequestHandler.MAX_AGE * 1000);
       resp.setHeader("Content-Type", "text/javascript");
+      resp.setHeader("Etag", ResourceRequestHandler.VERSION_E_TAG);
 
       PrintWriter writer = resp.getWriter();
       writer.append(serviceWorkerContent.get());

@@ -49,7 +49,7 @@ public class UserACLFilerTest extends TestCase {
   public void setUp() throws Exception {
     StandaloneContainer.setConfigurationURL(Thread.currentThread()
                                                   .getContextClassLoader()
-                                                  .getResource("conf/standalone/test-extension-configuration.xml")
+                                                  .getResource("conf/portal/test-configuration.xml")
                                                   .toString());
     StandaloneContainer container = StandaloneContainer.getInstance(Thread.currentThread()
                                                                           .getContextClassLoader());

@@ -45,10 +45,7 @@
 
         var browser = base.Browser;
         eXo.portal.UIMaskWorkspace.resetPositionEvt();
-        browser.addOnResizeCallback('mid_maskWorkspace',
-            eXo.portal.UIMaskWorkspace.resetPositionEvt);
-//        browser.addOnScrollCallback("setPosition_maskWorkspace",
-//            eXo.portal.UIMaskWorkspace.resetPositionEvt);
+        browser.addOnResizeCallback('mid_maskWorkspace', eXo.portal.UIMaskWorkspace.resetPositionEvt);
       }
     },
 

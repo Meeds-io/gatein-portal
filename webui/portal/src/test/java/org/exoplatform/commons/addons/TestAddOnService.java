@@ -32,7 +32,7 @@ import org.exoplatform.portal.config.model.TransientApplicationState;
 @ConfiguredBy({
    @ConfigurationUnit(
      scope = ContainerScope.PORTAL,
-     path = "conf/standalone/test-addon-configuration.xml"
+     path = "conf/portal/test-configuration.xml"
    )
 })
 public class TestAddOnService extends AbstractKernelTest {
