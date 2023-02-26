@@ -64,8 +64,7 @@ public class PortalApplication extends WebuiApplication {
         resolver.addResourceResolver(new ServletResourceResolver(config.getServletContext(), "war:"));
         resolver.addResourceResolver(new ServletResourceResolver(config.getServletContext(), "app:"));
         resolver.addResourceResolver(new ServletResourceResolver(config.getServletContext(), "system:"));
-        resolver.addResourceResolver(new ServletResourceResolver(config.getServletContext().getContext("/eXoResources"),
-                "resources:"));
+        resolver.addResourceResolver(new ServletResourceResolver(config.getServletContext(), "resources:"));
         setResourceResolver(resolver);
     }
 

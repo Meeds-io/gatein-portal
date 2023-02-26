@@ -396,12 +396,7 @@
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.portlet.web</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-      </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.web.rest</artifactId>

@@ -55,7 +55,6 @@
   <import>war:/conf/portal/web-configuration.xml</import>
   <import>war:/conf/portal/module-configuration.xml</import>
   <import>war:/conf/portal/page-template-configuration.xml</import>
-  <import>war:/conf/portal/inpage-navigation-configuration.xml</import>
 
   <import>war:/conf/branding/branding-configuration.xml</import>
 
@@ -63,5 +62,4 @@
   <import>war:/conf/api/api-configuration.xml</import>
   <import>war:/conf/jdbc/configuration.xml</import>
 
-  <import>war:/conf/pwa/pwa-configuration.xml</import>
 </configuration>
