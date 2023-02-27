@@ -30,40 +30,16 @@
       <path>/javascript/eXo.js</path>
     </script>
     <script>
-      <path>/javascript/eXo/core/require.js</path>
+      <path>/javascript/core/require.js</path>
     </script>
   </scripts>
-
-  <module>
-    <name>topbarLoading</name>
-    <load-group>baseGRP</load-group>
-    <script>
-      <path>/javascript/eXo/core/TopbarLoading.js</path>
-    </script>
-    <depends>
-      <module>jquery</module>
-    </depends>
-  </module>
-
-  <module>
-    <name>jquery</name>
-    <as>$</as>
-    <script>
-      <adapter>
-        (function() {
-        <include>/javascript/jquery-3.2.1.js</include>
-        return jQuery.noConflict(true);
-        })();
-      </adapter>
-    </script>
-  </module>
 
   <!-- Base Javascripts for anonymous mode -->
   <module>
     <name>base</name>
     <load-group>baseGRP</load-group>
     <script>
-      <path>/javascript/eXo/core/Base.js</path>
+      <path>/javascript/core/Base.js</path>
     </script>
     <depends>
       <module>jquery</module>
@@ -72,9 +48,8 @@
 
   <module>
     <name>portalRequest</name>
-    <load-group>baseGRP</load-group>
     <script>
-      <path>/javascript/eXo/portal/PortalHttpRequest.js</path>
+      <path>/javascript/portal/PortalHttpRequest.js</path>
     </script>
     <depends>
       <module>jquery</module>
@@ -94,7 +69,6 @@
   <module>
     <name>I18NMessage</name>
     <as>msg</as>
-    <load-group>baseGRP</load-group>
     <supported-locale>de</supported-locale>
     <supported-locale>en</supported-locale>
     <supported-locale>fr</supported-locale>
@@ -124,16 +98,15 @@
     <supported-locale>in</supported-locale>
     <supported-locale>fil</supported-locale>
     <script>
-      <path>/javascript/eXo/i18n/I18NMessage.js</path>
+      <path>/javascript/i18n/I18NMessage.js</path>
       <resource-bundle>eXo.portal</resource-bundle>
     </script>
   </module>
 
   <module>
     <name>uiPopup</name>
-    <load-group>baseGRP</load-group>
     <script>
-      <path>/javascript/eXo/webui/UIPopup.js</path>
+      <path>/javascript/webui/UIPopup.js</path>
     </script>
     <depends>
       <module>base</module>
@@ -145,9 +118,8 @@
 
   <module>
     <name>uiMaskLayer</name>
-    <load-group>baseGRP</load-group>
     <script>
-      <path>/javascript/eXo/core/UIMaskLayer.js</path>
+      <path>/javascript/core/UIMaskLayer.js</path>
     </script>
     <depends>
       <module>jquery</module>
@@ -162,9 +134,8 @@
 
   <module>
     <name>uiMaskWorkspace</name>
-    <load-group>baseGRP</load-group>
     <script>
-      <path>/javascript/eXo/portal/UIMaskWorkspace.js</path>
+      <path>/javascript/portal/UIMaskWorkspace.js</path>
     </script>
     <depends>
       <module>uiMaskLayer</module>
@@ -180,7 +151,7 @@
   <module>
     <name>popupCategory</name>
     <script>
-      <path>/javascript/eXo/webui/UIPopupSelectCategory.js</path>
+      <path>/javascript/webui/UIPopupSelectCategory.js</path>
     </script>
     <depends>
       <module>jquery</module>
@@ -191,25 +162,18 @@
   <module>
     <name>common</name>
     <script>
-      <path>/javascript/eXo/core/DragDrop.js</path>
+      <path>/javascript/core/DragDrop.js</path>
     </script>
     <depends>
       <module>jquery</module>
     </depends>
   </module>
 
-  <module>
-    <name>extensionRegistry</name>
-    <script>
-      <path>/javascript/eXo/core/extensionRegistry.js</path>
-    </script>
-  </module>
-
   <!-- Portal Javascripts -->
   <module>
     <name>portal</name>
     <script>
-      <path>/javascript/eXo/portal/UIPortal.js</path>
+      <path>/javascript/portal/UIPortal.js</path>
     </script>
     <depends>
       <module>base</module>
@@ -228,7 +192,7 @@
   <module>
     <name>portalComposer</name>
     <script>
-      <path>/javascript/eXo/portal/PortalComposer.js</path>
+      <path>/javascript/portal/PortalComposer.js</path>
     </script>
     <depends>
       <module>portalControl</module>
@@ -250,7 +214,7 @@
   <module>
     <name>portalDragDrop</name>
     <script>
-      <path>/javascript/eXo/portal/PortalDragDrop.js</path>
+      <path>/javascript/portal/PortalDragDrop.js</path>
     </script>
     <depends>
       <module>base</module>
@@ -267,7 +231,7 @@
   <module>
     <name>portalControl</name>
     <script>
-      <path>/javascript/eXo/portal/UIPortalControl.js</path>
+      <path>/javascript/portal/UIPortalControl.js</path>
     </script>
     <depends>
       <module>uiForm</module>
@@ -280,7 +244,7 @@
   <module>
     <name>selectors</name>
     <script>
-      <path>/javascript/eXo/webui/Selectors.js</path>
+      <path>/javascript/webui/Selectors.js</path>
     </script>
     <depends>
       <module>jquery</module>
@@ -290,7 +254,7 @@
   <module>
     <name>uiForm</name>
     <script>
-      <path>/javascript/eXo/webui/UIForm.js</path>
+      <path>/javascript/webui/UIForm.js</path>
     </script>
     <depends>
       <module>jquery</module>
@@ -303,7 +267,7 @@
   <module>
     <name>formValidation</name>
     <script>
-      <path>/javascript/eXo/webui/FormValidation.js</path>
+      <path>/javascript/webui/FormValidation.js</path>
     </script>
     <depends>
       <module>jquery</module>
@@ -313,7 +277,7 @@
   <module>
     <name>uiPopupWindow</name>
     <script>
-      <path>/javascript/eXo/webui/UIPopupWindow.js</path>
+      <path>/javascript/webui/UIPopupWindow.js</path>
     </script>
     <depends>
       <module>common</module>
@@ -334,9 +298,8 @@
   
   <module>
     <name>uiPopupMessages</name>
-    <load-group>webuiGRP</load-group>
     <script>
-      <path>/javascript/eXo/webui/UIPopupMessages.js</path>
+      <path>/javascript/webui/UIPopupMessages.js</path>
     </script>
     <depends>
       <module>jquery</module>
@@ -352,12 +315,11 @@
   <!-- Twitter Bootstrap bootstrap-affix plugin -->
   <module>
     <name>bts_affix</name>
-    <load-group>bts</load-group>
     <script>
       <adapter>
         (function($) {
           var _$ = window.jQuery; window.jQuery = $;
-          <include>/skin/bootstrap/js/bootstrap-affix.js</include>
+          <include>/javascript/bootstrap/bootstrap-affix.js</include>
           window.jQuery = _$;
         })($);
       </adapter>
@@ -370,12 +332,11 @@
   <!-- Twitter Bootstrap bootstrap-alert plugin -->
   <module>
     <name>bts_alert</name>
-    <load-group>bts</load-group>
     <script>
       <adapter>
         (function($) {
           var _$ = window.jQuery; window.jQuery = $;
-          <include>/skin/bootstrap/js/bootstrap-alert.js</include>
+          <include>/javascript/bootstrap/bootstrap-alert.js</include>
           window.jQuery = _$;
         })($);
       </adapter>
@@ -388,12 +349,11 @@
   <!-- Twitter Boostrap bootstrap-button plugin -->
   <module>
     <name>bts_button</name>
-    <load-group>bts</load-group>
     <script>
       <adapter>
         (function($) {
           var _$ = window.jQuery; window.jQuery = $;
-          <include>/skin/bootstrap/js/bootstrap-button.js</include>
+          <include>/javascript/bootstrap/bootstrap-button.js</include>
           window.jQuery = _$;
         })($);
       </adapter>
@@ -406,12 +366,11 @@
   <!-- Twitter Bootstrap bootstrap-carousel plugin -->
   <module>
     <name>bts_carousel</name>
-    <load-group>bts</load-group>
     <script>
       <adapter>
         (function($) {
           var _$ = window.jQuery; window.jQuery = $;
-          <include>/skin/bootstrap/js/bootstrap-carousel.js</include>
+          <include>/javascript/bootstrap/bootstrap-carousel.js</include>
           window.jQuery = _$;
         })($);
       </adapter>
@@ -424,12 +383,11 @@
   <!-- Twitter Bootstrap bootstrap-collapse plugin -->
   <module>
     <name>bts_collapse</name>
-    <load-group>bts</load-group>
     <script>
       <adapter>
         (function($) {
           var _$ = window.jQuery; window.jQuery = $;
-          <include>/skin/bootstrap/js/bootstrap-collapse.js</include>
+          <include>/javascript/bootstrap/bootstrap-collapse.js</include>
           window.jQuery = _$;
         })($);
       </adapter>
@@ -442,12 +400,11 @@
   <!-- Twitter Bootstrap bootstrap-dropdown plugin -->
   <module>
     <name>bts_dropdown</name>
-    <load-group>bts</load-group>
     <script>
       <adapter>
         (function($) {
           var _$ = window.jQuery; window.jQuery = $;
-          <include>/skin/bootstrap/js/bootstrap-dropdown.js</include>
+          <include>/javascript/bootstrap/bootstrap-dropdown.js</include>
           window.jQuery = _$;
         })($);
       </adapter>
@@ -460,26 +417,14 @@
   <!-- Twitter Bootstrap bootstrap-modal plugin -->
   <module>
     <name>bts_modal</name>
-    <load-group>bts</load-group>
     <script>
       <adapter>
         (function($) {
           var _$ = window.jQuery; window.jQuery = $;
-          <include>/skin/bootstrap/js/bootstrap-modal.js</include>
+          <include>/javascript/bootstrap/bootstrap-modal.js</include>
           window.jQuery = _$;
         })($);
       </adapter>
-    </script>
-    <depends>
-      <module>jquery</module>
-    </depends>
-  </module>
-
-  <module>
-    <name>uiSocialLoginButtons</name>
-    <load-group>webuiGRP</load-group>
-    <script>
-      <path>/javascript/eXo/webui/UISocialLoginButtons.js</path>
     </script>
     <depends>
       <module>jquery</module>
@@ -490,12 +435,11 @@
   <!-- Twitter Bootstrap bootstrap-popover plugin -->
   <module>
     <name>bts_popover</name>
-    <load-group>bts</load-group>
     <script>
       <adapter>
         (function($) {
           var _$ = window.jQuery; window.jQuery = $;
-          <include>/skin/bootstrap/js/bootstrap-popover.js</include>
+          <include>/javascript/bootstrap/bootstrap-popover.js</include>
           window.jQuery = _$;
         })($);
       </adapter>
@@ -511,12 +455,11 @@
   <!-- Twitter Bootstrap bootstrap-scrollspy plugin -->
   <module>
     <name>bts_scrollspy</name>
-    <load-group>bts</load-group>
     <script>
       <adapter>
         (function($) {
           var _$ = window.jQuery; window.jQuery = $;
-          <include>/skin/bootstrap/js/bootstrap-scrollspy.js</include>
+          <include>/javascript/bootstrap/bootstrap-scrollspy.js</include>
           window.jQuery = _$;
         })($);
       </adapter>
@@ -529,12 +472,11 @@
   <!-- Twitter Bootstrap bootstrap-tab plugin -->
   <module>
     <name>bts_tab</name>
-    <load-group>bts</load-group>
     <script>
       <adapter>
         (function($) {
           var _$ = window.jQuery; window.jQuery = $;
-          <include>/skin/bootstrap/js/bootstrap-tab.js</include>
+          <include>/javascript/bootstrap/bootstrap-tab.js</include>
           window.jQuery = _$;
         })($);
       </adapter>
@@ -547,12 +489,11 @@
   <!-- Twitter Bootstrap bootstrap-tooltip plugin -->
   <module>
     <name>bts_tooltip</name>
-    <load-group>bts</load-group>
     <script>
       <adapter>
         (function($) {
           var _$ = window.jQuery; window.jQuery = $;
-          <include>/skin/bootstrap/js/bootstrap-tooltip.js</include>
+          <include>/javascript/bootstrap/bootstrap-tooltip.js</include>
           window.jQuery = _$;
         })($);
       </adapter>
@@ -572,7 +513,7 @@
       <adapter>
         (function($) {
           var _$ = window.jQuery; window.jQuery = $;
-          <include>/skin/bootstrap/js/bootstrap-transition.js</include>
+          <include>/javascript/bootstrap/bootstrap-transition.js</include>
           window.jQuery = _$;
         })($);
       </adapter>
@@ -585,48 +526,12 @@
   <!-- Twitter Bootstrap bootstrap-typeahead plugin -->
   <module>
     <name>bts_typeahead</name>
-    <load-group>bts</load-group>
     <script>
       <adapter>
         (function($) {
           var _$ = window.jQuery; window.jQuery = $;
-          <include>/skin/bootstrap/js/bootstrap-typeahead.js</include>
+          <include>/javascript/bootstrap/bootstrap-typeahead.js</include>
           window.jQuery = _$;
-        })($);
-      </adapter>
-    </script>
-    <depends>
-      <module>jquery</module>
-    </depends>
-  </module>
-
-  <!-- JQuery perfect scrollbar plugin -->
-  <module>
-    <name>jq_perfect_scrollbar</name>
-    <load-group>webuiExt</load-group>
-    <script>
-      <adapter>
-        (function($) {
-        var _$ = window.jQuery; window.jQuery = $;
-        <include>/javascript/perfect-scrollbar.jquery.min.js</include>
-        window.jQuery = _$;
-        })($);
-      </adapter>
-    </script>
-    <depends>
-      <module>jquery</module>
-    </depends>
-  </module>
-
-  <!-- IphoneStyle plugin -->
-  <module>
-    <name>iphoneStyleCheckbox</name>
-    <script>
-      <adapter>
-        (function($) {
-        var _$ = window.jQuery; window.jQuery = $;
-        <include>/javascript/iphone-style-checkboxes.js</include>
-        window.jQuery = _$;
         })($);
       </adapter>
     </script>
@@ -639,9 +544,8 @@
   <module>
     <name>webui-ext</name>
     <as>webuiExt</as>
-    <load-group>webuiExtGRP</load-group>
     <script>
-      <path>/javascript/eXo/webui/WebUIExt.js</path>
+      <path>/javascript/webui/WebUIExt.js</path>
     </script>
     <depends>
       <module>base</module>
@@ -659,9 +563,8 @@
 
   <module>
     <name>upload</name>
-    <load-group>webuiExtGRP</load-group>
     <script>
-      <path>/javascript/eXo/webui/Upload.js</path>
+      <path>/javascript/webui/Upload.js</path>
     </script>
     <depends>
       <module>base</module>
@@ -710,7 +613,7 @@
     <supported-locale>in</supported-locale>
     <supported-locale>fil</supported-locale>
     <script>
-        <path>/javascript/eXo/webui/UIDateTimePicker.js</path>
+        <path>/javascript/webui/UIDateTimePicker.js</path>
         <resource-bundle>eXo.calendar.DateTimePicker</resource-bundle>
     </script>
     <depends>
@@ -724,9 +627,8 @@
 
   <module>
     <name>uiCalendar</name>
-    <load-group>webuiExtGRP</load-group>
     <script>
-      <path>/javascript/eXo/webui/UICalendar.js</path>
+      <path>/javascript/webui/UICalendar.js</path>
     </script>
     <depends>
       <module>common</module>
@@ -744,9 +646,8 @@
 
   <module>
     <name>uiRightClickPopupMenu</name>
-    <load-group>webuiExtGRP</load-group>
     <script>
-      <path>/javascript/eXo/webui/UIRightClickPopupMenu.js</path>
+      <path>/javascript/webui/UIRightClickPopupMenu.js</path>
     </script>
     <depends>
       <module>base</module>
@@ -761,9 +662,8 @@
 
   <module>
     <name>uiVirtualList</name>
-    <load-group>webuiExtGRP</load-group>
     <script>
-      <path>/javascript/eXo/webui/UIVirtualList.js</path>
+      <path>/javascript/webui/UIVirtualList.js</path>
     </script>
     <depends>
       <module>base</module>
@@ -785,7 +685,7 @@
   <module>
     <name>navigation</name>
     <script>
-      <path>/javascript/eXo/portal/UIPortalNavigation.js</path>
+      <path>/javascript/portal/UIPortalNavigation.js</path>
     </script>
     <depends>
       <module>base</module>
@@ -801,66 +701,14 @@
     </depends>
   </module>
 
-  <!-- Container Javascript -->
   <module>
     <name>toggleContainer</name>
     <script>
-      <path>/javascript/eXo/portal/ToggleContainer.js</path>
+      <path>/javascript/portal/ToggleContainer.js</path>
     </script>
     <depends>
       <module>jquery</module>
     </depends>
   </module>
 
-  <module>
-    <name>eCharts</name>
-    <script>
-      <minify>false</minify>
-      <adapter>
-        (function() {
-        <include>/javascript/echarts.min.js</include>
-        return echarts;
-        })();
-      </adapter>
-    </script>
-  </module>
-
-  <module>
-    <name>vueEllipsis</name>
-    <script>
-      <path>/javascript/vue-ellipsis.min.js</path>
-    </script>
-    <depends>
-      <module>jquery</module>
-    </depends>
-  </module>
-
-  <module>
-    <name>bodyScrollListener</name>
-    <load-group>baseGRP</load-group>
-    <script>
-      <path>/javascript/eXo/portal/BodyScrollListener.js</path>
-    </script>
-    <depends>
-      <module>jquery</module>
-    </depends>
-  </module>
-
-  <module>
-    <name>mobileSwipeContainer</name>
-    <script>
-      <path>/javascript/eXo/portal/MobileSwipeContainer.js</path>
-    </script>
-    <depends>
-      <module>jquery</module>
-    </depends>
-  </module>
-  
-  <module>
-    <name>qrcode</name>
-    <script>
-      <minify>false</minify>
-      <path>/javascript/easy.qrcode.min.js</path>
-    </script>
-  </module>
 </gatein-resources>

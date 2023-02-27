@@ -154,7 +154,6 @@
      eXo.session.isOpen = <%=uicomponent.isSessionOpen()%> ;
      eXo.session.itvTime = ${session.getMaxInactiveInterval()} ;
 
-     require(['SHARED/topbarLoading'], topbarLoading => topbarLoading.init());
      eXo.env.portal.onLoadCallbacks = eXo.env.portal.onLoadCallbacks || [];
      eXo.env.portal.addOnLoadCallback = callback => {
        eXo.env.portal.onLoadCallbacks.push(callback);
@@ -209,7 +208,6 @@
          stylesheet.insertRule("html[dir='rtl'] .skipHidden { right: 10000px !important;}", stylesheet.cssRules.length);
        }
      }
-     require(['SHARED/bodyScrollListener']);
    </script>
    <!-- /508 Compliancy -->
 
