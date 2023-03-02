@@ -223,7 +223,7 @@ public class NavigationRest implements ResourceContainer {
       Collection<UserNode> nodes = new ArrayList<>();
 
       if (nodeId != null && siteName != null) {
-        SiteKey siteKey = new SiteKey(siteTypeName, siteName);
+        SiteKey siteKey = new SiteKey(StringUtils.lowerCase(siteTypeName), siteName);
         UserNode userNode = userPortal.getNodeById(nodeId, siteKey, scope, userFilterConfig, null);
         nodes.add(userNode);
       } else if (siteType == SiteType.PORTAL || StringUtils.isBlank(siteName)) {
