@@ -52,7 +52,7 @@ public class TestLocaleConfig extends AbstractResourceBundleTest {
         // -------------------default locale is English-------------
         LocaleConfig locale = service_.getDefaultLocaleConfig();
         assertTrue("expect defautl locale config is found", locale != null);
-        assertTrue("expect default locale is English", locale.getLocale().equals(Locale.ENGLISH));
+        assertEquals("expect default locale is English", Locale.ENGLISH, locale.getLocale());
         // --------------get a locale------------------
         locale = service_.getLocaleConfig("fr");
         assertTrue("expect locale config is found", locale != null);

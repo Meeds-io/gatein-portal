@@ -20,14 +20,20 @@
 package org.exoplatform.portal.pom.data;
 
 import java.io.Serializable;
-import java.util.Objects;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@Data
+@NoArgsConstructor(force = true)
 public abstract class ModelData implements Serializable {
+
+    private static final long serialVersionUID = 2633784583642724742L;
 
     /** Storage id. */
     private final String storageId;
@@ -46,19 +52,5 @@ public abstract class ModelData implements Serializable {
 
     public String getStorageName() {
         return storageName;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ModelData)) return false;
-        ModelData modelData = (ModelData) o;
-        return Objects.equals(storageId, modelData.storageId) &&
-                Objects.equals(storageName, modelData.storageName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(storageId, storageName);
     }
 }

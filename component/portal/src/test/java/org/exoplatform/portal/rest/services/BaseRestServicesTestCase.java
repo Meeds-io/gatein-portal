@@ -17,8 +17,7 @@ import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.test.mock.MockPrincipal;
 
 @ConfiguredBy({
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
   @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/portal/config/conf/configuration.xml") })
 public abstract class BaseRestServicesTestCase extends AbstractKernelTest {
 
@@ -61,11 +60,11 @@ public abstract class BaseRestServicesTestCase extends AbstractKernelTest {
     return clazz.cast(this.container.getComponentInstanceOfType(clazz));
   }
 
-  private void registry(Class<?> resourceClass) throws Exception {
+  protected void registry(Class<?> resourceClass) throws Exception {
     binder.addResource(resourceClass, null);
   }
 
-  private void unregistry(Class<?> resourceClass) {
+  protected void unregistry(Class<?> resourceClass) {
     binder.removeResource(resourceClass);
   }
 

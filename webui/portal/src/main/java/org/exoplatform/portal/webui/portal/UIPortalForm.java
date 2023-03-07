@@ -32,13 +32,13 @@ import java.util.ResourceBundle;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.PortalProperties;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.resource.SkinService;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
 import org.exoplatform.portal.webui.util.Util;
@@ -164,7 +164,7 @@ public class UIPortalForm extends UIFormTabPane {
 
     public void setBindingBean() throws Exception {
 
-        DataStorage dataStorage = this.getApplicationComponent(DataStorage.class);
+        LayoutService layoutService = this.getApplicationComponent(LayoutService.class);
 
         UIPortal editPortal = null;
         UIPortalApplication uiPortalApp = Util.getUIPortalApplication();
@@ -174,7 +174,7 @@ public class UIPortalForm extends UIFormTabPane {
                 && uiEditWS.getUIComponent() != null && (uiEditWS.getUIComponent() instanceof UIPortal)) {
             editPortal = (UIPortal) uiEditWS.getUIComponent();
         } else {
-            PortalConfig pConfig = dataStorage.getPortalConfig(getEditingSiteTypeName(), getEditingSiteName());
+            PortalConfig pConfig = layoutService.getPortalConfig(getEditingSiteTypeName(), getEditingSiteName());
             editPortal = this.createUIComponent(UIPortal.class, null, null);
             PortalDataMapper.toUIPortal(editPortal, pConfig);
         }
@@ -361,12 +361,12 @@ public class UIPortalForm extends UIFormTabPane {
         public void execute(Event<UIPortalForm> event) throws Exception {
             UIPortalForm uiForm = event.getSource();
 
-            DataStorage dataService = uiForm.getApplicationComponent(DataStorage.class);
+            LayoutService layoutService = uiForm.getApplicationComponent(LayoutService.class);
             UserACL acl = uiForm.getApplicationComponent(UserACL.class);
             PortalRequestContext prContext = Util.getPortalRequestContext();
             UIPortalApplication uiPortalApp = (UIPortalApplication) prContext.getUIApplication();
 
-            PortalConfig pConfig = dataService.getPortalConfig(uiForm.getEditingSiteTypeName(), uiForm.getEditingSiteName());
+            PortalConfig pConfig = layoutService.getPortalConfig(uiForm.getEditingSiteTypeName(), uiForm.getEditingSiteName());
             if (pConfig != null && acl.hasPermission(pConfig)) {
                 UIPortal uiPortal = uiForm.createUIComponent(UIPortal.class, null, null);
                 PortalDataMapper.toUIPortal(uiPortal, pConfig);
@@ -375,7 +375,7 @@ public class UIPortalForm extends UIFormTabPane {
                 // uiPortal.refreshNavigation(localeConfigService.getLocaleConfig(uiPortal.getLocale()).getLocale()) ;
                 if (uiPortalApp.getModeState() == UIPortalApplication.NORMAL_MODE) {
                     PortalConfig portalConfig = (PortalConfig) PortalDataMapper.buildModelObject(uiPortal);
-                    dataService.save(portalConfig);
+                    layoutService.save(portalConfig);
                     UserPortalConfigService service = uiForm.getApplicationComponent(UserPortalConfigService.class);
                     uiPortalApp.reloadPortalProperties();
 
@@ -421,8 +421,8 @@ public class UIPortalForm extends UIFormTabPane {
             PortalRequestContext pcontext = (PortalRequestContext) event.getRequestContext();
             String template = uiForm.getChild(UIFormInputItemSelector.class).getSelectedItemOption().getValue().toString();
             String portalName = uiForm.getUIStringInput(FIELD_NAME).getValue();
-            DataStorage dataService = uiForm.getApplicationComponent(DataStorage.class);
-            PortalConfig config = dataService.getPortalConfig(portalName);
+            LayoutService layoutService = uiForm.getApplicationComponent(LayoutService.class);
+            PortalConfig config = layoutService.getPortalConfig(portalName);
             if (config != null) {
                 UIApplication uiApp = Util.getPortalRequestContext().getUIApplication();
                 uiApp.addMessage(new ApplicationMessage("UIPortalForm.msg.sameName", null));
@@ -432,14 +432,14 @@ public class UIPortalForm extends UIFormTabPane {
             UserPortalConfigService service = uiForm.getApplicationComponent(UserPortalConfigService.class);
             service.createUserPortalConfig(SiteType.PORTAL.getName(), portalName, template);
 
-            PortalConfig pconfig = dataService.getPortalConfig(portalName);
+            PortalConfig pconfig = layoutService.getPortalConfig(portalName);
             UIPortal uiPortal = uiForm.createUIComponent(UIPortal.class, null, null);
             PortalDataMapper.toUIPortal(uiPortal, pconfig);
 
             uiForm.invokeSetBindingBean(uiPortal);
 
             pconfig = (PortalConfig) PortalDataMapper.buildModelObject(uiPortal);
-            dataService.save(pconfig);
+            layoutService.save(pconfig);
 
             UIPortalApplication uiPortalApp = event.getSource().getAncestorOfType(UIPortalApplication.class);
             UIMaskWorkspace uiMaskWS = uiPortalApp.getChildById(UIPortalApplication.UI_MASK_WS_ID);

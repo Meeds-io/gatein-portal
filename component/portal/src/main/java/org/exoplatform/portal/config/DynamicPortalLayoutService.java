@@ -1,15 +1,22 @@
 package org.exoplatform.portal.config;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.picocontainer.Startable;
 
 import org.exoplatform.container.configuration.ConfigurationManager;
-import org.exoplatform.container.xml.*;
+import org.exoplatform.container.xml.ComponentPlugin;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -25,7 +32,7 @@ public class DynamicPortalLayoutService implements Startable {
 
   private ConfigurationManager                          configurationManager;
 
-  private DataStorage                                   dataStorage;
+  private LayoutService                                 layoutService;
 
   /**
    * Whether to force relying on configured dynamic site layout when one of
@@ -51,8 +58,8 @@ public class DynamicPortalLayoutService implements Startable {
 
   private List<DynamicPortalLayoutMatcherPlugin>        dynamicLayoutMatchers       = new ArrayList<>();
 
-  public DynamicPortalLayoutService(ConfigurationManager configurationManager, DataStorage dataStorage, InitParams params) {
-    this.dataStorage = dataStorage;
+  public DynamicPortalLayoutService(ConfigurationManager configurationManager, LayoutService dataStorage, InitParams params) {
+    this.layoutService = dataStorage;
     this.configurationManager = configurationManager;
 
     ValueParam ignoreStoredLayoutParam = params.getValueParam("forceIgnoreStoredLayout");
@@ -129,7 +136,7 @@ public class DynamicPortalLayoutService implements Startable {
       throw new IllegalArgumentException("siteKey is mandatory");
     }
 
-    PortalConfig storedPortalConfig = dataStorage.getPortalConfig(siteKey.getTypeName(), siteKey.getName());
+    PortalConfig storedPortalConfig = layoutService.getPortalConfig(siteKey.getTypeName(), siteKey.getName());
     if (storedPortalConfig == null) {
       return null;
     }
@@ -149,7 +156,7 @@ public class DynamicPortalLayoutService implements Startable {
       return storedPortalConfig;
     }
 
-    PortalConfig currentSitePortalConfig = dataStorage.getPortalConfig(SiteType.PORTAL.getName(), currentPortalSiteName);
+    PortalConfig currentSitePortalConfig = layoutService.getPortalConfig(SiteType.PORTAL.getName(), currentPortalSiteName);
     if (currentSitePortalConfig == null) {
       return storedPortalConfig;
     }

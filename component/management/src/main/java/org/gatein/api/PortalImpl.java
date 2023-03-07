@@ -30,7 +30,6 @@ import org.gatein.api.internal.Parameters;
 import org.gatein.api.navigation.Navigation;
 import org.gatein.api.navigation.NavigationImpl;
 import org.gatein.api.oauth.OAuthProvider;
-import org.gatein.api.oauth.OAuthProviderAccessor;
 import org.gatein.api.page.*;
 import org.gatein.api.security.*;
 import org.gatein.api.site.*;
@@ -43,10 +42,11 @@ import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.description.DescriptionService;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
-import org.exoplatform.portal.mop.navigation.NavigationService;
 import org.exoplatform.portal.mop.page.*;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.portal.mop.storage.DescriptionStorage;
 import org.exoplatform.services.resources.ResourceBundleManager;
 import org.exoplatform.services.security.*;
 
@@ -58,30 +58,29 @@ import org.exoplatform.services.security.*;
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
 public class PortalImpl implements Portal {
-  private static final Query<PortalConfig> SITES      = new Query<PortalConfig>(
-                                                                                org.exoplatform.portal.mop.SiteType.PORTAL.getName(),
-                                                                                null,
-                                                                                PortalConfig.class);
 
-  private static final Query<PortalConfig> SPACES     = new Query<PortalConfig>(
-                                                                                org.exoplatform.portal.mop.SiteType.GROUP.getName(),
-                                                                                null,
-                                                                                PortalConfig.class);
+  private static final Query<PortalConfig> SITES      = new Query<>(
+                                                                    org.exoplatform.portal.mop.SiteType.PORTAL.getName(),
+                                                                    null,
+                                                                    PortalConfig.class);
 
-  private static final Query<PortalConfig> DASHBOARDS = new Query<PortalConfig>(
-                                                                                org.exoplatform.portal.mop.SiteType.USER.getName(),
-                                                                                null,
-                                                                                PortalConfig.class);
+  private static final Query<PortalConfig> SPACES     = new Query<>(
+                                                                    org.exoplatform.portal.mop.SiteType.GROUP.getName(),
+                                                                    null,
+                                                                    PortalConfig.class);
+
+  private static final Query<PortalConfig> DASHBOARDS = new Query<>(
+                                                                    org.exoplatform.portal.mop.SiteType.USER.getName(),
+                                                                    null,
+                                                                    PortalConfig.class);
 
   static final Log                         log        = ExoLogger.getLogger("org.gatein.api");
 
-  private final DataStorage                dataStorage;
-
-  private final PageService                pageService;
+  private final LayoutService              layoutService;
 
   private final NavigationService          navigationService;
 
-  private final DescriptionService         descriptionService;
+  private final DescriptionStorage         descriptionStorage;
 
   private final ResourceBundleManager      bundleManager;
 
@@ -93,28 +92,22 @@ public class PortalImpl implements Portal {
 
   private final UserPortalConfigService    userPortalConfigService;
 
-  private final OAuthProviderAccessor      oauthProviderAccessor;
-
-  public PortalImpl(DataStorage dataStorage,
-                    PageService pageService,
+  public PortalImpl(LayoutService layoutService, // NOSONAR
                     NavigationService navigationService,
-                    DescriptionService descriptionService,
+                    DescriptionStorage descriptionStorage,
                     ResourceBundleManager bundleManager,
                     Authenticator authenticator,
                     IdentityRegistry identityRegistry,
                     UserACL acl,
-                    UserPortalConfigService userPortalConfigService,
-                    OAuthProviderAccessor oauthProviderAccessor) {
-    this.dataStorage = dataStorage;
-    this.pageService = pageService;
+                    UserPortalConfigService userPortalConfigService) {
+    this.layoutService = layoutService;
     this.navigationService = navigationService;
-    this.descriptionService = descriptionService;
+    this.descriptionStorage = descriptionStorage;
     this.bundleManager = bundleManager;
     this.authenticator = authenticator;
     this.identityRegistry = identityRegistry;
     this.acl = acl;
     this.userPortalConfigService = userPortalConfigService;
-    this.oauthProviderAccessor = oauthProviderAccessor;
   }
 
   @Override
@@ -123,7 +116,7 @@ public class PortalImpl implements Portal {
     SiteKey siteKey = Util.from(siteId);
 
     try {
-      PortalConfig portalConfig = dataStorage.getPortalConfig(siteKey.getTypeName(), siteKey.getName());
+      PortalConfig portalConfig = layoutService.getPortalConfig(siteKey.getTypeName(), siteKey.getName());
       return (portalConfig == null) ? null : new SiteImpl(portalConfig);
     } catch (Throwable e) {
       throw new ApiException("Failed to get site", e);
@@ -204,7 +197,7 @@ public class PortalImpl implements Portal {
                                boolean includeAllSites) {
     try {
       if (pagination != null) {
-        ListAccess<PortalConfig> access = dataStorage.find2(query, comparator);
+        ListAccess<PortalConfig> access = layoutService.find2(query, comparator);
         int size = access.getSize();
         int offset = pagination.getOffset();
         int limit = pagination.getLimit();
@@ -215,7 +208,7 @@ public class PortalImpl implements Portal {
         PortalConfig[] sites = loadSites(includeAllSites, access, size, offset, limit);
         return fromList(Arrays.asList(sites).subList(pagination.getOffset(), sites.length));
       } else {
-        return fromList(dataStorage.find(query, comparator).getAll());
+        return fromList(layoutService.find(query, comparator).getAll());
       }
     } catch (Throwable e) {
       throw new ApiException("Failed to query for sites", e);
@@ -225,7 +218,7 @@ public class PortalImpl implements Portal {
   @Override
   public void saveSite(Site site) {
     Parameters.requireNonNull(site, "site");
-    ((SiteImpl) site).save(dataStorage, userPortalConfigService);
+    ((SiteImpl) site).save(layoutService, userPortalConfigService);
   }
 
   @Override
@@ -237,7 +230,7 @@ public class PortalImpl implements Portal {
     SiteKey siteKey = Util.from(Parameters.requireNonNull(siteId, "siteId"));
     PortalConfig data = new PortalConfig(siteKey.getTypeName(), siteKey.getName());
     try {
-      dataStorage.remove(data);
+      layoutService.remove(data);
       return true;
     } catch (Throwable t) {
       throw new ApiException("Failed to remove site " + siteId, t);
@@ -253,7 +246,7 @@ public class PortalImpl implements Portal {
       if (ctx == null)
         return null;
 
-      return new NavigationImpl(siteId, navigationService, ctx, descriptionService, bundleManager);
+      return new NavigationImpl(siteId, navigationService, ctx, descriptionStorage, bundleManager);
     } catch (Throwable t) {
       throw new ApiException("Failed to load navigation", t);
     }
@@ -264,7 +257,7 @@ public class PortalImpl implements Portal {
     Parameters.requireNonNull(pageId, "pageId");
 
     try {
-      PageContext context = pageService.loadPage(Util.from(pageId));
+      PageContext context = layoutService.getPageContext(Util.from(pageId));
       return (context == null) ? null : new PageImpl(context);
     } catch (Throwable e) {
       throw new ApiException("Failed to get page", e);
@@ -309,14 +302,14 @@ public class PortalImpl implements Portal {
         throw new IllegalArgumentException("Pagination is required when site type or site name is null.");
 
       SiteKey siteKey = Util.from(new SiteId(query.getSiteType(), query.getSiteName()));
-      iterator = pageService.loadPages(siteKey).iterator();
+      iterator = layoutService.findPages(siteKey).iterator();
     } else {
-      QueryResult<PageContext> result = pageService.findPages(pagination.getOffset(),
-                                                              pagination.getLimit(),
-                                                              Util.from(query.getSiteType()),
-                                                              query.getSiteName(),
-                                                              null,
-                                                              query.getDisplayName());
+      QueryResult<PageContext> result = layoutService.findPages(pagination.getOffset(),
+                                                                pagination.getLimit(),
+                                                                Util.from(query.getSiteType()),
+                                                                query.getSiteName(),
+                                                                null,
+                                                                query.getDisplayName());
 
       iterator = result.iterator();
     }
@@ -348,7 +341,7 @@ public class PortalImpl implements Portal {
     PageContext context = ((PageImpl) page).getPageContext();
 
     try {
-      pageService.savePage(context);
+      layoutService.save(context);
     } catch (Throwable t) {
       throw new ApiException("Failed to save page " + page.getId(), t);
     }
@@ -359,7 +352,14 @@ public class PortalImpl implements Portal {
     Parameters.requireNonNull(pageId, "pageId");
 
     try {
-      return pageService.destroyPage(Util.from(pageId));
+      PageKey pageKey = Util.from(pageId);
+      PageContext pageContext = layoutService.getPageContext(pageKey);
+      if (pageContext == null) {
+        return false;
+      } else {
+        layoutService.remove(pageKey);
+        return true;
+      }
     } catch (PageServiceException e) {
       if (e.getError() == PageError.NO_SITE) {
         throw new EntityNotFoundException("Cannot remove page '" + pageId.getPageName() + "'. Site " + pageId.getSiteId()
@@ -422,7 +422,7 @@ public class PortalImpl implements Portal {
 
   @Override
   public OAuthProvider getOAuthProvider(String oauthProviderKey) {
-    return oauthProviderAccessor.getOAuthProvider(oauthProviderKey);
+    throw new UnsupportedOperationException();
   }
 
   private static <T> void filter(List<T> list, Filter<T> filter) {
@@ -520,4 +520,5 @@ public class PortalImpl implements Portal {
 
     return list.toArray(new PortalConfig[list.size()]);
   }
+
 }

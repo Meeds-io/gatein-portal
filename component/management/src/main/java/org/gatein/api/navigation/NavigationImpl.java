@@ -30,8 +30,13 @@ import org.gatein.api.internal.Parameters;
 import org.gatein.api.site.Site;
 import org.gatein.api.site.SiteId;
 
-import org.exoplatform.portal.mop.description.DescriptionService;
-import org.exoplatform.portal.mop.navigation.*;
+import org.exoplatform.portal.mop.navigation.NavigationContext;
+import org.exoplatform.portal.mop.navigation.NavigationState;
+import org.exoplatform.portal.mop.navigation.NodeChangeListener;
+import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.portal.mop.storage.DescriptionStorage;
 import org.exoplatform.services.resources.ResourceBundleManager;
 
 /**
@@ -41,7 +46,7 @@ import org.exoplatform.services.resources.ResourceBundleManager;
 public class NavigationImpl implements Navigation {
     private final NavigationService navigationService;
     private final NavigationContext navCtx;
-    private final DescriptionService descriptionService;
+    private final DescriptionStorage descriptionStorage;
     private final ResourceBundleManager bundleManager;
 
     private final SiteId siteId;
@@ -49,12 +54,12 @@ public class NavigationImpl implements Navigation {
 
     private Navigation18NResolver i18nResolver;
 
-    public NavigationImpl(SiteId siteId, NavigationService navigationService, NavigationContext navCtx, DescriptionService descriptionService,
+    public NavigationImpl(SiteId siteId, NavigationService navigationService, NavigationContext navCtx, DescriptionStorage descriptionService,
             ResourceBundleManager bundleManager) {
         this.siteId = siteId;
         this.navigationService = navigationService;
         this.navCtx = navCtx;
-        this.descriptionService = descriptionService;
+        this.descriptionStorage = descriptionService;
         this.bundleManager = bundleManager;
         this.model = new ApiNodeModel(this);
     }
@@ -64,7 +69,7 @@ public class NavigationImpl implements Navigation {
         this.siteId = siteId;
         this.navigationService = null;
         this.navCtx = null;
-        this.descriptionService = null;
+        this.descriptionStorage = null;
         this.bundleManager = null;
         this.model = null;
     }
@@ -162,7 +167,7 @@ public class NavigationImpl implements Navigation {
 
     Map<Locale, org.exoplatform.portal.mop.State> loadDescriptions(String id) {
         try {
-            return descriptionService.getDescriptions(id);
+            return descriptionStorage.getDescriptions(id);
         } catch (Throwable t) {
             throw new ApiException("Failed to retrieve descriptions", t);
         }
@@ -182,7 +187,7 @@ public class NavigationImpl implements Navigation {
                 throw new ApiException("Could not resolve display name because site " + siteId + " could not be found.");
             }
 
-            i18nResolver = new Navigation18NResolver(descriptionService, bundleManager, site.getLocale(), siteId);
+            i18nResolver = new Navigation18NResolver(descriptionStorage, bundleManager, site.getLocale(), siteId);
         }
 
         return i18nResolver.resolveName(ctx.getState().getLabel(), ctx.getId(), ctx.getName());
@@ -256,7 +261,7 @@ public class NavigationImpl implements Navigation {
 
     private void setDescriptions(String id, Map<Locale, org.exoplatform.portal.mop.State> descriptions) {
         try {
-            descriptionService.setDescriptions(id, descriptions);
+            descriptionStorage.setDescriptions(id, descriptions);
         } catch (Throwable t) {
             throw new ApiException("Failed to set descriptions", t);
         }

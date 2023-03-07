@@ -28,221 +28,245 @@ import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.Status;
-import org.exoplatform.portal.mop.page.PageService;
+import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.pom.data.ModelChange;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
 /**
- * Created by The eXo Platform SAS Apr 19, 2007
- *
- * This interface is used to load the PortalConfig, Page config and Navigation config from the database
+ * Created by The eXo Platform SAS Apr 19, 2007 This interface is used to load
+ * the PortalConfig, Page config and Navigation config from the database
+ * 
+ * @deprecated use {@link LayoutService} since this is service layout and this
+ *             interface name is ambiguous with storage layer
  */
+@Deprecated(forRemoval = true, since = "6.5")
 public interface DataStorage {
-    String PAGE_CREATED = "org.exoplatform.portal.config.DataStorage.pageCreated".intern();
 
-    String PAGE_REMOVED = "org.exoplatform.portal.config.DataStorage.pageRemoved".intern();
+  int    DEFAULT_LIMIT         = 50;
 
-    String PAGE_UPDATED = "org.exoplatform.portal.config.DataStorage.pageUpdated".intern();
+  String PAGE_CREATED          = "org.exoplatform.portal.config.DataStorage.pageCreated".intern();
 
-    String PORTAL_CONFIG_CREATED = "org.exoplatform.portal.config.DataStorage.portalConfigCreated".intern();
+  String PAGE_REMOVED          = "org.exoplatform.portal.config.DataStorage.pageRemoved".intern();
 
-    String PORTAL_CONFIG_REMOVED = "org.exoplatform.portal.config.DataStorage.portalConfigRemoved".intern();
+  String PAGE_UPDATED          = "org.exoplatform.portal.config.DataStorage.pageUpdated".intern();
 
-    String PORTAL_CONFIG_UPDATED = "org.exoplatform.portal.config.DataStorage.portalConfigUpdated".intern();
+  String PORTAL_CONFIG_CREATED = "org.exoplatform.portal.config.DataStorage.portalConfigCreated".intern();
 
-    /**
-     * Create a PortalConfig in database <br>
-     * Then broadcast PORTAL_CONFIG_CREATED event
-     *
-     * @param config
-     */
-    void create(PortalConfig config) throws Exception;
+  String PORTAL_CONFIG_REMOVED = "org.exoplatform.portal.config.DataStorage.portalConfigRemoved".intern();
 
-    /**
-     * This method should update the PortalConfig object <br>
-     * Then broadcast PORTAL_CONFIG_UPDATED event
-     *
-     * @param config
-     */
-    void save(PortalConfig config) throws Exception;
+  String PORTAL_CONFIG_UPDATED = "org.exoplatform.portal.config.DataStorage.portalConfigUpdated".intern();
 
-    /**
-     * This method should load the PortalConfig object from db according to the portalName
-     *
-     * @param portalName
-     */
-    PortalConfig getPortalConfig(String portalName) throws Exception;
+  /**
+   * Create a PortalConfig in database <br>
+   * Then broadcast PORTAL_CONFIG_CREATED event
+   *
+   * @param config {@link PortalConfig}
+   */
+  void create(PortalConfig config);
 
-    /**
-     * This method should load the PortalConfig object from db according to the portalName and ownerType
-     *
-     * @param portalName
-     * @param ownerType
-     */
-    PortalConfig getPortalConfig(String ownerType, String portalName) throws Exception;
+  /**
+   * This method should update the PortalConfig object <br>
+   * Then broadcast PORTAL_CONFIG_UPDATED event
+   *
+   * @param config {@link PortalConfig}
+   */
+  void save(PortalConfig config);
 
-    /**
-     * Remove the PortalConfig from the database <br>
-     * Then broadcast PORTAL_CONFIG_REMOVED event
-     *
-     * @param config
-     * @throws Exception
-     */
-    void remove(PortalConfig config) throws Exception;
+  /**
+   * This method should load the PortalConfig object from db according to the
+   * portalName
+   *
+   * @param  portalName
+   * @return            {@link PortalConfig}
+   */
+  PortalConfig getPortalConfig(String portalName);
 
-    /**
-     * This method should load the Page object from the database according to the pageId
-     *
-     * @param pageId - String represent id of page, it must be valid pageId (3 parts saparate by :: )
-     */
-    Page getPage(String pageId) throws Exception;
+  /**
+   * This method should load the PortalConfig object from db according to the
+   * portalName and ownerType
+   *
+   * @param  portalName
+   * @param  ownerType
+   * @return            {@link PortalConfig}
+   */
+  PortalConfig getPortalConfig(String ownerType, String portalName);
 
-    /**
-     * @deprecated replaced by
-     *             {@link PageService#clone(org.exoplatform.portal.mop.page.PageKey, org.exoplatform.portal.mop.page.PageKey)}
-     *
-     */
-    @Deprecated
-    Page clonePage(String pageId, String clonedOwnerType, String clonedOwnerId, String clonedName);
+  /**
+   * Retrieves {@link PortalConfig} of designated {@link SiteKey}
+   * 
+   * @param siteKey {@link SiteKey}
+   * @return null if not found, else {@link PortalConfig}
+   */
+  PortalConfig getPortalConfig(SiteKey siteKey);
 
-    /**
-     * @deprecated replaced by {@link PageService#destroyPage(org.exoplatform.portal.mop.page.PageKey)}
-     */
-    @Deprecated
-    void remove(Page page);
+  /**
+   * Remove the PortalConfig from the database <br>
+   * Then broadcast PORTAL_CONFIG_REMOVED event
+   *
+   * @param config {@link PortalConfig}
+   */
+  void remove(PortalConfig config);
 
-    /**
-     * This method should create or udate the given page object <br>
-     * Then broasdcast PAGE_CREATED event
-     *
-     * @deprecated This is replaced by {@link PageService#savePage(org.exoplatform.portal.mop.page.PageContext)}
-     *
-     * @param page
-     */
-    @Deprecated
-    void create(Page page);
+  /**
+   * This method should load the Page object from the database according to the
+   * pageId
+   *
+   * @param  pageId - String represent id of page, it must be valid pageId (3
+   *                  parts saparate by :: )
+   * @return        {@link Page}
+   */
+  Page getPage(String pageId);
 
-    /**
-     * Saves a page. If a page with the same id already exists then a merge operation will occur, otherwise it throws
-     * {@link IllegalStateException} <br>
-     *
-     * The operation returns a list of the change object that describes the changes that occured during the save operation. <br>
-     *
-     * Then broadcast PAGE_UPDATED event
-     *
-     * @param page the page to save
-     * @return the list of model changes that occured during the save operation
-     * @throws Exception any exception
-     */
-    List<ModelChange> save(Page page) throws Exception;
+  /**
+   * Retrieves Page designated by its key
+   * 
+   * @param pageKey {@link PageKey}
+   * @return {@link Page}
+   */
+  Page getPage(PageKey pageKey);
 
-    /**
-     * Return contentId according to each state (transient, persitent, clone)
-     *
-     * @param state
-     */
-    <S> String getId(ApplicationState<S> state) throws Exception;
+  void remove(Page page);
 
-    /**
-     * Return content state. If can't find, return null
-     *
-     * @param state - ApplicationState object
-     * @param type - ApplicationType object
-     */
-    <S> S load(ApplicationState<S> state, ApplicationType<S> type) throws Exception;
+  void remove(PageKey pageKey);
 
-    /**
-     * Save content state <br>
-     *
-     * @param state - ApplicationState object. It must be CloneApplicationState or PersistentApplicationState object
-     * @param preferences - object to be saved
-     */
-    <S> ApplicationState<S> save(ApplicationState<S> state, S preferences) throws Exception;
+  /**
+   * This method should create or update the given page object <br>
+   * Then broasdcast PAGE_CREATED event
+   *
+   * @param page
+   */
+  void create(Page page);
 
-    /**
-     * Return LazyPageList of object (unsorted) which type and other info determined in Query object
-     *
-     * @param q - Query object
-     */
-    <T> LazyPageList<T> find(Query<T> q) throws Exception;
+  /**
+   * Saves a page. If a page with the same id already exists then a merge
+   * operation will occur, otherwise it throws {@link IllegalStateException}
+   * <br>
+   * The operation returns a list of the change object that describes the
+   * changes that occured during the save operation. <br>
+   * Then broadcast PAGE_UPDATED event
+   *
+   * @param  page the page to save
+   * @return      the list of model changes that occurred during the save
+   */
+  List<ModelChange> save(Page page);
 
-    /**
-     * Return LazyPageList of object (sorted) which type and other info determined in Query object
-     *
-     * @param q - Query object
-     */
-    <T> LazyPageList<T> find(Query<T> q, Comparator<T> sortComparator) throws Exception;
+  /**
+   * Retrieved {@link Application} model switch its storage identifier
+   * 
+   * @param  <S>                  can be of type {@link Portlet} only, see
+   *                                {@link ApplicationType}
+   * @param  applicationStorageId
+   * @return                      {@link Application}
+   */
+  <S> Application<S> getApplicationModel(String applicationStorageId);
 
-    /**
-     * Return ListAccess, we can retrieved array of object (unsorted) in database through this.
-     *
-     * @param q - Query object
-     */
-    <T> ListAccess<T> find2(Query<T> q) throws Exception;
+  /**
+   * Return contentId according to each state (transient, persistent, clone)
+   * 
+   * @param  <S>   can be of type {@link Portlet} only, see
+   *                 {@link ApplicationType}
+   * @param  state
+   * @return       {@link ApplicationState} of type {@link Portlet}
+   */
+  <S> String getId(ApplicationState<S> state);
 
-    /**
-     * Return ListAccess, we can retrieved array of object (sorted) in database through this.
-     *
-     * @param q - Query object
-     * @param sortComparator - Comparator object, used to sort the result list
-     */
-    <T> ListAccess<T> find2(Query<T> q, Comparator<T> sortComparator) throws Exception;
+  /**
+   * Return content state. If can't find, return null
+   * 
+   * @param  <S>   can be of type {@link Portlet} only, see
+   *                 {@link ApplicationType}
+   * @param  state - ApplicationState object
+   * @param  type  - ApplicationType object
+   * @return       {@link Portlet}
+   */
+  <S> S load(ApplicationState<S> state, ApplicationType<S> type);
 
-    /**
-     * Return shared layout containing common layout of all sites (user, group and sites).
-     * This will retrieve the layout from /conf/portal/portal/sharedlayout-{siteName}.xml
-     * else if not found, retrieve it from /conf/portal/portal/sharedlayout.xml
-     * 
-     * @param siteName 
-     */
-    Container getSharedLayout(String siteName) throws Exception;
+  /**
+   * Save content state <br>
+   * 
+   * @param  <S>         can be of type {@link Portlet} only, see
+   *                       {@link ApplicationType}
+   * @param  state       - ApplicationState object. It must be
+   *                       CloneApplicationState or PersistentApplicationState
+   *                       object
+   * @param  preferences - object to be saved
+   * @return {@link ApplicationState} typed with {@link Portlet}
+   */
+  <S> ApplicationState<S> save(ApplicationState<S> state, S preferences);
 
-    void save() throws Exception;
+  /**
+   * Return LazyPageList of object (sorted) which type and other info determined
+   * in Query object
+   * @param <T> could be of type {@link Page} or {@link PortalConfig}
+   *
+   * @param q - Query object
+   * @param sortComparator {@link Comparator} used for sorting results
+   * @return {@link LazyPageList}
+   */
+  <T> LazyPageList<T> find(Query<T> q, Comparator<T> sortComparator);
 
-    /**
-     * Returns the list of all portal names.
-     *
-     * @return the portal names
-     * @throws Exception any exception
-     */
-    List<String> getAllPortalNames() throws Exception;
+  /**
+   * Return ListAccess, we can retrieved array of object (sorted) in database
+   * through this.
+   * @param <T> could be of type {@link Page} or {@link PortalConfig}
+   *
+   * @param q              - Query object
+   * @param sortComparator - Comparator object, used to sort the result list
+   * @return {@link LazyPageList}
+   */
+  <T> ListAccess<T> find2(Query<T> q, Comparator<T> sortComparator);
 
-    List<String> getAllGroupNames() throws Exception;
+  /**
+   * Return shared layout containing common layout of all sites (user, group and
+   * sites). This will retrieve the layout from
+   * /conf/portal/portal/sharedlayout-{siteName}.xml else if not found, retrieve
+   * it from /conf/portal/portal/sharedlayout.xml
+   * 
+   * @param  siteName
+   * @return          {@link Container}
+   */
+  Container getSharedLayout(String siteName);
 
-    /**
-     * This method is deprecated ad it's for the standalone feature but we will drop this feature in PLF 5.3.x (portal RDBMS)
-     * so this method will always return NULL from PLF 5.3.x
-     *
-     * Returns a String array that contains two elements. The first one is the site type and the second one is site name. <br>
-     *
-     * @param applicationStorageId
-     * @return
-     * @throws Exception
-     */
-    @Deprecated
-    String[] getSiteInfo(String applicationStorageId) throws Exception;
+  /**
+   * @return All portal site names
+   * @deprecated since 6.4.0, use {@link #getSiteNames(SiteType, int, int)} instead
+   */
+  @Deprecated(forRemoval = true, since = "6.5")
+  default List<String> getAllPortalNames() {
+    return getSiteNames(SiteType.PORTAL, 0, DEFAULT_LIMIT);
+  }
 
-    <S> Application<S> getApplicationModel(String applicationStorageId) throws Exception;
+  /**
+   * @return All group site names
+   * @deprecated since 6.4.0, use {@link #getSiteNames(SiteType, int, int)} instead
+   */
+  @Deprecated(forRemoval = true, since = "6.5")
+  default List<String> getAllGroupNames() {
+    return getSiteNames(SiteType.GROUP, 0, DEFAULT_LIMIT);
+  }
 
-    /*************************************************************
-     * Public API to access/modify MOP mixin, temporarily put here
-     **************************************************************/
+  /**
+   * Retrieves all site type names with pagination.
+   * 
+   * @param siteType {@link SiteType}
+   * @param offset offset of the query
+   * @param limit limit of the list to fetch
+   * @return {@link List} of corresponding site names, else empty list if not found
+   */
+  List<String> getSiteNames(SiteType siteType, int offset, int limit);
 
-    @Deprecated
-    <A> A adapt(ModelObject modelObject, Class<A> type);
+  default Status getImportStatus() {
+    throw new UnsupportedOperationException();
+  }
 
-    @Deprecated
-    <A> A adapt(ModelObject modelObject, Class<A> type, boolean create);
-  
-    default Status getImportStatus() {
-      throw new UnsupportedOperationException();
-    }
-
-    default void saveImportStatus(Status status) {
-      throw new UnsupportedOperationException();
-    }
+  default void saveImportStatus(Status status) {
+    throw new UnsupportedOperationException();
+  }
 
 }

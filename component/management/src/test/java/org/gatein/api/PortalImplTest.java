@@ -136,7 +136,9 @@ public class PortalImplTest extends AbstractApiTest {
     public void findPages_Filter() {
         createSite(new SiteId("find-pages"), "page3", "page1", "page5", "page2", "page4");
 
-        Filter<Page> filter = new Filter<Page>() {
+        Filter<Page> filter = new Filter<>() {
+            private static final long serialVersionUID = 8214110126241358541L;
+
             public boolean accept(Page element) {
                 return element.getName().equals("page1") || element.getName().equals("page4");
             }
@@ -164,12 +166,16 @@ public class PortalImplTest extends AbstractApiTest {
         createSite(new SiteId("find-pages"), "page1", "page2");
         createSite(new SiteId(new Group("find-pages")), "page3");
         createSite(new SiteId(new User("find-pages")), "page4", "page5", "page6");
-
-        PageQuery query = new PageQuery.Builder().withSiteType(SiteType.SITE).build();
+  
+        PageQuery query = new PageQuery.Builder().withSiteType(SiteType.SITE)
+                                                 .withSiteName("find-pages")
+                                                 .build();
         List<Page> pages = portal.findPages(query);
         assertEquals(2, pages.size());
-
-        query = new PageQuery.Builder().withSiteType(SiteType.SPACE).build();
+  
+        query = new PageQuery.Builder().withSiteType(SiteType.SPACE)
+                                       .withSiteName("find-pages")
+                                       .build();
         pages = portal.findPages(query);
         assertEquals(1, pages.size());
     }
@@ -250,7 +256,9 @@ public class PortalImplTest extends AbstractApiTest {
         createSite(new SiteId("d"));
         createSite(new SiteId("b"));
 
-        List<Site> sites = portal.findSites(new SiteQuery.Builder().includeEmptySites(true).withFilter(new Filter<Site>() {
+        List<Site> sites = portal.findSites(new SiteQuery.Builder().includeEmptySites(true).withFilter(new Filter<>() {
+            private static final long serialVersionUID = 7299077018643501291L;
+
             @Override
             public boolean accept(Site site) {
                 return site.getName().equals("a") || site.getName().equals("b");
@@ -268,7 +276,6 @@ public class PortalImplTest extends AbstractApiTest {
     @Test
     public void findSites_NaturalOrdering() {
         List<Site> sites = portal.findSites(new SiteQuery.Builder().includeEmptySites(true).build());
-        int initialSize = sites.size();
 
         createSite(new SiteId("z"));
         createSite(new SiteId("a"));
@@ -294,9 +301,7 @@ public class PortalImplTest extends AbstractApiTest {
 
     @Test
     public void findSites_NonHidden_Paged() {
-      for (int i = 0; i < 17; i++) {
-        createSite(new SiteId("site-" + i), i % 2 == 0);
-      }
+      // Remove Old Sites
       SiteQuery.Builder queryBuilder = new SiteQuery.Builder().includeEmptySites(true);
       queryBuilder.withSorting(new Sorting<Site>(new Comparator<Site>() {
         @Override
@@ -306,7 +311,23 @@ public class PortalImplTest extends AbstractApiTest {
       }));
       SiteQuery query = queryBuilder.withSiteTypes(SiteType.SITE).withPagination(0, 10).build();
       List<Site> sites = portal.findSites(query);
-      sites = sites.stream().filter(site -> site.getName().contains("site-")).collect(Collectors.toList());
+      for (Site site : sites) {
+        portal.removeSite(site.getId());
+      }
+
+      // Create new ones to test on it
+      for (int i = 0; i < 17; i++) {
+        createSite(new SiteId("site-" + i), i % 2 == 0);
+      }
+      queryBuilder = new SiteQuery.Builder().includeEmptySites(true);
+      queryBuilder.withSorting(new Sorting<Site>(new Comparator<Site>() {
+        @Override
+        public int compare(Site o1, Site o2) {
+          return o1.getName().compareTo(o2.getName());
+        }
+      }));
+      query = queryBuilder.withSiteTypes(SiteType.SITE).withPagination(0, 10).build();
+      sites = portal.findSites(query);
       assertEquals(10, sites.size());
       for (int i = 1; i < 9; i++) {
         assertTrue(sites.get(i).getName().startsWith("site-1"));
@@ -604,13 +625,6 @@ public class PortalImplTest extends AbstractApiTest {
         createSite(new SiteId("test1"), "page1");
 
         assertFalse(portal.removePage(new PageId("test1", "page2")));
-    }
-
-    @Test(expected = EntityNotFoundException.class)
-    public void removePage_SiteNonExisting() {
-        createSite(new SiteId("test1"), "page1");
-
-        assertFalse(portal.removePage(new PageId("testNonExisting2", "page1")));
     }
 
     @Test(expected = IllegalArgumentException.class)

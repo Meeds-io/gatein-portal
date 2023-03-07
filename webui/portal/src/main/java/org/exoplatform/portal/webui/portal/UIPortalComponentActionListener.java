@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.exoplatform.application.registry.Application;
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.ApplicationState;
@@ -32,6 +31,7 @@ import org.exoplatform.portal.config.model.CloneApplicationState;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.webui.application.PortletState;
 import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.container.UIComponentFactory;
@@ -73,19 +73,6 @@ public class UIPortalComponentActionListener {
             UIContainer uiContainer = event.getSource();
             String id = event.getRequestContext().getRequestParameter(UIComponent.OBJECTID);
             uiContainer.setRenderedChild(id);
-        }
-    }
-
-    public static class ShowLoginFormActionListener extends EventListener<UIPortalComponent> {
-        public void execute(Event<UIPortalComponent> event) throws Exception {
-            UIPortal uiPortal = Util.getUIPortal();
-            UIPortalApplication uiApp = uiPortal.getAncestorOfType(UIPortalApplication.class);
-            UIMaskWorkspace uiMaskWS = uiApp.getChildById(UIPortalApplication.UI_MASK_WS_ID);
-            UILogin uiLogin = uiMaskWS.createUIComponent(UILogin.class, null, null);
-            uiMaskWS.setUIComponent(uiLogin);
-            uiMaskWS.setCssClasses("TransparentMask");
-            uiMaskWS.setWindowSize(-1, -1);
-            event.getRequestContext().addUIComponentToUpdateByAjax(uiMaskWS);
         }
     }
 
@@ -340,8 +327,8 @@ public class UIPortalComponentActionListener {
                 // TODO Wait to fix issue EXOGTN-213 and then
                 // we should get "showInfobar" from current UI portal instead of Storage service
                 UIPortal currentPortal = Util.getUIPortal();
-                DataStorage storage = uiApp.getApplicationComponent(DataStorage.class);
-                uiPortlet.setShowInfoBar(storage.getPortalConfig(currentPortal.getSiteKey().getTypeName(),
+                LayoutService layoutService = uiApp.getApplicationComponent(LayoutService.class);
+                uiPortlet.setShowInfoBar(layoutService.getPortalConfig(currentPortal.getSiteKey().getTypeName(),
                         currentPortal.getSiteKey().getName()).isShowInfobar());
                 uiSource = uiPortlet;
             }
@@ -389,44 +376,6 @@ public class UIPortalComponentActionListener {
             event.getRequestContext().addUIComponentToUpdateByAjax(uiMaskWorkspace);
         }
 
-    }
-
-    public static class RecoveryPasswordAndUsernameActionListener extends EventListener<UIPortal> {
-        @Override
-        public void execute(Event<UIPortal> event) throws Exception {
-            UIPortal uiPortal = event.getSource();
-            RemindPasswordTokenService tokenService = uiPortal.getApplicationComponent(RemindPasswordTokenService.class);
-            String tokenId = event.getRequestContext().getRequestParameter("tokenId");
-
-            WebuiRequestContext requestContext = event.getRequestContext();
-            GateInToken token = tokenService.getToken(tokenId);
-            if (token == null) {
-                requestContext.getUIApplication().addMessage(new ApplicationMessage("UIForgetPassword.msg.expration", null));
-                requestContext.addUIComponentToUpdateByAjax(uiPortal.getParent());
-                return;
-            }
-
-            OrganizationService orgSrc = uiPortal.getApplicationComponent(OrganizationService.class);
-            // get user
-            User user = orgSrc.getUserHandler().findUserByName(token.getPayload().getUsername(), UserStatus.ANY);
-            if (user == null) {
-                requestContext.getUIApplication().addMessage(new ApplicationMessage("UIForgetPassword.msg.user-delete", null));
-                return;
-            } else if (!user.isEnabled()) {
-                requestContext.getUIApplication().addMessage(new ApplicationMessage("UIForgetPassword.msg.user-is-disabled", null));
-                return;
-            }
-
-            UIPortalApplication uiApp = uiPortal.getAncestorOfType(UIPortalApplication.class);
-            UIMaskWorkspace uiMaskWS = uiApp.getChildById(UIPortalApplication.UI_MASK_WS_ID);
-
-            UIResetPassword uiReset = uiMaskWS.createUIComponent(UIResetPassword.class, null, null);
-            uiReset.setUser(user);
-            uiReset.setTokenId(tokenId);
-            uiMaskWS.setUIComponent(uiReset);
-            uiMaskWS.setWindowSize(630, -1);
-            event.getRequestContext().addUIComponentToUpdateByAjax(uiMaskWS);
-        }
     }
 
     public static class ChangeSkinActionListener extends EventListener<UIPortal> {

@@ -121,13 +121,20 @@ public interface UserPortal {
      * Load the list of user nodes computed from the list of
      * {@link UserNavigation} of type siteType (PORTAL, GROUP or USER)
      * 
-     * @param siteType site type: PORTAL, GROUP or USER
-     * @param excludedSiteName site name regex to exclude
-     * @param scope an optional scope
-     * @param filterConfig an optional filter
-     * @return a {@link Collection} of {@link UserNode}
+     * @param      siteType         site type: PORTAL, GROUP or USER
+     * @param      excludedSiteName site name regex to exclude
+     * @param      scope            an optional scope
+     * @param      filterConfig     an optional filter
+     * @return                      a {@link Collection} of {@link UserNode}
+     * @deprecated                  use {@link #getNodes(SiteType, Scope, UserNodeFilterConfig)}
+     *                              instead since no need of filtering on Spaces nodes due to
+     *                              introduction of new {@link SiteType#SPACE} that allows to
+     *                              get space navigations
      */
-    Collection<UserNode> getNodes(SiteType siteType, String excludedSiteName, Scope scope, UserNodeFilterConfig filterConfig);
+    @Deprecated(forRemoval = true, since ="6.5")
+    default Collection<UserNode> getNodes(SiteType siteType, String excludedSiteName, Scope scope, UserNodeFilterConfig filterConfig) {
+      return getNodes(siteType, scope, filterConfig);
+    }
 
     /**
      * Update the specified content with the most recent state.

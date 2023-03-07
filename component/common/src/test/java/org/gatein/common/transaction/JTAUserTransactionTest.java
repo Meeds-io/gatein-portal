@@ -38,7 +38,10 @@ import org.exoplatform.container.PortalContainer;
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 @ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/gatein/common/transaction/configuration.xml") })
+  @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.settings-configuration-local-jta.xml"),
+})
 public class JTAUserTransactionTest extends AbstractKernelTest {
 
     private JTAUserTransactionLifecycleService jtaUserTransactionLifecycleService;
@@ -98,6 +101,6 @@ public class JTAUserTransactionTest extends AbstractKernelTest {
 
     private void assertStatus(int expectedStatus) throws Exception {
         int status = jtaUserTransactionLifecycleService.getUserTransaction().getStatus();
-        assertTrue(status == expectedStatus);
+        assertEquals(expectedStatus, status);
     }
 }

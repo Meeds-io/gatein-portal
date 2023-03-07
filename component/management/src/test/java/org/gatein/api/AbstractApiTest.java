@@ -25,10 +25,17 @@ package org.gatein.api;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.HashSet;
+import java.util.Locale;
 
-import junit.framework.AssertionFailedError;
+import org.gatein.api.navigation.NodePath;
+import org.gatein.api.page.PageId;
+import org.gatein.api.security.Permission;
+import org.gatein.api.security.User;
+import org.gatein.api.site.SiteId;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
 
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.component.test.ConfigurationUnit;
@@ -38,45 +45,37 @@ import org.exoplatform.component.test.KernelLifeCycle;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.Query;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
-import org.exoplatform.portal.mop.navigation.NavigationService;
 import org.exoplatform.portal.mop.navigation.NavigationState;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.mop.page.PageState;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.portal.mop.storage.PageStorage;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityRegistry;
 import org.exoplatform.services.security.MembershipEntry;
-import org.gatein.api.navigation.NodePath;
-import org.gatein.api.oauth.OAuthProviderAccessor;
-import org.gatein.api.page.PageId;
-import org.gatein.api.security.Permission;
-import org.gatein.api.security.User;
-import org.gatein.api.site.SiteId;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
 @ConfiguredBy({
         @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration-local.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "org/exoplatform/portal/mop/navigation/configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.portal-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.resources-configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.web.oauth-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.api-configuration.xml") })
-public class AbstractApiTest {
+public abstract class AbstractApiTest {
 
     protected static final Log LOG = ExoLogger.getLogger(AbstractApiTest.class);
 
@@ -130,7 +129,7 @@ public class AbstractApiTest {
 
     protected void createSite(SiteId siteId, boolean createNav, String... pages) {
         try {
-            DataStorage dataStorage = container.getComponentInstanceOfType(DataStorage.class);
+            LayoutService dataStorage = container.getComponentInstanceOfType(LayoutService.class);
             NavigationService navService = container.getComponentInstanceOfType(NavigationService.class);
 
             SiteKey siteKey = Util.from(siteId);
@@ -156,7 +155,7 @@ public class AbstractApiTest {
     }
 
     protected void createPage(SiteId siteId, String... pages) {
-        PageService pageService = container.getComponentInstanceOfType(PageService.class);
+        PageStorage pageService = container.getComponentInstanceOfType(PageStorage.class);
 
         SiteKey siteKey = Util.from(siteId);
         for (String page : pages) {
@@ -167,19 +166,19 @@ public class AbstractApiTest {
 
     protected void setPermission(PageId pageId, String editPermission, String... accessPermissions) {
         PageKey pageKey = Util.from(pageId);
-        PageService pageService = container.getComponentInstanceOfType(PageService.class);
+        PageStorage pageService = container.getComponentInstanceOfType(PageStorage.class);
         PageContext p = pageService.loadPage(pageKey);
         p.setState(p.getState().builder().editPermission(editPermission).accessPermissions(accessPermissions).build());
         pageService.savePage(p);
     }
 
     private void cleanup() throws Exception {
-        DataStorage dataStorage = container.getComponentInstanceOfType(DataStorage.class);
+        LayoutService dataStorage = container.getComponentInstanceOfType(LayoutService.class);
         SiteType[] types = new SiteType[] { SiteType.PORTAL, SiteType.GROUP, SiteType.USER };
 
         for (SiteType type : types) {
             Query<PortalConfig> q = new Query<PortalConfig>(type.getName(), null, PortalConfig.class);
-            ListAccess<PortalConfig> la = dataStorage.find2(q);
+            ListAccess<PortalConfig> la = dataStorage.find2(q, null);
             for (PortalConfig portalConfig : la.load(0, la.getSize())) {
                 dataStorage.remove(portalConfig);
             }

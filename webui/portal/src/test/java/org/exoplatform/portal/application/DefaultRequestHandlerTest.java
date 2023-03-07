@@ -35,6 +35,7 @@ public class DefaultRequestHandlerTest {
   public void testGetDefaultSite() {
     URLFactoryService urlFactory = mock(URLFactoryService.class);
     NodeURL url = mock(NodeURL.class);
+    when(url.toString()).thenCallRealMethod();
     UserPortalConfigService portalConfigService = mock(UserPortalConfigService.class);
     ControllerContext context = mock(ControllerContext.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
@@ -43,7 +44,7 @@ public class DefaultRequestHandlerTest {
     try {
       String defaultSite = "site2";
       when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
-      when(portalConfigService.getAllPortalNames()).thenReturn(Arrays.asList("site1", defaultSite));
+      when(portalConfigService.getSiteNames(eq(SiteType.PORTAL), anyInt(), anyInt())).thenReturn(Arrays.asList("site1", defaultSite));
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
 
@@ -87,7 +88,7 @@ public class DefaultRequestHandlerTest {
 
       DefaultRequestHandler defaultRequestHandler = new DefaultRequestHandler(portalConfigService, urlFactory);
       defaultRequestHandler.execute(context);
-      verify(response).sendRedirect(eq("/portal/site2"));
+      verify(response).sendRedirect("/portal/site2");
     } catch (Exception e) {
       LOG.error("Error while executing method", e);
       fail(e.getMessage());
@@ -105,7 +106,7 @@ public class DefaultRequestHandlerTest {
     try {
       String defaultSite = "site2";
       when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
-      when(portalConfigService.getAllPortalNames()).thenReturn(Arrays.asList("site1", defaultSite));
+      when(portalConfigService.getSiteNames(eq(SiteType.PORTAL), anyInt(), anyInt())).thenReturn(Arrays.asList("site1", defaultSite));
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
       when(request.getRemoteUser()).thenReturn("user");
@@ -130,6 +131,7 @@ public class DefaultRequestHandlerTest {
   public void testGetNonDefaultSite() {
     URLFactoryService urlFactory = mock(URLFactoryService.class);
     NodeURL url = mock(NodeURL.class);
+    when(url.toString()).thenCallRealMethod();
     UserPortalConfigService portalConfigService = mock(UserPortalConfigService.class);
     ControllerContext context = mock(ControllerContext.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
@@ -138,7 +140,7 @@ public class DefaultRequestHandlerTest {
     try {
       String defaultSite = "site2";
       when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
-      when(portalConfigService.getAllPortalNames()).thenReturn(Arrays.asList("site1"));
+      when(portalConfigService.getSiteNames(eq(SiteType.PORTAL), anyInt(), anyInt())).thenReturn(Arrays.asList("site1"));
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
 
@@ -200,7 +202,7 @@ public class DefaultRequestHandlerTest {
     try {
       String defaultSite = "site2";
       when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
-      when(portalConfigService.getAllPortalNames()).thenReturn(Arrays.asList());
+      when(portalConfigService.getSiteNames(eq(SiteType.PORTAL), anyInt(), anyInt())).thenReturn(Arrays.asList());
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
 
