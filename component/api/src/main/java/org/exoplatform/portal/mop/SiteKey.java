@@ -63,11 +63,11 @@ public final class SiteKey implements Serializable {
 
     // This will be used for transition in usage from PortalKey and SiteKey
     public SiteKey(String type, String name) {
-        if (PortalConfig.PORTAL_TYPE.equals(type)) {
+        if (PortalConfig.PORTAL_TYPE.equalsIgnoreCase(type)) {
             this.type = SiteType.PORTAL;
-        } else if (PortalConfig.GROUP_TYPE.equals(type)) {
+        } else if (PortalConfig.GROUP_TYPE.equalsIgnoreCase(type)) {
             this.type = SiteType.GROUP;
-        } else if (PortalConfig.USER_TYPE.equals(type)) {
+        } else if (PortalConfig.USER_TYPE.equalsIgnoreCase(type)) {
             this.type = SiteType.USER;
         } else {
             throw new NullPointerException("No null name can be provided");
