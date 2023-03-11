@@ -1,7 +1,10 @@
+<%
+  _ctx.getRequestContext().getJavascriptManager()
+    .require("SHARED/bodyScrollListener", "bodyScrollListener");
+  _ctx.getRequestContext().getJavascriptManager()
+    .require("SHARED/topbarLoading", "topbarLoading").addScripts("topbarLoading.init()");
+%>
 <div class="VuetifyApp TopbarLoadingContainer" id="$uicomponent.id">
-  <script>
-    require(['SHARED/topbarLoading']);
-  </script>
   <div data-app="true"
     class="v-application <%= isRT ? "v-application--is-rtl" : "v-application--is-ltr" %> transparent theme--light"
     id="vuetify-apps">

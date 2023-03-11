@@ -21,12 +21,17 @@ package org.exoplatform.resolver;
 
 import java.io.Serializable;
 
+import lombok.ToString;
+
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@ToString
 public class ResourceKey implements Serializable {
+
+    private static final long serialVersionUID = -51562811492603221L;
 
     /** . */
     private final int resolverId;
@@ -62,4 +67,5 @@ public class ResourceKey implements Serializable {
         }
         return false;
     }
+
 }
