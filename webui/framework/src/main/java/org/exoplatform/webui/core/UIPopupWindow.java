@@ -65,6 +65,10 @@ public class UIPopupWindow extends UIComponentDecorator {
 
     private boolean isShowMask_ = false;
 
+    public UIPopupWindow() {
+      // TODO Auto-generated constructor stub
+    }
+
     public boolean isShowMask() {
         return isShowMask_;
     }

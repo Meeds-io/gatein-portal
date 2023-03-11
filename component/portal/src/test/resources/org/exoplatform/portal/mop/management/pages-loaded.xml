@@ -69,7 +69,7 @@
           <access-permissions>Everyone</access-permissions>
           <portlet-application>
             <portlet>
-              <application-ref>exoadmin</application-ref>
+              <application-ref>portletapplication</application-ref>
               <portlet-ref>ApplicationRegistryPortlet</portlet-ref>
             </portlet>
             <theme>Default:DefaultTheme::Mac:MacTheme::Vista:VistaTheme</theme>

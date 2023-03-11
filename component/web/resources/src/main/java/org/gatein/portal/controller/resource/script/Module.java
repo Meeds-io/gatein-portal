@@ -204,6 +204,12 @@ public abstract class Module {
 
         private Reader getScript(String pt, Locale locale, ServletContext scriptLoader, ClassLoader bundleLoader) {
             InputStream in = scriptLoader.getResourceAsStream(pt);
+            if (in == null) {
+              PortalContainer container = PortalContainer.getInstanceIfPresent();
+              if (container != null && container.getPortalContext() != null) {
+                in = PortalContainer.getInstance().getPortalContext().getResourceAsStream(pt);
+              }
+            }
             if (in != null) {
                 Reader reader = new InputStreamReader(in);
                 if (resourceBundle != null) {

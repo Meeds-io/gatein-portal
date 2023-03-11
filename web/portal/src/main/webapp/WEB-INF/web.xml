@@ -228,11 +228,6 @@
   </servlet>
 
   <servlet>
-    <servlet-name>ServiceWorkerServlet</servlet-name>
-    <servlet-class>org.exoplatform.web.pwa.ServiceWorkerServlet</servlet-class>
-  </servlet>
-  
-  <servlet>
     <servlet-name>accountSetup</servlet-name>
     <servlet-class>org.exoplatform.account.setup.web.AccountSetup</servlet-class>
   </servlet>
@@ -253,11 +248,6 @@
   <servlet-mapping>
     <servlet-name>accountSetupViewServlet</servlet-name>
     <url-pattern>/accountSetup</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>ServiceWorkerServlet</servlet-name>
-    <url-pattern>/service-worker.js</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

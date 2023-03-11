@@ -65,7 +65,7 @@ public abstract class UIApplication extends UIContainer {
      * @return UIPopupMessages
      */
     public UIPopupMessages getUIPopupMessages() {
-        if (uiPopupMessages_ == null) {
+        if (USE_WEBUI_RESOURCES && uiPopupMessages_ == null) {
             try {
                 uiPopupMessages_ = createUIComponent(UIPopupMessages.class, null, null);
                 uiPopupMessages_.setId("_" + uiPopupMessages_.hashCode());
@@ -77,15 +77,21 @@ public abstract class UIApplication extends UIContainer {
     }
 
     public void addMessage(AbstractApplicationMessage message) {
+      if (USE_WEBUI_RESOURCES) {
         getUIPopupMessages().addMessage(message);
+      }
     }
 
     public void addMessage(ApplicationMessage message) {
+      if (USE_WEBUI_RESOURCES) {
         addMessage((AbstractApplicationMessage) message);
+      }
     }
 
     public void clearMessages() {
+      if (USE_WEBUI_RESOURCES) {
         getUIPopupMessages().clearMessages();
+      }
     }
 
     public long getLastAccessApplication() {
@@ -102,15 +108,16 @@ public abstract class UIApplication extends UIContainer {
 
     @SuppressWarnings("unchecked")
     public <T extends UIComponent> T findComponentById(String lookupId) {
-        if (getUIPopupMessages().getId().equals(lookupId))
+        if (USE_WEBUI_RESOURCES && getUIPopupMessages().getId().equals(lookupId))
             return (T) getUIPopupMessages();
         return (T) super.findComponentById(lookupId);
     }
 
     public void renderChildren() throws Exception {
         super.renderChildren();
-        if (getUIPopupMessages() == null)
+        if (!USE_WEBUI_RESOURCES || getUIPopupMessages() == null) {
             return;
+        }
         WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
         getUIPopupMessages().processRender(context);
     }

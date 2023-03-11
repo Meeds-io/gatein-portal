@@ -32,7 +32,7 @@
     <edit-permission>manager:/platform/administrators</edit-permission>
     <portlet-application>
       <portlet>
-        <application-ref>exoadmin</application-ref>
+        <application-ref>portletapplication</application-ref>
         <portlet-ref>AccountPortlet</portlet-ref>
       </portlet>
       <title>New Account</title>
@@ -48,7 +48,7 @@
     <edit-permission>manager:/platform/administrators</edit-permission>
     <portlet-application>
       <portlet>
-        <application-ref>exoadmin</application-ref>
+        <application-ref>portletapplication</application-ref>
         <portlet-ref>OrganizationPortlet</portlet-ref>
       </portlet>
       <title>Community Management</title>
@@ -64,7 +64,7 @@
     <edit-permission>manager:/platform/administrators</edit-permission>
     <portlet-application>
       <portlet>
-        <application-ref>exoadmin</application-ref>
+        <application-ref>portletapplication</application-ref>
         <portlet-ref>ApplicationRegistryPortlet</portlet-ref>
       </portlet>
       <title>Application Registry</title>
@@ -80,7 +80,7 @@
     <edit-permission>manager:/platform/administrators</edit-permission>
     <portlet-application>
       <portlet>
-        <application-ref>exoadmin</application-ref>
+        <application-ref>portletapplication</application-ref>
         <portlet-ref>PageManagementPortlet</portlet-ref>
       </portlet>
       <title>Page Management</title>
