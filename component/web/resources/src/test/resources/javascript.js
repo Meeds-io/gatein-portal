@@ -61,9 +61,7 @@ var eXo  = {
 
 /**
 * This method will : 
-*   1) dynamically load a javascript module from the server (if no root location is set 
-*      then use '/eXoResources/javascript/', aka files
-*      located in the eXoResources WAR in the application server). 
+*   1) dynamically load a javascript module from the server. 
 *      The method used underneath is a XMLHttpRequest
 *   2) Evaluate the returned script
 *   3) Cache the script on the client
@@ -76,10 +74,12 @@ eXo.require = function(module, jsLocation) {
     //alert(err + " : " + module);
   }
   window.status = "Loading Javascript Module " + module ;
-  if(jsLocation == null) jsLocation = '/eXoResources/javascript/' ;
+  if(!jsLocation) {
+    throw `JS location not found for module ${module}`;
+  }
   var path = jsLocation  + module.replace(/\./g, '/')  + '.js' ;
   eXo.loadJS(path);
-} ;
+};
 
 eXo.loadJS = function(path) {
   var request = eXo.core.Browser.createHttpRequest() ;

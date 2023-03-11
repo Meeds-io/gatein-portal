@@ -20,13 +20,16 @@
 package org.exoplatform.resolver;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.portlet.PortletContext;
+import javax.servlet.ServletContext;
 
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -35,71 +38,127 @@ import org.exoplatform.services.log.Log;
  */
 public class PortletResourceResolver extends ResourceResolver {
 
-    protected static Log log = ExoLogger.getLogger(PortletResourceResolver.class);
+  protected static Log   log = ExoLogger.getLogger(PortletResourceResolver.class);
 
-    private PortletContext pcontext_;
+  private ServletContext portalContext;
 
-    private String scheme_;
+  private PortletContext portletContext;
 
-    public PortletResourceResolver(PortletContext context, String scheme) {
-        pcontext_ = context;
-        scheme_ = scheme;
+  private String         scheme;
+
+  public PortletResourceResolver(PortletContext context, String scheme) {
+    this.portletContext = context;
+    this.scheme = scheme;
+  }
+
+  @Override
+  public URL getResource(String url) throws Exception {
+    ServletContext portalContextResolver = getPortalContext();
+    if (portalContextResolver != null) {
+      String relativePath = removeScheme(url);
+      URL res = portalContextResolver.getResource(relativePath);
+      if (res != null) {
+        return res;
+      }
     }
+    return getPortletResource(url);
+  }
 
-    public URL getResource(String url) throws Exception {
-        String path = removeScheme(url);
-        return pcontext_.getResource(path);
+  @Override
+  public InputStream getInputStream(String url) throws Exception {
+    ServletContext portalContextResolver = getPortalContext();
+    if (portalContextResolver != null) {
+      String relativePath = removeScheme(url);
+      InputStream inputStream = portalContextResolver.getResourceAsStream(relativePath);
+      if (inputStream != null) {
+        return inputStream;
+      }
     }
+    return getPortletInputStream(url);
+  }
 
-    public InputStream getInputStream(String url) throws Exception {
-        String path = removeScheme(url);
-        return pcontext_.getResourceAsStream(path);
+  @Override
+  public String getRealPath(String url) {
+    ServletContext portalContextResolver = getPortalContext();
+    if (portalContextResolver != null) {
+      String relativePath = removeScheme(url);
+      String path = portalContextResolver.getRealPath(relativePath);
+      if (path != null) {
+        return path;
+      }
     }
+    return getPortletRealPath(url);
+  }
 
-    public List<URL> getResources(String url) throws Exception {
-        ArrayList<URL> urlList = new ArrayList<URL>();
-        urlList.add(getResource(url));
-        return urlList;
-    }
+  @Override
+  public List<URL> getResources(String url) throws Exception {
+    ArrayList<URL> urlList = new ArrayList<>();
+    urlList.add(getResource(url));
+    return urlList;
+  }
 
-    public List<InputStream> getInputStreams(String url) throws Exception {
-        ArrayList<InputStream> inputStreams = new ArrayList<InputStream>();
-        inputStreams.add(getInputStream(url));
-        return inputStreams;
-    }
+  @Override
+  public List<InputStream> getInputStreams(String url) throws Exception {
+    ArrayList<InputStream> inputStreams = new ArrayList<>();
+    inputStreams.add(getInputStream(url));
+    return inputStreams;
+  }
 
-    public String getRealPath(String url) {
-        String path = removeScheme(url);
-        return pcontext_.getRealPath(path);
+  @Override
+  public boolean isModified(String url, long lastAccess) {
+    try {
+      URL uri = getResource(url);
+      URLConnection con = uri.openConnection();
+      if (log.isDebugEnabled())
+        log.debug(url + ": " + con.getLastModified() + " " + lastAccess);
+      if (con.getLastModified() > lastAccess) {
+        return true;
+      }
+    } catch (Exception e) {
+      return false;
     }
+    return false;
+  }
 
-    public boolean isModified(String url, long lastAccess) {
-        try {
-            URL uri = getResource(url);
-            URLConnection con = uri.openConnection();
-            if (log.isDebugEnabled())
-                log.debug(url + ": " + con.getLastModified() + " " + lastAccess);
-            if (con.getLastModified() > lastAccess) {
-                return true;
-            }
-        } catch (Exception e) {
-            return false;
-        }
-        return false;
-    }
+  @Override
+  public String getWebAccessPath(String url) {
+    return "/" + portletContext.getPortletContextName() + removeScheme(url);
+  }
 
-    public String getWebAccessPath(String url) {
-        return "/" + pcontext_.getPortletContextName() + removeScheme(url);
-    }
+  @Override
+  public String getResourceScheme() {
+    return scheme;
+  }
 
-    public String getResourceScheme() {
-        return scheme_;
-    }
+  @Override
+  public ResourceKey createResourceKey(String url) {
+    String portletContextName = portletContext.getPortletContextName();
+    int resolverId = portletContextName != null ? portletContextName.hashCode() : hashCode();
+    return new ResourceKey(resolverId, url);
+  }
 
-    @Override
-    public ResourceKey createResourceKey(String url) {
-        String portletContextName = pcontext_.getPortletContextName();
-        int resolverId = portletContextName != null ? portletContextName.hashCode() : hashCode();
-        return new ResourceKey(resolverId, url);
+  private URL getPortletResource(String url) throws MalformedURLException {
+    String path = removeScheme(url);
+    return portletContext.getResource(path);
+  }
+
+  private InputStream getPortletInputStream(String url) {
+    String path = removeScheme(url);
+    return portletContext.getResourceAsStream(path);
+  }
+
+  private String getPortletRealPath(String url) {
+    String path = removeScheme(url);
+    return portletContext.getRealPath(path);
+  }
+
+  private ServletContext getPortalContext() {
+    if (portalContext == null) {
+      PortalContainer container = PortalContainer.getInstanceIfPresent();
+      if (container != null) {
+        portalContext = container.getPortalContext();
+      }
     }
+    return portalContext;
+  }
 }

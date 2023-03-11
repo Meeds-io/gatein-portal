@@ -65,7 +65,7 @@ public class ScriptGraph {
      */
     public Map<ScriptResource, FetchMode> resolve(Map<ResourceId, FetchMode> pairs) {
         // Build a fetch graph
-        Map<ResourceId, ScriptFetch> determined = new HashMap<ResourceId, ScriptFetch>();
+        Map<ResourceId, ScriptFetch> determined = new HashMap<>();
         for (Map.Entry<ResourceId, FetchMode> pair : pairs.entrySet()) {
             traverse(determined, pair.getKey(), pair.getValue());
         }

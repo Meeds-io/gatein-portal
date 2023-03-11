@@ -37,7 +37,10 @@ import org.exoplatform.web.application.javascript.JavascriptConfigService;
  * Created by The eXo Platform SAS Mar 27, 2007
  */
 public class JavascriptManager {
-    Log log = ExoLogger.getLogger("portal:JavascriptManager");
+
+    public static final boolean USE_WEBUI_RESOURCES = Boolean.parseBoolean(System.getProperty("io.meeds.useWebuiResources", "true"));
+
+    public static final Log LOG = ExoLogger.getLogger("portal:JavascriptManager");
 
     /** . */
     private FetchMap<ResourceId> resourceIds = new FetchMap<ResourceId>();
@@ -57,7 +60,9 @@ public class JavascriptManager {
 
     public JavascriptManager() {
         requireJS = new RequireJS();
-        requireJS.require("SHARED/base", "base");
+        if (USE_WEBUI_RESOURCES) {
+          requireJS.require("SHARED/base", "base");
+        }
     }
 
     public JavascriptManager(JavascriptConfigService javascriptConfigService) {
@@ -104,7 +109,7 @@ public class JavascriptManager {
             if (FetchMode.IMMEDIATE.equals(resource.getFetchMode())) {
                 resourceIds.add(id, null);
             } else {
-                Map<ResourceId, FetchMode> tmp = new HashMap<ResourceId, FetchMode>();
+                Map<ResourceId, FetchMode> tmp = new HashMap<>();
                 tmp.put(id, null);
                 for (ScriptResource res : service.resolveIds(tmp).keySet()) {
                     require(res.getId().toString());
@@ -118,7 +123,7 @@ public class JavascriptManager {
     }
 
     public List<String> getExtendedScriptURLs() {
-        return new LinkedList<String>(extendedScriptURLs);
+        return new LinkedList<>(extendedScriptURLs);
     }
 
     public void addExtendedScriptURLs(String url) {
@@ -182,7 +187,7 @@ public class JavascriptManager {
     public String getJavaScripts() {
         StringBuilder callback = new StringBuilder();
         callback.append(scripts);
-        callback.append(requireJS.addScripts("base.Browser.onLoad();").addScripts(customizedOnloadJavascript.toString())
+        callback.append(requireJS.addScripts("typeof base !== 'undefined' && base?.Browser && base.Browser.onLoad();").addScripts(customizedOnloadJavascript.toString())
                 .toString());
         return callback.toString();
     }
@@ -229,6 +234,16 @@ public class JavascriptManager {
         Map<ScriptResource, FetchMode> resolvedPageResources = service.resolveIds(pageResourceIds);
 
         for (ScriptResource rs : resolvedPageResources.keySet()) {
+          ScriptGroup group = rs.getGroup();
+          if (group != null) {
+            Set<ResourceId> dependencies = group.getDependencies();
+            for (ResourceId moduleId : dependencies) {
+              ScriptResource moduleScriptResource = service.getResource(moduleId);
+              if (moduleScriptResource != null && moduleScriptResource.getClosure() != null) {
+                addDependencies(service, result, moduleScriptResource.getClosure());
+              }
+            }
+          }
           addResourceWithDependencies(service, result, rs);
         }
         for (String url : getExtendedScriptURLs()) {
@@ -265,12 +280,18 @@ public class JavascriptManager {
                                              ScriptResource scriptResource) {
       Set<ResourceId> dependencies = addResource(service, result, scriptResource);
 
+      addDependencies(service, result, dependencies);
+    }
+
+    private void addDependencies(JavascriptConfigService service,
+                                 Map<String, Boolean> result,
+                                 Set<ResourceId> dependencies) {
       for (ResourceId dependencyId : dependencies) {
         ScriptResource dependencyResource = service.getResource(dependencyId);
         if (dependencyResource != null) {
           addResourceWithDependencies(service, result, dependencyResource);
         } else if (PropertyManager.isDevelopping()) {
-          log.warn("Can't find dependent resource {}", dependencyId);
+          LOG.warn("Can't find dependent resource {}", dependencyId);
         }
       }
     }
