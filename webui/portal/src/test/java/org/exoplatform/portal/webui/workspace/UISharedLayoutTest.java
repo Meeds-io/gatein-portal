@@ -1,0 +1,90 @@
+/**
+ * This file is part of the Meeds project (https://meeds.io/).
+ *
+ * Copyright (C) 2020 - 2023 Meeds Association contact@meeds.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+package org.exoplatform.portal.webui.workspace;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import org.exoplatform.portal.application.PortalRequestContext;
+import org.exoplatform.portal.webui.portal.UISharedLayout;
+import org.exoplatform.web.application.RequestContext;
+import org.exoplatform.webui.application.WebuiRequestContext;
+
+@RunWith(MockitoJUnitRunner.class)
+public class UISharedLayoutTest {
+
+  private static final MockedStatic<RequestContext> PORTAL_REQUEST_CONTEXT = mockStatic(RequestContext.class);
+
+  @Mock
+  private PortalRequestContext                      pcontext;
+
+  @AfterClass
+  public static void afterRunBare() {
+    PORTAL_REQUEST_CONTEXT.close();
+  }
+
+  @Before
+  public void setUp() {
+    PORTAL_REQUEST_CONTEXT.when(() -> RequestContext.getCurrentInstance()).thenReturn(pcontext);
+  }
+
+  @Test
+  public void testStandaloneRender() throws Exception {
+    AtomicInteger siteBodyRenderCount = new AtomicInteger(0);
+    AtomicInteger overallRenderCount = new AtomicInteger(0);
+
+    UISharedLayout sharedLayout = new UISharedLayout() {
+      @Override
+      protected void processSiteBodyRender(WebuiRequestContext context) throws Exception {
+        siteBodyRenderCount.incrementAndGet();
+      }
+
+      @Override
+      protected void processContainerRender(WebuiRequestContext context) throws Exception {
+        overallRenderCount.incrementAndGet();
+      }
+
+      @Override
+      protected boolean isShowSharedLayout(PortalRequestContext requestContext) {
+        return !pcontext.isHideSharedLayout();
+      }
+    };
+    sharedLayout.processRender(pcontext);
+
+    assertEquals(1, overallRenderCount.get());
+    assertEquals(0, siteBodyRenderCount.get());
+
+    when(pcontext.isHideSharedLayout()).thenReturn(true);
+    sharedLayout.processRender(pcontext);
+
+    assertEquals(1, overallRenderCount.get());
+    assertEquals(1, siteBodyRenderCount.get());
+  }
+
+}

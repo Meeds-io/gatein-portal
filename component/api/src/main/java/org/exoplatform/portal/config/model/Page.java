@@ -27,6 +27,9 @@ import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.ComponentData;
 import org.exoplatform.portal.pom.data.PageData;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * May 13, 2004
  **/
@@ -42,6 +45,10 @@ public class Page extends Container {
     private String editPermission;
 
     private boolean showMaxWindow = false;
+
+    @Getter
+    @Setter
+    private boolean hideSharedLayout = false;
 
     private transient boolean modifiable;
 
@@ -144,7 +151,7 @@ public class Page extends Container {
     public PageData build() {
         List<ComponentData> children = buildChildren();
         return new PageData(storageId, id, name, icon, template, factoryId, title, description, width, height, cssClass, profiles,
-                Utils.safeImmutableList(accessPermissions), children, ownerType, ownerId, editPermission, showMaxWindow,
+                Utils.safeImmutableList(accessPermissions), children, ownerType, ownerId, editPermission, showMaxWindow, hideSharedLayout,
                 Utils.safeImmutableList(moveAppsPermissions), Utils.safeImmutableList(moveContainersPermissions));
     }
 

@@ -83,6 +83,7 @@ public class PageContext {
         page.setDescription(s.description);
         page.setFactoryId(s.factoryId);
         page.setShowMaxWindow(s.showMaxWindow);
+        page.setHideSharedLayout(s.hideSharedLayout);
 
         List<String> permisssions = s.accessPermissions;
         page.setAccessPermissions(permisssions != null ? permisssions.toArray(new String[permisssions.size()]) : null);

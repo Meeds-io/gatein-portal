@@ -5,6 +5,8 @@ import java.util.*;
 
 import org.exoplatform.commons.utils.Safe;
 
+import lombok.Getter;
+
 /**
  * An immutable page state class, modifying an existing state should use the
  * {@link Builder} builder class to rebuild a new immutable state object.
@@ -22,6 +24,10 @@ public class PageState implements Serializable {
   final boolean             showMaxWindow;
 
   /** . */
+  @Getter
+  final boolean             hideSharedLayout;
+
+  /** . */
   final String              factoryId;
 
   /** . */
@@ -37,7 +43,7 @@ public class PageState implements Serializable {
 
   final List<String>        moveContainersPermissions;
 
-  public PageState(String displayName,
+  public PageState(String displayName, // NOSONAR
                    String description,
                    boolean showMaxWindow,
                    String factoryId,
@@ -45,8 +51,21 @@ public class PageState implements Serializable {
                    String editPermission,
                    List<String> moveAppsPermissions,
                    List<String> moveContainersPermissions) {
+    this(displayName, description, showMaxWindow, false, factoryId, accessPermissions, editPermission, moveAppsPermissions, moveContainersPermissions);
+  }
+
+  public PageState(String displayName, // NOSONAR
+                   String description,
+                   boolean showMaxWindow,
+                   boolean hideSharedLayout,
+                   String factoryId,
+                   List<String> accessPermissions,
+                   String editPermission,
+                   List<String> moveAppsPermissions,
+                   List<String> moveContainersPermissions) {
     this.editPermission = editPermission;
     this.showMaxWindow = showMaxWindow;
+    this.hideSharedLayout = hideSharedLayout;
     this.factoryId = factoryId;
     this.displayName = displayName;
     this.description = description;
@@ -121,6 +140,7 @@ public class PageState implements Serializable {
   public Builder builder() {
     return new Builder(editPermission,
                        showMaxWindow,
+                       hideSharedLayout,
                        factoryId,
                        displayName,
                        description,
@@ -136,6 +156,9 @@ public class PageState implements Serializable {
 
     /** . */
     private boolean      showMaxWindow;
+
+    /** . */
+    private boolean      hideSharedLayout;
 
     /** . */
     private String       factoryId;
@@ -155,6 +178,7 @@ public class PageState implements Serializable {
 
     private Builder(String editPermission,
                     boolean showMaxWindow,
+                    boolean hideSharedLayout,
                     String factoryId,
                     String displayName,
                     String description,
@@ -163,6 +187,7 @@ public class PageState implements Serializable {
                     List<String> moveContainersPermissions) {
       this.editPermission = editPermission;
       this.showMaxWindow = showMaxWindow;
+      this.showMaxWindow = hideSharedLayout;
       this.factoryId = factoryId;
       this.displayName = displayName;
       this.description = description;
@@ -191,6 +216,11 @@ public class PageState implements Serializable {
       return this;
     }
 
+    public Builder hideSharedLayout(boolean hideSharedLayout) {
+      this.hideSharedLayout = hideSharedLayout;
+      return this;
+    }
+
     public Builder displayName(String displayName) {
       this.displayName = displayName;
       return this;
@@ -210,6 +240,7 @@ public class PageState implements Serializable {
       return new PageState(displayName,
                            description,
                            showMaxWindow,
+                           hideSharedLayout,
                            factoryId,
                            accessPermissions,
                            editPermission,

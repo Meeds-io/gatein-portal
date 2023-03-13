@@ -61,6 +61,10 @@ public class Util {
         return getUIPortalApplication().getCurrentSite();
     }
 
+    public static UIPage getUIPage() {
+      return getUIPortalApplication().getCurrentPage();
+    }
+
     public static UIPortalToolPanel getUIPortalToolPanel() {
         return getUIPortalApplication().findFirstComponentOfType(UIPortalToolPanel.class);
     }

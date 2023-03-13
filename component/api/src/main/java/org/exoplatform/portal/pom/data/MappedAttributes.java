@@ -42,6 +42,8 @@ public class MappedAttributes {
     /** . */
     public static final Key<Boolean> SHOW_MAX_WINDOW = Key.create("show-max-window", ValueType.BOOLEAN);
 
+    public static final Key<Boolean> HIDE_SHARED_LAYOUT = Key.create("hide-shared-layout", ValueType.BOOLEAN);
+
     /** . */
     public static final Key<String> FACTORY_ID = Key.create("factory-id", ValueType.STRING);
 

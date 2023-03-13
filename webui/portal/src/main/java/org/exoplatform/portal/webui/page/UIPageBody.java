@@ -20,6 +20,7 @@
 package org.exoplatform.portal.webui.page;
 
 import org.exoplatform.container.ExoContainer;
+import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PageBody;
@@ -73,11 +74,10 @@ public class UIPageBody extends UIComponentDecorator {
     }
 
     public void setPageBody(UserNode pageNode, UIPortal uiPortal) throws Exception {
-        WebuiRequestContext context = Util.getPortalRequestContext();
+        PortalRequestContext context = Util.getPortalRequestContext();
         uiPortal.setMaximizedUIComponent(null);
 
-        UIPage uiPage;
-        uiPage = getUIPage(pageNode, uiPortal, context);
+        UIPage uiPage = getUIPage(pageNode, uiPortal, context);
         if (uiPage == null) {
             setUIComponent(null);
             return;
@@ -86,10 +86,17 @@ public class UIPageBody extends UIComponentDecorator {
         setUIComponent(uiPage);
         pageName = uiPage.getName();
         if (uiPage.isShowMaxWindow()) {
+          context.setShowMaxWindow(true);
+        }
+        if (uiPage.isHideSharedLayout()) {
+          context.setHideSharedLayout(true);
+        }
+        Util.getUIPortalApplication().setCurrentPage(uiPage);
+        if (context.isShowMaxWindow()) {
             uiPortal.setMaximizedUIComponent(uiPage);
         } else {
             UIComponent maximizedComponent = uiPortal.getMaximizedUIComponent();
-            if (maximizedComponent != null && maximizedComponent instanceof UIPage) {
+            if (maximizedComponent instanceof UIPage) {
                 uiPortal.setMaximizedUIComponent(null);
             }
         }
