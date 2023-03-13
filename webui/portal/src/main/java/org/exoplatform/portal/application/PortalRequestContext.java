@@ -79,6 +79,10 @@ import org.exoplatform.webui.application.WebuiApplication;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.url.ComponentURL;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import org.gatein.common.http.QueryStringParser;
 import org.w3c.dom.Element;
 
@@ -138,6 +142,10 @@ public class PortalRequestContext extends WebuiRequestContext {
     private String cacheLevel_ = "cacheLevelPortlet";
 
     private boolean ajaxRequest_ = true;
+
+    @Getter
+    @Setter
+    private boolean standalonePage;
 
     private boolean forceFullUpdate = false;
 
@@ -227,6 +235,7 @@ public class PortalRequestContext extends WebuiRequestContext {
         }
 
         ajaxRequest_ = "true".equals(request_.getParameter("ajaxRequest"));
+        standalonePage = "true".equals(request_.getParameter("standalonePage"));
         String cache = request_.getParameter(CACHE_LEVEL);
         if (cache != null) {
             cacheLevel_ = cache;

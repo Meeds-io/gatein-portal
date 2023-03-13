@@ -22,6 +22,7 @@ package org.exoplatform.portal.webui.page;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.portal.application.PortalRequestContext;
+import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.core.UIComponentDecorator;
@@ -35,9 +36,6 @@ public class UISiteBody extends UIComponentDecorator {
     /** The storage id. */
     private String storageId;
 
-    public UISiteBody() {
-    }
-
     public String getStorageId() {
         return storageId;
     }
@@ -46,12 +44,32 @@ public class UISiteBody extends UIComponentDecorator {
         this.storageId = storageId;
     }
 
+    @Override
+    public void processRender(WebuiRequestContext context) throws Exception {
+      PortalRequestContext requestContext = RequestContext.getCurrentInstance();
+      if (!requestContext.isStandalonePage()) {
+        processContainerRender(context);
+      } else {
+        processPageBodyRender(context);
+      }
+    }
+
     public String getSiteClass() {
-      String portalOwner = ((PortalRequestContext) PortalRequestContext.getCurrentInstance()).getPortalOwner();
+      String portalOwner = ((PortalRequestContext) RequestContext.getCurrentInstance()).getPortalOwner();
       if (StringUtils.isBlank(portalOwner)) {
         return "";
       } else {
         return portalOwner.toUpperCase() + "Site";
       }
     }
+
+    protected void processPageBodyRender(WebuiRequestContext context) throws Exception {
+      UIPageBody uiPageBody = findFirstComponentOfType(UIPageBody.class);
+      uiPageBody.processRender(context);
+    }
+
+    protected void processContainerRender(WebuiRequestContext context) throws Exception {
+      super.processRender(context);
+    }
+
 }

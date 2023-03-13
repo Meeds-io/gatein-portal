@@ -19,12 +19,34 @@
 
 package org.exoplatform.portal.webui.portal;
 
+import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.webui.container.UIContainer;
+import org.exoplatform.portal.webui.page.UISiteBody;
+import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 
 @ComponentConfig(
 
 )
 public class UISharedLayout extends UIContainer {
+
+  @Override
+  public void processRender(WebuiRequestContext context) throws Exception {
+    PortalRequestContext requestContext = WebuiRequestContext.getCurrentInstance();
+    if (!requestContext.isStandalonePage()) {
+      processContainerRender(context);
+    } else {
+      processSiteBodyRender(context);
+    }
+  }
+
+  protected void processSiteBodyRender(WebuiRequestContext context) throws Exception {
+    UISiteBody uiSiteBody = findFirstComponentOfType(UISiteBody.class);
+    uiSiteBody.processRender(context);
+  }
+
+  protected void processContainerRender(WebuiRequestContext context) throws Exception {
+    super.processRender(context);
+  }
 
 }

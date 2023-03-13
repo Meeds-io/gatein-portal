@@ -45,6 +45,7 @@ import org.exoplatform.portal.webui.page.UIPageActionListener.ChangeNodeActionLi
 import org.exoplatform.portal.webui.page.UISiteBody;
 import org.exoplatform.portal.webui.portal.PageNodeEvent;
 import org.exoplatform.portal.webui.portal.UIPortal;
+import org.exoplatform.portal.webui.portal.UISharedLayout;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.services.log.ExoLogger;
@@ -56,7 +57,6 @@ import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.application.JavascriptManager;
-import org.exoplatform.web.application.RequireJS;
 import org.exoplatform.web.application.javascript.JavascriptConfigParser;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.exoplatform.web.url.MimeType;
@@ -791,12 +791,11 @@ public class UIPortalApplication extends UIApplication {
     private void initSharedLayout() throws Exception {
       Container container = layoutService.getSharedLayout(this.lastPortalOwner);
       if (container != null) {
-          org.exoplatform.portal.webui.container.UIContainer uiContainer = createUIComponent(
-                  org.exoplatform.portal.webui.container.UIContainer.class, null, null);
-          uiContainer.setStorageId(container.getStorageId());
-          PortalDataMapper.toUIContainer(uiContainer, container);
-          uiContainer.setRendered(true);
-          this.uiViewWorkingWorkspace.setUIComponent(uiContainer);
+        UISharedLayout uiContainer = createUIComponent(UISharedLayout.class, null, null);
+        uiContainer.setStorageId(container.getStorageId());
+        PortalDataMapper.toUIContainer(uiContainer, container);
+        uiContainer.setRendered(true);
+        this.uiViewWorkingWorkspace.setUIComponent(uiContainer);
       }
       refreshCachedUI();
     }
