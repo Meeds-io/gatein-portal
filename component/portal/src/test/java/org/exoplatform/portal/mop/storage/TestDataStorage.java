@@ -56,6 +56,7 @@ import org.exoplatform.portal.mop.navigation.NodeModel;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.service.NavigationService;
 import org.exoplatform.portal.pom.data.ContainerData;
@@ -247,6 +248,7 @@ public class TestDataStorage extends AbstractKernelTest {
     page.setOwnerId(portal.getName());
     page.setName("foo");
     page.setShowMaxWindow(false);
+    page.setHideSharedLayout(false);
 
     //
     try {
@@ -259,13 +261,17 @@ public class TestDataStorage extends AbstractKernelTest {
 
     //
     PageContext pageContext = pageService.loadPage(page.getPageKey());
-    pageContext.setState(pageContext.getState().builder().displayName("MyTitle").showMaxWindow(true).build());
+    PageState.Builder pageStateBuilder = pageContext.getState()
+                                                    .builder()
+                                                    .displayName("MyTitle")
+                                                    .showMaxWindow(true)
+                                                    .hideSharedLayout(true);
+    pageContext.setState(pageStateBuilder.build());
     pageService.savePage(pageContext);
 
     //
     Page page2 = storage_.getPage(page.getPageId());
     page2.setTitle("MyTitle2");
-    page2.setShowMaxWindow(true);
     storage_.save(page2);
     assertEquals(3, events.size());
 
@@ -280,6 +286,7 @@ public class TestDataStorage extends AbstractKernelTest {
     pageContext = pageService.loadPage(page.getPageKey());
     assertEquals("MyTitle", pageContext.getState().getDisplayName());
     assertEquals(true, pageContext.getState().getShowMaxWindow());
+    assertEquals(true, pageContext.getState().isHideSharedLayout());
   }
 
   public void testChangingPortletThemeInPage() throws Exception {

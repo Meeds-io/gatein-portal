@@ -152,6 +152,7 @@ public class PortalDataMapper {
         model.setEditPermission(uiPage.getEditPermission());
         model.setFactoryId(uiPage.getFactoryId());
         model.setShowMaxWindow(uiPage.isShowMaxWindow());
+        model.setHideSharedLayout(uiPage.isHideSharedLayout());
         model.setModifiable(uiPage.isModifiable());
         return model;
     }
@@ -280,6 +281,7 @@ public class PortalDataMapper {
         uiPage.setPageId(model.getPageId());
         uiPage.setTitle(model.getTitle());
         uiPage.setShowMaxWindow(model.isShowMaxWindow());
+        uiPage.setHideSharedLayout(model.isHideSharedLayout());
         uiPage.setModifiable(model.isModifiable());
 
         List<UIPortlet> portlets = new ArrayList<UIPortlet>();

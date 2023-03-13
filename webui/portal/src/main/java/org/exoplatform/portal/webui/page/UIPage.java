@@ -54,6 +54,9 @@ import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.EventListener;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * May 19, 2006
  */
@@ -105,6 +108,10 @@ public class UIPage extends UIContainer {
     private String editPermission;
 
     private boolean showMaxWindow = false;
+
+    @Getter
+    @Setter
+    private boolean hideSharedLayout = false;
 
     private UIPortlet maximizedUIPortlet;
 

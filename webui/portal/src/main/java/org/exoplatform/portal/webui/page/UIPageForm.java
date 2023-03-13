@@ -336,6 +336,7 @@ public class UIPageForm extends UIFormTabPane {
             }
             uiPage.setTitle(page.getTitle());
             uiPage.setShowMaxWindow(page.isShowMaxWindow());
+            uiPage.setHideSharedLayout(page.isHideSharedLayout());
 
             uiMaskWS.createEvent("Close", Phase.DECODE, pcontext).broadcast();
             pcontext.getJavascriptManager().require("SHARED/portalComposer", "portalComposer")

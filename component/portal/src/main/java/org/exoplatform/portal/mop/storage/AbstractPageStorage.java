@@ -127,6 +127,7 @@ public abstract class AbstractPageStorage implements PageStorage {
                         entity.getOwnerId(), // ownerId
                         editPermission, // editPermission
                         entity.isShowMaxWindow(), // showMaxWindow
+                        entity.isHideSharedLayout(),
                         moveAppsPermissions,
                         moveContainersPermissions);
   }
