@@ -54,6 +54,9 @@ public class PageEntity extends ComponentEntity implements Serializable {
   @Column(name = "SHOW_MAX_WINDOW")
   private boolean               showMaxWindow;
 
+  @Column(name = "HIDE_SHARED_LAYOUT")
+  private boolean               hideSharedLayout;
+
   @Column(name = "DISPLAY_NAME", length = 200)
   private String                displayName;
 
@@ -92,6 +95,10 @@ public class PageEntity extends ComponentEntity implements Serializable {
     return showMaxWindow;
   }
 
+  public boolean isHideSharedLayout() {
+    return hideSharedLayout;
+  }
+
   public SiteType getOwnerType() {
     if (getOwner() != null) {
       return getOwner().getSiteType();
@@ -110,6 +117,10 @@ public class PageEntity extends ComponentEntity implements Serializable {
 
   public void setShowMaxWindow(boolean showMaxWindow) {
     this.showMaxWindow = showMaxWindow;
+  }
+
+  public void setHideSharedLayout(boolean hideSharedLayout) {
+    this.hideSharedLayout = hideSharedLayout;
   }
 
   public String getDisplayName() {

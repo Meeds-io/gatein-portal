@@ -47,9 +47,19 @@ public class PageData extends ContainerData {
     /** . */
     private final boolean showMaxWindow;
 
-    public PageData(String storageId, String id, String name, String icon, String template, String factoryId, String title,
+    /** . */
+    private final boolean hideSharedLayout;
+
+    public PageData(String storageId, String id, String name, String icon, String template, String factoryId, String title, // NOSONAR
+                    String description, String width, String height, List<String> accessPermissions, List<ComponentData> children,
+                    String ownerType, String ownerId, String editPermission, boolean showMaxWindow,
+                    List<String> moveAppsPermissions, List<String> moveContainersPermissions) {
+      this(storageId, id, name, icon, template, factoryId, title, description, width, height, accessPermissions, children, ownerType, ownerId, editPermission, showMaxWindow, false, moveAppsPermissions, moveContainersPermissions);
+    }
+
+    public PageData(String storageId, String id, String name, String icon, String template, String factoryId, String title, // NOSONAR
             String description, String width, String height, List<String> accessPermissions, List<ComponentData> children,
-            String ownerType, String ownerId, String editPermission, boolean showMaxWindow,
+            String ownerType, String ownerId, String editPermission, boolean showMaxWindow, boolean hideSharedLayout,
             List<String> moveAppsPermissions, List<String> moveContainersPermissions) {
         super(storageId, id, name, icon, template, factoryId, title, description, width, height, accessPermissions,
                 moveContainersPermissions, moveContainersPermissions, children);
@@ -58,6 +68,7 @@ public class PageData extends ContainerData {
         this.key = new PageKey(ownerType, ownerId, name);
         this.editPermission = editPermission;
         this.showMaxWindow = showMaxWindow;
+        this.hideSharedLayout = hideSharedLayout;
     }
 
     public PageData(String storageId,
@@ -78,6 +89,7 @@ public class PageData extends ContainerData {
                     String ownerId,
                     String editPermission,
                     boolean showMaxWindow,
+                    boolean hideSharedLayout,
                     List<String> moveAppsPermissions,
                     List<String> moveContainersPermissions) {
       super(storageId,
@@ -101,6 +113,7 @@ public class PageData extends ContainerData {
         this.key = new PageKey(ownerType, ownerId, name);
         this.editPermission = editPermission;
         this.showMaxWindow = showMaxWindow;
+        this.hideSharedLayout = hideSharedLayout;
     }
 
     public String getOwnerType() {

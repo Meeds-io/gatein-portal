@@ -281,6 +281,7 @@ public class PortalImpl implements Portal {
     PageState pageState = new PageState(pageId.getPageName(),
                                         null,
                                         false,
+                                        false,
                                         null,
                                         Arrays.asList(Util.from(Permission
                                                                           .everyone())),

@@ -41,10 +41,12 @@ import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.resource.*;
 import org.exoplatform.portal.webui.application.UIPortlet;
+import org.exoplatform.portal.webui.page.UIPage;
 import org.exoplatform.portal.webui.page.UIPageActionListener.ChangeNodeActionListener;
 import org.exoplatform.portal.webui.page.UISiteBody;
 import org.exoplatform.portal.webui.portal.PageNodeEvent;
 import org.exoplatform.portal.webui.portal.UIPortal;
+import org.exoplatform.portal.webui.portal.UISharedLayout;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.services.log.ExoLogger;
@@ -70,6 +72,9 @@ import org.exoplatform.webui.core.UIComponentDecorator;
 import org.exoplatform.webui.core.UIContainer;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.url.ComponentURL;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import org.gatein.pc.api.info.PortletInfo;
 import org.gatein.pc.portlet.impl.info.ContainerPortletInfo;
@@ -198,6 +203,10 @@ public class UIPortalApplication extends UIApplication {
     private Map<SiteKey, UIPortal> all_UIPortals;
 
     private UIPortal currentSite;
+
+    @Getter
+    @Setter
+    private UIPage   currentPage;
 
     private boolean isAjaxInLastRequest;
 
@@ -788,12 +797,11 @@ public class UIPortalApplication extends UIApplication {
     private void initSharedLayout() throws Exception {
       Container container = layoutService.getSharedLayout(this.lastPortalOwner);
       if (container != null) {
-          org.exoplatform.portal.webui.container.UIContainer uiContainer = createUIComponent(
-                  org.exoplatform.portal.webui.container.UIContainer.class, null, null);
-          uiContainer.setStorageId(container.getStorageId());
-          PortalDataMapper.toUIContainer(uiContainer, container);
-          uiContainer.setRendered(true);
-          this.uiViewWorkingWorkspace.setUIComponent(uiContainer);
+        UISharedLayout uiContainer = createUIComponent(UISharedLayout.class, null, null);
+        uiContainer.setStorageId(container.getStorageId());
+        PortalDataMapper.toUIContainer(uiContainer, container);
+        uiContainer.setRendered(true);
+        this.uiViewWorkingWorkspace.setUIComponent(uiContainer);
       }
       refreshCachedUI();
     }

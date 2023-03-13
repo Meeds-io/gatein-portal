@@ -252,6 +252,7 @@ public class PageStorageImpl extends AbstractPageStorage {
       entity.setDisplayName(state.getDisplayName());
       entity.setFactoryId(state.getFactoryId());
       entity.setShowMaxWindow(state.getShowMaxWindow());
+      entity.setHideSharedLayout(state.isHideSharedLayout());
     }
 
     SiteKey siteKey = pageContext.getKey().getSite();

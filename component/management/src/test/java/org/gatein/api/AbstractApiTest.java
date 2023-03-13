@@ -159,7 +159,7 @@ public abstract class AbstractApiTest {
 
         SiteKey siteKey = Util.from(siteId);
         for (String page : pages) {
-            pageService.savePage(new PageContext(new PageKey(siteKey, page), new PageState("displayName", "description", false,
+            pageService.savePage(new PageContext(new PageKey(siteKey, page), new PageState("displayName", "description", false, false,
                     null, Arrays.asList("Everyone"), "Everyone", Arrays.asList("Everyone"), Arrays.asList("Everyone"))));
         }
     }
