@@ -1,7 +1,5 @@
 <%
   _ctx.getRequestContext().getJavascriptManager()
-    .require("SHARED/bodyScrollListener", "bodyScrollListener");
-  _ctx.getRequestContext().getJavascriptManager()
     .require("SHARED/topbarLoading", "topbarLoading").addScripts("topbarLoading.init()");
 %>
 <div class="VuetifyApp TopbarLoadingContainer" id="$uicomponent.id">
