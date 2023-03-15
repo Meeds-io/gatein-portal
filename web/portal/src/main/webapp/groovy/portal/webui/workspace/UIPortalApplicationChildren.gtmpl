@@ -1,6 +1,7 @@
 <%
   def rcontext = _ctx.getRequestContext() ;
   def jsManager = rcontext.getJavascriptManager();
+  jsManager.require("SHARED/bodyScrollListener", "bodyScrollListener");
   uicomponent.renderChildren();
 %>
 </div>
