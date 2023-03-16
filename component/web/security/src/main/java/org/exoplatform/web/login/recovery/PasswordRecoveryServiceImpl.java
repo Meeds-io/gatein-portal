@@ -19,6 +19,7 @@
 
 package org.exoplatform.web.login.recovery;
 
+import static org.exoplatform.web.security.security.CookieTokenService.EMAIL_VALIDATION_TOKEN;
 import static org.exoplatform.web.security.security.CookieTokenService.EXTERNAL_REGISTRATION_TOKEN;
 import static org.exoplatform.web.security.security.CookieTokenService.FORGOT_PASSWORD_TOKEN;
 import static org.exoplatform.web.security.security.CookieTokenService.ONBOARD_TOKEN;
@@ -125,6 +126,11 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
       return null;
     }
     return token.getPayload();
+  }
+
+  @Override
+  public void deleteToken(String tokenId, String type) {
+    remindPasswordTokenService.deleteToken(tokenId, type);
   }
 
   @Override
@@ -317,7 +323,50 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
   }
 
   @Override
-  public boolean sendExternalConfirmationAccountEmail(String username, Locale locale, StringBuilder url) {
+  public boolean sendAccountVerificationEmail(String data, String username, String firstName, String lastName, String email, String password, Locale locale, StringBuilder url) {
+    try {
+      ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
+
+      Credentials credentials = new Credentials(data, password);
+      String tokenId = remindPasswordTokenService.createToken(credentials, EMAIL_VALIDATION_TOKEN);
+
+      StringBuilder redirectUrl = new StringBuilder();
+      redirectUrl.append(url);
+      redirectUrl.append("/").append(ExternalRegisterHandler.NAME);
+      redirectUrl.append("?action=" + ExternalRegisterHandler.VALIDATE_EXTERNAL_EMAIL_ACTION);
+      redirectUrl.append("&token=" + tokenId);
+
+      String emailBody = buildExternalVerificationAccountEmailBody(firstName + " " + lastName,
+                                                                   username,
+                                                                   redirectUrl.toString(),
+                                                                   bundle);
+      String emailSubject = bundle.getString("external.verification.account.email.subject") + " "
+          + brandingService.getCompanyName() + "!";
+
+      String senderName = MailUtils.getSenderName();
+      String from = MailUtils.getSenderEmail();
+      if (senderName != null && !senderName.trim().isEmpty()) {
+        from = senderName + " <" + from + ">";
+      }
+
+      Message message = new Message();
+      message.setFrom(from);
+      message.setTo(email);
+      message.setSubject(emailSubject);
+      message.setBody(emailBody);
+      message.setMimeType("text/html");
+
+      mailService.sendMessage(message);
+    } catch (Exception ex) {
+      log.error("Failure to send external confirmation account email", ex);
+      return false;
+    }
+
+    return true;
+  }
+
+  @Override
+  public boolean sendAccountCreatedConfirmationEmail(String username, Locale locale, StringBuilder url) {
 
     try {
       User user = orgService.getUserHandler().findUserByName(username);
@@ -365,6 +414,28 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     InputStream input = this.getClass()
                             .getClassLoader()
                             .getResourceAsStream("conf/external_confirmation_account_email_template.html");
+    if (input == null) {
+      content = "";
+    } else {
+      content = resolveLanguage(input, bundle);
+    }
+
+    content = content.replaceAll("\\$\\{DISPLAY_NAME\\}", dispalyName);
+    content = content.replaceAll("\\$\\{COMPANY_NAME\\}", brandingService.getCompanyName());
+    content = content.replaceAll("\\$\\{USERNAME\\}", username);
+    content = content.replaceAll("\\$\\{LOGIN_LINK\\}", link);
+
+    return content;
+  }
+
+  private String buildExternalVerificationAccountEmailBody(String dispalyName,
+                                                           String username,
+                                                           String link,
+                                                           ResourceBundle bundle) {
+    String content;
+    InputStream input = this.getClass()
+        .getClassLoader()
+        .getResourceAsStream("conf/external_verification_account_email_template.html");
     if (input == null) {
       content = "";
     } else {
@@ -455,6 +526,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     }
 
     content = content.replaceAll("\\$\\{FIRST_NAME\\}", user.getFirstName());
+    content = content.replaceAll("\\$\\{COMPANY_NAME\\}", brandingService.getCompanyName());
     content = content.replaceAll("\\$\\{USERNAME\\}", user.getUserName());
     content = content.replaceAll("\\$\\{RESET_PASSWORD_LINK\\}", link);
 
@@ -547,4 +619,5 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
   public ChangePasswordConnector getActiveChangePasswordConnector() {
     return this.changePasswordConnectorMap.get(this.changePasswordConnectorName);
   }
+
 }

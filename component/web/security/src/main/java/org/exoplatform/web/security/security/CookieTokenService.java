@@ -90,6 +90,7 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
     public static final String LIFECYCLE_NAME = "lifecycle-name";
     public static final String HASH_SERVICE_INIT_PARAM = "hash.service";
     public static final String ONBOARD_TOKEN="onboard";
+    public static final String EMAIL_VALIDATION_TOKEN="email-validation";
     public static final String FORGOT_PASSWORD_TOKEN="forgot-password";
     public static final String EXTERNAL_REGISTRATION_TOKEN="external-registration";
     public static final String SEPARATOR_CHAR="#";
