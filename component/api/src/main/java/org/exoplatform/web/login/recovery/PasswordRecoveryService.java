@@ -73,7 +73,7 @@ public interface PasswordRecoveryService {
     throw new UnsupportedOperationException();
   }
 
-  public boolean sendExternalConfirmationAccountEmail(String sender, Locale locale, StringBuilder url);
+  public boolean sendAccountCreatedConfirmationEmail(String sender, Locale locale, StringBuilder url);
 
   public boolean allowChangePassword(String username) throws Exception; // NOSONAR
 
@@ -84,5 +84,29 @@ public interface PasswordRecoveryService {
   String getExternalRegistrationURL(String tokenId, String lang);
 
   public ChangePasswordConnector getActiveChangePasswordConnector();
+
+  /**
+   * Remove used Token
+   * 
+   * @param tokenId
+   * @param type
+   */
+  void deleteToken(String tokenId, String type);
+
+  /**
+   * Sends verification email to user to continue registration
+   * 
+   * @param data
+   * @param username
+   * @param firstName
+   * @param lastName
+   * @param email
+   * @param password
+   * @param locale
+   * @param url
+   * @return true if sent, else false
+   */
+  boolean sendAccountVerificationEmail(String data, String username, String firstName, String lastName, String email,
+                                       String password, Locale locale, StringBuilder url);
 
 }

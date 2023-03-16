@@ -54,7 +54,7 @@ public class MockPasswordRecoveryService implements PasswordRecoveryService {
   }
   
   @Override
-  public boolean sendExternalConfirmationAccountEmail(String sender, Locale locale, StringBuilder url) {
+  public boolean sendAccountCreatedConfirmationEmail(String sender, Locale locale, StringBuilder url) {
     return false;
   }
 
@@ -81,5 +81,16 @@ public class MockPasswordRecoveryService implements PasswordRecoveryService {
   @Override
   public ChangePasswordConnector getActiveChangePasswordConnector() {
     return this.mockChangePasswordConnector;
+  }
+
+  @Override
+  public void deleteToken(String tokenId, String type) {
+    // Delete Token
+  }
+
+  @Override
+  public boolean sendAccountVerificationEmail(String data, String username, String firstName, String lastName, String email,
+                                              String password, Locale locale, StringBuilder url) {
+    return false;
   }
 }
