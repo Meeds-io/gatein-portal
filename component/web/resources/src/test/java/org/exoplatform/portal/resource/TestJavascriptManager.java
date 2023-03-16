@@ -102,7 +102,7 @@ public class TestJavascriptManager extends AbstractWebResourceTest {
 
         String expected = "window.require([\"SHARED/base\",\"foo\"],function(base,bar) {\n"
                 + "try {bar.zoo;} catch(unhandledError) { console.error(unhandledError); }try {base.Browser.addOnLoadCallback('mid" + Math.abs(onload.hashCode()) + "'," + onload
-                + ");} catch(unhandledError) { console.error(unhandledError); }try {base.Browser.onLoad();} catch(unhandledError) { console.error(unhandledError); }try {} catch(unhandledError) { console.error(unhandledError); }});";
+                + ");} catch(unhandledError) { console.error(unhandledError); }try {typeof base !== 'undefined' && base?.Browser && base.Browser.onLoad();} catch(unhandledError) { console.error(unhandledError); }try {} catch(unhandledError) { console.error(unhandledError); }});";
         assertEquals(expected, jsManager.getJavaScripts());
     }
 }

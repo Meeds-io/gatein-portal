@@ -39,7 +39,7 @@
         <preferences>
           <preference>
             <name>url</name>
-            <value>/eXoResources/skin/sharedImages/GroupIcon.png</value>
+            <value>/resources/skin/sharedImages/GroupIcon.png</value>
             <read-only>false</read-only>
           </preference>
         </preferences>

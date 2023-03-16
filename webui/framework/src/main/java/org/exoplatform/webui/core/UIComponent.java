@@ -41,6 +41,9 @@ import org.exoplatform.webui.event.MonitorEvent;
 /** Created by The eXo Platform SAS May 7, 2006 */
 @Serialized
 public abstract class UIComponent {
+
+    public static final boolean USE_WEBUI_RESOURCES = Boolean.parseBoolean(System.getProperty("io.meeds.useWebuiResources", "true"));
+
     private static final Log log = ExoLogger.getLogger("webui:UIComponent");
 
     public static final String OBJECTID = "objectId";
