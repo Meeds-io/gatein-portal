@@ -18,6 +18,7 @@
  */
 package org.exoplatform.web.register;
 
+import static org.exoplatform.web.security.security.CookieTokenService.EMAIL_VALIDATION_TOKEN;
 import static org.exoplatform.web.security.security.CookieTokenService.EXTERNAL_REGISTRATION_TOKEN;
 
 import java.awt.Color;
@@ -70,7 +71,6 @@ import org.exoplatform.web.application.JspBasedWebHandler;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.login.recovery.PasswordRecoveryService;
-import org.exoplatform.web.security.security.CookieTokenService;
 import org.exoplatform.web.security.security.RemindPasswordTokenService;
 
 import nl.captcha.Captcha;
@@ -79,6 +79,8 @@ import nl.captcha.text.producer.DefaultTextProducer;
 import nl.captcha.text.renderer.DefaultWordRenderer;
 
 public class ExternalRegisterHandler extends JspBasedWebHandler {
+
+  public static final String             REQUIRE_EMAIL_VALIDATION                = "requireEmailValidation";
 
   private static final String            ADMINISTRATORS_GROUP                    = "/platform/administrators";
 
@@ -133,13 +135,19 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
 
   public static final String             ACTION_PARAM                            = "action";
 
+  public static final String             VALIDATE_EXTERNAL_EMAIL_ACTION          = "validateEmail";
+
   public static final String             SAVE_EXTERNAL_ACTION                    = "saveExternal";
 
   public static final String             EXPIRED_ACTION_NAME                     = "expired";
 
+  public static final String             SUCCESS_MESSAGE_PARAM                   = "success";
+
   public static final String             ERROR_MESSAGE_PARAM                     = "error";
 
   public static final String             ALREADY_AUTHENTICATED_MESSAGE_PARAM     = "authenticated";
+
+  public static final String             EMAIL_VERIFICATION_SENT                 = "emailVerificationSent";
 
   public static final String             TOKEN_ID_PARAM                          = "tokenId";
 
@@ -226,26 +234,33 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
     if ("true".equals(serveCaptcha)) {
       return serveCaptchaImage(request, response);
     }
-
+    String requestAction = request.getParameter(REQ_PARAM_ACTION);
+    String initialUri = request.getParameter(INITIAL_URI_PARAM);
     String token = controllerContext.getParameter(TOKEN);
-    Credentials credentials = getStoredCredentials(token);
+    Credentials credentials = getStoredCredentials(token, requestAction);
     if (credentials == null) {
       // Token expired
       return dispatch(controllerContext,
                       request,
                       response,
                       Collections.singletonMap(ACTION_PARAM, EXPIRED_ACTION_NAME));
-    } else if (findUser(credentials.getUsername()) != null) {
-      // User already exists
-      redirectToLoginPage(request,
-                          response,
-                          credentials.getUsername());
-      return true;
     }
 
-    String requestAction = request.getParameter(REQ_PARAM_ACTION);
-    String initialUri = request.getParameter(INITIAL_URI_PARAM);
-    if (SAVE_EXTERNAL_ACTION.equalsIgnoreCase(requestAction)) {
+    String username = credentials.getUsername();
+    if (VALIDATE_EXTERNAL_EMAIL_ACTION.equalsIgnoreCase(requestAction)) {
+      User user = generateUserFromCredential(credentials.getUsername(), credentials.getPassword());
+      username = createUser(user);
+      passwordRecoveryService.sendAccountCreatedConfirmationEmail(username, locale, getBaseUrl(request));
+      remindPasswordTokenService.deleteToken(token);
+      wrapForAutomaticLogin(request, response, initialUri, user.getUserName(), user.getPassword());
+    } else if (SAVE_EXTERNAL_ACTION.equalsIgnoreCase(requestAction)) {
+      if (findUser(username) != null) {
+        // User already exists
+        redirectToLoginPage(request,
+                            response,
+                            username);
+        return true;
+      }
       String requestUsername = request.getParameter(USERNAME_PARAM);
       String requestEmail = request.getParameter(EMAIL_PARAM);
       String firstName = request.getParameter(FIRSTNAME_PARAM);
@@ -254,9 +269,10 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
       String confirmPass = request.getParameter(PASSWORD_CONFIRM_PARAM);
       String captcha = request.getParameter(CAPTCHA_PARAM);
 
-      if (!isValidCaptch(request.getSession(), captcha)) {
+      HttpSession session = request.getSession();
+      if (!isValidCaptch(session, captcha)) {
         parameters.put(ERROR_MESSAGE_PARAM, resourceBundle.getString("gatein.forgotPassword.captchaError"));
-      } else if (isValidUserAndPassword(credentials.getUsername(),
+      } else if (isValidUserAndPassword(username,
                                         requestUsername,
                                         requestEmail,
                                         password,
@@ -266,12 +282,22 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
                                         locale)
           && isValidUserFullName(firstName, lastName, parameters, locale)) {
         try {
-          String username = createUser(requestUsername, requestEmail, firstName, lastName, password);
-          passwordRecoveryService.sendExternalConfirmationAccountEmail(username, locale, getBaseUrl(request));
-          remindPasswordTokenService.deleteTokensByUsernameAndType(username, CookieTokenService.EXTERNAL_REGISTRATION_TOKEN);
-
-          wrapForAutomaticLogin(request, response, initialUri, username, password);
-          return true;
+          if (session.getAttribute(REQUIRE_EMAIL_VALIDATION) == null) {
+            username = createUser(requestUsername, requestEmail, firstName, lastName, password);
+            passwordRecoveryService.sendAccountCreatedConfirmationEmail(username, locale, getBaseUrl(request));
+            remindPasswordTokenService.deleteToken(token);
+            wrapForAutomaticLogin(request, response, initialUri, username, password);
+            return true;
+          } else if (session.getAttribute(REQUIRE_EMAIL_VALIDATION).equals("true")) {
+            User user = organizationService.getUserHandler().createUserInstance(requestUsername);
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setEmail(requestEmail);
+            String data = generateUserDetailCredential(user);
+            passwordRecoveryService.sendAccountVerificationEmail(data, requestUsername, firstName, lastName, requestEmail, password, locale, getBaseUrl(request));
+            parameters.put(SUCCESS_MESSAGE_PARAM, EMAIL_VERIFICATION_SENT);
+            session.setAttribute(REQUIRE_EMAIL_VALIDATION, "false");
+          }
         } catch (Exception e) {
           LOG.warn("Error while registering external user", e);
           parameters.put(ERROR_MESSAGE_PARAM, resourceBundle.getString("external.registration.fail.create.user"));
@@ -285,10 +311,10 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
     }
 
     // Token can be generated using email or username (Metamask for example)
-    if (StringUtils.contains(credentials.getUsername(), "@")) {
-      parameters.put(EMAIL_PARAM, escapeXssCharacters(credentials.getUsername()));
+    if (StringUtils.contains(username, "@")) {
+      parameters.put(EMAIL_PARAM, escapeXssCharacters(username));
     } else {
-      parameters.put(USERNAME_PARAM, escapeXssCharacters(credentials.getUsername()));
+      parameters.put(USERNAME_PARAM, escapeXssCharacters(username));
     }
     parameters.put(TOKEN_ID_PARAM, token);
     parameters.put(INITIAL_URI_PARAM, initialUri);
@@ -296,11 +322,15 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
     return dispatch(controllerContext, request, response, parameters);
   }
 
-  private Credentials getStoredCredentials(String token) {
+  private Credentials getStoredCredentials(String token, String requestAction) {
     if (StringUtils.isBlank(token)) {
       return null;
     }
-    return passwordRecoveryService.verifyToken(token, EXTERNAL_REGISTRATION_TOKEN);
+    if (StringUtils.equals(VALIDATE_EXTERNAL_EMAIL_ACTION, requestAction)) {
+      return passwordRecoveryService.verifyToken(token, EMAIL_VALIDATION_TOKEN);
+    } else {
+      return passwordRecoveryService.verifyToken(token, EXTERNAL_REGISTRATION_TOKEN);
+    }
   }
 
   private boolean isValidUserFullName(String firstName,
@@ -356,23 +386,31 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
   }
 
   private String createUser(String username, String email, String firstName, String lastName, String password) throws Exception {
-    if (StringUtils.isBlank(username)) {
-      username = generateUsername(firstName, lastName);
-    }
     User user = organizationService.getUserHandler().createUserInstance(username);
     user.setFirstName(firstName);
     user.setLastName(lastName);
     user.setPassword(password);
     user.setEmail(email);
+
+    return createUser(user);
+  }
+
+  @SuppressWarnings("deprecation")
+  private String createUser(User user) throws Exception {
+    String login = null;
+    if (StringUtils.isBlank(user.getUserName())) {
+      login = generateUsername(user.getFirstName(), user.getLastName());
+      user.setUserName(login);
+    }
     organizationService.getUserHandler().createUser(user, true);
 
     Collection<Membership> memberships = organizationService.getMembershipHandler()
-                                                            .findMembershipsByUserAndGroup(username, ADMINISTRATORS_GROUP);
+                                                            .findMembershipsByUserAndGroup(login, ADMINISTRATORS_GROUP);
     boolean isAdministrator = CollectionUtils.isNotEmpty(memberships);
     if (!isAdministrator) {
       // Avoid incoherence by indicating an admin user
       // As external
-      deleteFromInternalUsersGroup(username);
+      deleteFromInternalUsersGroup(login);
     }
 
     MembershipType memberMembershipType = organizationService.getMembershipTypeHandler().findMembershipType(MEMBER);
@@ -389,7 +427,7 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
                                            true);
       }
     }
-    return username;
+    return login;
   }
 
   private void deleteFromInternalUsersGroup(String username) throws Exception {
@@ -583,6 +621,20 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
     for (int j = 0; j < i; j++) {
       RequestLifeCycle.begin(container);
     }
+  }
+
+  private String generateUserDetailCredential(User user) {
+    return user.getUserName() + "::" + user.getFirstName() + "::" + user.getLastName() + "::" + user.getEmail();
+  }
+
+  private User generateUserFromCredential(String data, String password) {
+    String[] dataParts = StringUtils.split(data, "::");
+    User user = organizationService.getUserHandler().createUserInstance(dataParts[0]);
+    user.setFirstName(dataParts[1]);
+    user.setLastName(dataParts[2]);
+    user.setEmail(dataParts[3]);
+    user.setPassword(password);
+    return user;
   }
 
 }
