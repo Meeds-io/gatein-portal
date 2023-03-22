@@ -43,7 +43,7 @@ public class UISharedLayout extends UIContainer {
   }
 
   protected boolean isShowSharedLayout(PortalRequestContext requestContext) {
-    return !requestContext.isHideSharedLayout() && !Util.getUIPage().isHideSharedLayout();
+    return !requestContext.isHideSharedLayout() && (Util.getUIPage() == null || !Util.getUIPage().isHideSharedLayout());
   }
 
   protected void processSiteBodyRender(WebuiRequestContext context) throws Exception {
