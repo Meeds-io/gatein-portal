@@ -65,7 +65,7 @@ public class UISiteBody extends UIComponentDecorator {
     }
 
     protected boolean isShowSiteBody(PortalRequestContext requestContext) {
-      return !requestContext.isShowMaxWindow() && !Util.getUIPage().isShowMaxWindow();
+      return !requestContext.isShowMaxWindow() && (Util.getUIPage() == null || !Util.getUIPage().isShowMaxWindow());
     }
 
     protected void processPageBodyRender(WebuiRequestContext context) throws Exception {
