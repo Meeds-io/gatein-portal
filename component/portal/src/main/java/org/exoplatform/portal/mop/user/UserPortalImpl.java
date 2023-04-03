@@ -149,7 +149,7 @@ public class UserPortalImpl implements UserPortal {
       if (siteKey.getType() != siteType
           || (siteType == SiteType.GROUP && siteKey.getName().startsWith(SPACES_SITE_TYPE_PREFIX))
           || (siteType == SiteType.SPACE && !siteKey.getName().startsWith(SPACES_SITE_TYPE_PREFIX))
-          || (!includeGlobal && siteKey.getName().equalsIgnoreCase("global"))) {
+          || (!includeGlobal && siteKey.getName().equalsIgnoreCase(service.getGlobalPortal()))) {
         continue;
       }
 
