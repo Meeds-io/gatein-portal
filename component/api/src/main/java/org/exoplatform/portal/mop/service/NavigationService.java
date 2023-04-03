@@ -168,4 +168,10 @@ public interface NavigationService extends org.exoplatform.portal.mop.navigation
    */
   <N> void rebaseNode(NodeContext<N> context, Scope scope, NodeChangeListener<NodeContext<N>> listener);
 
+  /**
+   * Delete a navigation node with a given node id
+   *
+   * @param nodeId the node id to be deleted
+   */
+  public void deleteNode(Long nodeId);
 }

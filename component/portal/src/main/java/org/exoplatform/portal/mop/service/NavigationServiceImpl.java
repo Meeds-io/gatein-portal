@@ -143,6 +143,11 @@ public class NavigationServiceImpl implements NavigationService {
     nodeManager.rebaseNode(context, scope, new NodeChangeNotifier<>(listener, this, listenerService));
   }
 
+  @Override
+  public void deleteNode(Long nodeId) {
+    navigationStorage.destroyNode(nodeId);
+  }
+
   private void notify(String name, SiteKey key) {
     try {
       listenerService.broadcast(name, this, key);
