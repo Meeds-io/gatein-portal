@@ -286,7 +286,7 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
         assertEquals(PortalConfig.PORTAL_TYPE, portalCfg.getType());
         assertEquals("classic", portalCfg.getName());
         UserPortal userPortal = userPortalCfg.getUserPortal();
-        Collection<UserNode> nodes = userPortal.getNodes(SiteType.PORTAL, Scope.ALL, filterConfig);
+        Collection<UserNode> nodes = userPortal.getNodes(SiteType.PORTAL, Scope.ALL, filterConfig, true);
         assertNotNull(nodes);
 
         int initialNodesSize = nodes.size();
@@ -298,7 +298,7 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
           userPortalCfg = userPortalConfigSer_.getUserPortalConfig("classic", "root");
           portalCfg = userPortalCfg.getPortalConfig();
           userPortal = userPortalCfg.getUserPortal();
-          nodes = userPortal.getNodes(SiteType.PORTAL, Scope.ALL, filterConfig);
+          nodes = userPortal.getNodes(SiteType.PORTAL, Scope.ALL, filterConfig, true);
           assertNotNull(nodes);
 
           assertEquals(initialNodesSize + 1, nodes.size());
