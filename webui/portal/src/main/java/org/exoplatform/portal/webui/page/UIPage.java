@@ -62,7 +62,8 @@ import lombok.Setter;
  */
 @ComponentConfig(lifecycle = UIPageLifecycle.class, template = "system:/groovy/portal/webui/page/UIPage.gtmpl", events = {
     @EventConfig(listeners = MoveChildActionListener.class),
-    @EventConfig(name = "EditCurrentPage", listeners = UIPage.EditCurrentPageActionListener.class, csrfCheck = false) })
+    @EventConfig(name = "EditCurrentPage", listeners = UIPage.EditCurrentPageActionListener.class, csrfCheck = false),
+    @EventConfig(name = "EditAnyPage", listeners = UIPage.EditAnyPageActionListener.class, csrfCheck = false) })
 public class UIPage extends UIContainer {
 
   /**
@@ -176,11 +177,14 @@ public class UIPage extends UIContainer {
     this.maximizedUIPortlet = maximizedUIPortlet;
   }
 
-  public void switchToEditMode() throws Exception {
+  public void switchToEditMode(String pageName, String pageSiteType, String pageSiteName) throws Exception {
     PageStorage pageStorage = this.getApplicationComponent(PageStorage.class);
     LayoutService layoutService = this.getApplicationComponent(LayoutService.class);
-
-    PageKey pageKey = new PageKey(getSiteKey(), getName());
+    SiteKey pageSiteKey = getSiteKey();
+    if (pageSiteType != null && pageSiteName != null) {
+      pageSiteKey = new SiteKey(pageSiteType, pageSiteName);
+    }
+    PageKey pageKey = new PageKey(pageSiteKey, pageName != null ? pageName : getName());
     PageContext pageContext = pageStorage.loadPage(pageKey);
     if (pageContext == null) {
       UIPortalApplication uiApp = Util.getUIPortalApplication();
@@ -235,7 +239,18 @@ public class UIPage extends UIContainer {
   public static class EditCurrentPageActionListener extends EventListener<UIPage> {
     @Override
     public void execute(Event<UIPage> event) throws Exception {
-      event.getSource().switchToEditMode();
+      event.getSource().switchToEditMode(null, null, null);
+    }
+  }
+  
+  public static class EditAnyPageActionListener extends EventListener<UIPage> {
+    @Override
+    public void execute(Event<UIPage> event) throws Exception {
+      WebuiRequestContext context = event.getRequestContext();
+      String pageName = context.getRequestParameter("pageName");
+      String pageSiteType = context.getRequestParameter("pageSiteType");
+      String pageSiteName = context.getRequestParameter("pageSiteName");
+      event.getSource().switchToEditMode(pageName, pageSiteType, pageSiteName);
     }
   }
 
