@@ -7,11 +7,7 @@ import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -140,13 +136,15 @@ public class NavigationRest implements ResourceContainer {
                                          @Schema(defaultValue = "ALL") @QueryParam("scope") String scopeName,
                                          @Parameter(description = "parent navigation node id") @QueryParam("nodeId") String nodeId,
                                          @Parameter(description = "Multivalued visibilities of navigation nodes to retrieve, possible values: DISPLAYED, HIDDEN, SYSTEM or TEMPORAL. If empty, all visibilities will be used.", required = false)
-                                         @Schema(defaultValue = "All possible values combined") @QueryParam("visibility") List<String> visibilityNames) {
+                                         @Schema(defaultValue = "All possible values combined") @QueryParam("visibility") List<String> visibilityNames,
+                                         @Parameter(description = "if to include Global site in results in portal type case", required = false)
+                                         @DefaultValue("true")  @QueryParam("includeGlobal") boolean includeGlobal) {
     // this function return nodes and not navigations
     if (StringUtils.isBlank(siteTypeName)) {
       return Response.status(400).build();
     }
 
-    return getNavigations(request, siteTypeName, siteName, scopeName, nodeId, visibilityNames);
+    return getNavigations(request, siteTypeName, siteName, scopeName, nodeId, visibilityNames, includeGlobal);
   }
 
   @Path("/categories")
@@ -181,7 +179,8 @@ public class NavigationRest implements ResourceContainer {
                                   String siteName,
                                   String scopeName,
                                   String nodeId,
-                                  List<String> visibilityNames) {
+                                  List<String> visibilityNames,
+                                  boolean includeGlobal) {
     ConversationState state = ConversationState.getCurrent();
     Identity userIdentity = state == null ? null : state.getIdentity();
     String username = userIdentity == null ? null : userIdentity.getUserId();
@@ -239,7 +238,7 @@ public class NavigationRest implements ResourceContainer {
         UserNode userNode = userPortal.getNodeById(nodeId, siteKey, scope, userFilterConfig, null);
         nodes.add(userNode);
       } else if (siteType == SiteType.PORTAL || StringUtils.isBlank(siteName)) {
-        nodes = userPortal.getNodes(siteType, scope, userFilterConfig);
+        nodes = userPortal.getNodes(siteType, scope, userFilterConfig, includeGlobal);
       } else {
         UserNavigation navigation = userPortal.getNavigation(new SiteKey(siteType, siteName));
         if (navigation == null) {
