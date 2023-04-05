@@ -113,9 +113,10 @@ public interface UserPortal {
      * @param siteType site type: PORTAL, GROUP or USER
      * @param scope an optional scope
      * @param filterConfig an optional filter
+     * @param includeGlobal to include global nodes
      * @return a {@link Collection} of {@link UserNode}
      */
-    Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig filterConfig);
+    Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig filterConfig, boolean includeGlobal);
 
     /**
      * Load the list of user nodes computed from the list of
@@ -126,14 +127,14 @@ public interface UserPortal {
      * @param      scope            an optional scope
      * @param      filterConfig     an optional filter
      * @return                      a {@link Collection} of {@link UserNode}
-     * @deprecated                  use {@link #getNodes(SiteType, Scope, UserNodeFilterConfig)}
+     * @deprecated                  use {@link #getNodes(SiteType, Scope, UserNodeFilterConfig, boolean)}
      *                              instead since no need of filtering on Spaces nodes due to
      *                              introduction of new {@link SiteType#SPACE} that allows to
      *                              get space navigations
      */
     @Deprecated(forRemoval = true, since ="6.5")
     default Collection<UserNode> getNodes(SiteType siteType, String excludedSiteName, Scope scope, UserNodeFilterConfig filterConfig) {
-      return getNodes(siteType, scope, filterConfig);
+      return getNodes(siteType, scope, filterConfig, true);
     }
 
     /**
