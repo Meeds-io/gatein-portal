@@ -25,6 +25,7 @@ import org.exoplatform.portal.mop.navigation.NavigationData;
 import org.exoplatform.portal.mop.navigation.NodeChangeListener;
 import org.exoplatform.portal.mop.navigation.NodeChangeNotifier;
 import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.portal.mop.navigation.NodeManager;
 import org.exoplatform.portal.mop.navigation.NodeModel;
 import org.exoplatform.portal.mop.navigation.Scope;
@@ -142,7 +143,12 @@ public class NavigationServiceImpl implements NavigationService {
   public <N> void rebaseNode(NodeContext<N> context, Scope scope, NodeChangeListener<NodeContext<N>> listener) {
     nodeManager.rebaseNode(context, scope, new NodeChangeNotifier<>(listener, this, listenerService));
   }
-
+  
+  @Override
+  public NodeData getNodeById(Long nodeId) {
+    return navigationStorage.loadNode(nodeId);
+  }
+  
   @Override
   public void deleteNode(Long nodeId) {
     navigationStorage.destroyNode(nodeId);
@@ -155,5 +161,4 @@ public class NavigationServiceImpl implements NavigationService {
       LOG.error("Error when delivering notification " + name + " for navigation " + key, e);
     }
   }
-
 }
