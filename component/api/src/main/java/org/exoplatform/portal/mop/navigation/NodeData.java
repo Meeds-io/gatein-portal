@@ -140,6 +140,10 @@ public class NodeData implements Serializable {
         return state;
     }
 
+    public SiteKey getSiteKey() {
+      return siteKey;
+    }
+
     public String getParentId() {
         return this.parentId;
     }

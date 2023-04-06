@@ -19,6 +19,7 @@ import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NodeChangeListener;
 import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.portal.mop.navigation.NodeModel;
 import org.exoplatform.portal.mop.navigation.Scope;
 
@@ -168,4 +169,17 @@ public interface NavigationService extends org.exoplatform.portal.mop.navigation
    */
   <N> void rebaseNode(NodeContext<N> context, Scope scope, NodeChangeListener<NodeContext<N>> listener);
 
+  /**
+   * Delete a navigation node with a given node id
+   *
+   * @param nodeId the node id to be deleted
+   */
+  public void deleteNode(Long nodeId);
+  
+  /**
+   * Get a navigation node with a given node id
+   *
+   * @param nodeId the node id
+   */
+  public NodeData getNodeById(Long nodeId);
 }
