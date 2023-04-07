@@ -92,7 +92,7 @@ public class RememberMeFilter extends AbstractFilter {
             // Clear token cookie if we did not authenticate
             if (request.getRemoteUser() == null) {
               Cookie cookie = new Cookie(LoginUtils.COOKIE_NAME, "");
-              cookie.setPath(request.getContextPath());
+              cookie.setPath("/");
               cookie.setMaxAge(0);
               cookie.setHttpOnly(true);
               cookie.setSecure(request.isSecure());
