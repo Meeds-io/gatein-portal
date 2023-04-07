@@ -28,6 +28,7 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.exoplatform.portal.mop.storage.PageStorage;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -60,6 +61,9 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
   @Mock
   private NavigationCategoryService navigationCategoryService;
 
+  @Mock
+  private PageStorage               pageStorage;
+
   protected Class<?> getComponentClass() {
     return NavigationRest.class;
   }
@@ -68,7 +72,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    binder.addResource(new NavigationRest(portalConfigService, navigationCategoryService), null);
+    binder.addResource(new NavigationRest(portalConfigService, navigationCategoryService, pageStorage), null);
   }
 
   @Override

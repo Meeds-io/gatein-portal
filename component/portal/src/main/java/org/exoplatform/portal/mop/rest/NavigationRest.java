@@ -13,6 +13,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.mop.storage.PageStorage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -61,9 +63,12 @@ public class NavigationRest implements ResourceContainer {
 
   private NavigationCategoryService         navigationCategoryService;
 
-  public NavigationRest(UserPortalConfigService portalConfigService, NavigationCategoryService navigationCategoryService) {
+  private PageStorage                       pageStorage;
+
+  public NavigationRest(UserPortalConfigService portalConfigService, NavigationCategoryService navigationCategoryService, PageStorage pageStorage) {
     this.portalConfigService = portalConfigService;
     this.navigationCategoryService = navigationCategoryService;
+    this.pageStorage = pageStorage;
   }
 
   @GET
@@ -138,13 +143,15 @@ public class NavigationRest implements ResourceContainer {
                                          @Parameter(description = "Multivalued visibilities of navigation nodes to retrieve, possible values: DISPLAYED, HIDDEN, SYSTEM or TEMPORAL. If empty, all visibilities will be used.", required = false)
                                          @Schema(defaultValue = "All possible values combined") @QueryParam("visibility") List<String> visibilityNames,
                                          @Parameter(description = "if to include Global site in results in portal type case", required = false)
-                                         @DefaultValue("true")  @QueryParam("includeGlobal") boolean includeGlobal) {
+                                         @DefaultValue("true")  @QueryParam("includeGlobal") boolean includeGlobal,
+                                         @Parameter(description = "to include extra node page attribute in results")
+                                         @QueryParam("expandPageDetails") boolean expandPageDetails) {
     // this function return nodes and not navigations
     if (StringUtils.isBlank(siteTypeName)) {
       return Response.status(400).build();
     }
 
-    return getNavigations(request, siteTypeName, siteName, scopeName, nodeId, visibilityNames, includeGlobal);
+    return getNavigations(request, siteTypeName, siteName, scopeName, nodeId, visibilityNames, includeGlobal, expandPageDetails);
   }
 
   @Path("/categories")
@@ -180,7 +187,8 @@ public class NavigationRest implements ResourceContainer {
                                   String scopeName,
                                   String nodeId,
                                   List<String> visibilityNames,
-                                  boolean includeGlobal) {
+                                  boolean includeGlobal,
+                                  boolean expandPageDetails) {
     ConversationState state = ConversationState.getCurrent();
     Identity userIdentity = state == null ? null : state.getIdentity();
     String username = userIdentity == null ? null : userIdentity.getUserId();
@@ -247,7 +255,7 @@ public class NavigationRest implements ResourceContainer {
         UserNode rootNode = userPortal.getNode(navigation, scope, userFilterConfig, null);
         nodes = rootNode.getChildren();
       }
-      List<ResultUserNode> resultNodes = convertNodes(nodes);
+      List<ResultUserNode> resultNodes = convertNodes(nodes, expandPageDetails);
       return Response.ok(resultNodes).build();
     } catch (Exception e) {
       LOG.error("Error retrieving ");
@@ -255,7 +263,7 @@ public class NavigationRest implements ResourceContainer {
     }
   }
 
-  private List<ResultUserNode> convertNodes(Collection<UserNode> nodes) {
+  private List<ResultUserNode> convertNodes(Collection<UserNode> nodes, boolean expandPageDetails) {
     if (nodes == null) {
       return Collections.emptyList();
     }
@@ -265,7 +273,17 @@ public class NavigationRest implements ResourceContainer {
         continue;
       }
       ResultUserNode resultNode = new ResultUserNode(userNode);
-      resultNode.setChildren(convertNodes(userNode.getChildren()));
+      if (expandPageDetails && userNode.getPageRef() != null) {
+        Page userNodePage = pageStorage.getPage(userNode.getPageRef());
+        boolean canEdit = ConversationState.getCurrent()
+                                           .getIdentity()
+                                           .isMemberOf(userNodePage.getEditPermission().split(":")[1],
+                                                       userNodePage.getEditPermission().split(":")[0]);
+        resultNode.setCanEdit(canEdit);
+        resultNode.setEditPermission(userNodePage.getEditPermission());
+        resultNode.setAccessPermissions(userNodePage.getAccessPermissions());
+      }
+      resultNode.setChildren(convertNodes(userNode.getChildren(), expandPageDetails));
       result.add(resultNode);
     }
     return result;
@@ -325,6 +343,12 @@ public class NavigationRest implements ResourceContainer {
 
     private List<ResultUserNode> subNodes;
 
+    private boolean              canEdit;
+
+    private String               editPermission;
+
+    private String[]             accessPermissions;
+
     public ResultUserNode(UserNode userNode) {
       this.userNode = userNode;
     }
@@ -379,6 +403,30 @@ public class NavigationRest implements ResourceContainer {
 
     public PageKey getPageKey() {
       return userNode.getPageRef();
+    }
+
+    public boolean isCanEdit() {
+      return canEdit;
+    }
+
+    public void setCanEdit(boolean canEdit) {
+      this.canEdit = canEdit;
+    }
+
+    public String getEditPermission() {
+      return editPermission;
+    }
+
+    public void setEditPermission(String editPermission) {
+      this.editPermission = editPermission;
+    }
+
+    public String[] getAccessPermissions() {
+      return accessPermissions;
+    }
+
+    public void setAccessPermissions(String[] accessPermissions) {
+      this.accessPermissions = accessPermissions;
     }
   }
 
