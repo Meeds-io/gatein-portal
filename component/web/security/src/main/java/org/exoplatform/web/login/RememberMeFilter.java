@@ -92,7 +92,7 @@ public class RememberMeFilter extends AbstractFilter {
             // Clear token cookie if we did not authenticate
             if (req.getRemoteUser() == null) {
                 Cookie cookie = new Cookie(LoginUtils.COOKIE_NAME, "");
-                cookie.setPath(req.getContextPath());
+                cookie.setPath("/");
                 cookie.setMaxAge(0);
                 cookie.setHttpOnly(true);
                 cookie.setSecure(req.isSecure());
@@ -132,7 +132,7 @@ public class RememberMeFilter extends AbstractFilter {
                 // Clear token cookie if we did not authenticate
                 if (req.getRemoteUser() == null) {
                     Cookie cookie = new Cookie(LoginUtils.OAUTH_COOKIE_NAME, "");
-                    cookie.setPath(req.getContextPath());
+                    cookie.setPath("/");
                     cookie.setMaxAge(0);
                     cookie.setHttpOnly(true);
                     cookie.setSecure(req.isSecure());
