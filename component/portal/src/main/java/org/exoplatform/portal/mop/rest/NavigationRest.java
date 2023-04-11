@@ -1,6 +1,7 @@
 package org.exoplatform.portal.mop.rest;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -278,40 +279,42 @@ public class NavigationRest implements ResourceContainer {
       ResultUserNode resultNode = new ResultUserNode(userNode);
       if (expandPageDetails && userNode.getPageRef() != null) {
         Page userNodePage = layoutService.getPage(userNode.getPageRef());
-        if (userNodePage.getEditPermission() != null && !userNodePage.getEditPermission().isBlank()) {
+        if (!StringUtils.isBlank(userNodePage.getEditPermission())) {
           resultNode.setCanEditPage(identity.isMemberOf(userNodePage.getEditPermission().split(":")[1],
                                                         userNodePage.getEditPermission().split(":")[0]));
-          Map<String, Object> editPermission = new LinkedHashMap<>();
-          editPermission.put("membershipType", userNodePage.getEditPermission().split(":")[0]);
+          Map<String, Object> editPermission = new HashMap<>();
           try {
+            editPermission.put("membershipType", userNodePage.getEditPermission().split(":")[0]);
             editPermission.put("group",
                                organizationService.getGroupHandler()
                                                   .findGroupById(userNodePage.getEditPermission().split(":")[1]));
           } catch (Exception e) {
-            editPermission.put("group", userNodePage.getEditPermission().split(":")[1]);
+            LOG.warn("Error when getting group with id {}", userNodePage.getEditPermission().split(":")[1], e);
           }
           resultNode.setPageEditPermission(editPermission);
         }
-        List<Map<String, Object>> accessPermissions = new ArrayList<>();
         if (userNodePage.getAccessPermissions() != null) {
+          List<Map<String, Object>> accessPermissions = new ArrayList<>();
+
           if (userNodePage.getAccessPermissions().length == 1 && userNodePage.getAccessPermissions()[0].equals("Everyone")) {
-            HashMap<String, Object> accessPermission = new LinkedHashMap<>();
+            HashMap<String, Object> accessPermission = new HashMap<>();
             accessPermission.put("membershipType", userNodePage.getAccessPermissions()[0]);
             accessPermissions.add(accessPermission);
           } else {
-            Arrays.stream(userNodePage.getAccessPermissions()).forEach(permission -> {
-              HashMap<String, Object> accessPermission = new LinkedHashMap<>();
-              accessPermission.put("membershipType", permission.split(":")[0]);
+            accessPermissions = Arrays.stream(userNodePage.getAccessPermissions()).map(permission -> {
               try {
+                Map<String, Object> accessPermission = new HashMap<>();
+                accessPermission.put("membershipType", permission.split(":")[0]);
                 accessPermission.put("group", organizationService.getGroupHandler().findGroupById(permission.split(":")[1]));
+                return accessPermission;
               } catch (Exception e) {
-                accessPermission.put("group", permission.split(":")[1]);
+                LOG.warn("Error when getting group with id {}", permission.split(":")[1], e);
+                return null;
               }
-              accessPermissions.add(accessPermission);
-            });
+            }).collect(Collectors.toList());
           }
+          resultNode.setPageAccessPermissions(accessPermissions);
         }
-        resultNode.setPageAccessPermissions(accessPermissions);
       }
       resultNode.setChildren(convertNodes(userNode.getChildren(), identity, expandPageDetails));
       result.add(resultNode);

@@ -203,6 +203,24 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     assertEquals(200, resp.getStatus());
     Object entity = resp.getEntity();
     assertNotNull(entity);
+    List<NavigationRest.ResultUserNode> resultUserNodes = (List<NavigationRest.ResultUserNode>) resp.getEntity();
+    assertEquals(1, resultUserNodes.size());
+    assertEquals("*", resultUserNodes.get(0).getPageEditPermission().get("membershipType"));
+    assertEquals(1, resultUserNodes.get(0).getPageAccessPermissions().size());
+    assertEquals("*", resultUserNodes.get(0).getPageAccessPermissions().get(0).get("membershipType"));
+
+   when(nodePage.getEditPermission()).thenReturn("manager:/platform/users");
+    when(nodePage.getAccessPermissions()).thenReturn(new String[]{"Everyone"});
+
+    resp = launcher.service("GET", path, "", null, null, envctx);
+    assertEquals(200, resp.getStatus());
+    entity = resp.getEntity();
+    assertNotNull(entity);
+    resultUserNodes = (List<NavigationRest.ResultUserNode>) resp.getEntity();
+    assertEquals(1, resultUserNodes.size());
+    assertEquals("manager", resultUserNodes.get(0).getPageEditPermission().get("membershipType"));
+    assertEquals(1, resultUserNodes.get(0).getPageAccessPermissions().size());
+    assertEquals("Everyone", resultUserNodes.get(0).getPageAccessPermissions().get(0).get("membershipType"));
   }
 
 }
