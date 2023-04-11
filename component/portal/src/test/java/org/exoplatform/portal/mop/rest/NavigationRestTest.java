@@ -15,20 +15,23 @@
  */
 package org.exoplatform.portal.mop.rest;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.storage.PageStorage;
+import org.exoplatform.portal.mop.user.*;
+import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.GroupHandler;
+import org.exoplatform.services.organization.OrganizationService;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -45,8 +48,6 @@ import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationState;
 import org.exoplatform.portal.mop.rest.NavigationRest.ResultUserNavigation;
-import org.exoplatform.portal.mop.user.UserNavigation;
-import org.exoplatform.portal.mop.user.UserPortalImpl;
 import org.exoplatform.portal.rest.services.BaseRestServicesTestCase;
 import org.exoplatform.services.rest.impl.ContainerResponse;
 import org.exoplatform.services.rest.impl.EnvironmentContext;
@@ -62,7 +63,10 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
   private NavigationCategoryService navigationCategoryService;
 
   @Mock
-  private PageStorage               pageStorage;
+  private LayoutService             layoutService;
+
+  @Mock
+  private OrganizationService       organizationService;
 
   protected Class<?> getComponentClass() {
     return NavigationRest.class;
@@ -72,7 +76,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    binder.addResource(new NavigationRest(portalConfigService, navigationCategoryService, pageStorage), null);
+    binder.addResource(new NavigationRest(portalConfigService, navigationCategoryService, layoutService, organizationService), null);
   }
 
   @Override
@@ -165,6 +169,39 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     assertEquals(navs.get("test"), jsonObject.getJSONObject("navs").get("test"));
     assertEquals(categoriesOrder.get("test"), jsonObject.getJSONObject("categoriesOrder").get("test"));
     assertEquals(urisOrder.get("test"), jsonObject.getJSONObject("urisOrder").get("test"));
+  }
+  @Test
+  public void testGetSiteTypeNavigations() throws Exception {
+    String path = "/v1/navigations/PORTAL?siteName=SiteName&expandPageDetails=true";
+
+    EnvironmentContext envctx = new EnvironmentContext();
+    HttpServletRequest httpRequest = new MockHttpServletRequest(path, null, 0, "GET", null);
+    envctx.put(HttpServletRequest.class, httpRequest);
+
+    startUserSession("root1");
+    Collection<UserNode> nodes = new ArrayList<>();
+    Page nodePage = mock(Page.class);
+    UserNode userNode = mock(UserNode.class);
+    nodes.add(userNode);
+    UserPortalConfig userPortalConfig = mock(UserPortalConfig.class);
+    UserPortal userPortal = mock(UserPortal.class);
+    GroupHandler groupHandler = mock(GroupHandler.class);
+    Group group = mock(Group.class);
+    when(organizationService.getGroupHandler()).thenReturn(groupHandler);
+    when(groupHandler.findGroupById("/platform/users")).thenReturn(group);
+    PageKey pageKey = PageKey.parse("portal::page::ref");
+    when(layoutService.getPage(pageKey)).thenReturn(nodePage);
+    when(nodePage.getEditPermission()).thenReturn("*:/platform/users");
+    when(nodePage.getAccessPermissions()).thenReturn(new String[]{"*:/platform/users"});
+    when(userNode.getPageRef()).thenReturn(pageKey);
+
+    when(portalConfigService.getUserPortalConfig(anyString(), anyString(), any())).thenReturn(userPortalConfig);
+    when(userPortalConfig.getUserPortal()).thenReturn(userPortal);
+    when(userPortal.getNodes(any(SiteType.class) , any(Scope.class), any(UserNodeFilterConfig.class),anyBoolean())).thenReturn(nodes);
+
+    ContainerResponse resp = launcher.service("GET", path, "", null, null, envctx);
+    assertEquals(200, resp.getStatus());
+
   }
 
 }

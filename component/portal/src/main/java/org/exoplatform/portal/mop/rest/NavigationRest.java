@@ -1,9 +1,6 @@
 package org.exoplatform.portal.mop.rest;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +11,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.mop.storage.PageStorage;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -63,12 +60,18 @@ public class NavigationRest implements ResourceContainer {
 
   private NavigationCategoryService         navigationCategoryService;
 
-  private PageStorage                       pageStorage;
+  private LayoutService                     layoutService;
 
-  public NavigationRest(UserPortalConfigService portalConfigService, NavigationCategoryService navigationCategoryService, PageStorage pageStorage) {
+  private OrganizationService               organizationService;
+
+  public NavigationRest(UserPortalConfigService portalConfigService,
+                        NavigationCategoryService navigationCategoryService,
+                        LayoutService layoutService,
+                        OrganizationService organizationService) {
     this.portalConfigService = portalConfigService;
     this.navigationCategoryService = navigationCategoryService;
-    this.pageStorage = pageStorage;
+    this.layoutService = layoutService;
+    this.organizationService = organizationService;
   }
 
   @GET
@@ -144,7 +147,7 @@ public class NavigationRest implements ResourceContainer {
                                          @Schema(defaultValue = "All possible values combined") @QueryParam("visibility") List<String> visibilityNames,
                                          @Parameter(description = "if to include Global site in results in portal type case", required = false)
                                          @DefaultValue("true")  @QueryParam("includeGlobal") boolean includeGlobal,
-                                         @Parameter(description = "to include extra node page attribute in results")
+                                         @Parameter(description = "to include extra node page details in results")
                                          @QueryParam("expandPageDetails") boolean expandPageDetails) {
     // this function return nodes and not navigations
     if (StringUtils.isBlank(siteTypeName)) {
@@ -255,7 +258,7 @@ public class NavigationRest implements ResourceContainer {
         UserNode rootNode = userPortal.getNode(navigation, scope, userFilterConfig, null);
         nodes = rootNode.getChildren();
       }
-      List<ResultUserNode> resultNodes = convertNodes(nodes, expandPageDetails);
+      List<ResultUserNode> resultNodes = convertNodes(nodes, userIdentity, expandPageDetails);
       return Response.ok(resultNodes).build();
     } catch (Exception e) {
       LOG.error("Error retrieving ");
@@ -263,7 +266,7 @@ public class NavigationRest implements ResourceContainer {
     }
   }
 
-  private List<ResultUserNode> convertNodes(Collection<UserNode> nodes, boolean expandPageDetails) {
+  private List<ResultUserNode> convertNodes(Collection<UserNode> nodes, org.exoplatform.services.security.Identity identity, boolean expandPageDetails) {
     if (nodes == null) {
       return Collections.emptyList();
     }
@@ -274,16 +277,44 @@ public class NavigationRest implements ResourceContainer {
       }
       ResultUserNode resultNode = new ResultUserNode(userNode);
       if (expandPageDetails && userNode.getPageRef() != null) {
-        Page userNodePage = pageStorage.getPage(userNode.getPageRef());
-        boolean canEdit = ConversationState.getCurrent()
-                                           .getIdentity()
-                                           .isMemberOf(userNodePage.getEditPermission().split(":")[1],
-                                                       userNodePage.getEditPermission().split(":")[0]);
-        resultNode.setCanEdit(canEdit);
-        resultNode.setEditPermission(userNodePage.getEditPermission());
-        resultNode.setAccessPermissions(userNodePage.getAccessPermissions());
+        Page userNodePage = layoutService.getPage(userNode.getPageRef());
+        boolean canEdit = false;
+        if (userNodePage.getEditPermission() != null && !userNodePage.getEditPermission().isBlank()){
+          canEdit = identity.isMemberOf(userNodePage.getEditPermission().split(":")[1],
+                  userNodePage.getEditPermission().split(":")[0]);
+        }
+        resultNode.setCanEditPage(canEdit);
+        HashMap<String, Object> editPermission = new LinkedHashMap<>();
+        editPermission.put("membershipType", userNodePage.getEditPermission().split(":")[0]);
+        try {
+          editPermission.put("group",
+                             organizationService.getGroupHandler().findGroupById(userNodePage.getEditPermission().split(":")[1]));
+        } catch (Exception e) {
+          editPermission.put("group", userNodePage.getEditPermission().split(":")[1]);
+        }
+        resultNode.setPageEditPermission(editPermission);
+        List<HashMap<String, Object>> accessPermissions = new ArrayList<>();
+
+        if(userNodePage.getAccessPermissions() != null && userNodePage.getAccessPermissions().length == 1 && userNodePage.getAccessPermissions()[0].equals("Everyone") ) {
+          HashMap<String, Object> accessPermission = new LinkedHashMap<>();
+          accessPermission.put("membershipType", userNodePage.getAccessPermissions()[0]);
+          accessPermissions.add(accessPermission);
+        } else {
+          for (String permission : userNodePage.getAccessPermissions()) {
+            HashMap<String, Object> accessPermission = new LinkedHashMap<>();
+
+            accessPermission.put("membershipType", permission.split(":")[0]);
+            try {
+              accessPermission.put("group", organizationService.getGroupHandler().findGroupById(permission.split(":")[1]));
+            } catch (Exception e) {
+              accessPermission.put("group", permission.split(":")[1]);
+            }
+            accessPermissions.add(accessPermission);
+          }
+        }
+        resultNode.setPageAccessPermissions(accessPermissions);
       }
-      resultNode.setChildren(convertNodes(userNode.getChildren(), expandPageDetails));
+      resultNode.setChildren(convertNodes(userNode.getChildren(), identity, expandPageDetails));
       result.add(resultNode);
     }
     return result;
@@ -343,11 +374,11 @@ public class NavigationRest implements ResourceContainer {
 
     private List<ResultUserNode> subNodes;
 
-    private boolean              canEdit;
+    private boolean canEditPage;
 
-    private String               editPermission;
+    private HashMap<String, Object> pageEditPermission;
 
-    private String[]             accessPermissions;
+    private List<HashMap<String, Object>> pageAccessPermissions;
 
     public ResultUserNode(UserNode userNode) {
       this.userNode = userNode;
@@ -405,28 +436,28 @@ public class NavigationRest implements ResourceContainer {
       return userNode.getPageRef();
     }
 
-    public boolean isCanEdit() {
-      return canEdit;
+    public boolean isCanEditPage() {
+      return canEditPage;
     }
 
-    public void setCanEdit(boolean canEdit) {
-      this.canEdit = canEdit;
+    public void setCanEditPage(boolean canEditPage) {
+      this.canEditPage = canEditPage;
     }
 
-    public String getEditPermission() {
-      return editPermission;
+    public HashMap<String, Object> getPageEditPermission() {
+      return pageEditPermission;
     }
 
-    public void setEditPermission(String editPermission) {
-      this.editPermission = editPermission;
+    public void setPageEditPermission(HashMap<String, Object> pageEditPermission) {
+      this.pageEditPermission = pageEditPermission;
     }
 
-    public String[] getAccessPermissions() {
-      return accessPermissions;
+    public List<HashMap<String, Object>> getPageAccessPermissions() {
+      return pageAccessPermissions;
     }
 
-    public void setAccessPermissions(String[] accessPermissions) {
-      this.accessPermissions = accessPermissions;
+    public void setPageAccessPermissions(List<HashMap<String, Object>> pageAccessPermissions) {
+      this.pageAccessPermissions = pageAccessPermissions;
     }
   }
 
