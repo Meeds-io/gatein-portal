@@ -148,7 +148,12 @@ public class NavigationServiceImpl implements NavigationService {
   public NodeData getNodeById(Long nodeId) {
     return navigationStorage.loadNode(nodeId);
   }
-  
+
+  @Override
+  public void moveNode(Long targetId, Long fromId, Long toId, Long previousId) {
+    navigationStorage.moveNode(targetId, fromId, toId, previousId);
+  }
+
   @Override
   public void deleteNode(Long nodeId) {
     navigationStorage.destroyNode(nodeId);

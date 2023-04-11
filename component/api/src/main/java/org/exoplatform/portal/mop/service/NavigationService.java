@@ -15,6 +15,8 @@
  */
 package org.exoplatform.portal.mop.service;
 
+import org.exoplatform.commons.ObjectAlreadyExistsException;
+import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NodeChangeListener;
@@ -182,4 +184,14 @@ public interface NavigationService extends org.exoplatform.portal.mop.navigation
    * @param nodeId the node id
    */
   public NodeData getNodeById(Long nodeId);
+
+  /**
+   * Move the given navigation node
+   *
+   * @param targetId the node id
+   * @param fromId the parent node id
+   * @param toId destination parent node id
+   * @param previousId the previous node id
+   */
+  public void moveNode(Long targetId, Long fromId, Long toId, Long previousId);
 }
