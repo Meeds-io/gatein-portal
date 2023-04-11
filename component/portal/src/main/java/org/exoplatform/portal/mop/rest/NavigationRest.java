@@ -266,7 +266,7 @@ public class NavigationRest implements ResourceContainer {
     }
   }
 
-  private List<ResultUserNode> convertNodes(Collection<UserNode> nodes, org.exoplatform.services.security.Identity identity, boolean expandPageDetails) {
+  private List<ResultUserNode> convertNodes(Collection<UserNode> nodes, Identity identity, boolean expandPageDetails) {
     if (nodes == null) {
       return Collections.emptyList();
     }
@@ -278,38 +278,37 @@ public class NavigationRest implements ResourceContainer {
       ResultUserNode resultNode = new ResultUserNode(userNode);
       if (expandPageDetails && userNode.getPageRef() != null) {
         Page userNodePage = layoutService.getPage(userNode.getPageRef());
-        boolean canEdit = false;
-        if (userNodePage.getEditPermission() != null && !userNodePage.getEditPermission().isBlank()){
-          canEdit = identity.isMemberOf(userNodePage.getEditPermission().split(":")[1],
-                  userNodePage.getEditPermission().split(":")[0]);
+        if (userNodePage.getEditPermission() != null && !userNodePage.getEditPermission().isBlank()) {
+          resultNode.setCanEditPage(identity.isMemberOf(userNodePage.getEditPermission().split(":")[1],
+                                                        userNodePage.getEditPermission().split(":")[0]));
+          Map<String, Object> editPermission = new LinkedHashMap<>();
+          editPermission.put("membershipType", userNodePage.getEditPermission().split(":")[0]);
+          try {
+            editPermission.put("group",
+                               organizationService.getGroupHandler()
+                                                  .findGroupById(userNodePage.getEditPermission().split(":")[1]));
+          } catch (Exception e) {
+            editPermission.put("group", userNodePage.getEditPermission().split(":")[1]);
+          }
+          resultNode.setPageEditPermission(editPermission);
         }
-        resultNode.setCanEditPage(canEdit);
-        HashMap<String, Object> editPermission = new LinkedHashMap<>();
-        editPermission.put("membershipType", userNodePage.getEditPermission().split(":")[0]);
-        try {
-          editPermission.put("group",
-                             organizationService.getGroupHandler().findGroupById(userNodePage.getEditPermission().split(":")[1]));
-        } catch (Exception e) {
-          editPermission.put("group", userNodePage.getEditPermission().split(":")[1]);
-        }
-        resultNode.setPageEditPermission(editPermission);
-        List<HashMap<String, Object>> accessPermissions = new ArrayList<>();
-
-        if(userNodePage.getAccessPermissions() != null && userNodePage.getAccessPermissions().length == 1 && userNodePage.getAccessPermissions()[0].equals("Everyone") ) {
-          HashMap<String, Object> accessPermission = new LinkedHashMap<>();
-          accessPermission.put("membershipType", userNodePage.getAccessPermissions()[0]);
-          accessPermissions.add(accessPermission);
-        } else {
-          for (String permission : userNodePage.getAccessPermissions()) {
+        List<Map<String, Object>> accessPermissions = new ArrayList<>();
+        if (userNodePage.getAccessPermissions() != null) {
+          if (userNodePage.getAccessPermissions().length == 1 && userNodePage.getAccessPermissions()[0].equals("Everyone")) {
             HashMap<String, Object> accessPermission = new LinkedHashMap<>();
-
-            accessPermission.put("membershipType", permission.split(":")[0]);
-            try {
-              accessPermission.put("group", organizationService.getGroupHandler().findGroupById(permission.split(":")[1]));
-            } catch (Exception e) {
-              accessPermission.put("group", permission.split(":")[1]);
-            }
+            accessPermission.put("membershipType", userNodePage.getAccessPermissions()[0]);
             accessPermissions.add(accessPermission);
+          } else {
+            Arrays.stream(userNodePage.getAccessPermissions()).forEach(permission -> {
+              HashMap<String, Object> accessPermission = new LinkedHashMap<>();
+              accessPermission.put("membershipType", permission.split(":")[0]);
+              try {
+                accessPermission.put("group", organizationService.getGroupHandler().findGroupById(permission.split(":")[1]));
+              } catch (Exception e) {
+                accessPermission.put("group", permission.split(":")[1]);
+              }
+              accessPermissions.add(accessPermission);
+            });
           }
         }
         resultNode.setPageAccessPermissions(accessPermissions);
@@ -376,9 +375,9 @@ public class NavigationRest implements ResourceContainer {
 
     private boolean canEditPage;
 
-    private HashMap<String, Object> pageEditPermission;
+    private Map<String, Object> pageEditPermission;
 
-    private List<HashMap<String, Object>> pageAccessPermissions;
+    private List<Map<String, Object>> pageAccessPermissions;
 
     public ResultUserNode(UserNode userNode) {
       this.userNode = userNode;
@@ -444,19 +443,19 @@ public class NavigationRest implements ResourceContainer {
       this.canEditPage = canEditPage;
     }
 
-    public HashMap<String, Object> getPageEditPermission() {
+    public Map<String, Object> getPageEditPermission() {
       return pageEditPermission;
     }
 
-    public void setPageEditPermission(HashMap<String, Object> pageEditPermission) {
+    public void setPageEditPermission(Map<String, Object> pageEditPermission) {
       this.pageEditPermission = pageEditPermission;
     }
 
-    public List<HashMap<String, Object>> getPageAccessPermissions() {
+    public List<Map<String, Object>> getPageAccessPermissions() {
       return pageAccessPermissions;
     }
 
-    public void setPageAccessPermissions(List<HashMap<String, Object>> pageAccessPermissions) {
+    public void setPageAccessPermissions(List<Map<String, Object>> pageAccessPermissions) {
       this.pageAccessPermissions = pageAccessPermissions;
     }
   }

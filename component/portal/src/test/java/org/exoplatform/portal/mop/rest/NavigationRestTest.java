@@ -201,7 +201,8 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
 
     ContainerResponse resp = launcher.service("GET", path, "", null, null, envctx);
     assertEquals(200, resp.getStatus());
-
+    Object entity = resp.getEntity();
+    assertNotNull(entity);
   }
 
 }
