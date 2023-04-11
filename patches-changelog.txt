@@ -2,4 +2,9 @@
 
    # 6.3.4 Patches changelog: 
 
+* 2023-02-17: Patch-6.3.4:1, Author: Jihed Chabbeh<jchabbeh@exoplatform.com>
+
+	-  https://github.com/exoplatform/web-conferencing/commit/fcbf298f227f8a557dbe5cecbbb321e9f7ad4ad1
+
+	-  https://github.com/Meeds-io/gatein-portal/pull/536
 
