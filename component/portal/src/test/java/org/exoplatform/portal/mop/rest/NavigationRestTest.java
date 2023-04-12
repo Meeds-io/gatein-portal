@@ -32,6 +32,14 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.GroupHandler;
+import org.exoplatform.services.organization.OrganizationService;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -43,24 +51,17 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.exoplatform.portal.config.NavigationCategoryService;
 import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
-import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationState;
-import org.exoplatform.portal.mop.navigation.Scope;
-import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.rest.NavigationRest.ResultUserNavigation;
-import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserNode;
 import org.exoplatform.portal.mop.user.UserNodeFilterConfig;
 import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.portal.mop.user.UserPortalImpl;
 import org.exoplatform.portal.rest.services.BaseRestServicesTestCase;
-import org.exoplatform.services.organization.Group;
-import org.exoplatform.services.organization.GroupHandler;
-import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.rest.impl.ContainerResponse;
 import org.exoplatform.services.rest.impl.EnvironmentContext;
 import org.exoplatform.services.test.mock.MockHttpServletRequest;
@@ -80,6 +81,9 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
   @Mock
   private OrganizationService       organizationService;
 
+  @Mock
+  private UserACL                   userACL;
+
   protected Class<?> getComponentClass() {
     return NavigationRest.class;
   }
@@ -88,7 +92,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    binder.addResource(new NavigationRest(portalConfigService, navigationCategoryService, layoutService, organizationService), null);
+    binder.addResource(new NavigationRest(portalConfigService, navigationCategoryService, layoutService, organizationService, userACL), null);
   }
 
   @Override
@@ -210,7 +214,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     when(portalConfigService.getUserPortalConfig(anyString(), anyString(), any())).thenReturn(userPortalConfig);
     when(userPortalConfig.getUserPortal()).thenReturn(userPortal);
     when(userPortal.getNodes(any(SiteType.class) , any(Scope.class), any(UserNodeFilterConfig.class),anyBoolean())).thenReturn(nodes);
-
+    when(userACL.hasEditPermission(any(Page.class))).thenReturn(true);
     ContainerResponse resp = launcher.service("GET", path, "", null, null, envctx);
     Object entity = resp.getEntity();
     
