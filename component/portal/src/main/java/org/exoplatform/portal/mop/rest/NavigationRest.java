@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.json.JSONException;
@@ -65,14 +66,18 @@ public class NavigationRest implements ResourceContainer {
 
   private OrganizationService               organizationService;
 
+  private UserACL                           userACL;
+
   public NavigationRest(UserPortalConfigService portalConfigService,
                         NavigationCategoryService navigationCategoryService,
                         LayoutService layoutService,
-                        OrganizationService organizationService) {
+                        OrganizationService organizationService,
+                        UserACL userACL) {
     this.portalConfigService = portalConfigService;
     this.navigationCategoryService = navigationCategoryService;
     this.layoutService = layoutService;
     this.organizationService = organizationService;
+    this.userACL = userACL;
   }
 
   @GET
@@ -276,8 +281,7 @@ public class NavigationRest implements ResourceContainer {
       if (expandPageDetails && userNode.getPageRef() != null) {
         Page userNodePage = layoutService.getPage(userNode.getPageRef());
         if (!StringUtils.isBlank(userNodePage.getEditPermission())) {
-          resultNode.setCanEditPage(identity.isMemberOf(userNodePage.getEditPermission().split(":")[1],
-                                                        userNodePage.getEditPermission().split(":")[0]));
+          resultNode.setCanEditPage(userACL.hasEditPermission(userNodePage));
           Map<String, Object> editPermission = new HashMap<>();
           try {
             editPermission.put("membershipType", userNodePage.getEditPermission().split(":")[0]);
