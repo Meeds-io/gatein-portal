@@ -37,7 +37,7 @@ public class MembershipTypeRestResourcesV1 implements ResourceContainer {
   }
 
   @GET
-  @RolesAllowed("administrators")
+  @RolesAllowed("users")
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(
       summary = "Gets membership types",
