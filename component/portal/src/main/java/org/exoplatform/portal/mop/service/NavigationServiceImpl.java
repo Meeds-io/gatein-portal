@@ -28,6 +28,7 @@ import org.exoplatform.portal.mop.navigation.NodeContext;
 import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.portal.mop.navigation.NodeManager;
 import org.exoplatform.portal.mop.navigation.NodeModel;
+import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.storage.NavigationStorage;
 import org.exoplatform.services.listener.ListenerService;
@@ -143,7 +144,7 @@ public class NavigationServiceImpl implements NavigationService {
   public <N> void rebaseNode(NodeContext<N> context, Scope scope, NodeChangeListener<NodeContext<N>> listener) {
     nodeManager.rebaseNode(context, scope, new NodeChangeNotifier<>(listener, this, listenerService));
   }
-  
+
   @Override
   public NodeData getNodeById(Long nodeId) {
     return navigationStorage.loadNode(nodeId);
@@ -157,6 +158,11 @@ public class NavigationServiceImpl implements NavigationService {
   @Override
   public void deleteNode(Long nodeId) {
     navigationStorage.destroyNode(nodeId);
+  }
+
+  @Override
+  public void createNode(Long parentId, Long previousId, String name, NodeState state) {
+    navigationStorage.createNode(parentId, previousId, name, state);
   }
 
   private void notify(String name, SiteKey key) {
