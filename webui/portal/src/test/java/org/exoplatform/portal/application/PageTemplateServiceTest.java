@@ -19,6 +19,8 @@ package org.exoplatform.portal.application;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import org.exoplatform.container.xml.InitParams;
@@ -26,6 +28,7 @@ import org.exoplatform.container.xml.ObjectParameter;
 import org.exoplatform.portal.page.PageTemplatePlugin;
 import org.exoplatform.portal.page.PageTemplateService;
 import org.exoplatform.webui.core.model.SelectItemCategory;
+import org.exoplatform.webui.core.model.SelectItemOption;
 
 public class PageTemplateServiceTest {
 
@@ -57,5 +60,40 @@ public class PageTemplateServiceTest {
     assertNotNull(pageTemplateService.getPageTemplateCategories());
     assertTrue(pageTemplateService.getPageTemplateCategories().size() == 1);
     assertEquals(category, pageTemplateService.getPageTemplateCategories().get(0));
+  }
+  
+  @Test
+  public void testGetPageTemplates() {
+    PageTemplateService pageTemplateService = new PageTemplateService();
+    
+    InitParams params = new InitParams();
+    ObjectParameter category1Parameter = new ObjectParameter();
+    category1Parameter.setName("category");
+    SelectItemCategory<String> category1 = new SelectItemCategory<String>("category1");
+    category1.addSelectItemOption(new SelectItemOption<String>("page template 11", "pageTemplate11"));
+    category1.addSelectItemOption(new SelectItemOption<String>("page template 12", "pageTemplate12"));
+    category1.addSelectItemOption(new SelectItemOption<String>("page template 13", "pageTemplate13"));
+    category1Parameter.setObject(category1);
+    params.addParameter(category1Parameter);
+    PageTemplatePlugin pageTemplatePlugin = new PageTemplatePlugin(params);
+    pageTemplateService.addPageTemplate(pageTemplatePlugin);
+    
+    params = new InitParams();
+    ObjectParameter category2Parameter = new ObjectParameter();
+    category2Parameter.setName("category");
+    SelectItemCategory<String> category2 = new SelectItemCategory<String>("category2");
+    category2.addSelectItemOption(new SelectItemOption<String>("page template 21", "pageTemplate11"));
+    category2.addSelectItemOption(new SelectItemOption<String>("page template 22", "pageTemplate12"));
+    category2Parameter.setObject(category2);
+    params.addParameter(category2Parameter);
+    pageTemplatePlugin = new PageTemplatePlugin(params);
+    pageTemplateService.addPageTemplate(pageTemplatePlugin);
+    
+    List<String> pageTemplates = pageTemplateService.getPageTemplates();
+
+    assertNotNull(pageTemplates);
+    assertEquals(5, pageTemplates.size());
+    assertEquals("pageTemplate11", pageTemplates.get(0));
+    assertEquals("pageTemplate12", pageTemplates.get(4));
   }
 }
