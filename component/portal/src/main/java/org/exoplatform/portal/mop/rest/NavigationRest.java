@@ -56,7 +56,7 @@ public class NavigationRest implements ResourceContainer {
 
   private static final Visibility[]         DEFAULT_VISIBILITIES = Visibility.values();
 
-  private static final UserNodeFilterConfig USER_FILTER_CONFIG   = getUserFilterConfig(DEFAULT_VISIBILITIES);
+  private static final UserNodeFilterConfig USER_FILTER_CONFIG   = getUserFilterConfig(DEFAULT_VISIBILITIES, false);
 
   private UserPortalConfigService           portalConfigService;
 
@@ -159,13 +159,17 @@ public class NavigationRest implements ResourceContainer {
                                          boolean includeGlobal,
                                          @Parameter(description = "to include extra node page details in results")
                                          @QueryParam("expandPageDetails")
-                                         boolean expandPageDetails) {
+                                         boolean expandPageDetails,
+                                         @Parameter(description = "to check start and end time of node publication")
+                                         @DefaultValue("true")
+                                         @QueryParam("temporalCheck")
+                                         boolean temporalCheck) {
     // this function return nodes and not navigations
     if (StringUtils.isBlank(siteTypeName)) {
       return Response.status(400).build();
     }
 
-    return getNavigations(request, siteTypeName, siteName, scopeName, nodeId, visibilityNames, includeGlobal, expandPageDetails);
+    return getNavigations(request, siteTypeName, siteName, scopeName, nodeId, visibilityNames, includeGlobal, expandPageDetails, temporalCheck);
   }
 
   @Path("/categories")
@@ -195,7 +199,8 @@ public class NavigationRest implements ResourceContainer {
                                   String nodeId,
                                   List<String> visibilityNames,
                                   boolean includeGlobal,
-                                  boolean expandPageDetails) {
+                                  boolean expandPageDetails,
+                                  boolean temporalCheck) {
     ConversationState state = ConversationState.getCurrent();
     Identity userIdentity = state == null ? null : state.getIdentity();
     String username = userIdentity == null ? null : userIdentity.getUserId();
@@ -227,8 +232,8 @@ public class NavigationRest implements ResourceContainer {
     }
 
     UserNodeFilterConfig userFilterConfig = USER_FILTER_CONFIG;
-    if (visibilities.length > 0) {
-      userFilterConfig = getUserFilterConfig(visibilities);
+    if (visibilities.length > 0 || temporalCheck) {
+      userFilterConfig = getUserFilterConfig(visibilities, temporalCheck);
     }
 
     String portalName = siteName;
@@ -320,9 +325,12 @@ public class NavigationRest implements ResourceContainer {
     return result;
   }
 
-  private static UserNodeFilterConfig getUserFilterConfig(Visibility[] visibilities) {
+  private static UserNodeFilterConfig getUserFilterConfig(Visibility[] visibilities, boolean temporalCheck) {
     UserNodeFilterConfig.Builder builder = UserNodeFilterConfig.builder();
-    builder.withReadWriteCheck().withVisibility(visibilities).withTemporalCheck().withReadCheck();
+    builder.withReadWriteCheck().withVisibility(visibilities).withReadCheck();
+    if(temporalCheck) {
+      builder.withTemporalCheck();
+    }
     return builder.build();
   }
 
