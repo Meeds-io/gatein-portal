@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -61,8 +60,6 @@ public class PageTemplateService {
    * @return {@link List} of page templates of page templates
    */
   public List<SelectItemOption<String>> getPageTemplates() {
-    return categories.stream().map(category -> {
-      return category.getSelectItemOptions().stream().toList();
-    }).flatMap(Collection::stream).toList();
+    return categories.stream().map(category -> category.getSelectItemOptions()).flatMap(Collection::stream).toList();
   }
 }
