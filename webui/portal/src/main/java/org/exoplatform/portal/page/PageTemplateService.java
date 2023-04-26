@@ -60,11 +60,9 @@ public class PageTemplateService {
   /**
    * @return {@link List} of page templates of page templates
    */
-  public List<String> getPageTemplates() {
-    List<String> pageTemplates = categories.stream().map(category -> {
-      return category.getSelectItemOptions().stream().map(SelectItemOption::getValue).collect(Collectors.toList());
-    }).flatMap(Collection::stream).collect(Collectors.toList());
-
-    return pageTemplates;
+  public List<SelectItemOption<String>> getPageTemplates() {
+    return categories.stream().map(category -> {
+      return category.getSelectItemOptions().stream().toList();
+    }).flatMap(Collection::stream).toList();
   }
 }

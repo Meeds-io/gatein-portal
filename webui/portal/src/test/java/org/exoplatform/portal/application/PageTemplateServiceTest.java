@@ -82,18 +82,21 @@ public class PageTemplateServiceTest {
     ObjectParameter category2Parameter = new ObjectParameter();
     category2Parameter.setName("category");
     SelectItemCategory<String> category2 = new SelectItemCategory<String>("category2");
-    category2.addSelectItemOption(new SelectItemOption<String>("page template 21", "pageTemplate11"));
-    category2.addSelectItemOption(new SelectItemOption<String>("page template 22", "pageTemplate12"));
+    category2.addSelectItemOption(new SelectItemOption<String>("page template 21", "pageTemplate21"));
+    category2.addSelectItemOption(new SelectItemOption<String>("page template 22", "pageTemplate22"));
     category2Parameter.setObject(category2);
     params.addParameter(category2Parameter);
     pageTemplatePlugin = new PageTemplatePlugin(params);
     pageTemplateService.addPageTemplate(pageTemplatePlugin);
     
-    List<String> pageTemplates = pageTemplateService.getPageTemplates();
+    List<SelectItemOption<String>> pageTemplates = pageTemplateService.getPageTemplates();
 
     assertNotNull(pageTemplates);
     assertEquals(5, pageTemplates.size());
-    assertEquals("pageTemplate11", pageTemplates.get(0));
-    assertEquals("pageTemplate12", pageTemplates.get(4));
+    assertEquals("pageTemplate11", pageTemplates.get(0).getValue());
+    assertEquals("page template 12", pageTemplates.get(1).getLabel());
+    assertEquals("pageTemplate13", pageTemplates.get(2).getValue());
+    assertEquals("page template 21", pageTemplates.get(3).getLabel());
+    assertEquals("pageTemplate22", pageTemplates.get(4).getValue());
   }
 }
