@@ -160,7 +160,7 @@ public class NavigationRest implements ResourceContainer {
                                          @Parameter(description = "to include extra node page details in results")
                                          @QueryParam("expandPageDetails")
                                          boolean expandPageDetails,
-                                         @Parameter(description = "to check start and end time of node publication")
+                                         @Parameter(description = "to check the navigation nodes scheduling start and end dates")
                                          @DefaultValue("true")
                                          @QueryParam("temporalCheck")
                                          boolean temporalCheck) {
