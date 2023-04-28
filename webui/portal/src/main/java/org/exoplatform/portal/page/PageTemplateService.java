@@ -1,10 +1,14 @@
 package org.exoplatform.portal.page;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
 import org.exoplatform.webui.core.model.SelectItemCategory;
+import org.exoplatform.webui.core.model.SelectItemOption;
 
 /**
  * A service to manage the list of Page templates to use in Page creator Wizard
@@ -50,5 +54,12 @@ public class PageTemplateService {
    */
   public List<SelectItemCategory<String>> getPageTemplateCategories() {
     return Collections.unmodifiableList(categories);
+  }
+
+  /**
+   * @return {@link List} of page templates of page templates
+   */
+  public List<SelectItemOption<String>> getPageTemplates() {
+    return categories.stream().map(SelectItemCategory::getSelectItemOptions).flatMap(Collection::stream).toList();
   }
 }
