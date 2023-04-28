@@ -231,10 +231,7 @@ public class NavigationRest implements ResourceContainer {
                      .build();
     }
 
-    UserNodeFilterConfig userFilterConfig = USER_FILTER_CONFIG;
-    if (visibilities.length > 0 || temporalCheck) {
-      userFilterConfig = getUserFilterConfig(visibilities, temporalCheck);
-    }
+    UserNodeFilterConfig userFilterConfig = getUserFilterConfig(visibilities, temporalCheck);
 
     String portalName = siteName;
     if (siteType != SiteType.PORTAL || StringUtils.isBlank(siteName)) {
@@ -327,7 +324,7 @@ public class NavigationRest implements ResourceContainer {
 
   private static UserNodeFilterConfig getUserFilterConfig(Visibility[] visibilities, boolean temporalCheck) {
     UserNodeFilterConfig.Builder builder = UserNodeFilterConfig.builder();
-    builder.withReadWriteCheck().withVisibility(visibilities).withReadCheck();
+    builder.withReadWriteCheck().withVisibility(visibilities.length > 0 ? visibilities : DEFAULT_VISIBILITIES).withReadCheck();
     if(temporalCheck) {
       builder.withTemporalCheck();
     }
