@@ -140,6 +140,11 @@ public class UserPortalImpl implements UserPortal {
   }
 
   @Override
+  public Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig filterConfig) {
+    return getNodes(siteType, scope, filterConfig, true);
+  }
+  
+  @Override
   public Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig filterConfig, boolean includeGlobal) {
 
     Collection<UserNode> resultUserNodes = new ArrayList<>();
