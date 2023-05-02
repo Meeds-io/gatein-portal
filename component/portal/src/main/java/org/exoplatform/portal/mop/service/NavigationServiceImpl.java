@@ -165,6 +165,11 @@ public class NavigationServiceImpl implements NavigationService {
     navigationStorage.createNode(parentId, previousId, name, state);
   }
 
+  public void editNode(Long nodeId, NodeState state) {
+    navigationStorage.updateNode(nodeId, state);
+  }
+
+
   private void notify(String name, SiteKey key) {
     try {
       listenerService.broadcast(name, this, key);
