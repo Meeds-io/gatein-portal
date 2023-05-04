@@ -129,7 +129,9 @@ public abstract class AbstractPageStorage implements PageStorage {
                         entity.isShowMaxWindow(), // showMaxWindow
                         entity.isHideSharedLayout(),
                         moveAppsPermissions,
-                        moveContainersPermissions);
+                        moveContainersPermissions,
+                        entity.getPageType().name(),
+                        entity.getLink());
   }
 
   protected void broadcastEvent(String eventName, org.exoplatform.portal.mop.page.PageKey pageKey) {

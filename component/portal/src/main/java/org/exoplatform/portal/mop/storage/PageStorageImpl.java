@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.portal.mop.*;
 import org.gatein.api.page.PageQuery;
 import org.json.simple.JSONArray;
 
@@ -16,11 +17,6 @@ import org.exoplatform.portal.jdbc.entity.ComponentEntity;
 import org.exoplatform.portal.jdbc.entity.PageEntity;
 import org.exoplatform.portal.jdbc.entity.PermissionEntity;
 import org.exoplatform.portal.jdbc.entity.SiteEntity;
-import org.exoplatform.portal.mop.EventType;
-import org.exoplatform.portal.mop.QueryResult;
-import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.Utils;
 import org.exoplatform.portal.mop.dao.PageDAO;
 import org.exoplatform.portal.mop.dao.SiteDAO;
 import org.exoplatform.portal.mop.page.PageContext;
@@ -253,6 +249,8 @@ public class PageStorageImpl extends AbstractPageStorage {
       entity.setFactoryId(state.getFactoryId());
       entity.setShowMaxWindow(state.getShowMaxWindow());
       entity.setHideSharedLayout(state.isHideSharedLayout());
+      entity.setPageType(!StringUtils.isBlank(state.getPageType()) ? PageType.valueOf(state.getPageType()) : PageType.PAGE);
+      entity.setLink(state.getLink());
     }
 
     SiteKey siteKey = pageContext.getKey().getSite();

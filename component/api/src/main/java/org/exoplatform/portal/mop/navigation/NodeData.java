@@ -52,13 +52,21 @@ public class NodeData implements Serializable {
     /** . */
     final String[] children;
 
-    public NodeData(String parentId, String id, SiteKey siteKey, String name, NodeState state, String[] children) {
+    /** . */
+    final String  target;
+
+    /** . */
+    final String description;
+
+    public NodeData(String parentId, String id, SiteKey siteKey, String name, NodeState state, String[] children, String target, String description) {
       this.parentId = parentId;
       this.id = id;
       this.siteKey = siteKey;
       this.name = name;
       this.state = state;
       this.children = children;
+      this.target = target;
+      this.description = description;
     }
 
     NodeData(NodeContext<?> context) {
@@ -82,6 +90,8 @@ public class NodeData implements Serializable {
         this.state = state;
         this.children = children;
         this.siteKey = context.getState().getSiteKey();
+        this.target = state.getTarget();
+        this.description = state.getDescription();
     }
 
     public Iterator<String> iterator(boolean reverse) {
@@ -146,6 +156,14 @@ public class NodeData implements Serializable {
 
     public String getParentId() {
         return this.parentId;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     @Override

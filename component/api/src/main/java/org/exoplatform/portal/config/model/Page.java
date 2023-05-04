@@ -52,6 +52,10 @@ public class Page extends Container {
 
     private transient boolean modifiable;
 
+    private String           pageType;
+
+    private String           link;
+
     public Page() {
     }
 
@@ -139,6 +143,22 @@ public class Page extends Container {
         }
     }
 
+    public String getPageType() {
+        return pageType;
+    }
+
+    public void setPageType(String pageType) {
+        this.pageType = pageType;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
     public boolean isModifiable() {
         return modifiable;
     }
@@ -152,7 +172,7 @@ public class Page extends Container {
         List<ComponentData> children = buildChildren();
         return new PageData(storageId, id, name, icon, template, factoryId, title, description, width, height, cssClass, profiles,
                 Utils.safeImmutableList(accessPermissions), children, ownerType, ownerId, editPermission, showMaxWindow, hideSharedLayout,
-                Utils.safeImmutableList(moveAppsPermissions), Utils.safeImmutableList(moveContainersPermissions));
+                Utils.safeImmutableList(moveAppsPermissions), Utils.safeImmutableList(moveContainersPermissions), pageType, link);
     }
 
     public static class PageSet {

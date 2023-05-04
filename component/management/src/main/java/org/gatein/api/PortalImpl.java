@@ -287,7 +287,9 @@ public class PortalImpl implements Portal {
                                                                           .everyone())),
                                         Util.from(edit)[0],
                                         moveAppsPermissions,
-                                        moveContainersPermissions);
+                                        moveContainersPermissions,
+                                        null,
+                                        null);
 
     PageImpl p = new PageImpl(new PageContext(Util.from(pageId), pageState));
     p.setCreate(true);

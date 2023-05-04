@@ -149,6 +149,20 @@ public class UserNode {
   public void setPageRef(PageKey pageRef) {
     context.setState(new NodeState.Builder(context.getState()).pageRef(pageRef).build());
   }
+  public String getTarget() {
+    return context.getState().getTarget();
+  }
+
+  public void setTarget(String target) {
+    context.setState(new NodeState.Builder(context.getState()).target(target).build());
+  }
+  public String getDescription() {
+    return context.getState().getDescription();
+  }
+
+  public void setDescription(String description) {
+    context.setState(new NodeState.Builder(context.getState()).description(description).build());
+  }
 
   public String getResolvedLabel() {
     if (cachedResolvedLabel != null) {

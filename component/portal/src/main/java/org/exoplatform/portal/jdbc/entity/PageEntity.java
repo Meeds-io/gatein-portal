@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import org.exoplatform.portal.mop.PageType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -68,6 +69,13 @@ public class PageEntity extends ComponentEntity implements Serializable {
 
   @Column(name = "FACTORY_ID", length = 200)
   private String                factoryId;
+
+  @Enumerated(EnumType.ORDINAL)
+  @Column(name = "PAGE_TYPE")
+  private PageType              pageType;
+
+  @Column(name = "LINK")
+  private String                link;
 
   @Column(name = "PAGE_BODY", length = 5000)
   private String                pageBody         = getJSONString(new JSONArray());
@@ -169,6 +177,22 @@ public class PageEntity extends ComponentEntity implements Serializable {
 
   public void setChildren(List<ComponentEntity> children) {
     this.children = children;
+  }
+
+  public PageType getPageType() {
+    return pageType;
+  }
+
+  public void setPageType(PageType pageType) {
+    this.pageType = pageType;
+  }
+
+  public String getLink() {
+    return link;
+  }
+
+  public void setLink(String link) {
+    this.link = link;
   }
 
   @Override

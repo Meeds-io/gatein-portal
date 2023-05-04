@@ -459,6 +459,13 @@ public class NavigationRest implements ResourceContainer {
     public void setPageAccessPermissions(List<Map<String, Object>> pageAccessPermissions) {
       this.pageAccessPermissions = pageAccessPermissions;
     }
+    public String getTarget() {
+      return userNode.getTarget();
+    }
+
+    public String getDescription() {
+      return userNode.getDescription();
+    }
   }
 
   /**
