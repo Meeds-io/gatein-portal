@@ -206,4 +206,12 @@ public interface NavigationService extends org.exoplatform.portal.mop.navigation
    */
   public void createNode(Long parentId, Long previousId, String name, NodeState state);
 
+  /**
+   * Update a navigation node
+   *
+   * @param nodeId the node id
+   * @param state node state
+   */
+  public void updateNode(Long nodeId, NodeState state);
+
 }
