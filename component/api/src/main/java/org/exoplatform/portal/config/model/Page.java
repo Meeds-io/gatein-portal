@@ -73,6 +73,8 @@ public class Page extends Container {
         this.ownerId = data.getOwnerId();
         this.editPermission = data.getEditPermission();
         this.showMaxWindow = data.isShowMaxWindow();
+        this.pageType = data.getPageType();
+        this.link = data.getLink();
     }
 
     public Page(String storageId) {
