@@ -28,7 +28,6 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.mop.NodeTarget;
-import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.services.listener.ListenerService;
 
@@ -87,9 +86,6 @@ public class NodeEntity implements Serializable {
   @Enumerated(EnumType.ORDINAL)
   @Column(name = "TARGET")
   private NodeTarget        nodeTarget;
-
-  @Column(name = "DESCRIPTION")
-  private String            description;
 
   public Long getId() {
     return id;
@@ -182,14 +178,6 @@ public class NodeEntity implements Serializable {
 
   public void setNodeTarget(NodeTarget nodeTarget) {
     this.nodeTarget = nodeTarget;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
   }
 
   public NodeEntity getParent() {

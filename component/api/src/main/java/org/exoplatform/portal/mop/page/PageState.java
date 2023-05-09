@@ -87,6 +87,39 @@ public class PageState implements Serializable {
     this.link = link;
   }
 
+  public PageState(String displayName, // NOSONAR
+                   String description,
+                   boolean showMaxWindow,
+                   String factoryId,
+                   List<String> accessPermissions,
+                   String editPermission,
+                   List<String> moveAppsPermissions,
+                   List<String> moveContainersPermissions) {
+    this(displayName, description, showMaxWindow, false, factoryId, accessPermissions, editPermission, moveAppsPermissions, moveContainersPermissions);
+  }
+
+  public PageState(String displayName, // NOSONAR
+                   String description,
+                   boolean showMaxWindow,
+                   boolean hideSharedLayout,
+                   String factoryId,
+                   List<String> accessPermissions,
+                   String editPermission,
+                   List<String> moveAppsPermissions,
+                   List<String> moveContainersPermissions) {
+    this.editPermission = editPermission;
+    this.showMaxWindow = showMaxWindow;
+    this.hideSharedLayout = hideSharedLayout;
+    this.factoryId = factoryId;
+    this.displayName = displayName;
+    this.description = description;
+    this.accessPermissions = accessPermissions;
+    this.moveAppsPermissions = moveAppsPermissions;
+    this.moveContainersPermissions = moveContainersPermissions;
+    this.pageType = PageType.PAGE.name();
+    this.link = null;
+  }
+
   public String getEditPermission() {
     return editPermission;
   }

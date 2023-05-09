@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.exoplatform.portal.mop.*;
 import org.gatein.api.page.PageQuery;
 import org.json.simple.JSONArray;
 
@@ -25,6 +24,12 @@ import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageServiceException;
 import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.pom.data.PageData;
+import org.exoplatform.portal.mop.EventType;
+import org.exoplatform.portal.mop.QueryResult;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.Utils;
+import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.services.listener.ListenerService;
 
 public class PageStorageImpl extends AbstractPageStorage {

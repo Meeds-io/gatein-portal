@@ -18,5 +18,5 @@
 package org.exoplatform.portal.mop;
 
 public enum PageType {
-  PAGE, LINK, GROUP
+  PAGE, LINK
 }

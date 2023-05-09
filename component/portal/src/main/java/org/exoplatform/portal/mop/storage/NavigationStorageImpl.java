@@ -29,7 +29,6 @@ import org.exoplatform.portal.jdbc.entity.NavigationEntity;
 import org.exoplatform.portal.jdbc.entity.NodeEntity;
 import org.exoplatform.portal.jdbc.entity.PageEntity;
 import org.exoplatform.portal.mop.NodeTarget;
-import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.dao.NavigationDAO;
 import org.exoplatform.portal.mop.dao.NodeDAO;
@@ -309,7 +308,6 @@ public class NavigationStorageImpl implements NavigationStorage {
     entity.setStartTime(state.getStartPublicationTime());
     entity.setVisibility(state.getVisibility());
     entity.setNodeTarget(!StringUtils.isBlank(state.getTarget()) ? NodeTarget.valueOf(state.getTarget()) : NodeTarget.NEW_TAB);
-    entity.setDescription(state.getDescription());
   }
 
   private NodeData buildNodeData(NodeEntity node) {
@@ -335,8 +333,7 @@ public class NavigationStorageImpl implements NavigationStorage {
            .label(node.getLabel())
            .startPublicationTime(node.getStartTime())
            .visibility(node.getVisibility())
-           .target(node.getNodeTarget().name())
-           .description(node.getDescription());
+           .target(node.getNodeTarget() != null ? node.getNodeTarget().name() : null);
     PageEntity page = node.getPage();
     if (page != null) {
       SiteKey siteKey = new SiteKey(page.getOwnerType(), page.getOwnerId());
@@ -354,8 +351,7 @@ public class NavigationStorageImpl implements NavigationStorage {
                         node.getName(),
                         state,
                         children.toArray(new String[children.size()]),
-                        node.getNodeTarget().name(),
-                        node.getDescription());
+                        node.getNodeTarget() != null ? node.getNodeTarget().name() : null);
   }
 
   private SiteKey getSiteKey(Long nodeId) {

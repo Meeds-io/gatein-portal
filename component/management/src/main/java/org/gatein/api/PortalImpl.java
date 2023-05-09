@@ -24,6 +24,7 @@ package org.gatein.api;
 
 import java.util.*;
 
+import org.exoplatform.portal.mop.PageType;
 import org.gatein.api.common.Filter;
 import org.gatein.api.common.Pagination;
 import org.gatein.api.internal.Parameters;
@@ -288,7 +289,7 @@ public class PortalImpl implements Portal {
                                         Util.from(edit)[0],
                                         moveAppsPermissions,
                                         moveContainersPermissions,
-                                        null,
+                                        PageType.PAGE.name(),
                                         null);
 
     PageImpl p = new PageImpl(new PageContext(Util.from(pageId), pageState));

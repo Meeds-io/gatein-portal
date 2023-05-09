@@ -463,9 +463,6 @@ public class NavigationRest implements ResourceContainer {
       return userNode.getTarget();
     }
 
-    public String getDescription() {
-      return userNode.getDescription();
-    }
   }
 
   /**

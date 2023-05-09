@@ -130,7 +130,7 @@ public abstract class AbstractPageStorage implements PageStorage {
                         entity.isHideSharedLayout(),
                         moveAppsPermissions,
                         moveContainersPermissions,
-                        entity.getPageType().name(),
+                        entity.getPageType() != null ? entity.getPageType().name() : null,
                         entity.getLink());
   }
 

@@ -28,6 +28,7 @@ import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.portal.mop.NodeTarget;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.navigation.HierarchyError;
@@ -473,7 +474,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractKernelTest {
     assertEquals("bar", added.getTarget().getName());
     NodeChange.Updated<Node> updated = (NodeChange.Updated<Node>) changes.next();
     assertSame(foo, updated.getTarget());
-    assertEquals(new NodeState.Builder().label("foo").build(), updated.getState());
+    assertEquals(new NodeState.Builder().label("foo").target(NodeTarget.NEW_TAB.name()).build(), updated.getState());
     assertFalse(changes.hasNext());
 
     //
@@ -482,7 +483,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractKernelTest {
     assertEquals("foo", foo.getState().getLabel());
     updated = (NodeChange.Updated<Node>) changes.next();
     assertSame(foo, updated.getTarget());
-    assertEquals(new NodeState.Builder().label("foo").build(), updated.getState());
+    assertEquals(new NodeState.Builder().label("foo").target(NodeTarget.NEW_TAB.name()).build(), updated.getState());
     assertFalse(changes.hasNext());
 
     //
@@ -491,7 +492,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractKernelTest {
     assertEquals("foo", foo.getState().getLabel());
     updated = (NodeChange.Updated<Node>) changes.next();
     assertSame(foo, updated.getTarget());
-    assertEquals(new NodeState.Builder().label("foo").build(), updated.getState());
+    assertEquals(new NodeState.Builder().label("foo").target(NodeTarget.NEW_TAB.name()).build(), updated.getState());
     assertFalse(changes.hasNext());
   }
 
