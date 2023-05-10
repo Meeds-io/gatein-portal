@@ -283,7 +283,7 @@ public class NavigationStorageImpl implements NavigationStorage {
       entity = new NavigationEntity();
       NodeEntity rootNode = new NodeEntity();
       rootNode.setName("default");
-      rootNode.setNodeTarget(NodeTarget.SAME_TAB);
+      rootNode.setTarget(NodeTarget.SAME_TAB);
       entity.setRootNode(rootNode);
     }
     entity.setPriority(priority == null ? 0 : priority);
@@ -308,7 +308,7 @@ public class NavigationStorageImpl implements NavigationStorage {
     }
     entity.setStartTime(state.getStartPublicationTime());
     entity.setVisibility(state.getVisibility());
-    entity.setNodeTarget(!StringUtils.isBlank(state.getTarget()) ? NodeTarget.valueOf(state.getTarget()) : NodeTarget.NEW_TAB);
+    entity.setTarget(!StringUtils.isBlank(state.getTarget()) ? NodeTarget.valueOf(state.getTarget()) : NodeTarget.NEW_TAB);
   }
 
   private NodeData buildNodeData(NodeEntity node) {
@@ -334,7 +334,7 @@ public class NavigationStorageImpl implements NavigationStorage {
            .label(node.getLabel())
            .startPublicationTime(node.getStartTime())
            .visibility(node.getVisibility())
-           .target(node.getNodeTarget() != null ? node.getNodeTarget().name() : null);
+           .target(node.getTarget() != null ? node.getTarget().name() : null);
     PageEntity page = node.getPage();
     if (page != null) {
       SiteKey siteKey = new SiteKey(page.getOwnerType(), page.getOwnerId());
@@ -352,7 +352,7 @@ public class NavigationStorageImpl implements NavigationStorage {
                         node.getName(),
                         state,
                         children.toArray(new String[children.size()]),
-                        node.getNodeTarget() != null ? node.getNodeTarget().name() : null);
+                        node.getTarget() != null ? node.getTarget().name() : null);
   }
 
   private SiteKey getSiteKey(Long nodeId) {

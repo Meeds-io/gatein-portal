@@ -1,13 +1,11 @@
 package org.exoplatform.portal.mop.dao;
 
-import org.exoplatform.portal.mop.PageType;
 import org.gatein.api.page.PageQuery;
 
 import org.exoplatform.portal.jdbc.entity.PageEntity;
 import org.exoplatform.portal.jdbc.entity.SiteEntity;
+import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.dao.PageDAO;
-import org.exoplatform.portal.mop.dao.SiteDAO;
 import org.exoplatform.portal.mop.page.PageKey;
 
 public class PageDAOTest extends AbstractDAOTest {

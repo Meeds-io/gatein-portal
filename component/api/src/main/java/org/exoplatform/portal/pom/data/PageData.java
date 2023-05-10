@@ -51,7 +51,7 @@ public class PageData extends ContainerData {
     private final boolean hideSharedLayout;
 
     /** . */
-    private final String       pageType;
+    private final String       type;
 
     /** . */
     private final String       link;
@@ -66,7 +66,7 @@ public class PageData extends ContainerData {
     public PageData(String storageId, String id, String name, String icon, String template, String factoryId, String title, // NOSONAR
             String description, String width, String height, List<String> accessPermissions, List<ComponentData> children,
             String ownerType, String ownerId, String editPermission, boolean showMaxWindow, boolean hideSharedLayout,
-            List<String> moveAppsPermissions, List<String> moveContainersPermissions, String pageType, String link) {
+            List<String> moveAppsPermissions, List<String> moveContainersPermissions, String type, String link) {
         super(storageId, id, name, icon, template, factoryId, title, description, width, height, accessPermissions,
                 moveContainersPermissions, moveContainersPermissions, children);
 
@@ -75,7 +75,7 @@ public class PageData extends ContainerData {
         this.editPermission = editPermission;
         this.showMaxWindow = showMaxWindow;
         this.hideSharedLayout = hideSharedLayout;
-        this.pageType= pageType;
+        this.type= type;
         this.link = link;
     }
 
@@ -100,7 +100,7 @@ public class PageData extends ContainerData {
                     boolean hideSharedLayout,
                     List<String> moveAppsPermissions,
                     List<String> moveContainersPermissions,
-                    String pageType,
+                    String type,
                     String link) {
       super(storageId,
             id,
@@ -124,12 +124,12 @@ public class PageData extends ContainerData {
         this.editPermission = editPermission;
         this.showMaxWindow = showMaxWindow;
         this.hideSharedLayout = hideSharedLayout;
-        this.pageType= pageType;
+        this.type= type;
         this.link = link;
     }
 
-    public String getPageType() {
-        return pageType;
+    public String getType() {
+        return type;
     }
 
     public String getLink() {

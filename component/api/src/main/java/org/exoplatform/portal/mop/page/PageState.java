@@ -38,7 +38,7 @@ public class PageState implements Serializable {
   final String              description;
 
   /** . */
-  final String            pageType;
+  final String              type;
 
   /** . */
   final String              link;
@@ -72,7 +72,7 @@ public class PageState implements Serializable {
                    String editPermission,
                    List<String> moveAppsPermissions,
                    List<String> moveContainersPermissions,
-                   String pageType,
+                   String type,
                    String link) {
     this.editPermission = editPermission;
     this.showMaxWindow = showMaxWindow;
@@ -83,7 +83,7 @@ public class PageState implements Serializable {
     this.accessPermissions = accessPermissions;
     this.moveAppsPermissions = moveAppsPermissions;
     this.moveContainersPermissions = moveContainersPermissions;
-    this.pageType = pageType;
+    this.type = type;
     this.link = link;
   }
 
@@ -116,7 +116,7 @@ public class PageState implements Serializable {
     this.accessPermissions = accessPermissions;
     this.moveAppsPermissions = moveAppsPermissions;
     this.moveContainersPermissions = moveContainersPermissions;
-    this.pageType = PageType.PAGE.name();
+    this.type = PageType.PAGE.name();
     this.link = null;
   }
 
@@ -158,8 +158,8 @@ public class PageState implements Serializable {
     return moveContainersPermissions;
   }
 
-  public String getPageType() {
-    return pageType;
+  public String getType() {
+    return type;
   }
 
   public String getLink() {
@@ -201,7 +201,7 @@ public class PageState implements Serializable {
                        accessPermissions,
                        moveAppsPermissions,
                        moveContainersPermissions,
-                       pageType,
+                       type,
                        link);
   }
 
@@ -305,6 +305,7 @@ public class PageState implements Serializable {
       this.pageType = pageType;
       return this;
     }
+
     public Builder link(String link) {
       this.link = link;
       return this;

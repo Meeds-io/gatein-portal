@@ -80,7 +80,7 @@ public class Utils {
                            page.getEditPermission(),
                            page.getMoveAppsPermissions() != null ? Arrays.asList(page.getMoveAppsPermissions()) : null,
                            page.getMoveContainersPermissions() != null ? Arrays.asList(page.getMoveContainersPermissions())                                                                       : null,
-                           page.getPageType(),
+                           page.getType(),
                            page.getLink());
     }
 
@@ -94,7 +94,7 @@ public class Utils {
                            page.getEditPermission(),
                            page.getMoveAppsPermissions(),
                            page.getMoveContainersPermissions(),
-                           page.getPageType(),
+                           page.getType(),
                            page.getLink());
     }
 

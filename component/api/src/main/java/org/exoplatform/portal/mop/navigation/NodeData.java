@@ -56,7 +56,6 @@ public class NodeData implements Serializable {
     /** . */
     final String  target;
 
-
     public NodeData(String parentId, String id, SiteKey siteKey, String name, NodeState state, String[] children, String target) {
       this.parentId = parentId;
       this.id = id;

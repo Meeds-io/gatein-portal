@@ -22,7 +22,25 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.PreRemove;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.container.ExoContainer;
@@ -35,17 +53,16 @@ import org.exoplatform.services.listener.ListenerService;
 @ExoEntity
 @Table(name = "PORTAL_NAVIGATION_NODES")
 @NamedQueries({
-        @NamedQuery(name = "NodeEntity.findByPage", query = "SELECT n FROM GateInNavigationNode n INNER JOIN n.page p WHERE p.id = :pageId")
-})
+    @NamedQuery(name = "NodeEntity.findByPage", query = "SELECT n FROM GateInNavigationNode n INNER JOIN n.page p WHERE p.id = :pageId") })
 public class NodeEntity implements Serializable {
 
   private static final long serialVersionUID = 8630708630711337929L;
 
   @Id
-  @SequenceGenerator(name="SEQ_GTN_NAVIGATION_NODE_ID", sequenceName="SEQ_GTN_NAVIGATION_NODE_ID", allocationSize = 1)
-  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_GTN_NAVIGATION_NODE_ID")
+  @SequenceGenerator(name = "SEQ_GTN_NAVIGATION_NODE_ID", sequenceName = "SEQ_GTN_NAVIGATION_NODE_ID", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_GTN_NAVIGATION_NODE_ID")
   @Column(name = "NODE_ID")
-  private Long             id;
+  private Long              id;
 
   @Column(name = "NAME", length = 200)
   private String            name;
@@ -67,7 +84,7 @@ public class NodeEntity implements Serializable {
 
   @ManyToOne(fetch = FetchType.LAZY, optional = true)
   @JoinColumn(name = "PAGE_ID", nullable = true)
-  private PageEntity    page;
+  private PageEntity        page;
 
   @Column(name = "NODE_INDEX")
   private int               index;
@@ -85,7 +102,7 @@ public class NodeEntity implements Serializable {
 
   @Enumerated(EnumType.ORDINAL)
   @Column(name = "TARGET")
-  private NodeTarget        nodeTarget;
+  private NodeTarget        target;
 
   public Long getId() {
     return id;
@@ -164,7 +181,7 @@ public class NodeEntity implements Serializable {
   }
 
   public void setChildren(List<NodeEntity> children) {
-    if (children != null) {      
+    if (children != null) {
       for (int i = 0; i < children.size(); i++) {
         children.get(i).setIndex(i);
       }
@@ -172,12 +189,12 @@ public class NodeEntity implements Serializable {
     this.children = children;
   }
 
-  public NodeTarget getNodeTarget() {
-    return nodeTarget;
+  public NodeTarget getTarget() {
+    return target;
   }
 
-  public void setNodeTarget(NodeTarget nodeTarget) {
-    this.nodeTarget = nodeTarget;
+  public void setTarget(NodeTarget target) {
+    this.target = target;
   }
 
   public NodeEntity getParent() {
@@ -187,7 +204,7 @@ public class NodeEntity implements Serializable {
   public void setParent(NodeEntity parent) {
     this.parent = parent;
   }
-  
+
   public NavigationEntity getNavigationEntity() {
     return navigationEntity;
   }
@@ -197,12 +214,12 @@ public class NodeEntity implements Serializable {
   }
 
   public static final String REMOVED_EVENT = "org.exoplatform.portal.jdbc.entity.NodeEntity.removed";
-  
+
   @PreRemove
   public void preRemove() throws Exception {
     ExoContainer container = ExoContainerContext.getCurrentContainer();
     if (container != null) {
-      ListenerService listenerService = container.getComponentInstanceOfType(ListenerService.class); 
+      ListenerService listenerService = container.getComponentInstanceOfType(ListenerService.class);
       if (listenerService != null) {
         listenerService.broadcast(REMOVED_EVENT, this, this.getId());
       }
