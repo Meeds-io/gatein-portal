@@ -283,6 +283,7 @@ public class NavigationStorageImpl implements NavigationStorage {
       entity = new NavigationEntity();
       NodeEntity rootNode = new NodeEntity();
       rootNode.setName("default");
+      rootNode.setNodeTarget(NodeTarget.SAME_TAB);
       entity.setRootNode(rootNode);
     }
     entity.setPriority(priority == null ? 0 : priority);

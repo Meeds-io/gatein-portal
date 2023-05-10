@@ -1,5 +1,6 @@
 package org.exoplatform.portal.mop.dao;
 
+import org.exoplatform.portal.mop.PageType;
 import org.gatein.api.page.PageQuery;
 
 import org.exoplatform.portal.jdbc.entity.PageEntity;
@@ -81,6 +82,7 @@ public class PageDAOTest extends AbstractDAOTest {
     entity.setHideSharedLayout(true);
     entity.setFactoryId("testFactoryId");
     entity.setPageBody("testPageBody");
+    entity.setPageType(PageType.PAGE);
     return entity;
   }
   
