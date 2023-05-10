@@ -58,9 +58,9 @@ public class PageState implements Serializable {
                    String editPermission,
                    List<String> moveAppsPermissions,
                    List<String> moveContainersPermissions,
-                   String pageType,
+                   String type,
                    String link) {
-    this(displayName, description, showMaxWindow, false, factoryId, accessPermissions, editPermission, moveAppsPermissions, moveContainersPermissions, pageType, link);
+    this(displayName, description, showMaxWindow, false, factoryId, accessPermissions, editPermission, moveAppsPermissions, moveContainersPermissions, type, link);
   }
 
   public PageState(String displayName, // NOSONAR
@@ -226,10 +226,10 @@ public class PageState implements Serializable {
     private String       description;
 
     /** . */
-    private String            pageType;
+    private String       type;
 
     /** . */
-    private String              link;
+    private String       link;
 
     /** . */
     private List<String> accessPermissions;
@@ -247,7 +247,7 @@ public class PageState implements Serializable {
                     List<String> accessPermissions,
                     List<String> moveAppsPermissions,
                     List<String> moveContainersPermissions,
-                    String pageType,
+                    String type,
                     String link) {
       this.editPermission = editPermission;
       this.showMaxWindow = showMaxWindow;
@@ -258,7 +258,7 @@ public class PageState implements Serializable {
       this.accessPermissions = accessPermissions;
       this.moveAppsPermissions = moveAppsPermissions;
       this.moveContainersPermissions = moveContainersPermissions;
-      this.pageType = pageType;
+      this.type = type;
       this.link = link;
     }
 
@@ -301,11 +301,10 @@ public class PageState implements Serializable {
       this.factoryId = factoryId;
       return this;
     }
-    public Builder pageType(String pageType) {
-      this.pageType = pageType;
+    public Builder type(String type) {
+      this.type = type;
       return this;
     }
-
     public Builder link(String link) {
       this.link = link;
       return this;
@@ -321,7 +320,7 @@ public class PageState implements Serializable {
                            editPermission,
                            moveAppsPermissions,
                            moveContainersPermissions,
-                           pageType,
+                           type,
                            link);
     }
   }
