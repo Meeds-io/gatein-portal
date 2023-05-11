@@ -107,8 +107,8 @@ public class TestSerialization extends AbstractGateInTest {
                                 true,
                                 Collections.singletonList("foo13"),
                                 Collections.singletonList("foo13"),
-                                PageType.PAGE.name(),
-                                null);
+                                PageType.LINK.name(),
+                                "wwww.exo.com");
         PageData clone = IOTools.clone(obj);
         assertEquals(obj.getStorageId(), clone.getStorageId());
         assertEquals(obj.getStorageName(), clone.getStorageName());
@@ -131,6 +131,9 @@ public class TestSerialization extends AbstractGateInTest {
         assertEquals(obj.getEditPermission(), clone.getEditPermission());
         assertEquals(obj.isShowMaxWindow(), clone.isShowMaxWindow());
         assertEquals(obj.isHideSharedLayout(), clone.isHideSharedLayout());
+        assertEquals(obj.isHideSharedLayout(), clone.isHideSharedLayout());
+        assertEquals(obj.getPageType(), clone.getPageType());
+        assertEquals(obj.getLink(), clone.getLink());
     }
 
     public void testPortal() throws Exception {

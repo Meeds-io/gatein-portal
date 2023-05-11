@@ -126,6 +126,7 @@ public class NavigationDAOTest extends AbstractDAOTest {
     assertEquals(expected.getStartTime(), node.getStartTime());
     assertEquals(expected.getId(), node.getId());
     assertEquals(expected.getVisibility(), node.getVisibility());
+    assertEquals(expected.getTarget(), node.getTarget());
   }
 
   private NodeEntity createNode(String name) {

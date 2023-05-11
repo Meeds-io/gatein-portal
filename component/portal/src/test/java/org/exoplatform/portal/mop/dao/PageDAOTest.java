@@ -94,6 +94,7 @@ public class PageDAOTest extends AbstractDAOTest {
     assertEquals(entity.getName(), result.getName());
     assertEquals(entity.getFactoryId(), result.getFactoryId());
     assertEquals(entity.getPageBody(), result.getPageBody());
+    assertEquals(entity.getPageType(), result.getPageType());
   }
   
   private SiteEntity getOrCreateSite(String name) {

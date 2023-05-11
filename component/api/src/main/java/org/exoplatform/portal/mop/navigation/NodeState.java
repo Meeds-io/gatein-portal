@@ -225,7 +225,7 @@ public final class NodeState implements Serializable {
             return Safe.equals(label, that.label) && Safe.equals(icon, that.icon)
                     && Safe.equals(startPublicationTime, that.startPublicationTime)
                     && Safe.equals(endPublicationTime, that.endPublicationTime) && Safe.equals(visibility, that.visibility)
-                    && Safe.equals(pageRef, that.pageRef)&& Safe.equals(target, that.target);
+                    && Safe.equals(pageRef, that.pageRef) && Safe.equals(target, that.target);
         }
         return false;
     }
