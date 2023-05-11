@@ -349,4 +349,17 @@
     </addColumn>
   </changeSet>
 
+  <changeSet author="portal" id="1.0.0-32">
+    <addColumn tableName="PORTAL_PAGES">
+      <column name="PAGE_TYPE" type="INT" defaultValueNumeric="0" >
+        <constraints nullable="false" />
+      </column>
+      <column name="LINK" type="TEXT" />
+    </addColumn>
+    <addColumn tableName="PORTAL_NAVIGATION_NODES">
+      <column name="TARGET" type="INT" defaultValueNumeric="0" >
+      <constraints nullable="false" />
+      </column>
+    </addColumn>
+  </changeSet>
 </databaseChangeLog>

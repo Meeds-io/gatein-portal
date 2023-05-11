@@ -22,12 +22,27 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
+import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.portal.mop.SiteType;
 
 @ExoEntity
@@ -68,6 +83,13 @@ public class PageEntity extends ComponentEntity implements Serializable {
 
   @Column(name = "FACTORY_ID", length = 200)
   private String                factoryId;
+
+  @Enumerated(EnumType.ORDINAL)
+  @Column(name = "PAGE_TYPE")
+  private PageType              pageType;
+
+  @Column(name = "LINK")
+  private String                link;
 
   @Column(name = "PAGE_BODY", length = 5000)
   private String                pageBody         = getJSONString(new JSONArray());
@@ -169,6 +191,22 @@ public class PageEntity extends ComponentEntity implements Serializable {
 
   public void setChildren(List<ComponentEntity> children) {
     this.children = children;
+  }
+
+  public PageType getPageType() {
+    return pageType;
+  }
+
+  public void setPageType(PageType pageType) {
+    this.pageType = pageType;
+  }
+
+  public String getLink() {
+    return link;
+  }
+
+  public void setLink(String link) {
+    this.link = link;
   }
 
   @Override

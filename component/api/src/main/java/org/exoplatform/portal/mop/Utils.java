@@ -79,7 +79,9 @@ public class Utils {
                            page.getAccessPermissions() != null ? Arrays.asList(page.getAccessPermissions()) : null,
                            page.getEditPermission(),
                            page.getMoveAppsPermissions() != null ? Arrays.asList(page.getMoveAppsPermissions()) : null,
-                           page.getMoveContainersPermissions() != null ? Arrays.asList(page.getMoveContainersPermissions()) : null);
+                           page.getMoveContainersPermissions() != null ? Arrays.asList(page.getMoveContainersPermissions())                                                                       : null,
+                           page.getType(),
+                           page.getLink());
     }
 
     public static PageState toPageState(PageData page) {
@@ -91,7 +93,9 @@ public class Utils {
                            page.getAccessPermissions(),
                            page.getEditPermission(),
                            page.getMoveAppsPermissions(),
-                           page.getMoveContainersPermissions());
+                           page.getMoveContainersPermissions(),
+                           page.getType(),
+                           page.getLink());
     }
 
     private static class ComparableComparator<T extends Comparable<T>> implements Comparator<T> {
