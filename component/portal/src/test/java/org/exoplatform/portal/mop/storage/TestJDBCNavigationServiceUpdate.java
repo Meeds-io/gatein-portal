@@ -475,6 +475,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractKernelTest {
     NodeChange.Updated<Node> updated = (NodeChange.Updated<Node>) changes.next();
     assertSame(foo, updated.getTarget());
     assertEquals(new NodeState.Builder().label("foo").target(NodeTarget.NEW_TAB.name()).build(), updated.getState());
+    assertEquals(NodeTarget.NEW_TAB.name(), updated.getState().getTarget());
     assertFalse(changes.hasNext());
 
     //
@@ -484,6 +485,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractKernelTest {
     updated = (NodeChange.Updated<Node>) changes.next();
     assertSame(foo, updated.getTarget());
     assertEquals(new NodeState.Builder().label("foo").target(NodeTarget.NEW_TAB.name()).build(), updated.getState());
+    assertEquals(NodeTarget.NEW_TAB.name(), updated.getState().getTarget());
     assertFalse(changes.hasNext());
 
     //
@@ -493,6 +495,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractKernelTest {
     updated = (NodeChange.Updated<Node>) changes.next();
     assertSame(foo, updated.getTarget());
     assertEquals(new NodeState.Builder().label("foo").target(NodeTarget.NEW_TAB.name()).build(), updated.getState());
+    assertEquals(NodeTarget.NEW_TAB.name(), updated.getState().getTarget());
     assertFalse(changes.hasNext());
   }
 

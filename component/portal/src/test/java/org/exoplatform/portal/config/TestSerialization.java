@@ -132,7 +132,7 @@ public class TestSerialization extends AbstractGateInTest {
         assertEquals(obj.isShowMaxWindow(), clone.isShowMaxWindow());
         assertEquals(obj.isHideSharedLayout(), clone.isHideSharedLayout());
         assertEquals(obj.isHideSharedLayout(), clone.isHideSharedLayout());
-        assertEquals(obj.getPageType(), clone.getPageType());
+        assertEquals(obj.getType(), clone.getType());
         assertEquals(obj.getLink(), clone.getLink());
     }
 
