@@ -1,31 +1,42 @@
 package org.exoplatform.portal.mop.rest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.portal.config.UserACL;
-import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.mop.service.LayoutService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.NavigationCategoryService;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.user.HttpUserPortalContext;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserNode;
@@ -458,6 +469,10 @@ public class NavigationRest implements ResourceContainer {
 
     public void setPageAccessPermissions(List<Map<String, Object>> pageAccessPermissions) {
       this.pageAccessPermissions = pageAccessPermissions;
+    }
+
+    public String getTarget() {
+      return userNode.getTarget();
     }
   }
 

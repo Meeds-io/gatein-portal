@@ -6,6 +6,7 @@ import java.util.*;
 import org.exoplatform.commons.utils.Safe;
 
 import lombok.Getter;
+import org.exoplatform.portal.mop.PageType;
 
 /**
  * An immutable page state class, modifying an existing state should use the
@@ -37,11 +38,54 @@ public class PageState implements Serializable {
   final String              description;
 
   /** . */
+  final String              type;
+
+  /** . */
+  final String              link;
+
+  /** . */
   final List<String>        accessPermissions;
 
   final List<String>        moveAppsPermissions;
 
   final List<String>        moveContainersPermissions;
+
+  public PageState(String displayName, // NOSONAR
+                   String description,
+                   boolean showMaxWindow,
+                   String factoryId,
+                   List<String> accessPermissions,
+                   String editPermission,
+                   List<String> moveAppsPermissions,
+                   List<String> moveContainersPermissions,
+                   String type,
+                   String link) {
+    this(displayName, description, showMaxWindow, false, factoryId, accessPermissions, editPermission, moveAppsPermissions, moveContainersPermissions, type, link);
+  }
+
+  public PageState(String displayName, // NOSONAR
+                   String description,
+                   boolean showMaxWindow,
+                   boolean hideSharedLayout,
+                   String factoryId,
+                   List<String> accessPermissions,
+                   String editPermission,
+                   List<String> moveAppsPermissions,
+                   List<String> moveContainersPermissions,
+                   String type,
+                   String link) {
+    this.editPermission = editPermission;
+    this.showMaxWindow = showMaxWindow;
+    this.hideSharedLayout = hideSharedLayout;
+    this.factoryId = factoryId;
+    this.displayName = displayName;
+    this.description = description;
+    this.accessPermissions = accessPermissions;
+    this.moveAppsPermissions = moveAppsPermissions;
+    this.moveContainersPermissions = moveContainersPermissions;
+    this.type = type;
+    this.link = link;
+  }
 
   public PageState(String displayName, // NOSONAR
                    String description,
@@ -72,6 +116,8 @@ public class PageState implements Serializable {
     this.accessPermissions = accessPermissions;
     this.moveAppsPermissions = moveAppsPermissions;
     this.moveContainersPermissions = moveContainersPermissions;
+    this.type = PageType.PAGE.name();
+    this.link = null;
   }
 
   public String getEditPermission() {
@@ -112,6 +158,14 @@ public class PageState implements Serializable {
     return moveContainersPermissions;
   }
 
+  public String getType() {
+    return type;
+  }
+
+  public String getLink() {
+    return link;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -146,7 +200,9 @@ public class PageState implements Serializable {
                        description,
                        accessPermissions,
                        moveAppsPermissions,
-                       moveContainersPermissions);
+                       moveContainersPermissions,
+                       type,
+                       link);
   }
 
   public static class Builder {
@@ -170,6 +226,12 @@ public class PageState implements Serializable {
     private String       description;
 
     /** . */
+    private String       type;
+
+    /** . */
+    private String       link;
+
+    /** . */
     private List<String> accessPermissions;
 
     private List<String> moveAppsPermissions;
@@ -184,7 +246,9 @@ public class PageState implements Serializable {
                     String description,
                     List<String> accessPermissions,
                     List<String> moveAppsPermissions,
-                    List<String> moveContainersPermissions) {
+                    List<String> moveContainersPermissions,
+                    String type,
+                    String link) {
       this.editPermission = editPermission;
       this.showMaxWindow = showMaxWindow;
       this.showMaxWindow = hideSharedLayout;
@@ -194,6 +258,8 @@ public class PageState implements Serializable {
       this.accessPermissions = accessPermissions;
       this.moveAppsPermissions = moveAppsPermissions;
       this.moveContainersPermissions = moveContainersPermissions;
+      this.type = type;
+      this.link = link;
     }
 
     public Builder editPermission(String editPermission) {
@@ -235,6 +301,14 @@ public class PageState implements Serializable {
       this.factoryId = factoryId;
       return this;
     }
+    public Builder type(String type) {
+      this.type = type;
+      return this;
+    }
+    public Builder link(String link) {
+      this.link = link;
+      return this;
+    }
 
     public PageState build() {
       return new PageState(displayName,
@@ -245,7 +319,9 @@ public class PageState implements Serializable {
                            accessPermissions,
                            editPermission,
                            moveAppsPermissions,
-                           moveContainersPermissions);
+                           moveContainersPermissions,
+                           type,
+                           link);
     }
   }
 }

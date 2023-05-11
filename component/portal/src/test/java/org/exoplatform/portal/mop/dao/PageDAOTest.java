@@ -4,9 +4,8 @@ import org.gatein.api.page.PageQuery;
 
 import org.exoplatform.portal.jdbc.entity.PageEntity;
 import org.exoplatform.portal.jdbc.entity.SiteEntity;
+import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.dao.PageDAO;
-import org.exoplatform.portal.mop.dao.SiteDAO;
 import org.exoplatform.portal.mop.page.PageKey;
 
 public class PageDAOTest extends AbstractDAOTest {
@@ -81,6 +80,7 @@ public class PageDAOTest extends AbstractDAOTest {
     entity.setHideSharedLayout(true);
     entity.setFactoryId("testFactoryId");
     entity.setPageBody("testPageBody");
+    entity.setPageType(PageType.PAGE);
     return entity;
   }
   
@@ -94,6 +94,7 @@ public class PageDAOTest extends AbstractDAOTest {
     assertEquals(entity.getName(), result.getName());
     assertEquals(entity.getFactoryId(), result.getFactoryId());
     assertEquals(entity.getPageBody(), result.getPageBody());
+    assertEquals(entity.getPageType(), result.getPageType());
   }
   
   private SiteEntity getOrCreateSite(String name) {
