@@ -54,6 +54,9 @@ public class PageNode extends PageNodeContainer {
     /** . */
     private String pageReference;
 
+    /** . */
+    private String   target;
+
     public PageNode() {
     }
 
@@ -149,6 +152,14 @@ public class PageNode extends PageNodeContainer {
         endPublicationDate = endDate;
     }
 
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
+    }
+
     public void setVisibility(Visibility visibility) {
         this.visibility = visibility;
     }
@@ -165,7 +176,7 @@ public class PageNode extends PageNodeContainer {
         PageKey pageKey = pageReference != null ? PageKey.parse(pageReference) : null;
         return new NodeState(labels.getSimple(), icon, startPublicationDate == null ? -1 : startPublicationDate.getTime(),
                 endPublicationDate == null ? -1 : endPublicationDate.getTime(), visibility,
-                pageKey, pageKey == null ? null : pageKey.getSite());
+                pageKey, pageKey == null ? null : pageKey.getSite(), target);
     }
 
     @Override

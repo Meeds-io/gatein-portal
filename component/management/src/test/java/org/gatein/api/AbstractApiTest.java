@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
 
+import org.exoplatform.portal.mop.PageType;
 import org.gatein.api.navigation.NodePath;
 import org.gatein.api.page.PageId;
 import org.gatein.api.security.Permission;
@@ -160,7 +161,7 @@ public abstract class AbstractApiTest {
         SiteKey siteKey = Util.from(siteId);
         for (String page : pages) {
             pageService.savePage(new PageContext(new PageKey(siteKey, page), new PageState("displayName", "description", false, false,
-                    null, Arrays.asList("Everyone"), "Everyone", Arrays.asList("Everyone"), Arrays.asList("Everyone"))));
+                    null, Arrays.asList("Everyone"), "Everyone", Arrays.asList("Everyone"), Arrays.asList("Everyone"), PageType.PAGE.name(),  null)));
         }
     }
 

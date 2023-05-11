@@ -24,6 +24,7 @@ import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.exoplatform.portal.mop.NodeTarget;
 import org.exoplatform.portal.mop.SiteKey;
 
 /**
@@ -52,6 +53,19 @@ public class NodeData implements Serializable {
     /** . */
     final String[] children;
 
+    /** . */
+    final String  target;
+
+    public NodeData(String parentId, String id, SiteKey siteKey, String name, NodeState state, String[] children, String target) {
+      this.parentId = parentId;
+      this.id = id;
+      this.siteKey = siteKey;
+      this.name = name;
+      this.state = state;
+      this.children = children;
+      this.target = target;
+    }
+
     public NodeData(String parentId, String id, SiteKey siteKey, String name, NodeState state, String[] children) {
       this.parentId = parentId;
       this.id = id;
@@ -59,6 +73,7 @@ public class NodeData implements Serializable {
       this.name = name;
       this.state = state;
       this.children = children;
+      this.target = NodeTarget.SAME_TAB.name();
     }
 
     NodeData(NodeContext<?> context) {
@@ -82,6 +97,7 @@ public class NodeData implements Serializable {
         this.state = state;
         this.children = children;
         this.siteKey = context.getState().getSiteKey();
+        this.target = state.getTarget();
     }
 
     public Iterator<String> iterator(boolean reverse) {
@@ -146,6 +162,10 @@ public class NodeData implements Serializable {
 
     public String getParentId() {
         return this.parentId;
+    }
+
+    public String getTarget() {
+        return target;
     }
 
     @Override

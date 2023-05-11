@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import org.exoplatform.portal.mop.NodeTarget;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
@@ -41,7 +42,7 @@ public class NodeVisitorScopeTest {
     @Test
     public void nodePathScope() {
         NodeState nodeState = new NodeState("label", "icon", -1, -1, Visibility.DISPLAYED, new PageKey(new SiteKey(
-                SiteType.PORTAL, "site"), "page"), new SiteKey(SiteType.PORTAL, "site"));
+                SiteType.PORTAL, "site"), "page"), new SiteKey(SiteType.PORTAL, "site"), NodeTarget.NEW_TAB.name());
         NodeVisitorMock mock = new NodeVisitorMock();
         Visitor visitor = new NodeVisitorScope(mock).get();
 
