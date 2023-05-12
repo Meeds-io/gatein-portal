@@ -161,8 +161,8 @@ public class NavigationServiceImpl implements NavigationService {
   }
 
   @Override
-  public void createNode(Long parentId, Long previousId, String name, NodeState state) {
-    navigationStorage.createNode(parentId, previousId, name, state);
+  public NodeData[] createNode(Long parentId, Long previousId, String name, NodeState state) {
+    return navigationStorage.createNode(parentId, previousId, name, state);
   }
 
   public void updateNode(Long nodeId, NodeState state) {
