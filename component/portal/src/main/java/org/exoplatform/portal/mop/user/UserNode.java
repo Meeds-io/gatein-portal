@@ -26,11 +26,14 @@ import java.util.ResourceBundle;
 
 import org.exoplatform.commons.utils.ExpressionUtil;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.navigation.NodeContext;
 import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.storage.DescriptionStorage;
+import org.exoplatform.services.resources.ResourceBundleService;
+import org.gatein.common.util.EmptyResourceBundle;
 
 /**
  * A navigation node as seen by a user.
@@ -168,11 +171,15 @@ public class UserNode {
     String id = context.getId();
 
     //
+    Locale userLocale = owner.navigation.portal.context.getUserLocale();
     if (context.getState().getLabel() != null) {
       ResourceBundle bundle = owner.navigation.getBundle();
+      if (bundle == EmptyResourceBundle.INSTANCE) {
+        ResourceBundleService resourceBundleService = ExoContainerContext.getService(ResourceBundleService.class);
+        bundle = resourceBundleService.getResourceBundle(resourceBundleService.getSharedResourceBundleNames(), userLocale);
+      }
       resolvedLabel = ExpressionUtil.getExpressionValue(bundle, context.getState().getLabel());
     } else if (id != null) {
-      Locale userLocale = owner.navigation.portal.context.getUserLocale();
       Locale portalLocale = owner.navigation.portal.getLocale();
       DescriptionStorage descriptionStorage = owner.navigation.portal.service.getDescriptionService();
       org.exoplatform.portal.mop.State description = descriptionStorage.resolveDescription(id, portalLocale, userLocale);
