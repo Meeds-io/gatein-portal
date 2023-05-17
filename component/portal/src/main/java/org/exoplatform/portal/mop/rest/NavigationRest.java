@@ -22,6 +22,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.portal.mop.PageType;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -63,19 +64,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "v1/navigations", description = "Retrieve sites navigations")
 public class NavigationRest implements ResourceContainer {
 
-  private static final Log                  LOG                  = ExoLogger.getLogger(NavigationRest.class);
+  private static final Log          LOG                  = ExoLogger.getLogger(NavigationRest.class);
 
-  private static final Visibility[]         DEFAULT_VISIBILITIES = Visibility.values();
+  private static final Visibility[] DEFAULT_VISIBILITIES = Visibility.values();
 
-  private UserPortalConfigService           portalConfigService;
+  private UserPortalConfigService   portalConfigService;
 
-  private NavigationCategoryService         navigationCategoryService;
+  private NavigationCategoryService navigationCategoryService;
 
-  private LayoutService                     layoutService;
+  private LayoutService             layoutService;
 
-  private OrganizationService               organizationService;
+  private OrganizationService       organizationService;
 
-  private UserACL                           userACL;
+  private UserACL                   userACL;
 
   public NavigationRest(UserPortalConfigService portalConfigService,
                         NavigationCategoryService navigationCategoryService,
@@ -178,7 +179,15 @@ public class NavigationRest implements ResourceContainer {
       return Response.status(400).build();
     }
 
-    return getNavigations(request, siteTypeName, siteName, scopeName, nodeId, visibilityNames, includeGlobal, expandPageDetails, temporalCheck);
+    return getNavigations(request,
+                          siteTypeName,
+                          siteName,
+                          scopeName,
+                          nodeId,
+                          visibilityNames,
+                          includeGlobal,
+                          expandPageDetails,
+                          temporalCheck);
   }
 
   @Path("/categories")
@@ -291,6 +300,9 @@ public class NavigationRest implements ResourceContainer {
       ResultUserNode resultNode = new ResultUserNode(userNode);
       if (expandPageDetails && userNode.getPageRef() != null) {
         Page userNodePage = layoutService.getPage(userNode.getPageRef());
+        if (PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
+          resultNode.setPageLink(userNodePage.getLink());
+        }
         if (!StringUtils.isBlank(userNodePage.getEditPermission())) {
           resultNode.setCanEditPage(userACL.hasEditPermission(userNodePage));
           Map<String, Object> editPermission = new HashMap<>();
@@ -334,7 +346,7 @@ public class NavigationRest implements ResourceContainer {
   private static UserNodeFilterConfig getUserFilterConfig(Visibility[] visibilities, boolean temporalCheck) {
     UserNodeFilterConfig.Builder builder = UserNodeFilterConfig.builder();
     builder.withReadWriteCheck().withVisibility(visibilities.length > 0 ? visibilities : DEFAULT_VISIBILITIES).withReadCheck();
-    if(temporalCheck) {
+    if (temporalCheck) {
       builder.withTemporalCheck();
     }
     return builder.build();
@@ -390,6 +402,8 @@ public class NavigationRest implements ResourceContainer {
     private Map<String, Object>       pageEditPermission;
 
     private List<Map<String, Object>> pageAccessPermissions;
+
+    private String                    pageLink;
 
     public ResultUserNode(UserNode userNode) {
       this.userNode = userNode;
@@ -473,6 +487,14 @@ public class NavigationRest implements ResourceContainer {
 
     public String getTarget() {
       return userNode.getTarget();
+    }
+
+    public String getPageLink() {
+      return pageLink;
+    }
+
+    public void setPageLink(String pageLink) {
+      this.pageLink = pageLink;
     }
   }
 
