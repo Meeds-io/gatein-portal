@@ -365,8 +365,7 @@ public class NavigationStorageImpl implements NavigationStorage {
     if (siteKey == null && rootNode != null) {
       NavigationEntity navigationEntity = navigationDAO.findByRootNode(rootNode.getId());
       return navigationEntity == null ? null
-                                      : navigationEntity.getOwnerType()
-                                                        .key(navigationEntity.getOwnerId());
+                                      : navigationEntity.getOwnerType().key(navigationEntity.getOwnerId());
     } else {
       return siteKey;
     }

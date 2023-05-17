@@ -64,19 +64,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "v1/navigations", description = "Retrieve sites navigations")
 public class NavigationRest implements ResourceContainer {
 
-  private static final Log                  LOG                  = ExoLogger.getLogger(NavigationRest.class);
+  private static final Log          LOG                  = ExoLogger.getLogger(NavigationRest.class);
 
-  private static final Visibility[]         DEFAULT_VISIBILITIES = Visibility.values();
+  private static final Visibility[] DEFAULT_VISIBILITIES = Visibility.values();
 
-  private UserPortalConfigService           portalConfigService;
+  private UserPortalConfigService   portalConfigService;
 
-  private NavigationCategoryService         navigationCategoryService;
+  private NavigationCategoryService navigationCategoryService;
 
-  private LayoutService                     layoutService;
+  private LayoutService             layoutService;
 
-  private OrganizationService               organizationService;
+  private OrganizationService       organizationService;
 
-  private UserACL                           userACL;
+  private UserACL                   userACL;
 
   public NavigationRest(UserPortalConfigService portalConfigService,
                         NavigationCategoryService navigationCategoryService,
@@ -179,7 +179,15 @@ public class NavigationRest implements ResourceContainer {
       return Response.status(400).build();
     }
 
-    return getNavigations(request, siteTypeName, siteName, scopeName, nodeId, visibilityNames, includeGlobal, expandPageDetails, temporalCheck);
+    return getNavigations(request,
+                          siteTypeName,
+                          siteName,
+                          scopeName,
+                          nodeId,
+                          visibilityNames,
+                          includeGlobal,
+                          expandPageDetails,
+                          temporalCheck);
   }
 
   @Path("/categories")
@@ -338,7 +346,7 @@ public class NavigationRest implements ResourceContainer {
   private static UserNodeFilterConfig getUserFilterConfig(Visibility[] visibilities, boolean temporalCheck) {
     UserNodeFilterConfig.Builder builder = UserNodeFilterConfig.builder();
     builder.withReadWriteCheck().withVisibility(visibilities.length > 0 ? visibilities : DEFAULT_VISIBILITIES).withReadCheck();
-    if(temporalCheck) {
+    if (temporalCheck) {
       builder.withTemporalCheck();
     }
     return builder.build();
