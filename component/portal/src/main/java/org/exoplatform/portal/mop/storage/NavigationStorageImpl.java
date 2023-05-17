@@ -308,7 +308,7 @@ public class NavigationStorageImpl implements NavigationStorage {
     }
     entity.setStartTime(state.getStartPublicationTime());
     entity.setVisibility(state.getVisibility());
-    entity.setTarget(!StringUtils.isBlank(state.getTarget()) ? NodeTarget.valueOf(state.getTarget()) : NodeTarget.NEW_TAB);
+    entity.setTarget(!StringUtils.isBlank(state.getTarget()) ? NodeTarget.valueOf(state.getTarget()) : NodeTarget.SAME_TAB);
   }
 
   private NodeData buildNodeData(NodeEntity node) {

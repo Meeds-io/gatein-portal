@@ -22,6 +22,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.portal.mop.PageType;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -291,6 +292,9 @@ public class NavigationRest implements ResourceContainer {
       ResultUserNode resultNode = new ResultUserNode(userNode);
       if (expandPageDetails && userNode.getPageRef() != null) {
         Page userNodePage = layoutService.getPage(userNode.getPageRef());
+        if (PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
+          resultNode.setPageLink(userNodePage.getLink());
+        }
         if (!StringUtils.isBlank(userNodePage.getEditPermission())) {
           resultNode.setCanEditPage(userACL.hasEditPermission(userNodePage));
           Map<String, Object> editPermission = new HashMap<>();
@@ -391,6 +395,8 @@ public class NavigationRest implements ResourceContainer {
 
     private List<Map<String, Object>> pageAccessPermissions;
 
+    private String                    pageLink;
+
     public ResultUserNode(UserNode userNode) {
       this.userNode = userNode;
     }
@@ -473,6 +479,14 @@ public class NavigationRest implements ResourceContainer {
 
     public String getTarget() {
       return userNode.getTarget();
+    }
+
+    public String getPageLink() {
+      return pageLink;
+    }
+
+    public void setPageLink(String pageLink) {
+      this.pageLink = pageLink;
     }
   }
 
