@@ -93,23 +93,29 @@ public class PageDAOImpl extends AbstractDAO<PageEntity> implements PageDAO {
     CriteriaQuery<PageKey> select = criteria.multiselect(join.get(SITE_TYPE), join.get(NAME), pageEntity.get(NAME));
     select.distinct(true);
 
-    List<Predicate> predicates = new LinkedList<>();
+    List<Predicate> andPredicates = new LinkedList<>();
+    List<Predicate> orPredicates = new LinkedList<>();
 
     if (query.getSiteType() != null && query.getSiteName() != null) {
       if (query.getSiteType() != null) {
-        predicates.add(cb.equal(join.get(SITE_TYPE), convertSiteType(query.getSiteType())));
+        andPredicates.add(cb.equal(join.get(SITE_TYPE), convertSiteType(query.getSiteType())));
       }
       if (query.getSiteName() != null) {
-        predicates.add(cb.equal(join.get(NAME), query.getSiteName()));
+        andPredicates.add(cb.equal(join.get(NAME), query.getSiteName()));
       }
     }
 
     if (query.getDisplayName() != null) {
-      predicates.add(cb.like(cb.lower(pageEntity.get(DISPLAY_NAME)),
-                             "%" + query.getDisplayName().toLowerCase() + "%"));
+      orPredicates.add(cb.like(cb.lower(pageEntity.get(DISPLAY_NAME)), "%" + query.getDisplayName().toLowerCase() + "%"));
+      orPredicates.add(cb.like(cb.lower(pageEntity.get(NAME)), "%" + query.getDisplayName().toLowerCase() + "%"));
     }
 
-    select.where(cb.and(predicates.toArray(new Predicate[predicates.size()])));
+    if (!orPredicates.isEmpty()) {
+      select.where(cb.and(andPredicates.toArray(new Predicate[andPredicates.size()])),
+                   cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+    } else {
+      select.where(cb.and(andPredicates.toArray(new Predicate[andPredicates.size()])));
+    }
 
     //
     TypedQuery<PageKey> typedQuery = em.createQuery(select);
