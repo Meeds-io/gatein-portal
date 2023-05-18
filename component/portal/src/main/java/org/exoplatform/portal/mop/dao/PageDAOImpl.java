@@ -106,14 +106,13 @@ public class PageDAOImpl extends AbstractDAO<PageEntity> implements PageDAO {
     }
 
     if (query.getDisplayName() != null) {
-      orPredicates.add(cb.like(cb.lower(pageEntity.get(DISPLAY_NAME)),
-                             "%" + query.getDisplayName().toLowerCase() + "%"));
-      orPredicates.add(cb.like(cb.lower(pageEntity.get(NAME)),
-              "%" + query.getDisplayName().toLowerCase() + "%"));
+      orPredicates.add(cb.like(cb.lower(pageEntity.get(DISPLAY_NAME)), "%" + query.getDisplayName().toLowerCase() + "%"));
+      orPredicates.add(cb.like(cb.lower(pageEntity.get(NAME)), "%" + query.getDisplayName().toLowerCase() + "%"));
     }
 
-    if(!orPredicates.isEmpty()) {
-      select.where(cb.and(andPredicates.toArray(new Predicate[andPredicates.size()])),cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+    if (!orPredicates.isEmpty()) {
+      select.where(cb.and(andPredicates.toArray(new Predicate[andPredicates.size()])),
+                   cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
     } else {
       select.where(cb.and(andPredicates.toArray(new Predicate[andPredicates.size()])));
     }
