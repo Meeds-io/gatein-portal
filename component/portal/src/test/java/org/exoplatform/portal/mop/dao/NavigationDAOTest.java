@@ -9,11 +9,9 @@ import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.portal.jdbc.entity.NavigationEntity;
 import org.exoplatform.portal.jdbc.entity.NodeEntity;
 import org.exoplatform.portal.jdbc.entity.SiteEntity;
+import org.exoplatform.portal.mop.NodeTarget;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
-import org.exoplatform.portal.mop.dao.NavigationDAO;
-import org.exoplatform.portal.mop.dao.NodeDAO;
-import org.exoplatform.portal.mop.dao.SiteDAO;
 
 public class NavigationDAOTest extends AbstractDAOTest {
 
@@ -128,6 +126,7 @@ public class NavigationDAOTest extends AbstractDAOTest {
     assertEquals(expected.getStartTime(), node.getStartTime());
     assertEquals(expected.getId(), node.getId());
     assertEquals(expected.getVisibility(), node.getVisibility());
+    assertEquals(expected.getTarget(), node.getTarget());
   }
 
   private NodeEntity createNode(String name) {
@@ -140,6 +139,7 @@ public class NavigationDAOTest extends AbstractDAOTest {
     node.setLabel("label");
     node.setStartTime(2);
     node.setVisibility(Visibility.SYSTEM);
+    node.setTarget(NodeTarget.SAME_TAB);
     return node;
   }
 

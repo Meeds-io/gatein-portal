@@ -24,9 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.portal.jdbc.entity.NavigationEntity;
 import org.exoplatform.portal.jdbc.entity.NodeEntity;
 import org.exoplatform.portal.jdbc.entity.PageEntity;
+import org.exoplatform.portal.mop.NodeTarget;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.dao.NavigationDAO;
 import org.exoplatform.portal.mop.dao.NodeDAO;
@@ -281,6 +283,7 @@ public class NavigationStorageImpl implements NavigationStorage {
       entity = new NavigationEntity();
       NodeEntity rootNode = new NodeEntity();
       rootNode.setName("default");
+      rootNode.setTarget(NodeTarget.SAME_TAB);
       entity.setRootNode(rootNode);
     }
     entity.setPriority(priority == null ? 0 : priority);
@@ -305,6 +308,7 @@ public class NavigationStorageImpl implements NavigationStorage {
     }
     entity.setStartTime(state.getStartPublicationTime());
     entity.setVisibility(state.getVisibility());
+    entity.setTarget(!StringUtils.isBlank(state.getTarget()) ? NodeTarget.valueOf(state.getTarget()) : NodeTarget.NEW_TAB);
   }
 
   private NodeData buildNodeData(NodeEntity node) {
@@ -329,7 +333,8 @@ public class NavigationStorageImpl implements NavigationStorage {
            .icon(node.getIcon())
            .label(node.getLabel())
            .startPublicationTime(node.getStartTime())
-           .visibility(node.getVisibility());
+           .visibility(node.getVisibility())
+           .target(node.getTarget() != null ? node.getTarget().name() : null);
     PageEntity page = node.getPage();
     if (page != null) {
       SiteKey siteKey = new SiteKey(page.getOwnerType(), page.getOwnerId());
@@ -346,7 +351,8 @@ public class NavigationStorageImpl implements NavigationStorage {
                         navigationSiteKey,
                         node.getName(),
                         state,
-                        children.toArray(new String[children.size()]));
+                        children.toArray(new String[children.size()]),
+                        node.getTarget() != null ? node.getTarget().name() : null);
   }
 
   private SiteKey getSiteKey(Long nodeId) {
