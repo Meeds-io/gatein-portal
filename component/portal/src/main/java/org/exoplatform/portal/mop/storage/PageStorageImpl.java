@@ -16,11 +16,6 @@ import org.exoplatform.portal.jdbc.entity.ComponentEntity;
 import org.exoplatform.portal.jdbc.entity.PageEntity;
 import org.exoplatform.portal.jdbc.entity.PermissionEntity;
 import org.exoplatform.portal.jdbc.entity.SiteEntity;
-import org.exoplatform.portal.mop.EventType;
-import org.exoplatform.portal.mop.QueryResult;
-import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.Utils;
 import org.exoplatform.portal.mop.dao.PageDAO;
 import org.exoplatform.portal.mop.dao.SiteDAO;
 import org.exoplatform.portal.mop.page.PageContext;
@@ -29,6 +24,12 @@ import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageServiceException;
 import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.pom.data.PageData;
+import org.exoplatform.portal.mop.EventType;
+import org.exoplatform.portal.mop.QueryResult;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.Utils;
+import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.services.listener.ListenerService;
 
 public class PageStorageImpl extends AbstractPageStorage {
@@ -253,6 +254,10 @@ public class PageStorageImpl extends AbstractPageStorage {
       entity.setFactoryId(state.getFactoryId());
       entity.setShowMaxWindow(state.getShowMaxWindow());
       entity.setHideSharedLayout(state.isHideSharedLayout());
+      entity.setPageType(!StringUtils.isBlank(state.getType()) ? PageType.valueOf(state.getType()) : PageType.PAGE);
+      entity.setLink(state.getLink());
+    } else {
+      entity.setPageType(PageType.PAGE);
     }
 
     SiteKey siteKey = pageContext.getKey().getSite();

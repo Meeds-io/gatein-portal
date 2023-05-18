@@ -50,17 +50,23 @@ public class PageData extends ContainerData {
     /** . */
     private final boolean hideSharedLayout;
 
+    /** . */
+    private final String       type;
+
+    /** . */
+    private final String       link;
+
     public PageData(String storageId, String id, String name, String icon, String template, String factoryId, String title, // NOSONAR
                     String description, String width, String height, List<String> accessPermissions, List<ComponentData> children,
                     String ownerType, String ownerId, String editPermission, boolean showMaxWindow,
-                    List<String> moveAppsPermissions, List<String> moveContainersPermissions) {
-      this(storageId, id, name, icon, template, factoryId, title, description, width, height, accessPermissions, children, ownerType, ownerId, editPermission, showMaxWindow, false, moveAppsPermissions, moveContainersPermissions);
+                    List<String> moveAppsPermissions, List<String> moveContainersPermissions, String pageType, String link) {
+      this(storageId, id, name, icon, template, factoryId, title, description, width, height, accessPermissions, children, ownerType, ownerId, editPermission, showMaxWindow, false, moveAppsPermissions, moveContainersPermissions, pageType, link);
     }
 
     public PageData(String storageId, String id, String name, String icon, String template, String factoryId, String title, // NOSONAR
             String description, String width, String height, List<String> accessPermissions, List<ComponentData> children,
             String ownerType, String ownerId, String editPermission, boolean showMaxWindow, boolean hideSharedLayout,
-            List<String> moveAppsPermissions, List<String> moveContainersPermissions) {
+            List<String> moveAppsPermissions, List<String> moveContainersPermissions, String type, String link) {
         super(storageId, id, name, icon, template, factoryId, title, description, width, height, accessPermissions,
                 moveContainersPermissions, moveContainersPermissions, children);
 
@@ -69,6 +75,8 @@ public class PageData extends ContainerData {
         this.editPermission = editPermission;
         this.showMaxWindow = showMaxWindow;
         this.hideSharedLayout = hideSharedLayout;
+        this.type= type;
+        this.link = link;
     }
 
     public PageData(String storageId,
@@ -91,7 +99,9 @@ public class PageData extends ContainerData {
                     boolean showMaxWindow,
                     boolean hideSharedLayout,
                     List<String> moveAppsPermissions,
-                    List<String> moveContainersPermissions) {
+                    List<String> moveContainersPermissions,
+                    String type,
+                    String link) {
       super(storageId,
             id,
             name,
@@ -114,6 +124,16 @@ public class PageData extends ContainerData {
         this.editPermission = editPermission;
         this.showMaxWindow = showMaxWindow;
         this.hideSharedLayout = hideSharedLayout;
+        this.type= type;
+        this.link = link;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getLink() {
+        return link;
     }
 
     public String getOwnerType() {

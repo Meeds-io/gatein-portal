@@ -21,6 +21,7 @@ package org.exoplatform.portal.config;
 
 import java.util.*;
 
+import org.exoplatform.portal.mop.PageType;
 import org.gatein.common.io.IOTools;
 
 import org.exoplatform.component.test.AbstractGateInTest;
@@ -105,7 +106,9 @@ public class TestSerialization extends AbstractGateInTest {
                                 true,
                                 true,
                                 Collections.singletonList("foo13"),
-                                Collections.singletonList("foo13"));
+                                Collections.singletonList("foo13"),
+                                PageType.LINK.name(),
+                                "wwww.exo.com");
         PageData clone = IOTools.clone(obj);
         assertEquals(obj.getStorageId(), clone.getStorageId());
         assertEquals(obj.getStorageName(), clone.getStorageName());
@@ -128,6 +131,9 @@ public class TestSerialization extends AbstractGateInTest {
         assertEquals(obj.getEditPermission(), clone.getEditPermission());
         assertEquals(obj.isShowMaxWindow(), clone.isShowMaxWindow());
         assertEquals(obj.isHideSharedLayout(), clone.isHideSharedLayout());
+        assertEquals(obj.isHideSharedLayout(), clone.isHideSharedLayout());
+        assertEquals(obj.getType(), clone.getType());
+        assertEquals(obj.getLink(), clone.getLink());
     }
 
     public void testPortal() throws Exception {
