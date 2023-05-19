@@ -210,6 +210,8 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     when(layoutService.getPage(pageKey)).thenReturn(nodePage);
     when(nodePage.getEditPermission()).thenReturn("*:/platform/users");
     when(nodePage.getAccessPermissions()).thenReturn(new String[] {"*:/platform/users"});
+    when(nodePage.getType()).thenReturn("LINK");
+    when(nodePage.getLink()).thenReturn("www.test.com");
     when(userNode.getPageRef()).thenReturn(pageKey);
     when(portalConfigService.getUserPortalConfig(anyString(), anyString(), any())).thenReturn(userPortalConfig);
     when(userPortalConfig.getUserPortal()).thenReturn(userPortal);
@@ -243,5 +245,6 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     assertEquals(1, resultUserNodes.get(0).getPageAccessPermissions().size());
     assertEquals("Everyone", resultUserNodes.get(0).getPageAccessPermissions().get(0).get("membershipType"));
     assertEquals(null, resultUserNodes.get(0).getPageAccessPermissions().get(0).get("group"));
+    assertEquals("www.test.com", resultUserNodes.get(0).getPageLink());
   }
 }
