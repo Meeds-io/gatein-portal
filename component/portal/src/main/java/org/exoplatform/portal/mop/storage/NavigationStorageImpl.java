@@ -92,7 +92,6 @@ public class NavigationStorageImpl implements NavigationStorage {
     buildNodeEntity(target, state);
     target.setName(name);
     target.setParent(parent);
-
     if (parent != null) {
       List<NodeEntity> children = parent.getChildren();
       int i;
@@ -104,6 +103,7 @@ public class NavigationStorageImpl implements NavigationStorage {
       }
       children.add(i, target);
       parent.setChildren(children);
+      parent.setLastUpdatedDate(System.currentTimeMillis());
       target = nodeDAO.create(target);
       parent = nodeDAO.update(parent);
     } else {
@@ -189,11 +189,14 @@ public class NavigationStorageImpl implements NavigationStorage {
       }
       children.add(index, target);
       to.setChildren(children);
+      to.setLastUpdatedDate(System.currentTimeMillis());
       to = nodeDAO.update(to);
     }
+    target.setLastUpdatedDate(System.currentTimeMillis());
     target = nodeDAO.update(target);
 
     if (from != null && !Objects.equals(fromId, toId)) {
+      from.setLastUpdatedDate(System.currentTimeMillis());
       from = nodeDAO.update(from);
     }
     return new NodeData[] {
@@ -215,6 +218,7 @@ public class NavigationStorageImpl implements NavigationStorage {
     }
 
     target.setName(name);
+    target.setLastUpdatedDate(System.currentTimeMillis());
     nodeDAO.update(target);
 
     return new NodeData[] {
