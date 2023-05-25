@@ -159,6 +159,13 @@ public class UserNode {
   public void setTarget(String target) {
     context.setState(new NodeState.Builder(context.getState()).target(target).build());
   }
+  public long getLastUpdatedDate() {
+    return context.getState().getLastUpdatedDate();
+  }
+
+  public void setLastUpdatedDate(long lastUpdatedDate) {
+    context.setState(new NodeState.Builder(context.getState()).lastUpdatedDate(lastUpdatedDate).build());
+  }
 
   public String getResolvedLabel() {
     if (cachedResolvedLabel != null) {

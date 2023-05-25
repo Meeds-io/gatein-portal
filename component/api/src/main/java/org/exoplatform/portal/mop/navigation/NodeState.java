@@ -65,6 +65,8 @@ public final class NodeState implements Serializable {
 
         private String  target;
 
+        private long lastUpdatedDate;
+
         public Builder() {
             this.icon = null;
             this.label = null;
@@ -73,6 +75,7 @@ public final class NodeState implements Serializable {
             this.visibility = Visibility.DISPLAYED;
             this.pageRef = null;
             this.target = null;
+            this.lastUpdatedDate = 0;
         }
 
         /**
@@ -93,6 +96,7 @@ public final class NodeState implements Serializable {
             this.pageRef = state.pageRef;
             this.siteKey = state.siteKey;
             this.target = state.target;
+            this.lastUpdatedDate = state.getLastUpdatedDate();
         }
 
         public Builder label(String label) {
@@ -133,9 +137,13 @@ public final class NodeState implements Serializable {
           this.target = target;
           return this;
         }
+        public Builder lastUpdatedDate(long lastUpdatedDate) {
+          this.lastUpdatedDate = lastUpdatedDate;
+          return this;
+        }
 
         public NodeState build() {
-            return new NodeState(label, icon, startPublicationTime, endPublicationTime, visibility, pageRef, siteKey, target);
+            return new NodeState(label, icon, startPublicationTime, endPublicationTime, visibility, pageRef, siteKey, target, lastUpdatedDate);
         }
     }
 
@@ -162,8 +170,10 @@ public final class NodeState implements Serializable {
 
     private final String  target;
 
+    private long lastUpdatedDate;
+
     public NodeState(String label, String icon, long startPublicationTime, long endPublicationTime, Visibility visibility,
-            PageKey pageRef, SiteKey siteKey, String target) {
+            PageKey pageRef, SiteKey siteKey, String target, long  lastUpdatedDate) {
         this.label = label;
         this.icon = icon;
         this.startPublicationTime = startPublicationTime;
@@ -172,6 +182,7 @@ public final class NodeState implements Serializable {
         this.pageRef = pageRef;
         this.siteKey = siteKey;
         this.target = target;
+        this.lastUpdatedDate = lastUpdatedDate;
     }
 
     public String getLabel() {
@@ -215,6 +226,10 @@ public final class NodeState implements Serializable {
       return siteKey;
     }
 
+    public long getLastUpdatedDate() {
+        return lastUpdatedDate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == this) {
@@ -225,7 +240,7 @@ public final class NodeState implements Serializable {
             return Safe.equals(label, that.label) && Safe.equals(icon, that.icon)
                     && Safe.equals(startPublicationTime, that.startPublicationTime)
                     && Safe.equals(endPublicationTime, that.endPublicationTime) && Safe.equals(visibility, that.visibility)
-                    && Safe.equals(pageRef, that.pageRef) && Safe.equals(target, that.target);
+                    && Safe.equals(pageRef, that.pageRef) && Safe.equals(target, that.target)&& Safe.equals(lastUpdatedDate, that.lastUpdatedDate);
         }
         return false;
     }

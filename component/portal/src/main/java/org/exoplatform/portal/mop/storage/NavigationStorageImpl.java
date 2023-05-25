@@ -19,10 +19,7 @@
 
 package org.exoplatform.portal.mop.storage;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.portal.jdbc.entity.NavigationEntity;
@@ -284,6 +281,7 @@ public class NavigationStorageImpl implements NavigationStorage {
       NodeEntity rootNode = new NodeEntity();
       rootNode.setName("default");
       rootNode.setTarget(NodeTarget.SAME_TAB);
+      rootNode.setLastUpdatedDate(System.currentTimeMillis());
       entity.setRootNode(rootNode);
     }
     entity.setPriority(priority == null ? 0 : priority);
@@ -309,6 +307,7 @@ public class NavigationStorageImpl implements NavigationStorage {
     entity.setStartTime(state.getStartPublicationTime());
     entity.setVisibility(state.getVisibility());
     entity.setTarget(!StringUtils.isBlank(state.getTarget()) ? NodeTarget.valueOf(state.getTarget()) : NodeTarget.SAME_TAB);
+    entity.setLastUpdatedDate(System.currentTimeMillis());
   }
 
   private NodeData buildNodeData(NodeEntity node) {
@@ -334,7 +333,8 @@ public class NavigationStorageImpl implements NavigationStorage {
            .label(node.getLabel())
            .startPublicationTime(node.getStartTime())
            .visibility(node.getVisibility())
-           .target(node.getTarget() != null ? node.getTarget().name() : null);
+           .target(node.getTarget() != null ? node.getTarget().name() : null)
+           .lastUpdatedDate(node.getLastUpdatedDate());
     PageEntity page = node.getPage();
     if (page != null) {
       SiteKey siteKey = new SiteKey(page.getOwnerType(), page.getOwnerId());
@@ -352,7 +352,8 @@ public class NavigationStorageImpl implements NavigationStorage {
                         node.getName(),
                         state,
                         children.toArray(new String[children.size()]),
-                        node.getTarget() != null ? node.getTarget().name() : null);
+                        node.getTarget() != null ? node.getTarget().name() : null,
+                        node.getLastUpdatedDate());
   }
 
   private SiteKey getSiteKey(Long nodeId) {

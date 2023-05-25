@@ -56,7 +56,10 @@ public class NodeData implements Serializable {
     /** . */
     final String  target;
 
-    public NodeData(String parentId, String id, SiteKey siteKey, String name, NodeState state, String[] children, String target) {
+    /** . */
+    final long lastUpdatedDate;
+
+    public NodeData(String parentId, String id, SiteKey siteKey, String name, NodeState state, String[] children, String target, long lastUpdatedDate) {
       this.parentId = parentId;
       this.id = id;
       this.siteKey = siteKey;
@@ -64,6 +67,7 @@ public class NodeData implements Serializable {
       this.state = state;
       this.children = children;
       this.target = target;
+      this.lastUpdatedDate = lastUpdatedDate;
     }
 
     public NodeData(String parentId, String id, SiteKey siteKey, String name, NodeState state, String[] children) {
@@ -74,6 +78,7 @@ public class NodeData implements Serializable {
       this.state = state;
       this.children = children;
       this.target = NodeTarget.SAME_TAB.name();
+      this.lastUpdatedDate = 0;
     }
 
     NodeData(NodeContext<?> context) {
@@ -98,6 +103,7 @@ public class NodeData implements Serializable {
         this.children = children;
         this.siteKey = context.getState().getSiteKey();
         this.target = state.getTarget();
+        this.lastUpdatedDate = state.getLastUpdatedDate();
     }
 
     public Iterator<String> iterator(boolean reverse) {
@@ -166,6 +172,10 @@ public class NodeData implements Serializable {
 
     public String getTarget() {
         return target;
+    }
+
+    public long getLastUpdatedDate() {
+        return lastUpdatedDate;
     }
 
     @Override
