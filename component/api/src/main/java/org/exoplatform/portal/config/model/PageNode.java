@@ -58,7 +58,7 @@ public class PageNode extends PageNodeContainer {
     private String   target;
 
     /** . */
-    private long   lastModifiedDate;
+    private long updatedDate;
 
     public PageNode() {
     }
@@ -176,19 +176,19 @@ public class PageNode extends PageNodeContainer {
     }
 
 
-    public long getLastModifiedDate() {
-        return lastModifiedDate;
+    public long getUpdatedDate() {
+        return updatedDate;
     }
 
-    public void setLastModifiedDate(long lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
+    public void setUpdatedDate(long updatedDate) {
+        this.updatedDate = updatedDate;
     }
 
     public NodeState getState() {
         PageKey pageKey = pageReference != null ? PageKey.parse(pageReference) : null;
         return new NodeState(labels.getSimple(), icon, startPublicationDate == null ? -1 : startPublicationDate.getTime(),
                 endPublicationDate == null ? -1 : endPublicationDate.getTime(), visibility,
-                pageKey, pageKey == null ? null : pageKey.getSite(), target, lastModifiedDate);
+                pageKey, pageKey == null ? null : pageKey.getSite(), target, updatedDate);
     }
 
     @Override

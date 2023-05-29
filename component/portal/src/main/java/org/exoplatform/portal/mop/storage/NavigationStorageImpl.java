@@ -19,7 +19,10 @@
 
 package org.exoplatform.portal.mop.storage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.portal.jdbc.entity.NavigationEntity;
@@ -103,7 +106,7 @@ public class NavigationStorageImpl implements NavigationStorage {
       }
       children.add(i, target);
       parent.setChildren(children);
-      parent.setLastUpdatedDate(System.currentTimeMillis());
+      parent.setUpdatedDate(System.currentTimeMillis());
       target = nodeDAO.create(target);
       parent = nodeDAO.update(parent);
     } else {
@@ -189,14 +192,14 @@ public class NavigationStorageImpl implements NavigationStorage {
       }
       children.add(index, target);
       to.setChildren(children);
-      to.setLastUpdatedDate(System.currentTimeMillis());
+      to.setUpdatedDate(System.currentTimeMillis());
       to = nodeDAO.update(to);
     }
-    target.setLastUpdatedDate(System.currentTimeMillis());
+    target.setUpdatedDate(System.currentTimeMillis());
     target = nodeDAO.update(target);
 
     if (from != null && !Objects.equals(fromId, toId)) {
-      from.setLastUpdatedDate(System.currentTimeMillis());
+      from.setUpdatedDate(System.currentTimeMillis());
       from = nodeDAO.update(from);
     }
     return new NodeData[] {
@@ -218,7 +221,7 @@ public class NavigationStorageImpl implements NavigationStorage {
     }
 
     target.setName(name);
-    target.setLastUpdatedDate(System.currentTimeMillis());
+    target.setUpdatedDate(System.currentTimeMillis());
     nodeDAO.update(target);
 
     return new NodeData[] {
@@ -285,7 +288,7 @@ public class NavigationStorageImpl implements NavigationStorage {
       NodeEntity rootNode = new NodeEntity();
       rootNode.setName("default");
       rootNode.setTarget(NodeTarget.SAME_TAB);
-      rootNode.setLastUpdatedDate(System.currentTimeMillis());
+      rootNode.setUpdatedDate(System.currentTimeMillis());
       entity.setRootNode(rootNode);
     }
     entity.setPriority(priority == null ? 0 : priority);
@@ -311,7 +314,7 @@ public class NavigationStorageImpl implements NavigationStorage {
     entity.setStartTime(state.getStartPublicationTime());
     entity.setVisibility(state.getVisibility());
     entity.setTarget(!StringUtils.isBlank(state.getTarget()) ? NodeTarget.valueOf(state.getTarget()) : NodeTarget.SAME_TAB);
-    entity.setLastUpdatedDate(System.currentTimeMillis());
+    entity.setUpdatedDate(System.currentTimeMillis());
   }
 
   private NodeData buildNodeData(NodeEntity node) {
@@ -338,7 +341,7 @@ public class NavigationStorageImpl implements NavigationStorage {
            .startPublicationTime(node.getStartTime())
            .visibility(node.getVisibility())
            .target(node.getTarget() != null ? node.getTarget().name() : null)
-           .lastUpdatedDate(node.getLastUpdatedDate());
+           .updatedDate(node.getUpdatedDate());
     PageEntity page = node.getPage();
     if (page != null) {
       SiteKey siteKey = new SiteKey(page.getOwnerType(), page.getOwnerId());
@@ -357,7 +360,7 @@ public class NavigationStorageImpl implements NavigationStorage {
                         state,
                         children.toArray(new String[children.size()]),
                         node.getTarget() != null ? node.getTarget().name() : null,
-                        node.getLastUpdatedDate());
+                        node.getUpdatedDate());
   }
 
   private SiteKey getSiteKey(Long nodeId) {

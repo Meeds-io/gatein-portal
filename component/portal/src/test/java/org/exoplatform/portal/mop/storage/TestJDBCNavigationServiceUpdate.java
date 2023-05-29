@@ -474,7 +474,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractKernelTest {
     assertEquals("bar", added.getTarget().getName());
     NodeChange.Updated<Node> updated = (NodeChange.Updated<Node>) changes.next();
     assertSame(foo, updated.getTarget());
-    assertEquals(new NodeState.Builder().label("foo").target(NodeTarget.SAME_TAB.name()).lastUpdatedDate(updated.getState().getLastUpdatedDate()).build(), updated.getState());
+    assertEquals(new NodeState.Builder().label("foo").target(NodeTarget.SAME_TAB.name()).updatedDate(updated.getState().getUpdatedDate()).build(), updated.getState());
     assertEquals(NodeTarget.SAME_TAB.name(), updated.getState().getTarget());
     assertFalse(changes.hasNext());
 
@@ -484,7 +484,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractKernelTest {
     assertEquals("foo", foo.getState().getLabel());
     updated = (NodeChange.Updated<Node>) changes.next();
     assertSame(foo, updated.getTarget());
-    assertEquals(new NodeState.Builder().label("foo").target(NodeTarget.SAME_TAB.name()).lastUpdatedDate(updated.getState().getLastUpdatedDate()).build(), updated.getState());
+    assertEquals(new NodeState.Builder().label("foo").target(NodeTarget.SAME_TAB.name()).updatedDate(updated.getState().getUpdatedDate()).build(), updated.getState());
     assertEquals(NodeTarget.SAME_TAB.name(), updated.getState().getTarget());
     assertFalse(changes.hasNext());
 
@@ -494,7 +494,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractKernelTest {
     assertEquals("foo", foo.getState().getLabel());
     updated = (NodeChange.Updated<Node>) changes.next();
     assertSame(foo, updated.getTarget());
-    assertEquals(new NodeState.Builder().label("foo").target(NodeTarget.SAME_TAB.name()).lastUpdatedDate(updated.getState().getLastUpdatedDate()).build(), updated.getState());
+    assertEquals(new NodeState.Builder().label("foo").target(NodeTarget.SAME_TAB.name()).updatedDate(updated.getState().getUpdatedDate()).build(), updated.getState());
     assertEquals(NodeTarget.SAME_TAB.name(), updated.getState().getTarget());
     assertFalse(changes.hasNext());
   }

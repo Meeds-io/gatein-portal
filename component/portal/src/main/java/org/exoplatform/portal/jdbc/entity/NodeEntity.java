@@ -22,7 +22,25 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.PreRemove;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.container.ExoContainer;
@@ -86,8 +104,8 @@ public class NodeEntity implements Serializable {
   @Column(name = "TARGET")
   private NodeTarget        target;
 
-  @Column(name = "LAST_UPDATED_DATE")
-  private long lastUpdatedDate;
+  @Column(name = "UPDATED_DATE")
+  private long updatedDate;
 
   public Long getId() {
     return id;
@@ -186,12 +204,12 @@ public class NodeEntity implements Serializable {
     return parent;
   }
 
-  public long getLastUpdatedDate() {
-    return lastUpdatedDate;
+  public long getUpdatedDate() {
+    return updatedDate;
   }
 
-  public void setLastUpdatedDate(long lastUpdatedDate) {
-    this.lastUpdatedDate = lastUpdatedDate;
+  public void setUpdatedDate(long updatedDate) {
+    this.updatedDate = updatedDate;
   }
 
   public void setParent(NodeEntity parent) {

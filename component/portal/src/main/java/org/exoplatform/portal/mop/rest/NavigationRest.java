@@ -497,8 +497,8 @@ public class NavigationRest implements ResourceContainer {
       this.pageLink = pageLink;
     }
 
-    public long getLastUpdatedDate() {
-      return userNode.getLastUpdatedDate();
+    public long getUpdatedDate() {
+      return userNode.getUpdatedDate();
     }
 
   }

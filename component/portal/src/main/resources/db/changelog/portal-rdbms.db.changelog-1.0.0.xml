@@ -364,7 +364,7 @@
   </changeSet>
   <changeSet author="portal" id="1.0.0-33">
     <addColumn tableName="PORTAL_NAVIGATION_NODES">
-      <column name="LAST_UPDATED_DATE" type="BIGINT" defaultValueNumeric="0" />
+      <column name="UPDATED_DATE" type="BIGINT" defaultValueNumeric="0" />
     </addColumn>
   </changeSet>
 </databaseChangeLog>
