@@ -104,6 +104,9 @@ public class NodeEntity implements Serializable {
   @Column(name = "TARGET")
   private NodeTarget        target;
 
+  @Column(name = "UPDATED_DATE")
+  private long updatedDate;
+
   public Long getId() {
     return id;
   }
@@ -199,6 +202,14 @@ public class NodeEntity implements Serializable {
 
   public NodeEntity getParent() {
     return parent;
+  }
+
+  public long getUpdatedDate() {
+    return updatedDate;
+  }
+
+  public void setUpdatedDate(long updatedDate) {
+    this.updatedDate = updatedDate;
   }
 
   public void setParent(NodeEntity parent) {
