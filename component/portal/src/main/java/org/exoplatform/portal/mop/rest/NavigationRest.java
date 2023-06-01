@@ -173,7 +173,11 @@ public class NavigationRest implements ResourceContainer {
                                          @Parameter(description = "to check the navigation nodes scheduling start and end dates")
                                          @DefaultValue("true")
                                          @QueryParam("temporalCheck")
-                                         boolean temporalCheck) {
+                                         boolean temporalCheck,
+                                         @Parameter(description = "navigation filter : ALL , GROUP, PAGE or LINK")
+                                         @DefaultValue("ALL")
+                                         @QueryParam("filter")
+                                         String filter) {
     // this function return nodes and not navigations
     if (StringUtils.isBlank(siteTypeName)) {
       return Response.status(400).build();
@@ -187,7 +191,8 @@ public class NavigationRest implements ResourceContainer {
                           visibilityNames,
                           includeGlobal,
                           expandPageDetails,
-                          temporalCheck);
+                          temporalCheck,
+                          filter);
   }
 
   @Path("/categories")
@@ -210,7 +215,8 @@ public class NavigationRest implements ResourceContainer {
     }
   }
 
-  private Response getNavigations(HttpServletRequest request, // NOSONAR
+  private Response
+  getNavigations(HttpServletRequest request, // NOSONAR
                                   String siteTypeName,
                                   String siteName,
                                   String scopeName,
@@ -218,7 +224,8 @@ public class NavigationRest implements ResourceContainer {
                                   List<String> visibilityNames,
                                   boolean includeGlobal,
                                   boolean expandPageDetails,
-                                  boolean temporalCheck) {
+                                  boolean temporalCheck,
+                                  String filter) {
     ConversationState state = ConversationState.getCurrent();
     Identity userIdentity = state == null ? null : state.getIdentity();
     String username = userIdentity == null ? null : userIdentity.getUserId();
@@ -280,7 +287,7 @@ public class NavigationRest implements ResourceContainer {
         UserNode rootNode = userPortal.getNode(navigation, scope, userFilterConfig, null);
         nodes = rootNode.getChildren();
       }
-      List<ResultUserNode> resultNodes = convertNodes(nodes, userIdentity, expandPageDetails);
+      List<ResultUserNode> resultNodes = convertNodes(nodes, userIdentity, expandPageDetails, filter);
       return Response.ok(resultNodes).build();
     } catch (Exception e) {
       LOG.error("Error retrieving ");
@@ -288,7 +295,7 @@ public class NavigationRest implements ResourceContainer {
     }
   }
 
-  private List<ResultUserNode> convertNodes(Collection<UserNode> nodes, Identity identity, boolean expandPageDetails) {
+  private List<ResultUserNode> convertNodes(Collection<UserNode> nodes, Identity identity, boolean expandPageDetails, String filter) {
     if (nodes == null) {
       return Collections.emptyList();
     }
@@ -297,9 +304,28 @@ public class NavigationRest implements ResourceContainer {
       if (userNode == null) {
         continue;
       }
-      ResultUserNode resultNode = new ResultUserNode(userNode);
-      if (expandPageDetails && userNode.getPageRef() != null) {
-        Page userNodePage = layoutService.getPage(userNode.getPageRef());
+      ResultUserNode resultNode = null;
+      Page userNodePage = null;
+      if (filter.equals("GROUP")) {
+        if (userNode.getPageRef() == null) {
+          resultNode = new ResultUserNode(userNode);
+        }
+      } else if (filter.equals("LINK") || filter.equals("PAGE")) {
+        if (userNode.getPageRef() != null) {
+          userNodePage = layoutService.getPage(userNode.getPageRef());
+          if (filter.equals("PAGE") && PageType.PAGE.equals(PageType.valueOf(userNodePage.getType()))) {
+            resultNode = new ResultUserNode(userNode);
+          } else if (filter.equals("LINK") && PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
+            resultNode = new ResultUserNode(userNode);
+          }
+        }
+      } else {
+        if (userNode.getPageRef() != null) {
+          userNodePage = layoutService.getPage(userNode.getPageRef());
+        }
+        resultNode = new ResultUserNode(userNode);
+      }
+      if (expandPageDetails &&  userNodePage != null && resultNode != null) {
         if (PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
           resultNode.setPageLink(userNodePage.getLink());
         }
@@ -337,8 +363,10 @@ public class NavigationRest implements ResourceContainer {
           resultNode.setPageAccessPermissions(accessPermissions);
         }
       }
-      resultNode.setChildren(convertNodes(userNode.getChildren(), identity, expandPageDetails));
-      result.add(resultNode);
+      if (resultNode != null) {
+        resultNode.setChildren(convertNodes(userNode.getChildren(), identity, expandPageDetails, filter));
+        result.add(resultNode);
+      }
     }
     return result;
   }
