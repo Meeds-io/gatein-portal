@@ -6,6 +6,8 @@
   
   def rcontext = _ctx.getRequestContext();
   ResourceBundle res = rcontext.getApplicationResourceBundle();
+  def requirejs = rcontext.getJavascriptManager().getRequireJS();
+  requirejs.require("SHARED/bts_dropdown","bts_dropdown");
 
   UIPortalApplication uiPortalApp = rcontext.getUIApplication();
   boolean hasPermission = uicomponent.hasPermission();
@@ -110,7 +112,7 @@
                       </div>
                       <a href="javascript:void(0);" onclick="<%=uicomponent.event("EditContainer")%>" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIColumnContainer.tooltip.editContainer")%>"><i class="uiIconEdit uiIconWhite"></i></a>
                       <a href="javascript:void(0);" onclick="<%=uicomponent.event("DeleteComponent")%>" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIColumnContainer.tooltip.closeContainer")%>"><i class="uiIconTrash uiIconWhite"></i></a>
-                    <%}%>                   
+                    <%}%
                   </div>
                 <%/*End InfoBar*/ %>
               </div>
