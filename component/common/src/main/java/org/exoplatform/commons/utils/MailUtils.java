@@ -22,7 +22,7 @@ public class MailUtils {
 
   public static String getSenderName() {
     SettingValue<?> name = getSettingService().get(Context.GLOBAL, Scope.GLOBAL.id(null), SENDER_NAME_PARAM);
-    return name != null ? (String) name.getValue() : System.getProperty("exo.notifications.portalname", getBrandingCompanyName());
+    return name != null ? (String) name.getValue() : getBrandingCompanyName();
   }
 
   public static String getSenderEmail() {
