@@ -22,6 +22,8 @@ import org.exoplatform.services.test.mock.MockHttpServletRequest;
 
 public class BrandingRestResourcesTest extends BaseRestServicesTestCase {
 
+  private BrandingService originalBrandingService;
+
   private BrandingService brandingService;
 
   private FileService     fileService;
@@ -39,16 +41,18 @@ public class BrandingRestResourcesTest extends BaseRestServicesTestCase {
     brandingService = mock(BrandingService.class);
     fileService = mock(FileService.class);
     settingService = mock(SettingService.class);
-    getContainer().registerComponentInstance("BrandingService", brandingService);
+    originalBrandingService = (BrandingService) getContainer().unregisterComponent(BrandingService.class).getComponentInstance();
+    getContainer().registerComponentInstance(BrandingService.class, brandingService);
     getContainer().registerComponentInstance("FileService", fileService);
     getContainer().registerComponentInstance("SettingService", settingService);
   }
 
   @Override
   public void tearDown() throws Exception {
-    getContainer().unregisterComponent("BrandingService");
     getContainer().unregisterComponent("FileService");
     getContainer().unregisterComponent("SettingService");
+    getContainer().unregisterComponent(BrandingService.class);
+    getContainer().registerComponentInstance(BrandingService.class, originalBrandingService);
     super.tearDown();
   }
 
