@@ -271,13 +271,52 @@
   </component>
 
   <component>
-    <key>MailProperties</key>
-    <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
+    <key>org.exoplatform.portal.branding.BrandingService</key>
+    <type>org.exoplatform.portal.branding.BrandingServiceImpl</type>
     <init-params>
-      <properties-param>
-        <name>MailProperties</name>
-        <property name="exo.notifications.portalname" value="Meeds Builders" />
-      </properties-param>
+      <value-param>
+        <name>exo.branding.company.name</name>
+        <value>${exo.branding.company.name:Web3 Hub}</value>
+      </value-param>
+      <value-param>
+        <name>exo.branding.company.siteName</name>
+        <value>${exo.branding.company.siteName:Meeds}</value>
+      </value-param>
+      <value-param>
+        <name>exo.branding.company.link</name>
+        <value>${exo.branding.company.link:https://meeds.io}</value>
+      </value-param>
+      <value-param>
+        <name>exo.branding.company.logo</name>
+        <value>${exo.branding.company.logo:/skin/images/logo/DefaultLogo.png}</value>
+      </value-param>
+      <value-param>
+        <name>exo.branding.company.favicon</name>
+        <value>${exo.branding.company.favicon:/skin/images/favicon.ico}</value>
+      </value-param>
+      <value-param>
+        <name>authentication.background</name>
+        <value>${portal.authentication.background:}</value>
+      </value-param>
+      <value-param>
+        <name>authentication.title</name>
+        <value>${portal.authentication.title:UILoginForm.label.pageTitle}</value>
+      </value-param>
+      <value-param>
+        <name>authentication.subtitle</name>
+        <value>${portal.authentication.subtitle:UILoginForm.label.pageSubTitle}</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <type>org.exoplatform.mock.MockUploadService</type>
+    <init-params>
+      <value-param>
+        <name>upload.limit.size</name>
+        <description>Maximum size of the file to upload in MB</description>
+        <value>${exo.uploadLimit:10}</value>
+      </value-param>
     </init-params>
   </component>
 
