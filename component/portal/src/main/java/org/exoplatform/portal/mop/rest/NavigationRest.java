@@ -1,13 +1,8 @@
 package org.exoplatform.portal.mop.rest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +17,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.portal.mop.PageType;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,12 +25,10 @@ import org.exoplatform.portal.config.NavigationCategoryService;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
-import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.navigation.Scope;
-import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.user.HttpUserPortalContext;
 import org.exoplatform.portal.mop.user.UserNavigation;
@@ -168,8 +160,8 @@ public class NavigationRest implements ResourceContainer {
                                          @QueryParam("includeGlobal")
                                          boolean includeGlobal,
                                          @Parameter(description = "to include extra node page details in results")
-                                         @QueryParam("expandPageDetails")
-                                         boolean expandPageDetails,
+                                         @QueryParam("expand")
+                                         boolean expand,
                                          @Parameter(description = "to check the navigation nodes scheduling start and end dates")
                                          @DefaultValue("true")
                                          @QueryParam("temporalCheck")
@@ -186,7 +178,7 @@ public class NavigationRest implements ResourceContainer {
                           nodeId,
                           visibilityNames,
                           includeGlobal,
-                          expandPageDetails,
+                          expand,
                           temporalCheck);
   }
 
@@ -217,7 +209,7 @@ public class NavigationRest implements ResourceContainer {
                                   String nodeId,
                                   List<String> visibilityNames,
                                   boolean includeGlobal,
-                                  boolean expandPageDetails,
+                                  boolean expand,
                                   boolean temporalCheck) {
     ConversationState state = ConversationState.getCurrent();
     Identity userIdentity = state == null ? null : state.getIdentity();
@@ -280,7 +272,7 @@ public class NavigationRest implements ResourceContainer {
         UserNode rootNode = userPortal.getNode(navigation, scope, userFilterConfig, null);
         nodes = rootNode.getChildren();
       }
-      List<ResultUserNode> resultNodes = convertNodes(nodes, userIdentity, expandPageDetails);
+      List<UserNodeRestEntity> resultNodes = EntityBuilder.toUserNodeRestEntity(nodes, expand, organizationService, layoutService, userACL);
       return Response.ok(resultNodes).build();
     } catch (Exception e) {
       LOG.error("Error retrieving ");
@@ -288,60 +280,6 @@ public class NavigationRest implements ResourceContainer {
     }
   }
 
-  private List<ResultUserNode> convertNodes(Collection<UserNode> nodes, Identity identity, boolean expandPageDetails) {
-    if (nodes == null) {
-      return Collections.emptyList();
-    }
-    List<ResultUserNode> result = new ArrayList<>();
-    for (UserNode userNode : nodes) {
-      if (userNode == null) {
-        continue;
-      }
-      ResultUserNode resultNode = new ResultUserNode(userNode);
-      if (expandPageDetails && userNode.getPageRef() != null) {
-        Page userNodePage = layoutService.getPage(userNode.getPageRef());
-        if (PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
-          resultNode.setPageLink(userNodePage.getLink());
-        }
-        if (!StringUtils.isBlank(userNodePage.getEditPermission())) {
-          resultNode.setCanEditPage(userACL.hasEditPermission(userNodePage));
-          Map<String, Object> editPermission = new HashMap<>();
-          try {
-            editPermission.put("membershipType", userNodePage.getEditPermission().split(":")[0]);
-            editPermission.put("group",
-                               organizationService.getGroupHandler()
-                                                  .findGroupById(userNodePage.getEditPermission().split(":")[1]));
-          } catch (Exception e) {
-            LOG.warn("Error when getting group with id {}", userNodePage.getEditPermission().split(":")[1], e);
-          }
-          resultNode.setPageEditPermission(editPermission);
-        }
-        if (userNodePage.getAccessPermissions() != null) {
-          List<Map<String, Object>> accessPermissions = new ArrayList<>();
-          if (userNodePage.getAccessPermissions().length == 1 && userNodePage.getAccessPermissions()[0].equals("Everyone")) {
-            Map<String, Object> accessPermission = new HashMap<>();
-            accessPermission.put("membershipType", userNodePage.getAccessPermissions()[0]);
-            accessPermissions.add(accessPermission);
-          } else {
-            accessPermissions = Arrays.stream(userNodePage.getAccessPermissions()).map(permission -> {
-              Map<String, Object> accessPermission = new HashMap<>();
-              try {
-                accessPermission.put("membershipType", permission.split(":")[0]);
-                accessPermission.put("group", organizationService.getGroupHandler().findGroupById(permission.split(":")[1]));
-              } catch (Exception e) {
-                LOG.warn("Error when getting group with id {}", permission.split(":")[1], e);
-              }
-              return accessPermission;
-            }).collect(Collectors.toList());
-          }
-          resultNode.setPageAccessPermissions(accessPermissions);
-        }
-      }
-      resultNode.setChildren(convertNodes(userNode.getChildren(), identity, expandPageDetails));
-      result.add(resultNode);
-    }
-    return result;
-  }
 
   private static UserNodeFilterConfig getUserFilterConfig(Visibility[] visibilities, boolean temporalCheck) {
     UserNodeFilterConfig.Builder builder = UserNodeFilterConfig.builder();
@@ -385,122 +323,6 @@ public class NavigationRest implements ResourceContainer {
       }
     }
     return scope;
-  }
-
-  /**
-   * A class to retrieve {@link UserNode} attributes by avoiding cyclic JSON
-   * parsing of instance when retrieving {@link UserNode#getChildren()} and
-   * {@link UserNode#getParent()} attributes using {@link JsonParserImpl}
-   */
-  public static final class ResultUserNode {
-    private UserNode                  userNode;
-
-    private List<ResultUserNode>      subNodes;
-
-    private boolean                   canEditPage;
-
-    private Map<String, Object>       pageEditPermission;
-
-    private List<Map<String, Object>> pageAccessPermissions;
-
-    private String                    pageLink;
-
-    public ResultUserNode(UserNode userNode) {
-      this.userNode = userNode;
-    }
-
-    public void setChildren(List<ResultUserNode> subNodes) {
-      this.subNodes = subNodes;
-    }
-
-    public List<ResultUserNode> getChildren() {
-      return subNodes;
-    }
-
-    public String getLabel() {
-      return userNode.getResolvedLabel();
-    }
-
-    public String getLabelKey() {
-      return userNode.getLabel();
-    }
-
-    public String getIcon() {
-      return userNode.getIcon();
-    }
-
-    public String getId() {
-      return userNode.getId();
-    }
-
-    public String getUri() {
-      return userNode.getURI();
-    }
-
-    public Visibility getVisibility() {
-      return userNode.getVisibility();
-    }
-
-    public String getName() {
-      return userNode.getName();
-    }
-
-    public long getStartPublicationTime() {
-      return userNode.getStartPublicationTime();
-    }
-
-    public long getEndPublicationTime() {
-      return userNode.getEndPublicationTime();
-    }
-
-    public SiteKey getSiteKey() {
-      return userNode.getNavigation().getKey();
-    }
-
-    public PageKey getPageKey() {
-      return userNode.getPageRef();
-    }
-
-    public boolean isCanEditPage() {
-      return canEditPage;
-    }
-
-    public void setCanEditPage(boolean canEditPage) {
-      this.canEditPage = canEditPage;
-    }
-
-    public Map<String, Object> getPageEditPermission() {
-      return pageEditPermission;
-    }
-
-    public void setPageEditPermission(Map<String, Object> pageEditPermission) {
-      this.pageEditPermission = pageEditPermission;
-    }
-
-    public List<Map<String, Object>> getPageAccessPermissions() {
-      return pageAccessPermissions;
-    }
-
-    public void setPageAccessPermissions(List<Map<String, Object>> pageAccessPermissions) {
-      this.pageAccessPermissions = pageAccessPermissions;
-    }
-
-    public String getTarget() {
-      return userNode.getTarget();
-    }
-
-    public String getPageLink() {
-      return pageLink;
-    }
-
-    public void setPageLink(String pageLink) {
-      this.pageLink = pageLink;
-    }
-
-    public long getUpdatedDate() {
-      return userNode.getUpdatedDate();
-    }
-
   }
 
   /**

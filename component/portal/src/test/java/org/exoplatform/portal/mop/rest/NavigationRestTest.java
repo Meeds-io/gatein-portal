@@ -189,7 +189,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
   
   @Test
   public void testGetSiteNavigationWithPageDetails() throws Exception {
-    String path = "/v1/navigations/PORTAL?siteName=SiteName&expandPageDetails=true";
+    String path = "/v1/navigations/PORTAL?siteName=SiteName&expand=true";
 
     EnvironmentContext envctx = new EnvironmentContext();
     HttpServletRequest httpRequest = new MockHttpServletRequest(path, null, 0, "GET", null);
@@ -222,7 +222,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     
     assertEquals(200, resp.getStatus());
     assertNotNull(entity);
-    List<NavigationRest.ResultUserNode> resultUserNodes = (List<NavigationRest.ResultUserNode>) resp.getEntity();
+    List<UserNodeRestEntity> resultUserNodes = (List<UserNodeRestEntity>) resp.getEntity();
     assertEquals(1, resultUserNodes.size());
     assertEquals("*", resultUserNodes.get(0).getPageEditPermission().get("membershipType"));
     assertEquals(group, resultUserNodes.get(0).getPageEditPermission().get("group"));
@@ -238,7 +238,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     
     assertEquals(200, resp.getStatus());
     assertNotNull(entity);
-    resultUserNodes = (List<NavigationRest.ResultUserNode>) resp.getEntity();
+    resultUserNodes = (List<UserNodeRestEntity>) resp.getEntity();
     assertEquals(1, resultUserNodes.size());
     assertEquals("manager", resultUserNodes.get(0).getPageEditPermission().get("membershipType"));
     assertEquals(group, resultUserNodes.get(0).getPageEditPermission().get("group"));
