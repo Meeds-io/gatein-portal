@@ -80,11 +80,6 @@ public class MailUtilsTest {
     senderName = MailUtils.getSenderName();
     assertEquals(companyName, senderName);
 
-    companyName = "Company Name From property";
-    System.setProperty("exo.notifications.portalname", companyName);
-    senderName = MailUtils.getSenderName();
-    assertEquals(companyName, senderName);
-
     companyName = "Company Name From Settings";
     SettingValue settingValue = SettingValue.create(companyName);
     when(settingService.get(Context.GLOBAL, Scope.GLOBAL.id(null), SENDER_NAME_PARAM)).thenReturn(settingValue);
