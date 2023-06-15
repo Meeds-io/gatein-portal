@@ -143,6 +143,8 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   private PortalContainer      container;
 
+  private LocaleConfigService  localeConfigService;
+
   private SettingService       settingService;
 
   private FileService          fileService;
@@ -177,8 +179,6 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   private Map<String, String>  loginSubtitle                     = null;
 
-  private String               defaultLanguage                   = null;
-
   private Map<String, String>  supportedLanguages                = null;
 
   private String               lessThemeContent                  = null;
@@ -203,8 +203,9 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     this.settingService = settingService;
     this.fileService = fileService;
     this.uploadService = uploadService;
+    this.localeConfigService = localeConfigService;
 
-    this.loadLanguages(localeConfigService);
+    this.loadLanguages();
     this.loadInitParams(initParams);
   }
 
@@ -239,7 +240,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   @Override
   public Branding getBrandingInformation(boolean retrieveBinaries) {
     Branding branding = new Branding();
-    branding.setDefaultLanguage(defaultLanguage);
+    branding.setDefaultLanguage(getDefaultLanguage());
     branding.setSupportedLanguages(Collections.unmodifiableMap(supportedLanguages));
     branding.setCompanyName(getCompanyName());
     branding.setCompanyLink(getCompanyLink());
@@ -556,7 +557,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
           valuePerLanguage.put(language, storedValue.getValue().toString());
         }
       }
-      valuePerLanguage.computeIfAbsent(defaultLanguage, key -> this.defaultLoginTitle);
+      valuePerLanguage.computeIfAbsent(getDefaultLanguage(), key -> this.defaultLoginTitle);
       this.loginTitle = valuePerLanguage;
     }
     return Collections.unmodifiableMap(this.loginTitle);
@@ -574,7 +575,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
           valuePerLanguage.put(language, storedValue.getValue().toString());
         }
       }
-      valuePerLanguage.computeIfAbsent(defaultLanguage, key -> this.defaultLoginSubtitle);
+      valuePerLanguage.computeIfAbsent(getDefaultLanguage(), key -> this.defaultLoginSubtitle);
       this.loginSubtitle = valuePerLanguage;
     }
     return Collections.unmodifiableMap(this.loginSubtitle);
@@ -586,7 +587,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     if (valuePerLanguage.containsKey(locale.getLanguage())) {
       return valuePerLanguage.get(locale.getLanguage());
     } else {
-      return valuePerLanguage.getOrDefault(defaultLanguage, this.defaultLoginTitle);
+      return valuePerLanguage.getOrDefault(getDefaultLanguage(), this.defaultLoginTitle);
     }
   }
 
@@ -596,7 +597,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     if (valuePerLanguage.containsKey(locale.getLanguage())) {
       return valuePerLanguage.get(locale.getLanguage());
     } else {
-      return valuePerLanguage.getOrDefault(defaultLanguage, this.defaultLoginTitle);
+      return valuePerLanguage.getOrDefault(getDefaultLanguage(), this.defaultLoginTitle);
     }
   }
 
@@ -668,15 +669,11 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     }
   }
 
-  private void loadLanguages(LocaleConfigService localeConfigService) {
-    Locale defaultLocale = localeConfigService.getDefaultLocaleConfig() == null ? Locale.ENGLISH
-                                                                                : localeConfigService.getDefaultLocaleConfig()
-                                                                                                     .getLocale();
-    this.defaultLanguage = defaultLocale.getLanguage();
+  private void loadLanguages() {
+    Locale defaultLocale = getDefaultLocale();
     this.supportedLanguages =
                             localeConfigService.getLocalConfigs() == null ? Collections.singletonMap(defaultLocale.getLanguage(),
-                                                                                                     getLocaleDisplayName(defaultLocale,
-                                                                                                                          defaultLocale))
+                                                                                                     getLocaleDisplayName(defaultLocale, defaultLocale))
                                                                           : localeConfigService.getLocalConfigs()
                                                                                                .stream()
                                                                                                .filter(localeConfig -> !StringUtils.equals(localeConfig.getLocaleName(),
@@ -684,6 +681,16 @@ public class BrandingServiceImpl implements BrandingService, Startable {
                                                                                                .collect(Collectors.toMap(LocaleConfig::getLocaleName,
                                                                                                                          localeConfig -> getLocaleDisplayName(defaultLocale,
                                                                                                                                                               localeConfig.getLocale())));
+  }
+
+  private Locale getDefaultLocale() {
+    return localeConfigService.getDefaultLocaleConfig() == null ? Locale.getDefault()
+                                                                : localeConfigService.getDefaultLocaleConfig()
+                                                                                     .getLocale();
+  }
+
+  private String getDefaultLanguage() {
+    return getDefaultLocale().toLanguageTag();
   }
 
   private String getLocaleDisplayName(Locale defaultLocale, Locale locale) {
