@@ -53,6 +53,12 @@
   <component>
     <key>org.exoplatform.services.resources.LocalePolicy</key>
     <type>org.exoplatform.portal.application.localization.DefaultLocalePolicyService</type>
+    <init-params>
+      <value-param>
+        <name>useDefaultSiteLanguage</name>
+        <value>${io.meeds.useDefaultSiteLanguage:false}</value>
+      </value-param>
+    </init-params>
   </component>
 
   <component>
