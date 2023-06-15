@@ -29,7 +29,7 @@
   <name>GateIn Portal Component Resources</name>
   <description>Internationalization and localization resources</description>
   <properties>
-    <exo.test.coverage.ratio>0.63</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.64</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
