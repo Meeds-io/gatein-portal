@@ -24,9 +24,12 @@ package org.exoplatform.portal.application.localization;
 import java.util.List;
 import java.util.Locale;
 
+import org.picocontainer.Startable;
+
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.LocalePolicy;
-import org.picocontainer.Startable;
 
 /**
  * This service represents a default policy for determining LocaleConfig to be used for user's session. This service is
@@ -47,6 +50,20 @@ import org.picocontainer.Startable;
  * @author <a href="mailto:mstrukel@redhat.com">Marko Strukelj</a>
  */
 public class DefaultLocalePolicyService implements LocalePolicy, Startable {
+
+    private static final String USE_DEFAULT_SITE_LANGUAGE_PARAM = "useDefaultSiteLanguage";
+
+    private LocaleConfigService localeConfigService;
+
+    private boolean             useDefaultSiteLanguage;
+
+    public DefaultLocalePolicyService(LocaleConfigService localeConfigService, InitParams params) {
+      this.localeConfigService = localeConfigService;
+      if (params != null && params.containsKey(USE_DEFAULT_SITE_LANGUAGE_PARAM)) {
+        this.useDefaultSiteLanguage = Boolean.parseBoolean(params.getValueParam(USE_DEFAULT_SITE_LANGUAGE_PARAM).getValue());
+      }
+    }
+
     /**
      * @see LocalePolicy#determineLocale(LocaleContextInfo)
      */
@@ -62,8 +79,13 @@ public class DefaultLocalePolicyService implements LocalePolicy, Startable {
         else
             locale = getLocaleConfigForRegistered(context);
 
-        if (locale == null)
+        if (locale == null) {
+          if (useDefaultSiteLanguage) {
             locale = context.getPortalLocale();
+          } else {
+            locale = localeConfigService.getDefaultLocaleConfig().getLocale();
+          }
+        }
 
         return locale;
     }
