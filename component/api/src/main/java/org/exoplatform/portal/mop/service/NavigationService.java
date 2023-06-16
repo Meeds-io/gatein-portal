@@ -19,7 +19,9 @@ import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NodeChangeListener;
 import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.portal.mop.navigation.NodeModel;
+import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.portal.mop.navigation.Scope;
 
 public interface NavigationService extends org.exoplatform.portal.mop.navigation.NavigationService {
@@ -167,5 +169,47 @@ public interface NavigationService extends org.exoplatform.portal.mop.navigation
    * @param <N>      the node generic type
    */
   <N> void rebaseNode(NodeContext<N> context, Scope scope, NodeChangeListener<NodeContext<N>> listener);
+
+  /**
+   * Delete a navigation node with a given node id
+   *
+   * @param nodeId the node id to be deleted
+   */
+  public void deleteNode(Long nodeId);
+
+  /**
+   * Get a navigation node with a given node id
+   *
+   * @param nodeId the node id
+   */
+  public NodeData getNodeById(Long nodeId);
+
+  /**
+   * Move the given navigation node
+   *
+   * @param targetId the node id
+   * @param fromId the parent node id
+   * @param toId destination parent node id
+   * @param previousId the previous node id
+   */
+  public void moveNode(Long targetId, Long fromId, Long toId, Long previousId);
+
+  /**
+   * Create a navigation node
+   *
+   * @param parentId the parent node id
+   * @param previousId the previous node id
+   * @param name node name
+   * @param state node state
+   */
+  public NodeData[] createNode(Long parentId, Long previousId, String name, NodeState state);
+
+  /**
+   * Update a navigation node
+   *
+   * @param nodeId the node id
+   * @param state node state
+   */
+  public void updateNode(Long nodeId, NodeState state);
 
 }

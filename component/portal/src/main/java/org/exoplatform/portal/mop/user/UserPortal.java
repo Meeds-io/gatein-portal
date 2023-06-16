@@ -116,6 +116,18 @@ public interface UserPortal {
      * @return a {@link Collection} of {@link UserNode}
      */
     Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig filterConfig);
+    
+    /**
+     * Load the list of user nodes computed from the list of
+     * {@link UserNavigation} of type siteType (PORTAL, GROUP or USER)
+     * 
+     * @param siteType site type: PORTAL, GROUP or USER
+     * @param scope an optional scope
+     * @param filterConfig an optional filter
+     * @param includeGlobal to include global nodes
+     * @return a {@link Collection} of {@link UserNode}
+     */
+    Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig filterConfig, boolean includeGlobal);
 
     /**
      * Load the list of user nodes computed from the list of

@@ -25,8 +25,10 @@ import org.exoplatform.portal.mop.navigation.NavigationData;
 import org.exoplatform.portal.mop.navigation.NodeChangeListener;
 import org.exoplatform.portal.mop.navigation.NodeChangeNotifier;
 import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.portal.mop.navigation.NodeManager;
 import org.exoplatform.portal.mop.navigation.NodeModel;
+import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.storage.NavigationStorage;
 import org.exoplatform.services.listener.ListenerService;
@@ -143,6 +145,30 @@ public class NavigationServiceImpl implements NavigationService {
     nodeManager.rebaseNode(context, scope, new NodeChangeNotifier<>(listener, this, listenerService));
   }
 
+  @Override
+  public NodeData getNodeById(Long nodeId) {
+    return navigationStorage.loadNode(nodeId);
+  }
+
+  @Override
+  public void moveNode(Long targetId, Long fromId, Long toId, Long previousId) {
+    navigationStorage.moveNode(targetId, fromId, toId, previousId);
+  }
+
+  @Override
+  public void deleteNode(Long nodeId) {
+    navigationStorage.destroyNode(nodeId);
+  }
+
+  @Override
+  public NodeData[] createNode(Long parentId, Long previousId, String name, NodeState state) {
+    return navigationStorage.createNode(parentId, previousId, name, state);
+  }
+
+  public void updateNode(Long nodeId, NodeState state) {
+    navigationStorage.updateNode(nodeId, state);
+  }
+
   private void notify(String name, SiteKey key) {
     try {
       listenerService.broadcast(name, this, key);
@@ -150,5 +176,4 @@ public class NavigationServiceImpl implements NavigationService {
       LOG.error("Error when delivering notification " + name + " for navigation " + key, e);
     }
   }
-
 }

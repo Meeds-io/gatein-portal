@@ -2,11 +2,11 @@ package org.exoplatform.portal.mop.rest;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -22,13 +22,14 @@ import org.json.JSONObject;
 
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.NavigationCategoryService;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.navigation.Scope;
-import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.user.HttpUserPortalContext;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserNode;
@@ -55,36 +56,42 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "v1/navigations", description = "Retrieve sites navigations")
 public class NavigationRest implements ResourceContainer {
 
-  private static final Log                  LOG                  = ExoLogger.getLogger(NavigationRest.class);
+  private static final Log          LOG                  = ExoLogger.getLogger(NavigationRest.class);
 
-  private static final Visibility[]         DEFAULT_VISIBILITIES = Visibility.values();
+  private static final Visibility[] DEFAULT_VISIBILITIES = Visibility.values();
 
-  private static final UserNodeFilterConfig USER_FILTER_CONFIG   = getUserFilterConfig(DEFAULT_VISIBILITIES);
+  private UserPortalConfigService   portalConfigService;
 
-  private UserPortalConfigService           portalConfigService;
+  private NavigationCategoryService navigationCategoryService;
 
-  private NavigationCategoryService         navigationCategoryService;
+  private LayoutService             layoutService;
 
-  public NavigationRest(UserPortalConfigService portalConfigService, NavigationCategoryService navigationCategoryService) {
+  private OrganizationService       organizationService;
+
+  private UserACL                   userACL;
+
+  public NavigationRest(UserPortalConfigService portalConfigService,
+                        NavigationCategoryService navigationCategoryService,
+                        LayoutService layoutService,
+                        OrganizationService organizationService,
+                        UserACL userACL) {
     this.portalConfigService = portalConfigService;
     this.navigationCategoryService = navigationCategoryService;
+    this.layoutService = layoutService;
+    this.organizationService = organizationService;
+    this.userACL = userACL;
   }
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @Operation(
-          summary = "Gets navigations",
-          description = "Gets navigations",
-          method = "GET")
-  @ApiResponses(value = {
-          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-          @ApiResponse(responseCode = "400", description = "Invalid query input"),
-          @ApiResponse(responseCode = "404", description = "Navigation does not exist"),
-          @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public Response getSiteNavigation(
-                                    @Context
-                                    HttpServletRequest request,
+  @Operation(summary = "Gets navigations", description = "Gets navigations", method = "GET")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+      @ApiResponse(responseCode = "400", description = "Invalid query input"),
+      @ApiResponse(responseCode = "404", description = "Navigation does not exist"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public Response getSiteNavigation(@Context
+  HttpServletRequest request,
                                     @Parameter(description = "Offset", required = false)
                                     @Schema(defaultValue = "0")
                                     @QueryParam("offset")
@@ -124,45 +131,64 @@ public class NavigationRest implements ResourceContainer {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @Operation(
-          summary = "Gets navigations of one or multiple site navigations",
-          description = "Gets navigations of one or multiple site navigations",
-          method = "GET")
-  @ApiResponses(value = {
-          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-          @ApiResponse(responseCode = "400", description = "Invalid query input"),
-          @ApiResponse(responseCode = "404", description = "Navigation does not exist"),
-          @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public Response getSiteTypeNavigations(@Context HttpServletRequest request,
-                                         @Parameter(description = "Portal site type, possible values: PORTAL, GROUP or USER", required = true) @PathParam("siteType") String siteTypeName,
-                                         @Parameter(description = "Portal site name", required = true) @QueryParam("siteName") String siteName,
+  @Operation(summary = "Gets navigations of one or multiple site navigations", description = "Gets navigations of one or multiple site navigations", method = "GET")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+      @ApiResponse(responseCode = "400", description = "Invalid query input"),
+      @ApiResponse(responseCode = "404", description = "Navigation does not exist"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public Response getSiteTypeNavigations(@Context
+  HttpServletRequest request,
+                                         @Parameter(description = "Portal site type, possible values: PORTAL, GROUP or USER", required = true)
+                                         @PathParam("siteType")
+                                         String siteTypeName,
+                                         @Parameter(description = "Portal site name", required = true)
+                                         @QueryParam("siteName")
+                                         String siteName,
                                          @Parameter(description = "Scope of navigations tree to retrieve, possible values: ALL, CHILDREN, GRANDCHILDREN, SINGLE", required = false)
-                                         @Schema(defaultValue = "ALL") @QueryParam("scope") String scopeName,
-                                         @Parameter(description = "parent navigation node id") @QueryParam("nodeId") String nodeId,
+                                         @Schema(defaultValue = "ALL")
+                                         @QueryParam("scope")
+                                         String scopeName,
+                                         @Parameter(description = "parent navigation node id")
+                                         @QueryParam("nodeId")
+                                         String nodeId,
                                          @Parameter(description = "Multivalued visibilities of navigation nodes to retrieve, possible values: DISPLAYED, HIDDEN, SYSTEM or TEMPORAL. If empty, all visibilities will be used.", required = false)
-                                         @Schema(defaultValue = "All possible values combined") @QueryParam("visibility") List<String> visibilityNames) {
+                                         @Schema(defaultValue = "All possible values combined")
+                                         @QueryParam("visibility")
+                                         List<String> visibilityNames,
+                                         @Parameter(description = "if to include Global site in results in portal type case", required = false)
+                                         @DefaultValue("true")
+                                         @QueryParam("includeGlobal")
+                                         boolean includeGlobal,
+                                         @Parameter(description = "to include extra node page details in results")
+                                         @QueryParam("expand")
+                                         boolean expand,
+                                         @Parameter(description = "to check the navigation nodes scheduling start and end dates")
+                                         @DefaultValue("true")
+                                         @QueryParam("temporalCheck")
+                                         boolean temporalCheck) {
     // this function return nodes and not navigations
     if (StringUtils.isBlank(siteTypeName)) {
       return Response.status(400).build();
     }
 
-    return getNavigations(request, siteTypeName, siteName, scopeName, nodeId, visibilityNames);
+    return getNavigations(request,
+                          siteTypeName,
+                          siteName,
+                          scopeName,
+                          nodeId,
+                          visibilityNames,
+                          includeGlobal,
+                          expand,
+                          temporalCheck);
   }
 
   @Path("/categories")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @Operation(
-      summary = "Gets navigations categories for UI",
-      description = "Gets navigations categories for UI",
-      method = "GET")
-  @ApiResponses(
-      value = {
-          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-          @ApiResponse(responseCode = "500", description = "Internal server error"),
-      }
-  )
+  @Operation(summary = "Gets navigations categories for UI", description = "Gets navigations categories for UI", method = "GET")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+      @ApiResponse(responseCode = "500", description = "Internal server error"), })
   public Response getNavigationCategories() {
     try {
       JSONObject object = new JSONObject();
@@ -181,7 +207,10 @@ public class NavigationRest implements ResourceContainer {
                                   String siteName,
                                   String scopeName,
                                   String nodeId,
-                                  List<String> visibilityNames) {
+                                  List<String> visibilityNames,
+                                  boolean includeGlobal,
+                                  boolean expand,
+                                  boolean temporalCheck) {
     ConversationState state = ConversationState.getCurrent();
     Identity userIdentity = state == null ? null : state.getIdentity();
     String username = userIdentity == null ? null : userIdentity.getUserId();
@@ -212,10 +241,7 @@ public class NavigationRest implements ResourceContainer {
                      .build();
     }
 
-    UserNodeFilterConfig userFilterConfig = USER_FILTER_CONFIG;
-    if (visibilities.length > 0) {
-      userFilterConfig = getUserFilterConfig(visibilities);
-    }
+    UserNodeFilterConfig userFilterConfig = getUserFilterConfig(visibilities, temporalCheck);
 
     String portalName = siteName;
     if (siteType != SiteType.PORTAL || StringUtils.isBlank(siteName)) {
@@ -224,9 +250,7 @@ public class NavigationRest implements ResourceContainer {
 
     try {
       HttpUserPortalContext userPortalContext = new HttpUserPortalContext(request);
-      UserPortalConfig userPortalConfig = portalConfigService.getUserPortalConfig(portalName,
-                                                                                  username,
-                                                                                  userPortalContext);
+      UserPortalConfig userPortalConfig = portalConfigService.getUserPortalConfig(portalName, username, userPortalContext);
       if (userPortalConfig == null) {
         return Response.status(404).build();
       }
@@ -239,7 +263,7 @@ public class NavigationRest implements ResourceContainer {
         UserNode userNode = userPortal.getNodeById(nodeId, siteKey, scope, userFilterConfig, null);
         nodes.add(userNode);
       } else if (siteType == SiteType.PORTAL || StringUtils.isBlank(siteName)) {
-        nodes = userPortal.getNodes(siteType, scope, userFilterConfig);
+        nodes = userPortal.getNodes(siteType, scope, userFilterConfig, includeGlobal);
       } else {
         UserNavigation navigation = userPortal.getNavigation(new SiteKey(siteType, siteName));
         if (navigation == null) {
@@ -248,7 +272,7 @@ public class NavigationRest implements ResourceContainer {
         UserNode rootNode = userPortal.getNode(navigation, scope, userFilterConfig, null);
         nodes = rootNode.getChildren();
       }
-      List<ResultUserNode> resultNodes = convertNodes(nodes);
+      List<UserNodeRestEntity> resultNodes = EntityBuilder.toUserNodeRestEntity(nodes, expand, organizationService, layoutService, userACL);
       return Response.ok(resultNodes).build();
     } catch (Exception e) {
       LOG.error("Error retrieving ");
@@ -256,28 +280,13 @@ public class NavigationRest implements ResourceContainer {
     }
   }
 
-  private List<ResultUserNode> convertNodes(Collection<UserNode> nodes) {
-    if (nodes == null) {
-      return Collections.emptyList();
-    }
-    List<ResultUserNode> result = new ArrayList<>();
-    for (UserNode userNode : nodes) {
-      if (userNode == null) {
-        continue;
-      }
-      ResultUserNode resultNode = new ResultUserNode(userNode);
-      resultNode.setChildren(convertNodes(userNode.getChildren()));
-      result.add(resultNode);
-    }
-    return result;
-  }
 
-  private static UserNodeFilterConfig getUserFilterConfig(Visibility[] visibilities) {
+  private static UserNodeFilterConfig getUserFilterConfig(Visibility[] visibilities, boolean temporalCheck) {
     UserNodeFilterConfig.Builder builder = UserNodeFilterConfig.builder();
-    builder.withReadWriteCheck()
-           .withVisibility(visibilities)
-           .withTemporalCheck()
-           .withReadCheck();
+    builder.withReadWriteCheck().withVisibility(visibilities.length > 0 ? visibilities : DEFAULT_VISIBILITIES).withReadCheck();
+    if (temporalCheck) {
+      builder.withTemporalCheck();
+    }
     return builder.build();
   }
 
@@ -317,75 +326,8 @@ public class NavigationRest implements ResourceContainer {
   }
 
   /**
-   * A class to retrieve {@link UserNode} attributes by avoiding cyclic JSON
-   * parsing of instance when retrieving {@link UserNode#getChildren()} and
-   * {@link UserNode#getParent()} attributes using {@link JsonParserImpl}
-   */
-  public static final class ResultUserNode {
-    private UserNode             userNode;
-
-    private List<ResultUserNode> subNodes;
-
-    public ResultUserNode(UserNode userNode) {
-      this.userNode = userNode;
-    }
-
-    public void setChildren(List<ResultUserNode> subNodes) {
-      this.subNodes = subNodes;
-    }
-
-    public List<ResultUserNode> getChildren() {
-      return subNodes;
-    }
-
-    public String getLabel() {
-      return userNode.getResolvedLabel();
-    }
-
-    public String getLabelKey() {
-      return userNode.getLabel();
-    }
-
-    public String getIcon() {
-      return userNode.getIcon();
-    }
-
-    public String getId() {
-      return userNode.getId();
-    }
-
-    public String getUri() {
-      return userNode.getURI();
-    }
-
-    public Visibility getVisibility() {
-      return userNode.getVisibility();
-    }
-
-    public String getName() {
-      return userNode.getName();
-    }
-
-    public long getStartPublicationTime() {
-      return userNode.getStartPublicationTime();
-    }
-
-    public long getEndPublicationTime() {
-      return userNode.getEndPublicationTime();
-    }
-
-    public SiteKey getSiteKey() {
-      return userNode.getNavigation().getKey();
-    }
-
-    public PageKey getPageKey() {
-      return userNode.getPageRef();
-    }
-  }
-
-  /**
-   * A class to retrieve {@link UserNavigation} attributes by avoiding cyclic JSON
-   * parsing of instance when retrieving {@link UserNavigation#getBundle()}
+   * A class to retrieve {@link UserNavigation} attributes by avoiding cyclic
+   * JSON parsing of instance when retrieving {@link UserNavigation#getBundle()}
    * attributes using {@link JsonParserImpl}
    */
   public static final class ResultUserNavigation {
@@ -422,9 +364,7 @@ public class NavigationRest implements ResourceContainer {
   }
 
   private boolean isValidNavigation(UserNavigation userNavigation) {
-    return !userNavigation.getKey()
-                          .getName()
-                          .equals(portalConfigService.getGlobalPortal());
+    return !userNavigation.getKey().getName().equals(portalConfigService.getGlobalPortal());
   }
 
 }

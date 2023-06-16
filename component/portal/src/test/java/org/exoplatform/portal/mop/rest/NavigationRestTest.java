@@ -16,11 +16,15 @@
 package org.exoplatform.portal.mop.rest;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +32,14 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.GroupHandler;
+import org.exoplatform.services.organization.OrganizationService;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -45,6 +57,9 @@ import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationState;
 import org.exoplatform.portal.mop.rest.NavigationRest.ResultUserNavigation;
 import org.exoplatform.portal.mop.user.UserNavigation;
+import org.exoplatform.portal.mop.user.UserNode;
+import org.exoplatform.portal.mop.user.UserNodeFilterConfig;
+import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.portal.mop.user.UserPortalImpl;
 import org.exoplatform.portal.rest.services.BaseRestServicesTestCase;
 import org.exoplatform.services.rest.impl.ContainerResponse;
@@ -60,6 +75,15 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
   @Mock
   private NavigationCategoryService navigationCategoryService;
 
+  @Mock
+  private LayoutService             layoutService;
+
+  @Mock
+  private OrganizationService       organizationService;
+
+  @Mock
+  private UserACL                   userACL;
+
   protected Class<?> getComponentClass() {
     return NavigationRest.class;
   }
@@ -68,7 +92,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    binder.addResource(new NavigationRest(portalConfigService, navigationCategoryService), null);
+    binder.addResource(new NavigationRest(portalConfigService, navigationCategoryService, layoutService, organizationService, userACL), null);
   }
 
   @Override
@@ -162,5 +186,65 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     assertEquals(categoriesOrder.get("test"), jsonObject.getJSONObject("categoriesOrder").get("test"));
     assertEquals(urisOrder.get("test"), jsonObject.getJSONObject("urisOrder").get("test"));
   }
+  
+  @Test
+  public void testGetSiteNavigationWithPageDetails() throws Exception {
+    String path = "/v1/navigations/PORTAL?siteName=SiteName&expand=true";
 
+    EnvironmentContext envctx = new EnvironmentContext();
+    HttpServletRequest httpRequest = new MockHttpServletRequest(path, null, 0, "GET", null);
+    envctx.put(HttpServletRequest.class, httpRequest);
+
+    startUserSession("root1");
+    Collection<UserNode> nodes = new ArrayList<>();
+    Page nodePage = mock(Page.class);
+    UserNode userNode = mock(UserNode.class);
+    nodes.add(userNode);
+    UserPortalConfig userPortalConfig = mock(UserPortalConfig.class);
+    UserPortal userPortal = mock(UserPortal.class);
+    GroupHandler groupHandler = mock(GroupHandler.class);
+    Group group = mock(Group.class);
+    when(organizationService.getGroupHandler()).thenReturn(groupHandler);
+    when(groupHandler.findGroupById("/platform/users")).thenReturn(group);
+    PageKey pageKey = PageKey.parse("portal::page::ref");
+    when(layoutService.getPage(pageKey)).thenReturn(nodePage);
+    when(nodePage.getEditPermission()).thenReturn("*:/platform/users");
+    when(nodePage.getAccessPermissions()).thenReturn(new String[] {"*:/platform/users"});
+    when(nodePage.getType()).thenReturn("LINK");
+    when(nodePage.getLink()).thenReturn("www.test.com");
+    when(userNode.getPageRef()).thenReturn(pageKey);
+    when(portalConfigService.getUserPortalConfig(anyString(), anyString(), any())).thenReturn(userPortalConfig);
+    when(userPortalConfig.getUserPortal()).thenReturn(userPortal);
+    when(userPortal.getNodes(any(SiteType.class) , any(Scope.class), any(UserNodeFilterConfig.class),anyBoolean())).thenReturn(nodes);
+    when(userACL.hasEditPermission(any(Page.class))).thenReturn(true);
+    ContainerResponse resp = launcher.service("GET", path, "", null, null, envctx);
+    Object entity = resp.getEntity();
+    
+    assertEquals(200, resp.getStatus());
+    assertNotNull(entity);
+    List<UserNodeRestEntity> resultUserNodes = (List<UserNodeRestEntity>) resp.getEntity();
+    assertEquals(1, resultUserNodes.size());
+    assertEquals("*", resultUserNodes.get(0).getPageEditPermission().get("membershipType"));
+    assertEquals(group, resultUserNodes.get(0).getPageEditPermission().get("group"));
+    assertEquals(1, resultUserNodes.get(0).getPageAccessPermissions().size());
+    assertEquals("*", resultUserNodes.get(0).getPageAccessPermissions().get(0).get("membershipType"));
+    assertEquals(group, resultUserNodes.get(0).getPageAccessPermissions().get(0).get("group"));
+
+    when(nodePage.getEditPermission()).thenReturn("manager:/platform/users");
+    when(nodePage.getAccessPermissions()).thenReturn(new String[] {"Everyone"});
+
+    resp = launcher.service("GET", path, "", null, null, envctx);
+    entity = resp.getEntity();
+    
+    assertEquals(200, resp.getStatus());
+    assertNotNull(entity);
+    resultUserNodes = (List<UserNodeRestEntity>) resp.getEntity();
+    assertEquals(1, resultUserNodes.size());
+    assertEquals("manager", resultUserNodes.get(0).getPageEditPermission().get("membershipType"));
+    assertEquals(group, resultUserNodes.get(0).getPageEditPermission().get("group"));
+    assertEquals(1, resultUserNodes.get(0).getPageAccessPermissions().size());
+    assertEquals("Everyone", resultUserNodes.get(0).getPageAccessPermissions().get(0).get("membershipType"));
+    assertEquals(null, resultUserNodes.get(0).getPageAccessPermissions().get(0).get("group"));
+    assertEquals("www.test.com", resultUserNodes.get(0).getPageLink());
+  }
 }

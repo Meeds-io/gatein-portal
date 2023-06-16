@@ -24,9 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.portal.jdbc.entity.NavigationEntity;
 import org.exoplatform.portal.jdbc.entity.NodeEntity;
 import org.exoplatform.portal.jdbc.entity.PageEntity;
+import org.exoplatform.portal.mop.NodeTarget;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.dao.NavigationDAO;
 import org.exoplatform.portal.mop.dao.NodeDAO;
@@ -93,7 +95,6 @@ public class NavigationStorageImpl implements NavigationStorage {
     buildNodeEntity(target, state);
     target.setName(name);
     target.setParent(parent);
-
     if (parent != null) {
       List<NodeEntity> children = parent.getChildren();
       int i;
@@ -105,6 +106,7 @@ public class NavigationStorageImpl implements NavigationStorage {
       }
       children.add(i, target);
       parent.setChildren(children);
+      parent.setUpdatedDate(System.currentTimeMillis());
       target = nodeDAO.create(target);
       parent = nodeDAO.update(parent);
     } else {
@@ -190,11 +192,14 @@ public class NavigationStorageImpl implements NavigationStorage {
       }
       children.add(index, target);
       to.setChildren(children);
+      to.setUpdatedDate(System.currentTimeMillis());
       to = nodeDAO.update(to);
     }
+    target.setUpdatedDate(System.currentTimeMillis());
     target = nodeDAO.update(target);
 
     if (from != null && !Objects.equals(fromId, toId)) {
+      from.setUpdatedDate(System.currentTimeMillis());
       from = nodeDAO.update(from);
     }
     return new NodeData[] {
@@ -216,6 +221,7 @@ public class NavigationStorageImpl implements NavigationStorage {
     }
 
     target.setName(name);
+    target.setUpdatedDate(System.currentTimeMillis());
     nodeDAO.update(target);
 
     return new NodeData[] {
@@ -281,6 +287,8 @@ public class NavigationStorageImpl implements NavigationStorage {
       entity = new NavigationEntity();
       NodeEntity rootNode = new NodeEntity();
       rootNode.setName("default");
+      rootNode.setTarget(NodeTarget.SAME_TAB);
+      rootNode.setUpdatedDate(System.currentTimeMillis());
       entity.setRootNode(rootNode);
     }
     entity.setPriority(priority == null ? 0 : priority);
@@ -305,6 +313,8 @@ public class NavigationStorageImpl implements NavigationStorage {
     }
     entity.setStartTime(state.getStartPublicationTime());
     entity.setVisibility(state.getVisibility());
+    entity.setTarget(!StringUtils.isBlank(state.getTarget()) ? NodeTarget.valueOf(state.getTarget()) : NodeTarget.SAME_TAB);
+    entity.setUpdatedDate(System.currentTimeMillis());
   }
 
   private NodeData buildNodeData(NodeEntity node) {
@@ -329,7 +339,9 @@ public class NavigationStorageImpl implements NavigationStorage {
            .icon(node.getIcon())
            .label(node.getLabel())
            .startPublicationTime(node.getStartTime())
-           .visibility(node.getVisibility());
+           .visibility(node.getVisibility())
+           .target(node.getTarget() != null ? node.getTarget().name() : null)
+           .updatedDate(node.getUpdatedDate());
     PageEntity page = node.getPage();
     if (page != null) {
       SiteKey siteKey = new SiteKey(page.getOwnerType(), page.getOwnerId());
@@ -346,7 +358,9 @@ public class NavigationStorageImpl implements NavigationStorage {
                         navigationSiteKey,
                         node.getName(),
                         state,
-                        children.toArray(new String[children.size()]));
+                        children.toArray(new String[children.size()]),
+                        node.getTarget() != null ? node.getTarget().name() : null,
+                        node.getUpdatedDate());
   }
 
   private SiteKey getSiteKey(Long nodeId) {
@@ -359,8 +373,7 @@ public class NavigationStorageImpl implements NavigationStorage {
     if (siteKey == null && rootNode != null) {
       NavigationEntity navigationEntity = navigationDAO.findByRootNode(rootNode.getId());
       return navigationEntity == null ? null
-                                      : navigationEntity.getOwnerType()
-                                                        .key(navigationEntity.getOwnerId());
+                                      : navigationEntity.getOwnerType().key(navigationEntity.getOwnerId());
     } else {
       return siteKey;
     }

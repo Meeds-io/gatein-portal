@@ -315,6 +315,51 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
       }
     }.execute("root");
   }
+  
+  public void testGetUserNodesGlobalNotIncluded() {
+    new UnitTest() {
+      public void execute() throws Exception {
+        UserNodeFilterConfig.Builder filterConfigBuilder = UserNodeFilterConfig.builder();
+        filterConfigBuilder.withReadWriteCheck().withVisibility(Visibility.DISPLAYED, Visibility.TEMPORAL);
+        filterConfigBuilder.withTemporalCheck();
+        UserNodeFilterConfig filterConfig = filterConfigBuilder.build();
+
+        UserPortalConfig userPortalCfg = userPortalConfigSer_.getUserPortalConfig("classic", "john");
+        assertNotNull(userPortalCfg);
+        PortalConfig portalCfg = userPortalCfg.getPortalConfig();
+        assertNotNull(portalCfg);
+        assertEquals(PortalConfig.PORTAL_TYPE, portalCfg.getType());
+        assertEquals("classic", portalCfg.getName());
+        UserPortal userPortal = userPortalCfg.getUserPortal();
+        Collection<UserNode> nodes = userPortal.getNodes(SiteType.PORTAL, Scope.ALL, filterConfig, false);
+        assertNotNull(nodes);
+
+        int initialNodesSize = nodes.size();
+        assertTrue(initialNodesSize > 0);
+
+        String originalGlobalPortal = userPortalConfigSer_.globalPortal_;
+        userPortalConfigSer_.globalPortal_ = "systemtest";
+        try {
+          userPortalCfg = userPortalConfigSer_.getUserPortalConfig("classic", "root");
+          portalCfg = userPortalCfg.getPortalConfig();
+          userPortal = userPortalCfg.getUserPortal();
+          nodes = userPortal.getNodes(SiteType.PORTAL, Scope.ALL, filterConfig, false);
+          assertNotNull(nodes);
+
+          assertEquals(initialNodesSize, nodes.size());
+          UserNode homeNode = nodes.iterator().next();
+          assertEquals("home", homeNode.getName());
+          assertEquals("classic", homeNode.getNavigation().getKey().getName());
+
+          UserNode lastUserNode = new ArrayList<>(nodes).get(nodes.size() - 1);
+          assertEquals("webexplorer", lastUserNode.getName());
+          assertEquals("classic", lastUserNode.getNavigation().getKey().getName());
+        } finally {
+          userPortalConfigSer_.globalPortal_ = originalGlobalPortal;
+        }
+      }
+    }.execute("root");
+  }
 
   public void testGetGlobalUserNode() {
     new UnitTest() {
