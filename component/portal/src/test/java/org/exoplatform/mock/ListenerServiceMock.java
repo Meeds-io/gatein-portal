@@ -37,12 +37,9 @@ import org.exoplatform.services.log.Log;
 })
 public class ListenerServiceMock extends ListenerService {
 
-  /**
-   * Listeners by name map.
-   */
-  private final Map<String, List<Listener>> listeners_ = new HashMap<>();
+  private static final Log                  LOG       = ExoLogger.getLogger("exo.kernel.component.common.ListenerService");
 
-  private static final Log                  LOG        = ExoLogger.getLogger("exo.kernel.component.common.ListenerService");
+  private final Map<String, List<Listener>> listeners = new HashMap<>();
 
   public ListenerServiceMock(ExoContainerContext ctx) {
     super(ctx, null, null);
@@ -55,13 +52,13 @@ public class ListenerServiceMock extends ListenerService {
 
   @Override
   public void addListener(String eventName, Listener listener) {
-    listeners_.computeIfAbsent(eventName, key -> new ArrayList<Listener>())
-              .add(listener);
+    listeners.computeIfAbsent(eventName, key -> new ArrayList<Listener>())
+             .add(listener);
   }
 
   @Override
   public <S, D> void broadcast(String name, S source, D data) throws Exception {
-    List<Listener> list = listeners_.get(name);
+    List<Listener> list = listeners.get(name);
     if (list == null) {
       return;
     }
@@ -76,7 +73,7 @@ public class ListenerServiceMock extends ListenerService {
 
   @Override
   public <T extends Event> void broadcast(T event) throws Exception {
-    List<Listener> list = listeners_.get(event.getEventName());
+    List<Listener> list = listeners.get(event.getEventName());
     if (list == null) {
       return;
     }
