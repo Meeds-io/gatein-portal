@@ -148,7 +148,7 @@
   
   <component>
     <key>org.exoplatform.services.listener.ListenerService</key>
-    <type>org.exoplatform.services.listener.ListenerService</type>
+    <type>org.exoplatform.mock.ListenerServiceMock</type>
   </component>
 
   <component>
