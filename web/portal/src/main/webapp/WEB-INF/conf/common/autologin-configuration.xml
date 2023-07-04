@@ -27,7 +27,12 @@
 
   <component>
     <type>org.exoplatform.web.security.codec.CodecInitializer</type>
-    <init-params />
+    <init-params>
+      <value-param>
+        <name>codeckey.relative.path</name>
+        <value>${io.meeds.codeckey.relative.path:/codec/codeckey.txt}</value>
+      </value-param>
+    </init-params>
   </component>
 
   <component>
