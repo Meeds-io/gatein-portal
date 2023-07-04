@@ -29,15 +29,18 @@
   </component>
 
   <component>
-      <type>org.exoplatform.settings.jpa.dao.SettingContextDAO</type>
+    <key>org.exoplatform.settings.jpa.SettingContextDAO</key>
+    <type>org.exoplatform.settings.jpa.dao.SettingContextDAO</type>
   </component>
 
   <component>
-      <type>org.exoplatform.settings.jpa.dao.SettingScopeDAO</type>
+    <key>org.exoplatform.settings.jpa.SettingScopeDAO</key>
+    <type>org.exoplatform.settings.jpa.dao.SettingScopeDAO</type>
   </component>
 
   <component>
-      <type>org.exoplatform.settings.jpa.dao.SettingsDAO</type>
+    <key>org.exoplatform.settings.jpa.SettingsDAO</key>
+    <type>org.exoplatform.settings.jpa.dao.SettingsDAO</type>
   </component>
 
   <component>
