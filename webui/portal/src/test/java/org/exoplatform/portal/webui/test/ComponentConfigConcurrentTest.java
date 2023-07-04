@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.exoplatform.component.test.AbstractGateInTest;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.webui.config.Event;
 
@@ -57,16 +59,17 @@ public class ComponentConfigConcurrentTest extends AbstractGateInTest {
         // init workers list
         List<Worker> workers = new ArrayList<Worker>(WORKERS_COUNT);
 
+        PortalContainer container = PortalContainer.getInstance();
         // test obtain event configuration concurrently with more worker threads
         for (int i = 0; i < WORKERS_COUNT; i++) {
-            Worker worker = new Worker("Worker-" + i);
+            Worker worker = new Worker(container, "Worker-" + i);
             workers.add(worker);
             worker.start();
         }
 
         // Wait for all workers to finish
         for (Worker worker : workers) {
-            worker.join();
+            worker.join(100);
         }
 
         // Go throguh all workers and throw error if some worker has null eventConfig
@@ -79,13 +82,17 @@ public class ComponentConfigConcurrentTest extends AbstractGateInTest {
     }
 
     private class Worker extends Thread {
+        private final PortalContainer container;
+
         private Event eventConfig = null;
 
-        public Worker(String name) {
+        public Worker(PortalContainer container, String name) {
             super(name);
+            this.container = container;
         }
 
         public void run() {
+            ExoContainerContext.setCurrentContainer(container);
             try {
                 UIPortal uiPortal = mockApplication.createUIComponent(UIPortal.class, null, null, null);
                 eventConfig = uiPortal.getComponentConfig().getUIComponentEventConfig("Logout");
@@ -96,6 +103,8 @@ public class ComponentConfigConcurrentTest extends AbstractGateInTest {
                 }
             } catch (Exception e) {
                 log.error("Exception occured during concurrent test in worker " + getName(), e);
+            } finally {
+              ExoContainerContext.setCurrentContainer(null);
             }
 
         }
