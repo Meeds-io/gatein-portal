@@ -41,7 +41,8 @@ import org.exoplatform.webui.core.UIContainer;
         @EventConfig(listeners = UIMainActionListener.PageCreationWizardActionListener.class, csrfCheck = false),
         @EventConfig(listeners = UIMainActionListener.EditBackgroundActionListener.class),
         @EventConfig(listeners = UIMainActionListener.EditInlineActionListener.class, csrfCheck = false),
-        @EventConfig(listeners = UIMainActionListener.EditPageInFullPreviewActionListener.class)})
+        @EventConfig(listeners = UIMainActionListener.EditPageInFullPreviewActionListener.class),
+        @EventConfig(name = "EditPortalLayout",listeners = UIMainActionListener.EditPortalLayoutActionListener.class, csrfCheck = false)})
 public class UIWorkingWorkspace extends UIContainer {
 
     private UIPortal backupUIPortal = null;

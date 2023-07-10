@@ -263,17 +263,8 @@ public class UIPortalComposer extends UIContainer {
      * @throws Exception
      */
     private boolean isPortalExist(UIPortal editPortal) throws Exception {
-        String remoteUser = Util.getPortalRequestContext().getRemoteUser();
-
-        String portalOwner = null;
-        if (editPortal.getSiteType().equals(SiteType.PORTAL)) {
-            portalOwner = editPortal.getName();
-        } else {
-            portalOwner = Util.getPortalRequestContext().getPortalOwner();
-        }
-
         LayoutService layoutService = getApplicationComponent(LayoutService.class);
-        return layoutService.getPortalConfig(portalOwner, remoteUser) != null;
+        return layoutService.getPortalConfig(editPortal.getSiteType().getName(), editPortal.getName()) != null;
     }
 
     /**
