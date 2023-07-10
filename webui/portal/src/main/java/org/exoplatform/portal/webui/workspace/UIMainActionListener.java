@@ -22,12 +22,12 @@ package org.exoplatform.portal.webui.workspace;
 import java.lang.reflect.Method;
 
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserNode;
 import org.exoplatform.portal.mop.user.UserNodeFilterConfig;
@@ -208,12 +208,12 @@ public class UIMainActionListener {
       public void execute(Event<UIWorkingWorkspace> event) throws Exception {
         UIWorkingWorkspace uicomp = event.getSource();
         String portalName = event.getRequestContext().getRequestParameter("portalName");
-        DataStorage dataStorage = uicomp.getApplicationComponent(DataStorage.class);
+        LayoutService layoutService = uicomp.getApplicationComponent(LayoutService.class);
         PortalRequestContext prContext = Util.getPortalRequestContext();
         UIPortalApplication portalApp = (UIPortalApplication) prContext.getUIApplication();
         UIWorkingWorkspace uiWorkingWS = portalApp.getChildById(UIPortalApplication.UI_WORKING_WS_ID);
 
-        PortalConfig pConfig = dataStorage.getPortalConfig(portalName);
+        PortalConfig pConfig = layoutService.getPortalConfig(portalName);
 
         if (pConfig == null) {
           portalApp.addMessage(new ApplicationMessage("UISiteManagement.msg.portal-not-exist", new String[] { portalName }));
@@ -252,6 +252,7 @@ public class UIMainActionListener {
         prContext.ignoreAJAXUpdateOnPortlets(true);
       }
     }
+    
     public static class EditPageInFullPreviewActionListener extends EditInlineActionListener {
 
         /**
