@@ -44,4 +44,13 @@ public interface LocaleConfigService {
      */
     Collection<LocaleConfig> getLocalConfigs();
 
+    /**
+     * Saves new default locale
+     * 
+     * @param locale {@link LocaleConfig#getLocaleName()} to set as default
+     */
+    default void saveDefaultLocaleConfig(String locale) {
+      throw new UnsupportedOperationException();
+    }
+
 }
