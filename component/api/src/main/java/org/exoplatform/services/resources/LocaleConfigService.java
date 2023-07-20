@@ -51,6 +51,6 @@ public interface LocaleConfigService {
      */
     default void saveDefaultLocaleConfig(String locale) {
       throw new UnsupportedOperationException();
-    };
+    }
 
 }
