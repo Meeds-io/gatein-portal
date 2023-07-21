@@ -104,11 +104,6 @@
     <key>org.exoplatform.web.login.recovery.PasswordRecoveryService</key>
     <type>org.exoplatform.mock.MockPasswordRecoveryService</type>
   </component>
-  
-  <component>
-    <key>org.exoplatform.services.listener.ListenerService</key>
-    <type>org.exoplatform.services.listener.ListenerService</type>
-  </component>
 
   <component>
     <key>org.exoplatform.portal.config.UserACL</key>

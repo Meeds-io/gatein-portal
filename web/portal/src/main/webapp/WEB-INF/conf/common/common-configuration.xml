@@ -169,6 +169,10 @@
     <type>org.exoplatform.services.resources.impl.LocaleConfigServiceImpl</type>
     <init-params>
       <value-param>
+        <name>locale.config.default</name>
+        <value>${io.meeds.defaultLocale:}</value>
+      </value-param>
+      <value-param>
         <name>locale.config.file</name>
         <value>war:/conf/common/locales-config.xml</value>
       </value-param>
