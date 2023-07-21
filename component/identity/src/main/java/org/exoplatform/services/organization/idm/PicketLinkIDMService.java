@@ -19,8 +19,11 @@
 
 package org.exoplatform.services.organization.idm;
 
+import org.gatein.portal.idm.impl.store.attribute.ExtendedAttributeManager;
 import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.api.IdentitySessionFactory;
+import org.picketlink.idm.api.cfg.IdentityConfiguration;
+import org.picketlink.idm.spi.configuration.metadata.IdentityConfigurationMetaData;
 
 /**
  * @author <a href="mailto:boleslaw.dawidowicz@redhat.com">Boleslaw Dawidowicz</a>
@@ -32,5 +35,11 @@ public interface PicketLinkIDMService {
     IdentitySession getIdentitySession() throws Exception;
 
     IdentitySession getIdentitySession(String realm) throws Exception;
+
+    IdentityConfigurationMetaData getConfigMD();
+
+    IdentityConfiguration getIdentityConfiguration();
+
+    ExtendedAttributeManager getExtendedAttributeManager() throws Exception;
 
 }
