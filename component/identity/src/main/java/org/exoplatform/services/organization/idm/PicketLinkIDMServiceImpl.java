@@ -34,6 +34,7 @@ import org.exoplatform.services.database.HibernateService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.naming.InitialContextInitializer;
+import org.gatein.portal.idm.impl.store.attribute.ExtendedAttributeManager;
 import org.infinispan.Cache;
 import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.api.IdentitySessionFactory;
@@ -41,6 +42,7 @@ import org.picketlink.idm.api.SecureRandomProvider;
 import org.picketlink.idm.api.cfg.IdentityConfiguration;
 import org.picketlink.idm.cache.APICacheProvider;
 import org.picketlink.idm.common.exception.IdentityConfigurationException;
+import org.picketlink.idm.impl.api.session.IdentitySessionImpl;
 import org.picketlink.idm.impl.configuration.IdentityConfigurationImpl;
 import org.picketlink.idm.impl.configuration.jaxb2.JAXB2IdentityConfiguration;
 import org.picketlink.idm.impl.credential.DatabaseReadingSaltEncoder;
@@ -208,6 +210,16 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
             throw new IllegalArgumentException("Realm name cannot be null");
         }
         return getIdentitySessionFactory().getCurrentIdentitySession(realm);
+    }
+
+    @Override
+    public IdentityConfiguration getIdentityConfiguration() {
+        return identityConfiguration;
+    }
+
+    @Override
+    public ExtendedAttributeManager getExtendedAttributeManager() throws Exception {
+      return new ExtendedAttributeManager((IdentitySessionImpl) getIdentitySession());
     }
 
     public String getRealmName() {
