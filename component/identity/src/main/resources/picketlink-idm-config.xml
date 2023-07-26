@@ -37,11 +37,15 @@
         </option>
         <option>
           <name>credentialEncoder.class</name>
-          <value>org.picketlink.idm.impl.credential.DatabaseReadingSaltEncoder</value>
+          <value>${exo.plidm.password.class:org.exoplatform.web.security.hash.Argon2IdPasswordEncoder}</value>
         </option>
         <option>
           <name>credentialEncoder.hashAlgorithm</name>
-          <value>SHA-256</value>
+          <value>${exo.plidm.password.hash:SHA-256}</value>
+        </option>
+        <option>
+          <name>credentialEncoder.secureRandomAlgorithm</name>
+          <value>${exo.plidm.password.secureRandomAlgorithm:SHA1PRNG}</value>
         </option>
       </options>
     </realm>

@@ -409,7 +409,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
         IdentitySession session = service_.getIdentitySession();
         org.picketlink.idm.api.User idmUser = session.getPersistenceManager().findUser(user.getUserName());
 
-        authenticated = session.getAttributesManager().validatePassword(idmUser, password);
+        authenticated = service_.getExtendedAttributeManager().validatePassword(idmUser, password);
       } catch (Exception e) {
         handleException("Cannot authenticate user: " + user.getUserName() + "; ", e);
       }
