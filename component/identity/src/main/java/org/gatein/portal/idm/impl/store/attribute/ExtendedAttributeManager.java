@@ -26,6 +26,7 @@ import org.picketlink.idm.impl.api.PasswordCredential;
 import org.picketlink.idm.impl.api.session.IdentitySessionImpl;
 import org.picketlink.idm.impl.api.session.managers.AttributesManagerImpl;
 import org.picketlink.idm.impl.credential.DatabaseReadingSaltEncoder;
+import org.picketlink.idm.impl.credential.HashingEncoder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,8 @@ public class ExtendedAttributeManager extends AttributesManagerImpl {
 
   public static final String          PASSWORD_SALT_USER_ATTRIBUTE     = "passwordSalt128";
 
+  private static final String DEFAULT_ENCODER = "org.exoplatform.web.security.hash.Argon2IdPasswordEncoder";
+
   private static PicketLinkIDMService idmService;
 
   public ExtendedAttributeManager(IdentitySessionImpl session) {
@@ -44,24 +47,32 @@ public class ExtendedAttributeManager extends AttributesManagerImpl {
 
   @Override
   public boolean validatePassword(User user, String password) throws IdentityException {
-
     Attribute salt128 = getAttribute(user.getKey(), PASSWORD_SALT_USER_ATTRIBUTE);
-    if (salt128 != null) {
+    if (salt128 != null || !this.getCredentialEncoder().getClass().getName().equals(DEFAULT_ENCODER)) {
       return super.validatePassword(user, password);
     } else {
-      DatabaseReadingSaltEncoder oldCredentialEncoder = new DatabaseReadingSaltEncoder();
+      HashingEncoder oldCredentialEncoder = new DatabaseReadingSaltEncoder();
       oldCredentialEncoder.setIdentitySession(getIdentitySession());
       oldCredentialEncoder.initialize(getCredentialEncoderProps(),
                                       getIdmService().getIdentityConfiguration().getIdentityConfigurationRegistry());
-      if (getRepository().validateCredential(getInvocationContext(),
-                                             createIdentityObject(user),
-                                             new PasswordCredential(password, oldCredentialEncoder, user.getKey()))) {
-        removeAttributes(user.getKey(), new String[] { OLD_PASSWORD_SALT_USER_ATTRIBUTE });
-        updatePassword(user, password);
-        return true;
+
+      if (!getRepository().validateCredential(getInvocationContext(),
+                                              createIdentityObject(user),
+                                              new PasswordCredential(password, oldCredentialEncoder, user.getKey()))) {
+        oldCredentialEncoder = new HashingEncoder();
+        oldCredentialEncoder.setIdentitySession(getIdentitySession());
+        oldCredentialEncoder.initialize(getCredentialEncoderProps(),
+                                        getIdmService().getIdentityConfiguration().getIdentityConfigurationRegistry());
+        if (!getRepository().validateCredential(getInvocationContext(),
+                                                createIdentityObject(user),
+                                                new PasswordCredential(password, oldCredentialEncoder, user.getKey()))) {
+          return false;
+        }
       }
+      removeAttributes(user.getKey(), new String[] { OLD_PASSWORD_SALT_USER_ATTRIBUTE });
+      updatePassword(user, password);
+      return true;
     }
-    return false;
   }
 
   private Map<String, String> getCredentialEncoderProps() {
