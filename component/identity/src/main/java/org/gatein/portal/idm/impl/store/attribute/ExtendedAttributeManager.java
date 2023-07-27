@@ -18,26 +18,32 @@ package org.gatein.portal.idm.impl.store.attribute;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.idm.PicketLinkIDMService;
 import org.picketlink.idm.api.Attribute;
+import org.picketlink.idm.api.CredentialEncoder;
 import org.picketlink.idm.api.User;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.PasswordCredential;
 import org.picketlink.idm.impl.api.session.IdentitySessionImpl;
 import org.picketlink.idm.impl.api.session.managers.AttributesManagerImpl;
-import org.picketlink.idm.impl.credential.DatabaseReadingSaltEncoder;
-import org.picketlink.idm.impl.credential.HashingEncoder;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ExtendedAttributeManager extends AttributesManagerImpl {
 
+  private static final Log            LOG                              = ExoLogger.getExoLogger(ExtendedAttributeManager.class);
+
   public static final String          OLD_PASSWORD_SALT_USER_ATTRIBUTE = "passwordSalt";
 
   public static final String          PASSWORD_SALT_USER_ATTRIBUTE     = "passwordSalt128";
 
-  private static final String DEFAULT_ENCODER = "org.exoplatform.web.security.hash.Argon2IdPasswordEncoder";
+  private static final String         DEFAULT_ENCODER                  =
+                                                      "org.exoplatform.web.security.hash.Argon2IdPasswordEncoder";
+
+  private static final String         OLD_ENCODER_CLASS_PROPERTY       = "oldCredentialEncoder.class";
 
   private static PicketLinkIDMService idmService;
 
@@ -48,30 +54,59 @@ public class ExtendedAttributeManager extends AttributesManagerImpl {
   @Override
   public boolean validatePassword(User user, String password) throws IdentityException {
     Attribute salt128 = getAttribute(user.getKey(), PASSWORD_SALT_USER_ATTRIBUTE);
-    if (salt128 != null || !this.getCredentialEncoder().getClass().getName().equals(DEFAULT_ENCODER)) {
-      return super.validatePassword(user, password);
-    } else {
-      HashingEncoder oldCredentialEncoder = new DatabaseReadingSaltEncoder();
-      oldCredentialEncoder.setIdentitySession(getIdentitySession());
-      oldCredentialEncoder.initialize(getCredentialEncoderProps(),
-                                      getIdmService().getIdentityConfiguration().getIdentityConfigurationRegistry());
 
-      if (!getRepository().validateCredential(getInvocationContext(),
-                                              createIdentityObject(user),
-                                              new PasswordCredential(password, oldCredentialEncoder, user.getKey()))) {
-        oldCredentialEncoder = new HashingEncoder();
-        oldCredentialEncoder.setIdentitySession(getIdentitySession());
-        oldCredentialEncoder.initialize(getCredentialEncoderProps(),
-                                        getIdmService().getIdentityConfiguration().getIdentityConfigurationRegistry());
-        if (!getRepository().validateCredential(getInvocationContext(),
-                                                createIdentityObject(user),
-                                                new PasswordCredential(password, oldCredentialEncoder, user.getKey()))) {
-          return false;
-        }
+    if (!getCredentialEncoder().getClass().getName().equals(DEFAULT_ENCODER)) {
+      return super.validatePassword(user, password);
+    }
+
+    if (salt128 != null) {
+      // Case of hash updated during authentication phase
+      // Case of password has been updated by upgradePlugin, and user was not
+      // connected since
+      // passwordHash was created like this passwordHash =
+      // newEncoder(oldEncoder(password))
+      if (super.validatePassword(user, password)) {
+        return true;
+      } else {
+        return validateAndUpdateHash(getCredentialEncoder(),
+                                     user,
+                                     (String) new PasswordCredential(password,
+                                                                     getOldCredentialEncoder(),
+                                                                     user.getKey()).getEncodedValue());
       }
+    } else {
+      // user didn't reconnect after new passwordEncoder modification,
+      // but upgrade plugin was not executed for him, his passwordHash is still
+      // oldEncoder(password)
+      // includes case of old encoder (such as MD5) which doesn't use a salt
+      return validateAndUpdateHash(getOldCredentialEncoder(), user, password);
+    }
+  }
+
+  private boolean validateAndUpdateHash(CredentialEncoder credentialEncoder,
+                                        User user,
+                                        String password) throws IdentityException {
+    if (getRepository().validateCredential(getInvocationContext(),
+                                           createIdentityObject(user),
+                                           new PasswordCredential(password, credentialEncoder, user.getKey()))) {
       removeAttributes(user.getKey(), new String[] { OLD_PASSWORD_SALT_USER_ATTRIBUTE });
       updatePassword(user, password);
       return true;
+    }
+    return false;
+  }
+
+  private CredentialEncoder getOldCredentialEncoder() {
+    try {
+      Class<?> credentialClass = Class.forName(getCredentialEncoderProps().get(OLD_ENCODER_CLASS_PROPERTY));
+      CredentialEncoder oldCredentialEncoder = (CredentialEncoder) credentialClass.getDeclaredConstructor().newInstance();
+      oldCredentialEncoder.setIdentitySession(getIdentitySession());
+      oldCredentialEncoder.initialize(getCredentialEncoderProps(),
+                                      getIdmService().getIdentityConfiguration().getIdentityConfigurationRegistry());
+      return oldCredentialEncoder;
+    } catch (Exception e) {
+      LOG.error("Error while initializing old credential encoder", e);
+      throw new RuntimeException();
     }
   }
 
@@ -87,5 +122,9 @@ public class ExtendedAttributeManager extends AttributesManagerImpl {
       idmService = container.getComponentInstanceOfType(PicketLinkIDMService.class);
     }
     return idmService;
+  }
+
+  public CredentialEncoder getDefaultCredentialEncoder() {
+    return getCredentialEncoder();
   }
 }
