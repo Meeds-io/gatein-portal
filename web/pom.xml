@@ -35,8 +35,6 @@
   <name>GateIn Portal Web</name>
 
   <modules>
-    <module>eXoSkin</module>
-    <module>eXoResources</module>
     <module>portal</module>
     <module>rest</module>
   </modules>
