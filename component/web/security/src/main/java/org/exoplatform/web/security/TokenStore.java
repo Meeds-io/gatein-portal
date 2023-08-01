@@ -32,12 +32,12 @@ public interface TokenStore {
      * Create a token and returns it. The store state is modified as it retains the token until it is removed either explicitely
      * or because the token validity is expired.
      *
-     * @param credentials the credentials
+     * @param username the username related to the token
      * @return the token key
      * @throws IllegalArgumentException if the validity is not greater than zero
      * @throws NullPointerException if the payload is null
      */
-    String createToken(Credentials credentials) throws IllegalArgumentException, NullPointerException;
+    String createToken(String username) throws IllegalArgumentException, NullPointerException;
 
     /**
      * Validates a token. If the token is valid it returns the attached credentials. The store state may be modified by the
@@ -49,6 +49,6 @@ public interface TokenStore {
      * @return the attached credentials or null
      * @throws NullPointerException if the token key argument is null
      */
-    Credentials validateToken(String tokenKey, boolean remove) throws NullPointerException;
+    String validateToken(String tokenKey, boolean remove) throws NullPointerException;
 
 }

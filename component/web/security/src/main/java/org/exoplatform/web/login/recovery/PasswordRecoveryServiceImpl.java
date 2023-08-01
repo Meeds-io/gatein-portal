@@ -120,12 +120,12 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
   }
 
   @Override
-  public Credentials verifyToken(String tokenId, String type) {
+  public String verifyToken(String tokenId, String type) {
     Token token = remindPasswordTokenService.getToken(tokenId, type);
     if (token == null || token.isExpired()) {
       return null;
     }
-    return token.getPayload();
+    return token.getUsername();
   }
 
   @Override
@@ -134,7 +134,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
   }
 
   @Override
-  public Credentials verifyToken(String tokenId) {
+  public String verifyToken(String tokenId) {
     return verifyToken(tokenId, "");
   }
 
@@ -196,8 +196,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
 
     ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
 
-    Credentials credentials = new Credentials(user.getUserName(), "");
-    String tokenId = remindPasswordTokenService.createToken(credentials, ONBOARD_TOKEN);
+    String tokenId = remindPasswordTokenService.createToken(user.getUserName(), ONBOARD_TOKEN);
     StringBuilder redirectUrl = new StringBuilder();
     redirectUrl.append(url);
     redirectUrl.append("/" + OnboardingHandler.NAME);
@@ -301,8 +300,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
   }
 
   private String createToken(String email) {
-    Credentials credentials = new Credentials(email, "");
-    return remindPasswordTokenService.createToken(credentials, EXTERNAL_REGISTRATION_TOKEN);
+    return remindPasswordTokenService.createToken(email, EXTERNAL_REGISTRATION_TOKEN);
   }
 
   private String buildExternalEmailBody(String sender, String space, String link, ResourceBundle bundle) {
@@ -323,12 +321,11 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
   }
 
   @Override
-  public boolean sendAccountVerificationEmail(String data, String username, String firstName, String lastName, String email, String password, Locale locale, StringBuilder url) {
+  public boolean sendAccountVerificationEmail(String data, String username, String firstName, String lastName, String email, Locale locale, StringBuilder url) {
     try {
       ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
 
-      Credentials credentials = new Credentials(data, password);
-      String tokenId = remindPasswordTokenService.createToken(credentials, EMAIL_VALIDATION_TOKEN);
+      String tokenId = remindPasswordTokenService.createToken(data, EMAIL_VALIDATION_TOKEN);
 
       StringBuilder redirectUrl = new StringBuilder();
       redirectUrl.append(url);
@@ -462,8 +459,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
 
     ResourceBundle bundle = bundleService.getResourceBundle(bundleService.getSharedResourceBundleNames(), locale);
 
-    Credentials credentials = new Credentials(user.getUserName(), "");
-    String tokenId = remindPasswordTokenService.createToken(credentials, FORGOT_PASSWORD_TOKEN);
+    String tokenId = remindPasswordTokenService.createToken(user.getUserName(), FORGOT_PASSWORD_TOKEN);
 
     Router router = webController.getRouter();
     Map<QualifiedName, String> params = new HashMap<>();

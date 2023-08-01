@@ -51,22 +51,22 @@ public class TestSimpleGeneratorService extends AbstractKernelTest {
      */
     public void testDuplicatedTokenGeneration() throws Exception {
         service.resetCounter();
-        String token1 = service.createToken(new Credentials("root1", "gtn1"));
-        assertEquals("random0.rememberme0", token1);
+        String token1 = service.createToken("root1");
+        assertEquals("rememberme0.random0", token1);
         assertEquals(service.getCounter(), 1);
 
-        String token2 = service.createToken(new Credentials("root2", "gtn2"));
-        assertEquals("random1.rememberme1", token2);
+        String token2 = service.createToken("root2");
+        assertEquals("rememberme1.random1", token2);
         assertEquals(service.getCounter(), 2);
 
-        String token3 = service.createToken(new Credentials("-root3", "gtn3"));
-        assertEquals("random2.rememberme2", token3);
+        String token3 = service.createToken("-root3");
+        assertEquals("rememberme2.random2", token3);
         // Counter should be 4 now due to duplicated token generation
         assertEquals(service.getCounter(), 4);
 
-        assertEquals("root1", service.getToken(token1).getPayload().getUsername());
-        assertEquals("root2", service.getToken(token2).getPayload().getUsername());
-        assertEquals("-root3", service.getToken(token3).getPayload().getUsername());
+        assertEquals("root1", service.getToken(token1).getUsername());
+        assertEquals("root2", service.getToken(token2).getUsername());
+        assertEquals("-root3", service.getToken(token3).getUsername());
         
         service.deleteToken(token1);
         service.deleteToken(token2);
@@ -78,22 +78,22 @@ public class TestSimpleGeneratorService extends AbstractKernelTest {
      */
     public void testDuplicatedTokenWithTypeGeneration() throws Exception {
         service.resetCounter();
-        String token1 = service.createToken(new Credentials("root1", "gtn1"),type);
-        assertEquals("random0.rememberme0", token1);
+        String token1 = service.createToken("root1",type);
+        assertEquals("rememberme0.random0", token1);
         assertEquals(service.getCounter(), 1);
         
-        String token2 = service.createToken(new Credentials("root2", "gtn2"),type);
-        assertEquals("random1.rememberme1", token2);
+        String token2 = service.createToken("root2",type);
+        assertEquals("rememberme1.random1", token2);
         assertEquals(service.getCounter(), 2);
         
-        String token3 = service.createToken(new Credentials("-root3", "gtn3"),type);
-        assertEquals("random2.rememberme2", token3);
+        String token3 = service.createToken("-root3",type);
+        assertEquals("rememberme2.random2", token3);
         // Counter should be 4 now due to duplicated token generation
         assertEquals(service.getCounter(), 4);
         
-        assertEquals("root1", service.getToken(token1,type).getPayload().getUsername());
-        assertEquals("root2", service.getToken(token2,type).getPayload().getUsername());
-        assertEquals("-root3", service.getToken(token3,type).getPayload().getUsername());
+        assertEquals("root1", service.getToken(token1,type).getUsername());
+        assertEquals("root2", service.getToken(token2,type).getUsername());
+        assertEquals("-root3", service.getToken(token3,type).getUsername());
     
         service.deleteToken(token1,type);
         service.deleteToken(token2,type);
@@ -102,8 +102,8 @@ public class TestSimpleGeneratorService extends AbstractKernelTest {
     
     public void testTokenValidationWithDifferentTypes() throws Exception {
         service.resetCounter();
-        String token1 = service.createToken(new Credentials("root1", "gtn1"),type);
-        assertEquals("random0.rememberme0", token1);
+        String token1 = service.createToken("root1",type);
+        assertEquals("rememberme0.random0", token1);
         assertEquals(service.getCounter(), 1);
         assertNull(service.getToken(token1,"otherType"));
         service.deleteToken(token1,type);

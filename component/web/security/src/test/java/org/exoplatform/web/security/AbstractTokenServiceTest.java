@@ -53,7 +53,8 @@ public abstract class AbstractTokenServiceTest<S extends AbstractTokenService<?,
     public abstract void testCleanExpiredTokens() throws Exception;
     
     public abstract void testGetTokenWithType() throws Exception;
-    
+    public abstract void testGetTokenWithWrongType() throws Exception;
+
     public abstract void testGetAllTokenWithType() throws Exception;
     
     public abstract void testSizeWithType() throws Exception;

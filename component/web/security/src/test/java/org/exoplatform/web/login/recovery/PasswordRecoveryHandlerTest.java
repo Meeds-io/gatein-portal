@@ -356,9 +356,7 @@ public class PasswordRecoveryHandlerTest {
   public void testDisplayResetPassword() throws Exception {
     prepareResetPasswordContext();
     String username = "user";
-    Credentials credentials = mock(Credentials.class);
-    when(credentials.getUsername()).thenReturn(username);
-    when(passwordRecoveryService.verifyToken(TOKEN_VALUE, CookieTokenService.FORGOT_PASSWORD_TOKEN)).thenReturn(credentials);
+    when(passwordRecoveryService.verifyToken(TOKEN_VALUE, CookieTokenService.FORGOT_PASSWORD_TOKEN)).thenReturn(username);
 
     passwordRecoveryHandler.execute(controllerContext);
 
@@ -380,10 +378,7 @@ public class PasswordRecoveryHandlerTest {
     String username = "user";
     String password = "pass1";
     String passwordConfirm = "pass2";
-    Credentials credentials = mock(Credentials.class);
-    when(credentials.getUsername()).thenReturn(username);
-
-    when(passwordRecoveryService.verifyToken(TOKEN_VALUE, CookieTokenService.FORGOT_PASSWORD_TOKEN)).thenReturn(credentials);
+    when(passwordRecoveryService.verifyToken(TOKEN_VALUE, CookieTokenService.FORGOT_PASSWORD_TOKEN)).thenReturn(username);
     when(request.getParameter(ACTION_PARAM)).thenReturn(RESET_PASSWORD_ACTION_NAME);
     when(request.getParameter(USERNAME_PARAM)).thenReturn("user2");
     when(request.getParameter(PASSWORD_PARAM)).thenReturn(password);
@@ -411,10 +406,8 @@ public class PasswordRecoveryHandlerTest {
     String username = "user";
     String password = "pass1";
     String passwordConfirm = "pass2";
-    Credentials credentials = mock(Credentials.class);
-    when(credentials.getUsername()).thenReturn(username);
 
-    when(passwordRecoveryService.verifyToken(TOKEN_VALUE, CookieTokenService.FORGOT_PASSWORD_TOKEN)).thenReturn(credentials);
+    when(passwordRecoveryService.verifyToken(TOKEN_VALUE, CookieTokenService.FORGOT_PASSWORD_TOKEN)).thenReturn(username);
     when(request.getParameter(ACTION_PARAM)).thenReturn(RESET_PASSWORD_ACTION_NAME);
     when(request.getParameter(USERNAME_PARAM)).thenReturn(username);
     when(request.getParameter(PASSWORD_PARAM)).thenReturn(password);
@@ -442,10 +435,8 @@ public class PasswordRecoveryHandlerTest {
     String username = "user";
     String password = "pass1";
     String passwordConfirm = password;
-    Credentials credentials = mock(Credentials.class);
-    when(credentials.getUsername()).thenReturn(username);
 
-    when(passwordRecoveryService.verifyToken(TOKEN_VALUE, CookieTokenService.FORGOT_PASSWORD_TOKEN)).thenReturn(credentials);
+    when(passwordRecoveryService.verifyToken(TOKEN_VALUE, CookieTokenService.FORGOT_PASSWORD_TOKEN)).thenReturn(username);
     when(request.getParameter(ACTION_PARAM)).thenReturn(RESET_PASSWORD_ACTION_NAME);
     when(request.getParameter(USERNAME_PARAM)).thenReturn(username);
     when(request.getParameter(PASSWORD_PARAM)).thenReturn(password);

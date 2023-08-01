@@ -169,7 +169,6 @@ public class OnboardingHandlerTest {
     when(session.getAttribute(NAME)).thenReturn(captcha);
     when(captcha.isCorrect(CAPTCHA_VALUE)).thenReturn(true);
     when(request.getParameter(CAPTCHA_PARAM)).thenReturn(CAPTCHA_VALUE);
-    when(credentials.getUsername()).thenReturn(USERNAME);
 
     when(request.getLocale()).thenReturn(REQUEST_LOCALE);
     LocaleConfigImpl localeConfig = new LocaleConfigImpl();
@@ -185,7 +184,7 @@ public class OnboardingHandlerTest {
     when(servletContext.getRequestDispatcher(any())).thenReturn(requestDispatcher);
 
     when(organizationService.getUserHandler()).thenReturn(userHandler);
-    when(passwordRecoveryService.verifyToken(TOKEN_VALUE, CookieTokenService.ONBOARD_TOKEN)).thenReturn(credentials);
+    when(passwordRecoveryService.verifyToken(TOKEN_VALUE, CookieTokenService.ONBOARD_TOKEN)).thenReturn(USERNAME);
 
     onboardingHandler = new OnboardingHandler(container,
                                               passwordRecoveryService,

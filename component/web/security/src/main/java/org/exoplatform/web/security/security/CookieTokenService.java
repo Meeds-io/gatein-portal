@@ -30,7 +30,6 @@ import org.exoplatform.web.security.hash.SaltedHashException;
 import org.exoplatform.web.security.hash.SaltedHashService;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
-import org.gatein.wci.security.Credentials;
 
 import java.util.Date;
 
@@ -93,7 +92,7 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
     public static final String EMAIL_VALIDATION_TOKEN="email-validation";
     public static final String FORGOT_PASSWORD_TOKEN="forgot-password";
     public static final String EXTERNAL_REGISTRATION_TOKEN="external-registration";
-    public static final String SEPARATOR_CHAR="#";
+    public static final String SEPARATOR_CHAR=".";
     
     private GateInTokenStore tokenStore;
 
@@ -105,8 +104,8 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
     private SaltedHashService saltedHashService;
 
     private final Log        log                         = ExoLogger.getLogger(CookieTokenService.class);
-    
-    
+
+
 
     public CookieTokenService(InitParams initParams, GateInTokenStore tokenStore, CodecInitializer codecInitializer)
             throws TokenServiceInitializationException {
@@ -135,34 +134,29 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
         super.start();
     }
     
-    public String createToken(final Credentials credentials) {
-        return createToken(credentials,"");
+    public String createToken(String username) {
+        return createToken(username,"");
     }
     
-    public String createToken(final Credentials credentials, String type) {
+    public String createToken(String username, String type) {
         if (validityMillis < 0) {
             throw new IllegalArgumentException();
         }
-        if (credentials == null) {
+        if (username == null) {
             throw new NullPointerException();
         }
 
         String cookieTokenString = null;
         while (cookieTokenString == null) {
-            String randomString = nextTokenId();
-            String id = nextRandom();
-            cookieTokenString = new CookieToken(id, randomString).toString();
+            String selector = nextTokenId(); //9 bytes selector
+            String validator = nextRandom(); //9 bytes validator
 
-            String hashedRandomString = hashToken(type+SEPARATOR_CHAR+randomString);
+            String hashedRandomString = hashToken(selector+SEPARATOR_CHAR+validator+SEPARATOR_CHAR+type);
             long expirationTimeMillis = System.currentTimeMillis() + validityMillis;
-
-            /* the symmetric encryption happens here */
-            String encryptedPassword = codec.encode(credentials.getPassword());
-            Credentials encodedCredentials = new Credentials(credentials.getUsername(), encryptedPassword);
-
+            cookieTokenString=selector+SEPARATOR_CHAR+validator;
             try {
-                this.tokenStore.saveToken(new GateInTokenStore.TokenData(id, hashedRandomString, encodedCredentials, new Date(expirationTimeMillis), type));
-//                tokenContainer.saveToken(context.getSession(), id, hashedRandomString, encodedCredentials, new Date(expirationTimeMillis, tokenType));
+                this.tokenStore.saveToken(new GateInTokenStore.TokenData(selector, hashedRandomString,
+                                                                         username, new Date(expirationTimeMillis), type));
             } catch (TokenExistsException e) {
                 cookieTokenString = null;
             }
@@ -179,17 +173,21 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
     public GateInToken getToken(String cookieTokenString, String tokenType) {
         try {
             CookieToken token = new CookieToken(cookieTokenString);
+            //cookieTokenString = selector#validator
 
             GateInTokenStore.TokenData encryptedToken = tokenStore.getToken(token.getId());
+            //encryptedToken =
+            // expirationTime
+            // selector
+            // hash (hash(validator#type)
+            // tokenType
+            // userId
+
             if (encryptedToken != null) {
                 try {
-                    String tokenRandomString=tokenType+SEPARATOR_CHAR+token.getRandomString();
+                    String tokenRandomString=cookieTokenString+SEPARATOR_CHAR+tokenType;
                     if (saltedHashService.validate(tokenRandomString, encryptedToken.hash)) {
-                        Credentials encryptedCredentials = encryptedToken.payload;
-                        Credentials decryptedCredentials = new Credentials(encryptedCredentials.getUsername(),
-                                    codec.decode(encryptedCredentials.getPassword()));
-
-                        return new GateInToken(encryptedToken.expirationTime.getTime(), decryptedCredentials);
+                        return new GateInToken(encryptedToken.expirationTime.getTime(), encryptedToken.username);
                     }
                 } catch (SaltedHashException e) {
                     log.warn("Could not validate cookie token against its salted hash.", e);
