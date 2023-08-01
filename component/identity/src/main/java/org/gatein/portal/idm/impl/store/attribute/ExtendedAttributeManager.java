@@ -72,25 +72,26 @@ public class ExtendedAttributeManager extends AttributesManagerImpl {
                                      user,
                                      (String) new PasswordCredential(password,
                                                                      getOldCredentialEncoder(),
-                                                                     user.getKey()).getEncodedValue());
+                                                                     user.getKey()).getEncodedValue(),
+                                     password);
       }
     } else {
       // user didn't reconnect after new passwordEncoder modification,
       // but upgrade plugin was not executed for him, his passwordHash is still
       // oldEncoder(password)
       // includes case of old encoder (such as MD5) which doesn't use a salt
-      return validateAndUpdateHash(getOldCredentialEncoder(), user, password);
+      return validateAndUpdateHash(getOldCredentialEncoder(), user, password, password);
     }
   }
 
   private boolean validateAndUpdateHash(CredentialEncoder credentialEncoder,
                                         User user,
-                                        String password) throws IdentityException {
+                                        String password, String newPassword) throws IdentityException {
     if (getRepository().validateCredential(getInvocationContext(),
                                            createIdentityObject(user),
                                            new PasswordCredential(password, credentialEncoder, user.getKey()))) {
       removeAttributes(user.getKey(), new String[] { OLD_PASSWORD_SALT_USER_ATTRIBUTE });
-      updatePassword(user, password);
+      updatePassword(user, newPassword);
       return true;
     }
     return false;
