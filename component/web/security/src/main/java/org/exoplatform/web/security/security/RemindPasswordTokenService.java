@@ -24,17 +24,15 @@ package org.exoplatform.web.security.security;
 
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.web.security.GateInTokenStore;
-import org.exoplatform.web.security.codec.CodecInitializer;
-
 /**
  * @author <a href="mailto:theute@redhat.com">Thomas Heute</a>
  * @version $Revision$
  */
 public class RemindPasswordTokenService extends CookieTokenService {
 
-    public RemindPasswordTokenService(InitParams initParams, GateInTokenStore tokenStore, CodecInitializer codecInitializer)
+    public RemindPasswordTokenService(InitParams initParams, GateInTokenStore tokenStore)
             throws TokenServiceInitializationException {
-        super(initParams, tokenStore, codecInitializer);
+        super(initParams, tokenStore);
     }
 
     @Override

@@ -134,7 +134,7 @@ public abstract class AbstractTokenService<T extends Token, K> implements Starta
         return classType.cast(container.getComponentInstanceOfType(classType));
     }
 
-    public Credentials validateToken(String stringKey, boolean remove) {
+    public String validateToken(String stringKey, boolean remove) {
         if (stringKey == null) {
             throw new NullPointerException();
         }
@@ -153,7 +153,7 @@ public abstract class AbstractTokenService<T extends Token, K> implements Starta
             if (token != null) {
                 boolean valid = token.getExpirationTimeMillis() > System.currentTimeMillis();
                 if (valid) {
-                    return token.getPayload();
+                    return token.getUsername();
                 } else if (!remove) {
                     this.deleteToken(tokenKey);
                 }

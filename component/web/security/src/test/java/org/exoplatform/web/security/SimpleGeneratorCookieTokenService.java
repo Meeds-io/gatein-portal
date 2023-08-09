@@ -25,7 +25,6 @@ package org.exoplatform.web.security;
 
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ObjectParameter;
-import org.exoplatform.web.security.codec.CodecInitializer;
 import org.exoplatform.web.security.hash.NoSaltedHashService;
 import org.exoplatform.web.security.security.CookieTokenService;
 import org.exoplatform.web.security.security.TokenServiceInitializationException;
@@ -40,9 +39,9 @@ public class SimpleGeneratorCookieTokenService extends CookieTokenService {
     private int counter = 0;
     private int noRandom = 0;
 
-    public SimpleGeneratorCookieTokenService(InitParams initParams, GateInTokenStore tokenStore, CodecInitializer codecInitializer)
+    public SimpleGeneratorCookieTokenService(InitParams initParams, GateInTokenStore tokenStore)
             throws TokenServiceInitializationException {
-        super(replaceHashService(initParams), tokenStore, codecInitializer);
+        super(replaceHashService(initParams), tokenStore);
     }
 
     

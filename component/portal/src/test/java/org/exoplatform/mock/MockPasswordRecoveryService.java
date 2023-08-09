@@ -23,12 +23,12 @@ public class MockPasswordRecoveryService implements PasswordRecoveryService {
   }
   
   @Override
-  public Credentials verifyToken(String tokenId, String type) {
+  public String verifyToken(String tokenId, String type) {
     return null;
   }
   
   @Override
-  public Credentials verifyToken(String tokenId) {
+  public String verifyToken(String tokenId) {
     return null;
   }
   
@@ -89,8 +89,7 @@ public class MockPasswordRecoveryService implements PasswordRecoveryService {
   }
 
   @Override
-  public boolean sendAccountVerificationEmail(String data, String username, String firstName, String lastName, String email,
-                                              String password, Locale locale, StringBuilder url) {
+  public boolean sendAccountVerificationEmail(String data, String username, String firstName, String lastName, String email, Locale locale, StringBuilder url) {
     return false;
   }
 }

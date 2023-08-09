@@ -148,14 +148,13 @@ public class OnboardingHandler extends JspBasedWebHandler {
 
     String token = controllerContext.getParameter(TOKEN);
     Map<String, Object> parameters = new HashMap<>();
-    Credentials credentials = StringUtils.isBlank(token) ? null : passwordRecoveryService.verifyToken(token, ONBOARD_TOKEN);
-    if (credentials == null) {
+    String username = StringUtils.isBlank(token) ? null : passwordRecoveryService.verifyToken(token, ONBOARD_TOKEN);
+    if (username == null) {
       parameters.put(ACTION_PARAM, EXPIRED_ACTION_NAME);
       // . TokenId is expired
       return dispatch(controllerContext, request, response, parameters);
     }
 
-    String tokenUsername = credentials.getUsername();
     String requestAction = request.getParameter(ACTION_PARAM);
     if (RESET_PASSWORD_ACTION_NAME.equalsIgnoreCase(requestAction)) {
       String password = request.getParameter(PASSWORD_PARAM);
@@ -164,16 +163,16 @@ public class OnboardingHandler extends JspBasedWebHandler {
       String captcha = request.getParameter(CAPTCHA_PARAM);
       if (!isValidCaptch(request.getSession(), captcha)) {
         parameters.put(ERROR_MESSAGE_PARAM, resourceBundle.getString("gatein.forgotPassword.captchaError"));
-      } else if (validateUserAndPassword(tokenUsername,
+      } else if (validateUserAndPassword(username,
                                          requestedUsername,
                                          password,
                                          confirmPass,
                                          parameters,
                                          resourceBundle,
                                          locale)) {
-        if (passwordRecoveryService.changePass(token, ONBOARD_TOKEN, tokenUsername, password)) {
+        if (passwordRecoveryService.changePass(token, ONBOARD_TOKEN, username, password)) {
           String loginPath = servletContext.getContextPath() + "/login";
-          User user = findUser(tokenUsername);
+          User user = findUser(username);
           if (user != null) {
             loginPath += "?email=" + user.getEmail();
           }
@@ -186,7 +185,7 @@ public class OnboardingHandler extends JspBasedWebHandler {
       parameters.put(PASSWORD_PARAM, password);
       parameters.put(PASSWORD_CONFIRM_PARAM, confirmPass);
     }
-    parameters.put(USERNAME_PARAM, escapeXssCharacters(tokenUsername));
+    parameters.put(USERNAME_PARAM, escapeXssCharacters(username));
     parameters.put(TOKEN_ID_PARAM, token);
     parameters.put(ACTION_PARAM, RESET_PASSWORD_ACTION_NAME);
 

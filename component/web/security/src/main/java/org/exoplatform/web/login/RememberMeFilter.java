@@ -83,8 +83,9 @@ public class RememberMeFilter extends AbstractFilter {
       if (token != null) {
         ExoContainer container = getContainer();
         CookieTokenService tokenservice = container.getComponentInstanceOfType(CookieTokenService.class);
-        Credentials credentials = tokenservice.validateToken(token, false);
-        if (credentials != null) {
+        String username = tokenservice.validateToken(token, false);
+        if (username != null) {
+          Credentials credentials = new Credentials(username,"");
           ServletContainer servletContainer = ServletContainerFactory.getServletContainer();
           try {
             servletContainer.login(request, response, credentials);

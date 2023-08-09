@@ -32,18 +32,18 @@ public interface GateInTokenStore {
         public final String hash;
 
         /** . */
-        public final Credentials payload;
+        public final String username;
 
         /** . */
         public final Date expirationTime;
         
         public final String tokenType;
 
-        public TokenData(String tokenId, String hash, Credentials payload, Date expirationTime, String tokenType) {
+        public TokenData(String tokenId, String hash, String username, Date expirationTime, String tokenType) {
             this.tokenId = tokenId;
             this.hash = hash;
             this.expirationTime = expirationTime;
-            this.payload = payload;
+            this.username = username;
             this.tokenType = tokenType;
         }
     }

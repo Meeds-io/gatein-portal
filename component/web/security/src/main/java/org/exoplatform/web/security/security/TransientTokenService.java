@@ -36,16 +36,16 @@ public class TransientTokenService extends PlainTokenService<GateInToken, String
         super(initParams);
     }
 
-    public String createToken(Credentials credentials) {
+    public String createToken(String username) {
         if (validityMillis < 0) {
             throw new IllegalArgumentException();
         }
-        if (credentials == null) {
+        if (username == null) {
             throw new NullPointerException();
         }
         String tokenId = nextTokenId();
         long expirationTimeMillis = System.currentTimeMillis() + validityMillis;
-        tokens.put(tokenId, new GateInToken(expirationTimeMillis, credentials));
+        tokens.put(tokenId, new GateInToken(expirationTimeMillis, username));
         return tokenId;
     }
 
