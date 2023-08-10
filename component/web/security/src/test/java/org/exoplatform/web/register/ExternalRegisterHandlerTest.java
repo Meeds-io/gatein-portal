@@ -202,7 +202,6 @@ public class ExternalRegisterHandlerTest {
     when(session.getAttribute(NAME)).thenReturn(captcha);
     when(captcha.isCorrect(CAPTCHA_VALUE)).thenReturn(true);
     when(request.getParameter(CAPTCHA_PARAM)).thenReturn(CAPTCHA_VALUE);
-    when(credentials.getUsername()).thenReturn(EMAIL);
 
     when(request.getLocale()).thenReturn(REQUEST_LOCALE);
     LocaleConfigImpl localeConfig = new LocaleConfigImpl();
@@ -223,7 +222,7 @@ public class ExternalRegisterHandlerTest {
     when(organizationService.getMembershipTypeHandler()).thenReturn(membershipTypeHandler);
     when(organizationService.getMembershipHandler()).thenReturn(membershipHandler);
     when(passwordRecoveryService.verifyToken(TOKEN_VALUE,
-                                             CookieTokenService.EXTERNAL_REGISTRATION_TOKEN)).thenReturn(credentials);
+                                             CookieTokenService.EXTERNAL_REGISTRATION_TOKEN)).thenReturn(EMAIL);
 
     externalRegisterHandler = new ExternalRegisterHandler(container,
                                                           remindPasswordTokenService,
@@ -484,7 +483,7 @@ public class ExternalRegisterHandlerTest {
     assertEquals(EMAIL_VERIFICATION_SENT, applicationParameters.get(SUCCESS_MESSAGE_PARAM));
 
     verify(passwordRecoveryService,
-           times(1)).sendAccountVerificationEmail(any(), any(), any(), any(), any(), any(), any(), any());
+           times(1)).sendAccountVerificationEmail(any(), any(), any(), any(), any(), any(), any());
   }
 
   private void prepareResetPasswordContext() {

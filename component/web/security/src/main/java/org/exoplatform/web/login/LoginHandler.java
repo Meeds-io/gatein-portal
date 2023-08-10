@@ -192,7 +192,7 @@ public class LoginHandler extends JspBasedWebHandler {
           LOG.debug("User {} authenticated successfuly.", username);
 
           // Handle remember me
-          addRememberMeCookie(request, response, credentials);
+          addRememberMeCookie(request, response, username);
         } catch (Exception e) {
           LOG.debug("User {} authentication failed.", username, e);
           status = LoginStatus.FAILED;
@@ -285,12 +285,12 @@ public class LoginHandler extends JspBasedWebHandler {
     return null;
   }
 
-  private void addRememberMeCookie(HttpServletRequest request, HttpServletResponse response, Credentials credentials) {
+  private void addRememberMeCookie(HttpServletRequest request, HttpServletResponse response, String username) {
     String rememberme = request.getParameter(LoginUtils.COOKIE_NAME);
     if ("true".equals(rememberme) || "on".equals(rememberme)) {
       // Create token for credentials
       CookieTokenService tokenService = AbstractTokenService.getInstance(CookieTokenService.class);
-      String cookieToken = tokenService.createToken(credentials);
+      String cookieToken = tokenService.createToken(username);
       if (LOG.isDebugEnabled()) {
         LOG.debug("Found a remember me request parameter, created a persistent token " + cookieToken
             + " for it and set it up " + "in the next response");
