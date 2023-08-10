@@ -35,6 +35,7 @@ import org.exoplatform.services.organization.Query;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserStatus;
 import org.exoplatform.web.application.ApplicationMessage;
+import org.exoplatform.web.security.security.CookieTokenService;
 import org.exoplatform.web.security.security.RemindPasswordTokenService;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
@@ -126,8 +127,7 @@ public class UIForgetPassword extends UIForm {
 
             // Create token
             RemindPasswordTokenService tokenService = uiForm.getApplicationComponent(RemindPasswordTokenService.class);
-            Credentials credentials = new Credentials(user.getUserName(), "");
-            tokenId = tokenService.createToken(credentials,tokenService.FORGOT_PASSWORD_TOKEN);
+            tokenId = tokenService.createToken(user.getUserName(), CookieTokenService.FORGOT_PASSWORD_TOKEN);
 
             String portalName = URLEncoder.encode(Util.getUIPortal().getName(), "UTF-8");
 

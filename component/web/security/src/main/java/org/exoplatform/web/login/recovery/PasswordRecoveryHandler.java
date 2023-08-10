@@ -137,20 +137,19 @@ public class PasswordRecoveryHandler extends JspBasedWebHandler {
 
     if (StringUtils.isNotBlank(token)) {
       // . Check tokenID is expired or not
-      Credentials credentials = passwordRecoveryService.verifyToken(token, FORGOT_PASSWORD_TOKEN);
-      if (credentials == null) {
+      String username = passwordRecoveryService.verifyToken(token, FORGOT_PASSWORD_TOKEN);
+      if (username == null) {
         parameters.put(ACTION_PARAM, EXPIRED_ACTION_NAME);
         // . TokenId is expired
         return dispatch(controllerContext, request, response, parameters);
       }
-      String tokenUsername = credentials.getUsername();
 
       if (RESET_PASSWORD_ACTION_NAME.equalsIgnoreCase(requestAction)) {
         String password = request.getParameter(PASSWORD_PARAM);
         String confirmPass = request.getParameter(PASSWORD_CONFIRM_PARAM);
         String requestedUsername = request.getParameter(USERNAME_PARAM);
-        if (validateUserAndPassword(tokenUsername, requestedUsername, password, confirmPass, parameters, bundle, locale)) {
-          if (passwordRecoveryService.changePass(token, FORGOT_PASSWORD_TOKEN, tokenUsername, password)) {
+        if (validateUserAndPassword(username, requestedUsername, password, confirmPass, parameters, bundle, locale)) {
+          if (passwordRecoveryService.changePass(token, FORGOT_PASSWORD_TOKEN, username, password)) {
             response.sendRedirect(contextPath + "/login");
             return true;
           } else {
@@ -160,7 +159,7 @@ public class PasswordRecoveryHandler extends JspBasedWebHandler {
         parameters.put(PASSWORD_PARAM, password);
         parameters.put(PASSWORD_CONFIRM_PARAM, confirmPass);
       }
-      parameters.put(USERNAME_PARAM, escapeXssCharacters(tokenUsername));
+      parameters.put(USERNAME_PARAM, escapeXssCharacters(username));
       parameters.put(TOKEN_ID_PARAM, token);
       parameters.put(ACTION_PARAM, RESET_PASSWORD_ACTION_NAME);
     } else if (SEND_ACTION_NAME.equalsIgnoreCase(requestAction)) {

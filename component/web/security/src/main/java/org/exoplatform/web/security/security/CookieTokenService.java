@@ -23,67 +23,15 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ObjectParameter;
 import org.exoplatform.web.security.GateInToken;
 import org.exoplatform.web.security.GateInTokenStore;
-import org.exoplatform.web.security.codec.AbstractCodec;
-import org.exoplatform.web.security.codec.CodecInitializer;
 import org.exoplatform.web.security.hash.JCASaltedHashService;
 import org.exoplatform.web.security.hash.SaltedHashException;
 import org.exoplatform.web.security.hash.SaltedHashService;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
-import org.gatein.wci.security.Credentials;
 
 import java.util.Date;
+import java.util.regex.Pattern;
 
-
-/**
- * <p>
- * Created by The eXo Platform SAS Author : liem.nguyen ncliam@gmail.com Jun 5, 2009
- * </p>
- *
- * On 2013-01-02 the followig was added by ppalaga@redhat.com:
- * <ul>
- * <li>Passwords encrypted symmetrically before they are stored. The functionaliy was taken from <a
- * href="https://github.com/exoplatform/exogtn/commit/5ef8b0fa2d639f4d834444468426dfb2c8485ae9"
- * >https://github.com/exoplatform/exogtn/commit/5ef8b0fa2d639f4d834444468426dfb2c8485ae9</a> with minor modifications. See
- * {@link #codec}</li>
- * <li>The tokens are not stored in plain text, but intead only their salted hash is stored. See {@link #saltedHashService}. To
- * enable this, the following was done:
- * <ul>
- * <li>The structure of the underlying store was changed from
- *
- * <pre>
- * autologin
- * |- plain-token1 user="user1" password="***" expiration="..."
- * |- plain-token2 user="user2" password="***" expiration="..."
- * `- ...
- * </pre>
- *
- * to
- *
- * <pre>
- * autologin
- * |- user1
- * |  |- plain-token1 user="user1" password="***" expiration="..."
- * |  |- plain-token2 user="user1" password="***" expiration="..."
- * |  `- ...
- * |- user2
- * |  |- plain-token3 user="user2" password="***" expiration="..."
- * |  |- plain-token4 user="user2" password="***" expiration="..."
- * |  `- ...
- * `- ...
- * </pre>
- *
- * </li>
- * <li>The value of the token was changed from {@code "rememberme" + randomString} to {@code userName + '.' + randomString}</li>
- * </ul>
- * </li>
- * </ul>
-
- * <p>
- * It should be considered in the future if the password field can be removed altogether.
- * </p>
- *
- */
 public class CookieTokenService extends AbstractTokenService<GateInToken, String> {
 
     /** . */
@@ -93,22 +41,17 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
     public static final String EMAIL_VALIDATION_TOKEN="email-validation";
     public static final String FORGOT_PASSWORD_TOKEN="forgot-password";
     public static final String EXTERNAL_REGISTRATION_TOKEN="external-registration";
-    public static final String SEPARATOR_CHAR="#";
+    public static final String SEPARATOR_CHAR=".";
     
     private GateInTokenStore tokenStore;
-
-    /**
-     * {@link AbstractCodec} used to symmetrically encrypt passwords before storing them.
-     */
-    private AbstractCodec codec;
 
     private SaltedHashService saltedHashService;
 
     private final Log        log                         = ExoLogger.getLogger(CookieTokenService.class);
-    
-    
 
-    public CookieTokenService(InitParams initParams, GateInTokenStore tokenStore, CodecInitializer codecInitializer)
+
+
+    public CookieTokenService(InitParams initParams, GateInTokenStore tokenStore)
             throws TokenServiceInitializationException {
         super(initParams);
 
@@ -121,7 +64,6 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
         } else {
             saltedHashService = (SaltedHashService) hashServiceParam.getObject();
         }
-        this.codec = codecInitializer.getCodec();
     }
 
     /*
@@ -135,34 +77,29 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
         super.start();
     }
     
-    public String createToken(final Credentials credentials) {
-        return createToken(credentials,"");
+    public String createToken(String username) {
+        return createToken(username,"");
     }
     
-    public String createToken(final Credentials credentials, String type) {
+    public String createToken(String username, String type) {
         if (validityMillis < 0) {
             throw new IllegalArgumentException();
         }
-        if (credentials == null) {
+        if (username == null) {
             throw new NullPointerException();
         }
 
         String cookieTokenString = null;
         while (cookieTokenString == null) {
-            String randomString = nextTokenId();
-            String id = nextRandom();
-            cookieTokenString = new CookieToken(id, randomString).toString();
+            String selector = nextTokenId(); //9 bytes selector
+            String validator = nextRandom(); //9 bytes validator
 
-            String hashedRandomString = hashToken(type+SEPARATOR_CHAR+randomString);
+            String hashedRandomString = hashToken(validator+SEPARATOR_CHAR+type);
             long expirationTimeMillis = System.currentTimeMillis() + validityMillis;
-
-            /* the symmetric encryption happens here */
-            String encryptedPassword = codec.encode(credentials.getPassword());
-            Credentials encodedCredentials = new Credentials(credentials.getUsername(), encryptedPassword);
-
+            cookieTokenString=selector+SEPARATOR_CHAR+validator;
             try {
-                this.tokenStore.saveToken(new GateInTokenStore.TokenData(id, hashedRandomString, encodedCredentials, new Date(expirationTimeMillis), type));
-//                tokenContainer.saveToken(context.getSession(), id, hashedRandomString, encodedCredentials, new Date(expirationTimeMillis, tokenType));
+                this.tokenStore.saveToken(new GateInTokenStore.TokenData(selector, hashedRandomString,
+                                                                         username, new Date(expirationTimeMillis), type));
             } catch (TokenExistsException e) {
                 cookieTokenString = null;
             }
@@ -179,17 +116,24 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
     public GateInToken getToken(String cookieTokenString, String tokenType) {
         try {
             CookieToken token = new CookieToken(cookieTokenString);
+            //cookieTokenString = selector#validator
 
             GateInTokenStore.TokenData encryptedToken = tokenStore.getToken(token.getId());
-            if (encryptedToken != null) {
-                try {
-                    String tokenRandomString=tokenType+SEPARATOR_CHAR+token.getRandomString();
-                    if (saltedHashService.validate(tokenRandomString, encryptedToken.hash)) {
-                        Credentials encryptedCredentials = encryptedToken.payload;
-                        Credentials decryptedCredentials = new Credentials(encryptedCredentials.getUsername(),
-                                    codec.decode(encryptedCredentials.getPassword()));
+            //encryptedToken =
+            // expirationTime
+            // selector
+            // hash (hash(validator#type)
+            // tokenType
+            // userId
 
-                        return new GateInToken(encryptedToken.expirationTime.getTime(), decryptedCredentials);
+            if (encryptedToken != null && cookieTokenString.contains(SEPARATOR_CHAR)) {
+                try {
+                    String[] splittedToken = cookieTokenString.split(Pattern.quote(SEPARATOR_CHAR));
+                    String validator = splittedToken[1];
+
+                    String tokenRandomString=validator+SEPARATOR_CHAR+tokenType;
+                    if (saltedHashService.validate(tokenRandomString, encryptedToken.hash)) {
+                        return new GateInToken(encryptedToken.expirationTime.getTime(), encryptedToken.username);
                     }
                 } catch (SaltedHashException e) {
                     log.warn("Could not validate cookie token against its salted hash.", e);

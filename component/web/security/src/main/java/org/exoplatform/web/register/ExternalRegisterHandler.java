@@ -237,8 +237,8 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
     String requestAction = request.getParameter(REQ_PARAM_ACTION);
     String initialUri = request.getParameter(INITIAL_URI_PARAM);
     String token = controllerContext.getParameter(TOKEN);
-    Credentials credentials = getStoredCredentials(token, requestAction);
-    if (credentials == null) {
+    String username = getStoredCredentials(token, requestAction);
+    if (username == null) {
       // Token expired
       return dispatch(controllerContext,
                       request,
@@ -246,9 +246,8 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
                       Collections.singletonMap(ACTION_PARAM, EXPIRED_ACTION_NAME));
     }
 
-    String username = credentials.getUsername();
     if (VALIDATE_EXTERNAL_EMAIL_ACTION.equalsIgnoreCase(requestAction)) {
-      User user = generateUserFromCredential(credentials.getUsername(), credentials.getPassword());
+      User user = generateUserFromCredential(username);
       username = createUser(user);
       passwordRecoveryService.sendAccountCreatedConfirmationEmail(username, locale, getBaseUrl(request));
       remindPasswordTokenService.deleteToken(token);
@@ -293,8 +292,9 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
             user.setFirstName(firstName);
             user.setLastName(lastName);
             user.setEmail(requestEmail);
+            user.setPassword(password);
             String data = generateUserDetailCredential(user);
-            passwordRecoveryService.sendAccountVerificationEmail(data, requestUsername, firstName, lastName, requestEmail, password, locale, getBaseUrl(request));
+            passwordRecoveryService.sendAccountVerificationEmail(data, requestUsername, firstName, lastName, requestEmail, locale, getBaseUrl(request));
             parameters.put(SUCCESS_MESSAGE_PARAM, EMAIL_VERIFICATION_SENT);
             session.setAttribute(REQUIRE_EMAIL_VALIDATION, "false");
           }
@@ -322,7 +322,7 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
     return dispatch(controllerContext, request, response, parameters);
   }
 
-  private Credentials getStoredCredentials(String token, String requestAction) {
+  private String getStoredCredentials(String token, String requestAction) {
     if (StringUtils.isBlank(token)) {
       return null;
     }
@@ -624,15 +624,20 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
   }
 
   private String generateUserDetailCredential(User user) {
-    return user.getUserName() + "::" + user.getFirstName() + "::" + user.getLastName() + "::" + user.getEmail();
+    return user.getUserName() + "::" + user.getFirstName() + "::" + user.getLastName() + "::" + user.getEmail()+"::"+user.getPassword();
   }
 
-  private User generateUserFromCredential(String data, String password) {
+  private User generateUserFromCredential(String data) {
     String[] dataParts = StringUtils.split(data, "::");
     User user = organizationService.getUserHandler().createUserInstance(dataParts[0]);
     user.setFirstName(dataParts[1]);
     user.setLastName(dataParts[2]);
     user.setEmail(dataParts[3]);
+
+    //password could contains '::'
+    //to extract it, we must not simply get last part, as we could be a not complete password.
+    String firstPart = dataParts[0]+"::" + dataParts[1] + "::" + dataParts[2] + "::" + dataParts[3]+"::";
+    String password = data.substring(firstPart.length());
     user.setPassword(password);
     return user;
   }

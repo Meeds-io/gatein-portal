@@ -41,50 +41,47 @@ public class TestTransientTokenService extends AbstractTokenServiceTest<Transien
 
     @Override
     public void testGetToken() throws Exception {
-        String tokenId = service.createToken(new Credentials("root", "gtn"));
+        String tokenId = service.createToken("root");
         assertEquals(service.getValidityTime(), 2);
 
         GateInToken token = service.getToken(tokenId);
-        assertEquals(token.getPayload().getUsername(), "root");
-        assertEquals(token.getPayload().getPassword(), "gtn");
+        assertEquals(token.getUsername(), "root");
         service.deleteToken(tokenId);
     }
 
     @Override
     public void testGetAllToken() throws Exception {
-        String tokenId1 = service.createToken(new Credentials("root1", "gtn1"));
-        String tokenId2 = service.createToken(new Credentials("root2", "gtn2"));
+        String tokenId1 = service.createToken("root1");
+        String tokenId2 = service.createToken("root2");
         String[] tokens = service.getAllTokens();
         assertEquals(tokens.length, 2);
 
         GateInToken token1 = service.getToken(tokenId1);
-        assertEquals(token1.getPayload().getUsername(), "root1");
-        assertEquals(token1.getPayload().getPassword(), "gtn1");
+        assertEquals(token1.getUsername(), "root1");
 
         GateInToken token2 = service.getToken(tokenId2);
-        assertEquals(token2.getPayload().getUsername(), "root2");
-        assertEquals(token2.getPayload().getPassword(), "gtn2");
+        assertEquals(token2.getUsername(), "root2");
         service.deleteToken(tokenId1);
         service.deleteToken(tokenId2);
     }
 
     @Override
     public void testSize() throws Exception {
-        String tokenId1 = service.createToken(new Credentials("root1", "gtn1"));
+        String tokenId1 = service.createToken("root1");
         assertEquals(service.size(), 1);
         service.deleteToken(tokenId1);
     }
 
     @Override
     public void testDeleteToken() throws Exception {
-        String tokenId = service.createToken(new Credentials("root", "gtn"));
+        String tokenId = service.createToken("root");
         service.deleteToken(tokenId);
         assertNull(service.getToken(tokenId));
     }
 
     public void testCleanExpiredTokens() throws Exception {
         assertEquals(2, service.getValidityTime());
-        String tokenId1 = service.createToken(new Credentials("user1", "gtn"));
+        String tokenId1 = service.createToken("user1");
         assertEquals(1, service.size());
         
         Thread.sleep(2100);
@@ -96,6 +93,10 @@ public class TestTransientTokenService extends AbstractTokenServiceTest<Transien
     
     @Override
     public void testGetTokenWithType() throws Exception {
+        //TransientTokenService have no type for token
+    }
+    @Override
+    public void testGetTokenWithWrongType() throws Exception {
         //TransientTokenService have no type for token
     }
     

@@ -19,36 +19,28 @@
 
 package org.exoplatform.web.security;
 
-import org.gatein.wci.security.Credentials;
-
 /**
  * Created by The eXo Platform SAS Author : Tan Pham Dinh tan.pham@exoplatform.com May 6, 2009
  */
 public class GateInToken implements Token {
 
-    public static String EXPIRE_MILI = "expirationMilis";
-
-    public static String USERNAME = "userName";
-
-    public static String PASSWORD = "password";
-
     /** . */
     private final long expirationTimeMillis;
 
     /** . */
-    private final Credentials payload;
+    private final String username;
 
-    public GateInToken(long expirationTimeMillis, Credentials payload) {
+    public GateInToken(long expirationTimeMillis, String username) {
         this.expirationTimeMillis = expirationTimeMillis;
-        this.payload = payload;
+        this.username = username;
     }
 
     public long getExpirationTimeMillis() {
         return expirationTimeMillis;
     }
 
-    public Credentials getPayload() {
-        return payload;
+    public String getUsername() {
+        return username;
     }
 
     public boolean isExpired() {

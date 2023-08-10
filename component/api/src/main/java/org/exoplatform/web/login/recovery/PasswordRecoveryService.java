@@ -33,9 +33,9 @@ import org.exoplatform.services.organization.User;
 public interface PasswordRecoveryService {
   void addConnector(ChangePasswordConnector connector);
 
-  Credentials verifyToken(String tokenId, String type);
+  String verifyToken(String tokenId, String type);
 
-  Credentials verifyToken(String tokenId);
+  String verifyToken(String tokenId);
 
   boolean changePass(final String tokenId, final String tokenType, final String username, final String password);
 
@@ -101,12 +101,10 @@ public interface PasswordRecoveryService {
    * @param firstName
    * @param lastName
    * @param email
-   * @param password
    * @param locale
    * @param url
    * @return true if sent, else false
    */
-  boolean sendAccountVerificationEmail(String data, String username, String firstName, String lastName, String email,
-                                       String password, Locale locale, StringBuilder url);
+  boolean sendAccountVerificationEmail(String data, String username, String firstName, String lastName, String email, Locale locale, StringBuilder url);
 
 }
