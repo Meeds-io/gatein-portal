@@ -128,8 +128,7 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
 
             if (encryptedToken != null && cookieTokenString.contains(SEPARATOR_CHAR)) {
                 try {
-                    String splittedToken[] = cookieTokenString.split(Pattern.quote(SEPARATOR_CHAR));
-                    String selector = splittedToken[0];
+                    String[] splittedToken = cookieTokenString.split(Pattern.quote(SEPARATOR_CHAR));
                     String validator = splittedToken[1];
 
                     String tokenRandomString=validator+SEPARATOR_CHAR+tokenType;
