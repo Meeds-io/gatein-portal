@@ -28,6 +28,6 @@ public interface Token {
 
     long getExpirationTimeMillis();
 
-    Credentials getPayload();
+    String getUsername();
 
 }

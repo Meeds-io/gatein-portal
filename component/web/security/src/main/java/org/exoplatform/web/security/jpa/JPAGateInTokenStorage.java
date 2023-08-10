@@ -30,8 +30,7 @@ public class JPAGateInTokenStorage implements GateInTokenStore {
         TokenEntity entity = new TokenEntity();
         entity.setTokenId(data.tokenId);
         entity.setTokenHash(data.hash);
-        entity.setUsername(data.payload.getUsername());
-        entity.setPassword(data.payload.getPassword());
+        entity.setUsername(data.username);
         entity.setExpirationTime(data.expirationTime);
         entity.setTokenType(data.tokenType);
 
@@ -44,7 +43,7 @@ public class JPAGateInTokenStorage implements GateInTokenStore {
         TokenEntity entity = this.tokenDAO.findByTokenId(tokenId);
         if (entity != null) {
             return new TokenData(entity.getTokenId(), entity.getTokenHash(),
-                    new Credentials(entity.getUsername(), entity.getPassword()), entity.getExpirationTime(), entity.getTokenType());
+                    entity.getUsername(), entity.getExpirationTime(), entity.getTokenType());
         }
         return null;
     }
