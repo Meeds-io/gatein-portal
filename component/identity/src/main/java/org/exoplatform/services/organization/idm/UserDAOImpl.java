@@ -62,7 +62,10 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
   public static final String      USER_ORGANIZATION_ID = EntityMapperUtils.USER_ORGANIZATION_ID;
 
-  public static final String      USER_ENABLED         = EntityMapperUtils.USER_ENABLED;
+  public static final String      USER_ENABLED          = EntityMapperUtils.USER_ENABLED;
+
+  public static final String      USER_PASSWORD_SALT128 = "passwordSalt128";
+
 
   public static final Set<String> USER_NON_PROFILE_KEYS;
 
@@ -81,6 +84,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
     keys.add(USER_ORGANIZATION_ID);
     keys.add(USER_ENABLED);
     keys.add(ORIGINATING_STORE);
+    keys.add(USER_PASSWORD_SALT128);
 
     USER_NON_PROFILE_KEYS = Collections.unmodifiableSet(keys);
   }
