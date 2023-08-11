@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gatein.wci.security.Credentials;
 import org.json.JSONObject;
 
 import org.exoplatform.commons.utils.I18N;

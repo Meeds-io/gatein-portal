@@ -23,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.web.security.GateInToken;
-import org.gatein.wci.security.Credentials;
 
 /**
  * Created by The eXo Platform SAS Author : liem.nguyen ncliam@gmail.com Jun 5, 2009

@@ -86,6 +86,7 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
     private IdentityConfigurationMetaData configMD;
 
     private HibernateService hibernateService;
+    private ExtendedAttributeManager extendedAttributeManager;
 
     public PicketLinkIDMServiceImpl(ExoContainerContext exoContainerContext, InitParams initParams,
             HibernateService hibernateService, ConfigurationManager confManager,
@@ -219,7 +220,10 @@ public class PicketLinkIDMServiceImpl implements PicketLinkIDMService, Startable
 
     @Override
     public ExtendedAttributeManager getExtendedAttributeManager() throws Exception {
-      return new ExtendedAttributeManager((IdentitySessionImpl) getIdentitySession());
+      if (this.extendedAttributeManager == null) {
+          this.extendedAttributeManager = new ExtendedAttributeManager((IdentitySessionImpl) getIdentitySession());
+      }
+      return this.extendedAttributeManager;
     }
 
     public String getRealmName() {

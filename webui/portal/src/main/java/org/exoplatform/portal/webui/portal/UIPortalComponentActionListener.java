@@ -36,8 +36,6 @@ import org.exoplatform.portal.webui.application.PortletState;
 import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.container.UIComponentFactory;
 import org.exoplatform.portal.webui.container.UITabContainer;
-import org.exoplatform.portal.webui.login.UILogin;
-import org.exoplatform.portal.webui.login.UIResetPassword;
 import org.exoplatform.portal.webui.page.UIPage;
 import org.exoplatform.portal.webui.page.UIPageBody;
 import org.exoplatform.portal.webui.util.PortalDataMapper;

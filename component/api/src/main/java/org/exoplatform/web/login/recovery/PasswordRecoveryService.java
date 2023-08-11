@@ -23,8 +23,6 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.gatein.wci.security.Credentials;
-
 import org.exoplatform.services.organization.User;
 
 /**

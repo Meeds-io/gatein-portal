@@ -19,8 +19,6 @@
 
 package org.exoplatform.web.security;
 
-import org.gatein.wci.security.Credentials;
-
 /**
  * The token store is a place where temporary tokens are held.
  *

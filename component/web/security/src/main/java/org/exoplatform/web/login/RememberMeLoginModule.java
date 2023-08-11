@@ -1,20 +1,18 @@
-/*
- * Copyright (C) 2013 eXo Platform SAS.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
+/**
+ * This file is part of the Meeds project (https://meeds.io/).
+ * Copyright (C) 2023 Meeds Association
+ * contact@meeds.io
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 package org.exoplatform.web.login;
 
@@ -31,14 +29,11 @@ import org.gatein.sso.agent.tomcat.ServletAccess;
 
 public class RememberMeLoginModule extends TomcatLoginModule {
 
-  private static final Log   log                = ExoLogger.getLogger(RememberMeLoginModule.class);
+  private static final Log log = ExoLogger.getLogger(RememberMeLoginModule.class);
 
   @Override
   public boolean login() throws LoginException {
-    log.debug("In login of RemembermeLoginModule.");
-
     try {
-
       HttpServletRequest servletRequest = ServletAccess.getRequest();
       if (servletRequest == null) {
         LOG.warn("HttpServletRequest is null. RemembermeLoginModule will be ignored.");
@@ -46,13 +41,12 @@ public class RememberMeLoginModule extends TomcatLoginModule {
       }
       String token = LoginUtils.getRememberMeTokenCookie(servletRequest);
 
-      if (token!=null) {
+      if (token != null) {
         CookieTokenService tokenservice = getContainer().getComponentInstanceOfType(CookieTokenService.class);
         String username = tokenservice.validateToken(token, false);
-        if (username!=null) {
+        if (username != null) {
           Authenticator authenticator = getContainer().getComponentInstanceOfType(Authenticator.class);
-          if (authenticator == null)
-          {
+          if (authenticator == null) {
             throw new LoginException("No Authenticator component found, check your configuration");
           }
           identity = authenticator.createIdentity(username);
@@ -71,16 +65,13 @@ public class RememberMeLoginModule extends TomcatLoginModule {
 
       return true;
     } catch (final Exception e) {
-      log.warn(e.getMessage());
       throw new LoginException(e.getMessage());
     }
   }
 
-
   @Override
-  public boolean commit() throws LoginException
-  {
-    if (identity!=null) {
+  public boolean commit() throws LoginException {
+    if (identity != null) {
       super.commit();
     }
     return true;
