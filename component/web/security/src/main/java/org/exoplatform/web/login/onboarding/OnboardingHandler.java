@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gatein.wci.security.Credentials;
 import org.json.JSONObject;
 
 import org.exoplatform.commons.utils.ListAccess;
