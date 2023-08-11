@@ -53,13 +53,13 @@ public class ExtendedAttributeManager extends AttributesManagerImpl {
 
   @Override
   public boolean validatePassword(User user, String password) throws IdentityException {
-    Attribute salt128 = getAttribute(user.getKey(), PASSWORD_SALT_USER_ATTRIBUTE);
+    Attribute salt = getAttribute(user.getKey(), PASSWORD_SALT_USER_ATTRIBUTE);
 
     if (!getCredentialEncoder().getClass().getName().equals(DEFAULT_ENCODER)) {
       return super.validatePassword(user, password);
     }
 
-    if (salt128 != null) {
+    if (salt != null) {
       // Case of hash updated during authentication phase
       // Case of password has been updated by upgradePlugin, and user was not
       // connected since

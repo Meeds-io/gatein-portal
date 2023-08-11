@@ -43,7 +43,6 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
 import org.gatein.common.util.Base64;
 import org.gatein.common.util.Base64.EncodingOption;
-import org.gatein.wci.security.Credentials;
 import org.picocontainer.Startable;
 
 /**

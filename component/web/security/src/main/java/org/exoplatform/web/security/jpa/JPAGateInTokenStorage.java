@@ -4,7 +4,6 @@ import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.web.security.GateInTokenStore;
 import org.exoplatform.web.security.security.TokenExistsException;
-import org.gatein.wci.security.Credentials;
 
 import java.util.List;
 

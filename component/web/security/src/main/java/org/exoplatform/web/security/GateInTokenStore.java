@@ -1,7 +1,6 @@
 package org.exoplatform.web.security;
 
 import org.exoplatform.web.security.security.TokenExistsException;
-import org.gatein.wci.security.Credentials;
 
 import java.util.Date;
 

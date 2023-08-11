@@ -133,7 +133,7 @@ public class Argon2IdPasswordEncoder extends HashingEncoder {
     }
   }
 
-  private byte[] generateRandomSalt() throws NoSuchAlgorithmException {
+  public byte[] generateRandomSalt() throws NoSuchAlgorithmException {
     SecureRandom secureRandom = getSecureRandomInstance();
     byte[] salt = new byte[16];
     secureRandom.nextBytes(salt);
