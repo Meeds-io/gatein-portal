@@ -138,7 +138,7 @@ public class TestSerialization extends AbstractGateInTest {
 
     public void testPortal() throws Exception {
         PortalData obj = new PortalData("foo01", "foo02", "foo03", "foo04", "foo10", "foo11", Arrays.asList("foo05"), "foo06",
-                Collections.singletonMap("foo07", "foo08"), "foo09", container, null);
+                Collections.singletonMap("foo07", "foo08"), "foo09", container, null, true, 8);
         PortalData clone = IOTools.clone(obj);
         assertEquals(obj.getStorageId(), clone.getStorageId());
         assertEquals(obj.getStorageName(), clone.getStorageName());
