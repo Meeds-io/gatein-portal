@@ -269,6 +269,8 @@ public class SiteStorageImpl implements SiteStorage {
     List<ComponentEntity> newSiteBody = layoutStorage.saveChildren(siteBody, children);
     entity.setChildren(newSiteBody);
     entity.setSiteBody(((JSONArray) entity.toJSON().get("children")).toJSONString());
+    entity.setDisplayed(config.isDisplayed());
+    entity.setDisplayOrder(config.getDisplayOrder());
   }
 
   @SuppressWarnings("unchecked")
@@ -316,7 +318,9 @@ public class SiteStorageImpl implements SiteStorage {
                           entity.getSkin(),
                           rootContainer,
                           entity.isDefaultSiteBody(),
-                          redirects);
+                          redirects,
+                          entity.isDisplayed(),
+                          entity.getDisplayOrder());
   }
 
   private void savePermissions(Long id, PortalData config) {
