@@ -18,6 +18,8 @@ package org.gatein.portal.idm.impl.store.attribute;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.RootContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.idm.PicketLinkIDMService;
@@ -120,6 +122,9 @@ public class ExtendedAttributeManager extends AttributesManagerImpl {
   private static PicketLinkIDMService getIdmService() {
     if (idmService == null) {
       ExoContainer container = ExoContainerContext.getCurrentContainer();
+      if (container instanceof RootContainer rootContainer) {
+        container = rootContainer.getPortalContainer(PortalContainer.DEFAULT_PORTAL_CONTAINER_NAME);
+      }
       idmService = container.getComponentInstanceOfType(PicketLinkIDMService.class);
     }
     return idmService;
