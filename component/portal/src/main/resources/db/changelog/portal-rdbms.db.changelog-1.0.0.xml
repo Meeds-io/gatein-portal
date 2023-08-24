@@ -372,4 +372,10 @@
       ALTER TABLE PORTAL_SITES MODIFY COLUMN DESCRIPTION longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     </sql>
   </changeSet>
+  <changeSet author="portal" id="1.0.0-35">
+    <addColumn tableName="PORTAL_SITES">
+      <column name="DISPLAYED" type="BOOLEAN" defaultValueBoolean="true" />
+      <column name="DISPLAY_ORDER" type="INT" defaultValueNumeric="0" />
+    </addColumn>
+  </changeSet>
 </databaseChangeLog>

@@ -73,6 +73,10 @@ public class PortalConfig extends ModelObject implements Cloneable {
 
     private transient boolean modifiable;
 
+    private boolean             displayed;
+
+    private int                 displayOrder;
+
     // TODO: storing this as a LinkedHashMap might make more sense (ordered + able to retrieve element based on redirect name
     private ArrayList<PortalRedirect> portalRedirects;
 
@@ -113,6 +117,8 @@ public class PortalConfig extends ModelObject implements Cloneable {
         this.portalLayout = new Container(data.getPortalLayout());
         this.defaultLayout = data.isDefaultLayout();
         this.portalRedirects = buildPortalRedirects(data.getRedirects());
+        this.displayed = data.isDisplayed();
+        this.displayOrder = data.getDisplayOrder();
     }
 
     public String getType() {
@@ -302,6 +308,22 @@ public class PortalConfig extends ModelObject implements Cloneable {
         return label;
     }
 
+    public boolean isDisplayed() {
+        return displayed;
+    }
+
+    public void setDisplayed(boolean displayed) {
+        this.displayed = displayed;
+    }
+
+    public int getDisplayOrder() {
+        return displayOrder;
+    }
+
+    public void setDisplayOrder(int displayOrder) {
+        this.displayOrder = displayOrder;
+    }
+
     public static class PortalConfigSet {
         private ArrayList<PortalConfig> portalConfigs;
 
@@ -346,7 +368,7 @@ public class PortalConfig extends ModelObject implements Cloneable {
         List<String> accessPermissions = Utils.safeImmutableList(this.accessPermissions);
         Map<String, String> properties = Utils.safeImmutableMap(this.properties);
         return new PortalData(storageId, name, type, locale, label, description, accessPermissions, editPermission, properties,
-                skin, portalLayout.build(), defaultLayout, buildRedirectData());
+                skin, portalLayout.build(), defaultLayout, buildRedirectData(), displayed, displayOrder);
     }
 
     private ArrayList<RedirectData> buildRedirectData() {
