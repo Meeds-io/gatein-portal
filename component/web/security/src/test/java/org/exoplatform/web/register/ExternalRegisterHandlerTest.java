@@ -92,6 +92,8 @@ import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 import org.exoplatform.web.security.security.CookieTokenService;
 import org.exoplatform.web.security.security.RemindPasswordTokenService;
 
+import io.meeds.portal.security.service.SecuritySettingService;
+
 import nl.captcha.Captcha;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -155,6 +157,9 @@ public class ExternalRegisterHandlerTest {
 
   @Mock
   private WebAppController           controller;
+
+  @Mock
+  private SecuritySettingService     securitySettingService;
 
   @Mock
   private Router                     router;
@@ -221,8 +226,8 @@ public class ExternalRegisterHandlerTest {
     when(organizationService.getGroupHandler()).thenReturn(groupHandler);
     when(organizationService.getMembershipTypeHandler()).thenReturn(membershipTypeHandler);
     when(organizationService.getMembershipHandler()).thenReturn(membershipHandler);
-    when(passwordRecoveryService.verifyToken(TOKEN_VALUE,
-                                             CookieTokenService.EXTERNAL_REGISTRATION_TOKEN)).thenReturn(EMAIL);
+    when(securitySettingService.getRegistrationGroupIds()).thenReturn(new String[] { "/platform/external" });
+    when(passwordRecoveryService.verifyToken(TOKEN_VALUE, CookieTokenService.EXTERNAL_REGISTRATION_TOKEN)).thenReturn(EMAIL);
 
     externalRegisterHandler = new ExternalRegisterHandler(container,
                                                           remindPasswordTokenService,
@@ -231,12 +236,11 @@ public class ExternalRegisterHandlerTest {
                                                           organizationService,
                                                           localeConfigService,
                                                           brandingService,
+                                                          securitySettingService,
                                                           javascriptConfigService,
-                                                          skinService,
-                                                          params) {
+                                                          skinService) {
       @Override
-      protected void extendApplicationParameters(JSONObject applicationParameters,
-                                                 Map<String, Object> additionalParameters) {
+      protected void extendApplicationParameters(JSONObject applicationParameters, Map<String, Object> additionalParameters) {
         ExternalRegisterHandlerTest.this.applicationParameters = additionalParameters;
         super.extendApplicationParameters(applicationParameters, additionalParameters);
       }
@@ -463,10 +467,10 @@ public class ExternalRegisterHandlerTest {
   @Test
   public void testRedirectToRegistrationWhenValid() throws Exception {
     prepareResetPasswordContext();
-    
+
     String password = "pass1234";
     String passwordConfirm = password;
-    
+
     when(request.getParameter(ACTION_PARAM)).thenReturn(SAVE_EXTERNAL_ACTION);
     when(request.getParameter(EMAIL_PARAM)).thenReturn(EMAIL);
     when(request.getParameter(FIRSTNAME_PARAM)).thenReturn(FIRSTNAME);
@@ -476,24 +480,19 @@ public class ExternalRegisterHandlerTest {
     when(session.getAttribute(REQUIRE_EMAIL_VALIDATION)).thenReturn("true");
 
     when(userHandler.createUserInstance(any())).thenAnswer(invocation -> new UserImpl(invocation.getArgument(0)));
-    
+
     externalRegisterHandler.execute(controllerContext);
 
     assertNotNull(applicationParameters);
     assertEquals(EMAIL_VERIFICATION_SENT, applicationParameters.get(SUCCESS_MESSAGE_PARAM));
 
-    verify(passwordRecoveryService,
-           times(1)).sendAccountVerificationEmail(any(), any(), any(), any(), any(), any(), any());
+    verify(passwordRecoveryService, times(1)).sendAccountVerificationEmail(any(), any(), any(), any(), any(), any(), any());
   }
 
   private void prepareResetPasswordContext() {
     Map<QualifiedName, String> parameters = new HashMap<>();
     parameters.put(TOKEN, TOKEN_VALUE);
-    controllerContext = new ControllerContext(controller,
-                                              router,
-                                              request,
-                                              response,
-                                              parameters);
+    controllerContext = new ControllerContext(controller, router, request, response, parameters);
   }
 
 }

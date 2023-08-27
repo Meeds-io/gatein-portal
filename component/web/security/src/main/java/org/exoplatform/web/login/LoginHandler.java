@@ -59,10 +59,14 @@ import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.application.JspBasedWebHandler;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.exoplatform.web.login.recovery.PasswordRecoveryService;
+import org.exoplatform.web.register.RegisterHandler;
 import org.exoplatform.web.security.AuthenticationRegistry;
 import org.exoplatform.web.security.security.AbstractTokenService;
 import org.exoplatform.web.security.security.CookieTokenService;
 import org.exoplatform.web.security.sso.SSOHelper;
+
+import io.meeds.portal.security.constant.UserRegistrationType;
+import io.meeds.portal.security.service.SecuritySettingService;
 
 public class LoginHandler extends JspBasedWebHandler {
 
@@ -88,6 +92,8 @@ public class LoginHandler extends JspBasedWebHandler {
 
   private OrganizationService     organizationService;
 
+  private SecuritySettingService  securitySettingService;
+
   private PasswordRecoveryService passwordRecoveryService;
 
   private SSOHelper               ssoHelper;
@@ -102,6 +108,7 @@ public class LoginHandler extends JspBasedWebHandler {
                       AuthenticationRegistry authenticationRegistry,
                       LocaleConfigService localeConfigService,
                       BrandingService brandingService,
+                      SecuritySettingService securitySettingService,
                       JavascriptConfigService javascriptConfigService,
                       SkinService skinService,
                       SSOHelper ssoHelper,
@@ -109,6 +116,7 @@ public class LoginHandler extends JspBasedWebHandler {
     super(localeConfigService, brandingService, javascriptConfigService, skinService);
     this.container = container;
     this.organizationService = organizationService;
+    this.securitySettingService = securitySettingService;
     this.authenticationRegistry = authenticationRegistry;
     this.passwordRecoveryService = passwordRecoveryService;
     this.ssoHelper = ssoHelper;
@@ -412,6 +420,10 @@ public class LoginHandler extends JspBasedWebHandler {
                             });
                           }
                         });
+      }
+      // Force disabling Register Form when the platform access is restricted
+      if (securitySettingService.getRegistrationType() == UserRegistrationType.RESTRICTED) {
+        params.put(RegisterHandler.REGISTER_ENABLED, false);
       }
     } catch (Exception e) {
       LOG.warn("Error while computing Login UI parameters", e);
