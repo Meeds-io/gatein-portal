@@ -157,13 +157,6 @@
       <name>ExternalRegistrationHandler</name>
       <set-method>register</set-method>
       <type>org.exoplatform.web.register.ExternalRegisterHandler</type>
-      <init-params>
-        <value-param>
-          <name>registeredUserMemberships</name>
-          <description>Comma seperated list of groups to add for newly registered users</description>
-          <value>${meeds.register.onboarding.memberships:/platform/externals}</value>
-        </value-param>
-      </init-params>
     </component-plugin>
     <component-plugin>
       <name>UploadHandler</name>
