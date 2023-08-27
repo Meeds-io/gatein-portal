@@ -23,12 +23,6 @@
 
   <component>
     <type>org.exoplatform.web.register.RegisterUIParamsExtension</type>
-    <init-params>
-      <value-param>
-        <name>enabled</name>
-        <value>${meeds.register.onboarding.enabled:false}</value>
-      </value-param>
-    </init-params>
   </component>
 
 </configuration>
