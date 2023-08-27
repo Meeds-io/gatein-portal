@@ -22,10 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.login.LoginHandler;
 import org.exoplatform.web.login.UIParamsExtension;
+
+import io.meeds.portal.security.constant.UserRegistrationType;
+import io.meeds.portal.security.service.SecuritySettingService;
 
 public class RegisterUIParamsExtension implements UIParamsExtension {
 
@@ -36,12 +38,10 @@ public class RegisterUIParamsExtension implements UIParamsExtension {
   private static final List<String> EXTENSION_NAMES             = Arrays.asList(RegisterHandler.REGISTER_EXTENSION_NAME,
                                                                                 LoginHandler.LOGIN_EXTENSION_NAME);
 
-  private boolean                   registerEnabled;
+  private SecuritySettingService    securitySettingService;
 
-  public RegisterUIParamsExtension(InitParams params) {
-    if (params != null && params.containsKey(ONBOARDING_ENABLED_PARAM)) {
-      this.registerEnabled = Boolean.parseBoolean(params.getValueParam(ONBOARDING_ENABLED_PARAM).getValue());
-    }
+  public RegisterUIParamsExtension(SecuritySettingService securitySettingService) {
+    this.securitySettingService = securitySettingService;
   }
 
   @Override
@@ -51,7 +51,7 @@ public class RegisterUIParamsExtension implements UIParamsExtension {
 
   @Override
   public Map<String, Object> extendParameters(ControllerContext controllerContext, String extensionName) {
-    if (this.registerEnabled) {
+    if (isRegisterEnabled()) {
       Map<String, Object> params = new HashMap<>();
       params.put(RegisterHandler.REGISTER_ENABLED, true);
       params.put(ONBOARDING_REGISTER_ENABLED, true);
@@ -61,6 +61,7 @@ public class RegisterUIParamsExtension implements UIParamsExtension {
   }
 
   public boolean isRegisterEnabled() {
-    return registerEnabled;
+    return this.securitySettingService.getRegistrationType() == UserRegistrationType.OPEN;
   }
+
 }

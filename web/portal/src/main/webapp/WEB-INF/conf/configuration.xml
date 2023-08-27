@@ -26,6 +26,7 @@
     xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
   <import>war:/conf/common/common-configuration.xml</import>
   <import>war:/conf/common/resource-compressor-configuration.xml</import>
+  <import>war:/conf/common/security-configuration.xml</import>
   <import>war:/conf/common/account-setup-configuration.xml</import>
   <import>war:/conf/common/portlet-container-configuration.xml</import>
   <import>war:/conf/common/autologin-configuration.xml</import>
