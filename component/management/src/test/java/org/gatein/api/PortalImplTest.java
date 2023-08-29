@@ -220,6 +220,18 @@ public class PortalImplTest extends AbstractApiTest {
         assertNotNull(sites);
         assertEquals(1, sites.size());
         assertEquals(defaultSiteId.getName(), sites.get(0).getId().getName());
+
+        createSite(new SiteId("empty site"), false);
+
+        sites = portal.findSites(new SiteQuery.Builder().withAllSiteTypes().build());
+        assertNotNull(sites);
+        assertEquals(1, sites.size());
+        assertEquals(defaultSiteId.getName(), sites.get(0).getId().getName());
+
+        sites = portal.findSites(new SiteQuery.Builder().withAllSiteTypes().includeEmptySites(true).build());
+        assertNotNull(sites);
+        assertEquals(2, sites.size());
+
     }
 
     @Test

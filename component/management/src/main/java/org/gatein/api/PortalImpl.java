@@ -197,20 +197,15 @@ public class PortalImpl implements Portal {
                                Comparator<PortalConfig> comparator,
                                boolean includeAllSites) {
     try {
-      if (pagination != null) {
         ListAccess<PortalConfig> access = layoutService.find2(query, comparator);
         int size = access.getSize();
-        int offset = pagination.getOffset();
-        int limit = pagination.getLimit();
+        int offset = pagination != null ? pagination.getOffset() : 0;
+        int limit = pagination != null ?  pagination.getLimit() : size;
         if (offset >= size) {
           return Collections.emptyList();
         }
-
         PortalConfig[] sites = loadSites(includeAllSites, access, size, offset, limit);
-        return fromList(Arrays.asList(sites).subList(pagination.getOffset(), sites.length));
-      } else {
-        return fromList(layoutService.find(query, comparator).getAll());
-      }
+        return fromList(Arrays.asList(sites).subList(offset, sites.length));
     } catch (Throwable e) {
       throw new ApiException("Failed to query for sites", e);
     }
