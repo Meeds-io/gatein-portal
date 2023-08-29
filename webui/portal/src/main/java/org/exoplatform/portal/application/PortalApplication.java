@@ -22,7 +22,7 @@ package org.exoplatform.portal.application;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import javax.servlet.ServletConfig;
+import jakarta.servlet.ServletConfig;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.resolver.ApplicationResourceResolver;

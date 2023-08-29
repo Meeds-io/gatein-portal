@@ -25,7 +25,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;

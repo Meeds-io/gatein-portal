@@ -32,7 +32,7 @@ import org.exoplatform.web.url.PortalURL;
 import org.exoplatform.web.url.URLContext;
 import org.gatein.common.io.UndeclaredIOException;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;

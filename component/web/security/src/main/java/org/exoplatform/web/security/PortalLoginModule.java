@@ -26,7 +26,7 @@ package org.exoplatform.web.security;
 import java.lang.reflect.Method;
 
 import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.services.log.ExoLogger;
@@ -214,7 +214,7 @@ public class PortalLoginModule extends AbstractLoginModule {
         HttpServletRequest request = null;
         try {
             if (getContextMethod != null) {
-                request = (HttpServletRequest) getContextMethod.invoke(null, "javax.servlet.http.HttpServletRequest");
+                request = (HttpServletRequest) getContextMethod.invoke(null, "jakarta.servlet.http.HttpServletRequest");
             }
         } catch (Exception e) {
             log.debug("Exception when trying to obtain HTTPServletRequest.", e);

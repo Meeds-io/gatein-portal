@@ -204,7 +204,7 @@ public class TestRequestParam extends AbstractTestController {
         rc.reset();
         router.render(parameters, rc.writer);
         assertEquals("", rc.getPath());
-        assertEquals(null, rc.getQueryParams());
+        assertNull(rc.getQueryParams());
         a = router.route("/", Collections.singletonMap("a", new String[] { "bar_value" }));
         assertNull(a);
     }

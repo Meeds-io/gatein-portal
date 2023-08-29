@@ -24,15 +24,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ServiceLoader;
 
-
-
-import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.codec.binary.StringUtils;
 
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.config.*;
+import org.exoplatform.portal.config.StaleModelException;
+import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.PortalProperties;
 import org.exoplatform.portal.mop.SiteType;
@@ -42,11 +39,17 @@ import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.PortalHttpServletResponseWrapper;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.WebRequestHandler;
-import org.exoplatform.web.application.*;
+import org.exoplatform.web.application.ApplicationLifecycle;
+import org.exoplatform.web.application.ApplicationRequestPhaseLifecycle;
+import org.exoplatform.web.application.Phase;
+import org.exoplatform.web.application.RequestContext;
+import org.exoplatform.web.application.RequestFailure;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.webui.core.UIApplication;
 
-import org.apache.commons.codec.binary.StringUtils;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Created by The eXo Platform SAS Dec 9, 2006

@@ -5,7 +5,7 @@ import org.exoplatform.web.login.recovery.ChangePasswordConnector;
 import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 import org.gatein.wci.security.Credentials;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Locale;
 
 public class MockPasswordRecoveryService implements PasswordRecoveryService {

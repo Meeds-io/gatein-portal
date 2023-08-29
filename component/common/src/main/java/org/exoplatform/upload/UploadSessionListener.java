@@ -1,7 +1,7 @@
 package org.exoplatform.upload;
 
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionEvent;
 
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.listener.Event;
@@ -22,7 +22,7 @@ public class UploadSessionListener extends Listener<PortalContainer, HttpSession
         PortalContainer container = event.getSource();
         HttpSession session = event.getData().getSession();
 
-        UploadService uploadService = (UploadService) container.getComponentInstanceOfType(UploadService.class);
+        UploadService uploadService = container.getComponentInstanceOfType(UploadService.class);
         uploadService.cleanUp(session);
     }
 }

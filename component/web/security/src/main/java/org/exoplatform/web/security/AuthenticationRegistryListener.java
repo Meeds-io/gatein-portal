@@ -22,7 +22,7 @@
 
 package org.exoplatform.web.security;
 
-import javax.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionEvent;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.web.AbstractHttpSessionListener;

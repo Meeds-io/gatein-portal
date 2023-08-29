@@ -18,7 +18,7 @@
  */
 package org.exoplatform.portal.application;
 
-import javax.servlet.ServletConfig;
+import jakarta.servlet.ServletConfig;
 
 import org.exoplatform.web.application.ApplicationFactory;
 
