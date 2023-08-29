@@ -247,6 +247,12 @@ public class SiteStorageImpl implements SiteStorage {
     }
   }
 
+  @Override
+  public List<PortalData> getPortalSitesOrderedByDisplayOrder() {
+    List<SiteEntity> siteEntities = siteDAO.findAPortalSitesOrderedByDisplayOrder();
+    return siteEntities.stream().map(this::buildPortalData).toList();
+  }
+
   private void buildSiteEntity(SiteEntity entity, PortalData config) {
     entity.setDescription(config.getDescription());
     entity.setLabel(config.getLabel());

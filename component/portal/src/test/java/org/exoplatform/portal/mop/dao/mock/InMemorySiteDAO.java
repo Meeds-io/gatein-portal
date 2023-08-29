@@ -17,6 +17,9 @@ package org.exoplatform.portal.mop.dao.mock;
 
 import java.util.List;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.jpa.mock.AbstractInMemoryDAO;
@@ -90,6 +93,16 @@ public class InMemorySiteDAO extends AbstractInMemoryDAO<SiteEntity> implements 
                                       .limit(limit(limit))
                                       .map(SiteKey::getName)
                                       .toList();
+  }
+
+  @Override
+  public List<SiteEntity> findAPortalSitesOrderedByDisplayOrder() {
+    return entities.values()
+            .stream()
+            .filter(siteEntity -> siteEntity.isDisplayed() && siteEntity.getSiteType() == SiteType.PORTAL)
+            .sorted(Comparator.comparing(SiteEntity::getDisplayOrder))
+            .toList();
+
   }
 
   private int limit(int limit) {

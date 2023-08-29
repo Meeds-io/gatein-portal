@@ -39,6 +39,8 @@ public class SiteDAOTest extends AbstractDAOTest {
   
   public void testFind() {
     SiteEntity siteEntity = creatSiteEntity();
+    siteEntity.setDisplayed(true);
+    siteEntity.setDisplayOrder(1);
     siteDAO.create(siteEntity);
     restartTransaction();
     
@@ -52,7 +54,20 @@ public class SiteDAOTest extends AbstractDAOTest {
     List<SiteKey> keys = siteDAO.findSiteKey(siteEntity.getSiteType());
     assertEquals(1, keys.size());
 
+    SiteEntity siteEntity2 = creatSiteEntity();
+    siteEntity2.setName("site2");
+    siteEntity2.setDisplayed(true);
+    siteEntity2.setDisplayOrder(2);
+    siteDAO.create(siteEntity2);
+    restartTransaction();
+
+    results = siteDAO.findAPortalSitesOrderedByDisplayOrder();
+    assertEquals(2, results.size());
+    assertEquals(1, results.get(0).getDisplayOrder());
+    assertEquals(2, results.get(1).getDisplayOrder());
+
     siteDAO.delete(siteEntity);
+    siteDAO.delete(siteEntity2);
   }
 
   private void assertSite(SiteEntity expected, SiteEntity siteEntity) {

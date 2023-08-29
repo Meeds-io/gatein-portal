@@ -311,4 +311,8 @@ public interface LayoutService extends DataStorage {
     throw new UnsupportedOperationException();
   }
 
+  default List<PortalConfig> getUserPortalSitesOrderedByDisplayOrder() { // NOSONAR
+    throw new UnsupportedOperationException();
+  }
+
 }

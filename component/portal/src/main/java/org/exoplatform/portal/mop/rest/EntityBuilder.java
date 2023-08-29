@@ -16,28 +16,41 @@
  */
 package org.exoplatform.portal.mop.rest;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.portal.config.UserPortalConfig;
+import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.PageType;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.service.LayoutService;
-import org.exoplatform.portal.mop.user.UserNode;
+import org.exoplatform.portal.mop.user.*;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
+
+import org.exoplatform.portal.mop.rest.model.SiteRestEntity;
+import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
+
+import javax.servlet.http.HttpServletRequest;
 
 public class EntityBuilder {
-  private static final Log LOG = ExoLogger.getLogger(EntityBuilder.class);
+  private static final Log               LOG = ExoLogger.getLogger(EntityBuilder.class);
+
+  public static final String             GROUP = "group";
+
+  private static UserPortalConfigService userPortalConfigService;
 
   private EntityBuilder() { // NOSONAR
   }
@@ -66,7 +79,7 @@ public class EntityBuilder {
           Map<String, Object> editPermission = new HashMap<>();
           try {
             editPermission.put("membershipType", userNodePage.getEditPermission().split(":")[0]);
-            editPermission.put("group",
+            editPermission.put(GROUP,
                                organizationService.getGroupHandler()
                                                   .findGroupById(userNodePage.getEditPermission().split(":")[1]));
           } catch (Exception e) {
@@ -85,7 +98,7 @@ public class EntityBuilder {
               Map<String, Object> accessPermission = new HashMap<>();
               try {
                 accessPermission.put("membershipType", permission.split(":")[0]);
-                accessPermission.put("group", organizationService.getGroupHandler().findGroupById(permission.split(":")[1]));
+                accessPermission.put(GROUP, organizationService.getGroupHandler().findGroupById(permission.split(":")[1]));
               } catch (Exception e) {
                 LOG.warn("Error when getting group with id {}", permission.split(":")[1], e);
               }
@@ -99,5 +112,94 @@ public class EntityBuilder {
       result.add(resultNode);
     }
     return result;
+  }
+
+
+  public static SiteRestEntity toSiteRestEntity(PortalConfig site,
+                                                HttpServletRequest  request,
+                                                UserPortalConfigService userPortalConfigService,
+                                                OrganizationService organizationService,
+                                                LayoutService layoutService,
+                                                UserACL userACL) {
+    if (site == null || (!StringUtils.isBlank(site.getName()) && StringUtils.equals(site.getName().toLowerCase(), "global"))) {
+      return null;
+    }
+    SiteType siteType = SiteType.valueOf(site.getType().toUpperCase());
+    String displayName = site.getLabel();
+    Identity userIdentity = ConversationState.getCurrent().getIdentity();
+    if (SiteType.GROUP.equals(siteType)) {
+      try {
+        Group siteGroup = organizationService.getGroupHandler().findGroupById(site.getName());
+        if (siteGroup == null || !userIdentity.isMemberOf(siteGroup.getId())) {
+          return null;
+        } else if (org.apache.commons.lang3.StringUtils.isBlank(displayName)) {
+          displayName = siteGroup.getLabel();
+        }
+      } catch (Exception e) {
+        LOG.error("Error while retrieving group with name ", site.getName(), e);
+      }
+    }
+    List<Map<String, Object>> accessPermissions = computePermissions(site.getAccessPermissions(), organizationService);
+    Map<String, Object> editPermission = computePermission(site.getEditPermission(), organizationService);
+
+    UserNode rootNode = null;
+    String currentUser = userIdentity.getUserId();
+    try {
+      HttpUserPortalContext userPortalContext = new HttpUserPortalContext(request);
+      UserPortalConfig userPortalCfg = userPortalConfigService.getUserPortalConfig(site.getName(), currentUser, userPortalContext);
+      UserPortal userPortal = userPortalCfg.getUserPortal();
+      UserNavigation navigation = userPortal.getNavigation(new SiteKey(siteType.getName(), site.getName()));
+      rootNode = userPortal.getNode(navigation, Scope.ALL, UserNodeFilterConfig.builder().build(), null);
+    } catch (Exception e) {
+      LOG.error("Error while getting user {} portal for site : {} ", currentUser, site.getName(), e);
+    }
+
+    return new SiteRestEntity(siteType,
+            site.getName(),
+            !StringUtils.isBlank(displayName) ? displayName : site.getName(),
+            site.getDescription(),
+            accessPermissions,
+            editPermission,
+            isDefaultSite(site.getName()) || site.isDisplayed(),
+            site.getDisplayOrder(),
+            isDefaultSite(site.getName()),
+            rootNode == null ? null : toUserNodeRestEntity(rootNode.getChildren(), true, organizationService, layoutService, userACL));
+
+  }
+
+  public static List<SiteRestEntity> toSiteRestEntities(List<PortalConfig> sites,
+                                                        HttpServletRequest request,
+                                                        UserPortalConfigService userPortalConfigService,
+                                                        OrganizationService organizationService,
+                                                        LayoutService layoutService,
+                                                        UserACL userACL) {
+    return sites.stream().map(site -> toSiteRestEntity(site, request, userPortalConfigService, organizationService, layoutService, userACL)).filter(Objects::nonNull).toList();
+  }
+
+  private static Map<String, Object> computePermission(String permission, OrganizationService organizationService) {
+    Map<String, Object> accessPermission = new HashMap<>();
+    try {
+      accessPermission.put("membershipType", permission.split(":")[0]);
+      accessPermission.put(GROUP, organizationService.getGroupHandler().findGroupById(permission.split(":")[1]));
+    } catch (Exception e) {
+      LOG.error("Error while computing user permission ", permission, e);
+    }
+    return accessPermission;
+  }
+
+  private static List<Map<String, Object>> computePermissions(String[] permissions, OrganizationService organizationService) {
+    return Arrays.stream(permissions).map(permission -> computePermission(permission, organizationService)).toList();
+  }
+
+  private static UserPortalConfigService getUserPortalConfigService() {
+    if (userPortalConfigService == null) {
+      userPortalConfigService =
+              ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(UserPortalConfigService.class);
+    }
+    return userPortalConfigService;
+  }
+
+  public static boolean isDefaultSite(String siteName) {
+    return getUserPortalConfigService().getDefaultPortal().equals(siteName);
   }
 }

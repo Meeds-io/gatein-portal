@@ -42,4 +42,6 @@ public interface SiteDAO extends GenericDAO<SiteEntity, Long> {
 
   List<String> findUserSites(int offset, int limit);
 
+  List<SiteEntity> findAPortalSitesOrderedByDisplayOrder();
+
 }

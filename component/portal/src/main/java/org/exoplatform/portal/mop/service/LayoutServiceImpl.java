@@ -31,8 +31,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.application.PortletPreferences;
 import org.exoplatform.portal.config.Query;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
@@ -360,6 +363,21 @@ public class LayoutServiceImpl implements LayoutService {
     } else {
       throw new UnsupportedOperationException("Could not perform search on query " + q);
     }
+  }
+
+  @Override
+  public List<PortalConfig> getUserPortalSitesOrderedByDisplayOrder() {
+    List<PortalData> portalDataList = siteStorage.getPortalSitesOrderedByDisplayOrder();
+    return portalDataList.isEmpty() ? Collections.emptyList() : filterUserPortalSites(portalDataList);
+  }
+
+  private List<PortalConfig> filterUserPortalSites(List<PortalData> portalDataList) {
+    ExoContainer container = ExoContainerContext.getCurrentContainer();
+    UserACL userACL = container.getComponentInstanceOfType(UserACL.class);
+    if (portalDataList.isEmpty())
+      return Collections.emptyList();
+
+    return portalDataList.stream().map(PortalConfig::new).filter(userACL::hasPermission).toList();
   }
 
   private abstract class Bilto<O extends ModelObject, D extends ModelData> {

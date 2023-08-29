@@ -16,7 +16,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.portal.config.model.PortalConfig;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -196,6 +198,24 @@ public class NavigationRest implements ResourceContainer {
       object.put("categoriesOrder", navigationCategoryService.getNavigationCategoriesOrder());
       object.put("urisOrder", navigationCategoryService.getNavigationUriOrder());
       return Response.ok(object.toString()).build();
+    } catch (JSONException e) {
+      LOG.warn("Error parsing navigation categories result", e);
+      return Response.serverError().build();
+    }
+  }
+
+
+  @Path("/sites")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @Operation(summary = "Gets navigations categories for UI", description = "Gets navigations categories for UI", method = "GET")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  public Response getSitesWithNavigationNodes(@Context HttpServletRequest request) {
+    try {
+      List<PortalConfig> sites = layoutService.getUserPortalSitesOrderedByDisplayOrder();
+      return Response.ok(EntityBuilder.toSiteRestEntities(sites, request, portalConfigService, organizationService, layoutService, userACL)).build();
     } catch (JSONException e) {
       LOG.warn("Error parsing navigation categories result", e);
       return Response.serverError().build();
