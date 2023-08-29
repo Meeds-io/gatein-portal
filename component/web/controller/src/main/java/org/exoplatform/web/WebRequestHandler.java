@@ -19,7 +19,7 @@
 
 package org.exoplatform.web;
 
-import javax.servlet.ServletConfig;
+import jakarta.servlet.ServletConfig;
 
 import org.exoplatform.container.component.BaseComponentPlugin;
 

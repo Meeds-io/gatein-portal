@@ -29,8 +29,6 @@ import org.exoplatform.services.security.IdentityRegistry;
 import org.exoplatform.services.security.MembershipEntry;
 import org.exoplatform.webui.application.portlet.PortletRequestContext;
 
-import com.ibm.icu.text.Transliterator;
-
 /**
  * Created by The eXo Platform SAS Author : Hoa Pham hoa.phamvu@exoplatform.com Oct 23, 2008
  */
@@ -103,39 +101,6 @@ public class ToolbarUtils {
         if (obj == null)
             return true;
         return !Boolean.parseBoolean(obj.toString());
-    }
-
-    public static String cleanString(String str) {
-
-        Transliterator accentsconverter = Transliterator.getInstance("Latin; NFD; [:Nonspacing Mark:] Remove; NFC;");
-
-        str = accentsconverter.transliterate(str);
-
-        // the character ? seems to not be changed to d by the transliterate function
-
-        StringBuffer cleanedStr = new StringBuffer(str.trim());
-        // delete special character
-        for (int i = 0; i < cleanedStr.length(); i++) {
-            char c = cleanedStr.charAt(i);
-            if (c == ' ') {
-                if (i > 0 && cleanedStr.charAt(i - 1) == '_') {
-                    cleanedStr.deleteCharAt(i--);
-                } else {
-                    c = '_';
-                    cleanedStr.setCharAt(i, c);
-                }
-                continue;
-            }
-
-            if (!(Character.isLetterOrDigit(c) || c == '_')) {
-                cleanedStr.deleteCharAt(i--);
-                continue;
-            }
-
-            if (i > 0 && c == '_' && cleanedStr.charAt(i - 1) == '_')
-                cleanedStr.deleteCharAt(i--);
-        }
-        return cleanedStr.toString().toLowerCase();
     }
 
 }

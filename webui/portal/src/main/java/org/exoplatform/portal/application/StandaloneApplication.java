@@ -19,7 +19,7 @@
 
 package org.exoplatform.portal.application;
 
-import javax.servlet.ServletConfig;
+import jakarta.servlet.ServletConfig;
 
 
 public class StandaloneApplication extends PortalApplication {

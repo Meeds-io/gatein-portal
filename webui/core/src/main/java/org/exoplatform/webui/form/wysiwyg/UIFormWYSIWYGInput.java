@@ -21,7 +21,7 @@ package org.exoplatform.webui.form.wysiwyg;
 
 import java.io.Writer;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.form.UIFormInputBase;

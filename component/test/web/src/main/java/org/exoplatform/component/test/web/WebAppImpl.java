@@ -22,9 +22,9 @@ package org.exoplatform.component.test.web;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.gatein.common.NotYetImplemented;
 import org.gatein.wci.WebApp;

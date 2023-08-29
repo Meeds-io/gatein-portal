@@ -21,7 +21,7 @@
  */
 package org.exoplatform.web.application.javascript;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.List;
 

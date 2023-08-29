@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.exoplatform.portal.mop.SiteFilter;
-import org.exoplatform.services.test.mock.MockHttpServletRequest;
 import org.gatein.common.util.Tools;
 
 import org.exoplatform.component.test.ConfigurationUnit;
@@ -66,10 +64,10 @@ import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.test.mock.MockHttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import junit.framework.AssertionFailedError;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>

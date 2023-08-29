@@ -20,9 +20,9 @@
 package org.exoplatform.web.controller.router;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
-
-import javax.servlet.http.HttpUtils;
+import java.util.stream.Collectors;
 
 import org.exoplatform.web.url.MimeType;
 
@@ -64,8 +64,11 @@ public class URIHelper implements Appendable {
             int index = sb.indexOf("?");
             if (index != -1) {
                 String query = sb.substring(index + 1);
-                return HttpUtils.parseQueryString(query);
-            }
+                return Arrays.stream(query.split("&"))
+                             .collect(Collectors.toMap(s -> s.split("=")[0],
+                                                       s -> s.split("=").length > 1 ? new String[] { s.split("=")[1] }
+                                                                                    : new String[] {""}));
+              }
         }
         return null;
     }

@@ -13,8 +13,6 @@ import static org.mockito.Mockito.when;
 import java.net.URL;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +23,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.exoplatform.commons.xml.DocumentSource;
 import org.exoplatform.portal.resource.config.tasks.SkinConfigTask;
 import org.exoplatform.portal.resource.config.xml.SkinConfigParser;
+
+import jakarta.servlet.ServletContext;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TestGateInResourceParser {

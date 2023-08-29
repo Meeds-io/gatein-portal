@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.portlet.PortletContext;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
