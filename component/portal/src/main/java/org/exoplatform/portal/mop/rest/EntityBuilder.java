@@ -28,6 +28,7 @@ import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.PageType;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.navigation.Scope;
@@ -46,9 +47,16 @@ import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import javax.servlet.http.HttpServletRequest;
 
 public class EntityBuilder {
-  private static final Log               LOG = ExoLogger.getLogger(EntityBuilder.class);
+
+  private static final Log               LOG   = ExoLogger.getLogger(EntityBuilder.class);
 
   public static final String             GROUP = "group";
+
+  private static LayoutService           layoutService;
+
+  private static OrganizationService     organizationService;
+
+  private static UserACL                 userACL;
 
   private static UserPortalConfigService userPortalConfigService;
 
@@ -115,13 +123,8 @@ public class EntityBuilder {
   }
 
 
-  public static SiteRestEntity toSiteRestEntity(PortalConfig site,
-                                                HttpServletRequest  request,
-                                                UserPortalConfigService userPortalConfigService,
-                                                OrganizationService organizationService,
-                                                LayoutService layoutService,
-                                                UserACL userACL) {
-    if (site == null || (!StringUtils.isBlank(site.getName()) && StringUtils.equals(site.getName().toLowerCase(), "global"))) {
+  public static SiteRestEntity toSiteRestEntity(PortalConfig site, HttpServletRequest request, SiteFilter siteFilter) {
+    if (site == null) {
       return null;
     }
     SiteType siteType = SiteType.valueOf(site.getType().toUpperCase());
@@ -129,7 +132,7 @@ public class EntityBuilder {
     Identity userIdentity = ConversationState.getCurrent().getIdentity();
     if (SiteType.GROUP.equals(siteType)) {
       try {
-        Group siteGroup = organizationService.getGroupHandler().findGroupById(site.getName());
+        Group siteGroup = getOrganizationService().getGroupHandler().findGroupById(site.getName());
         if (siteGroup == null || !userIdentity.isMemberOf(siteGroup.getId())) {
           return null;
         } else if (org.apache.commons.lang3.StringUtils.isBlank(displayName)) {
@@ -139,21 +142,22 @@ public class EntityBuilder {
         LOG.error("Error while retrieving group with name ", site.getName(), e);
       }
     }
-    List<Map<String, Object>> accessPermissions = computePermissions(site.getAccessPermissions(), organizationService);
-    Map<String, Object> editPermission = computePermission(site.getEditPermission(), organizationService);
+    List<Map<String, Object>> accessPermissions = computePermissions(site.getAccessPermissions());
+    Map<String, Object> editPermission = computePermission(site.getEditPermission());
 
     UserNode rootNode = null;
-    String currentUser = userIdentity.getUserId();
-    try {
-      HttpUserPortalContext userPortalContext = new HttpUserPortalContext(request);
-      UserPortalConfig userPortalCfg = userPortalConfigService.getUserPortalConfig(site.getName(), currentUser, userPortalContext);
-      UserPortal userPortal = userPortalCfg.getUserPortal();
-      UserNavigation navigation = userPortal.getNavigation(new SiteKey(siteType.getName(), site.getName()));
-      rootNode = userPortal.getNode(navigation, Scope.ALL, UserNodeFilterConfig.builder().build(), null);
-    } catch (Exception e) {
-      LOG.error("Error while getting user {} portal for site : {} ", currentUser, site.getName(), e);
+    if (siteFilter.isExpandNavigations()) {
+      String currentUser = userIdentity.getUserId();
+      try {
+        HttpUserPortalContext userPortalContext = new HttpUserPortalContext(request);
+        UserPortalConfig userPortalCfg = getUserPortalConfigService().getUserPortalConfig(site.getName(), currentUser, userPortalContext);
+        UserPortal userPortal = userPortalCfg.getUserPortal();
+        UserNavigation navigation = userPortal.getNavigation(new SiteKey(siteType.getName(), site.getName()));
+        rootNode = userPortal.getNode(navigation, Scope.ALL, UserNodeFilterConfig.builder().build(), null);
+      } catch (Exception e) {
+        LOG.error("Error while getting user {} portal for site : {} ", currentUser, site.getName(), e);
+      }
     }
-
     return new SiteRestEntity(siteType,
             site.getName(),
             !StringUtils.isBlank(displayName) ? displayName : site.getName(),
@@ -163,32 +167,50 @@ public class EntityBuilder {
             isDefaultSite(site.getName()) || site.isDisplayed(),
             site.getDisplayOrder(),
             isDefaultSite(site.getName()),
-            rootNode == null ? null : toUserNodeRestEntity(rootNode.getChildren(), true, organizationService, layoutService, userACL));
+            rootNode == null ? null : toUserNodeRestEntity(rootNode.getChildren(), true, getOrganizationService(), getLayoutService(), getUserACL()));
 
   }
 
   public static List<SiteRestEntity> toSiteRestEntities(List<PortalConfig> sites,
                                                         HttpServletRequest request,
-                                                        UserPortalConfigService userPortalConfigService,
-                                                        OrganizationService organizationService,
-                                                        LayoutService layoutService,
-                                                        UserACL userACL) {
-    return sites.stream().map(site -> toSiteRestEntity(site, request, userPortalConfigService, organizationService, layoutService, userACL)).filter(Objects::nonNull).toList();
+                                                        SiteFilter siteFilter) {
+    return sites.stream().map(site -> toSiteRestEntity(site, request, siteFilter)).filter(Objects::nonNull).toList();
   }
 
-  private static Map<String, Object> computePermission(String permission, OrganizationService organizationService) {
+  private static Map<String, Object> computePermission(String permission) {
     Map<String, Object> accessPermission = new HashMap<>();
     try {
       accessPermission.put("membershipType", permission.split(":")[0]);
-      accessPermission.put(GROUP, organizationService.getGroupHandler().findGroupById(permission.split(":")[1]));
+      accessPermission.put(GROUP, getOrganizationService().getGroupHandler().findGroupById(permission.split(":")[1]));
     } catch (Exception e) {
       LOG.error("Error while computing user permission ", permission, e);
     }
     return accessPermission;
   }
 
-  private static List<Map<String, Object>> computePermissions(String[] permissions, OrganizationService organizationService) {
-    return Arrays.stream(permissions).map(permission -> computePermission(permission, organizationService)).toList();
+  private static List<Map<String, Object>> computePermissions(String[] permissions) {
+    return Arrays.stream(permissions).map(EntityBuilder::computePermission).toList();
+  }
+
+  private static OrganizationService getOrganizationService() {
+    if (organizationService == null) {
+      organizationService = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(OrganizationService.class);
+    }
+    return organizationService;
+  }
+
+  private static LayoutService getLayoutService() {
+    if (layoutService == null) {
+      layoutService = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(LayoutService.class);
+    }
+    return layoutService;
+  }
+
+  private static UserACL getUserACL() {
+    if (userACL == null) {
+      userACL = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(UserACL.class);
+    }
+    return userACL;
   }
 
   private static UserPortalConfigService getUserPortalConfigService() {

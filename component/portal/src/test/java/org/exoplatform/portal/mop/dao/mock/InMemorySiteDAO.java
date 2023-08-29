@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.jpa.mock.AbstractInMemoryDAO;
 import org.exoplatform.portal.jdbc.entity.SiteEntity;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.dao.SiteDAO;
@@ -96,7 +97,7 @@ public class InMemorySiteDAO extends AbstractInMemoryDAO<SiteEntity> implements 
   }
 
   @Override
-  public List<SiteEntity> findAPortalSitesOrderedByDisplayOrder() {
+  public List<SiteEntity> getSitesByFilter(SiteFilter siteFilter) {
     return entities.values()
             .stream()
             .filter(siteEntity -> siteEntity.isDisplayed() && siteEntity.getSiteType() == SiteType.PORTAL)

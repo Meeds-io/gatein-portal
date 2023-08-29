@@ -15,7 +15,10 @@
  */
 package org.exoplatform.portal.mop.rest;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,14 +32,11 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.exoplatform.portal.mop.navigation.NodeChangeListener;
-import org.exoplatform.portal.mop.rest.model.SiteRestEntity;
-import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupHandler;
@@ -187,7 +187,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     assertEquals(categoriesOrder.get("test"), jsonObject.getJSONObject("categoriesOrder").get("test"));
     assertEquals(urisOrder.get("test"), jsonObject.getJSONObject("urisOrder").get("test"));
   }
-  
+
   @Test
   public void testGetSiteNavigationWithPageDetails() throws Exception {
     String path = "/v1/navigations/PORTAL?siteName=SiteName&expand=true";
@@ -220,7 +220,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     when(userACL.hasEditPermission(any(Page.class))).thenReturn(true);
     ContainerResponse resp = launcher.service("GET", path, "", null, null, envctx);
     Object entity = resp.getEntity();
-    
+
     assertEquals(200, resp.getStatus());
     assertNotNull(entity);
     List<UserNodeRestEntity> resultUserNodes = (List<UserNodeRestEntity>) resp.getEntity();
@@ -236,7 +236,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
 
     resp = launcher.service("GET", path, "", null, null, envctx);
     entity = resp.getEntity();
-    
+
     assertEquals(200, resp.getStatus());
     assertNotNull(entity);
     resultUserNodes = (List<UserNodeRestEntity>) resp.getEntity();
@@ -247,62 +247,5 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     assertEquals("Everyone", resultUserNodes.get(0).getPageAccessPermissions().get(0).get("membershipType"));
     assertEquals(null, resultUserNodes.get(0).getPageAccessPermissions().get(0).get("group"));
     assertEquals("www.test.com", resultUserNodes.get(0).getPageLink());
-  }
-
-  @Test
-  public void testGetSitesWithNavigationNodes() throws Exception {
-    String path = "/v1/navigations/sites";
-
-    EnvironmentContext envctx = new EnvironmentContext();
-    HttpServletRequest httpRequest = new MockHttpServletRequest(path, null, 0, "GET", null);
-    envctx.put(HttpServletRequest.class, httpRequest);
-
-    startUserSession("root1");
-    PortalConfig site1 = mock(PortalConfig.class);
-    when(site1.getType()).thenReturn(SiteType.PORTAL.getName());
-    when(site1.getName()).thenReturn("site1");
-    when(site1.getDisplayOrder()).thenReturn(1);
-    when(site1.getEditPermission()).thenReturn("*:/platform/users");
-    when(site1.getAccessPermissions()).thenReturn(new String[] {"*:/platform/users"});
-    PortalConfig site2 = mock(PortalConfig.class);
-    when(site2.getType()).thenReturn(SiteType.PORTAL.getName());
-    when(site2.getName()).thenReturn("site2");
-    when(site2.getDisplayOrder()).thenReturn(2);
-    when(site2.getEditPermission()).thenReturn("*:/platform/users");
-    when(site2.getAccessPermissions()).thenReturn(new String[] {"*:/platform/users"});
-    List<PortalConfig> sites = new ArrayList<>();
-    sites.add(site1);
-    sites.add(site2);
-    when(layoutService.getUserPortalSitesOrderedByDisplayOrder()).thenReturn(sites);
-
-    Collection<UserNode> nodes = new ArrayList<>();
-    UserNode userRootNode = mock(UserNode.class);
-    UserNode userNode = mock(UserNode.class);
-    nodes.add(userNode);
-
-    GroupHandler groupHandler = mock(GroupHandler.class);
-    Group group = mock(Group.class);
-    when(organizationService.getGroupHandler()).thenReturn(groupHandler);
-    when(groupHandler.findGroupById("/platform/users")).thenReturn(group);
-    when(userNode.getPageRef()).thenReturn(null);
-    UserPortalConfig userPortalConfig = mock(UserPortalConfig.class);
-    UserNavigation userNavigation = mock(UserNavigation.class);
-    when(portalConfigService.getUserPortalConfig(anyString(), anyString(), any())).thenReturn(userPortalConfig);
-    UserPortal userPortal = mock(UserPortal.class);
-    when(userPortalConfig.getUserPortal()).thenReturn(userPortal);
-    when(userPortal.getNavigation(any(SiteKey.class))).thenReturn(userNavigation);
-    when(userPortal.getNode(any(UserNavigation.class), any(Scope.class), any(UserNodeFilterConfig.class),any())).thenReturn(userRootNode);
-    when(userRootNode.getChildren()).thenReturn(nodes);
-    ContainerResponse resp = launcher.service("GET", path, "", null, null, envctx);
-    Object entity = resp.getEntity();
-
-    assertEquals(200, resp.getStatus());
-    assertNotNull(entity);
-    List<SiteRestEntity> results = (List<SiteRestEntity>) resp.getEntity();
-    assertEquals(2, results.size());
-    assertEquals(1, results.get(0).getDisplayOrder());
-    assertEquals(2, results.get(1).getDisplayOrder());
-
-
   }
 }

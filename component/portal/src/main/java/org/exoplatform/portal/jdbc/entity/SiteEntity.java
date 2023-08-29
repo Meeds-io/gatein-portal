@@ -69,13 +69,7 @@ import org.exoplatform.portal.mop.SiteType;
         + " ORDER BY s.name ASC"
 )
 
-@NamedQuery(
-  name = "SiteEntity.findPortalSitesOrderedByDisplayOrder",
-  query = "SELECT s FROM GateInSite s"
-        + " WHERE s.siteType = :siteType"
-        + " AND s.displayed = true"
-        + " ORDER BY s.displayOrder ASC , s.name ASC"
-)
+
 public class SiteEntity extends ComponentEntity {
 
   private static final long     serialVersionUID = 3036823700771832314L;

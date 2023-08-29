@@ -35,6 +35,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.impl.UnmarshallingContext;
@@ -248,8 +249,8 @@ public class SiteStorageImpl implements SiteStorage {
   }
 
   @Override
-  public List<PortalData> getPortalSitesOrderedByDisplayOrder() {
-    List<SiteEntity> siteEntities = siteDAO.findAPortalSitesOrderedByDisplayOrder();
+  public List<PortalData> getSitesByFilter(SiteFilter siteFilter) {
+    List<SiteEntity> siteEntities = siteDAO.getSitesByFilter(siteFilter);
     return siteEntities.stream().map(this::buildPortalData).toList();
   }
 

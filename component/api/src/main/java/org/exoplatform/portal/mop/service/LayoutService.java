@@ -29,6 +29,7 @@ import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.QueryResult;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.Status;
@@ -311,7 +312,7 @@ public interface LayoutService extends DataStorage {
     throw new UnsupportedOperationException();
   }
 
-  default List<PortalConfig> getUserPortalSitesOrderedByDisplayOrder() { // NOSONAR
+  default List<PortalConfig> getSitesByFilter(SiteFilter siteFilter) { // NOSONAR
     throw new UnsupportedOperationException();
   }
 

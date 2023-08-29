@@ -44,6 +44,7 @@ import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.QueryResult;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.Status;
@@ -366,18 +367,19 @@ public class LayoutServiceImpl implements LayoutService {
   }
 
   @Override
-  public List<PortalConfig> getUserPortalSitesOrderedByDisplayOrder() {
-    List<PortalData> portalDataList = siteStorage.getPortalSitesOrderedByDisplayOrder();
-    return portalDataList.isEmpty() ? Collections.emptyList() : filterUserPortalSites(portalDataList);
+  public List<PortalConfig> getSitesByFilter(SiteFilter filter) {
+    List<PortalData> portalDataList = siteStorage.getSitesByFilter(filter);
+    List<PortalConfig> sites = portalDataList.isEmpty() ? Collections.emptyList()
+                                                            : portalDataList.stream().map(PortalConfig::new).toList();
+    return filter.isFilterByPermission() ? filterSites(sites) : sites;
   }
 
-  private List<PortalConfig> filterUserPortalSites(List<PortalData> portalDataList) {
+  private List<PortalConfig> filterSites(List<PortalConfig> sites) {
+    if (sites.isEmpty())
+      return Collections.emptyList();
     ExoContainer container = ExoContainerContext.getCurrentContainer();
     UserACL userACL = container.getComponentInstanceOfType(UserACL.class);
-    if (portalDataList.isEmpty())
-      return Collections.emptyList();
-
-    return portalDataList.stream().map(PortalConfig::new).filter(userACL::hasPermission).toList();
+    return sites.stream().filter(userACL::hasPermission).toList();
   }
 
   private abstract class Bilto<O extends ModelObject, D extends ModelData> {
