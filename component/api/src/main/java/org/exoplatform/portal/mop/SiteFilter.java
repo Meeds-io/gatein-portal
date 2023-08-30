@@ -33,7 +33,7 @@ public class SiteFilter implements Serializable {
 
   private boolean  includeEmpty;
 
-  private boolean  filterByPermission = true;
+  private boolean  filterByPermission;
 
   private boolean  orderByDisplayOrder;
 

@@ -203,7 +203,6 @@ public class NavigationRest implements ResourceContainer {
     }
   }
 
-
   private Response getNavigations(HttpServletRequest request, // NOSONAR
                                   String siteTypeName,
                                   String siteName,

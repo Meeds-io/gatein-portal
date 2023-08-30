@@ -97,12 +97,25 @@ public class InMemorySiteDAO extends AbstractInMemoryDAO<SiteEntity> implements 
   }
 
   @Override
-  public List<SiteEntity> getSitesByFilter(SiteFilter siteFilter) {
-    return entities.values()
-            .stream()
-            .filter(siteEntity -> siteEntity.isDisplayed() && siteEntity.getSiteType() == SiteType.PORTAL)
-            .sorted(Comparator.comparing(SiteEntity::getDisplayOrder))
-            .toList();
+  public List<SiteEntity> getSitesByFilter(SiteFilter filter) {
+    List<SiteEntity> res = entities.values().stream().filter(siteEntity -> {
+      if (filter.isAllSites()) {
+        if (filter.getSiteType() != null) {
+          return filter.getSiteType() == siteEntity.getSiteType();
+        } else {
+          return true;
+        }
+      } else {
+        return siteEntity.isDisplayed() == filter.isDisplayed() && siteEntity.getSiteType() == filter.getSiteType();
+      }
+    }).toList();
+    if (StringUtils.isNotBlank(filter.getExcludedSiteName())) {
+      res = res.stream().filter(siteEntity -> !siteEntity.getName().equals(filter.getExcludedSiteName())).toList();
+    }
+    if (filter.isOrderByDisplayOrder()) {
+      res =  res.stream().sorted(Comparator.comparing(SiteEntity::getDisplayOrder)).toList();
+    }
+    return res;
 
   }
 
