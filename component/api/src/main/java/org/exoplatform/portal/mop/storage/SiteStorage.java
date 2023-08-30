@@ -65,6 +65,5 @@ public interface SiteStorage extends ModelDataStorage {
 
   Container getSharedLayout(String siteName);
 
-  List<PortalData> getSitesByFilter(SiteFilter siteFilter);
-
+  List<PortalData> getSites(SiteFilter siteFilter);
 }

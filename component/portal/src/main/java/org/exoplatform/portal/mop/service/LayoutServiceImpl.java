@@ -31,8 +31,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PropertyManager;
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.application.PortletPreferences;
 import org.exoplatform.portal.config.Query;
 import org.exoplatform.portal.config.UserACL;
@@ -74,16 +72,20 @@ public class LayoutServiceImpl implements LayoutService {
 
   private LayoutStorage          layoutStorage;
 
+  private UserACL                userACL;
+
   private Map<String, Container> sharedLayouts = new HashMap<>();
 
   public LayoutServiceImpl(ListenerService listenerService,
                            SiteStorage siteStorage,
                            PageStorage pageStorage,
-                           LayoutStorage layoutStorage) {
+                           LayoutStorage layoutStorage,
+                           UserACL userACL) {
     this.listenerService = listenerService;
     this.siteStorage = siteStorage;
     this.pageStorage = pageStorage;
     this.layoutStorage = layoutStorage;
+    this.userACL = userACL;
   }
 
   @Override
@@ -367,18 +369,17 @@ public class LayoutServiceImpl implements LayoutService {
   }
 
   @Override
-  public List<PortalConfig> getSitesByFilter(SiteFilter filter) {
-    List<PortalData> portalDataList = siteStorage.getSitesByFilter(filter);
+  public List<PortalConfig> getSites(SiteFilter filter) {
+    List<PortalData> portalDataList = siteStorage.getSites(filter);
     List<PortalConfig> sites = portalDataList.isEmpty() ? Collections.emptyList()
                                                             : portalDataList.stream().map(PortalConfig::new).toList();
-    return filter.isFilterByPermission() ? filterSites(sites) : sites;
+    return filter.isFilterByPermission() ? getFilteredSitesByPermission(sites) : sites;
   }
 
-  private List<PortalConfig> filterSites(List<PortalConfig> sites) {
-    if (sites.isEmpty())
+  private List<PortalConfig> getFilteredSitesByPermission(List<PortalConfig> sites) {
+    if (sites.isEmpty()) {
       return Collections.emptyList();
-    ExoContainer container = ExoContainerContext.getCurrentContainer();
-    UserACL userACL = container.getComponentInstanceOfType(UserACL.class);
+    }
     return sites.stream().filter(userACL::hasPermission).toList();
   }
 

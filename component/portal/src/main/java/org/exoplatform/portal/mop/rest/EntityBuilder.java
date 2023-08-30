@@ -16,8 +16,17 @@
  */
 package org.exoplatform.portal.mop.rest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -32,19 +41,20 @@ import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.rest.model.SiteRestEntity;
+import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.exoplatform.portal.mop.service.LayoutService;
-import org.exoplatform.portal.mop.user.*;
+import org.exoplatform.portal.mop.user.HttpUserPortalContext;
+import org.exoplatform.portal.mop.user.UserNavigation;
+import org.exoplatform.portal.mop.user.UserNode;
+import org.exoplatform.portal.mop.user.UserNodeFilterConfig;
+import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
-
-import org.exoplatform.portal.mop.rest.model.SiteRestEntity;
-import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class EntityBuilder {
 
@@ -155,7 +165,7 @@ public class EntityBuilder {
         UserNavigation navigation = userPortal.getNavigation(new SiteKey(siteType.getName(), site.getName()));
         rootNode = userPortal.getNode(navigation, Scope.ALL, UserNodeFilterConfig.builder().build(), null);
       } catch (Exception e) {
-        LOG.error("Error while getting user {} portal for site : {} ", currentUser, site.getName(), e);
+        LOG.error("Error while getting site {} navigations for user {}", site.getName(), currentUser, e);
       }
     }
     return new SiteRestEntity(siteType,
@@ -216,7 +226,7 @@ public class EntityBuilder {
   private static UserPortalConfigService getUserPortalConfigService() {
     if (userPortalConfigService == null) {
       userPortalConfigService =
-              ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(UserPortalConfigService.class);
+                              ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(UserPortalConfigService.class);
     }
     return userPortalConfigService;
   }

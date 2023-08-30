@@ -48,5 +48,4 @@ public class SiteRestEntity {
   private boolean                   isDefaultSite;
 
   List<UserNodeRestEntity>          siteNavigations;
-
 }

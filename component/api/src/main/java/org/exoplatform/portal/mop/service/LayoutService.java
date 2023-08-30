@@ -312,8 +312,13 @@ public interface LayoutService extends DataStorage {
     throw new UnsupportedOperationException();
   }
 
-  default List<PortalConfig> getSitesByFilter(SiteFilter siteFilter) { // NOSONAR
+  /**
+   * Retrieves sites according to the given site filter
+   * 
+   * @param siteFilter {@link SiteFilter} site filter for results filtering
+   * @return {@link List} of sites portal config
+   */
+  default List<PortalConfig> getSites(SiteFilter siteFilter) { // NOSONAR
     throw new UnsupportedOperationException();
   }
-
 }

@@ -249,8 +249,8 @@ public class SiteStorageImpl implements SiteStorage {
   }
 
   @Override
-  public List<PortalData> getSitesByFilter(SiteFilter siteFilter) {
-    List<SiteEntity> siteEntities = siteDAO.getSitesByFilter(siteFilter);
+  public List<PortalData> getSites(SiteFilter siteFilter) {
+    List<SiteEntity> siteEntities = siteDAO.findSites(siteFilter);
     return siteEntities.stream().map(this::buildPortalData).toList();
   }
 

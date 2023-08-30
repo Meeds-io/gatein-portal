@@ -68,8 +68,6 @@ import org.exoplatform.portal.mop.SiteType;
         + " WHERE s.siteType = :siteType"
         + " ORDER BY s.name ASC"
 )
-
-
 public class SiteEntity extends ComponentEntity {
 
   private static final long     serialVersionUID = 3036823700771832314L;

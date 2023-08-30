@@ -35,15 +35,9 @@ public class SiteFilter implements Serializable {
 
   private boolean  filterByPermission;
 
-  private boolean  orderByDisplayOrder;
-
   private boolean  displayed;
 
   private boolean  allSites;
-
-  private boolean  orderByName        = true;
-
-  private boolean  orderByDisplayName;
 
   private boolean  expandNavigations;
 
@@ -57,11 +51,8 @@ public class SiteFilter implements Serializable {
                           excludedSiteName,
                           includeEmpty,
                           filterByPermission,
-                          orderByDisplayOrder,
                           displayed,
                           allSites,
-                          orderByName,
-                          orderByDisplayName,
                           expandNavigations,
                           limit,
                           offset);

@@ -17,7 +17,7 @@ import org.exoplatform.services.rest.impl.EnvironmentContext;
 import org.exoplatform.services.test.mock.MockHttpServletRequest;
 
 public class SiteRestServiceTest extends BaseRestServicesTestCase {
-  private SiteDAO       siteDAO;
+  private SiteDAO siteDAO;
 
   @Before
   @Override
@@ -59,7 +59,7 @@ public class SiteRestServiceTest extends BaseRestServicesTestCase {
     List<SiteRestEntity> siteRestEntities = (List<SiteRestEntity>) resp.getEntity();
     assertEquals(3, siteRestEntities.size());
 
-    path = "/v1/sitesManagement?siteType=PORTAL&displayed=true&allSites=false&orderByDisplayOrder=true";
+    path = "/v1/sitesManagement?siteType=PORTAL&displayed=true&allSites=false";
 
     resp = launcher.service("GET", path, "", null, null, envctx);
     assertEquals(200, resp.getStatus());
@@ -69,7 +69,7 @@ public class SiteRestServiceTest extends BaseRestServicesTestCase {
     assertEquals(2, siteRestEntities.size());
     assertEquals(site1.getDisplayOrder(), siteRestEntities.get(0).getDisplayOrder());
     assertEquals(site2.getDisplayOrder(), siteRestEntities.get(1).getDisplayOrder());
-    path = "/v1/sitesManagement?siteType=PORTAL&displayed=true&allSites=false&orderByDisplayOrder=true&excludedSiteName=siteDeux";
+    path = "/v1/sitesManagement?siteType=PORTAL&displayed=true&allSites=false&excludedSiteName=siteDeux";
 
     resp = launcher.service("GET", path, "", null, null, envctx);
     assertEquals(200, resp.getStatus());
