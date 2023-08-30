@@ -15,6 +15,7 @@
  */
 package org.exoplatform.portal.test;
 
+import org.exoplatform.portal.mop.rest.SiteRestServiceTest;
 import org.gatein.portal.encoder.TestEncoderService;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -99,6 +100,7 @@ import org.exoplatform.settings.rest.SettingResourceTest;
     SettingResourceTest.class,
     TestEncoderService.class,
     NewPortalConfigListenerTest.class,
+    SiteRestServiceTest.class,
 })
 public class InitContainer1TestSuite {
 

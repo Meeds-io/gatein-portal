@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.exoplatform.commons.api.persistence.GenericDAO;
 import org.exoplatform.portal.jdbc.entity.SiteEntity;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 
@@ -42,4 +43,5 @@ public interface SiteDAO extends GenericDAO<SiteEntity, Long> {
 
   List<String> findUserSites(int offset, int limit);
 
+  List<SiteEntity> findSites(SiteFilter siteFilter);
 }
