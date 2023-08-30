@@ -320,6 +320,14 @@
     </init-params>
   </component>
 
+  <component>
+    <type>io.meeds.portal.security.service.SecuritySettingService</type>
+  </component>
+
+  <component>
+    <type>io.meeds.portal.security.rest.RegistrationSettingRest</type>
+  </component>
+
   <external-component-plugins>
     <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
     <component-plugin>
