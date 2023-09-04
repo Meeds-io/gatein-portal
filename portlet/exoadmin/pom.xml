@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.exoplatform.gatein.portal</groupId>
     <artifactId>exo.portal.portlet</artifactId>
-    <version>6.4.x-exo-SNAPSHOT</version>
+    <version>6.4.3-exo-RC01</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
