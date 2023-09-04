@@ -95,9 +95,6 @@
   <component>
     <type>org.exoplatform.portal.mop.rest.NavigationRest</type>
   </component>
-  <component>
-    <type>org.exoplatform.portal.mop.rest.SiteRestService</type>
-  </component>
 
   <external-component-plugins>
     <target-component>org.exoplatform.web.filter.ExtensibleFilter</target-component>
