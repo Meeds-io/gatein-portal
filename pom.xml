@@ -39,8 +39,8 @@
   <name>GateIn - Portal</name>
   
   <properties>
-    <org.exoplatform.gatein.sso.version>6.4.x-exo-SNAPSHOT</org.exoplatform.gatein.sso.version>
-    <org.exoplatform.gatein.pc.version>6.4.x-exo-SNAPSHOT</org.exoplatform.gatein.pc.version>
+    <org.exoplatform.gatein.sso.version>6.4.3-exo-RC01</org.exoplatform.gatein.sso.version>
+    <org.exoplatform.gatein.pc.version>6.4.3-exo-RC01</org.exoplatform.gatein.pc.version>
     
     <!-- Default eXo profiles -->
     <surefire.exo.profiles>hsqldb</surefire.exo.profiles>
