@@ -31,15 +31,11 @@ public class SiteFilter implements Serializable {
 
   private String   excludedSiteName;
 
-  private boolean  includeEmpty;
-
   private boolean  filterByPermission;
 
   private boolean  displayed;
 
   private boolean  allSites;
-
-  private boolean  expandNavigations;
 
   private int      limit;
 
@@ -47,15 +43,7 @@ public class SiteFilter implements Serializable {
 
   @Override
   public SiteFilter clone() { // NOSONAR
-    return new SiteFilter(siteType,
-                          excludedSiteName,
-                          includeEmpty,
-                          filterByPermission,
-                          displayed,
-                          allSites,
-                          expandNavigations,
-                          limit,
-                          offset);
+    return new SiteFilter(siteType, excludedSiteName, filterByPermission, displayed, allSites, limit, offset);
   }
 
 }
