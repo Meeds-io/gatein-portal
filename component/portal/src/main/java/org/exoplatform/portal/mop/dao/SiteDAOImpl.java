@@ -204,7 +204,7 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
       query.setParameter(SITE_TYPE, filter.getSiteType());
     }
     if (!filter.isAllSites()) {
-      query.setParameter(DISPLAYED, filter.isDisplayed());
+      query.setParameter(DISPLAYED, filter.getDisplayed());
     }
     if (StringUtils.isNotBlank(filter.getExcludedSiteName())) {
       query.setParameter(SITE_NAME, filter.getExcludedSiteName());

@@ -89,7 +89,7 @@ public class InMemorySiteDAO extends AbstractInMemoryDAO<SiteEntity> implements 
       if (filter.isAllSites()) {
         return filter.getSiteType() == null || filter.getSiteType() == siteEntity.getSiteType();
       } else {
-        return siteEntity.isDisplayed() == filter.isDisplayed() && siteEntity.getSiteType() == filter.getSiteType();
+        return siteEntity.isDisplayed() == filter.getDisplayed() && siteEntity.getSiteType() == filter.getSiteType();
       }
     }).toList();
     if (StringUtils.isNotBlank(filter.getExcludedSiteName())) {
