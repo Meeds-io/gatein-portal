@@ -98,7 +98,7 @@ import org.exoplatform.settings.rest.SettingResourceTest;
     TestListTree.class,
     SettingResourceTest.class,
     TestEncoderService.class,
-    NewPortalConfigListenerTest.class
+    NewPortalConfigListenerTest.class,
 })
 public class InitContainer1TestSuite {
 
