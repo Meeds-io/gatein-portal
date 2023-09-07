@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.PageType;
+import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.user.UserNode;
 import org.exoplatform.services.log.ExoLogger;
@@ -39,6 +40,7 @@ import org.exoplatform.services.organization.OrganizationService;
 public class EntityBuilder {
   private static final Log LOG = ExoLogger.getLogger(EntityBuilder.class);
 
+  public static final String             GROUP = "group";
   private EntityBuilder() { // NOSONAR
   }
 
@@ -66,7 +68,7 @@ public class EntityBuilder {
           Map<String, Object> editPermission = new HashMap<>();
           try {
             editPermission.put("membershipType", userNodePage.getEditPermission().split(":")[0]);
-            editPermission.put("group",
+            editPermission.put(GROUP,
                                organizationService.getGroupHandler()
                                                   .findGroupById(userNodePage.getEditPermission().split(":")[1]));
           } catch (Exception e) {
@@ -85,7 +87,7 @@ public class EntityBuilder {
               Map<String, Object> accessPermission = new HashMap<>();
               try {
                 accessPermission.put("membershipType", permission.split(":")[0]);
-                accessPermission.put("group", organizationService.getGroupHandler().findGroupById(permission.split(":")[1]));
+                accessPermission.put(GROUP, organizationService.getGroupHandler().findGroupById(permission.split(":")[1]));
               } catch (Exception e) {
                 LOG.warn("Error when getting group with id {}", permission.split(":")[1], e);
               }
