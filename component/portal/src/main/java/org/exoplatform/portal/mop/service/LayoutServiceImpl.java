@@ -118,6 +118,12 @@ public class LayoutServiceImpl implements LayoutService {
   }
 
   @Override
+  public PortalConfig getPortalConfig(long siteId) {
+    PortalData portalData = siteStorage.getPortalConfig(siteId);
+    return portalData == null ? null : new PortalConfig(portalData);
+  }
+
+  @Override
   public PortalConfig getPortalConfig(String ownerType, String portalName) {
     return siteStorage.getPortalConfig(ownerType, portalName);
   }
