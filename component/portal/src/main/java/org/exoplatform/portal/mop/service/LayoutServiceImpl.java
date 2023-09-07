@@ -33,6 +33,7 @@ import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.portal.application.PortletPreferences;
 import org.exoplatform.portal.config.Query;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
@@ -41,6 +42,7 @@ import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.QueryResult;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.Status;
@@ -70,16 +72,20 @@ public class LayoutServiceImpl implements LayoutService {
 
   private LayoutStorage          layoutStorage;
 
+  private UserACL                userACL;
+
   private Map<String, Container> sharedLayouts = new HashMap<>();
 
   public LayoutServiceImpl(ListenerService listenerService,
                            SiteStorage siteStorage,
                            PageStorage pageStorage,
-                           LayoutStorage layoutStorage) {
+                           LayoutStorage layoutStorage,
+                           UserACL userACL) {
     this.listenerService = listenerService;
     this.siteStorage = siteStorage;
     this.pageStorage = pageStorage;
     this.layoutStorage = layoutStorage;
+    this.userACL = userACL;
   }
 
   @Override
@@ -360,6 +366,21 @@ public class LayoutServiceImpl implements LayoutService {
     } else {
       throw new UnsupportedOperationException("Could not perform search on query " + q);
     }
+  }
+
+  @Override
+  public List<PortalConfig> getSites(SiteFilter filter) {
+    List<PortalData> portalDataList = siteStorage.getSites(filter);
+    List<PortalConfig> sites = portalDataList.isEmpty() ? Collections.emptyList()
+                                                            : portalDataList.stream().map(PortalConfig::new).toList();
+    return filter.isFilterByPermission() ? getFilteredSitesByPermission(sites) : sites;
+  }
+
+  private List<PortalConfig> getFilteredSitesByPermission(List<PortalConfig> sites) {
+    if (sites.isEmpty()) {
+      return Collections.emptyList();
+    }
+    return sites.stream().filter(userACL::hasPermission).toList();
   }
 
   private abstract class Bilto<O extends ModelObject, D extends ModelData> {

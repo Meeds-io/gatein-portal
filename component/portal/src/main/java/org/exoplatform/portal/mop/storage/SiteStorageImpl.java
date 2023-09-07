@@ -35,6 +35,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.impl.UnmarshallingContext;
@@ -245,6 +246,12 @@ public class SiteStorageImpl implements SiteStorage {
     } catch (Exception e) {
       throw new IllegalStateException("Unable to parse shared layout foud in path: " + path, e);
     }
+  }
+
+  @Override
+  public List<PortalData> getSites(SiteFilter siteFilter) {
+    List<SiteEntity> siteEntities = siteDAO.findSites(siteFilter);
+    return siteEntities.stream().map(this::buildPortalData).toList();
   }
 
   private void buildSiteEntity(SiteEntity entity, PortalData config) {
