@@ -53,21 +53,12 @@ public class SecuritySettingService {
   protected static final String               EXTRA_GROUPS_SEPARATOR             = ",";
 
   protected static final UserRegistrationType DEFAULT_REGISTRATION_TYPE          =
-                                                                        UserRegistrationType.valueOf(System.getProperty("meeds.security.registration.type",
-                                                                                                                        OPEN.name()));
+                                                                        UserRegistrationType.valueOf(System.getProperty("meeds.settings.access.type.default",
+                                                                                                                        OPEN.name()).toUpperCase());
 
   protected static final boolean              DEFAULT_REGISTRATION_EXTERNAL_USER =
-                                                                                 Boolean.parseBoolean(System.getProperty("meeds.security.registration.externalUser",
-                                                                                                                         "false"));
-
-  protected static final String[]             DEFAULT_REGISTRATION_EXTRA_GROUPS  =
-                                                                                Arrays.stream(System.getProperty("meeds.security.registration.extraGroups",
-                                                                                                                 "")
-                                                                                                    .trim()
-                                                                                                    .split(EXTRA_GROUPS_SEPARATOR))
-                                                                                      .filter(StringUtils::isNotBlank)
-                                                                                      .distinct()
-                                                                                      .toArray(String[]::new);
+                                                                                 Boolean.parseBoolean(System.getProperty("meeds.settings.access.externalUsers",
+                                                                                                                         "false").toLowerCase());
 
   private RegistrationSetting                 registrationSetting;
 
@@ -148,7 +139,7 @@ public class SecuritySettingService {
   public String[] getRegistrationExtraGroupIds() {
     SettingValue<?> settingValue = settingService.get(SECURITY_CONTEXT, SECURITY_SCOPE, REGISTRATION_EXTRA_GROUPS_PARAM);
     if (settingValue == null || settingValue.getValue() == null) {
-      return DEFAULT_REGISTRATION_EXTRA_GROUPS;
+      return new String[0];
     } else {
       return Arrays.stream(settingValue.getValue().toString().split(EXTRA_GROUPS_SEPARATOR))
                    .filter(StringUtils::isNotBlank)
@@ -160,7 +151,7 @@ public class SecuritySettingService {
   public void saveRegistrationExtraGroupIds(String[] groupIds) {
     try {
       if (groupIds == null) {
-        groupIds = DEFAULT_REGISTRATION_EXTRA_GROUPS;
+        groupIds = new String[0];
       }
       settingService.set(SECURITY_CONTEXT,
                          SECURITY_SCOPE,

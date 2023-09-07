@@ -20,7 +20,6 @@
 package io.meeds.portal.security.service;
 
 import static io.meeds.portal.security.service.SecuritySettingService.DEFAULT_REGISTRATION_EXTERNAL_USER;
-import static io.meeds.portal.security.service.SecuritySettingService.DEFAULT_REGISTRATION_EXTRA_GROUPS;
 import static io.meeds.portal.security.service.SecuritySettingService.DEFAULT_REGISTRATION_TYPE;
 import static io.meeds.portal.security.service.SecuritySettingService.EXTERNAL_USERS_GROUP;
 import static io.meeds.portal.security.service.SecuritySettingService.EXTRA_GROUPS_SEPARATOR;
@@ -76,8 +75,9 @@ public class SettingSecurityServieTest {
     RegistrationSetting registrationSetting = securitySettingService.getRegistrationSetting();
     assertNotNull(registrationSetting); // NOSONAR
     assertEquals(DEFAULT_REGISTRATION_TYPE, registrationSetting.getType());
-    assertEquals(Arrays.asList(DEFAULT_REGISTRATION_EXTRA_GROUPS), Arrays.asList(registrationSetting.getExtraGroupIds()));
     assertEquals(DEFAULT_REGISTRATION_EXTERNAL_USER, registrationSetting.isExternalUser());
+    assertNotNull(registrationSetting.getExtraGroupIds());
+    assertEquals(0, registrationSetting.getExtraGroupIds().length);
   }
 
   @Test
