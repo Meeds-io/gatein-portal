@@ -97,6 +97,15 @@ public interface LayoutService extends DataStorage {
   PortalConfig getPortalConfig(SiteKey siteKey);
 
   /**
+   * This method should load the PortalConfig object from db according to the
+   * siteId
+   *
+   * @param  siteId
+   * @return            {@link PortalConfig}
+   */
+  PortalConfig getPortalConfig(long siteId);
+
+  /**
    * Remove the PortalConfig from the database <br>
    * Then broadcast PORTAL_CONFIG_REMOVED event
    *

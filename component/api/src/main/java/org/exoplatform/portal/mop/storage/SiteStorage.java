@@ -45,6 +45,8 @@ public interface SiteStorage extends ModelDataStorage {
 
   PortalData getPortalConfig(SiteKey siteKey);
 
+  PortalData getPortalConfig(long siteId);
+
   PortalData getPortalConfig(PortalKey key);
 
   PortalConfig getPortalConfig(String ownerType, String portalName);
