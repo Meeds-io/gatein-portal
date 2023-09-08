@@ -103,16 +103,17 @@ public class SiteDAOTest extends AbstractDAOTest {
     assertEquals(2, results.size());
     assertEquals(siteEntity4.getName(), results.get(1).getName());
     
-//    filter.setSortByDisplayOrder(true);
-//    results = siteDAO.findSites(filter);
-//    assertEquals(2, results.size());
-//    assertEquals(siteEntity3.getName(), results.get(1).getName());
-//    
-//    siteEntity3.setDisplayOrder(2);
-//    siteDAO.update(siteEntity3);
-//    results = siteDAO.findSites(filter);
-//    assertEquals(2, results.size());
-//    assertEquals(siteEntity4.getName(), results.get(1).getName());
+    filter.setFilterByDisplayed(false);
+    filter.setSortByDisplayOrder(true);
+    results = siteDAO.findSites(filter);
+    assertEquals(2, results.size());
+    assertEquals(siteEntity3.getName(), results.get(1).getName());
+    
+    siteEntity3.setDisplayOrder(2);
+    siteDAO.update(siteEntity3);
+    results = siteDAO.findSites(filter);
+    assertEquals(2, results.size());
+    assertEquals(siteEntity4.getName(), results.get(1).getName());
     
     siteEntity3.setName("/spaces/test3");
     siteDAO.update(siteEntity3);
@@ -122,7 +123,6 @@ public class SiteDAOTest extends AbstractDAOTest {
     assertEquals(siteEntity4.getName(), results.get(0).getName());
     
     filter.setExcludedSiteType(null);
-    filter.setFilterByDisplayed(false);
     results = siteDAO.findSites(filter);
     assertEquals(3, results.size());
     
