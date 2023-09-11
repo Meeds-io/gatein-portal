@@ -85,8 +85,7 @@ public class RegisterHandler extends JspBasedWebHandler {
 
   public static final String             CAPTCHA_PARAM                 = "captcha";
 
-  public static final UserFieldValidator EMAIL_VALIDATOR               =
-                                                         new UserFieldValidator(EMAIL_PARAM, false, false);
+  public static final UserFieldValidator EMAIL_VALIDATOR               = new UserFieldValidator(EMAIL_PARAM, false, false);
 
   public static final String             ONBOARDING_EMAIL_SENT_MESSAGE = "onboardingEmailSent";
 
@@ -106,11 +105,11 @@ public class RegisterHandler extends JspBasedWebHandler {
 
   private ResourceBundleService          resourceBundleService;
 
+  private RegisterUIParamsExtension      registerUIParamsExtension;
+
   private ServletContext                 servletContext;
 
   private String                         registerJspPath;
-
-  private boolean                        enabled;
 
   public RegisterHandler(PortalContainer container, // NOSONAR
                          ResourceBundleService resourceBundleService,
@@ -127,7 +126,7 @@ public class RegisterHandler extends JspBasedWebHandler {
     this.passwordRecoveryService = passwordRecoveryService;
     this.organizationService = organizationService;
     this.resourceBundleService = resourceBundleService;
-    this.enabled = registerUIParamsExtension != null && registerUIParamsExtension.isRegisterEnabled();
+    this.registerUIParamsExtension = registerUIParamsExtension;
     this.servletContext = container.getPortalContext();
     if (params != null && params.containsKey(REGISTER_JSP_PATH_PARAM)) {
       this.registerJspPath = params.getValueParam(REGISTER_JSP_PATH_PARAM).getValue();
@@ -154,8 +153,7 @@ public class RegisterHandler extends JspBasedWebHandler {
       return false;
     }
 
-    if (!enabled) {
-      LOG.warn("An hack tentative for user registration was detected");
+    if (!registerUIParamsExtension.isRegisterEnabled()) {
       response.setStatus(401);
       return true;
     }
