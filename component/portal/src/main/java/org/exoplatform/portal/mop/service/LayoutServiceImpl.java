@@ -371,16 +371,8 @@ public class LayoutServiceImpl implements LayoutService {
   @Override
   public List<PortalConfig> getSites(SiteFilter filter) {
     List<PortalData> portalDataList = siteStorage.getSites(filter);
-    List<PortalConfig> sites = portalDataList.isEmpty() ? Collections.emptyList()
+    return portalDataList.isEmpty() ? Collections.emptyList()
                                                             : portalDataList.stream().map(PortalConfig::new).toList();
-    return filter.isFilterByPermission() ? getFilteredSitesByPermission(sites) : sites;
-  }
-
-  private List<PortalConfig> getFilteredSitesByPermission(List<PortalConfig> sites) {
-    if (sites.isEmpty()) {
-      return Collections.emptyList();
-    }
-    return sites.stream().filter(userACL::hasPermission).toList();
   }
 
   private abstract class Bilto<O extends ModelObject, D extends ModelData> {

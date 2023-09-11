@@ -86,11 +86,10 @@ public class InMemorySiteDAO extends AbstractInMemoryDAO<SiteEntity> implements 
   @Override
   public List<SiteEntity> findSites(SiteFilter filter) {
     List<SiteEntity> res = entities.values().stream().filter(siteEntity -> {
-      if (filter.isAllSites()) {
-        return filter.getSiteType() == null || filter.getSiteType() == siteEntity.getSiteType();
-      } else {
-        return siteEntity.isDisplayed() == filter.getDisplayed() && siteEntity.getSiteType() == filter.getSiteType();
+      if (filter.isFilterByDisplayed()) {
+        return siteEntity.isDisplayed() == filter.isDisplayed();
       }
+      return true;
     }).toList();
     if (StringUtils.isNotBlank(filter.getExcludedSiteName())) {
       res = res.stream().filter(siteEntity -> !siteEntity.getName().equals(filter.getExcludedSiteName())).toList();

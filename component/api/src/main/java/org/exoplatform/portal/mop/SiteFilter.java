@@ -16,11 +16,11 @@
  */
 package org.exoplatform.portal.mop;
 
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
@@ -29,13 +29,17 @@ public class SiteFilter implements Serializable {
 
   private SiteType siteType;
 
+  private SiteType excludedSiteType;
+
   private String   excludedSiteName;
 
-  private boolean  filterByPermission;
+  private boolean  excludeSpaceSites;
+  
+  private boolean  sortByDisplayOrder;
 
-  private Boolean  displayed;
+  private boolean  filterByDisplayed;
 
-  private boolean  allSites;
+  private boolean  displayed;
 
   private int      limit;
 
@@ -43,7 +47,15 @@ public class SiteFilter implements Serializable {
 
   @Override
   public SiteFilter clone() { // NOSONAR
-    return new SiteFilter(siteType, excludedSiteName, filterByPermission, displayed, allSites, limit, offset);
+    return new SiteFilter(siteType,
+                          excludedSiteType,
+                          excludedSiteName,
+                          excludeSpaceSites,
+                          sortByDisplayOrder,
+                          filterByDisplayed,
+                          displayed,
+                          limit,
+                          offset);
   }
 
 }
