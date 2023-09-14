@@ -15,6 +15,7 @@
  */
 package org.exoplatform.portal.mop.storage;
 
+import java.io.InputStream;
 import java.util.List;
 
 import org.exoplatform.portal.config.model.Container;
@@ -68,4 +69,5 @@ public interface SiteStorage extends ModelDataStorage {
   Container getSharedLayout(String siteName);
 
   List<PortalData> getSites(SiteFilter siteFilter);
+
 }

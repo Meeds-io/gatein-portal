@@ -378,4 +378,9 @@
       <column name="DISPLAY_ORDER" type="INT" defaultValueNumeric="0" />
     </addColumn>
   </changeSet>
+  <changeSet author="portal" id="1.0.0-36">
+    <addColumn tableName="PORTAL_SITES">
+      <column name="BANNER_FILE_ID" type="BIGINT" defaultValueNumeric="0" />
+    </addColumn>
+  </changeSet>
 </databaseChangeLog>
