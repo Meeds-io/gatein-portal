@@ -184,6 +184,12 @@ public class SiteStorageImpl implements SiteStorage {
   }
 
   @Override
+  public PortalData getPortalConfig(long siteId) {
+    SiteEntity entity = siteDAO.find(siteId);
+    return buildPortalData(entity);
+  }
+
+  @Override
   public List<String> getSiteNames(SiteType siteType, int offset, int limit) {
     return switch (siteType) {
     case PORTAL -> siteDAO.findPortalSites(offset, limit);
