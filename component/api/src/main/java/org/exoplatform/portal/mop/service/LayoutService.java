@@ -15,9 +15,12 @@
  */
 package org.exoplatform.portal.mop.service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Comparator;
 import java.util.List;
 
+import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.portal.config.DataStorage;
@@ -327,7 +330,29 @@ public interface LayoutService extends DataStorage {
    * @param siteFilter {@link SiteFilter} site filter for results filtering
    * @return {@link List} of sites portal config
    */
-  default List<PortalConfig> getSites(SiteFilter siteFilter) { // NOSONAR
+  default List<PortalConfig> getSites(SiteFilter siteFilter) {
     throw new UnsupportedOperationException();
   }
+
+  /**
+   * Retrieve site banner as stream
+   *
+   * @param siteName name of the portal site
+   * @return found {@link InputStream}
+   * @throws ObjectNotFoundException When site not found or file attachment
+   */
+  default InputStream getSiteBannerStream(String siteName) throws ObjectNotFoundException, IOException {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * remove site banner
+   *
+   * @param siteName name of the portal site
+   * @throws ObjectNotFoundException When site not found or file attachment
+   */
+  default void removeSiteBanner(String siteName) throws ObjectNotFoundException {
+    throw new UnsupportedOperationException();
+  }
+
 }

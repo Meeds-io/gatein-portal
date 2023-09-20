@@ -25,7 +25,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * @author  <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
 @Data
@@ -68,7 +68,11 @@ public class PortalData extends ModelData {
   private final boolean             displayed;
 
   private final int                 displayOrder;
-  
+
+  private String                    bannerUploadId;
+
+  private long                      bannerFileId;
+
   private PortalData() {
     super(null, null);
     this.key = null;
@@ -99,7 +103,9 @@ public class PortalData extends ModelData {
                     ContainerData portalLayout,
                     List<RedirectData> redirects,
                     boolean displayed,
-                    int displayOrder) {
+                    int displayOrder,
+                    String bannerUploadId,
+                    long bannerFileId) {
     this(storageId,
          name,
          type,
@@ -114,7 +120,9 @@ public class PortalData extends ModelData {
          false,
          redirects,
          displayed,
-         displayOrder);
+         displayOrder,
+         bannerUploadId,
+         bannerFileId);
   }
 
   public PortalData(String storageId, // NOSONAR
@@ -131,7 +139,9 @@ public class PortalData extends ModelData {
                     boolean defaultLayout,
                     List<RedirectData> redirects,
                     boolean displayed,
-                    int displayOrder) {
+                    int displayOrder,
+                    String bannerUploadId,
+                    long bannerFileId) {
     super(storageId, null);
 
     //
@@ -148,6 +158,8 @@ public class PortalData extends ModelData {
     this.defaultLayout = defaultLayout;
     this.displayed = displayed;
     this.displayOrder = displayOrder;
+    this.bannerUploadId = bannerUploadId;
+    this.bannerFileId = bannerFileId;
   }
 
   public String getName() {
