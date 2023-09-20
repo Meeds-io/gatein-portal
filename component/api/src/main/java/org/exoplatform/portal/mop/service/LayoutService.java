@@ -330,30 +330,28 @@ public interface LayoutService extends DataStorage {
    * @param siteFilter {@link SiteFilter} site filter for results filtering
    * @return {@link List} of sites portal config
    */
-  default List<PortalConfig> getSites(SiteFilter siteFilter) { // NOSONAR
+  default List<PortalConfig> getSites(SiteFilter siteFilter) {
     throw new UnsupportedOperationException();
   }
 
   /**
    * Retrieve site banner as stream
    *
-   * @param  siteName name of the portal site
-   * @return                         found {@link InputStream}   *
-   * @throws ObjectNotFoundException When program not found or file attachment
-   *
+   * @param siteName name of the portal site
+   * @return found {@link InputStream}
+   * @throws ObjectNotFoundException When site not found or file attachment
    */
-  default InputStream getSiteBannerStream(String siteName) throws ObjectNotFoundException, IOException { // NOSONAR
+  default InputStream getSiteBannerStream(String siteName) throws ObjectNotFoundException, IOException {
     throw new UnsupportedOperationException();
   }
 
   /**
-   * remove site banner as stream
+   * remove site banner
    *
-   * @param  siteName name of the portal site
-   * @throws ObjectNotFoundException When program not found or file attachment
-   *
+   * @param siteName name of the portal site
+   * @throws ObjectNotFoundException When site not found or file attachment
    */
-  default void removeSiteBanner(String siteName) throws ObjectNotFoundException { // NOSONAR
+  default void removeSiteBanner(String siteName) throws ObjectNotFoundException {
     throw new UnsupportedOperationException();
   }
 

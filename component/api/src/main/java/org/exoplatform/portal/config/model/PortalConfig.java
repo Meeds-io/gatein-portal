@@ -331,19 +331,19 @@ public class PortalConfig extends ModelObject implements Cloneable {
     }
 
     public String getBannerUploadId() {
-        return bannerUploadId;
+      return bannerUploadId;
     }
 
     public void setBannerUploadId(String bannerUploadId) {
-        this.bannerUploadId = bannerUploadId;
+      this.bannerUploadId = bannerUploadId;
     }
 
     public long getBannerFileId() {
-        return bannerFileId;
+      return bannerFileId;
     }
 
     public void setBannerFileId(long bannerFileId) {
-        this.bannerFileId = bannerFileId;
+      this.bannerFileId = bannerFileId;
     }
 
     public static class PortalConfigSet {

@@ -27,8 +27,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Date;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.file.model.FileItem;
@@ -385,7 +390,7 @@ public class SiteStorageImpl implements SiteStorage {
     if (uploadResource == null) {
       throw new IllegalStateException("Can't find uploaded resource with id : " + uploadId);
     }
-    try { // NOSONAR
+    try {
       InputStream inputStream = new FileInputStream(uploadResource.getStoreLocation());
       FileItem fileItem = new FileItem(null,
               uploadResource.getFileName(),
