@@ -18,6 +18,7 @@ package org.exoplatform.portal.mop.storage.cache;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.cache.future.FutureExoCache;
 import org.exoplatform.commons.cache.future.Loader;
+import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.dao.SiteDAO;
@@ -29,6 +30,7 @@ import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
+import org.exoplatform.upload.UploadService;
 
 public class CacheSiteStorage extends SiteStorageImpl {
 
@@ -44,8 +46,10 @@ public class CacheSiteStorage extends SiteStorageImpl {
                           NavigationStorage navigationStorage,
                           PageStorage pageStorage,
                           LayoutStorage layoutStorage,
-                          SiteDAO siteDAO) {
-    super(settingService, configurationManager, navigationStorage, pageStorage, layoutStorage, siteDAO);
+                          SiteDAO siteDAO,
+                          UploadService uploadService,
+                          FileService fileService) {
+    super(settingService, configurationManager, navigationStorage, pageStorage, layoutStorage, siteDAO, uploadService, fileService);
     this.siteCache = cacheService.getCacheInstance(SITE_CACHE_NAME);
     this.siteFutureCache = new FutureExoCache<>(new Loader<SiteKey, PortalData, Object>() {
       @Override

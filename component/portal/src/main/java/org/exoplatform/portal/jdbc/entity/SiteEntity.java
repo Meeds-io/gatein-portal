@@ -114,6 +114,9 @@ public class SiteEntity extends ComponentEntity {
   @Column(name = "DISPLAY_ORDER")
   private int               displayOrder;
 
+  @Column(name = "BANNER_FILE_ID")
+  protected long            bannerFileId;
+
   public Long getId() {
     return id;
   }
@@ -216,6 +219,14 @@ public class SiteEntity extends ComponentEntity {
 
   public void setDisplayOrder(int displayOrder) {
     this.displayOrder = displayOrder;
+  }
+
+  public long getBannerFileId() {
+    return bannerFileId;
+  }
+
+  public void setBannerFileId(long bannerFileId) {
+    this.bannerFileId = bannerFileId;
   }
 
   @Override

@@ -77,6 +77,10 @@ public class PortalConfig extends ModelObject implements Cloneable {
 
     private int                 displayOrder;
 
+    private String                  bannerUploadId;
+
+    private long                    bannerFileId;
+
     // TODO: storing this as a LinkedHashMap might make more sense (ordered + able to retrieve element based on redirect name
     private ArrayList<PortalRedirect> portalRedirects;
 
@@ -119,6 +123,8 @@ public class PortalConfig extends ModelObject implements Cloneable {
         this.portalRedirects = buildPortalRedirects(data.getRedirects());
         this.displayed = data.isDisplayed();
         this.displayOrder = data.getDisplayOrder();
+        this.bannerFileId= data.getBannerFileId();
+        this.bannerUploadId = data.getBannerUploadId();
     }
 
     public String getType() {
@@ -324,6 +330,22 @@ public class PortalConfig extends ModelObject implements Cloneable {
         this.displayOrder = displayOrder;
     }
 
+    public String getBannerUploadId() {
+      return bannerUploadId;
+    }
+
+    public void setBannerUploadId(String bannerUploadId) {
+      this.bannerUploadId = bannerUploadId;
+    }
+
+    public long getBannerFileId() {
+      return bannerFileId;
+    }
+
+    public void setBannerFileId(long bannerFileId) {
+      this.bannerFileId = bannerFileId;
+    }
+
     public static class PortalConfigSet {
         private ArrayList<PortalConfig> portalConfigs;
 
@@ -368,7 +390,7 @@ public class PortalConfig extends ModelObject implements Cloneable {
         List<String> accessPermissions = Utils.safeImmutableList(this.accessPermissions);
         Map<String, String> properties = Utils.safeImmutableMap(this.properties);
         return new PortalData(storageId, name, type, locale, label, description, accessPermissions, editPermission, properties,
-                skin, portalLayout.build(), defaultLayout, buildRedirectData(), displayed, displayOrder);
+                skin, portalLayout.build(), defaultLayout, buildRedirectData(), displayed, displayOrder, bannerUploadId, bannerFileId);
     }
 
     private ArrayList<RedirectData> buildRedirectData() {
