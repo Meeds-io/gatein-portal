@@ -83,5 +83,6 @@
       <show-info-bar>false</show-info-bar>
     </portlet-application>
   </portal-layout>
-
+  <displayed>true</displayed>
+  <display-order>1</display-order>
 </portal-config>

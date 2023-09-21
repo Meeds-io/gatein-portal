@@ -30,5 +30,6 @@
 
   <portal-layout>
   </portal-layout>
-
+  <displayed>true</displayed>
+  <display-order>3</display-order>
 </portal-config>
