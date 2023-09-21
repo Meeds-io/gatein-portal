@@ -27,6 +27,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.container.*;
 import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.url.PortalURLContext;
@@ -68,18 +70,23 @@ public class DefaultRequestHandler extends WebRequestHandler {
 
         if (StringUtils.isBlank(defaultUri)) {
           String defaultPortal = configService.getDefaultPortal();
-          List<String> portalNames = configService.getSiteNames(SiteType.PORTAL, 0, 10);
-          boolean emptyPortalList = portalNames == null || portalNames.isEmpty();
-          boolean canAccessDefaultPortal = portalNames != null && portalNames.contains(defaultPortal);
-          if (!emptyPortalList && !canAccessDefaultPortal) {
-            defaultPortal = portalNames.get(0);
-          } else if (emptyPortalList) {
+          SiteFilter siteFilter = new SiteFilter();
+          siteFilter.setExcludedSiteName(configService.getGlobalPortal());
+          siteFilter.setSiteType(SiteType.PORTAL);
+          siteFilter.setSortByDisplayOrder(true);
+          siteFilter.setFilterByDisplayed(true);
+          siteFilter.setDisplayed(true);
+          siteFilter.setLimit(1);
+          siteFilter.setOffset(0);
+          List<PortalConfig> portalConfigList = configService.getSites(siteFilter);
+          if (portalConfigList != null && !portalConfigList.isEmpty()) {
+            defaultPortal = portalConfigList.get(0).getName();
+          } else {
             HttpServletResponse resp = context.getResponse();
             String currentPortalContainerName = PortalContainer.getCurrentPortalContainerName();
             resp.sendRedirect("/" + currentPortalContainerName + "/login");
             return true;
           }
-
           PortalURLContext urlContext = new PortalURLContext(context, SiteKey.portal(defaultPortal));
           NodeURL url = urlFactory.newURL(NodeURL.TYPE, urlContext);
           defaultUri = url.setResource(new NavigationResource(SiteType.PORTAL, defaultPortal, "")).toString();
