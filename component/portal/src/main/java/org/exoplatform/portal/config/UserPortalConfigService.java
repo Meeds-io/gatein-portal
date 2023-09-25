@@ -29,6 +29,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.picocontainer.Startable;
 
 import org.exoplatform.commons.api.settings.SettingService;
@@ -527,6 +528,11 @@ public class UserPortalConfigService implements Startable {
         }
       }
       return list;
+    }
+
+    public List<PortalConfig> getSites(SiteFilter siteFilter) {
+      List<PortalConfig> list = layoutService.getSites(siteFilter);
+      return list.stream().filter(config -> config != null && userACL_.hasPermission(config)).toList();
     }
 
     /**

@@ -28,6 +28,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -60,8 +62,9 @@ public class DefaultRequestHandlerTest {
 
     try {
       String defaultSite = "site2";
-      when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
-      when(portalConfigService.getSiteNames(eq(SiteType.PORTAL), anyInt(), anyInt())).thenReturn(Arrays.asList("site1", defaultSite));
+      PortalConfig defaultPortalConfig = mock(PortalConfig.class);
+      when(defaultPortalConfig.getName()).thenReturn(defaultSite);
+      when(portalConfigService.getSites(any(SiteFilter.class))).thenReturn(Arrays.asList(defaultPortalConfig));
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
 
@@ -122,8 +125,9 @@ public class DefaultRequestHandlerTest {
 
     try {
       String defaultSite = "site2";
-      when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
-      when(portalConfigService.getSiteNames(eq(SiteType.PORTAL), anyInt(), anyInt())).thenReturn(Arrays.asList("site1", defaultSite));
+      PortalConfig defaultPortalConfig = mock(PortalConfig.class);
+      when(defaultPortalConfig.getName()).thenReturn(defaultSite);
+      when(portalConfigService.getSites(any(SiteFilter.class))).thenReturn(Arrays.asList(defaultPortalConfig));
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
       when(request.getRemoteUser()).thenReturn("user");
@@ -155,9 +159,9 @@ public class DefaultRequestHandlerTest {
     HttpServletRequest request = mock(HttpServletRequest.class);
 
     try {
-      String defaultSite = "site2";
-      when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
-      when(portalConfigService.getSiteNames(eq(SiteType.PORTAL), anyInt(), anyInt())).thenReturn(Arrays.asList("site1"));
+      PortalConfig defaultPortalConfig = mock(PortalConfig.class);
+      when(defaultPortalConfig.getName()).thenReturn("site1");
+      when(portalConfigService.getSites(any(SiteFilter.class))).thenReturn(Arrays.asList(defaultPortalConfig));
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
 
@@ -217,9 +221,7 @@ public class DefaultRequestHandlerTest {
     HttpServletRequest request = mock(HttpServletRequest.class);
 
     try {
-      String defaultSite = "site2";
-      when(portalConfigService.getDefaultPortal()).thenReturn(defaultSite);
-      when(portalConfigService.getSiteNames(eq(SiteType.PORTAL), anyInt(), anyInt())).thenReturn(Arrays.asList());
+      when(portalConfigService.getSites(any(SiteFilter.class))).thenReturn(null);
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
 
