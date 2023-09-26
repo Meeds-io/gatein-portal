@@ -62,7 +62,7 @@ public class TestJDBCNavigationService extends AbstractKernelTest {
         ContainerData container = new ContainerData(null, "testcontainer_" + siteName, "", "", "", "", "", "", "",
                 "", "", "", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
         PortalData portal = new PortalData(null, siteName, type.getName(), null, null,
-                null, new ArrayList<>(), null, null, null, container, null, true, 9);
+                null, new ArrayList<>(), null, null, null, container, null, true, 9, "", 0);
         this.modelStorage.create(portal);
 
         NavigationContext nav = new NavigationContext(type.key(siteName), new NavigationState(1));

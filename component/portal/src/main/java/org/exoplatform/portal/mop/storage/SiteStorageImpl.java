@@ -23,19 +23,25 @@ import static org.exoplatform.portal.mop.storage.utils.MOPUtils.parseJsonArray;
 import static org.exoplatform.portal.mop.storage.utils.MOPUtils.parseJsonObject;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Date;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.commons.file.model.FileItem;
+import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.portal.mop.SiteFilter;
+import org.exoplatform.services.security.IdentityConstants;
+import org.exoplatform.upload.UploadResource;
+import org.exoplatform.upload.UploadService;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.impl.UnmarshallingContext;
@@ -75,6 +81,9 @@ public class SiteStorageImpl implements SiteStorage {
 
   private static final Log     LOG                       = ExoLogger.getExoLogger(SiteStorageImpl.class);
 
+  private static final String FILE_API_NAME_SPACE = "sites";
+
+
   private SettingService       settingService;
 
   private ConfigurationManager configurationManager;
@@ -87,18 +96,26 @@ public class SiteStorageImpl implements SiteStorage {
 
   private SiteDAO              siteDAO;
 
+  private final UploadService uploadService;
+
+  private final FileService fileService;
+
   public SiteStorageImpl(SettingService settingService,
                          ConfigurationManager configurationManager,
                          NavigationStorage navigationStorage,
                          PageStorage pageStorage,
                          LayoutStorage layoutStorage,
-                         SiteDAO siteDAO) {
+                         SiteDAO siteDAO,
+                        UploadService uploadService,
+                         FileService fileService) {
     this.navigationStorage = navigationStorage;
     this.pageStorage = pageStorage;
     this.layoutStorage = layoutStorage;
     this.settingService = settingService;
     this.configurationManager = configurationManager;
     this.siteDAO = siteDAO;
+    this.uploadService = uploadService;
+    this.fileService = fileService;
   }
 
   @Override
@@ -110,6 +127,10 @@ public class SiteStorageImpl implements SiteStorage {
   public void create(PortalData config) {
     SiteEntity entity = new SiteEntity();
     buildSiteEntity(entity, config);
+    if (StringUtils.isNotBlank(config.getBannerUploadId())) {
+      Long bannerFileId = saveSiteBanner(config.getBannerUploadId(), config.getBannerFileId());
+      entity.setBannerFileId(bannerFileId == null ? 0 : bannerFileId);
+    }
     entity = siteDAO.create(entity);
     savePermissions(entity.getId(), config);
   }
@@ -127,6 +148,10 @@ public class SiteStorageImpl implements SiteStorage {
       throw new IllegalStateException("Cannot update portal " + config.getName() + " that does not exist");
     }
     buildSiteEntity(entity, config);
+    if (StringUtils.isNotBlank(config.getBannerUploadId())) {
+      Long bannerFileId = saveSiteBanner(config.getBannerUploadId(), config.getBannerFileId());
+      entity.setBannerFileId(bannerFileId == null ? 0 : bannerFileId);
+    }
     entity = siteDAO.update(entity);
     savePermissions(entity.getId(), config);
   }
@@ -260,6 +285,7 @@ public class SiteStorageImpl implements SiteStorage {
     return siteEntities.stream().map(this::buildPortalData).toList();
   }
 
+
   private void buildSiteEntity(SiteEntity entity, PortalData config) {
     entity.setDescription(config.getDescription());
     entity.setLabel(config.getLabel());
@@ -284,6 +310,7 @@ public class SiteStorageImpl implements SiteStorage {
     entity.setSiteBody(((JSONArray) entity.toJSON().get("children")).toJSONString());
     entity.setDisplayed(config.isDisplayed());
     entity.setDisplayOrder(config.getDisplayOrder());
+    entity.setBannerFileId(config.getBannerFileId());
   }
 
   @SuppressWarnings("unchecked")
@@ -333,7 +360,9 @@ public class SiteStorageImpl implements SiteStorage {
                           entity.isDefaultSiteBody(),
                           redirects,
                           entity.isDisplayed(),
-                          entity.getDisplayOrder());
+                          entity.getDisplayOrder(),
+                          null,
+                          entity.getBannerFileId());
   }
 
   private void savePermissions(Long id, PortalData config) {
@@ -350,4 +379,34 @@ public class SiteStorageImpl implements SiteStorage {
                                   Arrays.asList(config.getEditPermission()));
   }
 
+  private Long saveSiteBanner(String uploadId, Long oldFileId) {
+    if (uploadId == null || uploadId.isBlank()) {
+      throw new IllegalArgumentException("uploadId is mandatory");
+    }
+    if (oldFileId != null && oldFileId != 0) {
+      fileService.deleteFile(oldFileId);
+    }
+    UploadResource uploadResource = uploadService.getUploadResource(uploadId);
+    if (uploadResource == null) {
+      throw new IllegalStateException("Can't find uploaded resource with id : " + uploadId);
+    }
+    try {
+      InputStream inputStream = new FileInputStream(uploadResource.getStoreLocation());
+      FileItem fileItem = new FileItem(null,
+              uploadResource.getFileName(),
+              uploadResource.getMimeType(),
+              FILE_API_NAME_SPACE,
+              (long) uploadResource.getUploadedSize(),
+              new Date(),
+              IdentityConstants.SYSTEM,
+              false,
+              inputStream);
+      fileItem = fileService.writeFile(fileItem);
+      return fileItem != null && fileItem.getFileInfo() != null ? fileItem.getFileInfo().getId() : null;
+    } catch (Exception e) {
+      throw new IllegalStateException("Error while saving Program image file", e);
+    } finally {
+      uploadService.removeUploadResource(uploadResource.getUploadId());
+    }
+  }
 }
