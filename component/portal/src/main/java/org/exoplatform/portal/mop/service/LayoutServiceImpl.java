@@ -18,6 +18,8 @@
  */
 package org.exoplatform.portal.mop.service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +30,10 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.commons.file.model.FileItem;
+import org.exoplatform.commons.file.services.FileService;
+import org.exoplatform.commons.file.services.FileStorageException;
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PropertyManager;
@@ -76,16 +82,21 @@ public class LayoutServiceImpl implements LayoutService {
 
   private Map<String, Container> sharedLayouts = new HashMap<>();
 
+  private FileService fileService;
+
+
   public LayoutServiceImpl(ListenerService listenerService,
                            SiteStorage siteStorage,
                            PageStorage pageStorage,
                            LayoutStorage layoutStorage,
-                           UserACL userACL) {
+                           UserACL userACL,
+                           FileService fileService) {
     this.listenerService = listenerService;
     this.siteStorage = siteStorage;
     this.pageStorage = pageStorage;
     this.layoutStorage = layoutStorage;
     this.userACL = userACL;
+    this.fileService = fileService;
   }
 
   @Override
@@ -379,6 +390,35 @@ public class LayoutServiceImpl implements LayoutService {
     List<PortalData> portalDataList = siteStorage.getSites(filter);
     return portalDataList.isEmpty() ? Collections.emptyList()
                                                             : portalDataList.stream().map(PortalConfig::new).toList();
+  }
+
+  @Override
+  public InputStream getSiteBannerStream(String siteName) throws ObjectNotFoundException {
+    PortalConfig portalConfig = getPortalConfig(siteName);
+    if (portalConfig == null) {
+      throw new ObjectNotFoundException("site with name " + siteName + " doesn't exist");
+    }
+    if (portalConfig.getBannerFileId() == 0) {
+      throw new ObjectNotFoundException("site with name " + siteName + " doesn't have a bannerId");
+    }
+    try {
+      FileItem fileItem = fileService.getFile(portalConfig.getBannerFileId());
+      return fileItem == null || fileItem.getFileInfo() == null ? null : fileItem.getAsStream();
+    } catch (FileStorageException | IOException e) {
+      return null ;
+    }
+  }
+
+  @Override
+  public void removeSiteBanner(String siteName) throws ObjectNotFoundException {
+    PortalConfig portalConfig = getPortalConfig(siteName);
+    if (portalConfig == null) {
+      throw new ObjectNotFoundException("site with name " + siteName + " doesn't exist");
+    }
+    if (portalConfig.getBannerFileId() == 0) {
+      throw new ObjectNotFoundException("site with name " + siteName + " doesn't have a bannerId");
+    }
+    fileService.deleteFile(portalConfig.getBannerFileId());
   }
 
   private abstract class Bilto<O extends ModelObject, D extends ModelData> {

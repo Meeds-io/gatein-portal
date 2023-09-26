@@ -67,7 +67,7 @@ public class TestJCBCNavigationServiceRebase extends AbstractKernelTest {
       ContainerData container = new ContainerData(null, "testcontainer_" + siteName, "", "", "", "", "", "", "",
               "", "", "", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
       PortalData portal = new PortalData(null, siteName, type.getName(), null, null,
-              null, new ArrayList<>(), null, null, null, container, null, true, 11);
+              null, new ArrayList<>(), null, null, null, container, null, true, 11, "" , 0);
       this.modelStorage.create(portal);
 
       restartTransaction();
