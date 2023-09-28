@@ -19,17 +19,10 @@
 
 package org.exoplatform.portal.config;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.portal.mop.SiteFilter;
 import org.picocontainer.Startable;
 
 import org.exoplatform.commons.api.settings.SettingService;
@@ -43,14 +36,11 @@ import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.exoplatform.portal.config.model.Application;
-import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.config.model.ModelObject;
-import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.config.model.*;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.importer.ImportMode;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationState;
@@ -60,12 +50,21 @@ import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.service.NavigationService;
 import org.exoplatform.portal.mop.storage.DescriptionStorage;
 import org.exoplatform.portal.mop.storage.PageStorage;
-import org.exoplatform.portal.mop.user.UserNavigation;
-import org.exoplatform.portal.mop.user.UserPortalContext;
+import org.exoplatform.portal.mop.user.*;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.OrganizationService;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Created by The eXo Platform SAS Apr 19, 2007 This service is used to load the PortalConfig, Page config and Navigation config
@@ -533,6 +532,34 @@ public class UserPortalConfigService implements Startable {
     public List<PortalConfig> getSites(SiteFilter siteFilter) {
       List<PortalConfig> list = layoutService.getSites(siteFilter);
       return list.stream().filter(config -> config != null && userACL_.hasPermission(config)).toList();
+    }
+    public Collection<UserNode> getSiteNavigations(String siteName, String userName, HttpServletRequest context) throws Exception {
+        HttpUserPortalContext userPortalContext = new HttpUserPortalContext(context);
+        UserPortalConfig userPortalConfig = getUserPortalConfig(siteName, userName, userPortalContext);
+        UserPortal userPortal = userPortalConfig.getUserPortal();
+        UserNavigation navigation = userPortal.getNavigation(new SiteKey(SiteType.PORTAL, siteName));
+        UserNodeFilterConfig builder = UserNodeFilterConfig.builder()
+                .withReadWriteCheck()
+                .withVisibility(Visibility.DISPLAYED, Visibility.TEMPORAL)
+                .withTemporalCheck()
+                .build();
+        UserNode rootNode = userPortal.getNode(navigation, org.exoplatform.portal.mop.navigation.Scope.ALL, builder, null);
+        return rootNode != null ? rootNode.getChildren() : Collections.emptyList();
+    }
+    public String getFirstAvailableNodeUri(Collection<UserNode> userNodes) {
+      String nodeUri = "";
+      for (UserNode node : userNodes) {
+        if (node.getPageRef() != null) {
+          nodeUri = node.getURI();
+          break;
+        } else if (node.getChildren() != null && !node.getChildren().isEmpty()) {
+          nodeUri = getFirstAvailableNodeUri(node.getChildren());
+        }
+        if (StringUtils.isNotBlank(nodeUri)) {
+          break;
+        }
+      }
+      return nodeUri;
     }
 
     /**

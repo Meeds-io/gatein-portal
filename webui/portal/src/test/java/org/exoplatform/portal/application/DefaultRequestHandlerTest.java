@@ -22,14 +22,14 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteFilter;
+import org.exoplatform.portal.mop.user.UserNode;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -55,6 +55,7 @@ public class DefaultRequestHandlerTest {
     URLFactoryService urlFactory = mock(URLFactoryService.class);
     NodeURL url = mock(NodeURL.class);
     when(url.toString()).thenCallRealMethod();
+    when(url.setResource(any(NavigationResource.class))).thenCallRealMethod();
     UserPortalConfigService portalConfigService = mock(UserPortalConfigService.class);
     ControllerContext context = mock(ControllerContext.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
@@ -62,11 +63,16 @@ public class DefaultRequestHandlerTest {
 
     try {
       String defaultSite = "site2";
+      String defaultSiteNodeUri = "node";
       PortalConfig defaultPortalConfig = mock(PortalConfig.class);
-      when(defaultPortalConfig.getName()).thenReturn(defaultSite);
+      UserNode siteUserNode = mock(UserNode.class);
       when(portalConfigService.getSites(any(SiteFilter.class))).thenReturn(Arrays.asList(defaultPortalConfig));
+      when(portalConfigService.getSiteNavigations(eq(defaultSite), anyString(), any(HttpServletRequest.class))).thenReturn(Collections.singletonList(siteUserNode));
+      when(portalConfigService.getFirstAvailableNodeUri(anyCollection())).thenReturn(defaultSiteNodeUri);
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
+      when(request.getRemoteUser()).thenReturn("root");
+      when(defaultPortalConfig.getName()).thenReturn(defaultSite);
 
       doAnswer(invocation -> {
         @SuppressWarnings("unchecked")
@@ -74,6 +80,7 @@ public class DefaultRequestHandlerTest {
         URIWriter uriWriter = invocation.getArgument(1, URIWriter.class);
         uriWriter.append("/portal/");
         uriWriter.append(parameters.get(NodeURL.REQUEST_SITE_NAME));
+        uriWriter.append("/" + defaultSiteNodeUri);
         return null;
       }).when(context).renderURL(any(), any());
 
@@ -108,7 +115,7 @@ public class DefaultRequestHandlerTest {
 
       DefaultRequestHandler defaultRequestHandler = new DefaultRequestHandler(portalConfigService, urlFactory);
       defaultRequestHandler.execute(context);
-      verify(response).sendRedirect("/portal/site2");
+      verify(response).sendRedirect("/portal/site2/node");
     } catch (Exception e) {
       LOG.error("Error while executing method", e);
       fail(e.getMessage());
