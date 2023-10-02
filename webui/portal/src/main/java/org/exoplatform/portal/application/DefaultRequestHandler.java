@@ -88,10 +88,8 @@ public class DefaultRequestHandler extends WebRequestHandler {
             return true;
           }
           Collection<UserNode> userNodes = configService.getSiteNavigations(defaultPortal, currentUser, context.getRequest());
-          String nodeUri = configService.getFirstAvailableNodeUri(userNodes) ;
-          PortalURLContext urlContext = new PortalURLContext(context, SiteKey.portal(defaultPortal));
-          NodeURL url = urlFactory.newURL(NodeURL.TYPE, urlContext);
-          defaultUri = url.setResource(new NavigationResource(SiteType.PORTAL, defaultPortal, nodeUri)).toString();
+          UserNode userNode = configService.getFirstAllowedPageNode(userNodes) ;
+          defaultUri = configService.getDefaultUri(userNode, defaultPortal);
         }
 
         HttpServletResponse resp = context.getResponse();

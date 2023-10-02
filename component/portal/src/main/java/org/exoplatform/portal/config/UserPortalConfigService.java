@@ -23,6 +23,17 @@ package org.exoplatform.portal.config;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.portal.config.model.ModelObject;
+import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.mop.PageType;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.SiteFilter;
+import org.exoplatform.portal.mop.Visibility;
 import org.picocontainer.Startable;
 
 import org.exoplatform.commons.api.settings.SettingService;
@@ -36,11 +47,6 @@ import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.exoplatform.portal.config.model.*;
-import org.exoplatform.portal.mop.SiteFilter;
-import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.importer.ImportMode;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationState;
@@ -533,33 +539,48 @@ public class UserPortalConfigService implements Startable {
       List<PortalConfig> list = layoutService.getSites(siteFilter);
       return list.stream().filter(config -> config != null && userACL_.hasPermission(config)).toList();
     }
-    public Collection<UserNode> getSiteNavigations(String siteName, String userName, HttpServletRequest context) throws Exception {
-        HttpUserPortalContext userPortalContext = new HttpUserPortalContext(context);
-        UserPortalConfig userPortalConfig = getUserPortalConfig(siteName, userName, userPortalContext);
-        UserPortal userPortal = userPortalConfig.getUserPortal();
-        UserNavigation navigation = userPortal.getNavigation(new SiteKey(SiteType.PORTAL, siteName));
-        UserNodeFilterConfig builder = UserNodeFilterConfig.builder()
-                .withReadWriteCheck()
-                .withVisibility(Visibility.DISPLAYED, Visibility.TEMPORAL)
-                .withTemporalCheck()
-                .build();
-        UserNode rootNode = userPortal.getNode(navigation, org.exoplatform.portal.mop.navigation.Scope.ALL, builder, null);
-        return rootNode != null ? rootNode.getChildren() : Collections.emptyList();
+
+    public Collection<UserNode> getSiteNavigations(String siteName,
+                                                   String userName,
+                                                   HttpServletRequest context) throws Exception {
+      HttpUserPortalContext userPortalContext = new HttpUserPortalContext(context);
+      UserPortalConfig userPortalConfig = getUserPortalConfig(siteName, userName, userPortalContext);
+      UserPortal userPortal = userPortalConfig.getUserPortal();
+      UserNavigation navigation = userPortal.getNavigation(new SiteKey(SiteType.PORTAL, siteName));
+      UserNodeFilterConfig builder = UserNodeFilterConfig.builder()
+                                                         .withReadWriteCheck()
+                                                         .withVisibility(Visibility.DISPLAYED, Visibility.TEMPORAL)
+                                                         .withTemporalCheck()
+                                                         .build();
+      UserNode rootNode = userPortal.getNode(navigation, org.exoplatform.portal.mop.navigation.Scope.ALL, builder, null);
+      return rootNode != null ? rootNode.getChildren() : Collections.emptyList();
     }
-    public String getFirstAvailableNodeUri(Collection<UserNode> userNodes) {
-      String nodeUri = "";
+
+    public UserNode getFirstAllowedPageNode(Collection<UserNode> userNodes) {
+      UserNode userNode = null;
       for (UserNode node : userNodes) {
         if (node.getPageRef() != null) {
-          nodeUri = node.getURI();
+          userNode = node;
           break;
         } else if (node.getChildren() != null && !node.getChildren().isEmpty()) {
-          nodeUri = getFirstAvailableNodeUri(node.getChildren());
+          userNode = getFirstAllowedPageNode(node.getChildren());
         }
-        if (StringUtils.isNotBlank(nodeUri)) {
+        if (userNode != null) {
           break;
         }
       }
-      return nodeUri;
+      return userNode;
+    }
+
+    public String getDefaultUri(UserNode node, String site) {
+      String uri = "/portal/" + site + "/";
+      Page userNodePage = layoutService.getPage(node.getPageRef());
+      if (PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
+        uri = userNodePage.getLink();
+      } else {
+        uri = uri + node.getURI();
+      }
+      return uri;
     }
 
     /**
