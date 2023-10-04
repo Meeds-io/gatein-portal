@@ -19,6 +19,7 @@
 
 package org.exoplatform.portal.application;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +32,7 @@ import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.user.*;
 import org.exoplatform.portal.url.PortalURLContext;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.WebRequestHandler;
@@ -76,8 +78,6 @@ public class DefaultRequestHandler extends WebRequestHandler {
           siteFilter.setSortByDisplayOrder(true);
           siteFilter.setFilterByDisplayed(true);
           siteFilter.setDisplayed(true);
-          siteFilter.setLimit(1);
-          siteFilter.setOffset(0);
           List<PortalConfig> portalConfigList = configService.getSites(siteFilter);
           if (portalConfigList != null && !portalConfigList.isEmpty()) {
             defaultPortal = portalConfigList.get(0).getName();
@@ -87,9 +87,9 @@ public class DefaultRequestHandler extends WebRequestHandler {
             resp.sendRedirect("/" + currentPortalContainerName + "/login");
             return true;
           }
-          PortalURLContext urlContext = new PortalURLContext(context, SiteKey.portal(defaultPortal));
-          NodeURL url = urlFactory.newURL(NodeURL.TYPE, urlContext);
-          defaultUri = url.setResource(new NavigationResource(SiteType.PORTAL, defaultPortal, "")).toString();
+          Collection<UserNode> userNodes = configService.getSiteNavigations(defaultPortal, currentUser, context.getRequest());
+          UserNode userNode = configService.getFirstAllowedPageNode(userNodes) ;
+          defaultUri = configService.getDefaultUri(userNode, defaultPortal);
         }
 
         HttpServletResponse resp = context.getResponse();
