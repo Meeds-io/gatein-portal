@@ -38,9 +38,10 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
 
 public class EntityBuilder {
-  private static final Log LOG = ExoLogger.getLogger(EntityBuilder.class);
+  private static final Log   LOG   = ExoLogger.getLogger(EntityBuilder.class);
 
-  public static final String             GROUP = "group";
+  public static final String GROUP = "group";
+
   private EntityBuilder() { // NOSONAR
   }
 

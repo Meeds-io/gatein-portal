@@ -352,6 +352,17 @@
           </object>
         </object-param>
         <object-param>
+          <name>portal.SiteKeysByFilterService</name>
+          <description>The cache configuration for Site layout service</description>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>portal.SiteKeysByFilterService</string></field>
+            <field name="strategy"  profiles="cluster"><string>${exo.cache.portal.site.strategy:LIRS}</string></field>
+            <field name="maxSize"><int>${exo.cache.portal.site.MaxNodes:1000}</int></field>
+            <field name="liveTime"><long>${exo.cache.portal.site.TimeToLive:86400}</long></field>
+            <field name="cacheMode"  profiles="cluster"><string>${exo.cache.portal.site.cacheMode:invalidation}</string></field>
+          </object>
+        </object-param>
+        <object-param>
           <name>portal.DescriptionService</name>
           <description>The Cache configuration for the description service</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">

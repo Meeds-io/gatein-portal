@@ -38,48 +38,48 @@ import org.exoplatform.portal.pom.data.RedirectMappingsData;
  **/
 public class PortalConfig extends ModelObject implements Cloneable {
 
-    public static final String USER_TYPE = SiteType.USER.getName();
+  public static final String        USER_TYPE      = SiteType.USER.getName();
 
-    public static final String GROUP_TYPE = SiteType.GROUP.getName();
+  public static final String        GROUP_TYPE     = SiteType.GROUP.getName();
 
-    public static final String PORTAL_TYPE = SiteType.PORTAL.getName();
+  public static final String        PORTAL_TYPE    = SiteType.PORTAL.getName();
 
-    public static final String SPACE_TYPE  = SiteType.SPACE.getName();
+  public static final String        SPACE_TYPE     = SiteType.SPACE.getName();
 
-    public static final Container DEFAULT_LAYOUT = initDefaultLayout();
+  public static final Container     DEFAULT_LAYOUT = initDefaultLayout();
 
-    private String name;
+  private String                    name;
 
-    /** Added for new POM . */
-    private String type;
+  /** Added for new POM . */
+  private String                    type;
 
-    private String locale;
+  private String                    locale;
 
-    private String label;
+  private String                    label;
 
-    private String description;
+  private String                    description;
 
-    private String[] accessPermissions;
+  private String[]                  accessPermissions;
 
-    private String editPermission;
+  private String                    editPermission;
 
-    private Properties properties;
+  private Properties                properties;
 
-    private String skin;
+  private String                    skin;
 
-    private Container portalLayout;
+  private Container                 portalLayout;
 
-    private boolean defaultLayout;
+  private boolean                   defaultLayout;
 
-    private transient boolean modifiable;
+  private transient boolean         modifiable;
 
-    private boolean             displayed;
+  private boolean                   displayed      = true;
 
-    private int                 displayOrder;
+  private int                       displayOrder;
 
-    private String                  bannerUploadId;
+  private String                    bannerUploadId;
 
-    private long                    bannerFileId;
+  private long                      bannerFileId;
 
     // TODO: storing this as a LinkedHashMap might make more sense (ordered + able to retrieve element based on redirect name
     private ArrayList<PortalRedirect> portalRedirects;
@@ -123,8 +123,7 @@ public class PortalConfig extends ModelObject implements Cloneable {
         this.portalRedirects = buildPortalRedirects(data.getRedirects());
         this.displayed = data.isDisplayed();
         this.displayOrder = data.getDisplayOrder();
-        this.bannerFileId= data.getBannerFileId();
-        this.bannerUploadId = data.getBannerUploadId();
+        this.bannerFileId = data.getBannerFileId();
     }
 
     public String getType() {
@@ -390,7 +389,7 @@ public class PortalConfig extends ModelObject implements Cloneable {
         List<String> accessPermissions = Utils.safeImmutableList(this.accessPermissions);
         Map<String, String> properties = Utils.safeImmutableMap(this.properties);
         return new PortalData(storageId, name, type, locale, label, description, accessPermissions, editPermission, properties,
-                skin, portalLayout.build(), defaultLayout, buildRedirectData(), displayed, displayOrder, bannerUploadId, bannerFileId);
+                skin, portalLayout.build(), defaultLayout, buildRedirectData(), displayed, displayOrder, bannerFileId);
     }
 
     private ArrayList<RedirectData> buildRedirectData() {

@@ -243,19 +243,14 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
 
   public void testGetSites() {
     new UnitTest() {
-      public void execute() {
-        SiteFilter siteFilter = new SiteFilter();
-        siteFilter.setSiteType(SiteType.PORTAL);
-        siteFilter.setSortByDisplayOrder(true);
-        siteFilter.setFilterByDisplayed(true);
-        siteFilter.setDisplayed(true);
-        assertEquals(4, userPortalConfigSer_.getSites(siteFilter).size());
+      public void execute() throws Exception {
+        userPortalConfigSer_.removeUserPortalConfig("jazz");
+        assertEquals(4, userPortalConfigSer_.getUserPortalDisplayedSites().size());
 
         String originalGlobalPortal = userPortalConfigSer_.globalPortal_;
         userPortalConfigSer_.globalPortal_ = "system";
-        siteFilter.setExcludedSiteName(userPortalConfigSer_.globalPortal_);
         try {
-          assertEquals(3, userPortalConfigSer_.getSites(siteFilter).size());
+          assertEquals(3, userPortalConfigSer_.getUserPortalDisplayedSites().size());
         } finally {
           userPortalConfigSer_.globalPortal_ = originalGlobalPortal;
         }

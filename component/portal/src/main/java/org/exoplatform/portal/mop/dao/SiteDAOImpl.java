@@ -140,15 +140,15 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
   }
 
   @Override
-  public List<SiteEntity> findSites(SiteFilter siteFilter) {
-    TypedQuery<SiteEntity> query = buildQueryFromFilter(siteFilter);
+  public List<SiteKey> findSitesKeys(SiteFilter siteFilter) {
+    TypedQuery<SiteKey> query = buildQueryFromFilter(siteFilter);
     if (siteFilter.getOffset() > 0) {
       query.setFirstResult(siteFilter.getOffset());
     }
     if (siteFilter.getLimit() > 0) {
       query.setMaxResults(siteFilter.getLimit());
     }
-    List<SiteEntity> resultList = query.getResultList();
+    List<SiteKey> resultList = query.getResultList();
     return resultList == null ? Collections.emptyList() : resultList;
   }
 
@@ -172,10 +172,10 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
     TypedQuery<T> query;
     String queryName = getQueryFilterName(suffixes);
     if (filterNamedQueries.containsKey(queryName)) {
-      query = (TypedQuery<T>) getEntityManager().createNamedQuery(queryName, SiteEntity.class);
+      query = (TypedQuery<T>) getEntityManager().createNamedQuery(queryName, SiteKey.class);
     } else {
       String queryContent = getQueryFilterContent(filter, predicates);
-      query = (TypedQuery<T>) getEntityManager().createQuery(queryContent, SiteEntity.class);
+      query = (TypedQuery<T>) getEntityManager().createQuery(queryContent, SiteKey.class);
       getEntityManager().getEntityManagerFactory().addNamedQuery(queryName, query);
       filterNamedQueries.put(queryName, true);
     }
@@ -227,7 +227,7 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
   }
 
   private String getQueryFilterContent(SiteFilter filter, List<String> predicates) {
-    String querySelect = "SELECT s FROM GateInSite s ";
+    String querySelect = "SELECT new org.exoplatform.portal.mop.SiteKey(s.siteType, s.name) FROM GateInSite s ";
 
     String queryContent;
     if (predicates.isEmpty()) {

@@ -97,7 +97,6 @@ public class TestJDBCNavigationServiceUpdate extends AbstractKernelTest {
                                        null,
                                        true,
                                        5,
-                                       "",
                                        0);
     this.siteStorage.create(portal);
 

@@ -75,60 +75,60 @@ public class SiteDAOTest extends AbstractDAOTest {
     SiteFilter filter = new SiteFilter();
     filter.setFilterByDisplayed(true);
     filter.setDisplayed(false);
-    results = siteDAO.findSites(filter);
-    assertEquals(1, results.size());
+    List<SiteKey> siteKeys = siteDAO.findSitesKeys(filter);
+    assertEquals(1, siteKeys.size());
 
     filter.setDisplayed(true);
     filter.setSiteType(SiteType.PORTAL);
-    results = siteDAO.findSites(filter);
-    assertEquals(1, results.size());
-    assertEquals(siteEntity.getName(), results.get(0).getName());
+    siteKeys = siteDAO.findSitesKeys(filter);
+    assertEquals(1, siteKeys.size());
+    assertEquals(siteEntity.getName(), siteKeys.get(0).getName());
     
     filter.setExcludedSiteName("test1");
-    results = siteDAO.findSites(filter);
-    assertEquals(0, results.size());
+    siteKeys = siteDAO.findSitesKeys(filter);
+    assertEquals(0, siteKeys.size());
     
     filter.setExcludedSiteName(null);
     filter.setSiteType(SiteType.GROUP);
-    results = siteDAO.findSites(filter);
-    assertEquals(1, results.size());
-    assertEquals(siteEntity3.getName(), results.get(0).getName());
+    siteKeys = siteDAO.findSitesKeys(filter);
+    assertEquals(1, siteKeys.size());
+    assertEquals(siteEntity3.getName(), siteKeys.get(0).getName());
 
     filter.setSiteType(null);
-    results = siteDAO.findSites(filter);
-    assertEquals(3, results.size());
+    siteKeys = siteDAO.findSitesKeys(filter);
+    assertEquals(3, siteKeys.size());
     
     filter.setExcludedSiteType(SiteType.PORTAL);
-    results = siteDAO.findSites(filter);
-    assertEquals(2, results.size());
-    assertEquals(siteEntity4.getName(), results.get(1).getName());
+    siteKeys = siteDAO.findSitesKeys(filter);
+    assertEquals(2, siteKeys.size());
+    assertEquals(siteEntity4.getName(), siteKeys.get(1).getName());
     
     filter.setFilterByDisplayed(false);
     filter.setSortByDisplayOrder(true);
-    results = siteDAO.findSites(filter);
-    assertEquals(2, results.size());
-    assertEquals(siteEntity3.getName(), results.get(1).getName());
+    siteKeys = siteDAO.findSitesKeys(filter);
+    assertEquals(2, siteKeys.size());
+    assertEquals(siteEntity3.getName(), siteKeys.get(1).getName());
     
     siteEntity3.setDisplayOrder(2);
     siteDAO.update(siteEntity3);
-    results = siteDAO.findSites(filter);
-    assertEquals(2, results.size());
-    assertEquals(siteEntity4.getName(), results.get(1).getName());
+    siteKeys = siteDAO.findSitesKeys(filter);
+    assertEquals(2, siteKeys.size());
+    assertEquals(siteEntity4.getName(), siteKeys.get(1).getName());
     
     siteEntity3.setName("/spaces/test3");
     siteDAO.update(siteEntity3);
     filter.setExcludeSpaceSites(true);
-    results = siteDAO.findSites(filter);
-    assertEquals(1, results.size());
-    assertEquals(siteEntity4.getName(), results.get(0).getName());
+    siteKeys = siteDAO.findSitesKeys(filter);
+    assertEquals(1, siteKeys.size());
+    assertEquals(siteEntity4.getName(), siteKeys.get(0).getName());
     
     filter.setExcludedSiteType(null);
-    results = siteDAO.findSites(filter);
-    assertEquals(3, results.size());
+    siteKeys = siteDAO.findSitesKeys(filter);
+    assertEquals(3, siteKeys.size());
     
     filter.setExcludeSpaceSites(false);
-    results = siteDAO.findSites(filter);
-    assertEquals(4, results.size());
+    siteKeys = siteDAO.findSitesKeys(filter);
+    assertEquals(4, siteKeys.size());
     
     siteDAO.delete(siteEntity);
     siteDAO.delete(siteEntity2);

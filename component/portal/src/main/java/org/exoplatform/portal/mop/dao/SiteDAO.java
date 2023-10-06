@@ -43,5 +43,5 @@ public interface SiteDAO extends GenericDAO<SiteEntity, Long> {
 
   List<String> findUserSites(int offset, int limit);
 
-  List<SiteEntity> findSites(SiteFilter siteFilter);
+  List<SiteKey> findSitesKeys(SiteFilter siteFilter);
 }

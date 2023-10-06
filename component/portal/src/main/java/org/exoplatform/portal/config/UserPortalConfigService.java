@@ -88,6 +88,16 @@ public class UserPortalConfigService implements Startable {
 
   public static final String      DEFAULT_USER_SITE_TEMPLATE  = "user";
 
+  private final SiteFilter        siteFilter                     = new SiteFilter(SiteType.PORTAL,
+                                                                                  null,
+                                                                                  null,
+                                                                                  true,
+                                                                                  true,
+                                                                                  true,
+                                                                                  true,
+                                                                                  0,
+                                                                                  0);
+
     LayoutService layoutService;
 
     UserACL userACL_;
@@ -535,9 +545,21 @@ public class UserPortalConfigService implements Startable {
       return list;
     }
 
-    public List<PortalConfig> getSites(SiteFilter siteFilter) {
+    public List<PortalConfig> getUserPortalDisplayedSites() {
+      siteFilter.setExcludedSiteName(globalPortal_);
       List<PortalConfig> list = layoutService.getSites(siteFilter);
       return list.stream().filter(config -> config != null && userACL_.hasPermission(config)).toList();
+    }
+
+    public String computePortalPath(HttpServletRequest context) throws Exception {
+      List<PortalConfig> portalConfigList = getUserPortalDisplayedSites();
+      if (portalConfigList == null || portalConfigList.isEmpty()) {
+        return null;
+      }
+      String defaultPortal = portalConfigList.get(0).getName();
+      Collection<UserNode> userNodes = getSiteNavigations(defaultPortal, context.getRemoteUser(), context);
+      UserNode userNode = getFirstAllowedPageNode(userNodes);
+      return getDefaultUri(userNode, defaultPortal);
     }
 
     public Collection<UserNode> getSiteNavigations(String siteName,
