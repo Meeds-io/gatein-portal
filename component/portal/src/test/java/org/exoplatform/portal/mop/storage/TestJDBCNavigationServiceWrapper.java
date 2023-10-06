@@ -104,7 +104,6 @@ public class TestJDBCNavigationServiceWrapper extends AbstractKernelTest {
                                          null,
                                          true,
                                          88,
-                                         "",
                                          0);
       this.modelStorage.create(portal);
   

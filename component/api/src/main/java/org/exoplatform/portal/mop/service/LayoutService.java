@@ -344,7 +344,17 @@ public interface LayoutService extends DataStorage {
   default InputStream getSiteBannerStream(String siteName) throws ObjectNotFoundException, IOException {
     throw new UnsupportedOperationException();
   }
-
+  
+  /**
+   * Retrieve default site banner as stream
+   *
+   * @param siteName name of the portal site
+   * @return found {@link InputStream}
+   */
+  default InputStream getDefaultSiteBannerStream(String siteName) {
+    throw new UnsupportedOperationException();
+  }
+  
   /**
    * remove site banner
    *

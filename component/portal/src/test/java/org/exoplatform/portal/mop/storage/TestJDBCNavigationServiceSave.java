@@ -69,7 +69,7 @@ public class TestJDBCNavigationServiceSave extends AbstractKernelTest {
       ContainerData container = new ContainerData(null, "testcontainer_" + siteName, "", "", "", "", "", "", "",
               "", "", "", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
       PortalData portal = new PortalData(null, siteName, type.getName(), null, null,
-              null, new ArrayList<>(), null, null, null, container, null, true, 4, "", 0);
+              null, new ArrayList<>(), null, null, null, container, null, true, 4, 0);
       this.modelStorage.create(portal);
 
       restartTransaction();

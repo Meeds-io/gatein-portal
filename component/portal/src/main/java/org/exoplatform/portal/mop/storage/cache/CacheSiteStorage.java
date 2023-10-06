@@ -20,6 +20,7 @@ import org.exoplatform.commons.cache.future.FutureExoCache;
 import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.container.configuration.ConfigurationManager;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.dao.SiteDAO;
 import org.exoplatform.portal.mop.storage.LayoutStorage;
@@ -32,13 +33,21 @@ import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.upload.UploadService;
 
+import java.util.List;
+
 public class CacheSiteStorage extends SiteStorageImpl {
 
   public static final String                                SITE_CACHE_NAME = "portal.SiteService";
 
+  public static final String                                SITE_KEYS_BY_FILTER_CACHE_NAME = "portal.SiteKeysByFilterService";
+
   private final FutureExoCache<SiteKey, PortalData, Object> siteFutureCache;
 
   private final ExoCache<SiteKey, PortalData>               siteCache;
+
+  private final FutureExoCache<SiteFilter, Object, Object>    siteKeysByFilterFutureCache;
+
+  private final ExoCache<SiteFilter, Object>                  siteKeysByFilterCache;
 
   public CacheSiteStorage(CacheService cacheService, // NOSONAR
                           SettingService settingService,
@@ -58,6 +67,13 @@ public class CacheSiteStorage extends SiteStorageImpl {
         return portalData == null ? PortalData.NULL_OBJECT : portalData;
       }
     }, siteCache);
+    this.siteKeysByFilterCache = cacheService.getCacheInstance(SITE_KEYS_BY_FILTER_CACHE_NAME);
+    this.siteKeysByFilterFutureCache = new FutureExoCache<>(new Loader<SiteFilter, Object, Object>() {
+      @Override
+      public List<SiteKey> retrieve(Object context, SiteFilter siteFilter) throws Exception {
+        return CacheSiteStorage.super.getSitesKeys(siteFilter);
+      }
+    }, siteKeysByFilterCache);
   }
 
   @Override
@@ -66,6 +82,7 @@ public class CacheSiteStorage extends SiteStorageImpl {
       super.create(config);
     } finally {
       siteFutureCache.remove(getSiteKey(config.getKey()));
+      clearSiteKeysByFilterFutureCache();
     }
   }
 
@@ -75,6 +92,7 @@ public class CacheSiteStorage extends SiteStorageImpl {
       super.save(config);
     } finally {
       siteFutureCache.remove(getSiteKey(config.getKey()));
+      clearSiteKeysByFilterFutureCache();
     }
   }
 
@@ -84,6 +102,7 @@ public class CacheSiteStorage extends SiteStorageImpl {
       super.remove(config);
     } finally {
       siteFutureCache.remove(getSiteKey(config.getKey()));
+      clearSiteKeysByFilterFutureCache();
     }
   }
 
@@ -93,7 +112,16 @@ public class CacheSiteStorage extends SiteStorageImpl {
     return portalData == null || portalData.isNull() ? null : portalData;
   }
 
+  @Override
+  public List<SiteKey> getSitesKeys(SiteFilter siteFilter) {
+    return (List<SiteKey>) siteKeysByFilterFutureCache.get(null, siteFilter);
+  }
+
   private SiteKey getSiteKey(PortalKey portalKey) {
     return new SiteKey(portalKey.getType(), portalKey.getId());
+  }
+
+  private void clearSiteKeysByFilterFutureCache() {
+    this.siteKeysByFilterFutureCache.clear();
   }
 }

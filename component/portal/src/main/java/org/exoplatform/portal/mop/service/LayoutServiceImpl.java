@@ -18,6 +18,7 @@
  */
 package org.exoplatform.portal.mop.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
@@ -37,9 +38,11 @@ import org.exoplatform.commons.file.services.FileStorageException;
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.portal.application.PortletPreferences;
 import org.exoplatform.portal.config.Query;
-import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
@@ -69,6 +72,8 @@ import org.exoplatform.services.log.Log;
 public class LayoutServiceImpl implements LayoutService {
 
   private static final Log       LOG           = ExoLogger.getLogger(LayoutServiceImpl.class);
+  
+  private static final String    SITE_DEAULT_BANNER_PATH = "site.default.banner.path";
 
   private ListenerService        listenerService;
 
@@ -78,30 +83,33 @@ public class LayoutServiceImpl implements LayoutService {
 
   private LayoutStorage          layoutStorage;
 
-  private UserACL                userACL;
-
   private Map<String, Container> sharedLayouts = new HashMap<>();
 
   private FileService fileService;
+  
+  private PortalContainer        portalContainer;
 
-
+  private InitParams             initParams;
+  
   public LayoutServiceImpl(ListenerService listenerService,
                            SiteStorage siteStorage,
                            PageStorage pageStorage,
                            LayoutStorage layoutStorage,
-                           UserACL userACL,
-                           FileService fileService) {
+                           FileService fileService,
+                           PortalContainer portalContainer,
+                           InitParams initParams) {
     this.listenerService = listenerService;
     this.siteStorage = siteStorage;
     this.pageStorage = pageStorage;
     this.layoutStorage = layoutStorage;
-    this.userACL = userACL;
     this.fileService = fileService;
+    this.portalContainer = portalContainer;
+    this.initParams = initParams;
   }
 
   @Override
   public void create(PortalConfig config) {
-    siteStorage.create(config.build());
+    siteStorage.create(config);
     broadcastEvent(PORTAL_CONFIG_CREATED, config);
   }
 
@@ -387,9 +395,9 @@ public class LayoutServiceImpl implements LayoutService {
 
   @Override
   public List<PortalConfig> getSites(SiteFilter filter) {
-    List<PortalData> portalDataList = siteStorage.getSites(filter);
-    return portalDataList.isEmpty() ? Collections.emptyList()
-                                                            : portalDataList.stream().map(PortalConfig::new).toList();
+    List<SiteKey> portalKeysList = siteStorage.getSitesKeys(filter);
+    return portalKeysList.isEmpty() ? Collections.emptyList()
+                                                            : portalKeysList.stream().map(siteKey -> new PortalConfig(siteStorage.getPortalConfig(siteKey))).toList();
   }
 
   @Override
@@ -407,6 +415,20 @@ public class LayoutServiceImpl implements LayoutService {
     } catch (FileStorageException | IOException e) {
       return null ;
     }
+  }
+  
+  @Override
+  public InputStream getDefaultSiteBannerStream(String siteName) {
+    InputStream defaultSiteBanner = portalContainer.getPortalContext()
+                                    .getResourceAsStream(System.getProperty("sites." + siteName
+                                        + ".defaultBannerPath", "/images/sites/banner/" + siteName.toLowerCase() + ".png"));
+    if (defaultSiteBanner == null && initParams != null) {
+      ValueParam siteDefaultBannerPath = initParams.getValueParam(SITE_DEAULT_BANNER_PATH);
+      if (siteDefaultBannerPath != null && siteDefaultBannerPath.getValue() != null) {
+        defaultSiteBanner = portalContainer.getPortalContext().getResourceAsStream(siteDefaultBannerPath.getValue());
+      }
+    }
+    return defaultSiteBanner != null ? defaultSiteBanner : new ByteArrayInputStream(new byte[] {});
   }
 
   @Override

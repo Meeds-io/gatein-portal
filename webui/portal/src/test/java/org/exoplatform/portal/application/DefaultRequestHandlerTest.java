@@ -17,7 +17,6 @@
  */
 package org.exoplatform.portal.application;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -27,22 +26,16 @@ import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.mop.SiteFilter;
-import org.exoplatform.portal.mop.user.UserNode;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import org.exoplatform.portal.config.UserPortalConfigService;
-import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.url.PortalURLContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.controller.router.URIWriter;
-import org.exoplatform.web.url.URLFactoryService;
 import org.exoplatform.web.url.navigation.NavigationResource;
 import org.exoplatform.web.url.navigation.NodeURL;
 
@@ -52,7 +45,6 @@ public class DefaultRequestHandlerTest {
 
   @Test
   public void testGetDefaultSite() {
-    URLFactoryService urlFactory = mock(URLFactoryService.class);
     NodeURL url = mock(NodeURL.class);
     when(url.toString()).thenCallRealMethod();
     when(url.setResource(any(NavigationResource.class))).thenCallRealMethod();
@@ -62,26 +54,17 @@ public class DefaultRequestHandlerTest {
     HttpServletRequest request = mock(HttpServletRequest.class);
 
     try {
-      String defaultSite = "site2";
-      String defaultSiteNodeUri = "/portal/site2/node";
-      PortalConfig defaultPortalConfig = mock(PortalConfig.class);
-      UserNode siteUserNode = mock(UserNode.class);
-      when(portalConfigService.getSites(any(SiteFilter.class))).thenReturn(Arrays.asList(defaultPortalConfig));
-      when(portalConfigService.getSiteNavigations(eq(defaultSite), anyString(), any(HttpServletRequest.class))).thenReturn(Collections.singletonList(siteUserNode));
-      when(portalConfigService.getFirstAllowedPageNode(anyCollection())).thenReturn(siteUserNode);
-      when(portalConfigService.getDefaultUri(siteUserNode, defaultSite)).thenReturn(defaultSiteNodeUri);
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
       when(request.getRemoteUser()).thenReturn("root");
-      when(defaultPortalConfig.getName()).thenReturn(defaultSite);
-
+      when(portalConfigService.computePortalPath(any(HttpServletRequest.class))).thenReturn("/portal/site2/node");
       when(response.encodeRedirectURL(anyString())).thenAnswer(new Answer<String>() {
         public String answer(InvocationOnMock invocation) {
           return invocation.getArgument(0, String.class);
         }
       });
 
-      DefaultRequestHandler defaultRequestHandler = new DefaultRequestHandler(portalConfigService, urlFactory);
+      DefaultRequestHandler defaultRequestHandler = new DefaultRequestHandler(portalConfigService);
       defaultRequestHandler.execute(context);
       verify(response).sendRedirect("/portal/site2/node");
     } catch (Exception e) {
@@ -92,17 +75,12 @@ public class DefaultRequestHandlerTest {
 
   @Test
   public void testGetUserDefaultUri() {
-    URLFactoryService urlFactory = mock(URLFactoryService.class);
     UserPortalConfigService portalConfigService = mock(UserPortalConfigService.class);
     ControllerContext context = mock(ControllerContext.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
     HttpServletRequest request = mock(HttpServletRequest.class);
 
     try {
-      String defaultSite = "site2";
-      PortalConfig defaultPortalConfig = mock(PortalConfig.class);
-      when(defaultPortalConfig.getName()).thenReturn(defaultSite);
-      when(portalConfigService.getSites(any(SiteFilter.class))).thenReturn(Arrays.asList(defaultPortalConfig));
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
       when(request.getRemoteUser()).thenReturn("user");
@@ -114,7 +92,7 @@ public class DefaultRequestHandlerTest {
         }
       });
 
-      DefaultRequestHandler defaultRequestHandler = new DefaultRequestHandler(portalConfigService, urlFactory);
+      DefaultRequestHandler defaultRequestHandler = new DefaultRequestHandler(portalConfigService);
       defaultRequestHandler.execute(context);
       verify(response).sendRedirect(eq("/portal/home"));
     } catch (Exception e) {
@@ -125,7 +103,6 @@ public class DefaultRequestHandlerTest {
 
   @Test
   public void testGetNonDefaultSite() {
-    URLFactoryService urlFactory = mock(URLFactoryService.class);
     NodeURL url = mock(NodeURL.class);
     when(url.toString()).thenCallRealMethod();
     UserPortalConfigService portalConfigService = mock(UserPortalConfigService.class);
@@ -134,21 +111,11 @@ public class DefaultRequestHandlerTest {
     HttpServletRequest request = mock(HttpServletRequest.class);
 
     try {
-      PortalConfig defaultPortalConfig = mock(PortalConfig.class);
-      String defaultSite = "site1";
-      String defaultSiteUri = "/portal/site1";
-      when(defaultPortalConfig.getName()).thenReturn(defaultSite);
-      when(portalConfigService.getSites(any(SiteFilter.class))).thenReturn(Arrays.asList(defaultPortalConfig));
-      UserNode siteUserNode = mock(UserNode.class);
-      when(portalConfigService.getSites(any(SiteFilter.class))).thenReturn(Arrays.asList(defaultPortalConfig));
-      when(portalConfigService.getSiteNavigations(eq(defaultSite), anyString(), any(HttpServletRequest.class))).thenReturn(Collections.singletonList(siteUserNode));
-      when(portalConfigService.getFirstAllowedPageNode(anyCollection())).thenReturn(siteUserNode);
-      when(portalConfigService.getDefaultUri(siteUserNode, defaultSite)).thenReturn(defaultSiteUri);
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
       when(request.getRemoteUser()).thenReturn("root");
-      when(defaultPortalConfig.getName()).thenReturn(defaultSite);
-
+      when(request.getRemoteUser()).thenReturn("user");
+      when(portalConfigService.computePortalPath(any(HttpServletRequest.class))).thenReturn("/portal/site1");
       doAnswer(invocation -> {
         @SuppressWarnings("unchecked")
         Map<QualifiedName, String> parameters = invocation.getArgument(0, Map.class);
@@ -163,7 +130,7 @@ public class DefaultRequestHandlerTest {
           return invocation.getArgument(0, String.class);
         }
       });
-       DefaultRequestHandler defaultRequestHandler = new DefaultRequestHandler(portalConfigService, urlFactory);
+       DefaultRequestHandler defaultRequestHandler = new DefaultRequestHandler(portalConfigService);
       defaultRequestHandler.execute(context);
       verify(response).sendRedirect(eq("/portal/site1"));
     } catch (Exception e) {
@@ -174,14 +141,14 @@ public class DefaultRequestHandlerTest {
 
   @Test
   public void testGetLoginPageWhenNoSite() {
-    URLFactoryService urlFactory = mock(URLFactoryService.class);
     UserPortalConfigService portalConfigService = mock(UserPortalConfigService.class);
     ControllerContext context = mock(ControllerContext.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
     HttpServletRequest request = mock(HttpServletRequest.class);
 
     try {
-      when(portalConfigService.getSites(any(SiteFilter.class))).thenReturn(null);
+      when(request.getRemoteUser()).thenReturn("user");
+      when(portalConfigService.getUserPortalDisplayedSites()).thenReturn(null);
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
 
@@ -191,7 +158,7 @@ public class DefaultRequestHandlerTest {
         }
       });
 
-      DefaultRequestHandler defaultRequestHandler = new DefaultRequestHandler(portalConfigService, urlFactory);
+      DefaultRequestHandler defaultRequestHandler = new DefaultRequestHandler(portalConfigService);
       defaultRequestHandler.execute(context);
       verify(response).sendRedirect(eq("/portal/login"));
     } catch (Exception e) {

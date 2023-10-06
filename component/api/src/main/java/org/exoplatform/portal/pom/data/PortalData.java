@@ -69,8 +69,6 @@ public class PortalData extends ModelData {
 
   private final int                 displayOrder;
 
-  private String                    bannerUploadId;
-
   private long                      bannerFileId;
 
   private PortalData() {
@@ -104,7 +102,6 @@ public class PortalData extends ModelData {
                     List<RedirectData> redirects,
                     boolean displayed,
                     int displayOrder,
-                    String bannerUploadId,
                     long bannerFileId) {
     this(storageId,
          name,
@@ -121,7 +118,6 @@ public class PortalData extends ModelData {
          redirects,
          displayed,
          displayOrder,
-         bannerUploadId,
          bannerFileId);
   }
 
@@ -140,7 +136,6 @@ public class PortalData extends ModelData {
                     List<RedirectData> redirects,
                     boolean displayed,
                     int displayOrder,
-                    String bannerUploadId,
                     long bannerFileId) {
     super(storageId, null);
 
@@ -158,7 +153,6 @@ public class PortalData extends ModelData {
     this.defaultLayout = defaultLayout;
     this.displayed = displayed;
     this.displayOrder = displayOrder;
-    this.bannerUploadId = bannerUploadId;
     this.bannerFileId = bannerFileId;
   }
 

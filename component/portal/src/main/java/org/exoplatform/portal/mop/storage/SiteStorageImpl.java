@@ -81,8 +81,7 @@ public class SiteStorageImpl implements SiteStorage {
 
   private static final Log     LOG                       = ExoLogger.getExoLogger(SiteStorageImpl.class);
 
-  private static final String FILE_API_NAME_SPACE = "sites";
-
+  private static final String  FILE_API_NAME_SPACE       = "sites";
 
   private SettingService       settingService;
 
@@ -96,9 +95,9 @@ public class SiteStorageImpl implements SiteStorage {
 
   private SiteDAO              siteDAO;
 
-  private final UploadService uploadService;
+  private final UploadService  uploadService;
 
-  private final FileService fileService;
+  private final FileService    fileService;
 
   public SiteStorageImpl(SettingService settingService,
                          ConfigurationManager configurationManager,
@@ -106,7 +105,7 @@ public class SiteStorageImpl implements SiteStorage {
                          PageStorage pageStorage,
                          LayoutStorage layoutStorage,
                          SiteDAO siteDAO,
-                        UploadService uploadService,
+                         UploadService uploadService,
                          FileService fileService) {
     this.navigationStorage = navigationStorage;
     this.pageStorage = pageStorage;
@@ -120,6 +119,10 @@ public class SiteStorageImpl implements SiteStorage {
 
   @Override
   public void create(PortalConfig config) {
+    if (StringUtils.isNotBlank(config.getBannerUploadId())) {
+      Long bannerFileId = saveSiteBanner(config.getBannerUploadId(), config.getBannerFileId());
+      config.setBannerFileId(bannerFileId == null ? 0 : bannerFileId);
+    }
     create(config.build());
   }
 
@@ -127,16 +130,16 @@ public class SiteStorageImpl implements SiteStorage {
   public void create(PortalData config) {
     SiteEntity entity = new SiteEntity();
     buildSiteEntity(entity, config);
-    if (StringUtils.isNotBlank(config.getBannerUploadId())) {
-      Long bannerFileId = saveSiteBanner(config.getBannerUploadId(), config.getBannerFileId());
-      entity.setBannerFileId(bannerFileId == null ? 0 : bannerFileId);
-    }
     entity = siteDAO.create(entity);
     savePermissions(entity.getId(), config);
   }
 
   @Override
   public void save(PortalConfig config) {
+    if (StringUtils.isNotBlank(config.getBannerUploadId())) {
+      Long bannerFileId = saveSiteBanner(config.getBannerUploadId(), config.getBannerFileId());
+      config.setBannerFileId(bannerFileId == null ? 0 : bannerFileId);
+    }
     save(config.build());
   }
 
@@ -148,10 +151,6 @@ public class SiteStorageImpl implements SiteStorage {
       throw new IllegalStateException("Cannot update portal " + config.getName() + " that does not exist");
     }
     buildSiteEntity(entity, config);
-    if (StringUtils.isNotBlank(config.getBannerUploadId())) {
-      Long bannerFileId = saveSiteBanner(config.getBannerUploadId(), config.getBannerFileId());
-      entity.setBannerFileId(bannerFileId == null ? 0 : bannerFileId);
-    }
     entity = siteDAO.update(entity);
     savePermissions(entity.getId(), config);
   }
@@ -280,9 +279,8 @@ public class SiteStorageImpl implements SiteStorage {
   }
 
   @Override
-  public List<PortalData> getSites(SiteFilter siteFilter) {
-    List<SiteEntity> siteEntities = siteDAO.findSites(siteFilter);
-    return siteEntities.stream().map(this::buildPortalData).toList();
+  public List<SiteKey> getSitesKeys(SiteFilter siteFilter) {
+    return siteDAO.findSitesKeys(siteFilter);
   }
 
 
@@ -361,7 +359,6 @@ public class SiteStorageImpl implements SiteStorage {
                           redirects,
                           entity.isDisplayed(),
                           entity.getDisplayOrder(),
-                          null,
                           entity.getBannerFileId());
   }
 
@@ -404,7 +401,7 @@ public class SiteStorageImpl implements SiteStorage {
       fileItem = fileService.writeFile(fileItem);
       return fileItem != null && fileItem.getFileInfo() != null ? fileItem.getFileInfo().getId() : null;
     } catch (Exception e) {
-      throw new IllegalStateException("Error while saving Program image file", e);
+      throw new IllegalStateException("Error while saving site image file", e);
     } finally {
       uploadService.removeUploadResource(uploadResource.getUploadId());
     }

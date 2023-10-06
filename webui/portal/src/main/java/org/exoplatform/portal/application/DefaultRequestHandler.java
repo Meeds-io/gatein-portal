@@ -19,26 +19,14 @@
 
 package org.exoplatform.portal.application;
 
-import java.util.Collection;
-import java.util.List;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
-import org.exoplatform.container.*;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.UserPortalConfigService;
-import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.mop.SiteFilter;
-import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.user.*;
-import org.exoplatform.portal.url.PortalURLContext;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.WebRequestHandler;
-import org.exoplatform.web.url.URLFactoryService;
-import org.exoplatform.web.url.navigation.NavigationResource;
-import org.exoplatform.web.url.navigation.NodeURL;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -48,12 +36,8 @@ public class DefaultRequestHandler extends WebRequestHandler {
     /** . */
     private final UserPortalConfigService configService;
 
-    /** . */
-    private final URLFactoryService urlFactory;
-
-    public DefaultRequestHandler(UserPortalConfigService configService, URLFactoryService urlFactory) {
+    public DefaultRequestHandler(UserPortalConfigService configService) {
         this.configService = configService;
-        this.urlFactory = urlFactory;
     }
 
     @Override
@@ -63,38 +47,23 @@ public class DefaultRequestHandler extends WebRequestHandler {
 
     @Override
     public boolean execute(ControllerContext context) throws Exception {
-        String defaultUri = null;
-
-        String currentUser = context.getRequest().getRemoteUser();
-        if (StringUtils.isNotBlank(currentUser)) {
-          defaultUri = configService.getUserHomePage(currentUser);
-        }
-
+      String defaultUri = null;
+      String currentUser = context.getRequest().getRemoteUser();
+      if (StringUtils.isNotBlank(currentUser)) {
+        defaultUri = configService.getUserHomePage(currentUser);
+      }
+      if (StringUtils.isBlank(defaultUri)) {
+        defaultUri = configService.computePortalPath(context.getRequest());
         if (StringUtils.isBlank(defaultUri)) {
-          String defaultPortal = configService.getDefaultPortal();
-          SiteFilter siteFilter = new SiteFilter();
-          siteFilter.setExcludedSiteName(configService.getGlobalPortal());
-          siteFilter.setSiteType(SiteType.PORTAL);
-          siteFilter.setSortByDisplayOrder(true);
-          siteFilter.setFilterByDisplayed(true);
-          siteFilter.setDisplayed(true);
-          List<PortalConfig> portalConfigList = configService.getSites(siteFilter);
-          if (portalConfigList != null && !portalConfigList.isEmpty()) {
-            defaultPortal = portalConfigList.get(0).getName();
-          } else {
-            HttpServletResponse resp = context.getResponse();
-            String currentPortalContainerName = PortalContainer.getCurrentPortalContainerName();
-            resp.sendRedirect("/" + currentPortalContainerName + "/login");
-            return true;
-          }
-          Collection<UserNode> userNodes = configService.getSiteNavigations(defaultPortal, currentUser, context.getRequest());
-          UserNode userNode = configService.getFirstAllowedPageNode(userNodes) ;
-          defaultUri = configService.getDefaultUri(userNode, defaultPortal);
+          HttpServletResponse resp = context.getResponse();
+          String currentPortalContainerName = PortalContainer.getCurrentPortalContainerName();
+          resp.sendRedirect("/" + currentPortalContainerName + "/login");
+          return true;
         }
-
-        HttpServletResponse resp = context.getResponse();
-        resp.sendRedirect(resp.encodeRedirectURL(defaultUri));
-        return true;
+      }
+      HttpServletResponse resp = context.getResponse();
+      resp.sendRedirect(resp.encodeRedirectURL(defaultUri));
+      return true;
     }
 
     @Override
