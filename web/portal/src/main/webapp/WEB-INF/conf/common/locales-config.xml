@@ -171,7 +171,7 @@
   </locale-config>
 
   <locale-config>
-    <locale>in</locale>
+    <locale>id</locale>
     <output-encoding>UTF-8</output-encoding>
     <input-encoding>UTF-8</input-encoding>
     <description>Default configuration for the Indonesian locale</description>
@@ -199,4 +199,3 @@
   </locale-config>
 
 </locales-config>
-
