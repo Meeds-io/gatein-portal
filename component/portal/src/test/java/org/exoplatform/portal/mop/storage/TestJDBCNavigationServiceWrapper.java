@@ -101,7 +101,10 @@ public class TestJDBCNavigationServiceWrapper extends AbstractKernelTest {
                                          null,
                                          null,
                                          container,
-                                         null);
+                                         null,
+                                         true,
+                                         88,
+                                         0);
       this.modelStorage.create(portal);
   
       NavigationContext nav = new NavigationContext(type.key(siteName), new NavigationState(1));

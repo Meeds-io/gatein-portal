@@ -18,6 +18,9 @@
  */
 package org.exoplatform.portal.mop.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,9 +31,16 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.commons.file.model.FileItem;
+import org.exoplatform.commons.file.services.FileService;
+import org.exoplatform.commons.file.services.FileStorageException;
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.portal.application.PortletPreferences;
 import org.exoplatform.portal.config.Query;
 import org.exoplatform.portal.config.model.Application;
@@ -41,6 +51,7 @@ import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.QueryResult;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.Status;
@@ -61,6 +72,8 @@ import org.exoplatform.services.log.Log;
 public class LayoutServiceImpl implements LayoutService {
 
   private static final Log       LOG           = ExoLogger.getLogger(LayoutServiceImpl.class);
+  
+  private static final String    SITE_DEAULT_BANNER_PATH = "site.default.banner.path";
 
   private ListenerService        listenerService;
 
@@ -72,19 +85,31 @@ public class LayoutServiceImpl implements LayoutService {
 
   private Map<String, Container> sharedLayouts = new HashMap<>();
 
+  private FileService fileService;
+  
+  private PortalContainer        portalContainer;
+
+  private InitParams             initParams;
+  
   public LayoutServiceImpl(ListenerService listenerService,
                            SiteStorage siteStorage,
                            PageStorage pageStorage,
-                           LayoutStorage layoutStorage) {
+                           LayoutStorage layoutStorage,
+                           FileService fileService,
+                           PortalContainer portalContainer,
+                           InitParams initParams) {
     this.listenerService = listenerService;
     this.siteStorage = siteStorage;
     this.pageStorage = pageStorage;
     this.layoutStorage = layoutStorage;
+    this.fileService = fileService;
+    this.portalContainer = portalContainer;
+    this.initParams = initParams;
   }
 
   @Override
   public void create(PortalConfig config) {
-    siteStorage.create(config.build());
+    siteStorage.create(config);
     broadcastEvent(PORTAL_CONFIG_CREATED, config);
   }
 
@@ -108,6 +133,12 @@ public class LayoutServiceImpl implements LayoutService {
   @Override
   public PortalConfig getPortalConfig(SiteKey siteKey) {
     PortalData portalData = siteStorage.getPortalConfig(siteKey);
+    return portalData == null ? null : new PortalConfig(portalData);
+  }
+
+  @Override
+  public PortalConfig getPortalConfig(long siteId) {
+    PortalData portalData = siteStorage.getPortalConfig(siteId);
     return portalData == null ? null : new PortalConfig(portalData);
   }
 
@@ -360,6 +391,56 @@ public class LayoutServiceImpl implements LayoutService {
     } else {
       throw new UnsupportedOperationException("Could not perform search on query " + q);
     }
+  }
+
+  @Override
+  public List<PortalConfig> getSites(SiteFilter filter) {
+    List<SiteKey> portalKeysList = siteStorage.getSitesKeys(filter);
+    return portalKeysList.isEmpty() ? Collections.emptyList()
+                                                            : portalKeysList.stream().map(siteKey -> new PortalConfig(siteStorage.getPortalConfig(siteKey))).toList();
+  }
+
+  @Override
+  public InputStream getSiteBannerStream(String siteName) throws ObjectNotFoundException {
+    PortalConfig portalConfig = getPortalConfig(siteName);
+    if (portalConfig == null) {
+      throw new ObjectNotFoundException("site with name " + siteName + " doesn't exist");
+    }
+    if (portalConfig.getBannerFileId() == 0) {
+      throw new ObjectNotFoundException("site with name " + siteName + " doesn't have a bannerId");
+    }
+    try {
+      FileItem fileItem = fileService.getFile(portalConfig.getBannerFileId());
+      return fileItem == null || fileItem.getFileInfo() == null ? null : fileItem.getAsStream();
+    } catch (FileStorageException | IOException e) {
+      return null ;
+    }
+  }
+  
+  @Override
+  public InputStream getDefaultSiteBannerStream(String siteName) {
+    InputStream defaultSiteBanner = portalContainer.getPortalContext()
+                                    .getResourceAsStream(System.getProperty("sites." + siteName
+                                        + ".defaultBannerPath", "/images/sites/banner/" + siteName.toLowerCase() + ".png"));
+    if (defaultSiteBanner == null && initParams != null) {
+      ValueParam siteDefaultBannerPath = initParams.getValueParam(SITE_DEAULT_BANNER_PATH);
+      if (siteDefaultBannerPath != null && siteDefaultBannerPath.getValue() != null) {
+        defaultSiteBanner = portalContainer.getPortalContext().getResourceAsStream(siteDefaultBannerPath.getValue());
+      }
+    }
+    return defaultSiteBanner != null ? defaultSiteBanner : new ByteArrayInputStream(new byte[] {});
+  }
+
+  @Override
+  public void removeSiteBanner(String siteName) throws ObjectNotFoundException {
+    PortalConfig portalConfig = getPortalConfig(siteName);
+    if (portalConfig == null) {
+      throw new ObjectNotFoundException("site with name " + siteName + " doesn't exist");
+    }
+    if (portalConfig.getBannerFileId() == 0) {
+      throw new ObjectNotFoundException("site with name " + siteName + " doesn't have a bannerId");
+    }
+    fileService.deleteFile(portalConfig.getBannerFileId());
   }
 
   private abstract class Bilto<O extends ModelObject, D extends ModelData> {

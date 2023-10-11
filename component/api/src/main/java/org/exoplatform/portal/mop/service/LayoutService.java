@@ -15,9 +15,12 @@
  */
 package org.exoplatform.portal.mop.service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Comparator;
 import java.util.List;
 
+import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.portal.config.DataStorage;
@@ -29,6 +32,7 @@ import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.QueryResult;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.Status;
@@ -94,6 +98,15 @@ public interface LayoutService extends DataStorage {
    * @return         null if not found, else {@link PortalConfig}
    */
   PortalConfig getPortalConfig(SiteKey siteKey);
+
+  /**
+   * This method should load the PortalConfig object from db according to the
+   * siteId
+   *
+   * @param  siteId
+   * @return            {@link PortalConfig}
+   */
+  PortalConfig getPortalConfig(long siteId);
 
   /**
    * Remove the PortalConfig from the database <br>
@@ -308,6 +321,47 @@ public interface LayoutService extends DataStorage {
   }
 
   default void saveImportStatus(Status status) { // NOSONAR
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Retrieves sites according to the given site filter
+   * 
+   * @param siteFilter {@link SiteFilter} site filter for results filtering
+   * @return {@link List} of sites portal config
+   */
+  default List<PortalConfig> getSites(SiteFilter siteFilter) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Retrieve site banner as stream
+   *
+   * @param siteName name of the portal site
+   * @return found {@link InputStream}
+   * @throws ObjectNotFoundException When site not found or file attachment
+   */
+  default InputStream getSiteBannerStream(String siteName) throws ObjectNotFoundException, IOException {
+    throw new UnsupportedOperationException();
+  }
+  
+  /**
+   * Retrieve default site banner as stream
+   *
+   * @param siteName name of the portal site
+   * @return found {@link InputStream}
+   */
+  default InputStream getDefaultSiteBannerStream(String siteName) {
+    throw new UnsupportedOperationException();
+  }
+  
+  /**
+   * remove site banner
+   *
+   * @param siteName name of the portal site
+   * @throws ObjectNotFoundException When site not found or file attachment
+   */
+  default void removeSiteBanner(String siteName) throws ObjectNotFoundException {
     throw new UnsupportedOperationException();
   }
 

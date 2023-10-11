@@ -372,4 +372,63 @@
       ALTER TABLE PORTAL_SITES MODIFY COLUMN DESCRIPTION longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     </sql>
   </changeSet>
+  <changeSet author="portal" id="1.0.0-35">
+    <addColumn tableName="PORTAL_SITES">
+      <column name="DISPLAYED" type="BOOLEAN" defaultValueBoolean="true" />
+      <column name="DISPLAY_ORDER" type="INT" defaultValueNumeric="0" />
+    </addColumn>
+  </changeSet>
+  <changeSet author="portal" id="1.0.0-36">
+    <addColumn tableName="PORTAL_SITES">
+      <column name="BANNER_FILE_ID" type="BIGINT" defaultValueNumeric="0" />
+    </addColumn>
+  </changeSet>
+
+  <!-- Add index for performance -->
+  <changeSet author="portal" id="1.0.0-37">
+    <createIndex indexName="IDX_PORTAL_SITES_TYPE_01"
+                 tableName="PORTAL_SITES">
+      <column name="TYPE" type="INT"/>
+    </createIndex>
+    <createIndex indexName="IDX_PORTAL_SITES_NAME_01"
+                 tableName="PORTAL_SITES">
+      <column name="NAME" type="NVARCHAR(200)"/>
+    </createIndex>
+    <createIndex indexName="IDX_PORTAL_LOCALE_01"
+                 tableName="PORTAL_SITES">
+      <column name="LOCALE" type="NVARCHAR(200)"/>
+    </createIndex>
+    <createIndex indexName="IDX_PORTAL_SKIN_01"
+                 tableName="PORTAL_SITES">
+      <column name="SKIN" type="NVARCHAR(200)"/>
+    </createIndex>
+    <createIndex indexName="IDX_PORTAL_LABEL_01"
+                 tableName="PORTAL_SITES">
+      <column name="LABEL" type="NVARCHAR(200)"/>
+    </createIndex>
+    <createIndex indexName="IDX_PORTAL_DESCRIPTION_01"
+                 tableName="PORTAL_SITES">
+      <column name="DESCRIPTION" type="LONGTEXT"/>
+    </createIndex>
+    <createIndex indexName="IDX_PORTAL_PROPERTIES_01"
+                 tableName="PORTAL_SITES">
+      <column name="PROPERTIES" type="LONGTEXT"/>
+    </createIndex>
+    <createIndex indexName="IDX_PORTAL_SITE_BODY_01"
+                 tableName="PORTAL_SITES">
+      <column name="SITE_BODY" type="LONGTEXT"/>
+    </createIndex>
+    <createIndex indexName="IDX_PORTAL_SITES_DISPLAYED_01"
+                 tableName="PORTAL_SITES">
+      <column name="DISPLAYED" type="BOOLEAN"/>
+    </createIndex>
+    <createIndex indexName="IDX_PORTAL_SITES_DISPLAY_ORDER_01"
+                 tableName="PORTAL_SITES">
+      <column name="DISPLAY_ORDER" type="INT"/>
+    </createIndex>
+    <createIndex indexName="IDX_PORTAL_SITES_BANNER_FILE_ID_01"
+                 tableName="PORTAL_SITES">
+      <column name="BANNER_FILE_ID" type="BIGINT"/>
+    </createIndex>
+  </changeSet>
 </databaseChangeLog>

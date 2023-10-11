@@ -108,6 +108,15 @@ public class SiteEntity extends ComponentEntity {
   @Transient
   private List<ComponentEntity> children         = new LinkedList<>();
 
+  @Column(name = "DISPLAYED")
+  private boolean               displayed;
+
+  @Column(name = "DISPLAY_ORDER")
+  private int               displayOrder;
+
+  @Column(name = "BANNER_FILE_ID")
+  protected long            bannerFileId;
+
   public Long getId() {
     return id;
   }
@@ -194,6 +203,30 @@ public class SiteEntity extends ComponentEntity {
 
   public boolean isDefaultSiteBody() {
     return defaultSiteBody;
+  }
+
+  public boolean isDisplayed() {
+    return displayed;
+  }
+
+  public void setDisplayed(boolean displayed) {
+    this.displayed = displayed;
+  }
+
+  public int getDisplayOrder() {
+    return displayOrder;
+  }
+
+  public void setDisplayOrder(int displayOrder) {
+    this.displayOrder = displayOrder;
+  }
+
+  public long getBannerFileId() {
+    return bannerFileId;
+  }
+
+  public void setBannerFileId(long bannerFileId) {
+    this.bannerFileId = bannerFileId;
   }
 
   @Override

@@ -1,27 +1,43 @@
 package org.exoplatform.portal.mop.dao;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
+import org.apache.commons.lang.StringUtils;
+
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.portal.jdbc.entity.SiteEntity;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 
 public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
 
-  private static final String NAME                   = "name";
+  private static final String        SITE_NAME                = "name";
 
-  private static final String SITE_TYPE              = "siteType";
+  private static final String        SITE_TYPE                = "siteType";
 
-  private static final String SPACE_SITE_TYPE_PREFIX = "/spaces/";
+  private static final String        DISPLAYED                = "displayed";
 
-  private PageDAO             pageDAO;
+  private static final String        EXCLUDED_SITE_NAME       = "excludedSiteName";
 
-  private NavigationDAO       navDAO;
+  private static final String        EXCLUDED_SITE_TYPE       = "excludedSiteType";
+
+  private static final String        SPACE_SITE_TYPE_PREFIX   = "/spaces/";
+
+  private static final String        QUERY_FILTER_FIND_PREFIX = "SiteEntity.findSites";
+
+  private final Map<String, Boolean> filterNamedQueries       = new HashMap<>();
+
+  private PageDAO                    pageDAO;
+
+  private NavigationDAO              navDAO;
 
   public SiteDAOImpl(PageDAO pageDAO, NavigationDAO navDAO) {
     super();
@@ -56,7 +72,7 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
     TypedQuery<SiteEntity> query = getEntityManager().createNamedQuery("SiteEntity.findByKey", SiteEntity.class);
 
     query.setParameter(SITE_TYPE, siteKey.getType());
-    query.setParameter(NAME, siteKey.getName());
+    query.setParameter(SITE_NAME, siteKey.getName());
     try {
       return query.getSingleResult();
     } catch (NoResultException ex) {
@@ -123,6 +139,19 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
     return getSiteNames(SiteType.USER, offset, limit);
   }
 
+  @Override
+  public List<SiteKey> findSitesKeys(SiteFilter siteFilter) {
+    TypedQuery<SiteKey> query = buildQueryFromFilter(siteFilter);
+    if (siteFilter.getOffset() > 0) {
+      query.setFirstResult(siteFilter.getOffset());
+    }
+    if (siteFilter.getLimit() > 0) {
+      query.setMaxResults(siteFilter.getLimit());
+    }
+    List<SiteKey> resultList = query.getResultList();
+    return resultList == null ? Collections.emptyList() : resultList;
+  }
+
   private List<String> getSiteNames(SiteType siteType, int offset, int limit) {
     TypedQuery<String> query = getEntityManager().createNamedQuery("SiteEntity.findPortalSites", String.class);
     query.setParameter(SITE_TYPE, siteType);
@@ -135,4 +164,79 @@ public class SiteDAOImpl extends AbstractDAO<SiteEntity> implements SiteDAO {
     return query.getResultList();
   }
 
+  private <T> TypedQuery<T> buildQueryFromFilter(SiteFilter filter) {
+    List<String> suffixes = new ArrayList<>();
+    List<String> predicates = new ArrayList<>();
+    buildPredicates(filter, suffixes, predicates);
+
+    TypedQuery<T> query;
+    String queryName = getQueryFilterName(suffixes);
+    if (filterNamedQueries.containsKey(queryName)) {
+      query = (TypedQuery<T>) getEntityManager().createNamedQuery(queryName, SiteKey.class);
+    } else {
+      String queryContent = getQueryFilterContent(filter, predicates);
+      query = (TypedQuery<T>) getEntityManager().createQuery(queryContent, SiteKey.class);
+      getEntityManager().getEntityManagerFactory().addNamedQuery(queryName, query);
+      filterNamedQueries.put(queryName, true);
+    }
+
+    addQueryFilterParameters(filter, query);
+    return query;
+  }
+
+  private void buildPredicates(SiteFilter filter, List<String> suffixes, List<String> predicates) {
+    if (filter.getSiteType() != null) {
+      suffixes.add("SiteType");
+      predicates.add("s.siteType = :siteType");
+    }
+    if (filter.getExcludedSiteType() != null) {
+      suffixes.add("ExcludedSiteType");
+      predicates.add("s.siteType != :excludedSiteType");
+    }
+    if (filter.isFilterByDisplayed()) {
+      suffixes.add("Displayed");
+      predicates.add("s.displayed = :displayed");
+    }
+    if (StringUtils.isNotBlank(filter.getExcludedSiteName())) {
+      suffixes.add("ExcludedSiteName");
+      predicates.add("s.name != :excludedSiteName");
+    }
+    if (filter.isExcludeSpaceSites()) {
+      suffixes.add("ExcludeSpaceSites");
+      predicates.add("NOT(s.name LIKE '" + SPACE_SITE_TYPE_PREFIX + "%')");
+    }
+  }
+
+  private String getQueryFilterName(List<String> suffixes) {
+    return suffixes.isEmpty() ? QUERY_FILTER_FIND_PREFIX : QUERY_FILTER_FIND_PREFIX + "By" + StringUtils.join(suffixes, "And");
+  }
+
+  private <T> void addQueryFilterParameters(SiteFilter filter, TypedQuery<T> query) {
+    if (filter.getSiteType() != null) {
+      query.setParameter(SITE_TYPE, filter.getSiteType());
+    }
+    if (filter.getExcludedSiteType() != null) {
+      query.setParameter(EXCLUDED_SITE_TYPE, filter.getExcludedSiteType());
+    }
+    if (filter.isFilterByDisplayed()) {
+      query.setParameter(DISPLAYED, filter.isDisplayed());
+    }
+    if (StringUtils.isNotBlank(filter.getExcludedSiteName())) {
+      query.setParameter(EXCLUDED_SITE_NAME, filter.getExcludedSiteName());
+    }
+  }
+
+  private String getQueryFilterContent(SiteFilter filter, List<String> predicates) {
+    String querySelect = "SELECT new org.exoplatform.portal.mop.SiteKey(s.siteType, s.name) FROM GateInSite s ";
+
+    String queryContent;
+    if (predicates.isEmpty()) {
+      queryContent = querySelect;
+    } else {
+      queryContent = querySelect + " WHERE " + StringUtils.join(predicates, " AND ");
+    }
+    String orderBy = filter.isSortByDisplayOrder() ? "s.displayOrder ASC, s.label ASC" : "s.label ASC";
+    queryContent += " ORDER BY " + orderBy;
+    return queryContent;
+  }
 }

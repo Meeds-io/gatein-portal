@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.importer.Status;
@@ -44,6 +45,8 @@ public interface SiteStorage extends ModelDataStorage {
 
   PortalData getPortalConfig(SiteKey siteKey);
 
+  PortalData getPortalConfig(long siteId);
+
   PortalData getPortalConfig(PortalKey key);
 
   PortalConfig getPortalConfig(String ownerType, String portalName);
@@ -64,4 +67,5 @@ public interface SiteStorage extends ModelDataStorage {
 
   Container getSharedLayout(String siteName);
 
+  List<SiteKey> getSitesKeys(SiteFilter siteFilter);
 }
