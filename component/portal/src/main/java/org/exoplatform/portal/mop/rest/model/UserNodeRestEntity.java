@@ -14,10 +14,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.exoplatform.portal.mop.rest;
+package org.exoplatform.portal.mop.rest.model;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.Visibility;
@@ -132,5 +133,13 @@ public class UserNodeRestEntity {
 
   public long getUpdatedDate() {
     return userNode.getUpdatedDate();
+  }
+  
+  @Override
+  public int hashCode() {
+    int result = 17;
+    result = 31 * result + (int) getUpdatedDate();
+    result = 31 * result + (subNodes != null ? Objects.hash(subNodes) : 0);
+    return result;
   }
 }

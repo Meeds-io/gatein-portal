@@ -15,12 +15,14 @@
  */
 package org.exoplatform.portal.mop.dao.mock;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.jpa.mock.AbstractInMemoryDAO;
 import org.exoplatform.portal.jdbc.entity.SiteEntity;
+import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.dao.SiteDAO;
@@ -39,10 +41,7 @@ public class InMemorySiteDAO extends AbstractInMemoryDAO<SiteEntity> implements 
 
   @Override
   public List<SiteEntity> findByType(SiteType siteType) {
-    return entities.values()
-                   .stream()
-                   .filter(site -> site.getSiteType() == siteType)
-                   .toList();
+    return entities.values().stream().filter(site -> site.getSiteType() == siteType).toList();
   }
 
   @Override
@@ -56,20 +55,12 @@ public class InMemorySiteDAO extends AbstractInMemoryDAO<SiteEntity> implements 
 
   @Override
   public List<String> findPortalSites(int offset, int limit) {
-    return findSiteKey(SiteType.PORTAL).stream()
-                                       .skip(offset)
-                                       .limit(limit(limit))
-                                       .map(SiteKey::getName)
-                                       .toList();
+    return findSiteKey(SiteType.PORTAL).stream().skip(offset).limit(limit(limit)).map(SiteKey::getName).toList();
   }
 
   @Override
   public List<String> findUserSites(int offset, int limit) {
-    return findSiteKey(SiteType.USER).stream()
-                                     .skip(offset)
-                                     .limit(limit(limit))
-                                     .map(SiteKey::getName)
-                                     .toList();
+    return findSiteKey(SiteType.USER).stream().skip(offset).limit(limit(limit)).map(SiteKey::getName).toList();
   }
 
   @Override
@@ -90,6 +81,24 @@ public class InMemorySiteDAO extends AbstractInMemoryDAO<SiteEntity> implements 
                                       .limit(limit(limit))
                                       .map(SiteKey::getName)
                                       .toList();
+  }
+
+  @Override
+  public List<SiteKey> findSitesKeys(SiteFilter filter) {
+    List<SiteEntity> res = entities.values().stream().toList();
+    if (filter.isFilterByDisplayed()) {
+      res = res.stream().filter(siteEntity -> siteEntity.isDisplayed() == filter.isDisplayed()).toList();
+    }
+    if (filter.getSiteType() != null) {
+      res = res.stream().filter(siteEntity -> siteEntity.getSiteType() == filter.getSiteType()).toList();
+    }
+    if (StringUtils.isNotBlank(filter.getExcludedSiteName())) {
+      res = res.stream().filter(siteEntity -> !siteEntity.getName().equals(filter.getExcludedSiteName())).toList();
+    }
+    if (filter.isSortByDisplayOrder()) {
+      res = res.stream().sorted(Comparator.comparingInt(SiteEntity::getDisplayOrder)).toList();
+    }
+    return res.stream().map(site -> new SiteKey(site.getSiteType(), site.getName())).toList();
   }
 
   private int limit(int limit) {

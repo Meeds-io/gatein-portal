@@ -193,6 +193,16 @@ public class TestDataStorage extends AbstractKernelTest {
     assertEquals("foo1", portal.getName());
     assertEquals(label, portal.getLabel());
     assertEquals(description, portal.getDescription());
+
+    //
+    long siteId = Long.parseLong(portal.getStorageId().split("_")[1]);
+    PortalConfig portal1 = storage_.getPortalConfig(siteId);
+    assertNotNull(portal1);
+    assertEquals(portal1.getStorageId(), portal.getStorageId());
+    assertEquals("portal", portal1.getType());
+    assertEquals("foo1", portal1.getName());
+    assertEquals(label, portal1.getLabel());
+    assertEquals(description, portal1.getDescription());
   }
 
   public void testPortalConfigSave() throws Exception {
@@ -827,7 +837,7 @@ public class TestDataStorage extends AbstractKernelTest {
       ContainerData container = new ContainerData(null, "testcontainer_" + siteName, "", "", "", "", "", "", "",
               "", "", "", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
       PortalData portal = new PortalData(null, siteName, type.getName(), null, null,
-              null, new ArrayList<>(), null, null, null, container, null);
+              null, new ArrayList<>(), null, null, null, container, null, true, 5, 0);
       this.modelStorage.create(portal);
 
       NavigationContext nav = new NavigationContext(type.key(siteName), new NavigationState(1));

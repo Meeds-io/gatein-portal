@@ -221,6 +221,10 @@ public class UserACL {
     public boolean hasEditPermission(PortalConfig pconfig) {
         return hasPermission(getIdentity(), pconfig.getEditPermission());
     }
+    
+    public boolean hasAccessPermission(PortalConfig portalConfig) {
+      return hasPermission(portalConfig.getAccessPermissions());
+    }
 
     /**
      * This method is equivalent to <code>hasEditPermission(PortalConfig)</code>. That allows us to check edit permission on a

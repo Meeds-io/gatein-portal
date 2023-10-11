@@ -123,6 +123,8 @@
           deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions"/>
     <value name="edit-permission" field="editPermission" usage="optional"/>
     <value name="skin" field="skin" usage="optional"/>
+    <value name="displayed" field="displayed" default="true"/>
+    <value name="display-order" field="displayOrder" default="0"/>
     <structure field="properties" usage="optional"/>
     <structure name="portal-layout" using="container" field="portalLayout" usage="optional"/>
     <collection name="portal-redirects" usage="optional" get-method="getPortalRedirects" set-method="setPortalRedirects"

@@ -16,6 +16,7 @@
 package org.exoplatform.portal.mop.storage.mock;
 
 import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.portal.mop.dao.SiteDAO;
 import org.exoplatform.portal.mop.importer.Status;
@@ -23,6 +24,7 @@ import org.exoplatform.portal.mop.storage.LayoutStorage;
 import org.exoplatform.portal.mop.storage.NavigationStorage;
 import org.exoplatform.portal.mop.storage.PageStorage;
 import org.exoplatform.portal.mop.storage.SiteStorageImpl;
+import org.exoplatform.upload.UploadService;
 
 public class InMemorySiteStorage extends SiteStorageImpl {
 
@@ -33,8 +35,10 @@ public class InMemorySiteStorage extends SiteStorageImpl {
                              NavigationStorage navigationStorage,
                              PageStorage pageStorage,
                              LayoutStorage layoutStorage,
-                             SiteDAO siteDAO) {
-    super(settingService, confManager, navigationStorage, pageStorage, layoutStorage, siteDAO);
+                             SiteDAO siteDAO,
+                             UploadService uploadService,
+                             FileService fileService) {
+    super(settingService, confManager, navigationStorage, pageStorage, layoutStorage, siteDAO, uploadService, fileService);
   }
 
   @Override

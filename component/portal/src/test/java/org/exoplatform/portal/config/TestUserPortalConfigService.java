@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.exoplatform.portal.mop.SiteFilter;
 import org.gatein.common.util.Tools;
 
 import org.exoplatform.component.test.ConfigurationUnit;
@@ -233,6 +234,23 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
         userPortalConfigSer_.globalPortal_ = "system";
         try {
           assertFalse(userPortalConfigSer_.getSiteNames(SiteType.PORTAL, 0, 0).contains("system"));
+        } finally {
+          userPortalConfigSer_.globalPortal_ = originalGlobalPortal;
+        }
+      }
+    }.execute("root");
+  }
+
+  public void testGetSites() {
+    new UnitTest() {
+      public void execute() throws Exception {
+        userPortalConfigSer_.removeUserPortalConfig("jazz");
+        assertEquals(4, userPortalConfigSer_.getUserPortalDisplayedSites().size());
+
+        String originalGlobalPortal = userPortalConfigSer_.globalPortal_;
+        userPortalConfigSer_.globalPortal_ = "system";
+        try {
+          assertEquals(3, userPortalConfigSer_.getUserPortalDisplayedSites().size());
         } finally {
           userPortalConfigSer_.globalPortal_ = originalGlobalPortal;
         }

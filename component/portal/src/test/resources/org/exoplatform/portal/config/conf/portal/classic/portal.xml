@@ -20,11 +20,12 @@
 
 <portal-config
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_objects_1_6 http://www.gatein.org/xml/ns/gatein_objects_1_6"
-    xmlns="http://www.gatein.org/xml/ns/gatein_objects_1_6">
+    xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_objects_1_10 http://www.gatein.org/xml/ns/gatein_objects_1_10"
+    xmlns="http://www.gatein.org/xml/ns/gatein_objects_1_10">
   <portal-name>classic</portal-name>
   <label>Classic</label>
   <description>This is classic portal for testing</description>
+  <display-order>1</display-order>
   <locale>en</locale>
   <access-permissions>Everyone</access-permissions>
   <edit-permission>*:/platform/administrators</edit-permission>
@@ -83,5 +84,4 @@
       <show-info-bar>false</show-info-bar>
     </portlet-application>
   </portal-layout>
-
 </portal-config>

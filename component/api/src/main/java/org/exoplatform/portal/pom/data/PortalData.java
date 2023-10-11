@@ -25,7 +25,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * @author  <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
 @Data
@@ -65,6 +65,12 @@ public class PortalData extends ModelData {
 
   private final List<RedirectData>  redirects;
 
+  private final boolean             displayed;
+
+  private final int                 displayOrder;
+
+  private long                      bannerFileId;
+
   private PortalData() {
     super(null, null);
     this.key = null;
@@ -78,6 +84,8 @@ public class PortalData extends ModelData {
     this.portalLayout = null;
     this.redirects = null;
     this.defaultLayout = false;
+    this.displayed = true;
+    this.displayOrder = 0;
   }
 
   public PortalData(String storageId, // NOSONAR
@@ -91,7 +99,10 @@ public class PortalData extends ModelData {
                     Map<String, String> properties,
                     String skin,
                     ContainerData portalLayout,
-                    List<RedirectData> redirects) {
+                    List<RedirectData> redirects,
+                    boolean displayed,
+                    int displayOrder,
+                    long bannerFileId) {
     this(storageId,
          name,
          type,
@@ -104,7 +115,10 @@ public class PortalData extends ModelData {
          skin,
          portalLayout,
          false,
-         redirects);
+         redirects,
+         displayed,
+         displayOrder,
+         bannerFileId);
   }
 
   public PortalData(String storageId, // NOSONAR
@@ -119,7 +133,10 @@ public class PortalData extends ModelData {
                     String skin,
                     ContainerData portalLayout,
                     boolean defaultLayout,
-                    List<RedirectData> redirects) {
+                    List<RedirectData> redirects,
+                    boolean displayed,
+                    int displayOrder,
+                    long bannerFileId) {
     super(storageId, null);
 
     //
@@ -134,6 +151,9 @@ public class PortalData extends ModelData {
     this.portalLayout = portalLayout;
     this.redirects = redirects;
     this.defaultLayout = defaultLayout;
+    this.displayed = displayed;
+    this.displayOrder = displayOrder;
+    this.bannerFileId = bannerFileId;
   }
 
   public String getName() {
