@@ -386,6 +386,13 @@
 
   <!-- Add index for performance -->
   <changeSet author="portal" id="1.0.0-37">
+    <preConditions onFail="MARK_RAN">
+      <not><indexExists indexName="IDX_PORTAL_SITES_TYPE_01" tableName="PORTAL_SITES"/></not>
+      <not><indexExists indexName="IDX_PORTAL_SITES_NAME_01" tableName="PORTAL_SITES"/></not>
+      <not><indexExists indexName="IDX_PORTAL_LOCALE_01" tableName="PORTAL_SITES"/></not>
+      <not><indexExists indexName="IDX_PORTAL_SKIN_01" tableName="PORTAL_SITES"/></not>
+      <not><indexExists indexName="IDX_PORTAL_LABEL_01" tableName="PORTAL_SITES"/></not>
+    </preConditions>
     <createIndex indexName="IDX_PORTAL_SITES_TYPE_01"
                  tableName="PORTAL_SITES">
       <column name="TYPE" type="INT"/>
@@ -406,18 +413,10 @@
                  tableName="PORTAL_SITES">
       <column name="LABEL" type="NVARCHAR(200)"/>
     </createIndex>
-    <createIndex indexName="IDX_PORTAL_DESCRIPTION_01"
-                 tableName="PORTAL_SITES">
-      <column name="DESCRIPTION" type="LONGTEXT"/>
-    </createIndex>
-    <createIndex indexName="IDX_PORTAL_PROPERTIES_01"
-                 tableName="PORTAL_SITES">
-      <column name="PROPERTIES" type="LONGTEXT"/>
-    </createIndex>
-    <createIndex indexName="IDX_PORTAL_SITE_BODY_01"
-                 tableName="PORTAL_SITES">
-      <column name="SITE_BODY" type="LONGTEXT"/>
-    </createIndex>
+  </changeSet>
+
+  <!-- Add index for performance -->
+  <changeSet author="portal" id="1.0.0-38">
     <createIndex indexName="IDX_PORTAL_SITES_DISPLAYED_01"
                  tableName="PORTAL_SITES">
       <column name="DISPLAYED" type="BOOLEAN"/>
