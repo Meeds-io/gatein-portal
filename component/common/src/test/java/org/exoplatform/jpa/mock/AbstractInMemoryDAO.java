@@ -30,11 +30,11 @@ import org.exoplatform.services.log.Log;
 
 public class AbstractInMemoryDAO<E> implements GenericDAO<E, Long> {
 
-  private static final Log                   LOG         = ExoLogger.getLogger(AbstractInMemoryDAO.class);
+  private static final Log                   LOG          = ExoLogger.getLogger(AbstractInMemoryDAO.class);
+
+  protected static final AtomicLong          ID_GENERATOR = new AtomicLong();
 
   protected Class<E>                         modelClass;
-
-  protected AtomicLong                       idGenerator = new AtomicLong();
 
   protected static Map<String, Map<Long, ?>> allEntities = new HashMap<>();
 
@@ -73,7 +73,7 @@ public class AbstractInMemoryDAO<E> implements GenericDAO<E, Long> {
 
   @Override
   public E create(E entity) {
-    long id = idGenerator.incrementAndGet();
+    long id = ID_GENERATOR.incrementAndGet();
     setId(entity, id);
     entities.put(id, entity);
     return entity;
