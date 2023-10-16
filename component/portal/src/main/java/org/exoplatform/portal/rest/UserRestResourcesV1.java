@@ -180,6 +180,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
     String firstName = userEntity.getFirstName();
     String lastName = userEntity.getLastName();
     String password = userEntity.getPassword();
+    Boolean isEnabled = userEntity.isEnabled();
 
     Locale locale = request == null ? Locale.ENGLISH : request.getLocale();
 
@@ -231,8 +232,8 @@ public class UserRestResourcesV1 implements ResourceContainer {
        return Response.status(Response.Status.BAD_REQUEST).entity("USERNAME:ALREADY_EXISTS_AS_DELETED").build();
     }
 
-    if (!user.isEnabled()) {
-      organizationService.getUserHandler().setEnabled(userName, false, true);
+    if (!isEnabled) {
+      organizationService.getUserHandler().setEnabled(userName, isEnabled, true);
     }
 
     return Response.noContent().build();
