@@ -200,7 +200,7 @@ public class UserFieldValidator {
   }
 
   private static boolean isSymbol(char c) {
-    return c == '_' || c == '.';
+    return c == '_' || c == '.' || c == '-' ;
   }
 
   private static String getLabel(Locale locale, String key, Object... values) {
