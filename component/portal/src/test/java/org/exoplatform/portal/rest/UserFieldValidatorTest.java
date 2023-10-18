@@ -106,13 +106,13 @@ public class UserFieldValidatorTest {
 
   @Test
   public void testValidateFieldRegexWithHyphen() {
-    System.setProperty("gatein.validators.fieldregexp.regexp", "[a-z1-9-]*");
+    System.setProperty("gatein.validators.fieldregexphyphen.regexp", "[a-z1-9-]*");
 
     try {
-      UserFieldValidator fieldValidator = new UserFieldValidator("fieldregexp", true, false);
+      UserFieldValidator fieldValidator = new UserFieldValidator("fieldregexphyphen", true, false);
       assertNull(fieldValidator.validate(Locale.ENGLISH, "a123-456"));
     } finally {
-      System.setProperty("gatein.validators.fieldregexp.regexp", "");
+      System.setProperty("gatein.validators.fieldregexphyphen.regexp", "");
     }
   }
 }
