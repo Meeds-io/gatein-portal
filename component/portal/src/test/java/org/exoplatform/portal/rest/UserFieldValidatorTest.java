@@ -102,4 +102,17 @@ public class UserFieldValidatorTest {
     assertNotNull(passwordValidator.validate(Locale.ENGLISH, "Aa123456"));
     assertNull(passwordValidator.validate(Locale.ENGLISH, "newPassword1"));
   }
+
+
+  @Test
+  public void testValidateFieldRegexWithHyphen() {
+    System.setProperty("gatein.validators.fieldregexp.regexp", "[a-z1-9-]*");
+
+    try {
+      UserFieldValidator fieldValidator = new UserFieldValidator("fieldregexp", true, false);
+      assertNull(fieldValidator.validate(Locale.ENGLISH, "a123-456"));
+    } finally {
+      System.setProperty("gatein.validators.fieldregexp.regexp", "");
+    }
+  }
 }
