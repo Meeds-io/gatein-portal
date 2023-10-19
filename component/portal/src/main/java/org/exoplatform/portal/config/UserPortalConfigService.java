@@ -551,15 +551,29 @@ public class UserPortalConfigService implements Startable {
       return list.stream().filter(config -> config != null && userACL_.hasPermission(config)).toList();
     }
 
+    public String computePortalSitePath(String portalName, HttpServletRequest context) throws Exception {
+      PortalConfig portalConfig = layoutService.getPortalConfig(portalName);
+      if (portalConfig == null) {
+        return null;
+      }
+      return computeSitePath(portalConfig.getName(), context);
+    }
+
     public String computePortalPath(HttpServletRequest context) throws Exception {
       List<PortalConfig> portalConfigList = getUserPortalDisplayedSites();
       if (portalConfigList == null || portalConfigList.isEmpty()) {
         return null;
       }
-      String defaultPortal = portalConfigList.get(0).getName();
-      Collection<UserNode> userNodes = getSiteNavigations(defaultPortal, context.getRemoteUser(), context);
+      return computeSitePath(portalConfigList.get(0).getName(), context);
+    }
+
+    private String computeSitePath(String portalName, HttpServletRequest context) throws Exception {
+      Collection<UserNode> userNodes = getSiteNavigations(portalName, context.getRemoteUser(), context);
       UserNode userNode = getFirstAllowedPageNode(userNodes);
-      return getDefaultUri(userNode, defaultPortal);
+      if (userNode == null ) {
+          return null;
+      }
+      return getDefaultUri(userNode, portalName);
     }
 
     public Collection<UserNode> getSiteNavigations(String siteName,
