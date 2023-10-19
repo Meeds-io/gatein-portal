@@ -551,22 +551,30 @@ public class UserPortalConfigService implements Startable {
       return list.stream().filter(config -> config != null && userACL_.hasPermission(config)).toList();
     }
 
+    public String computePortalSitePath(String portalName, HttpServletRequest context) throws Exception {
+      PortalConfig portalConfig = layoutService.getPortalConfig(portalName);
+      if (portalConfig == null) {
+        return null;
+      }
+      Collection<UserNode> userNodes = getPortalSiteNavigations(portalName, context);
+      UserNode userNode = getFirstAllowedPageNode(userNodes);
+      if (userNode == null) {
+        return null;
+      }
+      return getDefaultUri(userNode, portalName);
+    }
+    
     public String computePortalPath(HttpServletRequest context) throws Exception {
       List<PortalConfig> portalConfigList = getUserPortalDisplayedSites();
       if (portalConfigList == null || portalConfigList.isEmpty()) {
         return null;
       }
-      String defaultPortal = portalConfigList.get(0).getName();
-      Collection<UserNode> userNodes = getSiteNavigations(defaultPortal, context.getRemoteUser(), context);
-      UserNode userNode = getFirstAllowedPageNode(userNodes);
-      return getDefaultUri(userNode, defaultPortal);
+      return computePortalSitePath(portalConfigList.get(0).getName(), context);
     }
 
-    public Collection<UserNode> getSiteNavigations(String siteName,
-                                                   String userName,
-                                                   HttpServletRequest context) throws Exception {
+    public Collection<UserNode> getPortalSiteNavigations(String siteName, HttpServletRequest context) throws Exception {
       HttpUserPortalContext userPortalContext = new HttpUserPortalContext(context);
-      UserPortalConfig userPortalConfig = getUserPortalConfig(siteName, userName, userPortalContext);
+      UserPortalConfig userPortalConfig = getUserPortalConfig(siteName, context.getRemoteUser(), userPortalContext);
       UserPortal userPortal = userPortalConfig.getUserPortal();
       UserNavigation navigation = userPortal.getNavigation(new SiteKey(SiteType.PORTAL, siteName));
       UserNodeFilterConfig builder = UserNodeFilterConfig.builder()
@@ -592,17 +600,6 @@ public class UserPortalConfigService implements Startable {
         }
       }
       return userNode;
-    }
-
-    public String getDefaultUri(UserNode node, String site) {
-      String uri = "/portal/" + site + "/";
-      Page userNodePage = layoutService.getPage(node.getPageRef());
-      if (PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
-        uri = userNodePage.getLink();
-      } else {
-        uri = uri + node.getURI();
-      }
-      return uri;
     }
 
     /**
@@ -772,6 +769,17 @@ public class UserPortalConfigService implements Startable {
 
     public void reloadConfig(String ownerType, String predefinedOwner, String location, String importMode, boolean overrideMode) {
       newPortalConfigListener_.reloadConfig(ownerType, predefinedOwner, location, importMode, overrideMode);
+    }
+    
+    private String getDefaultUri(UserNode node, String site) {
+      String uri = "/portal/" + site + "/";
+      Page userNodePage = layoutService.getPage(node.getPageRef());
+      if (PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
+        uri = userNodePage.getLink();
+      } else {
+        uri = uri + node.getURI();
+      }
+      return uri;
     }
 
 }
