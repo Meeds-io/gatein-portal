@@ -22,11 +22,13 @@ package org.exoplatform.portal.webui.portal;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.webui.container.UIContainer;
+import org.exoplatform.portal.webui.page.UIPageBody;
 import org.exoplatform.portal.webui.page.UISiteBody;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
+import org.exoplatform.webui.core.UIComponent;
 
 @ComponentConfig(
 
@@ -44,10 +46,11 @@ public class UISharedLayout extends UIContainer {
   }
 
   protected boolean isShowSharedLayout(PortalRequestContext requestContext) {
+    boolean showSharedLayout = !requestContext.isHideSharedLayout() && (Util.getUIPage() == null || !Util.getUIPage().isHideSharedLayout());
     if (requestContext.getUserPortalConfig() != null && requestContext.getUserPortalConfig().getPortalConfig() != null) {
-      return !requestContext.getUserPortalConfig().getPortalConfig().getType().equals(PortalConfig.PORTAL_TYPE) || requestContext.getUserPortalConfig().getPortalConfig().isDisplayed();
+      showSharedLayout = showSharedLayout && (!requestContext.getUserPortalConfig().getPortalConfig().getType().equals(PortalConfig.PORTAL_TYPE) || requestContext.getUserPortalConfig().getPortalConfig().isDisplayed());
     }
-    return !requestContext.isHideSharedLayout() && (Util.getUIPage() == null || !Util.getUIPage().isHideSharedLayout());
+    return showSharedLayout;
   }
 
   protected void processSiteBodyRender(WebuiRequestContext context) throws Exception {
@@ -56,6 +59,15 @@ public class UISharedLayout extends UIContainer {
   }
 
   protected void processContainerRender(WebuiRequestContext context) throws Exception {
+    UISiteBody uiSiteBody = findFirstComponentOfType(UISiteBody.class);
+//    UIPortalApplication UIPortalApplication = Util.getUIPortalApplication();
+//    //UIPortalApplication.getCachedUIPortal(String ownerType, String ownerId);
+//    UIPortal defaultUiPortal = UIPortalApplication.getCachedUIPortal(PortalConfig.PORTAL_TYPE, "dw");
+//    uiSiteBody.setUIComponent(defaultUiPortal);
+//    uiSiteBody.processRender(context);
+    uiSiteBody.setRendered(false);
+
+    UIPageBody uiPageBody = uiSiteBody.findFirstComponentOfType(UIPageBody.class);
     super.processRender(context);
   }
 

@@ -22,6 +22,7 @@ package org.exoplatform.portal.webui.page;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.portal.application.PortalRequestContext;
+import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.webui.application.WebuiRequestContext;
@@ -65,7 +66,11 @@ public class UISiteBody extends UIComponentDecorator {
     }
 
     protected boolean isShowSiteBody(PortalRequestContext requestContext) {
-      return !requestContext.isShowMaxWindow() && (Util.getUIPage() == null || !Util.getUIPage().isShowMaxWindow());
+      boolean showSiteBody = !requestContext.isShowMaxWindow() && (Util.getUIPage() == null || !Util.getUIPage().isShowMaxWindow());
+      if (requestContext.getUserPortalConfig() != null && requestContext.getUserPortalConfig().getPortalConfig() != null) {
+        showSiteBody = showSiteBody && requestContext.getUserPortalConfig().getPortalConfig().getType().equals(PortalConfig.PORTAL_TYPE) && !requestContext.getUserPortalConfig().getPortalConfig().isDisplayed();
+      }
+      return showSiteBody;
     }
 
     protected void processPageBodyRender(WebuiRequestContext context) throws Exception {

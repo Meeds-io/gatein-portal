@@ -338,6 +338,15 @@ public class UIPortalApplication extends UIApplication {
     public UIPortal getCurrentSite() {
         return currentSite;
     }
+    
+    /**
+     * Returns current UIPortal which being showed in normal mode
+     *
+     * @return
+     */
+    public UIPortal getDefaultSite() {
+        return currentSite;
+    }
 
     /**
      * Returns a cached UIPortal matching to OwnerType and OwnerId if any
