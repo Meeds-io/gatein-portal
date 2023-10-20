@@ -32,6 +32,7 @@ import org.exoplatform.portal.config.model.PageBody;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.SiteBody;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.webui.application.PortletState;
 import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.container.UIComponentFactory;
@@ -308,9 +309,11 @@ public class PortalDataMapper {
         uiPortal.setProperties(model.getProperties());
         uiPortal.setRedirects(model.getPortalRedirects());
         uiPortal.setUseDynamicLayout(model.isDefaultLayout());
+        LayoutService layoutService = uiPortal.getApplicationComponent(LayoutService.class);
+        PortalConfig metaSite = layoutService.getPortalConfig("dw");
 
-
-        Container layout = model.getPortalLayout();
+        Container layout = model.isDisplayed() ? metaSite.getPortalLayout() : model.getPortalLayout();
+        
         uiPortal.setMoveAppsPermissions(layout.getMoveAppsPermissions());
         uiPortal.setMoveContainersPermissions(layout.getMoveContainersPermissions());
         List<ModelObject> children = layout .getChildren();

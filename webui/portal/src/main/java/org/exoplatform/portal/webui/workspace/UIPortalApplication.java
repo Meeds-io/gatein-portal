@@ -415,6 +415,7 @@ public class UIPortalApplication extends UIApplication {
 
             UIPortal tmp = null;
             PortalConfig portalConfig = Util.getPortalRequestContext().getDynamicPortalConfig();
+            //TODO
             if (portalConfig != null) {
                 tmp = this.createUIComponent(UIPortal.class, null, null);
                 PortalDataMapper.toUIPortal(tmp, portalConfig);

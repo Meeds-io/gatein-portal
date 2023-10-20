@@ -388,6 +388,7 @@ public class PortalRequestContext extends WebuiRequestContext {
     }
 
     public PortalConfig getDynamicPortalConfig() throws Exception {
+      //TODO
       if (this.currentPortalConfig == null) {
         SiteKey displayingSiteKey = getSiteKey();
 
