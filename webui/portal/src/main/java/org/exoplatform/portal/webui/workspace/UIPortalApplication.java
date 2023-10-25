@@ -1122,11 +1122,15 @@ public class UIPortalApplication extends UIApplication {
      */
     public boolean isMenuSticky() {
       PortalRequestContext context = Util.getPortalRequestContext();
-      SettingValue<?> stickySettingValue = getApplicationComponent(SettingService.class).get(Context.USER.id(context.getRemoteUser()),
-                                                                                             Scope.APPLICATION.id("HamburgerMenu"),
-                                                                                             "Sticky");
-      return stickySettingValue == null ? Boolean.parseBoolean(System.getProperty("io.meeds.userPrefs.HamburgerMenu.sticky", "false"))
-                                        : Boolean.parseBoolean(stickySettingValue.getValue().toString());
+      if (StringUtils.isBlank(context.getRemoteUser())) {
+        return false;
+      } else {
+        SettingValue<?> stickySettingValue = getApplicationComponent(SettingService.class).get(Context.USER.id(context.getRemoteUser()),
+                                                                                               Scope.APPLICATION.id("HamburgerMenu"),
+                                                                                               "Sticky");
+        return stickySettingValue == null ? Boolean.parseBoolean(System.getProperty("io.meeds.userPrefs.HamburgerMenu.sticky", "false"))
+                                          : Boolean.parseBoolean(stickySettingValue.getValue().toString());
+      }
     }
 
     /**
