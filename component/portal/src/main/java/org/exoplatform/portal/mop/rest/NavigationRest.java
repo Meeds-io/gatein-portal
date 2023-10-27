@@ -85,14 +85,14 @@ public class NavigationRest implements ResourceContainer {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
   @Operation(summary = "Gets navigations", description = "Gets navigations", method = "GET")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
       @ApiResponse(responseCode = "400", description = "Invalid query input"),
       @ApiResponse(responseCode = "404", description = "Navigation does not exist"),
       @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public Response getSiteNavigation(@Context
-  HttpServletRequest request,
+  public Response getSiteNavigation(
+                                    @Context
+                                    HttpServletRequest request,
                                     @Parameter(description = "Offset", required = false)
                                     @Schema(defaultValue = "0")
                                     @QueryParam("offset")
@@ -131,14 +131,14 @@ public class NavigationRest implements ResourceContainer {
   @Path("/{siteType}")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
   @Operation(summary = "Gets navigations of one or multiple site navigations", description = "Gets navigations of one or multiple site navigations", method = "GET")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
       @ApiResponse(responseCode = "400", description = "Invalid query input"),
       @ApiResponse(responseCode = "404", description = "Navigation does not exist"),
       @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public Response getSiteTypeNavigations(@Context
-  HttpServletRequest request,
+  public Response getSiteTypeNavigations(
+                                         @Context
+                                         HttpServletRequest request,
                                          @Parameter(description = "Portal site type, possible values: PORTAL, GROUP or USER", required = true)
                                          @PathParam("siteType")
                                          String siteTypeName,
@@ -186,7 +186,6 @@ public class NavigationRest implements ResourceContainer {
   @Path("/categories")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
   @Operation(summary = "Gets navigations categories for UI", description = "Gets navigations categories for UI", method = "GET")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
       @ApiResponse(responseCode = "500", description = "Internal server error"), })
