@@ -20,7 +20,6 @@ package org.exoplatform.portal.mop.service;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Spliterator;
 
 import org.apache.commons.lang.StringUtils;
 
