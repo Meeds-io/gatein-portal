@@ -30,11 +30,20 @@ import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 import io.meeds.portal.security.constant.UserRegistrationType;
 import io.meeds.portal.security.model.RegistrationSetting;
 
 public class SecuritySettingService {
+
+  public static final String                  ACCESS_TYPE_MODIFIED               = "meeds.settings.access.type.modified";
+
+  public static final String                  EXTERNAL_USER_REG_MODIFIED         = "meeds.settings.access.externalUsers.modified";
+
+  public static final String                  DEFAULT_GROUPS_MODIFIED            = "meeds.settings.access.defaultGroups.modified";
 
   protected static final String               INTERNAL_USERS_GROUP               = "/platform/users";
 
@@ -60,12 +69,19 @@ public class SecuritySettingService {
                                                                                  Boolean.parseBoolean(System.getProperty("meeds.settings.access.externalUsers",
                                                                                                                          "false").toLowerCase());
 
+  private static final Log                    LOG                                =
+                                                  ExoLogger.getLogger(SecuritySettingService.class);
+
   private RegistrationSetting                 registrationSetting;
 
   private SettingService                      settingService;
 
-  public SecuritySettingService(SettingService settingService) {
+  private ListenerService                     listenerService;
+
+  public SecuritySettingService(SettingService settingService,
+                                ListenerService listenerService) {
     this.settingService = settingService;
+    this.listenerService = listenerService;
   }
 
   public RegistrationSetting getRegistrationSetting() {
@@ -103,16 +119,21 @@ public class SecuritySettingService {
   }
 
   public void saveRegistrationType(UserRegistrationType registrationType) {
-    try {
-      if (registrationType == null) {
-        registrationType = DEFAULT_REGISTRATION_TYPE;
+    if (registrationType == null) {
+      registrationType = DEFAULT_REGISTRATION_TYPE;
+    }
+    UserRegistrationType storedRegistrationType = getRegistrationType();
+    boolean modified = registrationType != storedRegistrationType;
+    if (modified) {
+      try {
+        settingService.set(SECURITY_CONTEXT,
+                           SECURITY_SCOPE,
+                           REGISTRATION_TYPE_PARAM,
+                           SettingValue.create(registrationType.toString()));
+        broadcastEvent(ACCESS_TYPE_MODIFIED, null, registrationType);
+      } finally {
+        registrationSetting = null;
       }
-      settingService.set(SECURITY_CONTEXT,
-                         SECURITY_SCOPE,
-                         REGISTRATION_TYPE_PARAM,
-                         SettingValue.create(registrationType.toString()));
-    } finally {
-      registrationSetting = null;
     }
   }
 
@@ -126,13 +147,16 @@ public class SecuritySettingService {
   }
 
   public void saveRegistrationExternalUser(boolean externalUser) {
-    try {
-      settingService.set(SECURITY_CONTEXT,
-                         SECURITY_SCOPE,
-                         REGISTRATION_EXTERNAL_USER_PARAM,
-                         SettingValue.create(String.valueOf(externalUser)));
-    } finally {
-      registrationSetting = null;
+    if (externalUser != isRegistrationExternalUser()) {
+      try {
+        settingService.set(SECURITY_CONTEXT,
+                           SECURITY_SCOPE,
+                           REGISTRATION_EXTERNAL_USER_PARAM,
+                           SettingValue.create(String.valueOf(externalUser)));
+        broadcastEvent(EXTERNAL_USER_REG_MODIFIED, null, externalUser);
+      } finally {
+        registrationSetting = null;
+      }
     }
   }
 
@@ -157,8 +181,21 @@ public class SecuritySettingService {
                          SECURITY_SCOPE,
                          REGISTRATION_EXTRA_GROUPS_PARAM,
                          SettingValue.create(StringUtils.join(groupIds, EXTRA_GROUPS_SEPARATOR)));
+      broadcastEvent(DEFAULT_GROUPS_MODIFIED, null, groupIds);
     } finally {
       registrationSetting = null;
+    }
+  }
+
+  private void broadcastEvent(String eventName, Object source, Object data) {
+    try {
+      listenerService.broadcast(eventName, source, data);
+    } catch (Exception e) {
+      LOG.warn("Error broacasting event {} with source {} and data {}",
+               eventName,
+               source,
+               data,
+               e);
     }
   }
 
