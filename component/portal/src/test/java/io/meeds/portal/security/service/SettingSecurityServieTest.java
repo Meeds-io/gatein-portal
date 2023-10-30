@@ -19,7 +19,7 @@
 
 package io.meeds.portal.security.service;
 
-import static io.meeds.portal.security.service.SecuritySettingService.DEFAULT_REGISTRATION_EXTERNAL_USER;
+import static io.meeds.portal.security.service.SecuritySettingService.*;
 import static io.meeds.portal.security.service.SecuritySettingService.DEFAULT_REGISTRATION_TYPE;
 import static io.meeds.portal.security.service.SecuritySettingService.EXTERNAL_USERS_GROUP;
 import static io.meeds.portal.security.service.SecuritySettingService.EXTRA_GROUPS_SEPARATOR;
@@ -37,6 +37,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,6 +53,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.services.listener.ListenerService;
 
 import io.meeds.portal.security.constant.UserRegistrationType;
 import io.meeds.portal.security.model.RegistrationSetting;
@@ -63,11 +65,14 @@ public class SettingSecurityServieTest {
   @Mock
   private SettingService         settingService;
 
+  @Mock
+  private ListenerService        listenerService;
+
   private SecuritySettingService securitySettingService;
 
   @Before
   public void setUp() {
-    securitySettingService = new SecuritySettingService(settingService);
+    securitySettingService = new SecuritySettingService(settingService, listenerService);
   }
 
   @Test
@@ -79,9 +84,21 @@ public class SettingSecurityServieTest {
     assertNotNull(registrationSetting.getExtraGroupIds());
     assertEquals(0, registrationSetting.getExtraGroupIds().length);
   }
-
+  
   @Test
   public void testSaveRegistrationSetting() {
+    securitySettingService.saveRegistrationSetting(new RegistrationSetting());
+    verify(settingService, times(1)).set(eq(SECURITY_CONTEXT), eq(SECURITY_SCOPE), anyString(), any());
+  }
+
+  @Test
+  public void testSaveRegistrationSettingWithNoDefault() {
+    when(settingService.get(eq(SECURITY_CONTEXT),
+                            eq(SECURITY_SCOPE),
+                            eq(REGISTRATION_TYPE_PARAM))).thenReturn((SettingValue) SettingValue.create(UserRegistrationType.RESTRICTED.name()));
+    when(settingService.get(eq(SECURITY_CONTEXT),
+                            eq(SECURITY_SCOPE),
+                            eq(REGISTRATION_EXTERNAL_USER_PARAM))).thenReturn((SettingValue) SettingValue.create(true));
     securitySettingService.saveRegistrationSetting(new RegistrationSetting());
     verify(settingService, times(3)).set(eq(SECURITY_CONTEXT), eq(SECURITY_SCOPE), anyString(), any());
   }
@@ -136,19 +153,35 @@ public class SettingSecurityServieTest {
   }
 
   @Test
-  public void testSaveRegistrationType() {
+  public void testSaveRegistrationType() throws Exception {
+    when(settingService.get(eq(SECURITY_CONTEXT),
+                            eq(SECURITY_SCOPE),
+                            eq(REGISTRATION_TYPE_PARAM))).thenReturn((SettingValue) SettingValue.create(UserRegistrationType.RESTRICTED.name()));
     securitySettingService.saveRegistrationType(UserRegistrationType.OPEN);
     verify(settingService,
            times(1)).set(eq(SECURITY_CONTEXT),
                          eq(SECURITY_SCOPE),
                          eq(REGISTRATION_TYPE_PARAM),
                          argThat(args -> StringUtils.equals(args.getValue().toString(), UserRegistrationType.OPEN.name())));
+    verify(listenerService, times(1)).broadcast(ACCESS_TYPE_MODIFIED, null, UserRegistrationType.OPEN);
+
+    securitySettingService.saveRegistrationType(UserRegistrationType.RESTRICTED);
+    verify(settingService,
+           never()).set(eq(SECURITY_CONTEXT),
+                         eq(SECURITY_SCOPE),
+                         eq(REGISTRATION_TYPE_PARAM),
+                         argThat(args -> StringUtils.equals(args.getValue().toString(), UserRegistrationType.RESTRICTED.name())));
+
+    when(settingService.get(eq(SECURITY_CONTEXT),
+                            eq(SECURITY_SCOPE),
+                            eq(REGISTRATION_TYPE_PARAM))).thenReturn((SettingValue) SettingValue.create(UserRegistrationType.OPEN.name()));
     securitySettingService.saveRegistrationType(UserRegistrationType.RESTRICTED);
     verify(settingService,
            times(1)).set(eq(SECURITY_CONTEXT),
                          eq(SECURITY_SCOPE),
                          eq(REGISTRATION_TYPE_PARAM),
                          argThat(args -> StringUtils.equals(args.getValue().toString(), UserRegistrationType.RESTRICTED.name())));
+    verify(listenerService, times(1)).broadcast(ACCESS_TYPE_MODIFIED, null, UserRegistrationType.RESTRICTED);
   }
 
   @Test
@@ -167,17 +200,23 @@ public class SettingSecurityServieTest {
   }
 
   @Test
-  public void testSaveRegistrationExternalUser() {
+  public void testSaveRegistrationExternalUser() throws Exception {
     securitySettingService.saveRegistrationExternalUser(true);
     verify(settingService, times(1)).set(eq(SECURITY_CONTEXT),
                                          eq(SECURITY_SCOPE),
                                          eq(REGISTRATION_EXTERNAL_USER_PARAM),
                                          argThat(args -> StringUtils.equals(args.getValue().toString(), "true")));
+    verify(listenerService, times(1)).broadcast(EXTERNAL_USER_REG_MODIFIED, null, true);
+
+    when(settingService.get(eq(SECURITY_CONTEXT),
+                            eq(SECURITY_SCOPE),
+                            eq(REGISTRATION_EXTERNAL_USER_PARAM))).thenReturn((SettingValue) SettingValue.create("true"));
     securitySettingService.saveRegistrationExternalUser(false);
     verify(settingService, times(1)).set(eq(SECURITY_CONTEXT),
                                          eq(SECURITY_SCOPE),
                                          eq(REGISTRATION_EXTERNAL_USER_PARAM),
                                          argThat(args -> StringUtils.equals(args.getValue().toString(), "false")));
+    verify(listenerService, times(1)).broadcast(EXTERNAL_USER_REG_MODIFIED, null, false);
   }
 
   @Test
