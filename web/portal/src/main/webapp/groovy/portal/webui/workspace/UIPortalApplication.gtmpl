@@ -137,7 +137,6 @@
    <script type="text/javascript" id="portalHeadScripts">
      eXo.env.portal.context = "<%=docBase%>";
      eXo.env.portal.accessMode = "<%= rcontext.getAccessPath() == 0 ? "public" : "private" %>";
-     eXo.env.portal.portalName = "<%=rcontext.getPortalOwner()%>";
      eXo.env.portal.homeLink = "<%=userHomeLink%>";
      eXo.env.portal.stickyMenu = <%=stickyMenu%>;
      eXo.env.portal.containerName = "<%=PortalContainer.getInstance().getName()%>";
