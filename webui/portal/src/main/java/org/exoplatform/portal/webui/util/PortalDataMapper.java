@@ -23,6 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.gatein.common.net.media.MediaType;
+import org.gatein.pc.api.Portlet;
+import org.gatein.pc.api.info.ModeInfo;
+import org.gatein.pc.api.info.PortletInfo;
+
+import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
@@ -44,10 +50,6 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.core.UIComponent;
-import org.gatein.common.net.media.MediaType;
-import org.gatein.pc.api.Portlet;
-import org.gatein.pc.api.info.ModeInfo;
-import org.gatein.pc.api.info.PortletInfo;
 
 /**
  * Created by The eXo Platform SAS May 4, 2007 TODO: Rename this to PortalDataModelMapper
@@ -308,9 +310,11 @@ public class PortalDataMapper {
         uiPortal.setProperties(model.getProperties());
         uiPortal.setRedirects(model.getPortalRedirects());
         uiPortal.setUseDynamicLayout(model.isDefaultLayout());
+        UserPortalConfigService userPortalConfigService = uiPortal.getApplicationComponent(UserPortalConfigService.class);
+        PortalConfig metaSite = userPortalConfigService.getDefaultPortalConfig();
 
-
-        Container layout = model.getPortalLayout();
+        Container layout = model.isDisplayed() ? metaSite.getPortalLayout() : model.getPortalLayout();
+        
         uiPortal.setMoveAppsPermissions(layout.getMoveAppsPermissions());
         uiPortal.setMoveContainersPermissions(layout.getMoveContainersPermissions());
         List<ModelObject> children = layout .getChildren();
