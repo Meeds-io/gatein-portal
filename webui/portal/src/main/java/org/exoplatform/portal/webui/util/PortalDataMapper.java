@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
@@ -309,8 +310,8 @@ public class PortalDataMapper {
         uiPortal.setProperties(model.getProperties());
         uiPortal.setRedirects(model.getPortalRedirects());
         uiPortal.setUseDynamicLayout(model.isDefaultLayout());
-        LayoutService layoutService = uiPortal.getApplicationComponent(LayoutService.class);
-        PortalConfig metaSite = layoutService.getPortalConfig("dw");
+        UserPortalConfigService userPortalConfigService = uiPortal.getApplicationComponent(UserPortalConfigService.class);
+        PortalConfig metaSite = userPortalConfigService.getDefaultPortalConfig();
 
         Container layout = model.isDisplayed() ? metaSite.getPortalLayout() : model.getPortalLayout();
         
