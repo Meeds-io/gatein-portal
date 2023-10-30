@@ -84,7 +84,7 @@ public class SettingSecurityServieTest {
     assertNotNull(registrationSetting.getExtraGroupIds());
     assertEquals(0, registrationSetting.getExtraGroupIds().length);
   }
-  
+
   @Test
   public void testSaveRegistrationSetting() {
     securitySettingService.saveRegistrationSetting(new RegistrationSetting());
@@ -93,12 +93,12 @@ public class SettingSecurityServieTest {
 
   @Test
   public void testSaveRegistrationSettingWithNoDefault() {
-    when(settingService.get(eq(SECURITY_CONTEXT),
-                            eq(SECURITY_SCOPE),
-                            eq(REGISTRATION_TYPE_PARAM))).thenReturn((SettingValue) SettingValue.create(UserRegistrationType.RESTRICTED.name()));
-    when(settingService.get(eq(SECURITY_CONTEXT),
-                            eq(SECURITY_SCOPE),
-                            eq(REGISTRATION_EXTERNAL_USER_PARAM))).thenReturn((SettingValue) SettingValue.create(true));
+    when(settingService.get(SECURITY_CONTEXT,
+                            SECURITY_SCOPE,
+                            REGISTRATION_TYPE_PARAM)).thenReturn((SettingValue) SettingValue.create(UserRegistrationType.RESTRICTED.name()));
+    when(settingService.get(SECURITY_CONTEXT,
+                            SECURITY_SCOPE,
+                            REGISTRATION_EXTERNAL_USER_PARAM)).thenReturn((SettingValue) SettingValue.create(true));
     securitySettingService.saveRegistrationSetting(new RegistrationSetting());
     verify(settingService, times(3)).set(eq(SECURITY_CONTEXT), eq(SECURITY_SCOPE), anyString(), any());
   }
@@ -110,18 +110,18 @@ public class SettingSecurityServieTest {
     assertEquals(1, registrationGroupIds.length);
     assertEquals(INTERNAL_USERS_GROUP, registrationGroupIds[0]);
 
-    when(settingService.get(eq(SECURITY_CONTEXT),
-                            eq(SECURITY_SCOPE),
-                            eq(REGISTRATION_EXTERNAL_USER_PARAM))).thenReturn((SettingValue) SettingValue.create(true));
+    when(settingService.get(SECURITY_CONTEXT,
+                            SECURITY_SCOPE,
+                            REGISTRATION_EXTERNAL_USER_PARAM)).thenReturn((SettingValue) SettingValue.create(true));
 
     registrationGroupIds = securitySettingService.getRegistrationGroupIds();
     assertNotNull(registrationGroupIds);
     assertEquals(1, registrationGroupIds.length);
     assertEquals(EXTERNAL_USERS_GROUP, registrationGroupIds[0]);
 
-    when(settingService.get(eq(SECURITY_CONTEXT),
-                            eq(SECURITY_SCOPE),
-                            eq(REGISTRATION_EXTERNAL_USER_PARAM))).thenReturn((SettingValue) SettingValue.create(false));
+    when(settingService.get(SECURITY_CONTEXT,
+                            SECURITY_SCOPE,
+                            REGISTRATION_EXTERNAL_USER_PARAM)).thenReturn((SettingValue) SettingValue.create(false));
 
     registrationGroupIds = securitySettingService.getRegistrationGroupIds();
     assertNotNull(registrationGroupIds);
@@ -135,17 +135,17 @@ public class SettingSecurityServieTest {
     assertNotNull(registrationType);
     assertEquals(DEFAULT_REGISTRATION_TYPE, registrationType);
 
-    when(settingService.get(eq(SECURITY_CONTEXT),
-                            eq(SECURITY_SCOPE),
-                            eq(REGISTRATION_TYPE_PARAM))).thenReturn((SettingValue) SettingValue.create(UserRegistrationType.OPEN.name()));
+    when(settingService.get(SECURITY_CONTEXT,
+                            SECURITY_SCOPE,
+                            REGISTRATION_TYPE_PARAM)).thenReturn((SettingValue) SettingValue.create(UserRegistrationType.OPEN.name()));
 
     registrationType = securitySettingService.getRegistrationType();
     assertNotNull(registrationType);
     assertEquals(UserRegistrationType.OPEN, registrationType);
 
-    when(settingService.get(eq(SECURITY_CONTEXT),
-                            eq(SECURITY_SCOPE),
-                            eq(REGISTRATION_TYPE_PARAM))).thenReturn((SettingValue) SettingValue.create(UserRegistrationType.RESTRICTED.name()));
+    when(settingService.get(SECURITY_CONTEXT,
+                            SECURITY_SCOPE,
+                            REGISTRATION_TYPE_PARAM)).thenReturn((SettingValue) SettingValue.create(UserRegistrationType.RESTRICTED.name()));
 
     registrationType = securitySettingService.getRegistrationType();
     assertNotNull(registrationType);
@@ -154,27 +154,27 @@ public class SettingSecurityServieTest {
 
   @Test
   public void testSaveRegistrationType() throws Exception {
-    when(settingService.get(eq(SECURITY_CONTEXT),
-                            eq(SECURITY_SCOPE),
-                            eq(REGISTRATION_TYPE_PARAM))).thenReturn((SettingValue) SettingValue.create(UserRegistrationType.RESTRICTED.name()));
+    when(settingService.get(SECURITY_CONTEXT,
+                            SECURITY_SCOPE,
+                            REGISTRATION_TYPE_PARAM)).thenReturn((SettingValue) SettingValue.create(UserRegistrationType.RESTRICTED.name()));
     securitySettingService.saveRegistrationType(UserRegistrationType.OPEN);
     verify(settingService,
            times(1)).set(eq(SECURITY_CONTEXT),
-                         eq(SECURITY_SCOPE),
-                         eq(REGISTRATION_TYPE_PARAM),
+                            eq(SECURITY_SCOPE),
+                               eq(REGISTRATION_TYPE_PARAM),
                          argThat(args -> StringUtils.equals(args.getValue().toString(), UserRegistrationType.OPEN.name())));
     verify(listenerService, times(1)).broadcast(ACCESS_TYPE_MODIFIED, null, UserRegistrationType.OPEN);
 
     securitySettingService.saveRegistrationType(UserRegistrationType.RESTRICTED);
     verify(settingService,
            never()).set(eq(SECURITY_CONTEXT),
-                         eq(SECURITY_SCOPE),
-                         eq(REGISTRATION_TYPE_PARAM),
-                         argThat(args -> StringUtils.equals(args.getValue().toString(), UserRegistrationType.RESTRICTED.name())));
+                        eq(SECURITY_SCOPE),
+                        eq(REGISTRATION_TYPE_PARAM),
+                        argThat(args -> StringUtils.equals(args.getValue().toString(), UserRegistrationType.RESTRICTED.name())));
 
-    when(settingService.get(eq(SECURITY_CONTEXT),
-                            eq(SECURITY_SCOPE),
-                            eq(REGISTRATION_TYPE_PARAM))).thenReturn((SettingValue) SettingValue.create(UserRegistrationType.OPEN.name()));
+    when(settingService.get(SECURITY_CONTEXT,
+                            SECURITY_SCOPE,
+                            REGISTRATION_TYPE_PARAM)).thenReturn((SettingValue) SettingValue.create(UserRegistrationType.OPEN.name()));
     securitySettingService.saveRegistrationType(UserRegistrationType.RESTRICTED);
     verify(settingService,
            times(1)).set(eq(SECURITY_CONTEXT),
@@ -188,14 +188,14 @@ public class SettingSecurityServieTest {
   public void testIsRegistrationExternalUser() {
     assertEquals(DEFAULT_REGISTRATION_EXTERNAL_USER, securitySettingService.isRegistrationExternalUser());
 
-    when(settingService.get(eq(SECURITY_CONTEXT),
-                            eq(SECURITY_SCOPE),
-                            eq(REGISTRATION_EXTERNAL_USER_PARAM))).thenReturn((SettingValue) SettingValue.create(true));
+    when(settingService.get(SECURITY_CONTEXT,
+                            SECURITY_SCOPE,
+                            REGISTRATION_EXTERNAL_USER_PARAM)).thenReturn((SettingValue) SettingValue.create(true));
     assertTrue(securitySettingService.isRegistrationExternalUser());
 
-    when(settingService.get(eq(SECURITY_CONTEXT),
-                            eq(SECURITY_SCOPE),
-                            eq(REGISTRATION_EXTERNAL_USER_PARAM))).thenReturn((SettingValue) SettingValue.create(false));
+    when(settingService.get(SECURITY_CONTEXT,
+                            SECURITY_SCOPE,
+                            REGISTRATION_EXTERNAL_USER_PARAM)).thenReturn((SettingValue) SettingValue.create(false));
     assertFalse(securitySettingService.isRegistrationExternalUser());
   }
 
@@ -208,9 +208,9 @@ public class SettingSecurityServieTest {
                                          argThat(args -> StringUtils.equals(args.getValue().toString(), "true")));
     verify(listenerService, times(1)).broadcast(EXTERNAL_USER_REG_MODIFIED, null, true);
 
-    when(settingService.get(eq(SECURITY_CONTEXT),
-                            eq(SECURITY_SCOPE),
-                            eq(REGISTRATION_EXTERNAL_USER_PARAM))).thenReturn((SettingValue) SettingValue.create("true"));
+    when(settingService.get(SECURITY_CONTEXT,
+                            SECURITY_SCOPE,
+                            REGISTRATION_EXTERNAL_USER_PARAM)).thenReturn((SettingValue) SettingValue.create("true"));
     securitySettingService.saveRegistrationExternalUser(false);
     verify(settingService, times(1)).set(eq(SECURITY_CONTEXT),
                                          eq(SECURITY_SCOPE),
@@ -223,17 +223,17 @@ public class SettingSecurityServieTest {
   public void testGetRegistrationExtraGroupIds() {
     assertEquals(Arrays.asList(INTERNAL_USERS_GROUP), Arrays.asList(securitySettingService.getRegistrationGroupIds()));
 
-    when(settingService.get(eq(SECURITY_CONTEXT),
-                            eq(SECURITY_SCOPE),
-                            eq(REGISTRATION_EXTRA_GROUPS_PARAM))).thenReturn((SettingValue) SettingValue.create(""));
+    when(settingService.get(SECURITY_CONTEXT,
+                            SECURITY_SCOPE,
+                            REGISTRATION_EXTRA_GROUPS_PARAM)).thenReturn((SettingValue) SettingValue.create(""));
     String[] registrationGroupIds = securitySettingService.getRegistrationGroupIds();
     assertNotNull(registrationGroupIds);
     assertEquals(1, registrationGroupIds.length);
     assertEquals(INTERNAL_USERS_GROUP, registrationGroupIds[0]);
 
-    when(settingService.get(eq(SECURITY_CONTEXT),
-                            eq(SECURITY_SCOPE),
-                            eq(REGISTRATION_EXTRA_GROUPS_PARAM))).thenReturn((SettingValue) SettingValue.create("group1,group2"));
+    when(settingService.get(SECURITY_CONTEXT,
+                            SECURITY_SCOPE,
+                            REGISTRATION_EXTRA_GROUPS_PARAM)).thenReturn((SettingValue) SettingValue.create("group1,group2"));
     registrationGroupIds = securitySettingService.getRegistrationGroupIds();
     assertNotNull(registrationGroupIds);
     assertEquals(3, registrationGroupIds.length);
