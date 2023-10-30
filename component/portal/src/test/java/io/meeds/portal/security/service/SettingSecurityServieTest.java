@@ -84,7 +84,7 @@ public class SettingSecurityServieTest {
     assertNotNull(registrationSetting.getExtraGroupIds());
     assertEquals(0, registrationSetting.getExtraGroupIds().length);
   }
-  
+
   @Test
   public void testSaveRegistrationSetting() {
     securitySettingService.saveRegistrationSetting(new RegistrationSetting());
