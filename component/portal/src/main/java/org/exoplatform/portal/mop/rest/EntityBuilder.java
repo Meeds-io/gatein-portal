@@ -16,13 +16,7 @@
  */
 package org.exoplatform.portal.mop.rest;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
@@ -30,9 +24,14 @@ import org.apache.commons.lang.StringUtils;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.PageType;
+import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.rest.model.UserNodeBreadcrumbItem;
 import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserNode;
+import org.exoplatform.portal.mop.user.UserNodeFilterConfig;
+import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
@@ -41,7 +40,7 @@ public class EntityBuilder {
   private static final Log   LOG   = ExoLogger.getLogger(EntityBuilder.class);
 
   public static final String GROUP = "group";
-
+  
   private EntityBuilder() { // NOSONAR
   }
 
@@ -49,7 +48,9 @@ public class EntityBuilder {
                                                               boolean expand,
                                                               OrganizationService organizationService,
                                                               LayoutService layoutService,
-                                                              UserACL userACL) {
+                                                              UserACL userACL,
+                                                              UserPortal userPortal,
+                                                              boolean expandBreadcrumb) {
     if (nodes == null) {
       return Collections.emptyList();
     }
@@ -98,9 +99,66 @@ public class EntityBuilder {
           resultNode.setPageAccessPermissions(accessPermissions);
         }
       }
-      resultNode.setChildren(toUserNodeRestEntity(userNode.getChildren(), expand, organizationService, layoutService, userACL));
+      if (expandBreadcrumb) {
+        List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList = getUserNodeBreadcrumbList(userPortal, userNode);
+        Collections.reverse(userNodeBreadcrumbItemList);
+        resultNode.setUserNodeBreadcrumbItemList(userNodeBreadcrumbItemList);
+      }
+
+
+      resultNode.setChildren(toUserNodeRestEntity(userNode.getChildren(),
+              expand,
+              organizationService,
+              layoutService,
+              userACL,
+              userPortal,
+              expandBreadcrumb));
       result.add(resultNode);
     }
     return result;
+  }
+
+  public static List<UserNodeBreadcrumbItem> getUserNodeBreadcrumbList(UserPortal userPortal, UserNode node) {
+    UserNavigation navigation = userPortal.getNavigation(node.getNavigation().getKey());
+    UserNode rootNode = userPortal.getNode(navigation, Scope.ALL, UserNodeFilterConfig.builder().build(), null);
+    node = findTargetNode(node.getName(), rootNode.getChildren());
+    return node != null ? computeUserNodeBreadcrumbList(node) : Collections.emptyList();
+  }
+
+  public static List<UserNodeBreadcrumbItem> computeUserNodeBreadcrumbList(UserNode node) {
+    List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList = new ArrayList<>();
+    UserNodeBreadcrumbItem breadcrumbItem = new UserNodeBreadcrumbItem(node.getId(),
+                                                                       node.getName(),
+                                                                       node.getResolvedLabel(),
+                                                                       node.getPageRef() != null ? node.getURI() : null);
+    userNodeBreadcrumbItemList.add(breadcrumbItem);
+    if (node.getParent() != null && !node.getParent().getName().equals("default")) {
+      userNodeBreadcrumbItemList.addAll(computeUserNodeBreadcrumbList(node.getParent()));
+    }
+    return userNodeBreadcrumbItemList;
+  }
+
+  private static UserNode findTargetNode(String nodeName, Collection<UserNode> userNodes) {
+    if (userNodes.isEmpty()) {
+      return null;
+    }
+    UserNode targetUserNode = null;
+    for (Iterator<UserNode> i = userNodes.iterator(); i.hasNext();) {
+      UserNode userNode = i.next();
+
+      if (userNode.getName().equals(nodeName)) {
+        targetUserNode = userNode;
+      } else if (userNode.getChildren() != null && !userNode.getChildren().isEmpty() ) {
+        if (userNode.getChild(nodeName) != null) {
+          targetUserNode = userNode.getChild(nodeName);
+        } else {
+          targetUserNode = findTargetNode(nodeName, userNode.getChildren());
+        }
+      }
+      if (targetUserNode != null) {
+        break;
+      }
+    }
+    return targetUserNode;
   }
 }

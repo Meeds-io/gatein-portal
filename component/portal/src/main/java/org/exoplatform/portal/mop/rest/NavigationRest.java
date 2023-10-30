@@ -166,7 +166,11 @@ public class NavigationRest implements ResourceContainer {
                                          @Parameter(description = "to check the navigation nodes scheduling start and end dates")
                                          @DefaultValue("true")
                                          @QueryParam("temporalCheck")
-                                         boolean temporalCheck) {
+                                         boolean temporalCheck,
+                                         @Parameter(description = "to expand the navigation breadcrumb")
+                                         @DefaultValue("false")
+                                         @QueryParam("expandBreadcrumb")
+                                         boolean expandBreadcrumb) {
     // this function return nodes and not navigations
     if (StringUtils.isBlank(siteTypeName)) {
       return Response.status(400).build();
@@ -180,7 +184,8 @@ public class NavigationRest implements ResourceContainer {
                           visibilityNames,
                           includeGlobal,
                           expand,
-                          temporalCheck);
+                          temporalCheck,
+                          expandBreadcrumb);
   }
 
   @Path("/categories")
@@ -211,7 +216,8 @@ public class NavigationRest implements ResourceContainer {
                                   List<String> visibilityNames,
                                   boolean includeGlobal,
                                   boolean expand,
-                                  boolean temporalCheck) {
+                                  boolean temporalCheck,
+                                  boolean expandBreadcrumb) {
     ConversationState state = ConversationState.getCurrent();
     Identity userIdentity = state == null ? null : state.getIdentity();
     String username = userIdentity == null ? null : userIdentity.getUserId();
@@ -273,7 +279,7 @@ public class NavigationRest implements ResourceContainer {
         UserNode rootNode = userPortal.getNode(navigation, scope, userFilterConfig, null);
         nodes = rootNode.getChildren();
       }
-      List<UserNodeRestEntity> resultNodes = EntityBuilder.toUserNodeRestEntity(nodes, expand, organizationService, layoutService, userACL);
+      List<UserNodeRestEntity> resultNodes = EntityBuilder.toUserNodeRestEntity(nodes, expand, organizationService, layoutService, userACL, userPortal, expandBreadcrumb);
       return Response.ok(resultNodes).build();
     } catch (Exception e) {
       LOG.error("Error retrieving ");
