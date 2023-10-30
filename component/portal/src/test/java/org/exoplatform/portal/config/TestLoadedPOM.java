@@ -121,6 +121,24 @@ public class TestLoadedPOM extends AbstractConfigTest {
     assertEquals(Visibility.TEMPORAL, nodeNavigation.getState().getVisibility());
   }
 
+  public void testLoadNode() throws Exception {
+    NodeContext<?> root = navService.loadNode(SiteKey.portal("test"));
+    assertEquals(5, root.getNodeCount());
+
+    NodeContext<?> nodeNavigation = navService.loadNode(SiteKey.portal("test"), "node_name");
+    assertEquals(0, nodeNavigation.getNodeCount());
+    assertEquals("node_name", nodeNavigation.getName());
+    assertEquals("node_label", nodeNavigation.getState().getLabel());
+    assertEquals("node_icon", nodeNavigation.getState().getIcon());
+    GregorianCalendar start = new GregorianCalendar(2000, 2, 21, 1, 33, 0);
+    start.setTimeZone(TimeZone.getTimeZone("UTC"));
+    assertEquals(start.getTime().getTime(), nodeNavigation.getState().getStartPublicationTime());
+    GregorianCalendar end = new GregorianCalendar(2009, 2, 21, 1, 33, 0);
+    end.setTimeZone(TimeZone.getTimeZone("UTC"));
+    assertEquals(end.getTime().getTime(), nodeNavigation.getState().getEndPublicationTime());
+    assertEquals(Visibility.TEMPORAL, nodeNavigation.getState().getVisibility());
+  }
+
   public void testPortal() throws Exception {
     PortalConfig portal = layoutService.getPortalConfig("test");
     assertNotNull(portal);

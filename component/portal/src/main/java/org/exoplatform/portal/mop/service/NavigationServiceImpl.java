@@ -18,8 +18,15 @@
  */
 package org.exoplatform.portal.mop.service;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Spliterator;
+
+import org.apache.commons.lang.StringUtils;
+
 import org.exoplatform.portal.mop.EventType;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.navigation.GenericScope;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationData;
 import org.exoplatform.portal.mop.navigation.NodeChangeListener;
@@ -99,7 +106,41 @@ public class NavigationServiceImpl implements NavigationService {
     }
   }
 
-  public <N> NodeContext<N> loadNode(NodeModel<N> model, NavigationContext navigation, Scope scope,
+  @Override
+  public NodeContext<NodeContext<?>> loadNode(SiteKey siteKey) {
+    return loadNode(siteKey, null);
+  }
+
+  @Override
+  public NodeContext<NodeContext<?>> loadNode(SiteKey siteKey, String navUri) {
+    if (siteKey == null) {
+      return null;
+    }
+    NavigationContext navigation = loadNavigation(siteKey);
+    if (navigation == null) {
+      return null;
+    }
+
+    if (StringUtils.isBlank(navUri)) {
+      return loadNode(NodeModel.SELF_MODEL, navigation, Scope.ALL, null);
+    } else {
+      String[] pathTreeParts = StringUtils.trim(navUri).split("/");
+      NodeContext<NodeContext<?>> node = loadNode(NodeModel.SELF_MODEL,
+                                                  navigation,
+                                                  GenericScope.branchShape(pathTreeParts, Scope.ALL),
+                                                  null);
+      Iterator<String> iterator = Arrays.asList(pathTreeParts).iterator();
+      while (iterator.hasNext() && node != null) {
+        String name = iterator.next();
+        node = node.get(name);
+      }
+      return node;
+    }
+  }
+
+  public <N> NodeContext<N> loadNode(NodeModel<N> model,
+                                     NavigationContext navigation,
+                                     Scope scope,
                                      NodeChangeListener<NodeContext<N>> listener) {
     if (model == null) {
       throw new NullPointerException("No null model accepted");
@@ -119,7 +160,9 @@ public class NavigationServiceImpl implements NavigationService {
   }
 
   @Override
-  public <N> NodeContext<N> loadNodeById(NodeModel<N> model, String nodeId, Scope scope,
+  public <N> NodeContext<N> loadNodeById(NodeModel<N> model,
+                                         String nodeId,
+                                         Scope scope,
                                          NodeChangeListener<NodeContext<N>> listener) {
     if (model == null) {
       throw new NullPointerException("No null model accepted");
@@ -135,6 +178,10 @@ public class NavigationServiceImpl implements NavigationService {
 
   public <N> void updateNode(NodeContext<N> root, Scope scope, NodeChangeListener<NodeContext<N>> listener) {
     nodeManager.updateNode(root, scope, new NodeChangeNotifier<>(listener, this, listenerService));
+  }
+
+  public <N> void saveNode(NodeContext<N> context) {
+    saveNode(context, null);
   }
 
   public <N> void saveNode(NodeContext<N> context, NodeChangeListener<NodeContext<N>> listener) {
