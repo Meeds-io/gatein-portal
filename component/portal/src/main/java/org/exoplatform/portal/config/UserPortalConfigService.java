@@ -679,13 +679,17 @@ public class UserPortalConfigService implements Startable {
      * @return User home page uri preference
      */
     public String getUserHomePage(String username) {
-      SettingValue<?> homePageSettingValue = settingService.get(Context.USER.id(username),
-                                                                HOME_PAGE_URI_PREFERENCE_SCOPE,
-                                                                HOME_PAGE_URI_PREFERENCE_KEY);
-      if (homePageSettingValue != null && homePageSettingValue.getValue() != null) {
-        return homePageSettingValue.getValue().toString();
+      if (StringUtils.isBlank(username)) {
+        return null;
+      } else {
+        SettingValue<?> homePageSettingValue = settingService.get(Context.USER.id(username),
+                                                                  HOME_PAGE_URI_PREFERENCE_SCOPE,
+                                                                  HOME_PAGE_URI_PREFERENCE_KEY);
+        if (homePageSettingValue != null && homePageSettingValue.getValue() != null) {
+          return homePageSettingValue.getValue().toString();
+        }
+        return PropertyManager.getProperty("exo.portal.user.defaultHome");
       }
-      return PropertyManager.getProperty("exo.portal.user.defaultHome");
     }
 
     /**

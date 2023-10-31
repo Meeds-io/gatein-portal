@@ -19,6 +19,9 @@
   import org.exoplatform.commons.utils.HTMLEntityEncoder;
   import org.exoplatform.portal.webui.util.Util;
   import org.exoplatform.services.resources.Orientation;
+  import org.exoplatform.services.resources.ResourceBundleService;
+  import org.exoplatform.portal.branding.BrandingService;
+  import java.util.ResourceBundle;
 
   def rcontext = _ctx.getRequestContext() ;
   def session = rcontext.getRequest().getSession();
@@ -52,6 +55,15 @@
     }
   }
   def title = rcontext.getTitle();
+
+  if (portal.getSiteKey().getType() == org.exoplatform.portal.mop.SiteType.PORTAL && portal.getSiteKey().getName().equals("public")) {
+    ResourceBundleService resourceBundleService = uicomponent.getApplicationComponent(ResourceBundleService.class);
+    ResourceBundle bundle = resourceBundleService.getResourceBundle("locale.portlet.Portlets", rcontext.getLocale());
+
+    BrandingService brandingService = uicomponent.getApplicationComponent(BrandingService.class);
+    title = brandingService.getCompanyName() + " - " + bundle.getString("publicSite.title.suffix");
+  }
+
   def metaInformation = rcontext.getMetaInformation();
 
   def bodyClasses = session.getAttribute("UIPortalApplication.body.class");
