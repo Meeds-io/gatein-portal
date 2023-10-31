@@ -171,7 +171,7 @@ public class BrandingServiceImplTest {
 
     // Then
     assertNotNull(brandingInformation);
-    assertNotNull("Default Theme colors shouldn't be null", brandingInformation.getThemeStyle());
+    assertNotNull("Default Theme style shouldn't be null", brandingInformation.getThemeStyle());
 
     assertEquals(5, brandingInformation.getThemeStyle().size());
     assertEquals(primaryColor, brandingInformation.getThemeStyle().get("primaryColor"));
