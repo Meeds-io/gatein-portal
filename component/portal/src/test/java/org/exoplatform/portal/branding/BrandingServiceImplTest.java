@@ -137,23 +137,25 @@ public class BrandingServiceImplTest {
     String primaryBackground = "#f0f0f0";
     String secondaryColor = "#000000";
     String secondaryBackground = "#e25d5d";
+    String borderRadius = "8px";
 
     InitParams initParams = new InitParams();
-    ValuesParam colorsTheme = new ValuesParam();
-    colorsTheme.setName(BRANDING_THEME_VARIABLES);
+    ValuesParam themeStyle = new ValuesParam();
+    themeStyle.setName(BRANDING_THEME_VARIABLES);
     List<String> variables = new ArrayList<>();
     variables.add("primaryColor:" + primaryColor);
     variables.add("primaryBackground:" + primaryBackground);
     variables.add("secondaryColor:" + secondaryColor);
     variables.add("secondaryBackground:" + secondaryBackground);
-    colorsTheme.setValues(variables);
+    variables.add("borderRadius:" + borderRadius);
+    themeStyle.setValues(variables);
 
     ValueParam companyName = new ValueParam();
     companyName.setName(BRANDING_COMPANY_NAME_INIT_PARAM);
     companyName.setValue("Default Company Name");
 
     initParams.addParam(companyName);
-    initParams.addParam(colorsTheme);
+    initParams.addParam(themeStyle);
 
     BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
                                                                   configurationManager,
@@ -169,13 +171,14 @@ public class BrandingServiceImplTest {
 
     // Then
     assertNotNull(brandingInformation);
-    assertNotNull("Default Theme colors shouldn't be null", brandingInformation.getThemeColors());
+    assertNotNull("Default Theme colors shouldn't be null", brandingInformation.getThemeStyle());
 
-    assertEquals(4, brandingInformation.getThemeColors().size());
-    assertEquals(primaryColor, brandingInformation.getThemeColors().get("primaryColor"));
-    assertEquals(primaryBackground, brandingInformation.getThemeColors().get("primaryBackground"));
-    assertEquals(secondaryColor, brandingInformation.getThemeColors().get("secondaryColor"));
-    assertEquals(secondaryBackground, brandingInformation.getThemeColors().get("secondaryBackground"));
+    assertEquals(5, brandingInformation.getThemeStyle().size());
+    assertEquals(primaryColor, brandingInformation.getThemeStyle().get("primaryColor"));
+    assertEquals(primaryBackground, brandingInformation.getThemeStyle().get("primaryBackground"));
+    assertEquals(secondaryColor, brandingInformation.getThemeStyle().get("secondaryColor"));
+    assertEquals(secondaryBackground, brandingInformation.getThemeStyle().get("secondaryBackground"));
+    assertEquals(borderRadius, brandingInformation.getThemeStyle().get("borderRadius"));
   }
 
   @Test
@@ -192,6 +195,7 @@ public class BrandingServiceImplTest {
     String primaryBackgroundNewValue = "#f0f0f1";
     String secondaryColorNewValue = "#000001";
     String secondaryBackgroundNewValue = "#e25d5e";
+    String borderRadiusNewValue = "12px";
 
     when(settingService.get(BRANDING_CONTEXT,
                             BRANDING_SCOPE,
@@ -205,29 +209,34 @@ public class BrandingServiceImplTest {
     when(settingService.get(BRANDING_CONTEXT,
                             BRANDING_SCOPE,
                             "secondaryBackground")).thenReturn((SettingValue) SettingValue.create(secondaryBackgroundNewValue));
+    when(settingService.get(BRANDING_CONTEXT,
+                            BRANDING_SCOPE,
+                            "borderRadius")).thenReturn((SettingValue) SettingValue.create(borderRadiusNewValue));
 
     String primaryColor = "#3f8487";
     String primaryBackground = "#f0f0f0";
     String secondaryColor = "#000000";
     String secondaryBackground = "#e25d5d";
+    String borderRadius = "8px";
 
     InitParams initParams = new InitParams();
 
-    ValuesParam colorsTheme = new ValuesParam();
-    colorsTheme.setName(BRANDING_THEME_VARIABLES);
+    ValuesParam themeStyle = new ValuesParam();
+    themeStyle.setName(BRANDING_THEME_VARIABLES);
     List<String> variables = new ArrayList<>();
     variables.add("primaryColor:" + primaryColor);
     variables.add("primaryBackground:" + primaryBackground);
     variables.add("secondaryColor:" + secondaryColor);
     variables.add("secondaryBackground:" + secondaryBackground);
-    colorsTheme.setValues(variables);
+    variables.add("borderRadius:" + borderRadius);
+    themeStyle.setValues(variables);
 
     ValueParam companyName = new ValueParam();
     companyName.setName(BRANDING_COMPANY_NAME_INIT_PARAM);
     companyName.setValue("Default Company Name");
 
     initParams.addParam(companyName);
-    initParams.addParam(colorsTheme);
+    initParams.addParam(themeStyle);
 
     BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
                                                                   configurationManager,
@@ -243,13 +252,14 @@ public class BrandingServiceImplTest {
 
     // Then
     assertNotNull(brandingInformation);
-    assertNotNull("Default Theme colors shouldn't be null", brandingInformation.getThemeColors());
+    assertNotNull("Default Theme colors shouldn't be null", brandingInformation.getThemeStyle());
 
-    assertEquals(4, brandingInformation.getThemeColors().size());
-    assertEquals(primaryColorNewValue, brandingInformation.getThemeColors().get("primaryColor"));
-    assertEquals(primaryBackgroundNewValue, brandingInformation.getThemeColors().get("primaryBackground"));
-    assertEquals(secondaryColorNewValue, brandingInformation.getThemeColors().get("secondaryColor"));
-    assertEquals(secondaryBackgroundNewValue, brandingInformation.getThemeColors().get("secondaryBackground"));
+    assertEquals(5, brandingInformation.getThemeStyle().size());
+    assertEquals(primaryColorNewValue, brandingInformation.getThemeStyle().get("primaryColor"));
+    assertEquals(primaryBackgroundNewValue, brandingInformation.getThemeStyle().get("primaryBackground"));
+    assertEquals(secondaryColorNewValue, brandingInformation.getThemeStyle().get("secondaryColor"));
+    assertEquals(secondaryBackgroundNewValue, brandingInformation.getThemeStyle().get("secondaryBackground"));
+    assertEquals(borderRadiusNewValue, brandingInformation.getThemeStyle().get("borderRadius"));
   }
 
   @Test
@@ -398,21 +408,24 @@ public class BrandingServiceImplTest {
     String primaryBackground = "#f0f0f0";
     String secondaryColor = "#000000";
     String secondaryBackground = "#e25d5d";
+    String borderRadius = "8px";
 
     String primaryColorNewValue = "#3f8488";
     String primaryBackgroundNewValue = "#f0f0f1";
     String secondaryColorNewValue = null;
     String secondaryBackgroundNewValue = null;
+    String borderRadiusNewValue = null;
 
-    ValuesParam colorsTheme = new ValuesParam();
-    colorsTheme.setName(BRANDING_THEME_VARIABLES);
+    ValuesParam themeStyle = new ValuesParam();
+    themeStyle.setName(BRANDING_THEME_VARIABLES);
     List<String> variables = new ArrayList<>();
     variables.add("primaryColor:" + primaryColor);
     variables.add("primaryBackground:" + primaryBackground);
     variables.add("secondaryColor:" + secondaryColor);
     variables.add("secondaryBackground:" + secondaryBackground);
-    colorsTheme.setValues(variables);
-    initParams.addParam(colorsTheme);
+    variables.add("borderRadius:" + borderRadius);
+    themeStyle.setValues(variables);
+    initParams.addParam(themeStyle);
 
     BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
                                                                   configurationManager,
@@ -425,11 +438,12 @@ public class BrandingServiceImplTest {
     Branding newBranding = new Branding();
     newBranding.setCompanyName("New Company Name");
     newBranding.setTopBarTheme("Pink");
-    newBranding.setThemeColors(new HashMap<String, String>());
-    newBranding.getThemeColors().put("primaryColor", primaryColorNewValue);
-    newBranding.getThemeColors().put("primaryBackground", primaryBackgroundNewValue);
-    newBranding.getThemeColors().put("secondaryColor", secondaryColorNewValue);
-    newBranding.getThemeColors().put("secondaryBackground", secondaryBackgroundNewValue);
+    newBranding.setThemeStyle(new HashMap<String, String>());
+    newBranding.getThemeStyle().put("primaryColor", primaryColorNewValue);
+    newBranding.getThemeStyle().put("primaryBackground", primaryBackgroundNewValue);
+    newBranding.getThemeStyle().put("secondaryColor", secondaryColorNewValue);
+    newBranding.getThemeStyle().put("secondaryBackground", secondaryBackgroundNewValue);
+    newBranding.getThemeStyle().put("borderRadius", borderRadiusNewValue);
 
     ArgumentCaptor<Context> settingContext = ArgumentCaptor.forClass(Context.class);
     ArgumentCaptor<Scope> settingScope = ArgumentCaptor.forClass(Scope.class);
@@ -450,6 +464,9 @@ public class BrandingServiceImplTest {
     verify(settingService, times(1)).remove(BRANDING_CONTEXT,
                                             BRANDING_SCOPE,
                                             "secondaryBackground");
+    verify(settingService, times(1)).remove(BRANDING_CONTEXT,
+                                            BRANDING_SCOPE,
+                                            "borderRadius");
 
     List<Context> contexts = settingContext.getAllValues();
     List<Scope> scopes = settingScope.getAllValues();

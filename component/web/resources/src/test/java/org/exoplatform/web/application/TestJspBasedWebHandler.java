@@ -92,7 +92,7 @@ public class TestJspBasedWebHandler {
 
     when(brandingService.getCompanyName()).thenReturn(companyName);
     when(brandingService.getLastUpdatedTime()).thenReturn(brandingLastModifiedTime);
-    when(brandingService.getThemeColors()).thenReturn(Collections.singletonMap("primaryColor", primarycolor));
+    when(brandingService.getThemeStyle()).thenReturn(Collections.singletonMap("primaryColor", primarycolor));
 
     JSONObject jsConfig = new JSONObject("{paths:{}}");
     JSONObject jsConfigPaths = jsConfig.getJSONObject("paths");
