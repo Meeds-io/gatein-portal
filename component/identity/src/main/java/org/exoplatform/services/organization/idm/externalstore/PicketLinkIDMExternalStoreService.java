@@ -572,7 +572,7 @@ public class PicketLinkIDMExternalStoreService implements IDMExternalStoreServic
   }
 
   private boolean validatePassword(final org.picketlink.idm.api.User idmUser, String password) throws Exception {
-    return (Boolean) executeOnExternalStoreFuntion.apply(() -> picketLinkIDMService.getExtendedAttributeManager()
+    return (Boolean) executeOnExternalStoreFuntion.apply(() -> picketLinkIDMService.getIdentitySession().getAttributesManager()
                                                                                    .validatePassword(idmUser, password));
   }
 
