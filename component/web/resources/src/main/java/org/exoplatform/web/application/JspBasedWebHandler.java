@@ -141,7 +141,7 @@ public abstract class JspBasedWebHandler extends WebRequestHandler {
     }
     request.setAttribute("inlineScripts", javascriptManager.getJavaScripts());
 
-    String brandingPrimaryColor = brandingService.getThemeColors().get("primaryColor");
+    String brandingPrimaryColor = brandingService.getThemeStyle().get("primaryColor");
     String brandingThemeUrl = "/" + PortalContainer.getCurrentPortalContainerName() + "/"
         + PortalContainer.getCurrentRestContextName() + "/v1/platform/branding/css?v=" + brandingService.getLastUpdatedTime();
 

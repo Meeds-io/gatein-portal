@@ -149,11 +149,11 @@ public interface BrandingService {
   /**
    * Updates CSS variables that defines the chosen theme and that will be
    * applied and server on UI
-   * 
-   * @param themeColors {@link Map} with variable name as key and variable value
+   *
+   * @param themeStyle {@link Map} with variable name as key and variable value
    *                      as map value
    */
-  void updateThemeColors(Map<String, String> themeColors);
+  void updateThemeStyle(Map<String, String> themeStyle);
 
   /**
    * Updates the login background text color
@@ -166,7 +166,7 @@ public interface BrandingService {
    * @return {@link Map} with variable name as key and variable value as map
    *         value
    */
-  Map<String, String> getThemeColors();
+  Map<String, String> getThemeStyle();
 
   /**
    * @return {@link Map} of login titles per language
