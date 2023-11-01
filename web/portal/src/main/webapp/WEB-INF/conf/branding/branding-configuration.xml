@@ -49,6 +49,7 @@
         <value>${exo.branding.theme.tertiaryColor:tertiaryColor:#e25d5d}</value>
         <value>${exo.branding.theme.greyColorLighten1:greyColorLighten1:#707070}</value>
         <value>${exo.branding.theme.textColor:textColor:#20282c}</value>
+        <value>${exo.branding.theme.borderRadius:borderRadius:8px}</value>
       </values-param>
     </init-params>
   </component>
