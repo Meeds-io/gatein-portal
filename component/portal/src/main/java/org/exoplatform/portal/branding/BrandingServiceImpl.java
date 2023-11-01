@@ -250,7 +250,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     branding.setFavicon(getFavicon());
     branding.setLoginBackground(getLoginBackground());
     branding.setLoginBackgroundTextColor(getLoginBackgroundTextColor());
-    branding.setThemeColors(getThemeColors());
+    branding.setThemeStyle(getThemeStyle());
     branding.setLoginTitle(getLoginTitle());
     branding.setLoginSubtitle(getLoginSubtitle());
     branding.setLastUpdatedTime(getLastUpdatedTime());
@@ -294,7 +294,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
       updateFavicon(branding.getFavicon(), false);
       updateLoginBackground(branding.getLoginBackground(), false);
       updateLoginBackgroundTextColor(branding.getLoginBackgroundTextColor(), false);
-      updateThemeColors(branding.getThemeColors(), false);
+      updateThemeStyle(branding.getThemeStyle(), false);
       updateLoginTitle(branding.getLoginTitle());
       updateLoginSubtitle(branding.getLoginSubtitle());
     } finally {
@@ -522,27 +522,26 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   }
 
   @Override
-  public void updateThemeColors(Map<String, String> themeColors) {
-    updateThemeColors(themeColors, true);
+  public void updateThemeStyle(Map<String, String> themeStyle) {
+    updateThemeStyle(themeStyle, true);
   }
-
   @Override
-  public Map<String, String> getThemeColors() {
+  public Map<String, String> getThemeStyle() {
     if (themeVariables == null || themeVariables.isEmpty()) {
       return Collections.emptyMap();
     }
 
-    Map<String, String> themeColors = new HashMap<>();
+    Map<String, String> themeStyleVariables = new HashMap<>();
     Set<String> variables = themeVariables.keySet();
     for (String themeVariable : variables) {
-      SettingValue<?> storedColorValue = settingService.get(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable);
-      String colorValue = storedColorValue == null
-          || storedColorValue.getValue() == null ? themeVariables.get(themeVariable) : storedColorValue.getValue().toString();
-      if (StringUtils.isNotBlank(colorValue)) {
-        themeColors.put(themeVariable, colorValue);
+      SettingValue<?> storedStyleValue = settingService.get(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable);
+      String styleValue = storedStyleValue == null
+          || storedStyleValue.getValue() == null ? themeVariables.get(themeVariable) : storedStyleValue.getValue().toString();
+      if (StringUtils.isNotBlank(styleValue)) {
+        themeStyleVariables.put(themeVariable, styleValue);
       }
     }
-    return themeColors;
+    return themeStyleVariables;
   }
 
   @Override
@@ -753,16 +752,16 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     }
   }
 
-  private void updateThemeColors(Map<String, String> themeColors, boolean updateLastUpdatedTime) {
+  private void updateThemeStyle(Map<String, String> themeStyles, boolean updateLastUpdatedTime) {
     if (themeVariables == null || themeVariables.isEmpty()) {
       return;
     }
 
     Set<String> variables = themeVariables.keySet();
     for (String themeVariable : variables) {
-      if (themeColors != null && themeColors.get(themeVariable) != null) {
-        String themeColor = themeColors.get(themeVariable);
-        settingService.set(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable, SettingValue.create(themeColor));
+      if (themeStyles != null && themeStyles.get(themeVariable) != null) {
+        String themeStyle = themeStyles.get(themeVariable);
+        settingService.set(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable, SettingValue.create(themeStyle));
       } else {
         settingService.remove(BRANDING_CONTEXT, BRANDING_SCOPE, themeVariable);
       }
