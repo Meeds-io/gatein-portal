@@ -140,7 +140,7 @@
      eXo.env.portal.homeLink = "<%=userHomeLink%>";
      eXo.env.portal.stickyMenu = <%=stickyMenu%>;
      eXo.env.portal.containerName = "<%=PortalContainer.getInstance().getName()%>";
-     eXo.env.portal.userName='<%= userName %>';
+     eXo.env.portal.userName='<%= userName == null ? "" : userName %>';
      eXo.env.portal.language='<%= language %>';
      eXo.env.portal.orientation='<%= orientation == Orientation.RT ? "rtl" : "ltr" %>';
      eXo.env.portal.selectedNodeUri = '<%= selectedNodeUri %>';
