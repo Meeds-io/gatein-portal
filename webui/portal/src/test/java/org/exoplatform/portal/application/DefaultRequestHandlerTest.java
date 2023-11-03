@@ -148,7 +148,7 @@ public class DefaultRequestHandlerTest {
 
     try {
       when(request.getRemoteUser()).thenReturn("user");
-      when(portalConfigService.getUserPortalDisplayedSites()).thenReturn(null);
+      when(portalConfigService.getUserPortalSites()).thenReturn(null);
       when(context.getResponse()).thenReturn(response);
       when(context.getRequest()).thenReturn(request);
 
