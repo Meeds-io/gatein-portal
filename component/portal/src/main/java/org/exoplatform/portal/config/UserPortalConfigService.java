@@ -22,6 +22,7 @@ package org.exoplatform.portal.config;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
@@ -70,6 +71,7 @@ import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -88,13 +90,13 @@ public class UserPortalConfigService implements Startable {
 
   public static final String      DEFAULT_USER_SITE_TEMPLATE  = "user";
 
-  private final SiteFilter        siteFilter                     = new SiteFilter(SiteType.PORTAL,
+  protected final SiteFilter      siteFilter                     = new SiteFilter(SiteType.PORTAL,
                                                                                   null,
                                                                                   null,
                                                                                   true,
                                                                                   true,
-                                                                                  true,
-                                                                                  true,
+                                                                                  false,
+                                                                                  false,
                                                                                   0,
                                                                                   0);
 
@@ -186,6 +188,7 @@ public class UserPortalConfigService implements Startable {
         this.defaultImportMode = defaultImportMode;
         this.defaultGroupSiteTemplate = defaultGroupSiteTemplate;
         this.defaultUserSiteTemplate = defaultUserSiteTemplate;
+        this.siteFilter.setExcludedSiteName(globalPortal_);
     }
 
     public PageStorage getPageService() {
@@ -545,15 +548,26 @@ public class UserPortalConfigService implements Startable {
       return list;
     }
 
-    public List<PortalConfig> getUserPortalDisplayedSites() {
-      siteFilter.setExcludedSiteName(globalPortal_);
+    public List<PortalConfig> getUserPortalSites() {
       List<PortalConfig> list = layoutService.getSites(siteFilter);
-      return list.stream().filter(config -> config != null && userACL_.hasPermission(config)).toList();
+      return list.stream()
+                 .filter(Objects::nonNull)
+                 .filter(userACL_::hasPermission)
+                 .sorted((s1, s2) -> {
+                   if (StringUtils.equals(s1.getName(), getDefaultPortal())) {
+                     return -Integer.MAX_VALUE;
+                   } else if (StringUtils.equals(s2.getName(), getDefaultPortal())) {
+                     return Integer.MAX_VALUE;
+                   } else {
+                     return s2.getDisplayOrder() - s1.getDisplayOrder();
+                   }
+                 })
+                 .toList();
     }
 
     public String computePortalPath(HttpServletRequest context) throws Exception {
-      List<PortalConfig> portalConfigList = getUserPortalDisplayedSites();
-      if (portalConfigList == null || portalConfigList.isEmpty()) {
+      List<PortalConfig> portalConfigList = getUserPortalSites();
+      if (CollectionUtils.isEmpty(portalConfigList)) {
         return null;
       }
       String defaultPortal = portalConfigList.get(0).getName();
