@@ -47,17 +47,11 @@ public class GroupPortalConfigListener extends GroupEventListener {
     private final UserPortalConfigService portalConfigService;
 
     /** . */
-    private final LayoutService layoutService;
-
-    /** . */
     private final OrganizationService orgService;
 
-    private static Log LOG = ExoLogger.getLogger(GroupPortalConfigListener.class);
-
-    public GroupPortalConfigListener(UserPortalConfigService portalConfigService, OrganizationService orgService, LayoutService layoutService) {
+    public GroupPortalConfigListener(UserPortalConfigService portalConfigService, OrganizationService orgService) {
         this.portalConfigService = portalConfigService;
         this.orgService = orgService;
-        this.layoutService = layoutService;
     }
 
     public void preDelete(Group group) throws Exception {
@@ -69,58 +63,6 @@ public class GroupPortalConfigListener extends GroupEventListener {
             removeGroupNavigation(group);
 
             portalConfigService.removeUserPortalConfig(PortalConfig.GROUP_TYPE, groupId);
-        } finally {
-            RequestLifeCycle.end();
-        }
-    }
-
-    @Override
-    public void postSave(Group group, boolean isNew) throws Exception {
-        if (!isNew) {
-            return;
-        }
-
-        RequestLifeCycle.begin(PortalContainer.getInstance());
-        try {
-            String groupId = group.getId();
-
-            // Bug in hibernate org service implementation
-            if (groupId == null) {
-                groupId = "/" + group.getGroupName();
-            }
-
-            if ("/administrators".equals(groupId)) {
-                groupId = "/platform/administrators";
-            } else if ("/users".equals(groupId)) {
-                groupId = "/platform/users";
-            } else if ("/guests".equals(groupId)) {
-                groupId = "/platform/guests";
-            } else if ("/management".equals(groupId)) {
-                groupId = "/organization/management";
-            } else if ("/executive-board".equals(groupId)) {
-                groupId = "/organization/management/executive-board";
-            } else if ("/human-resources".equals(groupId)) {
-                groupId = "/organization/management/human-resources";
-            } else if ("/communication".equals(groupId)) {
-                groupId = "/organization/communication";
-            } else if ("/marketing".equals(groupId)) {
-                groupId = "/organization/communication/marketing";
-            } else if ("/press-and-media".equals(groupId)) {
-                groupId = "/organization/communication/press-and-media";
-            } else if ("/operations".equals(groupId)) {
-                groupId = "/organization/operations";
-            } else if ("/sales".equals(groupId)) {
-                groupId = "/organization/operations/sales";
-            } else if ("/finances".equals(groupId)) {
-                groupId = "/organization/operations/finances";
-            }
-
-            // Create the portal from the template
-            if (layoutService.getPortalConfig(SiteKey.group(groupId)) == null) {
-                portalConfigService.createGroupSite(groupId);
-            } else {
-                LOG.debug("The group site {} already exists. Ignore creating from listener", groupId);
-            }
         } finally {
             RequestLifeCycle.end();
         }
