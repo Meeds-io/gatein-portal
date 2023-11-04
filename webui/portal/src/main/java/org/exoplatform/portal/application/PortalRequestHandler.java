@@ -165,7 +165,7 @@ public class PortalRequestHandler extends WebRequestHandler {
             } else if (req.getRemoteUser() == null) {
                 context.requestAuthenticationLogin();
             } else {
-                context.sendRedirect("/portal");
+                context.sendRedirect("/portal/" + portalConfigService.getDefaultPortal() + "/page-not-found");
             }
         } else if (persistentPortalConfig != null && StringUtils.equals(persistentPortalConfig.getName(), portalConfigService.getGlobalPortal())) {
           return false;
