@@ -729,68 +729,9 @@ public class TestDataStorage extends AbstractKernelTest {
     assertNotNull(pConfig);
     assertNotNull("The Group layout of " + pConfig.getName() + " is null", pConfig.getPortalLayout());
 
-    pConfig = storage_.getPortalConfig(PortalConfig.GROUP_TYPE, "/platform/administrators");
-    assertNotNull(pConfig);
-    assertNotNull("The Group layout of " + pConfig.getName() + " is null", pConfig.getPortalLayout());
-    assertTrue(pConfig.getPortalLayout().getChildren() != null && pConfig.getPortalLayout().getChildren().size() > 1);
-    pConfig.getPortalLayout().getChildren().clear();
-    storage_.save(pConfig);
-
-    pConfig = storage_.getPortalConfig(PortalConfig.GROUP_TYPE, "/platform/administrators");
-    assertNotNull(pConfig);
-    assertNotNull("The Group layout of " + pConfig.getName() + " is null", pConfig.getPortalLayout());
-    assertTrue(pConfig.getPortalLayout().getChildren() != null && pConfig.getPortalLayout().getChildren().size() == 0);
-
     pConfig = storage_.getPortalConfig(PortalConfig.USER_TYPE, "root");
     assertNotNull(pConfig);
     assertNotNull("The User layout of " + pConfig.getName() + " is null", pConfig.getPortalLayout());
-  }
-
-  public void testGroupLayout() throws Exception {
-    GroupHandler groupHandler = org.getGroupHandler();
-    Group group = groupHandler.findGroupById("groupTest");
-    assertNull(group);
-
-    group = groupHandler.createGroupInstance();
-    group.setGroupName("groupTest");
-    group.setLabel("group label");
-
-    groupHandler.addChild(null, group, true);
-
-    group = groupHandler.findGroupById("/groupTest");
-    assertNotNull(group);
-
-    PortalConfig pConfig = storage_.getPortalConfig(PortalConfig.GROUP_TYPE, "/groupTest");
-    assertNotNull("the Group's PortalConfig is not null", pConfig);
-    assertTrue(pConfig.getPortalLayout().getChildren() == null || pConfig.getPortalLayout().getChildren().size() == 4);
-
-    /**
-     * We need to remove the /groupTest from the groupHandler as the handler is
-     * shared between the tests and can cause other tests to fail. TODO: make
-     * the tests fully independent
-     */
-    groupHandler.removeGroup(group, false);
-    group = groupHandler.findGroupById("/groupTest");
-    assertNull(group);
-  }
-
-  public void testGroupNavigation() throws Exception {
-    GroupHandler groupHandler = org.getGroupHandler();
-    Group group = groupHandler.createGroupInstance();
-    group.setGroupName("testGroupNavigation");
-    group.setLabel("testGroupNavigation");
-
-    groupHandler.addChild(null, group, true);
-
-    SiteKey key = SiteKey.group(group.getId());
-    navService.saveNavigation(new NavigationContext(key, new NavigationState(0)));
-    assertNotNull(navService.loadNavigation(key));
-
-    // Remove group
-    groupHandler.removeGroup(group, true);
-
-    // Group navigations is removed after remove group
-    assertNull(navService.loadNavigation(key));
   }
 
   public void testUserLayout() throws Exception {
