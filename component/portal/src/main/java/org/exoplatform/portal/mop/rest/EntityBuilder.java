@@ -21,13 +21,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.PageType;
@@ -117,7 +117,7 @@ public class EntityBuilder {
                                                   layoutService,
                                                   userACL,
                                                   userPortal,
-                                                  false));
+                                                  expandBreadcrumb));
       result.add(resultNode);
     }
     return result;
@@ -130,21 +130,21 @@ public class EntityBuilder {
     UserNode rootNavigationNode = userPortal.getNode(userNodeNavigation, Scope.ALL, UserNodeFilterConfig.builder().build(), null);
     userNode = findTargetNode(userNode.getId(), rootNavigationNode);
     List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList = new ArrayList<>();
+    String portalName =  PortalContainer.getCurrentPortalContainerName();
     while (userNode != null && !userNode.getName().equals("default")) {
-      userNodeBreadcrumbItemList.add(computeUserNodeBreadcrumbItem(layoutService, userNode));
+      userNodeBreadcrumbItemList.add(computeUserNodeBreadcrumbItem(layoutService, userNode, portalName, userNodeNavigation.getKey().getName()));
       userNode = userNode.getParent();
     }
     return userNodeBreadcrumbItemList;
   }
 
-  private static UserNodeBreadcrumbItem computeUserNodeBreadcrumbItem(LayoutService layoutService, UserNode node) {
-    String nodeUri = null;
+  private static UserNodeBreadcrumbItem computeUserNodeBreadcrumbItem(LayoutService layoutService, UserNode node, String portalName, String siteName) {    String nodeUri = null;
     if (node.getPageRef() != null) {
       Page userNodePage = layoutService.getPage(node.getPageRef());
       if (PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
         nodeUri = userNodePage.getLink();
       } else {
-        nodeUri = node.getURI();
+        nodeUri = new StringBuilder("/").append(portalName).append("/").append(siteName).append("/").append(node.getURI()).toString();
       }
     }
     return new UserNodeBreadcrumbItem(node.getId(), node.getName(), node.getResolvedLabel(), nodeUri, node.getTarget());
