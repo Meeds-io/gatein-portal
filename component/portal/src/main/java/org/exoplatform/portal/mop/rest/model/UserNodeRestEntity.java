@@ -39,6 +39,8 @@ public class UserNodeRestEntity {
 
   private String                    pageLink;
 
+  private List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList;
+
   public UserNodeRestEntity(UserNode userNode) {
     this.userNode = userNode;
   }
@@ -134,7 +136,15 @@ public class UserNodeRestEntity {
   public long getUpdatedDate() {
     return userNode.getUpdatedDate();
   }
-  
+
+  public List<UserNodeBreadcrumbItem> getUserNodeBreadcrumbItemList() {
+    return userNodeBreadcrumbItemList;
+  }
+
+  public void setUserNodeBreadcrumbItemList(List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList) {
+    this.userNodeBreadcrumbItemList = userNodeBreadcrumbItemList;
+  }
+
   @Override
   public int hashCode() {
     int result = 17;
