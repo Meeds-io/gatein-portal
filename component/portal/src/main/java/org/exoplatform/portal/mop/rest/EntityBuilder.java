@@ -16,7 +16,14 @@
  */
 package org.exoplatform.portal.mop.rest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
@@ -40,7 +47,7 @@ public class EntityBuilder {
   private static final Log   LOG   = ExoLogger.getLogger(EntityBuilder.class);
 
   public static final String GROUP = "group";
-  
+
   private EntityBuilder() { // NOSONAR
   }
 
@@ -105,68 +112,54 @@ public class EntityBuilder {
         resultNode.setUserNodeBreadcrumbItemList(userNodeBreadcrumbItemList);
       }
       resultNode.setChildren(toUserNodeRestEntity(userNode.getChildren(),
-              expand,
-              organizationService,
-              layoutService,
-              userACL,
-              userPortal,
-              false));
+                                                  expand,
+                                                  organizationService,
+                                                  layoutService,
+                                                  userACL,
+                                                  userPortal,
+                                                  false));
       result.add(resultNode);
     }
     return result;
   }
 
-  private static List<UserNodeBreadcrumbItem> getUserNodeBreadcrumbList(UserPortal userPortal, LayoutService layoutService, UserNode node) {
-    UserNavigation navigation = userPortal.getNavigation(node.getNavigation().getKey());
-    UserNode rootNode = userPortal.getNode(navigation, Scope.ALL, UserNodeFilterConfig.builder().build(), null);
-    node = findTargetNode(node.getName(), rootNode.getChildren());
-    return node != null ? computeUserNodeBreadcrumbList(layoutService, node) : Collections.emptyList();
-  }
-
-  private static List<UserNodeBreadcrumbItem> computeUserNodeBreadcrumbList(LayoutService layoutService, UserNode node) {
+  private static List<UserNodeBreadcrumbItem> getUserNodeBreadcrumbList(UserPortal userPortal,
+                                                                        LayoutService layoutService,
+                                                                        UserNode userNode) {
+    UserNavigation userNodeNavigation = userPortal.getNavigation(userNode.getNavigation().getKey());
+    UserNode rootNavigationNode = userPortal.getNode(userNodeNavigation, Scope.ALL, UserNodeFilterConfig.builder().build(), null);
+    userNode = findTargetNode(userNode.getId(), rootNavigationNode);
     List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList = new ArrayList<>();
-    String uri = null;
-    if (node.getPageRef() != null) {
-      Page userNodePage = layoutService.getPage(node.getPageRef());
-      if (PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
-        uri = userNodePage.getLink();
-      } else {
-        uri = node.getURI();
-      }
-    }
-    UserNodeBreadcrumbItem breadcrumbItem = new UserNodeBreadcrumbItem(node.getId(),
-                                                                       node.getName(),
-                                                                       node.getResolvedLabel(),
-                                                                       uri,
-                                                                       node.getTarget());
-    userNodeBreadcrumbItemList.add(breadcrumbItem);
-    if (node.getParent() != null && !node.getParent().getName().equals("default")) {
-      userNodeBreadcrumbItemList.addAll(computeUserNodeBreadcrumbList(layoutService, node.getParent()));
+    while (userNode != null && !userNode.getName().equals("default")) {
+      userNodeBreadcrumbItemList.add(computeUserNodeBreadcrumbItem(layoutService, userNode));
+      userNode = userNode.getParent();
     }
     return userNodeBreadcrumbItemList;
   }
 
-  private static UserNode findTargetNode(String nodeName, Collection<UserNode> userNodes) {
-    if (userNodes.isEmpty()) {
-      return null;
+  private static UserNodeBreadcrumbItem computeUserNodeBreadcrumbItem(LayoutService layoutService, UserNode node) {
+    String nodeUri = null;
+    if (node.getPageRef() != null) {
+      Page userNodePage = layoutService.getPage(node.getPageRef());
+      if (PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
+        nodeUri = userNodePage.getLink();
+      } else {
+        nodeUri = node.getURI();
+      }
     }
-    UserNode targetUserNode = null;
-    for (Iterator<UserNode> i = userNodes.iterator(); i.hasNext();) {
-      UserNode userNode = i.next();
+    return new UserNodeBreadcrumbItem(node.getId(), node.getName(), node.getResolvedLabel(), nodeUri, node.getTarget());
+  }
 
-      if (userNode.getName().equals(nodeName)) {
-        targetUserNode = userNode;
-      } else if (userNode.getChildren() != null && !userNode.getChildren().isEmpty() ) {
-        if (userNode.getChild(nodeName) != null) {
-          targetUserNode = userNode.getChild(nodeName);
-        } else {
-          targetUserNode = findTargetNode(nodeName, userNode.getChildren());
-        }
+  private static UserNode findTargetNode(String nodeId, UserNode rootNode) {
+    for (UserNode userNode : rootNode.getChildren()) {
+      if (userNode.getId().equals(nodeId)) {
+        return userNode;
       }
+      UserNode targetUserNode = findTargetNode(nodeId, userNode);
       if (targetUserNode != null) {
-        break;
+        return targetUserNode;
       }
     }
-    return targetUserNode;
+    return null;
   }
 }
