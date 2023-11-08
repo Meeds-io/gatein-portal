@@ -130,21 +130,33 @@ public class EntityBuilder {
     UserNode rootNavigationNode = userPortal.getNode(userNodeNavigation, Scope.ALL, UserNodeFilterConfig.builder().build(), null);
     userNode = findTargetNode(userNode.getId(), rootNavigationNode);
     List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList = new ArrayList<>();
-    String portalName =  PortalContainer.getCurrentPortalContainerName();
+    String portalName = PortalContainer.getCurrentPortalContainerName();
     while (userNode != null && !userNode.getName().equals("default")) {
-      userNodeBreadcrumbItemList.add(computeUserNodeBreadcrumbItem(layoutService, userNode, portalName, userNodeNavigation.getKey().getName()));
+      userNodeBreadcrumbItemList.add(computeUserNodeBreadcrumbItem(layoutService,
+                                                                   userNode,
+                                                                   portalName,
+                                                                   userNodeNavigation.getKey().getName()));
       userNode = userNode.getParent();
     }
     return userNodeBreadcrumbItemList;
   }
 
-  private static UserNodeBreadcrumbItem computeUserNodeBreadcrumbItem(LayoutService layoutService, UserNode node, String portalName, String siteName) {    String nodeUri = null;
+  private static UserNodeBreadcrumbItem computeUserNodeBreadcrumbItem(LayoutService layoutService,
+                                                                      UserNode node,
+                                                                      String portalName,
+                                                                      String siteName) {
+    String nodeUri = null;
     if (node.getPageRef() != null) {
       Page userNodePage = layoutService.getPage(node.getPageRef());
       if (PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
         nodeUri = userNodePage.getLink();
       } else {
-        nodeUri = new StringBuilder("/").append(portalName).append("/").append(siteName).append("/").append(node.getURI()).toString();
+        nodeUri = new StringBuilder("/").append(portalName)
+                                        .append("/")
+                                        .append(siteName)
+                                        .append("/")
+                                        .append(node.getURI())
+                                        .toString();
       }
     }
     return new UserNodeBreadcrumbItem(node.getId(), node.getName(), node.getResolvedLabel(), nodeUri, node.getTarget());
