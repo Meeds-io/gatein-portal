@@ -100,40 +100,48 @@ public class EntityBuilder {
         }
       }
       if (expandBreadcrumb) {
-        List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList = getUserNodeBreadcrumbList(userPortal, userNode);
+        List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList = getUserNodeBreadcrumbList(userPortal, layoutService, userNode);
         Collections.reverse(userNodeBreadcrumbItemList);
         resultNode.setUserNodeBreadcrumbItemList(userNodeBreadcrumbItemList);
       }
-
-
       resultNode.setChildren(toUserNodeRestEntity(userNode.getChildren(),
               expand,
               organizationService,
               layoutService,
               userACL,
               userPortal,
-              expandBreadcrumb));
+              false));
       result.add(resultNode);
     }
     return result;
   }
 
-  public static List<UserNodeBreadcrumbItem> getUserNodeBreadcrumbList(UserPortal userPortal, UserNode node) {
+  private static List<UserNodeBreadcrumbItem> getUserNodeBreadcrumbList(UserPortal userPortal, LayoutService layoutService, UserNode node) {
     UserNavigation navigation = userPortal.getNavigation(node.getNavigation().getKey());
     UserNode rootNode = userPortal.getNode(navigation, Scope.ALL, UserNodeFilterConfig.builder().build(), null);
     node = findTargetNode(node.getName(), rootNode.getChildren());
-    return node != null ? computeUserNodeBreadcrumbList(node) : Collections.emptyList();
+    return node != null ? computeUserNodeBreadcrumbList(layoutService, node) : Collections.emptyList();
   }
 
-  public static List<UserNodeBreadcrumbItem> computeUserNodeBreadcrumbList(UserNode node) {
+  private static List<UserNodeBreadcrumbItem> computeUserNodeBreadcrumbList(LayoutService layoutService, UserNode node) {
     List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList = new ArrayList<>();
+    String uri = null;
+    if (node.getPageRef() != null) {
+      Page userNodePage = layoutService.getPage(node.getPageRef());
+      if (PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
+        uri = userNodePage.getLink();
+      } else {
+        uri = node.getURI();
+      }
+    }
     UserNodeBreadcrumbItem breadcrumbItem = new UserNodeBreadcrumbItem(node.getId(),
                                                                        node.getName(),
                                                                        node.getResolvedLabel(),
-                                                                       node.getPageRef() != null ? node.getURI() : null);
+                                                                       uri,
+                                                                       node.getTarget());
     userNodeBreadcrumbItemList.add(breadcrumbItem);
     if (node.getParent() != null && !node.getParent().getName().equals("default")) {
-      userNodeBreadcrumbItemList.addAll(computeUserNodeBreadcrumbList(node.getParent()));
+      userNodeBreadcrumbItemList.addAll(computeUserNodeBreadcrumbList(layoutService, node.getParent()));
     }
     return userNodeBreadcrumbItemList;
   }

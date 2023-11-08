@@ -31,5 +31,8 @@ public class UserNodeBreadcrumbItem {
 
   private String label;
 
-  private String path;
+  private String uri;
+
+  private String target;
+
 }

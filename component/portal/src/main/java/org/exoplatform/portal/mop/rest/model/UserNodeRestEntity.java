@@ -144,6 +144,7 @@ public class UserNodeRestEntity {
   public void setUserNodeBreadcrumbItemList(List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList) {
     this.userNodeBreadcrumbItemList = userNodeBreadcrumbItemList;
   }
+
   @Override
   public int hashCode() {
     int result = 17;
