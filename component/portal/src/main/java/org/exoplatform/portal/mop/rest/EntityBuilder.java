@@ -126,7 +126,7 @@ public class EntityBuilder {
   private static List<UserNodeBreadcrumbItem> getUserNodeBreadcrumbList(UserPortal userPortal,
                                                                         LayoutService layoutService,
                                                                         UserNode userNode) {
-    UserNavigation userNodeNavigation = userPortal.getNavigation(userNode.getNavigation().getKey());
+    UserNavigation userNodeNavigation = userNode.getNavigation();
     UserNode rootNavigationNode = userPortal.getNode(userNodeNavigation, Scope.ALL, UserNodeFilterConfig.builder().build(), null);
     userNode = findTargetNode(userNode.getId(), rootNavigationNode);
     List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList = new ArrayList<>();
