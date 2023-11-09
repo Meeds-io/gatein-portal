@@ -524,12 +524,16 @@ public class PortalRequestContext extends WebuiRequestContext {
     }
 
     public String getPortalOwner() {
-        UserPortalConfig userPortalConfig = getUserPortalConfig();
-        if (userPortalConfig != null && userPortalConfig.getPortalName() != null) {
-            return userPortalConfig.getPortalName();
-        } else {
-            return portalConfigService.getDefaultPortal();
-        }
+      UserPortalConfig portalConfig = getUserPortalConfig();
+      if (portalConfig != null && portalConfig.getPortalName() != null) {
+        return portalConfig.getPortalName();
+      } else {
+        return portalConfigService.getDefaultPortal();
+      }
+    }
+
+    public String getDefaultPortal() {
+      return portalConfigService.getDefaultPortal();
     }
 
     public String getNodePath() {

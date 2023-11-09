@@ -185,7 +185,9 @@ public class NodeManager {
         NodeChangeQueue<NodeContext<N>> changes = rebased.getChanges();
         if (changes != null) {
             changes.broadcast(persister);
-            changes.broadcast(listener);
+            if (listener != null) {
+              changes.broadcast(listener);
+            }
 
             // Update the tree handles to the persistent values
             for (Map.Entry<String, String> entry : persister.toPersist.entrySet()) {

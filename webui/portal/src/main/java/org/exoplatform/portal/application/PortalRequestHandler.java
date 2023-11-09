@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.exoplatform.commons.utils.I18N;
-import org.exoplatform.commons.utils.Safe;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.*;
 import org.exoplatform.portal.config.model.PortalConfig;
@@ -42,11 +41,9 @@ import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.WebRequestHandler;
 import org.exoplatform.web.application.*;
 import org.exoplatform.web.controller.QualifiedName;
-import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.core.UIApplication;
 
 import org.apache.commons.codec.binary.StringUtils;
-import org.gatein.common.text.EntityEncoder;
 
 /**
  * Created by The eXo Platform SAS Dec 9, 2006
@@ -168,7 +165,7 @@ public class PortalRequestHandler extends WebRequestHandler {
             } else if (req.getRemoteUser() == null) {
                 context.requestAuthenticationLogin();
             } else {
-                context.sendError(HttpServletResponse.SC_FORBIDDEN);
+                context.sendRedirect("/portal/" + portalConfigService.getDefaultPortal() + "/page-not-found");
             }
         } else if (persistentPortalConfig != null && StringUtils.equals(persistentPortalConfig.getName(), portalConfigService.getGlobalPortal())) {
           return false;

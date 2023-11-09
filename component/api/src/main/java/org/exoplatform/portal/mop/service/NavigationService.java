@@ -77,6 +77,26 @@ public interface NavigationService extends org.exoplatform.portal.mop.navigation
                               NodeChangeListener<NodeContext<N>> listener);
 
   /**
+   * Loads root node of a designated Site
+   * 
+   * @param siteKey {@link SiteKey}
+   * @param <N> the node generic type
+   * @return the loaded node
+   */
+  <N> NodeContext<NodeContext<N>> loadNode(SiteKey siteKey);
+
+  /**
+   * Loads a specific node of a Site identitifed by its relative URI (from root
+   * node until node)
+   * 
+   * @param siteKey
+   * @param navUri
+   * @param <N> the node generic type
+   * @return the loaded node
+   */
+  <N> NodeContext<NodeContext<N>> loadNode(SiteKey siteKey, String navUri);
+
+  /**
    * Load a navigation node from a specified navigation by its id
    *
    * @param  model    the node model

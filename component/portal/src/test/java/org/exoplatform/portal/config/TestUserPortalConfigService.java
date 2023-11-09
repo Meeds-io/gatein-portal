@@ -245,12 +245,13 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
     new UnitTest() {
       public void execute() throws Exception {
         userPortalConfigSer_.removeUserPortalConfig("jazz");
-        assertEquals(4, userPortalConfigSer_.getUserPortalDisplayedSites().size());
+        assertEquals(4, userPortalConfigSer_.getUserPortalSites().size());
 
         String originalGlobalPortal = userPortalConfigSer_.globalPortal_;
         userPortalConfigSer_.globalPortal_ = "system";
+        userPortalConfigSer_.siteFilter.setExcludedSiteName(userPortalConfigSer_.getGlobalPortal());
         try {
-          assertEquals(3, userPortalConfigSer_.getUserPortalDisplayedSites().size());
+          assertEquals(3, userPortalConfigSer_.getUserPortalSites().size());
         } finally {
           userPortalConfigSer_.globalPortal_ = originalGlobalPortal;
         }

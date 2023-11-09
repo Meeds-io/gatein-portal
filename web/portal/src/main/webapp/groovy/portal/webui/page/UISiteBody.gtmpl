@@ -22,15 +22,17 @@
 	<%} else {%>
 		<div class="VIEW-SITEBODY VIEW-BLOCK" id="SITEBODY-VIEW-BLOCK">
 			<% if(uicomponent.getUIComponent() == null){ %>
-			<div class="UIPortalWarning Empty">
-
-				<h3 class="TitleWaring"><%=_ctx.appRes("UIPageBody.msg.pageNotFoundLine1")%></h3>
-				<ul>
-					<li class="Icon"><%=_ctx.appRes("UIPageBody.msg.pageNotFoundLine2")%></li>
-					<li class="Icon"><%=_ctx.appRes("UIPageBody.msg.pageNotFoundLine3")%></li>
-					<li class="Icon"><%=_ctx.appRes("UIPageBody.msg.pageNotFoundLine4")%></li>
-				</ul>
-			</div>
+        <div class="VuetifyApp">
+          <div data-app="true"
+             class="v-application transparent v-application--is-ltr theme--light singlePageApplication"
+             id="PageNotFound">
+            <script type="text/javascript">
+              require(['PORTLET/social-portlet/PageNotFound'],
+                  app => app.init()
+              );
+            </script>
+          </div>
+        </div>
 			<% } else { uicomponent.renderChildren(); } %>
 		</div>
 	<%}%>
