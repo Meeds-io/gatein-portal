@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,9 +50,11 @@ import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationState;
+import org.exoplatform.portal.mop.navigation.NodeChangeListener;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.rest.NavigationRest.ResultUserNavigation;
+import org.exoplatform.portal.mop.rest.model.UserNodeBreadcrumbItem;
 import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.user.UserNavigation;
@@ -247,5 +250,81 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     assertEquals("Everyone", resultUserNodes.get(0).getPageAccessPermissions().get(0).get("membershipType"));
     assertEquals(null, resultUserNodes.get(0).getPageAccessPermissions().get(0).get("group"));
     assertEquals("www.test.com", resultUserNodes.get(0).getPageLink());
+  }
+
+  @Test
+  public void testGetSiteNavigationWithBreadcrumbs() throws Exception {
+
+    String path = "/v1/navigations/PORTAL?siteName=SiteName&expandBreadcrumb=true";
+
+    EnvironmentContext envctx = new EnvironmentContext();
+    HttpServletRequest httpRequest = new MockHttpServletRequest(path, null, 0, "GET", null);
+    envctx.put(HttpServletRequest.class, httpRequest);
+
+    startUserSession("root1");
+    Collection<UserNode> nodes = new ArrayList<>();
+    Page nodePage = mock(Page.class);
+    UserNode parentNode = mock(UserNode.class);
+    UserNode userNode = mock(UserNode.class);
+    nodes.add(userNode);
+    UserNavigation userNavigation = mock(UserNavigation.class);
+    UserPortalConfig userPortalConfig = mock(UserPortalConfig.class);
+    UserPortal userPortal = mock(UserPortal.class);
+    PageKey pageKey = PageKey.parse("portal::page::ref");
+    when(layoutService.getPage(pageKey)).thenReturn(nodePage);
+    when(nodePage.getType()).thenReturn("PAGE");
+    when(userNode.getPageRef()).thenReturn(pageKey);
+    when(userNode.getURI()).thenReturn("homepage/usernode");
+    when(userNode.getId()).thenReturn("1");
+    when(userNode.getName()).thenReturn("usernode");
+    when(userNode.getResolvedLabel()).thenReturn("user node label");
+    when(userNode.getTarget()).thenReturn("SAME_TAB");
+    when(userNode.getNavigation()).thenReturn(userNavigation);
+    SiteKey siteKey = mock(SiteKey.class);
+    when(userNavigation.getKey()).thenReturn(siteKey);
+    when(siteKey.getName()).thenReturn("siteName");
+    when(userNode.getParent()).thenReturn(parentNode);
+    when(parentNode.getName()).thenReturn("default");
+    when(parentNode.getChildren()).thenReturn(nodes);
+    when(portalConfigService.getUserPortalConfig(anyString(), anyString(), any())).thenReturn(userPortalConfig);
+    when(userPortalConfig.getUserPortal()).thenReturn(userPortal);
+    when(userPortal.getNodes(any(SiteType.class),
+                             any(Scope.class),
+                             any(UserNodeFilterConfig.class),
+                             anyBoolean())).thenReturn(nodes);
+    when(userPortal.getNode(any(UserNavigation.class),
+                            any(Scope.class),
+                            any(UserNodeFilterConfig.class),
+                            nullable(NodeChangeListener.class))).thenReturn(parentNode);
+    ContainerResponse resp = launcher.service("GET", path, "", null, null, envctx);
+    Object entity = resp.getEntity();
+    assertEquals(200, resp.getStatus());
+    assertNotNull(entity);
+    List<UserNodeRestEntity> resultUserNodes = (List<UserNodeRestEntity>) resp.getEntity();
+    assertEquals(1, resultUserNodes.size());
+    List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList = resultUserNodes.get(0).getUserNodeBreadcrumbItemList();
+    assertNotNull(userNodeBreadcrumbItemList);
+    assertEquals(1, userNodeBreadcrumbItemList.size());
+    assertEquals("1", userNodeBreadcrumbItemList.get(0).getNodeId());
+    assertEquals("usernode", userNodeBreadcrumbItemList.get(0).getName());
+    assertEquals("SAME_TAB", userNodeBreadcrumbItemList.get(0).getTarget());
+    assertEquals("user node label", userNodeBreadcrumbItemList.get(0).getLabel());
+    assertEquals("/portal/siteName/homepage/usernode", userNodeBreadcrumbItemList.get(0).getUri());
+
+    when(userNode.getTarget()).thenReturn("NEW_TAB");
+    when(nodePage.getType()).thenReturn("LINK");
+    when(nodePage.getLink()).thenReturn("www.test.com");
+
+    resp = launcher.service("GET", path, "", null, null, envctx);
+    entity = resp.getEntity();
+    assertEquals(200, resp.getStatus());
+    assertNotNull(entity);
+    resultUserNodes = (List<UserNodeRestEntity>) resp.getEntity();
+    assertEquals(1, resultUserNodes.size());
+    userNodeBreadcrumbItemList = resultUserNodes.get(0).getUserNodeBreadcrumbItemList();
+    assertNotNull(userNodeBreadcrumbItemList);
+    assertTrue(userNodeBreadcrumbItemList.size() > 0);
+    assertEquals("NEW_TAB", userNodeBreadcrumbItemList.get(0).getTarget());
+    assertNotNull("www.test.com", userNodeBreadcrumbItemList.get(0).getUri());
   }
 }
