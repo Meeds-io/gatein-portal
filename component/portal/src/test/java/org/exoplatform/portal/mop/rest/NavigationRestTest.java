@@ -15,7 +15,11 @@
  */
 package org.exoplatform.portal.mop.rest;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,9 +33,6 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.sun.istack.Nullable;
-import org.exoplatform.portal.mop.navigation.NodeChangeListener;
-import org.exoplatform.portal.mop.rest.model.UserNodeBreadcrumbItem;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -49,9 +50,11 @@ import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationState;
+import org.exoplatform.portal.mop.navigation.NodeChangeListener;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.rest.NavigationRest.ResultUserNavigation;
+import org.exoplatform.portal.mop.rest.model.UserNodeBreadcrumbItem;
 import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.user.UserNavigation;
