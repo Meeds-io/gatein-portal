@@ -174,11 +174,14 @@ public class CacheableMembershipHandlerImpl extends MembershipDAOImpl {
     disableCacheInThread.set(true);
     try {
       super.linkMembership(user, g, mt, broadcast);
-      if (useCacheList) {
-        membershipCache.remove(new MembershipCacheKey(user.getUserName(), null, null));
-      }
     } finally {
       disableCacheInThread.set(false);
+      if (user != null && g != null && mt != null) {
+        membershipCache.remove(new MembershipCacheKey(user.getUserName(), g.getId(), mt.getName()));
+        if (useCacheList) {
+          membershipCache.remove(new MembershipCacheKey(user.getUserName(), null, null));
+        }
+      }
     }
   }
 
