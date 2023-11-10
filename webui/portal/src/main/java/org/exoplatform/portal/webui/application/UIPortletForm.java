@@ -33,7 +33,6 @@ import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.portlet.Preference;
-import org.exoplatform.portal.resource.SkinService;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.portal.webui.workspace.UIMaskWorkspace;
 import org.exoplatform.portal.webui.workspace.UIPortalApplication;
@@ -50,7 +49,6 @@ import org.exoplatform.webui.core.lifecycle.UIFormLifecycle;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.Event.Phase;
 import org.exoplatform.webui.event.EventListener;
-import org.exoplatform.webui.form.UIFormInputIconSelector;
 import org.exoplatform.webui.form.UIFormInputInfo;
 import org.exoplatform.webui.form.UIFormInputSet;
 import org.exoplatform.webui.form.UIFormStringInput;
@@ -83,8 +81,6 @@ public class UIPortletForm extends UIFormTabPane {
 
     private UIComponent backComponent_;
 
-    private static final String FIELD_THEME = "Theme";
-
     private static final String FIELD_PORTLET_PREF = "PortletPref";
 
     @SuppressWarnings("unchecked")
@@ -111,14 +107,6 @@ public class UIPortletForm extends UIFormTabPane {
                         new UIFormTextAreaInput("description", "description", null).addValidator(StringLengthValidator.class, 0, 255).addValidator(NotHTMLTagValidator.class,
                                 "UIPortletForm.msg.InvalidPortletDescription"));
         addUIFormInput(uiSettingSet);
-        UIFormInputIconSelector uiIconSelector = new UIFormInputIconSelector("Icon", "icon");
-        addUIFormInput(uiIconSelector);
-
-        UIFormInputThemeSelector uiThemeSelector = new UIFormInputThemeSelector(FIELD_THEME, null);
-        SkinService skinService = getApplicationComponent(SkinService.class);
-        uiThemeSelector.getChild(UIItemThemeSelector.class).setValues(skinService.getPortletThemes());
-        addUIFormInput(uiThemeSelector);
-
         PortalRequestContext prc = Util.getPortalRequestContext();
         if (prc.getSiteType() != SiteType.USER) {
             UIListPermissionSelector uiListPermissionSelector = createUIComponent(UIListPermissionSelector.class, null, null);
@@ -176,14 +164,7 @@ public class UIPortletForm extends UIFormTabPane {
             return false;
         }
         invokeGetBindingBean(uiPortlet_);
-        String icon = uiPortlet.getIcon();
 
-        if (icon == null || icon.length() < 0) {
-            icon = "PortletIcon";
-        }
-        getChild(UIFormInputIconSelector.class).setSelectedIcon(icon);
-        getChild(UIFormInputThemeSelector.class).getChild(UIItemThemeSelector.class).setSelectedTheme(
-                uiPortlet.getSuitedTheme(null));
         if (hasEditMode()) {
             uiPortlet.setCurrentPortletMode(PortletMode.EDIT);
         } else {
@@ -253,15 +234,7 @@ public class UIPortletForm extends UIFormTabPane {
         public void execute(final Event<UIPortletForm> event) throws Exception {
             UIPortletForm uiPortletForm = event.getSource();
             UIPortlet uiPortlet = uiPortletForm.getUIPortlet();
-            UIFormInputIconSelector uiIconSelector = uiPortletForm.getChild(UIFormInputIconSelector.class);
             uiPortletForm.invokeSetBindingBean(uiPortlet);
-            if (uiIconSelector.getSelectedIcon().equals("Default")) {
-                uiPortlet.setIcon("PortletIcon");
-            } else {
-                uiPortlet.setIcon(uiIconSelector.getSelectedIcon());
-            }
-            UIFormInputThemeSelector uiThemeSelector = uiPortletForm.getChild(UIFormInputThemeSelector.class);
-            uiPortlet.putSuitedTheme(null, uiThemeSelector.getChild(UIItemThemeSelector.class).getSelectedTheme());
             uiPortletForm.savePreferences();
             UIMaskWorkspace uiMaskWorkspace = uiPortletForm.getParent();
             PortalRequestContext pcontext = (PortalRequestContext) event.getRequestContext();
