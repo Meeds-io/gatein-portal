@@ -23,6 +23,7 @@ import static org.exoplatform.services.organization.idm.EntityMapperUtils.ORIGIN
 
 import java.text.DateFormat;
 import java.util.*;
+import java.util.function.Supplier;
 
 import org.exoplatform.services.log.LogLevel;
 import org.picketlink.idm.api.*;
@@ -42,7 +43,7 @@ import org.exoplatform.services.organization.externalstore.IDMExternalStoreServi
  */
 public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
-  private List<UserEventListener> listeners_ = new ArrayList<UserEventListener>(3);
+  private static final String     LISTENER_EXECUTION_ERR_MSG = "Error executing %s on listener %s for user %s";
 
   public static final String      USER_PASSWORD        = EntityMapperUtils.USER_PASSWORD;
 
@@ -88,6 +89,8 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
     USER_NON_PROFILE_KEYS = Collections.unmodifiableSet(keys);
   }
+
+  private List<UserEventListener> listeners_ = new ArrayList<UserEventListener>(3);
 
   public UserDAOImpl(PicketLinkIDMOrganizationServiceImpl orgService, PicketLinkIDMService idmService) {
     super(orgService, idmService);
@@ -387,10 +390,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
   }
 
   public boolean authenticateExternal(String username, String password) throws Exception {
-    ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
-    if (currentContainer == null || (currentContainer instanceof RootContainer)) {
-      currentContainer = PortalContainer.getInstance();
-    }
+    ExoContainer currentContainer = getPortalContainer();
     IDMExternalStoreService externalStoreService = currentContainer.getComponentInstanceOfType(IDMExternalStoreService.class);
     if (externalStoreService == null || !externalStoreService.isEnabled()) {
       return false;
@@ -702,38 +702,40 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
 
   //
-  private void preSave(User user, boolean isNew) throws Exception {
+  private void preSave(User user, boolean isNew) {
     for (UserEventListener listener : listeners_) {
-      listener.preSave(user, isNew);
+      executeWithTransaction(() -> preSave(listener, user, isNew));
     }
   }
 
-  private void postSave(User user, boolean isNew) throws Exception {
+  private void postSave(User user, boolean isNew) {
     for (UserEventListener listener : listeners_) {
-      listener.postSave(user, isNew);
+      executeWithTransaction(() -> postSave(listener, user, isNew));
     }
   }
 
-  private void preDelete(User user) throws Exception {
+  private void preDelete(User user) {
     for (UserEventListener listener : listeners_) {
-      listener.preDelete(user);
+      executeWithTransaction(() -> preDelete(listener, user));
     }
   }
 
-  private void postDelete(User user) throws Exception {
+  private void postDelete(User user) {
     for (UserEventListener listener : listeners_) {
-      listener.postDelete(user);
+      executeWithTransaction(() -> postDelete(listener, user));
     }
   }
 
-  private void preSetEnabled(User user) throws Exception {
-    for (UserEventListener listener : listeners_)
-      listener.preSetEnabled(user);
+  private void preSetEnabled(User user) {
+    for (UserEventListener listener : listeners_) {
+      executeWithTransaction(() -> preSetEnabled(listener, user));
+    }
   }
 
   private void postSetEnabled(User user) throws Exception {
-    for (UserEventListener listener : listeners_)
-      listener.postSetEnabled(user);
+    for (UserEventListener listener : listeners_) {
+      executeWithTransaction(() -> postSetEnabled(listener, user));
+    }
   }
 
   public void persistUserInfo(User user, IdentitySession session, boolean isNew) throws Exception {
@@ -919,6 +921,116 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
 
   private boolean disableUserActived() {
     return orgService.getConfiguration().isDisableUserActived();
+  }
+
+  private void preSave(UserEventListener listener, User user, boolean isNew) {
+    try {
+      listener.preSave(user, isNew);
+    } catch (Exception e) {
+      throw new IllegalStateException(String.format(LISTENER_EXECUTION_ERR_MSG,
+                                                    "preSave",
+                                                    listener.getClass().getName(),
+                                                    user.getUserName()),
+                                      e);
+    }
+  }
+
+  private void postSave(UserEventListener listener, User user, boolean isNew) {
+    try {
+      listener.postSave(user, isNew);
+    } catch (Exception e) {
+      throw new IllegalStateException(String.format(LISTENER_EXECUTION_ERR_MSG,
+                                                    "postSave",
+                                                    listener.getClass().getName(),
+                                                    user.getUserName()),
+                                      e);
+    }
+  }
+
+  private void preDelete(UserEventListener listener, User user) {
+    try {
+      listener.preDelete(user);
+    } catch (Exception e) {
+      throw new IllegalStateException(String.format(LISTENER_EXECUTION_ERR_MSG,
+                                                    "preDelete",
+                                                    listener.getClass().getName(),
+                                                    user.getUserName()),
+                                      e);
+    }
+  }
+
+  private void postDelete(UserEventListener listener, User user) {
+    try {
+      listener.postDelete(user);
+    } catch (Exception e) {
+      throw new IllegalStateException(String.format(LISTENER_EXECUTION_ERR_MSG,
+                                                    "postDelete",
+                                                    listener.getClass().getName(),
+                                                    user.getUserName()),
+                                      e);
+    }
+  }
+
+  private void preSetEnabled(UserEventListener listener, User user) {
+    try {
+      listener.preSetEnabled(user);
+    } catch (Exception e) {
+      throw new IllegalStateException(String.format(LISTENER_EXECUTION_ERR_MSG,
+                                                    "preSetEnabled",
+                                                    listener.getClass().getName(),
+                                                    user.getUserName()),
+                                      e);
+    }
+  }
+
+  private void postSetEnabled(UserEventListener listener, User user) {
+    try {
+      listener.postSetEnabled(user);
+    } catch (Exception e) {
+      throw new IllegalStateException(String.format(LISTENER_EXECUTION_ERR_MSG,
+                                                    "postSetEnabled",
+                                                    listener.getClass().getName(),
+                                                    user.getUserName()),
+                                      e);
+    }
+  }
+
+  public void executeWithTransaction(Runnable runnable) {
+    int transactionCount = restartTransaction();
+    ExoContainer portalContainer = getPortalContainer();
+    if (transactionCount == 0) {
+      orgService.startRequest(portalContainer);
+    }
+    try {
+      runnable.run();
+    } finally {
+      if (transactionCount == 0 && orgService.isStarted(portalContainer)) {
+        orgService.endRequest(portalContainer);
+      }
+    }
+  }
+
+  protected int restartTransaction() {
+    ExoContainer portalContainer = getPortalContainer();
+    int i = 0;
+    // Close transactions until no encapsulated transaction
+    while (orgService.isStarted(portalContainer)) {
+      orgService.endRequest(portalContainer);
+      i++;
+    }
+    // Restart transactions with the same number of encapsulations
+    for (int j = 0; j < i; j++) {
+      orgService.startRequest(portalContainer);
+    }
+    return i;
+  }
+
+  private ExoContainer getPortalContainer() {
+    ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
+    if (currentContainer == null || (currentContainer instanceof RootContainer)) {
+      currentContainer = PortalContainer.getInstance();
+    }
+    return currentContainer;
   }
 
 }
