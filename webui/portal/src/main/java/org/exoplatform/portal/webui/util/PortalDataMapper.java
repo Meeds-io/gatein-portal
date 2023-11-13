@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.gatein.common.net.media.MediaType;
 import org.gatein.pc.api.Portlet;
 import org.gatein.pc.api.info.ModeInfo;
@@ -125,15 +124,9 @@ public class PortalDataMapper {
         model.setWidth(uiPortlet.getWidth());
         model.setHeight(uiPortlet.getHeight());
         model.setDescription(uiPortlet.getDescription());
-        if (StringUtils.isBlank(uiPortlet.getStorageId())) {
-          model.setShowInfoBar(false);
-          model.setShowApplicationState(false);
-          model.setShowApplicationMode(false);
-        } else {
-          model.setShowInfoBar(uiPortlet.getShowInfoBar());
-          model.setShowApplicationState(uiPortlet.getShowWindowState());
-          model.setShowApplicationMode(uiPortlet.getShowPortletMode());
-        }
+        model.setShowInfoBar(uiPortlet.getShowInfoBar());
+        model.setShowApplicationState(uiPortlet.getShowWindowState());
+        model.setShowApplicationMode(uiPortlet.getShowPortletMode());
         model.setDescription(uiPortlet.getDescription());
         model.setIcon(uiPortlet.getIcon());
         model.setProperties(uiPortlet.getProperties());
