@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.gatein.common.net.media.MediaType;
 import org.gatein.pc.api.Portlet;
 import org.gatein.pc.api.info.ModeInfo;
@@ -173,7 +174,11 @@ public class PortalDataMapper {
         model.setDefaultLayout(uiPortal.isUseDynamicLayout());
 
         model.setPortalLayout(new Container());
-
+        LayoutService layoutService = uiPortal.getApplicationComponent(LayoutService.class);
+        PortalConfig portalConfig = layoutService.getPortalConfig(uiPortal.getSiteKey());
+        model.setDisplayed(portalConfig.isDisplayed());
+        model.setDisplayOrder(portalConfig.getDisplayOrder());
+        model.setBannerFileId(portalConfig.getBannerFileId());
         List<UIComponent> children = uiPortal.getChildren();
         if (children == null || children.isEmpty()) {
           // Use default portal layout when the UI doesn't define one
