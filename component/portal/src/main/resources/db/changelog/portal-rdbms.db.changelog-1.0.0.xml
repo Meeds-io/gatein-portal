@@ -431,7 +431,7 @@
     </createIndex>
   </changeSet>
   
-  <changeSet author="portal" id="1.0.0-39" dbms="mysql">
+  <changeSet author="portal" id="1.0.0-39">
     <sql>
       UPDATE PORTAL_SITES set DISPLAYED=1 where NAME LIKE '/spaces/%';
     </sql>
