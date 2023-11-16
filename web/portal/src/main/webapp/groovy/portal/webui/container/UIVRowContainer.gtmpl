@@ -30,13 +30,13 @@
 
   if (!uiPortalApp.isEditing()) {
 %>
-<div id="${uicomponent.id}" class="row ma-n3 border-box-sizing <%=uiComponentClass%>" ${cssStyle}>
+<div id="${uicomponent.id}" class="row mx-n3 border-box-sizing <%=uiComponentClass%>" ${cssStyle}>
   <%uicomponent.renderChildren();%>
 </div>
 <%
   } else {
 %>
-<div class="UIContainer row ma-n3 border-box-sizing <%=uiComponentClass%> EdittingContainer<%=uicomponent.getPermissionClasses()%>" id="${uicomponent.id}" ${cssStyle}>
+<div class="UIContainer row mx-n3 border-box-sizing <%=uiComponentClass%> EdittingContainer<%=uicomponent.getPermissionClasses()%>" id="${uicomponent.id}" ${cssStyle}>
   <div class="NormalContainerBlock UIComponentBlock">
     <div class="LAYOUT-CONTAINER LAYOUT-BLOCK">
       <div class="UIIntermediateContainer">
