@@ -22,12 +22,14 @@
 package org.exoplatform.portal.application.localization;
 
 import java.util.Locale;
-import java.util.Set;
+import java.util.Objects;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.component.BaseComponentPlugin;
@@ -71,18 +73,32 @@ import org.exoplatform.webui.application.WebuiRequestContext;
  */
 public class LocalizationLifecycle extends BaseComponentPlugin implements ApplicationLifecycle<WebuiRequestContext> {
 
+  public static final String SAVE_PROFILE_LOCALE_ATTR = "SaveProfileLocale";
+
+  private static final Log    LOG                      = ExoLogger.getLogger("portal:LocalizationLifecycle");
+
   private static final String LOCALE_COOKIE            = "LOCALE";
 
   private static final String LOCALE_SESSION_ATTR      = "org.gatein.LOCALE";
 
   private static final String PREV_LOCALE_SESSION_ATTR = "org.gatein.LAST_LOCALE";
 
-  private static Log          log                      = ExoLogger.getLogger("portal:LocalizationLifecycle");
+  private ExoContainer        container;
+
+  private LocalePolicy        localePolicy;
+
+  private LocaleConfigService localeConfigService;
+
+  private OrganizationService organizationService;
 
   /**
    * @see org.exoplatform.web.application.ApplicationLifecycle#onInit
    */
   public void onInit(Application app) throws Exception {
+    container = app.getApplicationServiceContainer();
+    localePolicy = container.getComponentInstanceOfType(LocalePolicy.class);
+    localeConfigService = container.getComponentInstanceOfType(LocaleConfigService.class);
+    organizationService = container.getComponentInstanceOfType(OrganizationService.class);
   }
 
   /**
@@ -91,33 +107,20 @@ public class LocalizationLifecycle extends BaseComponentPlugin implements Applic
    * @see org.exoplatform.web.application.ApplicationLifecycle#onStartRequest
    */
   public void onStartRequest(Application app, WebuiRequestContext context) throws Exception {
-    if (!(context instanceof PortalRequestContext)) {
+    if (!(context instanceof PortalRequestContext reqCtx)) {
       return;
     }
 
-    PortalRequestContext reqCtx = (PortalRequestContext) context;
-    ExoContainer container = app.getApplicationServiceContainer();
-    //
-    LocalePolicy localePolicy = container.getComponentInstanceOfType(LocalePolicy.class);
-    HttpServletRequest request = HttpServletRequest.class.cast(context.getRequest());
+    Locale requestLocale = reqCtx.getRequestLocale();
+    HttpServletRequest request = reqCtx.getRequest();
     LocaleContextInfo localeCtx = LocaleContextInfoUtils.buildLocaleContextInfo(request);
-    localeCtx.setRequestLocale(reqCtx.getRequestLocale());
-    //
-    Set<Locale> supportedLocales = LocaleContextInfoUtils.getSupportedLocales();
-    //
+    localeCtx.setRequestLocale(requestLocale);
     Locale locale = localePolicy.determineLocale(localeCtx);
-    boolean supported = supportedLocales.contains(locale);
-
-    if (!supported && !"".equals(locale.getCountry())) {
-      locale = new Locale(locale.getLanguage());
-      supported = supportedLocales.contains(locale);
-    }
-    if (!supported) {
-      if (log.isWarnEnabled())
-        log.warn("Unsupported locale returned by LocalePolicy: " + localePolicy + ". Falling back to 'en'.");
-      locale = Locale.ENGLISH;
-    }
     reqCtx.setLocale(locale);
+    if (request.getRemoteUser() != null
+        && (localeCtx.getUserProfileLocale() == null || !Objects.equals(locale, localeCtx.getUserProfileLocale()))) {
+      reqCtx.setAttribute(SAVE_PROFILE_LOCALE_ATTR, true);
+    }
     resetOrientation(reqCtx, locale);
   }
 
@@ -135,7 +138,10 @@ public class LocalizationLifecycle extends BaseComponentPlugin implements Applic
 
     // if locale changed since previous request
     Locale sessLocale = getPreviousLocale(reqCtx.getRequest());
-    if (loc != null && sessLocale != null && !loc.equals(sessLocale)) {
+    if (reqCtx.getAttribute(SAVE_PROFILE_LOCALE_ATTR) != null
+        || (loc != null
+            && sessLocale != null
+            && !loc.equals(sessLocale))) {
       saveLocale(reqCtx, loc);
       resetOrientation(reqCtx, loc);
       savePreviousLocale(reqCtx, loc);
@@ -156,33 +162,27 @@ public class LocalizationLifecycle extends BaseComponentPlugin implements Applic
   public void onDestroy(Application app) throws Exception {
   }
 
-  private UserProfile loadUserProfile(ExoContainer container, PortalRequestContext context) {
+  private UserProfile loadUserProfile(PortalRequestContext context) {
     UserProfile userProfile = null;
-    OrganizationService svc = (OrganizationService) container.getComponentInstanceOfType(OrganizationService.class);
-
-    String user = context.getRemoteUser();
-    if (user != null) {
+    String userName = context.getRemoteUser();
+    if (userName != null) {
       try {
-        userProfile = svc.getUserProfileHandler().findUserProfileByName(user);
-      } catch (Exception ignored) {
-        log.error("IGNORED: Failed to load UserProfile for username: " + user, ignored);
-      }
-
-      if (userProfile == null && log.isWarnEnabled())
-        log.warn("Could not load user profile for " + user + ". Using default portal locale.");
-
-      if (userProfile == null) {
-        userProfile = svc.getUserProfileHandler().createUserProfileInstance(user);
+        userProfile = organizationService.getUserProfileHandler().findUserProfileByName(userName);
+        if (userProfile == null) {
+          userProfile = organizationService.getUserProfileHandler().createUserProfileInstance(userName);
+        }
+      } catch (Exception e) {
+        LOG.error("Failed to load UserProfile for user {}", userName, e);
       }
     }
     return userProfile;
   }
 
-  public static Locale getPreviousLocale(HttpServletRequest request) {
+  private Locale getPreviousLocale(HttpServletRequest request) {
     return getLocaleFromSession(request, PREV_LOCALE_SESSION_ATTR);
   }
 
-  private static Locale getLocaleFromSession(HttpServletRequest request, String attrName) {
+  private Locale getLocaleFromSession(HttpServletRequest request, String attrName) {
     String lang = null;
     HttpSession session = request.getSession(false);
     if (session != null)
@@ -192,22 +192,18 @@ public class LocalizationLifecycle extends BaseComponentPlugin implements Applic
 
   private void saveLocale(PortalRequestContext context, Locale loc) {
     String user = context.getRemoteUser();
-    if (user != null) {
-      saveLocaleToUserProfile(context, loc, user);
-    } else {
+    if (StringUtils.isBlank(user)) {
       saveLocaleToCookie(context, loc);
+    } else {
+      saveLocaleToUserProfile(context, loc, user);
     }
-
     saveSessionLocale(context, loc);
   }
 
   private void resetOrientation(PortalRequestContext context, Locale loc) {
-    ExoContainer container = context.getApplication().getApplicationServiceContainer();
-    LocaleConfigService localeConfigService = container.getComponentInstanceOfType(LocaleConfigService.class);
     LocaleConfig localeConfig = localeConfigService.getLocaleConfig(LocaleContextInfo.getLocaleAsString(loc));
     if (localeConfig == null) {
-      if (log.isWarnEnabled())
-        log.warn("Locale changed to unsupported Locale during request processing: " + loc);
+      LOG.warn("Locale changed to unsupported Locale during request processing: " + loc);
       return;
     }
     // we presume PortalRequestContext, and UIPortalApplication
@@ -238,26 +234,22 @@ public class LocalizationLifecycle extends BaseComponentPlugin implements Applic
   }
 
   private void saveLocaleToUserProfile(PortalRequestContext context, Locale loc, String user) {
-    ExoContainer container = context.getApplication().getApplicationServiceContainer();
-    OrganizationService svc = container.getComponentInstanceOfType(OrganizationService.class);
-
     RequestLifeCycle.begin(container);
     try {
       // Don't rely on UserProfileLifecycle loaded UserProfile when doing
       // an update to avoid a potential overwrite of other changes
-      UserProfile userProfile = loadUserProfile(container, context);
-      if (userProfile != null) {
-        userProfile.getUserInfoMap().put(Constants.USER_LANGUAGE, LocaleContextInfo.getLocaleAsString(loc));
-        svc.getUserProfileHandler().saveUserProfile(userProfile, false);
-      }
+      UserProfile userProfile = loadUserProfile(context);
       if (userProfile == null) {
-        if (log.isWarnEnabled())
-          log.warn("Unable to save locale into profile for user: " + user);
+        LOG.warn("Unable to save locale into profile for user {}", user);
+      } else {
+        userProfile.getUserInfoMap().put(Constants.USER_LANGUAGE, LocaleContextInfo.getLocaleAsString(loc));
+        organizationService.getUserProfileHandler().saveUserProfile(userProfile, false);
       }
-    } catch (Exception ignored) {
-      log.error("IGNORED: Failed to save profile for user: " + user, ignored);
+    } catch (Exception e) {
+      LOG.warn("Failed to save profile for user {}", user, e);
     } finally {
       RequestLifeCycle.end();
     }
   }
+
 }

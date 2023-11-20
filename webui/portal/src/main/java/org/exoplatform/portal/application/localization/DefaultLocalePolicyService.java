@@ -23,10 +23,13 @@ package org.exoplatform.portal.application.localization;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.picocontainer.Startable;
+import org.apache.commons.lang.StringUtils;
 
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.LocalePolicy;
@@ -49,7 +52,7 @@ import org.exoplatform.services.resources.LocalePolicy;
  *
  * @author <a href="mailto:mstrukel@redhat.com">Marko Strukelj</a>
  */
-public class DefaultLocalePolicyService implements LocalePolicy, Startable {
+public class DefaultLocalePolicyService implements LocalePolicy {
 
     private static final String USE_DEFAULT_SITE_LANGUAGE_PARAM = "useDefaultSiteLanguage";
 
@@ -68,26 +71,47 @@ public class DefaultLocalePolicyService implements LocalePolicy, Startable {
      * @see LocalePolicy#determineLocale(LocaleContextInfo)
      */
     public Locale determineLocale(LocaleContextInfo context) {
-        if (context.getRequestLocale() != null) {
-            return context.getRequestLocale();
+      if (context.getRequestLocale() != null) {
+        return context.getRequestLocale();
+      }
+
+      //
+      Locale locale = null;
+      if (context.getRemoteUser() == null) {
+        locale = getLocaleConfigForAnonymous(context);
+      } else {
+        locale = getLocaleConfigForRegistered(context);
+      }
+
+      if (locale == null) {
+        if (useDefaultSiteLanguage) {
+          locale = context.getPortalLocale();
+        } else {
+          locale = localeConfigService.getDefaultLocaleConfig().getLocale();
         }
-
-        //
-        Locale locale = null;
-        if (context.getRemoteUser() == null)
-            locale = getLocaleConfigForAnonymous(context);
-        else
-            locale = getLocaleConfigForRegistered(context);
-
-        if (locale == null) {
-          if (useDefaultSiteLanguage) {
-            locale = context.getPortalLocale();
-          } else {
-            locale = localeConfigService.getDefaultLocaleConfig().getLocale();
-          }
+      } else {
+        Set<Locale> supportedLocales = context.getSupportedLocales();
+        if (supportedLocales == null) {
+          supportedLocales = localeConfigService.getLocalConfigs()
+                                                .stream()
+                                                .map(LocaleConfig::getLocale)
+                                                .collect(Collectors.toSet());
         }
-
-        return locale;
+        if (!supportedLocales.contains(locale) && StringUtils.isNotBlank(locale.getVariant())) {
+          // Try without variant
+          locale = new Locale(locale.getLanguage(), locale.getCountry());
+        }
+        if (!supportedLocales.contains(locale) && StringUtils.isNotBlank(locale.getCountry())) {
+          // Try without variant and country
+          locale = new Locale(locale.getLanguage());
+        }
+        if (!supportedLocales.contains(locale)) {
+          // Use default language
+          locale = localeConfigService.getDefaultLocaleConfig()
+                                      .getLocale();
+        }
+      }
+      return locale;
     }
 
     /**
@@ -119,9 +143,8 @@ public class DefaultLocalePolicyService implements LocalePolicy, Startable {
      */
     protected Locale getLocaleConfigFromBrowser(LocaleContextInfo context) {
         List<Locale> locales = context.getBrowserLocales();
-        if (locales != null) {
-            for (Locale loc : locales)
-                return context.getLocaleIfLangSupported(loc);
+        if (locales != null && !locales.isEmpty()) {
+          return context.getLocaleIfLangSupported(locales.get(0));
         }
         return null;
     }
@@ -163,23 +186,10 @@ public class DefaultLocalePolicyService implements LocalePolicy, Startable {
      */
     protected Locale getLocaleConfigFromCookie(LocaleContextInfo context) {
         List<Locale> locales = context.getCookieLocales();
-        if (locales != null) {
-            for (Locale locale : locales)
-                return context.getLocaleIfLangSupported(locale);
+        if (locales != null && !locales.isEmpty()) {
+          return context.getLocaleIfLangSupported(locales.get(0));
         }
         return null;
-    }
-
-    /**
-     * Starter interface method
-     */
-    public void start() {
-    }
-
-    /**
-     * Starter interface method
-     */
-    public void stop() {
     }
 
 }
