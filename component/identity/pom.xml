@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.exoplatform.gatein.portal</groupId>
     <artifactId>exo.portal.component</artifactId>
-    <version>6.4.x-exo-SNAPSHOT</version>
+    <version>6.4.4-exo</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -33,7 +33,7 @@
 
   <properties>
     <jacoco.skip>true</jacoco.skip>
-    <jacoco.listener></jacoco.listener>
+    <jacoco.listener />
     <sun-opends.version>1.0.0</sun-opends.version>
     <berkeleydb.version>3.2.76</berkeleydb.version>
   </properties>
