@@ -21,10 +21,13 @@ package org.exoplatform.portal.config;
 
 import java.util.HashSet;
 
+import lombok.ToString;
+
 
 /**
  * Author : Nhu Dinh Thuan nhudinhthuan@yahoo.com May 23, 2006
  */
+@ToString
 public class NewPortalConfig {
 
     private HashSet<String> predefinedOwner = new HashSet<String>(5);
@@ -169,11 +172,5 @@ public class NewPortalConfig {
 
     public boolean isUseDefaultPortalLayout() {
       return useDefaultPortalLayout;
-    }
-
-    @Override
-    public String toString() {
-        return "PortalConfig[predefinedOwner=" + predefinedOwner + ",ownerType=" + ownerType + ",templateName=" + templateName
-                + ",label=" + label + ",description=" + description + ",location=" + location + ",templateLocation=" + templateLocation + "]";
     }
 }
