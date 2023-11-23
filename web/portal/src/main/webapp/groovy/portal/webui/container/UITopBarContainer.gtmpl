@@ -15,7 +15,7 @@
   String uiComponentClass = uicomponent.getCssClass() == null ? "" : uicomponent.getCssClass();
 %>
 <div id="UITopBarContainerParent" class="<%=uiComponentClass%>" role="banner">
-  <div class="UIContainer UITopBarContainer <%=uiPortalApp.isEditing()?"EdittingContainer":""%> <%=hasPermission?"": "ProtectedContainer"%>" id="${uicomponent.id}">
+  <div class="UIContainer UITopBarContainer <%=uiPortalApp.isEditing()?"EdittingContainer":""%> <%=hasPermission?"": "ProtectedContainer"%>" id="UITopBarContainer">
   	<div class="NormalContainerBlock">
   	<%
   		int portalMode = uiPortalApp.getModeState();
