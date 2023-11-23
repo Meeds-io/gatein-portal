@@ -742,6 +742,13 @@ public class UserPortalConfigService implements Startable {
         return newPortalConfigListener_.getPortalConfigFromTemplate(PortalConfig.PORTAL_TYPE, templateName);
     }
 
+    public <T> T getConfig(String portalType,
+                           String portalName,
+                           Class<T> objectType,
+                           String parentLocation) {
+      return newPortalConfigListener_.getConfig(portalType, portalName, objectType, parentLocation);
+    }
+
     /**
      * Get the skin name of the default portal
      * @return Skin name of the default portal

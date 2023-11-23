@@ -21,16 +21,17 @@ package org.exoplatform.portal.config;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.jibx.runtime.JiBXException;
 
 import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.container.PortalContainer;
@@ -67,6 +68,8 @@ import org.exoplatform.services.resources.LocaleConfigService;
  */
 
 public class NewPortalConfigListener extends BaseComponentPlugin {
+
+    private static final Pattern OWNER_PATTERN = Pattern.compile("@owner@");
 
     /** . */
     private final UserPortalConfigService owner_;
@@ -539,59 +542,106 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         merge.perform();
     }
 
-    private final Pattern OWNER_PATTERN = Pattern.compile("@owner@");
-
     /**
      * Best effort to load and unmarshall a configuration.
      *
      * @param config the config object
-     * @param owner the owner
+     * @param portalName the owner
      * @param fileName the file name
-     * @param type the type to unmarshall to
+     * @param objectType the type to unmarshall to
      * @return the xml of the config or null
      * @throws Exception any exception
      * @param <T> the generic type to unmarshall to
      */
-    private <T> UnmarshalledObject<T> getConfig(NewPortalConfig config, String owner, String fileName, Class<T> type)
-            throws Exception {
-        log.debug("About to load config=" + config + " owner=" + owner + " fileName=" + fileName);
+    public <T> UnmarshalledObject<T> getConfig(NewPortalConfig config,
+                                               String portalName,
+                                               String fileName,
+                                               Class<T> objectType)
+                                                                                                                      throws Exception {
+      String templateName = StringUtils.isBlank(config.getTemplateName()) ? fileName : config.getTemplateName();
 
-        //
-        String ownerType = config.getOwnerType();
+      String portalType = config.getOwnerType();
+      String location = config.getTemplateLocation();
+      return getConfig(portalType, portalName, objectType, fileName, location, templateName);
+    }
 
-        // Get XML
-        String path = "/" + ownerType + "/" + owner + "/" + fileName + ".xml";
-        String xml = getDefaultConfig(config.getTemplateLocation(), path);
-
-        //
-        if (xml == null) {
-            String templateName = StringUtils.isBlank(config.getTemplateName()) ? fileName : config.getTemplateName();
-            path = "/" + ownerType + "/template/" + templateName + "/" + fileName + ".xml";
-            xml = getDefaultConfig(config.getTemplateLocation(), path);
-            if (xml != null) {
-                xml = OWNER_PATTERN.matcher(xml).replaceAll(StringEscapeUtils.escapeXml(owner));
-            }
+    public <T> T getConfig(String portalType,
+                           String portalName,
+                           Class<T> objectType,
+                           String parentLocation) {
+      String fileName;
+      if (objectType.isAssignableFrom(PortalConfig.class)) {
+        fileName = switch (portalType.toLowerCase()) {
+        case "portal": {
+          yield "portal";
         }
-
-        //
-        if (xml != null) {
-            boolean ok = false;
-            try {
-                final UnmarshalledObject<T> o = fromXML(config.getOwnerType(), owner, xml, type);
-                ok = true;
-                return o;
-            } catch (JiBXException e) {
-                log.error(e.getMessage() + " file: " + path, e);
-                throw e;
-            } finally {
-                if (!ok) {
-                    log.error("Could not load file: " + path);
-                }
-            }
+        case "group": {
+          yield "group";
         }
+        case "user": {
+          yield "user";
+        }
+        default:
+          throw new IllegalArgumentException("Unexpected value: " + portalType);
+        };
+      } else if (objectType.isAssignableFrom(PageSet.class)) {
+        fileName = "pages";
+      } else if (objectType.isAssignableFrom(PageNavigation.class)) {
+        fileName = "navigation";
+      } else {
+        throw new IllegalArgumentException("Unexpected value: " + objectType);
+      }
+      UnmarshalledObject<T> config = getConfig(portalType, portalName, objectType, fileName, parentLocation, null);
+      return config == null ? null : config.getObject();
+    }
 
-        //
-        return null;
+    public <T> UnmarshalledObject<T> getConfig(String portalType,
+                                               String portalName,
+                                               Class<T> objectType,
+                                               String fileName,
+                                               String parentLocation) {
+      return getConfig(portalType, portalName, objectType, fileName, parentLocation, null);
+    }
+
+    public <T> UnmarshalledObject<T> getConfig(String portalType,
+                                                String portalName,
+                                                Class<T> objectType,
+                                                String fileName,
+                                                String parentLocation,
+                                                String templateName) {
+      String filePath = "/" + portalType + "/" + portalName + "/" + fileName + ".xml";
+      String templateFilePath = StringUtils.isBlank(templateName) ? null :
+                                                                  "/" + portalType + "/template/" + templateName + "/" + fileName + ".xml";
+      List<String> relativePaths = templateFilePath == null ? Collections.singletonList(filePath) :
+                                                            Arrays.asList(filePath, templateFilePath);
+      return getConfig(portalName, portalType, objectType, parentLocation, relativePaths);
+    }
+
+    public <T> UnmarshalledObject<T> getConfig(String portalName,
+                                               String portalType,
+                                               Class<T> objectType,
+                                               String parentLocation,
+                                               List<String> relativePaths) {
+      String xml = relativePaths.stream()
+                                .sequential()
+                                .map(filePath -> getDefaultConfig(parentLocation, filePath))
+                                .filter(Objects::nonNull)
+                                .findFirst()
+                                .orElse(null);
+      if (xml != null) {
+        xml = OWNER_PATTERN.matcher(xml).replaceAll(StringEscapeUtils.escapeXml(portalName));
+        try {
+          return fromXML(portalType, portalName, xml, objectType);
+        } catch (Exception e) {
+          throw new IllegalStateException(String.format("Error parsing configuration from location %s for portal with type %s and name %s (object type = %s)",
+                                                        parentLocation,
+                                                        portalType,
+                                                        portalName,
+                                                        objectType.getSimpleName()),
+                                          e);
+        }
+      }
+      return null;
     }
 
     private String fixPath(String path) {
