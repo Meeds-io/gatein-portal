@@ -24,6 +24,10 @@ import javax.servlet.ServletContext;
 import org.exoplatform.portal.resource.SkinDependentManager;
 import org.exoplatform.portal.resource.SkinService;
 import org.exoplatform.portal.resource.config.xml.SkinConfigParser;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -41,6 +45,10 @@ public class PortalSkinTask extends AbstractSkinModule implements SkinConfigTask
 
     private String moduleName;
 
+    @Getter
+    @Setter
+    protected boolean filtered;
+
     public PortalSkinTask() {
         super(null);
         this.overwrite = true;
@@ -55,12 +63,22 @@ public class PortalSkinTask extends AbstractSkinModule implements SkinConfigTask
         moduleName = nodes.item(0).getFirstChild().getNodeValue();
     }
 
+    protected void bindingFiltered(Element element) {
+      NodeList nodes = element.getElementsByTagName(SkinConfigParser.FILTERED);
+      if (nodes == null || nodes.getLength() < 1) {
+          return;
+      }
+      String isFiltered = nodes.item(0).getFirstChild().getNodeValue();
+      setFiltered("true".equals(isFiltered));
+    }
+
     public void binding(Element elemt) {
         bindingCSSPath(elemt);
         bindingSkinName(elemt);
         bindingModuleName(elemt);
         bindingOverwrite(elemt);
         bindingCSSPriority(elemt);
+        bindingFiltered(elemt);
     }
 
     public void execute(SkinService skinService, ServletContext scontext) {
@@ -78,7 +96,7 @@ public class PortalSkinTask extends AbstractSkinModule implements SkinConfigTask
         } catch (Exception e) {
             priority = Integer.MAX_VALUE;
         }
-        skinService.addPortalSkin(moduleName, skinName, fullCSSPath, priority, overwrite);
+        skinService.addPortalSkin(moduleName, skinName, fullCSSPath, priority, overwrite, filtered);
         updateSkinDependentManager(contextPath, moduleName, skinName);
     }
 

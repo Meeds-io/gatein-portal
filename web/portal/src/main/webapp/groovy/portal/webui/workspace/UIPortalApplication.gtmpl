@@ -115,17 +115,17 @@
     <% for (skinConfig in portalSkins) {
          def url = skinConfig.createURL(rcontext.controllerContext);
          url.setOrientation(orientation); %>
-      <link id="${skinConfig.id}" rel="stylesheet" type="text/css" href="$url" skin-type="portal-skin" />
+      <link id="${skinConfig.id}" rel="stylesheet" type="text/css" href="$url" skin-type="${skinConfig.type}" />
     <% } %>
     <% for (portletSkin in portletSkins) {
          def url = portletSkin.createURL(rcontext.controllerContext);
          url.setOrientation(orientation); %>
-      <link id="${portletSkin.id}" rel="stylesheet" type="text/css" href= "$url" skin-type="portlet-skin" />
+      <link id="${portletSkin.id}" rel="stylesheet" type="text/css" href= "$url" skin-type="${portletSkin.type}" />
     <% } %>
     <% for (customSkin in customSkins) {
          def url = customSkin.createURL(rcontext.controllerContext);
          url.setOrientation(orientation); %>
-      <link id="${customSkin.id}" rel="stylesheet" type="text/css" href= "$url" skin-type="custom-skin" />
+      <link id="${customSkin.id}" rel="stylesheet" type="text/css" href= "$url" skin-type="${customSkin.type}" />
     <% } %>
 
     <!-- Scripts -->
