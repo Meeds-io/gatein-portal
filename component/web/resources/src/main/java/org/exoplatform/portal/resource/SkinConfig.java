@@ -19,6 +19,8 @@
 
 package org.exoplatform.portal.resource;
 
+import java.util.List;
+
 /**
  * Extends a skin with additional information.
  *
@@ -48,10 +50,24 @@ public interface SkinConfig extends Skin {
     String getCSSPath();
 
     /**
-     * Returns the priority number
-     *
-     * @return the priority number
+     * @return the dependent PortalSkins to load with the current Skin
      */
-    int getCSSPriority();
+    default List<String> getAdditionalModules() {
+      return null;
+    }
+
+    /**
+     * @return true is the current PortalSkin is filtered
+     */
+    default boolean isFiltered() {
+      return false;
+    }
+
+    /**
+     * Sets Skin type
+     * 
+     * @param type
+     */
+    void setType(String type);
 
 }
