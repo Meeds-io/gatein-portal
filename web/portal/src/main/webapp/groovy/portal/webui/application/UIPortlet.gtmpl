@@ -144,7 +144,6 @@
 							</div>		
 						</div>
 					</div>
-					
 					<%//Begin Bottom Decorator %>
 					<div class="bottomDecorator clearfix">
 						<div class="resizeArea" title="<%=_ctx.appRes("UIPortlet.tooltip.ResizeWindow");%>"><span></span></div>
@@ -166,13 +165,17 @@
 			{
 				cssStyle += "height: "+ windowHeight +";";
 			}
+			String hiddenClass = "";
+			if(org.apache.commons.lang.StringUtils.isBlank(portletContent.toString())) {
+			  hiddenClass = "hidden";
+			}
  %>
  				<div id="<%=editMode == EditMode.NO_EDIT ? portletId : "EditMode-"+ portletId%>">
-					<div class="PORTLET-FRAGMENT" style="${cssStyle}">
+					<div class="PORTLET-FRAGMENT $hiddenClass" style="${cssStyle}">
  						<% 
 							if(hasAccessPermission)
               {
-							   println portletContent; 
+							   println portletContent;
               }
 							else
 							{
