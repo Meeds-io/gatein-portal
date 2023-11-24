@@ -166,7 +166,7 @@
 				cssStyle += "height: "+ windowHeight +";";
 			}
 			String hiddenClass = "";
-			if(org.apache.commons.lang.StringUtils.isBlank(portletContent.toString())) {
+			if(portletContent == null || org.apache.commons.lang.StringUtils.isBlank(portletContent.toString())) {
 			  hiddenClass = "hidden";
 			}
  %>
