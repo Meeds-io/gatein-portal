@@ -55,7 +55,7 @@ public class SkinConfigParser {
 
     /** . */
     public static final String GATEIN_RESOURCES_1_3_SYSTEM_ID = "http://www.gatein.org/xml/ns/gatein_resources_1_3";
-    
+
     /** . */
     public static final String GATEIN_RESOURCES_1_4_SYSTEM_ID = "http://www.exoplatform.org/xml/ns/gatein_resources_1_4";
 
