@@ -12,6 +12,7 @@
   import org.exoplatform.webui.core.UIComponent;
   import org.exoplatform.portal.application.PortalRequestContext ;
   import org.exoplatform.portal.config.model.PortalProperties ;
+  import org.exoplatform.portal.config.model.PortalConfig ;
   import org.exoplatform.commons.info.ProductInformations;
   import org.exoplatform.portal.webui.workspace.UIPortalApplication;
   import org.exoplatform.portal.webui.workspace.UIWorkingWorkspace;
@@ -81,6 +82,8 @@
   if (stickyMenu) {
     bodyClasses += " HamburgerMenuSticky";
   }
+  PortalConfig sitePortalConfig = rcontext.getDynamicPortalConfig();
+  String siteId = sitePortalConfig.getStorageId().split("_")[1];
 %>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="$language" lang="$language" dir="$dir">
   <head id="head">
@@ -154,6 +157,7 @@
      eXo.env.portal.rest = '<%= PortalContainer.getCurrentRestContextName() %>';
      eXo.env.portal.csrfToken = "<%=CSRFTokenUtil.getToken(rcontext.getRequest())%>";
      eXo.env.portal.productName = "<%=productName%>";
+     eXo.env.portal.siteId = '<%=siteId%>';
      eXo.env.server.context = "<%=docBase%>";
      eXo.env.server.portalBaseURL = "<%=uicomponent.getBaseURL()%>";
      eXo.env.server.portalURLTemplate = "<%=uicomponent.getPortalURLTemplate()%>";
