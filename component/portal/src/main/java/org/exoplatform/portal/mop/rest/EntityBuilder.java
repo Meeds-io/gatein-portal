@@ -27,12 +27,18 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.PageType;
+import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.rest.model.UserNodeBreadcrumbItem;
 import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserNode;
+import org.exoplatform.portal.mop.user.UserNodeFilterConfig;
+import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
@@ -49,7 +55,9 @@ public class EntityBuilder {
                                                               boolean expand,
                                                               OrganizationService organizationService,
                                                               LayoutService layoutService,
-                                                              UserACL userACL) {
+                                                              UserACL userACL,
+                                                              UserPortal userPortal,
+                                                              boolean expandBreadcrumb) {
     if (nodes == null) {
       return Collections.emptyList();
     }
@@ -98,9 +106,72 @@ public class EntityBuilder {
           resultNode.setPageAccessPermissions(accessPermissions);
         }
       }
-      resultNode.setChildren(toUserNodeRestEntity(userNode.getChildren(), expand, organizationService, layoutService, userACL));
+      if (expandBreadcrumb) {
+        List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList = getUserNodeBreadcrumbList(userPortal, layoutService, userNode);
+        Collections.reverse(userNodeBreadcrumbItemList);
+        resultNode.setUserNodeBreadcrumbItemList(userNodeBreadcrumbItemList);
+      }
+      resultNode.setChildren(toUserNodeRestEntity(userNode.getChildren(),
+                                                  expand,
+                                                  organizationService,
+                                                  layoutService,
+                                                  userACL,
+                                                  userPortal,
+                                                  expandBreadcrumb));
       result.add(resultNode);
     }
     return result;
+  }
+
+  private static List<UserNodeBreadcrumbItem> getUserNodeBreadcrumbList(UserPortal userPortal,
+                                                                        LayoutService layoutService,
+                                                                        UserNode userNode) {
+    UserNavigation userNodeNavigation = userNode.getNavigation();
+    UserNode rootNavigationNode = userPortal.getNode(userNodeNavigation, Scope.ALL, UserNodeFilterConfig.builder().build(), null);
+    userNode = findTargetNode(userNode.getId(), rootNavigationNode);
+    List<UserNodeBreadcrumbItem> userNodeBreadcrumbItemList = new ArrayList<>();
+    String portalName = PortalContainer.getCurrentPortalContainerName();
+    while (userNode != null && !userNode.getName().equals("default")) {
+      userNodeBreadcrumbItemList.add(computeUserNodeBreadcrumbItem(layoutService,
+                                                                   userNode,
+                                                                   portalName,
+                                                                   userNodeNavigation.getKey().getName()));
+      userNode = userNode.getParent();
+    }
+    return userNodeBreadcrumbItemList;
+  }
+
+  private static UserNodeBreadcrumbItem computeUserNodeBreadcrumbItem(LayoutService layoutService,
+                                                                      UserNode node,
+                                                                      String portalName,
+                                                                      String siteName) {
+    String nodeUri = null;
+    if (node.getPageRef() != null) {
+      Page userNodePage = layoutService.getPage(node.getPageRef());
+      if (PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
+        nodeUri = userNodePage.getLink();
+      } else {
+        nodeUri = new StringBuilder("/").append(portalName)
+                                        .append("/")
+                                        .append(siteName)
+                                        .append("/")
+                                        .append(node.getURI())
+                                        .toString();
+      }
+    }
+    return new UserNodeBreadcrumbItem(node.getId(), node.getName(), node.getResolvedLabel(), nodeUri, node.getTarget());
+  }
+
+  private static UserNode findTargetNode(String nodeId, UserNode rootNode) {
+    for (UserNode userNode : rootNode.getChildren()) {
+      if (userNode.getId().equals(nodeId)) {
+        return userNode;
+      }
+      UserNode targetUserNode = findTargetNode(nodeId, userNode);
+      if (targetUserNode != null) {
+        return targetUserNode;
+      }
+    }
+    return null;
   }
 }
