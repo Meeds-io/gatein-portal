@@ -45,4 +45,17 @@ public interface Skin {
      */
     SkinURL createURL(ControllerContext context) throws NullPointerException;
 
+    /**
+     * Returns the priority number
+     *
+     * @return the priority number
+     */
+    default int getCSSPriority() {
+      return 0;
+    }
+
+    default String getType() {
+      return "custom";
+    }
+
 }
