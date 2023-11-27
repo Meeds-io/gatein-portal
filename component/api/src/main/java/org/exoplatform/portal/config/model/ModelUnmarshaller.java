@@ -52,22 +52,27 @@ public class ModelUnmarshaller {
         // Find out version
         XMLInputFactory factory = XMLInputFactory.newInstance();
         baos.reset();
-        XMLStreamReader reader = factory.createXMLStreamReader(baos);
+
         Version version = Version.UNKNOWN;
-        while (reader.hasNext()) {
+        XMLStreamReader reader = factory.createXMLStreamReader(baos);
+        try {
+          while (reader.hasNext()) {
             int next = reader.next();
             if (next == XMLStreamReader.START_ELEMENT) {
-                QName name = reader.getName();
-                String uri = name.getNamespaceURI();
-                if (uri != null) {
-                    version = Version.forURI(uri);
-                }
-                break;
+              QName name = reader.getName();
+              String uri = name.getNamespaceURI();
+              if (uri != null) {
+                version = Version.forURI(uri);
+              }
+              break;
             }
+          }
+        } finally {
+          reader.close();
         }
 
         //
-        return new UnmarshalledObject<T>(version, obj);
+        return new UnmarshalledObject<>(version, obj);
     }
 
 }

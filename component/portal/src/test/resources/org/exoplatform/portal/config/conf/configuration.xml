@@ -90,6 +90,9 @@
                 <value>
                   <string>systemtest</string>
                 </value>
+                <value>
+                  <string>profiles</string>
+                </value>
               </collection>
             </field>
             <field name="ownerType">

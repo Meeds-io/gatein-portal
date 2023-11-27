@@ -296,16 +296,25 @@ public class Container extends ModelObject implements Cloneable {
   }
 
   protected List<ComponentData> buildChildren() {
+    if (StringUtils.isNotBlank(profiles)) {
+      Set<String> activeProfiles = Tools.parseCommaList(profiles);
+      if (ExoContainer.getProfiles()
+                      .stream()
+                      .noneMatch(activeProfiles::contains)) {
+        return Collections.emptyList();
+      }
+    }
     if (children != null && !children.isEmpty()) {
       ArrayList<ComponentData> dataChildren = new ArrayList<>();
       for (int i = 0; i < children.size(); i++) {
         ModelObject node = children.get(i);
-        if (node instanceof Container) {
-          String nodeProfiles = ((Container) node).getProfiles();
+        if (node instanceof Container container) {
+          String nodeProfiles = container.getProfiles();
           if (StringUtils.isNotBlank(nodeProfiles)) {
             Set<String> activeProfiles = Tools.parseCommaList(nodeProfiles);
-            activeProfiles.retainAll(ExoContainer.getProfiles());
-            if (activeProfiles.isEmpty()) {
+            if (ExoContainer.getProfiles()
+                            .stream()
+                            .noneMatch(activeProfiles::contains)) {
               continue;
             }
           }

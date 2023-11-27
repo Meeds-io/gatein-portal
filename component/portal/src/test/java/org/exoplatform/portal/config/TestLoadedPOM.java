@@ -25,7 +25,13 @@ import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+
+import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
@@ -82,6 +88,7 @@ public class TestLoadedPOM extends AbstractConfigTest {
 
   public void testGroupWithNormalizedName() throws Exception {
     SiteKey key = SiteKey.group("/test/normalized");
+    restartTransaction();
     NavigationContext nav = navService.loadNavigation(key);
     assertNotNull(nav);
     NodeContext<?> root = navService.loadNode(NodeModel.SELF_MODEL, nav, Scope.ALL, null);
@@ -92,6 +99,42 @@ public class TestLoadedPOM extends AbstractConfigTest {
     assertNotNull(page);
     assertEquals("group::/test/normalized::register", page.getPageId());
     assertEquals("/test/normalized", page.getOwnerId());
+  }
+
+  public void testPageProfiles() throws Exception {
+    try (MockedStatic<ExoContainer> exoContainer = Mockito.mockStatic(ExoContainer.class);) {
+      exoContainer.when(ExoContainer::getProfiles).thenReturn(Stream.of("test").collect(Collectors.toSet()));
+
+      SiteKey key = SiteKey.portal("profiles");
+      NavigationContext nav = navService.loadNavigation(key);
+      assertNotNull(nav);
+      NodeContext<?> root = navService.loadNode(NodeModel.SELF_MODEL, nav, Scope.ALL, null);
+      NodeContext<?> node = root.get(0);
+      assertEquals("register", node.getName());
+      assertNull(node.getState().getPageRef());
+
+      node = root.get(1);
+      assertEquals("register2", node.getName());
+      assertEquals(SiteKey.portal("profiles").page("register2"), node.getState().getPageRef());
+
+      Page page = layoutService.getPage("portal::profiles::register");
+      assertNotNull(page);
+      assertEquals("portal::profiles::register", page.getPageId());
+      assertEquals("profiles", page.getOwnerId());
+      assertEquals("unknown", page.getProfiles());
+
+      page = layoutService.getPage("portal::profiles::register2");
+      assertNotNull(page);
+      assertEquals("portal::profiles::register2", page.getPageId());
+      assertEquals("profiles", page.getOwnerId());
+      assertEquals("test", page.getProfiles());
+
+      node = root.get(0);
+      NodeContext<?> subNode = node.get("subpage");
+      assertNotNull(subNode);
+      assertEquals("subpage", subNode.getName());
+      assertEquals(SiteKey.portal("profiles").page("subpage"), subNode.getState().getPageRef());
+    }
   }
 
   public void testNavigation() throws Exception {

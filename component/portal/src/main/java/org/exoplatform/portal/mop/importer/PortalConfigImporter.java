@@ -75,7 +75,7 @@ public class PortalConfigImporter {
                      src.getType(),
                      src.getName(),
                      mode,
-                     portalNotExists);
+                     !portalNotExists);
             if (portalNotExists) {
                 service.create(dst);
             } else {

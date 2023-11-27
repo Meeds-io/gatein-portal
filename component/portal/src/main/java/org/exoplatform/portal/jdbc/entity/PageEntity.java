@@ -32,7 +32,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -49,9 +48,8 @@ import org.exoplatform.portal.mop.SiteType;
 @Entity(name = "GateInPage")
 @SequenceGenerator(name = "SEQ_GTN_ID_GENERATOR", sequenceName = "SEQ_GTN_PAGE_ID", allocationSize = 1)
 @Table(name = "PORTAL_PAGES")
-@NamedQueries({
-    @NamedQuery(name = "PageEntity.deleteByOwner", query = "DELETE GateInPage p WHERE p.owner.id = :ownerId"),
-    @NamedQuery(name = "PageEntity.findByKey", query = "SELECT p FROM GateInPage p WHERE p.name = :name AND p.owner.siteType = :ownerType AND p.owner.name = :ownerId") })
+@NamedQuery(name = "PageEntity.deleteByOwner", query = "DELETE GateInPage p WHERE p.owner.id = :ownerId")
+@NamedQuery(name = "PageEntity.findByKey", query = "SELECT p FROM GateInPage p WHERE p.name = :name AND p.owner.siteType = :ownerType AND p.owner.name = :ownerId")
 public class PageEntity extends ComponentEntity implements Serializable {
 
   private static final long     serialVersionUID = -6195451978995765259L;
@@ -90,6 +88,9 @@ public class PageEntity extends ComponentEntity implements Serializable {
 
   @Column(name = "LINK")
   private String                link;
+
+  @Column(name = "PROFILES")
+  private String                profiles;
 
   @Column(name = "PAGE_BODY", length = 5000)
   private String                pageBody         = getJSONString(new JSONArray());
@@ -159,6 +160,14 @@ public class PageEntity extends ComponentEntity implements Serializable {
 
   public void setPageBody(String pageBody) {
     this.pageBody = pageBody;
+  }
+
+  public String getProfiles() {
+    return profiles;
+  }
+
+  public void setProfiles(String profiles) {
+    this.profiles = profiles;
   }
 
   public String getName() {
