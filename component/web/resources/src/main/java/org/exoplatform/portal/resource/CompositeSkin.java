@@ -33,6 +33,8 @@ import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.controller.router.URIWriter;
 import org.exoplatform.web.url.MimeType;
 import org.exoplatform.services.log.ExoLogger;
+
+import org.apache.commons.lang3.StringUtils;
 import org.gatein.portal.controller.resource.ResourceRequestHandler;
 
 /**
@@ -58,7 +60,9 @@ class CompositeSkin implements Skin {
     CompositeSkin(SkinService service, Collection<SkinConfig> skins, String compositeId) {
         TreeMap<String, SkinConfig> urlSkins = new TreeMap<String, SkinConfig>();
         for (SkinConfig skin : skins) {
-            urlSkins.put(skin.getCSSPath(), skin);
+            if (StringUtils.isNotBlank(skin.getCSSPath())) {
+              urlSkins.put(skin.getCSSPath(), skin);
+            }
         }
 
         //
