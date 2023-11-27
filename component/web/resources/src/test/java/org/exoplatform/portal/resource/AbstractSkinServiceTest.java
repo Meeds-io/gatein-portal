@@ -220,10 +220,14 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
         SkinConfig portletSkin = skinService.getSkin("mockwebapp/FirstPortlet", "TestSkin");
         String contextPath = mockServletContext.getContextPath();
         assertNotNull(portletSkin);
+        assertNotNull(portletSkin.getAdditionalModules());
+        assertEquals(1, portletSkin.getAdditionalModules().size());
+        assertEquals("AdditionalModule", portletSkin.getAdditionalModules().get(0));
         assertEquals(contextPath + "/skin/FirstPortlet.css", portletSkin.getCSSPath());
 
         portletSkin = skinService.getSkin("mockwebapp/SecondPortlet", "TestSkin");
         assertNotNull(portletSkin);
+        assertNull(portletSkin.getAdditionalModules());
         assertEquals(contextPath + "/skin/SecondPortlet.css", portletSkin.getCSSPath());
     }
 

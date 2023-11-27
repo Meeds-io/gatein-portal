@@ -297,12 +297,45 @@ public class SkinService extends AbstractResourceService implements Startable {
 
       skinConfig = new SimpleSkin(this, module, skinName, cssPath, priority);
       if (module.startsWith(CUSTOM_MODULE_ID)) {
+        skinConfig.setType("custom-skin");
         customPortalSkins_.put(key, skinConfig);
       } else {
+        skinConfig.setType("portal-skin");
         portalSkins_.put(key, skinConfig);
       }
       if (log.isDebugEnabled()) {
         log.debug("Adding Portal skin : Bind " + key + " to " + skinConfig);
+      }
+    }
+  }
+
+  /**
+   * Register a portal skin
+   *
+   * @param module skin module identifier
+   * @param skinName skin name
+   * @param cssPath path uri to the css file. This is relative to the root
+   *          context, use leading '/'
+   * @param priority priority to support sorting in skin list
+   * @param overwrite if any previous skin should be replaced by that one
+   * @param filtered if true, then the portal skin will be loaded only when required by a portlet
+   */
+  public void addPortalSkin(String module, String skinName, String cssPath, int priority, boolean overwrite, boolean filtered) {
+    availableSkins_.add(skinName);
+    SkinKey key = new SkinKey(module, skinName);
+    SkinConfig skinConfig = portalSkins_.get(key);
+    if (skinConfig == null || overwrite) {
+      if (priority < 0) {
+        priority = Integer.MAX_VALUE;
+      }
+
+      SimpleSkin skin = new SimpleSkin(module, skinName, cssPath, priority, filtered);
+      if (module.startsWith(CUSTOM_MODULE_ID)) {
+        skin.setType("custom-skin");
+        customPortalSkins_.put(key, skin);
+      } else {
+        skin.setType("portal-skin");
+        portalSkins_.put(key, skin);
       }
     }
   }
@@ -374,6 +407,15 @@ public class SkinService extends AbstractResourceService implements Startable {
    * @param priority priority to support sorting in skin list
    */
   public void addSkin(String module, String skinName, String cssPath, int priority, boolean overwrite) {
+    addSkin(module, skinName, cssPath, priority, overwrite, null);
+  }
+
+  public void addSkin(String module,
+                      String skinName,
+                      String cssPath,
+                      int priority,
+                      boolean overwrite,
+                      List<String> additionalModules) {
     availableSkins_.add(skinName);
     SkinKey key = new SkinKey(module, skinName);
     SkinConfig skinConfig = skinConfigs_.get(key);
@@ -381,13 +423,9 @@ public class SkinService extends AbstractResourceService implements Startable {
       if (priority < 0) {
         priority = Integer.MAX_VALUE;
       }
-
-      skinConfig = new SimpleSkin(this, module, skinName, cssPath, priority);
+      skinConfig = new SimpleSkin(module, skinName, cssPath, priority, additionalModules);
+      skinConfig.setType("portlet-skin");
       skinConfigs_.put(key, skinConfig);
-
-      if (log.isDebugEnabled()) {
-        log.debug("Adding skin : Bind " + key + " to " + skinConfig);
-      }
     }
   }
 
@@ -406,7 +444,9 @@ public class SkinService extends AbstractResourceService implements Startable {
     SkinKey key = new SkinKey(module, skinName);
     SkinConfig skinConfig = skinConfigs_.get(key);
     if (skinConfig == null) {
-      skinConfigs_.put(key, new SimpleSkin(this, module, skinName, cssPath));
+      skinConfig = new SimpleSkin(this, module, skinName, cssPath);
+      skinConfig.setType("custom");
+      skinConfigs_.put(key, skinConfig);
     }
     ltCache.remove(cssPath);
     rtCache.remove(cssPath);
@@ -559,8 +599,12 @@ public class SkinService extends AbstractResourceService implements Startable {
     Set<SkinKey> keys = portalSkins_.keySet();
     List<SkinConfig> portalSkins = new ArrayList<SkinConfig>();
     for (SkinKey key : keys) {
-      if (key.getName().equals(skinName))
-        portalSkins.add(portalSkins_.get(key));
+      if (key.getName().equals(skinName)) {
+        SkinConfig skinConfig = portalSkins_.get(key);
+        if (!skinConfig.isFiltered()) {
+          portalSkins.add(skinConfig);
+        }
+      }
     }
     Collections.sort(portalSkins, new Comparator<SkinConfig>() {
       public int compare(SkinConfig o1, SkinConfig o2) {
@@ -595,8 +639,12 @@ public class SkinService extends AbstractResourceService implements Startable {
     Set<SkinKey> keys = customPortalSkins_.keySet();
     List<SkinConfig> customPortalSkins = new ArrayList<SkinConfig>();
     for (SkinKey key : keys) {
-      if (key.getName().equals(skinName))
-        customPortalSkins.add(customPortalSkins_.get(key));
+      if (key.getName().equals(skinName)) {
+        SkinConfig skinConfig = customPortalSkins_.get(key);
+        if (!skinConfig.isFiltered()) {
+          customPortalSkins.add(skinConfig);
+        }
+      }
     }
     Collections.sort(customPortalSkins, new Comparator<SkinConfig>() {
       public int compare(SkinConfig o1, SkinConfig o2) {
@@ -740,7 +788,7 @@ public class SkinService extends AbstractResourceService implements Startable {
 
     SkinConfig remove = skinConfigs_.remove(key);
 
-    if (remove != null) {
+    if (remove != null && StringUtils.isNotBlank(remove.getCSSPath())) {
       invalidateCachedSkin(remove.getCSSPath());
     }
   }
@@ -779,7 +827,7 @@ public class SkinService extends AbstractResourceService implements Startable {
       remove = portalSkins_.remove(key);
     }
 
-    if (remove != null) {
+    if (remove != null && StringUtils.isNotBlank(remove.getCSSPath())) {
       invalidateCachedSkin(remove.getCSSPath());
     }
   }
@@ -1056,4 +1104,5 @@ public class SkinService extends AbstractResourceService implements Startable {
   public void stop() {
     ServletContainerFactory.getServletContainer().removeWebAppListener(deployer);
   }
+
 }
