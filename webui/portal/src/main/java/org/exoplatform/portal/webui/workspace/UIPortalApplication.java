@@ -19,6 +19,7 @@
 
 package org.exoplatform.portal.webui.workspace;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import org.exoplatform.commons.api.settings.SettingService;
@@ -58,7 +59,6 @@ import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.application.JavascriptManager;
-import org.exoplatform.web.application.RequireJS;
 import org.exoplatform.web.application.javascript.JavascriptConfigParser;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.exoplatform.web.url.MimeType;
@@ -570,8 +570,7 @@ public class UIPortalApplication extends UIApplication {
 
     public Collection<SkinConfig> getPortalSkins(SkinVisitor visitor) {
         if (visitor != null) {
-            Collection<SkinConfig> skins = skinService.findSkins(visitor);
-            return skins;
+            return skinService.findSkins(visitor);
         } else {
             return Collections.emptyList();
         }
@@ -586,11 +585,11 @@ public class UIPortalApplication extends UIApplication {
      * - skin for specific site<br>
      */
     public Collection<SkinConfig> getPortalSkins() {
-        Collection<SkinConfig> skins = null;
+        List<SkinConfig> skins = null;
         if (skinVisitor == null) {
           skins = new ArrayList<>(skinService.getPortalSkins(skin_));
         } else {
-          skins = getPortalSkins(skinVisitor);
+          skins = new ArrayList<>(getPortalSkins(skinVisitor));
         }
 
         //
@@ -598,6 +597,7 @@ public class UIPortalApplication extends UIApplication {
         if (skinConfig != null) {
             skins.add(skinConfig);
         }
+        Collections.sort(skins, (s1, s2) -> s1.getCSSPriority() - s2.getCSSPriority());
         return skins;
     }
 
@@ -672,28 +672,21 @@ public class UIPortalApplication extends UIApplication {
             }
         }
 
-        // Sort skins by priority
-        Collections.sort(portletSkins, new Comparator<Skin>() {
-            public int compare(Skin s1, Skin s2) {
-                if ((s1 instanceof SkinConfig) && (s2 instanceof SkinConfig)) {
-                    SkinConfig o1 = (SkinConfig)s1;
-                    SkinConfig o2 = (SkinConfig)s2;
-                    if (o1.getCSSPriority() == o2.getCSSPriority())
-                        return 1;// Can indicate others condition here
-                    else if (o1.getCSSPriority() < 0)
-                        return 1;
-                    else if (o2.getCSSPriority() < 0)
-                        return -1;
-                    else
-                        return o1.getCSSPriority() - o2.getCSSPriority();
-                } else {
-                    return 0;
-                }
-            }
-        });
-
-        //
-        return (new HashSet<Skin>(portletSkins));
+        List<SkinConfig> additionalSkins = portletSkins.stream()
+                                                       .filter(portletSkin -> portletSkin instanceof SkinConfig skinConfig
+                                                                              && CollectionUtils.isNotEmpty(skinConfig.getAdditionalModules()))
+                                                       .map(portletSkin -> ((SkinConfig) portletSkin).getAdditionalModules())
+                                                       .flatMap(List::stream)
+                                                       .distinct()
+                                                       .map(module -> skinService.getPortalSkin(module, skin_))
+                                                       .filter(Objects::nonNull)
+                                                       .toList();
+        portletSkins.addAll(additionalSkins);
+        return portletSkins.stream()
+                           .filter(Objects::nonNull)
+                           .filter(c -> !(c instanceof SkinConfig skinConfig) || skinConfig.getCSSPath() != null)
+                           .sorted((s1, s2) -> s1.getCSSPriority() - s2.getCSSPriority())
+                           .collect(Collectors.toSet());
     }
 
     /**

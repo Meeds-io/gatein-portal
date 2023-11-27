@@ -23,6 +23,9 @@ import java.io.Reader;
 import java.util.Map;
 
 import org.exoplatform.services.log.Log;
+
+import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.services.log.ExoLogger;
 
 /**
@@ -67,7 +70,7 @@ class CompositeResourceResolver implements ResourceResolver {
                 String module = Codec.decode(blah[i + 1]);
                 SkinKey key = new SkinKey(module, name);
                 SkinConfig skin = skins.get(key);
-                if (skin != null) {
+                if (skin != null && StringUtils.isNotBlank(skin.getCSSPath())) {
                     sb.append("@import url(").append(skin.getCSSPath()).append(");").append("\n");
                 }
             }
