@@ -287,6 +287,7 @@ public class PortalDataMapper {
         uiPage.setFactoryId(model.getFactoryId());
         uiPage.setPageId(model.getPageId());
         uiPage.setTitle(model.getTitle());
+        uiPage.setProfiles(model.getProfiles());
         uiPage.setShowMaxWindow(model.isShowMaxWindow());
         uiPage.setHideSharedLayout(model.isHideSharedLayout());
         uiPage.setModifiable(model.isModifiable());

@@ -170,7 +170,6 @@ public class TestJIBXXmlMapping extends TestCase {
     public void testNavigationFragment() throws Exception {
         UnmarshalledObject<PageNavigation> obj = ModelUnmarshaller.unmarshall(PageNavigation.class, new FileInputStream(
                 "src/test/resources/jibx/fragment-navigation.xml"));
-        ;
         PageNavigation nav = obj.getObject();
         assertEquals(Version.V_1_6, obj.getVersion());
 

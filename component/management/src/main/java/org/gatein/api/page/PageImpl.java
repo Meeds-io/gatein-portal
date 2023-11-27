@@ -36,8 +36,12 @@ import org.gatein.api.site.SiteId;
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  */
 public class PageImpl implements Page, Serializable {
-    private PageKey key;
-    private PageState state;
+
+    private static final long serialVersionUID = 4541337067269269259L;
+
+    private PageKey           key;
+
+    private PageState         state;
 
     private boolean create;
 
