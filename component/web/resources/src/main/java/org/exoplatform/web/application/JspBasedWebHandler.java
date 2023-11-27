@@ -176,9 +176,12 @@ public abstract class JspBasedWebHandler extends WebRequestHandler {
     skins.addAll(customSkins);
     return skins.stream().map(skin -> {
       SkinURL url = skin.createURL(controllerContext);
+      if (url == null) {
+        return null;
+      }
       url.setOrientation(orientation);
       return url.toString();
-    }).toList();
+    }).filter(Objects::nonNull).toList();
   }
 
   private Set<String> getPageScripts(JavascriptManager javascriptManager,
