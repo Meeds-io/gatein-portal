@@ -60,6 +60,9 @@ public class SkinConfigParser {
     public static final String GATEIN_RESOURCES_1_4_SYSTEM_ID = "http://www.exoplatform.org/xml/ns/gatein_resources_1_4";
 
     /** . */
+    public static final String GATEIN_RESOURCES_1_5_SYSTEM_ID = "http://www.exoplatform.org/xml/ns/gatein_resources_1_5";
+
+    /** . */
     private static final String GATEIN_RESOURCE_1_0_XSD_PATH = "gatein_resources_1_0.xsd";
 
     /** . */
@@ -70,15 +73,20 @@ public class SkinConfigParser {
 
     /** . */
     private static final String GATEIN_RESOURCE_1_3_XSD_PATH = "gatein_resources_1_3.xsd";
-
+    
     /** . */
     private static final String GATEIN_RESOURCE_1_4_XSD_PATH = "gatein_resources_1_4.xsd";
+
+    /** . */
+    private static final String GATEIN_RESOURCE_1_5_XSD_PATH = "gatein_resources_1_5.xsd";
 
     /** . */
     private static final XMLValidator VALIDATOR;
 
     /** . */
     public static final String OVERWRITE = "overwrite";
+
+    public static final String FILTERED  = "filtered";
 
     /** . */
     public static final String SKIN_NAME_TAG = "skin-name";
@@ -97,6 +105,8 @@ public class SkinConfigParser {
 
     /** . */
     public static final String APPLICATION_NAME_TAG = "application-name";
+
+    public static final String ADDITIONAL_MODULE    = "additional-module";
 
     /** . */
     public static final String CSS_PATH_TAG = "css-path";
@@ -123,6 +133,7 @@ public class SkinConfigParser {
         systemIdToResourcePath.put(GATEIN_RESOURCES_1_2_SYSTEM_ID, GATEIN_RESOURCE_1_2_XSD_PATH);
         systemIdToResourcePath.put(GATEIN_RESOURCES_1_3_SYSTEM_ID, GATEIN_RESOURCE_1_3_XSD_PATH);
         systemIdToResourcePath.put(GATEIN_RESOURCES_1_4_SYSTEM_ID, GATEIN_RESOURCE_1_4_XSD_PATH);
+        systemIdToResourcePath.put(GATEIN_RESOURCES_1_5_SYSTEM_ID, GATEIN_RESOURCE_1_5_XSD_PATH);
         VALIDATOR = new XMLValidator(SkinConfigParser.class, systemIdToResourcePath);
     }
 
@@ -139,7 +150,7 @@ public class SkinConfigParser {
         try {
             Document document = VALIDATOR.validate(source);
 
-            List<SkinConfigTask> tasks = new ArrayList<SkinConfigTask>();
+            List<SkinConfigTask> tasks = new ArrayList<>();
             Element docElement = document.getDocumentElement();
 
             fetchTasksByTagName(PORTAl_SKIN_TAG, docElement, tasks);

@@ -37,6 +37,9 @@
     <%}%>
     <%for(portletSkin in portletSkins) {
     def url = portletSkin.createURL();
+    if (url == null) {
+      continue;
+    }
     url.setOrientation(orientation);
     %>
       <link id="${portletSkin.id}" rel="stylesheet" type="text/css" href= "$url" />
