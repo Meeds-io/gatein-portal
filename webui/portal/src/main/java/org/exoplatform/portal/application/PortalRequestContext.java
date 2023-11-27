@@ -390,11 +390,14 @@ public class PortalRequestContext extends WebuiRequestContext {
     public PortalConfig getDynamicPortalConfig() throws Exception {
       if (this.currentPortalConfig == null) {
         SiteKey displayingSiteKey = getSiteKey();
-
+        this.currentPortalConfig = layoutService.getPortalConfig(displayingSiteKey.getTypeName(), displayingSiteKey.getName());
         if (portalLayoutService == null) {
-          this.currentPortalConfig = layoutService.getPortalConfig(displayingSiteKey.getTypeName(), displayingSiteKey.getName());
+          return this.currentPortalConfig;
         } else {
-          this.currentPortalConfig = portalLayoutService.getPortalConfigWithDynamicLayout(displayingSiteKey, getCurrentPortalSite());
+          this.currentPortalConfig =
+                                   portalLayoutService.getPortalConfigWithDynamicLayout(displayingSiteKey,
+                                                                                        currentPortalConfig.isDisplayed() ? portalConfigService.getDefaultPortal()
+                                                                                                                          : getCurrentPortalSite());
         }
       }
       return this.currentPortalConfig;
