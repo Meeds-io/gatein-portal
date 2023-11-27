@@ -255,6 +255,7 @@ public class PageStorageImpl extends AbstractPageStorage {
       entity.setShowMaxWindow(state.getShowMaxWindow());
       entity.setHideSharedLayout(state.isHideSharedLayout());
       entity.setPageType(!StringUtils.isBlank(state.getType()) ? PageType.valueOf(state.getType()) : PageType.PAGE);
+      entity.setProfiles(state.getProfiles());
       entity.setLink(state.getLink());
     } else {
       entity.setPageType(PageType.PAGE);

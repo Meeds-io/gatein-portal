@@ -1,7 +1,6 @@
 package org.exoplatform.portal.config;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -147,8 +146,7 @@ public class DynamicPortalLayoutMatcherPlugin extends BaseComponentPlugin {
       }
 
       String dynamicLayoutPluginName = getName();
-      try {
-        InputStream inputStream = configurationManager.getInputStream(layoutTemplateFilePath);
+      try (InputStream inputStream = configurationManager.getInputStream(layoutTemplateFilePath)) {
         if (inputStream == null) {
           LOG.warn("Can't find portal layout using path '{}'. Matcher '{}' will be ignored.",
                    layoutTemplateFilePath,

@@ -668,9 +668,10 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
     public Page createPageFromTemplate(String ownerType, String owner, String temp) throws Exception {
         String path = pageTemplatesLocation_ + "/" + temp + "/page.xml";
         path = fixPath(path);
-        InputStream is = cmanager_.getInputStream(path);
-        String xml = IOUtil.getStreamContentAsString(is);
-        return fromXML(ownerType, owner, xml, Page.class).getObject();
+        try (InputStream is = cmanager_.getInputStream(path)) {
+          String xml = IOUtil.getStreamContentAsString(is);
+          return fromXML(ownerType, owner, xml, Page.class).getObject();
+        }
     }
 
     public String getTemplateConfig(String type, String name) {
