@@ -28,6 +28,8 @@ public class PageState implements Serializable {
   @Getter
   final boolean             hideSharedLayout;
 
+  final String              profiles;
+
   /** . */
   final String              factoryId;
 
@@ -60,7 +62,7 @@ public class PageState implements Serializable {
                    List<String> moveContainersPermissions,
                    String type,
                    String link) {
-    this(displayName, description, showMaxWindow, false, factoryId, accessPermissions, editPermission, moveAppsPermissions, moveContainersPermissions, type, link);
+    this(displayName, description, showMaxWindow, false, factoryId, null, accessPermissions, editPermission, moveAppsPermissions, moveContainersPermissions, type, link);
   }
 
   public PageState(String displayName, // NOSONAR
@@ -74,10 +76,26 @@ public class PageState implements Serializable {
                    List<String> moveContainersPermissions,
                    String type,
                    String link) {
+    this(displayName, description, showMaxWindow, hideSharedLayout, factoryId, null, accessPermissions, editPermission, moveAppsPermissions, moveContainersPermissions, type, link);
+  }
+
+  public PageState(String displayName, // NOSONAR
+                   String description,
+                   boolean showMaxWindow,
+                   boolean hideSharedLayout,
+                   String factoryId,
+                   String profiles,
+                   List<String> accessPermissions,
+                   String editPermission,
+                   List<String> moveAppsPermissions,
+                   List<String> moveContainersPermissions,
+                   String type,
+                   String link) {
     this.editPermission = editPermission;
     this.showMaxWindow = showMaxWindow;
     this.hideSharedLayout = hideSharedLayout;
     this.factoryId = factoryId;
+    this.profiles = profiles;
     this.displayName = displayName;
     this.description = description;
     this.accessPermissions = accessPermissions;
@@ -111,6 +129,7 @@ public class PageState implements Serializable {
     this.showMaxWindow = showMaxWindow;
     this.hideSharedLayout = hideSharedLayout;
     this.factoryId = factoryId;
+    this.profiles = null;
     this.displayName = displayName;
     this.description = description;
     this.accessPermissions = accessPermissions;
@@ -138,6 +157,10 @@ public class PageState implements Serializable {
 
   public String getDescription() {
     return description;
+  }
+
+  public String getProfiles() {
+    return profiles;
   }
 
   public List<String> getAccessPermissions() {
@@ -196,6 +219,7 @@ public class PageState implements Serializable {
                        showMaxWindow,
                        hideSharedLayout,
                        factoryId,
+                       profiles,
                        displayName,
                        description,
                        accessPermissions,
@@ -218,6 +242,8 @@ public class PageState implements Serializable {
 
     /** . */
     private String       factoryId;
+
+    private String       profiles;
 
     /** . */
     private String       displayName;
@@ -242,6 +268,7 @@ public class PageState implements Serializable {
                     boolean showMaxWindow,
                     boolean hideSharedLayout,
                     String factoryId,
+                    String profiles,
                     String displayName,
                     String description,
                     List<String> accessPermissions,
@@ -253,6 +280,7 @@ public class PageState implements Serializable {
       this.showMaxWindow = showMaxWindow;
       this.showMaxWindow = hideSharedLayout;
       this.factoryId = factoryId;
+      this.profiles = profiles;
       this.displayName = displayName;
       this.description = description;
       this.accessPermissions = accessPermissions;
@@ -292,6 +320,11 @@ public class PageState implements Serializable {
       return this;
     }
 
+    public Builder profiles(String profiles) {
+      this.profiles = profiles;
+      return this;
+    }
+
     public Builder description(String description) {
       this.description = description;
       return this;
@@ -316,6 +349,7 @@ public class PageState implements Serializable {
                            showMaxWindow,
                            hideSharedLayout,
                            factoryId,
+                           profiles,
                            accessPermissions,
                            editPermission,
                            moveAppsPermissions,

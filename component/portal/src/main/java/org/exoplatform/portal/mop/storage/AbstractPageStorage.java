@@ -120,7 +120,7 @@ public abstract class AbstractPageStorage implements PageStorage {
                         null, // width
                         null, // height
                         null, // cssClass
-                        null, // profiles
+                        entity.getProfiles(), // profiles
                         accessPermissions, // accessPermissions
                         children, // children
                         entity.getOwnerType().getName(), // ownerType

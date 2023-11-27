@@ -23,8 +23,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+
+import org.exoplatform.commons.utils.Tools;
+import org.exoplatform.container.ExoContainer;
 import org.exoplatform.portal.jdbc.entity.NavigationEntity;
 import org.exoplatform.portal.jdbc.entity.NodeEntity;
 import org.exoplatform.portal.jdbc.entity.PageEntity;
@@ -343,6 +347,15 @@ public class NavigationStorageImpl implements NavigationStorage {
            .target(node.getTarget() != null ? node.getTarget().name() : null)
            .updatedDate(node.getUpdatedDate());
     PageEntity page = node.getPage();
+    // Delete page reference if the page hasn't active profiles
+    if (page != null && StringUtils.isNotBlank(page.getProfiles())) {
+      Set<String> activeProfiles = Tools.parseCommaList(page.getProfiles());
+      if (ExoContainer.getProfiles()
+                      .stream()
+                      .noneMatch(activeProfiles::contains)) {
+        page = null;
+      }
+    }
     if (page != null) {
       SiteKey siteKey = new SiteKey(page.getOwnerType(), page.getOwnerId());
       PageKey pageKey = new PageKey(siteKey, page.getName());
