@@ -436,4 +436,11 @@
       UPDATE PORTAL_SITES set DISPLAYED=1 where NAME LIKE '/spaces/%';
     </sql>
   </changeSet>
+
+  <changeSet author="portal" id="1.0.0-40">
+    <addColumn tableName="PORTAL_PAGES">
+      <column name="PROFILES" type="NVARCHAR(2000)" />
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>

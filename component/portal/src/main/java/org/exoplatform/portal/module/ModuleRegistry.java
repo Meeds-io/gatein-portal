@@ -196,9 +196,9 @@ public class ModuleRegistry implements Startable {
     if (portletActiveProfiles == null || portletActiveProfiles.isEmpty()) {
       isPortletActive = true;
     } else {
-      Set<String> currentActiveProfiles = ExoContainer.getProfiles();
-      portletActiveProfiles.retainAll(currentActiveProfiles);
-      isPortletActive = !portletActiveProfiles.isEmpty();
+      isPortletActive = ExoContainer.getProfiles()
+                                    .stream()
+                                    .noneMatch(portletActiveProfiles::contains);
     }
     isPortletActiveCache.put(portletId, isPortletActive);
     return isPortletActive;
