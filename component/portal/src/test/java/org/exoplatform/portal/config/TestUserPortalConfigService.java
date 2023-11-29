@@ -475,10 +475,10 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
     }.execute(null);
   }
 
-  public void testGetDefaultPortalConfig() {
+  public void testGetMetaPortalConfig() {
     new UnitTest() {
       public void execute() throws Exception {
-        PortalConfig portalConfig = userPortalConfigSer_.getDefaultPortalConfig();
+        PortalConfig portalConfig = userPortalConfigSer_.getMetaPortalConfig();
         assertNotNull(portalConfig);
         assertEquals(PortalConfig.PORTAL_TYPE, portalConfig.getType());
         assertEquals("classic", portalConfig.getName());
