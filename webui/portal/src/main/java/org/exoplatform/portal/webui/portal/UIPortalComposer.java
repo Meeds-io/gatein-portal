@@ -189,7 +189,7 @@ public class UIPortalComposer extends UIContainer {
           // flag of isDefaultLayout with checkbox, thus the default layout has to
           // be used
           if (!uiPortal.isUseDynamicLayout() && portalConfig.isDefaultLayout()) {
-            portalConfig.useDefaultPortalLayout();
+            portalConfig.useMetaPortalLayout();
             // A modification was made on layout, thus we will not use default layout anymore
           } else if (uiPortal.isUseDynamicLayout() && portalConfig.isDefaultLayout()) {
             portalConfig.setDefaultLayout(false);

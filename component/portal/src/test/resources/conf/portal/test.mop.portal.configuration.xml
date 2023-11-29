@@ -30,7 +30,7 @@
             <type>org.exoplatform.portal.config.NewPortalConfigListener</type>
             <init-params>
                 <value-param>
-                    <name>default.portal</name>
+                    <name>meta.portal</name>
                     <value>classic</value>
                 </value-param>
                 <value-param>

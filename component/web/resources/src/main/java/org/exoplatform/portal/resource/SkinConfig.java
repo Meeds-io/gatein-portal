@@ -68,6 +68,8 @@ public interface SkinConfig extends Skin {
      * 
      * @param type
      */
-    void setType(String type);
+    default void setType(String type) {
+      // Nothing to do
+    }
 
 }
