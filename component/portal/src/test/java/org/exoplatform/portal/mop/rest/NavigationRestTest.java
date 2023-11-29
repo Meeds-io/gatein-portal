@@ -115,7 +115,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
   public void testGetSiteNavigation() throws Exception {
     String path = "/v1/navigations/";
     String username = "testuser";
-    String defaultPortalName = "default";
+    String metaPortalName = "default";
     String globalPortalName = "global";
     String portalName = "test";
 
@@ -137,9 +137,9 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
                                                                             false));
 
     startUserSession(username);
-    when(portalConfigService.getDefaultPortal()).thenReturn(defaultPortalName);
+    when(portalConfigService.getMetaPortal()).thenReturn(metaPortalName);
     when(portalConfigService.getGlobalPortal()).thenReturn(globalPortalName);
-    when(portalConfigService.getUserPortalConfig(eq(defaultPortalName), eq(username), any())).thenReturn(userPortalConfig);
+    when(portalConfigService.getUserPortalConfig(eq(metaPortalName), eq(username), any())).thenReturn(userPortalConfig);
     when(userPortalConfig.getUserPortal()).thenReturn(userPortal);
     when(userPortal.getNavigations()).thenReturn(userNavigations);
 

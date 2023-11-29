@@ -53,14 +53,14 @@ public class NewPortalConfigListenerTest {
   @Test
   public void testInitPageDB() throws Exception {
     ValueParam valueParam = new ValueParam();
-    valueParam.setName("default.portal");
+    valueParam.setName("meta.portal");
     valueParam.setValue("classic");
 
     ValueParam valueParam1 = new ValueParam();
     valueParam.setName("page.templates.location");
     valueParam.setValue("war:/conf/portal/template/pages");
 
-    when(initParams.getValueParam("default.portal")).thenReturn(valueParam);
+    when(initParams.getValueParam("meta.portal")).thenReturn(valueParam);
     when(initParams.getValueParam("page.templates.location")).thenReturn(valueParam1);
 
     NewPortalConfigListener newPortalConfigListener = new NewPortalConfigListener(owner,
@@ -104,14 +104,14 @@ public class NewPortalConfigListenerTest {
   @Test
   public void testReloadConfig() throws Exception {
     ValueParam valueParam = new ValueParam();
-    valueParam.setName("default.portal");
+    valueParam.setName("meta.portal");
     valueParam.setValue("classic");
 
     ValueParam valueParam1 = new ValueParam();
     valueParam.setName("page.templates.location");
     valueParam.setValue("war:/conf/portal/template/pages");
 
-    when(initParams.getValueParam("default.portal")).thenReturn(valueParam);
+    when(initParams.getValueParam("meta.portal")).thenReturn(valueParam);
     when(initParams.getValueParam("page.templates.location")).thenReturn(valueParam1);
 
     HashSet<String> predefinedOwner = new HashSet<>();

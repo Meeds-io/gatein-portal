@@ -383,12 +383,12 @@ public class DynamicPortalLayoutServiceTest {
                                        eq(EXISTING_PORTAL_SITE_NAME))).thenReturn(portalPortalConfig);
 
       PortalConfig groupPortalConfig = new PortalConfig(SiteType.GROUP.getName(), EXISTING_GROUP_SITE_NAME);
-      groupPortalConfig.useDefaultPortalLayout();
+      groupPortalConfig.useMetaPortalLayout();
       groupPortalConfig.setDefaultLayout(markPortalConfigAsDefault);
       when(dataStorage.getPortalConfig(eq(SiteType.GROUP.getName()), eq(EXISTING_GROUP_SITE_NAME))).thenReturn(groupPortalConfig);
 
       PortalConfig userPortalConfig = new PortalConfig(SiteType.USER.getName(), EXISTING_USER_SITE_NAME);
-      userPortalConfig.useDefaultPortalLayout();
+      userPortalConfig.useMetaPortalLayout();
       userPortalConfig.setDefaultLayout(markPortalConfigAsDefault);
       when(dataStorage.getPortalConfig(eq(SiteType.USER.getName()), eq(EXISTING_USER_SITE_NAME))).thenReturn(userPortalConfig);
 

@@ -210,7 +210,7 @@
     <component-plugin>
       <name>org.exoplatform.portal.config.DataStorage.portalConfigUpdated</name>
       <set-method>addListener</set-method>
-      <type>org.exoplatform.portal.config.DefaultPortalConfigUpdateListener</type>
+      <type>org.exoplatform.portal.config.MetaPortalConfigUpdateListener</type>
     </component-plugin>
   </external-component-plugins>
 </configuration>

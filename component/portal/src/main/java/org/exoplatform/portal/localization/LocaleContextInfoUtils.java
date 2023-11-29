@@ -217,7 +217,7 @@ public class LocaleContextInfoUtils {
     }
     UserPortalConfigService userPortalConfigService = currentContainer.getComponentInstanceOfType(UserPortalConfigService.class);
     if(userPortalConfigService != null) {
-      PortalConfig config = userPortalConfigService.getDefaultPortalConfig();
+      PortalConfig config = userPortalConfigService.getMetaPortalConfig();
       if (config != null) {
         lang = config.getLocale();
       }

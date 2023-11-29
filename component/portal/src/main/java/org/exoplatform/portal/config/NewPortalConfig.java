@@ -49,7 +49,7 @@ public class NewPortalConfig {
      */
     private Object override;
 
-    private boolean useDefaultPortalLayout = false;
+    private boolean useMetaPortalLayout = false;
 
     /**
      * @deprecated use the location instead
@@ -70,7 +70,7 @@ public class NewPortalConfig {
         this.predefinedOwner = new HashSet<String>(cfg.predefinedOwner);
         this.importMode = cfg.importMode;
         this.override = cfg.override;
-        this.useDefaultPortalLayout = cfg.useDefaultPortalLayout;
+        this.useMetaPortalLayout = cfg.useMetaPortalLayout;
     }
 
     public NewPortalConfig(String path) {
@@ -166,11 +166,27 @@ public class NewPortalConfig {
       this.override = overrideMode;
     }
 
-    public void setUseDefaultPortalLayout(boolean useDefaultPortalLayout) {
-      this.useDefaultPortalLayout = useDefaultPortalLayout;
+    public void setUseMetaPortalLayout(boolean useMetaPortalLayout) {
+      this.useMetaPortalLayout = useMetaPortalLayout;
     }
 
+    public boolean isUseMetaPortalLayout() {
+      return useMetaPortalLayout;
+    }
+
+    /**
+     * @deprecated the 'default' portal notion doesn't exist anymore
+     */
+    @Deprecated(forRemoval = true, since = "1.5.0")
+    public void setUseDefaultPortalLayout(boolean useMetaPortalLayout) {
+      this.useMetaPortalLayout = useMetaPortalLayout;
+    }
+
+    /**
+     * @deprecated the 'default' portal notion doesn't exist anymore
+     */
+    @Deprecated(forRemoval = true, since = "1.5.0")
     public boolean isUseDefaultPortalLayout() {
-      return useDefaultPortalLayout;
+      return useMetaPortalLayout;
     }
 }
