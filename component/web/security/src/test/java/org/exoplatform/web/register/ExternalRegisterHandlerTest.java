@@ -39,6 +39,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
@@ -78,6 +79,7 @@ import org.exoplatform.services.organization.GroupHandler;
 import org.exoplatform.services.organization.MembershipHandler;
 import org.exoplatform.services.organization.MembershipTypeHandler;
 import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.idm.UserImpl;
 import org.exoplatform.services.resources.LocaleConfigService;
@@ -96,12 +98,12 @@ import io.meeds.portal.security.service.SecuritySettingService;
 
 import nl.captcha.Captcha;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ExternalRegisterHandlerTest {
 
   private static final Locale        REQUEST_LOCALE = Locale.ENGLISH;
 
-  private static final String        CONTEXT_PATH   = "/portal";
+  private static final String        CONTEXT_PATH   = "/portal";       // NOSONAR
 
   private static final String        TOKEN_VALUE    = "tokenValue";
 
@@ -195,7 +197,7 @@ public class ExternalRegisterHandlerTest {
   private Map<String, Object>        applicationParameters;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() throws Exception { // NOSONAR
     this.applicationParameters = null;
     ExoContainerContext.setCurrentContainer(container);
     lenient().when(container.getComponentInstanceOfType(ResourceBundleService.class)).thenReturn(resourceBundleService);
@@ -248,7 +250,7 @@ public class ExternalRegisterHandlerTest {
   }
 
   @After
-  public void teardown() throws Exception {
+  public void teardown() {
     ExoContainerContext.setCurrentContainer(null);
   }
 
@@ -462,6 +464,49 @@ public class ExternalRegisterHandlerTest {
 
     verify(passwordRecoveryService, times(1)).sendAccountCreatedConfirmationEmail(any(), any(), any());
     verify(response, times(1)).sendRedirect(servletContext.getContextPath() + LOGIN);
+  }
+  
+  @Test
+  public void testRegisterInternalWhenValid() throws Exception {
+    prepareResetPasswordContext();
+
+    String password = "pass1234";
+    String passwordConfirm = password;
+
+    when(request.getParameter(ACTION_PARAM)).thenReturn(SAVE_EXTERNAL_ACTION);
+    when(request.getParameter(EMAIL_PARAM)).thenReturn(EMAIL);
+    when(request.getParameter(FIRSTNAME_PARAM)).thenReturn(FIRSTNAME);
+    when(request.getParameter(LASTNAME_PARAM)).thenReturn(LASTNAME);
+    when(request.getParameter(PASSWORD_PARAM)).thenReturn(password);
+    when(request.getParameter(PASSWORD_CONFIRM_PARAM)).thenReturn(passwordConfirm);
+
+    when(userHandler.createUserInstance(any())).thenAnswer(invocation -> new UserImpl(invocation.getArgument(0)));
+
+    externalRegisterHandler.execute(controllerContext);
+    verify(organizationService.getUserHandler(), times(1)).createUser(any(User.class), anyBoolean());
+    verify(organizationService.getMembershipHandler(), never()).removeMembership(anyString(), anyBoolean());
+  }
+
+  @Test
+  public void testRegisterExternalWhenValid() throws Exception {
+    prepareResetPasswordContext();
+
+    String password = "pass1234";
+    String passwordConfirm = password;
+
+    when(request.getParameter(ACTION_PARAM)).thenReturn(SAVE_EXTERNAL_ACTION);
+    when(request.getParameter(EMAIL_PARAM)).thenReturn(EMAIL);
+    when(request.getParameter(FIRSTNAME_PARAM)).thenReturn(FIRSTNAME);
+    when(request.getParameter(LASTNAME_PARAM)).thenReturn(LASTNAME);
+    when(request.getParameter(PASSWORD_PARAM)).thenReturn(password);
+    when(request.getParameter(PASSWORD_CONFIRM_PARAM)).thenReturn(passwordConfirm);
+
+    when(userHandler.createUserInstance(any())).thenAnswer(invocation -> new UserImpl(invocation.getArgument(0)));
+    when(securitySettingService.isRegistrationExternalUser()).thenReturn(true);
+
+    externalRegisterHandler.execute(controllerContext);
+    verify(organizationService.getUserHandler(), times(1)).createUser(any(User.class), anyBoolean());
+    verify(organizationService.getMembershipHandler(), times(1)).linkMembership(any(), any(), any(), anyBoolean());
   }
 
   @Test

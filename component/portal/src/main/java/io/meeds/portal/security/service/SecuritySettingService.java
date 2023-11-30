@@ -20,9 +20,7 @@ package io.meeds.portal.security.service;
 
 import static io.meeds.portal.security.constant.UserRegistrationType.OPEN;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -45,10 +43,6 @@ public class SecuritySettingService {
 
   public static final String                  DEFAULT_GROUPS_MODIFIED            = "meeds.settings.access.defaultGroups.modified";
 
-  protected static final String               INTERNAL_USERS_GROUP               = "/platform/users";
-
-  protected static final String               EXTERNAL_USERS_GROUP               = "/platform/externals";
-
   protected static final Context              SECURITY_CONTEXT                   = Context.GLOBAL.id("SECURITY");
 
   protected static final Scope                SECURITY_SCOPE                     = Scope.APPLICATION.id("SECURITY");
@@ -63,11 +57,13 @@ public class SecuritySettingService {
 
   protected static final UserRegistrationType DEFAULT_REGISTRATION_TYPE          =
                                                                         UserRegistrationType.valueOf(System.getProperty("meeds.settings.access.type.default",
-                                                                                                                        OPEN.name()).toUpperCase());
+                                                                                                                        OPEN.name())
+                                                                                                           .toUpperCase());
 
   protected static final boolean              DEFAULT_REGISTRATION_EXTERNAL_USER =
                                                                                  Boolean.parseBoolean(System.getProperty("meeds.settings.access.externalUsers",
-                                                                                                                         "false").toLowerCase());
+                                                                                                                         "false")
+                                                                                                            .toLowerCase());
 
   private static final Log                    LOG                                =
                                                   ExoLogger.getLogger(SecuritySettingService.class);
@@ -88,7 +84,7 @@ public class SecuritySettingService {
     if (registrationSetting == null) {
       registrationSetting = new RegistrationSetting(getRegistrationType(),
                                                     isRegistrationExternalUser(),
-                                                    getRegistrationExtraGroupIds());
+                                                    getRegistrationGroupIds());
     }
     return registrationSetting;
   }
@@ -96,17 +92,19 @@ public class SecuritySettingService {
   public void saveRegistrationSetting(RegistrationSetting registrationSetting) {
     saveRegistrationType(registrationSetting.getType());
     saveRegistrationExternalUser(registrationSetting.isExternalUser());
-    saveRegistrationExtraGroupIds(registrationSetting.getExtraGroupIds());
+    saveRegistrationGroupIds(registrationSetting.getExtraGroupIds());
   }
 
   public String[] getRegistrationGroupIds() {
-    List<String> registrationExtraGroupIds = new ArrayList<>(Arrays.asList(getRegistrationExtraGroupIds()));
-    if (isRegistrationExternalUser()) {
-      registrationExtraGroupIds.add(EXTERNAL_USERS_GROUP);
+    SettingValue<?> settingValue = settingService.get(SECURITY_CONTEXT, SECURITY_SCOPE, REGISTRATION_EXTRA_GROUPS_PARAM);
+    if (settingValue == null || settingValue.getValue() == null) {
+      return new String[0];
     } else {
-      registrationExtraGroupIds.add(INTERNAL_USERS_GROUP);
+      return Arrays.stream(settingValue.getValue().toString().split(EXTRA_GROUPS_SEPARATOR))
+                   .filter(StringUtils::isNotBlank)
+                   .distinct()
+                   .toArray(String[]::new);
     }
-    return registrationExtraGroupIds.stream().filter(StringUtils::isNotBlank).distinct().toList().toArray(new String[0]);
   }
 
   public UserRegistrationType getRegistrationType() {
@@ -160,19 +158,7 @@ public class SecuritySettingService {
     }
   }
 
-  public String[] getRegistrationExtraGroupIds() {
-    SettingValue<?> settingValue = settingService.get(SECURITY_CONTEXT, SECURITY_SCOPE, REGISTRATION_EXTRA_GROUPS_PARAM);
-    if (settingValue == null || settingValue.getValue() == null) {
-      return new String[0];
-    } else {
-      return Arrays.stream(settingValue.getValue().toString().split(EXTRA_GROUPS_SEPARATOR))
-                   .filter(StringUtils::isNotBlank)
-                   .distinct()
-                   .toArray(String[]::new);
-    }
-  }
-
-  public void saveRegistrationExtraGroupIds(String[] groupIds) {
+  public void saveRegistrationGroupIds(String[] groupIds) {
     try {
       if (groupIds == null) {
         groupIds = new String[0];

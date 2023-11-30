@@ -57,13 +57,15 @@ import org.exoplatform.portal.rest.UserRestResourcesTest;
 import org.exoplatform.portal.tree.list.TestListTree;
 import org.exoplatform.settings.rest.SettingResourceTest;
 
+import io.meeds.portal.security.listener.DefaultUserMembershipListenerTest;
 import io.meeds.portal.security.listener.PortalRegistrationUpdateListenerTest;
-import io.meeds.portal.security.service.SettingSecurityServieTest;
+import io.meeds.portal.security.service.SecuritySettingServiceTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    SettingSecurityServieTest.class,
+    SecuritySettingServiceTest.class,
     PortalRegistrationUpdateListenerTest.class,
+    DefaultUserMembershipListenerTest.class,
     AccountSetupServiceTest.class,
     BrandingServiceImplTest.class,
     DefaultGroupVisibilityPluginTest.class,
