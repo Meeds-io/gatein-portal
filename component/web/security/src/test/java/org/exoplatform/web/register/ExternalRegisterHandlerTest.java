@@ -101,7 +101,7 @@ public class ExternalRegisterHandlerTest {
 
   private static final Locale        REQUEST_LOCALE = Locale.ENGLISH;
 
-  private static final String        CONTEXT_PATH   = "/portal";
+  private static final String        CONTEXT_PATH   = "/portal";       // NOSONAR
 
   private static final String        TOKEN_VALUE    = "tokenValue";
 
@@ -195,7 +195,7 @@ public class ExternalRegisterHandlerTest {
   private Map<String, Object>        applicationParameters;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() throws Exception { // NOSONAR
     this.applicationParameters = null;
     ExoContainerContext.setCurrentContainer(container);
     lenient().when(container.getComponentInstanceOfType(ResourceBundleService.class)).thenReturn(resourceBundleService);
@@ -226,7 +226,6 @@ public class ExternalRegisterHandlerTest {
     when(organizationService.getGroupHandler()).thenReturn(groupHandler);
     when(organizationService.getMembershipTypeHandler()).thenReturn(membershipTypeHandler);
     when(organizationService.getMembershipHandler()).thenReturn(membershipHandler);
-    when(securitySettingService.getRegistrationGroupIds()).thenReturn(new String[] { "/platform/external" });
     when(passwordRecoveryService.verifyToken(TOKEN_VALUE, CookieTokenService.EXTERNAL_REGISTRATION_TOKEN)).thenReturn(EMAIL);
 
     externalRegisterHandler = new ExternalRegisterHandler(container,
@@ -248,7 +247,7 @@ public class ExternalRegisterHandlerTest {
   }
 
   @After
-  public void teardown() throws Exception {
+  public void teardown() {
     ExoContainerContext.setCurrentContainer(null);
   }
 

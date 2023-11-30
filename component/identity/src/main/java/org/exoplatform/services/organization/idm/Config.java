@@ -364,12 +364,26 @@ public class Config {
         this.skipPaginationInMembershipQuery = skipPaginationInMembershipQuery;
     }
 
-    public boolean isUpdateLastLoginTimeAfterAuthentication() {
-        return updateLastLoginTimeAfterAuthentication;
+    /**
+     * @param updateLastLoginTimeAfterAuthentication
+     * @deprecated kept for backward compatibility with existing configurations
+     *             The update of login time is mandatory to be able to associate
+     *             default spaces/groups to users after login
+     */
+    @Deprecated(forRemoval = true, since = "1.5.0")
+    public void setUpdateLastLoginTimeAfterAuthentication(boolean updateLastLoginTimeAfterAuthentication) {
+      this.updateLastLoginTimeAfterAuthentication = updateLastLoginTimeAfterAuthentication;
     }
 
-    public void setUpdateLastLoginTimeAfterAuthentication(boolean updateLastLoginTimeAfterAuthentication) {
-        this.updateLastLoginTimeAfterAuthentication = updateLastLoginTimeAfterAuthentication;
+    /**
+     * @return updateLastLoginTimeAfterAuthentication
+     * @deprecated kept for backward compatibility with existing configurations
+     *             The update of login time is mandatory to be able to associate
+     *             default spaces/groups to users after login
+     */
+    @Deprecated(forRemoval = true, since = "1.5.0")
+    public boolean isUpdateLastLoginTimeAfterAuthentication() {
+        return updateLastLoginTimeAfterAuthentication;
     }
 
     public boolean isUseCache() {
