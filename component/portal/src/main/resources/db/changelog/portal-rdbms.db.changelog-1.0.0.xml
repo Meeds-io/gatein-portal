@@ -438,6 +438,7 @@
 
   <changeSet author="portal" id="1.0.0-39">
     <validCheckSum>8:3192bea7bfda7a7ec61ae9a0badab022</validCheckSum>
+    <validCheckSum>8:2a666543dcf9d902f88283141bef8620</validCheckSum>
     <sql dbms="mysql">
       UPDATE PORTAL_SITES set DISPLAYED=1 where NAME LIKE '/spaces/%';
     </sql>
