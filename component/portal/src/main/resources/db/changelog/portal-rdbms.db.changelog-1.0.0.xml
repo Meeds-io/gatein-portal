@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
   <!-- Managing both DB that use sequences and db that use auto increment -->
@@ -253,7 +253,7 @@
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
     </modifySql>
   </changeSet>
-  
+
   <changeSet author="portal" id="1.0.0-23">
     <validCheckSum>ANY</validCheckSum>
     <createTable tableName="PORTAL_WINDOWS">
@@ -272,7 +272,7 @@
       <column name="PROPERTIES" type="LONGTEXT" />
       <column name="APP_TYPE" type="INT"/>
       <column name="CONTENT_ID" type="NVARCHAR(200)"/>
-      <column name="CUSTOMIZATION" type="BLOB"/>      
+      <column name="CUSTOMIZATION" type="BLOB"/>
     </createTable>
     <modifySql dbms="mysql">
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
@@ -307,7 +307,7 @@
   </changeSet>
   <changeSet author="portal" id="1.0.0-27">
     <addUniqueConstraint columnNames="REF_TYPE, REF_ID, PERMISSION, TYPE" constraintName="UK_PORTAL_PERMISSIONS"
-              tableName="PORTAL_PERMISSIONS"/>
+                         tableName="PORTAL_PERMISSIONS"/>
   </changeSet>
 
   <changeSet author="portal" id="1.0.0-28">
@@ -320,8 +320,8 @@
     <createSequence sequenceName="SEQ_GTN_APPLICATION_CAT_ID" startValue="1" />
     <createSequence sequenceName="SEQ_GTN_APPLICATION_ID" startValue="1" />
     <createSequence sequenceName="SEQ_SITE_ID_GENERATOR" startValue="1" />
-    <createSequence sequenceName="SEQ_PAGE_ID_GENERATOR" startValue="1" /> 
-    <createSequence sequenceName="SEQ_GTN_NAVIGATION_NODE_ID" startValue="1" /> 
+    <createSequence sequenceName="SEQ_PAGE_ID_GENERATOR" startValue="1" />
+    <createSequence sequenceName="SEQ_GTN_NAVIGATION_NODE_ID" startValue="1" />
     <createSequence sequenceName="SEQ_GTN_NAVIGATION_ID" startValue="1" />
     <createSequence sequenceName="SEQ_PORTAL_DESCRIPTIONS_ID" startValue="1" />
     <createSequence sequenceName="SEQ_CONTAINER_ID_GENERATOR" startValue="1" />
@@ -358,7 +358,7 @@
     </addColumn>
     <addColumn tableName="PORTAL_NAVIGATION_NODES">
       <column name="TARGET" type="INT" defaultValueNumeric="0" >
-      <constraints nullable="false" />
+        <constraints nullable="false" />
       </column>
     </addColumn>
   </changeSet>
@@ -417,6 +417,11 @@
 
   <!-- Add index for performance -->
   <changeSet author="portal" id="1.0.0-38">
+    <preConditions onFail="MARK_RAN">
+      <not><indexExists indexName="IDX_PORTAL_SITES_DISPLAYED_01" tableName="PORTAL_SITES"/></not>
+      <not><indexExists indexName="IDX_PORTAL_SITES_DISPLAY_ORDER_01" tableName="PORTAL_SITES"/></not>
+      <not><indexExists indexName="IDX_PORTAL_SITES_BANNER_FILE_ID_01" tableName="PORTAL_SITES"/></not>
+    </preConditions>
     <createIndex indexName="IDX_PORTAL_SITES_DISPLAYED_01"
                  tableName="PORTAL_SITES">
       <column name="DISPLAYED" type="BOOLEAN"/>
@@ -430,10 +435,14 @@
       <column name="BANNER_FILE_ID" type="BIGINT"/>
     </createIndex>
   </changeSet>
-  
+
   <changeSet author="portal" id="1.0.0-39">
-    <sql>
+    <validCheckSum>8:3192bea7bfda7a7ec61ae9a0badab022</validCheckSum>
+    <sql dbms="mysql">
       UPDATE PORTAL_SITES set DISPLAYED=1 where NAME LIKE '/spaces/%';
+    </sql>
+    <sql dbms="postgresql">
+      UPDATE PORTAL_SITES set DISPLAYED=true where NAME LIKE '/spaces/%';
     </sql>
   </changeSet>
 
