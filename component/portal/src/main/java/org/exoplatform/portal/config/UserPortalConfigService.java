@@ -80,6 +80,8 @@ import java.util.ResourceBundle;
  */
 public class UserPortalConfigService implements Startable {
 
+  private static final String     PUBLIC_SITE_NAME               = "public";
+
   private static final Scope      HOME_PAGE_URI_PREFERENCE_SCOPE = Scope.PORTAL.id("HOME");
 
   private static final String     HOME_PAGE_URI_PREFERENCE_KEY   = "HOME_PAGE_URI";
@@ -136,7 +138,7 @@ public class UserPortalConfigService implements Startable {
     /** . */
     private final ImportMode defaultImportMode;
 
-    private PortalConfig defaultPortalConfig;
+    private PortalConfig metaPortalConfig;
 
     private Log log = ExoLogger.getLogger("Portal:UserPortalConfigService");
 
@@ -409,7 +411,7 @@ public class UserPortalConfigService implements Startable {
         PortalConfig cfg = layoutService.getPortalConfig(PortalConfig.USER_TYPE, userName);
         if (cfg == null) {
             cfg = new PortalConfig(PortalConfig.USER_TYPE, userName);
-            cfg.useDefaultPortalLayout();
+            cfg.useMetaPortalLayout();
             layoutService.create(cfg);
         }
 
@@ -441,7 +443,7 @@ public class UserPortalConfigService implements Startable {
         PortalConfig cfg = layoutService.getPortalConfig(PortalConfig.GROUP_TYPE, groupId);
         if (cfg == null) {
             cfg = new PortalConfig(PortalConfig.GROUP_TYPE, groupId);
-            cfg.useDefaultPortalLayout();
+            cfg.useMetaPortalLayout();
             layoutService.create(cfg);
         }
     }
@@ -458,7 +460,7 @@ public class UserPortalConfigService implements Startable {
         NewPortalConfig portalConfig = null;
         if (StringUtils.isBlank(template)) {
           portalConfig = new NewPortalConfig();
-          portalConfig.setUseDefaultPortalLayout(true);
+          portalConfig.setUseMetaPortalLayout(true);
         } else {
           String templatePath = newPortalConfigListener_.getTemplateConfig(siteType, template);
           portalConfig = new NewPortalConfig(templatePath);
@@ -554,12 +556,21 @@ public class UserPortalConfigService implements Startable {
                  .filter(Objects::nonNull)
                  .filter(userACL_::hasPermission)
                  .sorted((s1, s2) -> {
-                   if (StringUtils.equals(s1.getName(), getDefaultPortal())) {
+                   if (!s2.isDisplayed() && !s1.isDisplayed()) {
+                     if (StringUtils.equals(s1.getName(), PUBLIC_SITE_NAME)) {
+                       return -1;
+                     } else if (StringUtils.equals(s2.getName(), PUBLIC_SITE_NAME)) {
+                       return 1;
+                     } else {
+                       return s2.getName().compareTo(s1.getName());
+                     }
+                   } else if (!s2.isDisplayed()) {
                      return -Integer.MAX_VALUE;
-                   } else if (StringUtils.equals(s2.getName(), getDefaultPortal())) {
+                   } else if (!s1.isDisplayed()) {
                      return Integer.MAX_VALUE;
                    } else {
-                     return s2.getDisplayOrder() - s1.getDisplayOrder();
+                     int order = s1.getDisplayOrder() - s2.getDisplayOrder();
+                     return order == 0 ? s2.getName().compareTo(s1.getName()) : order;
                    }
                  })
                  .toList();
@@ -678,14 +689,23 @@ public class UserPortalConfigService implements Startable {
             log.error("Could not import initial data", e);
         }
 
-        loadDefaultPortalConfig();
+        loadMetaPortalConfig();
     }
 
     public void stop() {
     }
 
+    /**
+     * @return configured default portal
+     * @deprecated notion of 'default' portal doesn't exist anymore
+     */
+    @Deprecated(forRemoval = true, since = "1.5.0")
     public String getDefaultPortal() {
-        return newPortalConfigListener_.getDefaultPortal();
+      return newPortalConfigListener_.getDefaultPortal();
+    }
+
+    public String getMetaPortal() {
+      return newPortalConfigListener_.getMetaPortal();
     }
 
     /**
@@ -752,40 +772,66 @@ public class UserPortalConfigService implements Startable {
     /**
      * Get the skin name of the default portal
      * @return Skin name of the default portal
+     * @deprecated notion of 'default' portal doesn't exist anymore
      */
+    @Deprecated(forRemoval = true, since = "1.5.0")
     public String getDefaultPortalSkinName() {
-        return defaultPortalConfig != null && StringUtils.isNotBlank(defaultPortalConfig.getSkin()) ?
-                defaultPortalConfig.getSkin() : null;
+        return getMetaPortalSkinName();
+    }
+
+    /**
+     * Get the skin name of the default portal
+     * @return Skin name of the default portal
+     */
+    public String getMetaPortalSkinName() {
+        return metaPortalConfig != null && StringUtils.isNotBlank(metaPortalConfig.getSkin()) ?
+                metaPortalConfig.getSkin() : null;
+    }
+
+    /**
+     * Get the PortalConfig object of the default portal
+     * 
+     * @return PortalConfig object of the default portal
+     * @deprecated the default portal has been deprecated in favor of a meta
+     *             site that aggregate other sites into it and which shares the
+     *             same Shared Layout and Portal layout with aggregated sites.
+     *             The notion of default portal doesn't exist anymore, since the
+     *             default displayed portal/page will be the first portal +
+     *             navigation determined switch 'display-order' of portal (portal.xml) and
+     *             'node' order definition (navigation.xml)
+     */
+    @Deprecated(forRemoval = true, since = "1.5.0")
+    public PortalConfig getDefaultPortalConfig() {
+      return getMetaPortalConfig();
     }
 
     /**
      * Get the PortalConfig object of the default portal
      * @return PortalConfig object of the default portal
      */
-    public PortalConfig getDefaultPortalConfig() {
-        return defaultPortalConfig;
+    public PortalConfig getMetaPortalConfig() {
+        return metaPortalConfig;
     }
 
     /**
      * Set the PortalConfig object of the default portal
-     * @param defaultPortalConfig PortalConfig object of the default portal
+     * @param metaPortalConfig PortalConfig object of the default portal
      */
-    public void setDefaultPortalConfig(PortalConfig defaultPortalConfig) {
-        this.defaultPortalConfig = defaultPortalConfig;
+    public void setMetaPortalConfig(PortalConfig metaPortalConfig) {
+        this.metaPortalConfig = metaPortalConfig;
     }
 
     /**
      * Load the PortalConfig object of the default portal
      */
-    protected void loadDefaultPortalConfig() {
-        String defaultPortal = this.getDefaultPortal();
-
-        if(defaultPortal != null) {
+    private void loadMetaPortalConfig() {
+        String metaPortal = this.getMetaPortal();
+        if(metaPortal != null) {
             try {
                 RequestLifeCycle.begin(ExoContainerContext.getCurrentContainer());
-                defaultPortalConfig = getDataStorage().getPortalConfig(defaultPortal);
+                metaPortalConfig = getDataStorage().getPortalConfig(metaPortal);
             } catch (Exception e) {
-                log.error("Cannot retrieve data of portal " + defaultPortal, e);
+                log.error("Cannot retrieve data of portal " + metaPortal, e);
             } finally {
                 RequestLifeCycle.end();
             }
