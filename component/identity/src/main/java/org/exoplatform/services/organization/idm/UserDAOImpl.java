@@ -284,11 +284,6 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserHandler {
     return exoUser;
   }
 
-  @Override
-  public boolean isUpdateLastLoginTime() {
-    return orgService.getConfiguration().isUpdateLastLoginTimeAfterAuthentication();
-  }
-
   //
   public User findUserByName(String userName) throws Exception {
     return findUserByName(userName, UserStatus.ENABLED);
