@@ -245,12 +245,6 @@
           <field name="disableUserActived">
             <boolean>${exo.disable.user.activated:true}</boolean>
           </field>
-
-          <!-- If true, the property lastLoginTime of user will be updated after successful authentication of this user to portal.
-               If false, the property won't be updated, which could have performance improvement in systems with many concurrent user logins -->
-          <field name="updateLastLoginTimeAfterAuthentication">
-            <boolean>${exo.idm.user.updateLastLoginTime:true}</boolean>
-          </field>
         </object>
       </object-param>
     </init-params>
@@ -261,8 +255,16 @@
     <component-plugin>
       <name>exo.core.security.ConversationRegistry.register</name>
       <set-method>addListener</set-method>
+      <type>io.meeds.portal.security.listener.DefaultUserMembershipListener</type>
+      <description>update user groups when first login</description>
+      <priority>10</priority>
+    </component-plugin>
+    <component-plugin>
+      <name>exo.core.security.ConversationRegistry.register</name>
+      <set-method>addListener</set-method>
       <type>org.exoplatform.services.organization.idm.UpdateLoginTimeListener</type>
-      <description>update last login time for user</description>      
+      <description>update last login time for user</description>
+      <priority>100</priority>
     </component-plugin>
   </external-component-plugins>    
 
