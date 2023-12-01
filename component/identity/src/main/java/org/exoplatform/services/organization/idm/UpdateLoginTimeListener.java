@@ -19,7 +19,6 @@ package org.exoplatform.services.organization.idm;
 import java.util.Calendar;
 
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.listener.Asynchronous;
 import org.exoplatform.services.listener.Event;
@@ -32,8 +31,11 @@ import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.security.ConversationRegistry;
 import org.exoplatform.services.security.ConversationState;
 
+import io.meeds.common.ContainerTransactional;
+
 @Asynchronous
 public class UpdateLoginTimeListener extends Listener<ConversationRegistry, ConversationState> {
+
   private static final Log LOG = ExoLogger.getLogger(UpdateLoginTimeListener.class);
 
   public static final String  USER_PROFILE = "UserProfile";
@@ -47,37 +49,25 @@ public class UpdateLoginTimeListener extends Listener<ConversationRegistry, Conv
   }
 
   @Override
+  @ContainerTransactional
   public void onEvent(Event<ConversationRegistry, ConversationState> event) {
     if (organizationService == null) {
       organizationService = this.container.getComponentInstanceOfType(OrganizationService.class);
     }
     UserHandler userHandler = organizationService.getUserHandler();
-    if (!userHandler.isUpdateLastLoginTime()) {
-      return;
-    }
     ConversationState state = event.getData();
     String userId = state.getIdentity().getUserId();
-    boolean transactionOpened = false;
-    if(organizationService instanceof ComponentRequestLifecycle) {
-      RequestLifeCycle.begin((ComponentRequestLifecycle)organizationService);
-      transactionOpened = true;
-    }
+    RequestLifeCycle.begin(container);
     try {
       User user = (User) state.getAttribute(USER_PROFILE);
-
       if (user == null) {
         user = userHandler.findUserByName(userId);
         state.setAttribute(USER_PROFILE, user);
       }
-
       user.setLastLoginTime(Calendar.getInstance().getTime());
       userHandler.saveUser(user, false);
     } catch (Exception e) {
       LOG.error("Error while updating the last login time for user {}", userId, e);
-    } finally {
-      if(transactionOpened) {
-        RequestLifeCycle.end();
-      }
     }
   }
 }
