@@ -301,27 +301,6 @@ public class TestOrganization extends AbstractKernelTest {
         user = uHandler.findUserByName("root");
         Assert.assertTrue(user.getLastLoginTime().after(oldLastLoginTime));
         Assert.assertTrue(user.getLastLoginTime().after(current));
-
-        assertTrue(userHandler_.isUpdateLastLoginTime());
-
-        if (organizationService instanceof PicketLinkIDMOrganizationServiceImpl) {
-            // Hack, but sufficient for now..
-            ((PicketLinkIDMOrganizationServiceImpl)organizationService).getConfiguration().setUpdateLastLoginTimeAfterAuthentication(false);
-            assertFalse(userHandler_.isUpdateLastLoginTime());
-
-            Thread.sleep(1);
-            current = new Date();
-            Thread.sleep(1);
-
-            Assert.assertTrue(uHandler.authenticate("root", "gtn"));
-            updateLoginTimeListener.onEvent(new Event<ConversationRegistry, ConversationState>("nothing", null,
-                new ConversationState(new Identity("root"))));
-
-            user = uHandler.findUserByName("root");
-            Assert.assertTrue(user.getLastLoginTime().before(current));
-            ((PicketLinkIDMOrganizationServiceImpl)organizationService).getConfiguration().setUpdateLastLoginTimeAfterAuthentication(true);
-            assertTrue(userHandler_.isUpdateLastLoginTime());
-        }
     }
 
     public void testDisplayName() throws Exception {

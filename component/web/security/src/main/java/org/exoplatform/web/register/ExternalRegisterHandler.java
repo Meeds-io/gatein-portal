@@ -55,9 +55,7 @@ import org.exoplatform.portal.resource.SkinService;
 import org.exoplatform.portal.rest.UserFieldValidator;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.Membership;
-import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.Query;
 import org.exoplatform.services.organization.User;
@@ -124,6 +122,8 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
   public static final String             LOGIN                               = "/login";
 
   public static final String             USERS_GROUP                         = "/platform/users";
+
+  public static final String             EXTERNAL_USERS_GROUP                = "/platform/externals";
 
   public static final String             CAPTCHA_PARAM                       = "captcha";
 
@@ -390,31 +390,39 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
                                                             .findMembershipsByUserAndGroup(login, ADMINISTRATORS_GROUP);
 
     boolean isAdministrator = CollectionUtils.isNotEmpty(memberships);
-    if (!isAdministrator || securitySettingService.isRegistrationExternalUser()) {
+    if (!isAdministrator && securitySettingService.isRegistrationExternalUser()) {
       // Avoid incoherence by indicating an admin user As external
       deleteFromInternalUsersGroup(login);
-    }
-
-    MembershipType memberMembershipType = organizationService.getMembershipTypeHandler().findMembershipType(MEMBER);
-    for (String groupId : securitySettingService.getRegistrationGroupIds()) {
-      Group group = organizationService.getGroupHandler().findGroupById(groupId);
-      if (group == null) {
-        LOG.warn("Group with id {} wasn't found, the newly registered user will not be added into it", groupId);
-      } else if (organizationService.getMembershipHandler().findMembershipByUserGroupAndType(login, groupId, MEMBER) == null) {
-        organizationService.getMembershipHandler().linkMembership(user, group, memberMembershipType, true);
-      }
+      addToExternalUsersGroup(login);
     }
     return login;
   }
 
   private void deleteFromInternalUsersGroup(String username) throws Exception {
     Collection<Membership> usersMemberhips = organizationService.getMembershipHandler()
-                                                                .findMembershipsByUserAndGroup(username, USERS_GROUP);
+        .findMembershipsByUserAndGroup(username, USERS_GROUP);
     if (CollectionUtils.isNotEmpty(usersMemberhips)) {
       for (Membership usersMemberhip : usersMemberhips) {
         organizationService.getMembershipHandler().removeMembership(usersMemberhip.getId(), true);
       }
     }
+  }
+
+  private void addToExternalUsersGroup(String username) throws Exception {
+    Collection<Membership> externalsUsersMemberhips = organizationService.getMembershipHandler()
+                                                                         .findMembershipsByUserAndGroup(username,
+                                                                                                        EXTERNAL_USERS_GROUP);
+    if (CollectionUtils.isNotEmpty(externalsUsersMemberhips)) {
+      for (Membership usersMemberhip : externalsUsersMemberhips) {
+        organizationService.getMembershipHandler().removeMembership(usersMemberhip.getId(), true);
+      }
+    }
+    
+    organizationService.getMembershipHandler()
+                       .linkMembership(organizationService.getUserHandler().findUserByName(username),
+                                       organizationService.getGroupHandler().findGroupById(EXTERNAL_USERS_GROUP),
+                                       organizationService.getMembershipTypeHandler().findMembershipType(MEMBER),
+                                       true);
   }
 
   private StringBuilder getBaseUrl(HttpServletRequest request) {

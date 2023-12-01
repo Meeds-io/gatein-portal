@@ -19,11 +19,11 @@
 
 package io.meeds.portal.security.service;
 
-import static io.meeds.portal.security.service.SecuritySettingService.*;
+import static io.meeds.portal.security.service.SecuritySettingService.ACCESS_TYPE_MODIFIED;
+import static io.meeds.portal.security.service.SecuritySettingService.DEFAULT_REGISTRATION_EXTERNAL_USER;
 import static io.meeds.portal.security.service.SecuritySettingService.DEFAULT_REGISTRATION_TYPE;
-import static io.meeds.portal.security.service.SecuritySettingService.EXTERNAL_USERS_GROUP;
+import static io.meeds.portal.security.service.SecuritySettingService.EXTERNAL_USER_REG_MODIFIED;
 import static io.meeds.portal.security.service.SecuritySettingService.EXTRA_GROUPS_SEPARATOR;
-import static io.meeds.portal.security.service.SecuritySettingService.INTERNAL_USERS_GROUP;
 import static io.meeds.portal.security.service.SecuritySettingService.REGISTRATION_EXTERNAL_USER_PARAM;
 import static io.meeds.portal.security.service.SecuritySettingService.REGISTRATION_EXTRA_GROUPS_PARAM;
 import static io.meeds.portal.security.service.SecuritySettingService.REGISTRATION_TYPE_PARAM;
@@ -42,8 +42,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
-
 import org.apache.commons.codec.binary.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +58,7 @@ import io.meeds.portal.security.model.RegistrationSetting;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class SettingSecurityServieTest {
+public class SecuritySettingServiceTest {
 
   @Mock
   private SettingService         settingService;
@@ -101,32 +99,6 @@ public class SettingSecurityServieTest {
                             REGISTRATION_EXTERNAL_USER_PARAM)).thenReturn((SettingValue) SettingValue.create(true));
     securitySettingService.saveRegistrationSetting(new RegistrationSetting());
     verify(settingService, times(3)).set(eq(SECURITY_CONTEXT), eq(SECURITY_SCOPE), anyString(), any());
-  }
-
-  @Test
-  public void testGetRegistrationGroupIds() {
-    String[] registrationGroupIds = securitySettingService.getRegistrationGroupIds();
-    assertNotNull(registrationGroupIds);
-    assertEquals(1, registrationGroupIds.length);
-    assertEquals(INTERNAL_USERS_GROUP, registrationGroupIds[0]);
-
-    when(settingService.get(SECURITY_CONTEXT,
-                            SECURITY_SCOPE,
-                            REGISTRATION_EXTERNAL_USER_PARAM)).thenReturn((SettingValue) SettingValue.create(true));
-
-    registrationGroupIds = securitySettingService.getRegistrationGroupIds();
-    assertNotNull(registrationGroupIds);
-    assertEquals(1, registrationGroupIds.length);
-    assertEquals(EXTERNAL_USERS_GROUP, registrationGroupIds[0]);
-
-    when(settingService.get(SECURITY_CONTEXT,
-                            SECURITY_SCOPE,
-                            REGISTRATION_EXTERNAL_USER_PARAM)).thenReturn((SettingValue) SettingValue.create(false));
-
-    registrationGroupIds = securitySettingService.getRegistrationGroupIds();
-    assertNotNull(registrationGroupIds);
-    assertEquals(1, registrationGroupIds.length);
-    assertEquals(INTERNAL_USERS_GROUP, registrationGroupIds[0]);
   }
 
   @Test
@@ -220,36 +192,32 @@ public class SettingSecurityServieTest {
   }
 
   @Test
-  public void testGetRegistrationExtraGroupIds() {
-    assertEquals(Arrays.asList(INTERNAL_USERS_GROUP), Arrays.asList(securitySettingService.getRegistrationGroupIds()));
+  public void testGetRegistrationGroupIds() {
+    assertEquals(0, securitySettingService.getRegistrationGroupIds().length);
 
     when(settingService.get(SECURITY_CONTEXT,
                             SECURITY_SCOPE,
                             REGISTRATION_EXTRA_GROUPS_PARAM)).thenReturn((SettingValue) SettingValue.create(""));
-    String[] registrationGroupIds = securitySettingService.getRegistrationGroupIds();
-    assertNotNull(registrationGroupIds);
-    assertEquals(1, registrationGroupIds.length);
-    assertEquals(INTERNAL_USERS_GROUP, registrationGroupIds[0]);
+    assertEquals(0, securitySettingService.getRegistrationGroupIds().length);
 
     when(settingService.get(SECURITY_CONTEXT,
                             SECURITY_SCOPE,
                             REGISTRATION_EXTRA_GROUPS_PARAM)).thenReturn((SettingValue) SettingValue.create("group1,group2"));
-    registrationGroupIds = securitySettingService.getRegistrationGroupIds();
+    String[] registrationGroupIds = securitySettingService.getRegistrationGroupIds();
     assertNotNull(registrationGroupIds);
-    assertEquals(3, registrationGroupIds.length);
+    assertEquals(2, registrationGroupIds.length);
     assertEquals("group1", registrationGroupIds[0]);
     assertEquals("group2", registrationGroupIds[1]);
-    assertEquals(INTERNAL_USERS_GROUP, registrationGroupIds[2]);
   }
 
   @Test
-  public void testSaveRegistrationExtraGroupIds() {
-    securitySettingService.saveRegistrationExtraGroupIds(new String[0]);
+  public void testSaveRegistrationGroupIds() {
+    securitySettingService.saveRegistrationGroupIds(new String[0]);
     verify(settingService, times(1)).set(eq(SECURITY_CONTEXT),
                                          eq(SECURITY_SCOPE),
                                          eq(REGISTRATION_EXTRA_GROUPS_PARAM),
                                          argThat(args -> StringUtils.equals(args.getValue().toString(), "")));
-    securitySettingService.saveRegistrationExtraGroupIds(new String[] { "/group1", "/group2" });
+    securitySettingService.saveRegistrationGroupIds(new String[] { "/group1", "/group2" });
     verify(settingService, times(1)).set(eq(SECURITY_CONTEXT),
                                          eq(SECURITY_SCOPE),
                                          eq(REGISTRATION_EXTRA_GROUPS_PARAM),
