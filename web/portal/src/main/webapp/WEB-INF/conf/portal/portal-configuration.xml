@@ -96,109 +96,6 @@
   </component>
 
   <component>
-    <key>org.exoplatform.portal.config.UserPortalConfigService</key>
-    <type>org.exoplatform.portal.config.UserPortalConfigService</type>
-    <component-plugins>
-      <component-plugin>
-        <name>new.portal.config.user.listener</name>
-        <set-method>initListener</set-method>
-        <type>org.exoplatform.portal.config.NewPortalConfigListener</type>
-        <description>this listener init the portal configuration</description>
-        <init-params>
-          <value-param>
-            <name>page.templates.location</name>
-            <description>the path to the location that contains Page templates</description>
-            <value>war:/conf/portal/template/pages</value>
-          </value-param>
-          <value-param>
-            <name>override</name>
-            <description>The flag parameter to decide if portal metadata is overriden on restarting server</description>
-            <value>false</value>
-          </value-param>
-          <value-param>
-            <name>default.portal.template</name>
-            <description>Default template to use when creating a site</description>
-            <value>basic</value>
-          </value-param>
-          <value-param>
-            <name>global.portal</name>
-            <description>Global site name that defines generic pages</description>
-            <value>${exo.portal.global.siteName:global}</value>
-          </value-param>
-          <object-param>
-            <name>site.templates.location</name>
-            <description>description</description>
-            <object type="org.exoplatform.portal.config.SiteConfigTemplates">
-              <field name="location">
-                <string>war:/conf/portal</string>
-              </field>
-              <field name="portalTemplates">
-                <collection type="java.util.HashSet">
-                  <value>
-                    <string>basic</string>
-                  </value>
-                </collection>
-              </field>
-              <field name="groupTemplates">
-                <collection type="java.util.HashSet">
-                  <value>
-                    <string>${exo.portal.default.groupSite.template:group}</string>
-                  </value>
-                </collection>
-              </field>
-              <field name="userTemplates">
-                <collection type="java.util.HashSet">
-                  <value>
-                    <string>${exo.portal.default.userSite.template:user}</string>
-                  </value>
-                </collection>
-              </field>
-            </object>
-          </object-param>
-          <object-param>
-            <name>user.configuration</name>
-            <description>description</description>
-            <object type="org.exoplatform.portal.config.NewPortalConfig">
-              <field name="predefinedOwner">
-                <collection type="java.util.HashSet">
-                </collection>
-              </field>
-              <field name="ownerType">
-                <string>user</string>
-              </field>
-              <field name="templateLocation">
-                <string>war:/conf/portal</string>
-              </field>
-            </object>
-          </object-param>
-        </init-params>
-      </component-plugin>
-    </component-plugins>
-    <init-params>
-      <value-param>
-        <name>create.user.portal</name>
-        <value>${gatein.portal.idm.createuserportal:false}</value>
-      </value-param>
-      <value-param>
-        <name>destroy.user.portal</name>
-        <value>${gatein.portal.idm.destroyserportal}</value>
-      </value-param>
-      <value-param>
-        <name>default.import.mode</name>
-        <value>${exo.portal.default.importMode:merge}</value>
-      </value-param>
-      <value-param>
-        <name>default.groupSite.template</name>
-        <value>${exo.portal.default.groupSite.template:}</value>
-      </value-param>
-      <value-param>
-        <name>default.userSite.template</name>
-        <value>${exo.portal.default.userSite.template:}</value>
-      </value-param>
-    </init-params>
-  </component>
-
-  <component>
     <type>org.exoplatform.settings.rest.SettingResource</type>
   </component>
 
@@ -346,7 +243,7 @@
     <component-plugin>
       <name>org.exoplatform.portal.config.DataStorage.portalConfigUpdated</name>
       <set-method>addListener</set-method>
-      <type>org.exoplatform.portal.config.DefaultPortalConfigUpdateListener</type>
+      <type>org.exoplatform.portal.config.MetaPortalConfigUpdateListener</type>
     </component-plugin>
 
     <component-plugin>
