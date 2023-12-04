@@ -90,12 +90,12 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
     private String pageTemplatesLocation_;
 
     /** . */
-    private String defaultPortal;
+    private String metaPortal;
 
     /**
-     * If true the default portal name has been explicitly set. If false the name has not been set and we are using the default.
+     * If true the meta portal name has been explicitly set. If false the name has not been set and we are using the default.
      */
-    private boolean defaultPortalSpecified = false;
+    private boolean metaPortalSpecified = false;
 
     /** . */
     private String defaultPortalTemplate;
@@ -148,15 +148,18 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         if (valueParam != null)
             pageTemplatesLocation_ = valueParam.getValue();
 
-        valueParam = params.getValueParam("default.portal");
+        valueParam = params.getValueParam("meta.portal");
         if (valueParam != null) {
-            defaultPortal = valueParam.getValue();
+            metaPortal = valueParam.getValue();
+        } else {
+          valueParam = params.getValueParam("default.portal");
+          if (valueParam != null) {
+            metaPortal = valueParam.getValue();
+          }
         }
 
-        if (defaultPortal == null || defaultPortal.trim().length() == 0) {
-            defaultPortal = "classic";
-        } else {
-            defaultPortalSpecified = true;
+        if (StringUtils.isNotBlank(metaPortal)) {
+            metaPortalSpecified = true;
         }
 
         // I guess we'll use the term 'portal' to mean site as to be consistent with defaultPortal
@@ -207,7 +210,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
             if (st != null) {
                 perform = (Status.WANT_REIMPORT == st);
             } else {
-                if (layoutService.getPortalConfig(defaultPortal) != null) {
+                if (layoutService.getPortalConfig(metaPortal) != null) {
                     perform = false;
                     layoutService.saveImportStatus(Status.DONE);
                 } else {
@@ -297,12 +300,21 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         touchImport();
     }
 
-    String getDefaultPortal() {
-        return defaultPortal;
-    }
-
     String getDefaultPortalTemplate() {
         return defaultPortalTemplate;
+    }
+
+    /**
+     * @return configured default portal
+     * @deprecated notion of 'default' portal doesn't exist anymore
+     */
+    @Deprecated(forRemoval = true, since = "1.5.0")
+    String getDefaultPortal() {
+      return getMetaPortal();
+    }
+
+    String getMetaPortal() {
+      return metaPortal;
     }
 
     /**
@@ -332,8 +344,8 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         // if other didn't actually set anything for the default portal name
         // then we should continue to use the current value. This way if an extension
         // doesn't set it, it wont override the parent's set value.
-        if (other.defaultPortalSpecified) {
-            this.defaultPortal = other.defaultPortal;
+        if (other.metaPortalSpecified) {
+            this.metaPortal = other.metaPortal;
         }
 
         if (other.defaultPortalTemplate != null && other.defaultPortalTemplate.length() > 0) {
@@ -452,7 +464,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
 
         PortalConfig pConfig = null;
 
-        if (config.isUseDefaultPortalLayout()) {
+        if (config.isUseMetaPortalLayout()) {
           // If PortalConfig already exists, no need to erase the data with empty
           // and predefined data
           PortalConfig persistedPortalConfig = layoutService.getPortalConfig(type, fixedOwnerName);
@@ -461,7 +473,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
           }
 
           // PortalConfig doesn't exists in storage => force to use default layout
-          pConfig = getDefaultPortalConfig(type, fixedOwnerName);
+          pConfig = buildEmptyPortalConfig(type, fixedOwnerName);
         } else {
           // If nor template location neither template name, we will use default PortalLayout created by constructor
           if (StringUtils.isNotBlank(config.getTemplateName()) || StringUtils.isNotBlank(config.getTemplateLocation())) {
@@ -479,7 +491,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
               return true;
             } else {
               // PortalConfig doesn't exists in storage => use default layout
-              pConfig = getDefaultPortalConfig(type, fixedOwnerName);
+              pConfig = buildEmptyPortalConfig(type, fixedOwnerName);
             }
           }
         }
@@ -624,7 +636,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
                                                List<String> relativePaths) {
       String xml = relativePaths.stream()
                                 .sequential()
-                                .map(filePath -> getDefaultConfig(parentLocation, filePath))
+                                .map(filePath -> getConfig(parentLocation, filePath))
                                 .filter(Objects::nonNull)
                                 .findFirst()
                                 .orElse(null);
@@ -651,7 +663,7 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
       return path;
     }
 
-    private String getDefaultConfig(String location, String path) {
+    private String getConfig(String location, String path) {
         String s = location + path;
         String content = null;
         try {
@@ -757,9 +769,9 @@ public class NewPortalConfigListener extends BaseComponentPlugin {
         return obj;
     }
 
-    private PortalConfig getDefaultPortalConfig(String type, String ownerName) throws Exception {
+    private PortalConfig buildEmptyPortalConfig(String type, String ownerName) throws Exception {
       PortalConfig pConfig = new PortalConfig(type, ownerName);
-      pConfig.useDefaultPortalLayout();
+      pConfig.useMetaPortalLayout();
       checkPortalConfigGroupProperties(pConfig);
       return pConfig;
     }

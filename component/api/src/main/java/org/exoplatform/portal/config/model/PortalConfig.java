@@ -440,8 +440,16 @@ public class PortalConfig extends ModelObject implements Cloneable {
         }
     }
 
-    public void useDefaultPortalLayout() {
+    public void useMetaPortalLayout() {
       this.setPortalLayout(initDefaultLayout());
       this.setDefaultLayout(true);
+    }
+
+    /**
+     * @deprecated the 'default' portal notion doesn't exist anymore
+     */
+    @Deprecated(forRemoval = true, since = "1.5.0")
+    public void useDefaultPortalLayout() {
+      this.useMetaPortalLayout();
     }
 }

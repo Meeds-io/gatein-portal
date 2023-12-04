@@ -113,7 +113,7 @@ public class DynamicPortalLayoutMatcherPlugin extends BaseComponentPlugin {
         if (portalLayout == null) {
           LOG.warn("Last displayed PORTAL site with name '{}' have a NULL layout. An empty layout will be used instead.",
                    lastPortalSiteName);
-          sitePortalConfig.useDefaultPortalLayout();
+          sitePortalConfig.useMetaPortalLayout();
         } else {
           Container portalContainer = portalLayout.clone();
           portalContainer.resetStorage();
