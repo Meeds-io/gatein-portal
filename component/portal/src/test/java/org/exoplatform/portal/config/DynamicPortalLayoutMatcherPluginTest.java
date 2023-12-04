@@ -150,7 +150,7 @@ public class DynamicPortalLayoutMatcherPluginTest {
     assertNull(result);
 
     PortalConfig userPortalConfig = new PortalConfig(SiteType.USER.getName(), USER_SITE_NAME);
-    userPortalConfig.useDefaultPortalLayout();
+    userPortalConfig.useMetaPortalLayout();
     userPortalConfig.setDefaultLayout(false);
     result = dynamicPortalLayoutMatcherPlugin.getPortalConfigWithDynamicLayout(SiteKey.user(USER_SITE_NAME),
                                                                                userPortalConfig,

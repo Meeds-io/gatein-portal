@@ -51,7 +51,7 @@ public class PortalURLContext implements URLContext {
 
     private static volatile String  globalSite;
 
-    private static volatile String  defaultSite;
+    private static volatile String  metaSite;
 
     /** . */
     private final ControllerContext controllerContext;
@@ -223,7 +223,7 @@ public class PortalURLContext implements URLContext {
 
     public static String getSiteName(String siteName) {
       if (StringUtils.equals(siteName, getGlobalSite())) {
-        return getDefaultSite();
+        return getMetaSite();
       }
       return siteName;
     }
@@ -238,13 +238,13 @@ public class PortalURLContext implements URLContext {
       return globalSite;
     }
 
-    public static String getDefaultSite() {
-      if (defaultSite == null) {
+    public static String getMetaSite() {
+      if (metaSite == null) {
         UserPortalConfigService portalConfigService = ExoContainerContext.getService(UserPortalConfigService.class);
         if (portalConfigService != null) {
-          defaultSite = portalConfigService.getDefaultPortal();
+          metaSite = portalConfigService.getMetaPortal();
         }
       }
-      return defaultSite;
+      return metaSite;
     }
 }

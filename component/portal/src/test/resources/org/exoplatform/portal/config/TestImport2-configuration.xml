@@ -31,7 +31,7 @@
       <priority>2</priority>
       <init-params>
         <value-param>
-          <name>default.portal</name>
+          <name>meta.portal</name>
           <value>classic</value>
         </value-param>
         <value-param>

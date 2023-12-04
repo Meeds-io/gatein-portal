@@ -101,7 +101,7 @@ public class NavigationRest implements ResourceContainer {
                                     @QueryParam("limit")
                                     int limit) {
     HttpUserPortalContext userPortalContext = new HttpUserPortalContext(request);
-    String portalName = portalConfigService.getDefaultPortal();
+    String portalName = portalConfigService.getMetaPortal();
 
     ConversationState state = ConversationState.getCurrent();
     Identity userIdentity = state == null ? null : state.getIdentity();
@@ -250,7 +250,7 @@ public class NavigationRest implements ResourceContainer {
 
     String portalName = siteName;
     if (siteType != SiteType.PORTAL || StringUtils.isBlank(siteName)) {
-      portalName = portalConfigService.getDefaultPortal();
+      portalName = portalConfigService.getMetaPortal();
     }
 
     try {

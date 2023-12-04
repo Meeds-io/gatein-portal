@@ -184,7 +184,7 @@ public class PortalDataMapper {
           // Use default portal layout when the UI doesn't define one
           // The default portal layout will add just the PageBody component
           // which is mandatory to display page content inside PortalLayout
-          model.useDefaultPortalLayout();
+          model.useMetaPortalLayout();
           return model;
         }
         ArrayList<ModelObject> newChildren = new ArrayList<>();
@@ -317,7 +317,7 @@ public class PortalDataMapper {
         uiPortal.setRedirects(model.getPortalRedirects());
         uiPortal.setUseDynamicLayout(model.isDefaultLayout());
         UserPortalConfigService userPortalConfigService = uiPortal.getApplicationComponent(UserPortalConfigService.class);
-        PortalConfig metaSite = userPortalConfigService.getDefaultPortalConfig();
+        PortalConfig metaSite = userPortalConfigService.getMetaPortalConfig();
 
         Container layout = model.isDisplayed() ? metaSite.getPortalLayout() : model.getPortalLayout();
         
