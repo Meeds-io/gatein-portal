@@ -57,12 +57,15 @@
   }
   def title = rcontext.getTitle();
 
-  if (portal.getSiteKey().getType() == org.exoplatform.portal.mop.SiteType.PORTAL && portal.getSiteKey().getName().equals("public")) {
+  if (portal.getSiteKey().getType() == org.exoplatform.portal.mop.SiteType.PORTAL) {
     ResourceBundleService resourceBundleService = uicomponent.getApplicationComponent(ResourceBundleService.class);
     ResourceBundle bundle = resourceBundleService.getResourceBundle("locale.portlet.Portlets", rcontext.getLocale());
-
     BrandingService brandingService = uicomponent.getApplicationComponent(BrandingService.class);
-    title = brandingService.getCompanyName() + " - " + bundle.getString("publicSite.title.suffix");
+    if (portal.getSiteKey().getName().equals("public")) {
+      title = brandingService.getCompanyName() + " - " + bundle.getString("publicSite.title.suffix");
+    } else if (portal.getSiteKey().getName().equals("administration")) {
+      title = title + " - " + brandingService.getCompanyName();
+    }
   }
 
   def metaInformation = rcontext.getMetaInformation();
