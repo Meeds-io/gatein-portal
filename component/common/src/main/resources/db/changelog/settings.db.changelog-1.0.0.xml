@@ -124,4 +124,10 @@
     <createSequence sequenceName="SEQ_STG_SCOPE_COMMON_ID" startValue="1"/>
   </changeSet>
 
+  <changeSet author="settings" id="1.0.0-14" dbms="mysql">
+    <sql>
+      ALTER TABLE STG_SETTINGS MODIFY COLUMN VALUE longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
 </databaseChangeLog>
