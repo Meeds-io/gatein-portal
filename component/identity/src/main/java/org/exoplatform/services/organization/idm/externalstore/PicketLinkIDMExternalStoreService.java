@@ -55,6 +55,7 @@ public class PicketLinkIDMExternalStoreService implements IDMExternalStoreServic
   private ExoFallbackIdentityStoreRepository                     fallbackStoreRepository       = null;
 
   private boolean                                                updateInformationOnLogin      = true;
+  private boolean                                                authorizeLogin      = true;
 
   private Set<IDMEntityType<?>>                                  entityTypes                   = Collections.emptySet();
 
@@ -97,6 +98,9 @@ public class PicketLinkIDMExternalStoreService implements IDMExternalStoreServic
     if (params != null) {
       if (params.containsKey(UPDATE_USER_ON_LOGIN_PARAM)) {
         updateInformationOnLogin = Boolean.parseBoolean(params.getValueParam(UPDATE_USER_ON_LOGIN_PARAM).getValue());
+      }
+      if (params.containsKey(AUTHORIZE_LOGIN_PARAM)) {
+        authorizeLogin = Boolean.parseBoolean(params.getValueParam(AUTHORIZE_LOGIN_PARAM).getValue());
       }
     }
   }
@@ -151,6 +155,9 @@ public class PicketLinkIDMExternalStoreService implements IDMExternalStoreServic
   @Override
   public boolean authenticate(String username, String password) throws Exception {
     checkEnabled();
+    if (!authorizeLogin) {
+      throw new IllegalStateException("LDAP Store does not authorize login");
+    }
 
     checkManagedType(IDMEntityType.USER);
 
