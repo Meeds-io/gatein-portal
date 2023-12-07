@@ -40,7 +40,7 @@ public class PicketLinkIDMExternalStoreService implements IDMExternalStoreServic
   public static final Log                                        LOG                           =
                                                                      ExoLogger.getLogger(PicketLinkIDMExternalStoreService.class);
 
-  public static final  IDMEntityType<org.picketlink.idm.api.User> IDMUSER                       =
+  public static final IDMEntityType<org.picketlink.idm.api.User> IDMUSER                       =
                                                                          new IDMEntityType<>("Picket Link IDM User",
                                                                                              org.picketlink.idm.api.User.class);
 
