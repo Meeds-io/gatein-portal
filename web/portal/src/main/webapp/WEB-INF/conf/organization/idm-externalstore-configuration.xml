@@ -38,11 +38,6 @@
         <description>Cron expression used to schedule the job that will import periodically data from external store</description>
         <value>${exo.idm.externalStore.import.cronExpression:0 59 23 ? * *}</value>
       </value-param>
-			<value-param>
-				<name>exo.idm.externalStore.authorizelogin</name>
-				<description>Does the authentication against the externalStore is authorized ?</description>
-				<value>${exo.idm.externalStore.authorizelogin:true}</value>
-			</value-param>
     </init-params>
   </component>
 
