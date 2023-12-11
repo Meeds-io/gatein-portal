@@ -150,6 +150,8 @@ public class UserNodeRestEntity {
     int result = 17;
     result = 31 * result + (int) getUpdatedDate();
     result = 31 * result + (subNodes != null ? Objects.hash(subNodes) : 0);
+    result = 31 * result + (pageAccessPermissions != null ? Objects.hash(pageAccessPermissions) : 0);
+    result = 31 * result + (pageEditPermission != null ? pageEditPermission.hashCode() : 0);
     return result;
   }
 }
