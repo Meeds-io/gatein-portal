@@ -26,6 +26,7 @@
       <pattern>%date{ISO8601} | %highlight(%-5level) | %msg %green([%logger{40}){}%cyan(&lt;%thread&gt;){}%green(]){} %n%xEx</pattern>
     </encoder>
   </appender>
+  <logger name="org.hibernate.engine.jdbc.spi.SqlExceptionHelper" level="ERROR"/>
   <root level="INFO">
     <appender-ref ref="STDOUT" />
   </root>
