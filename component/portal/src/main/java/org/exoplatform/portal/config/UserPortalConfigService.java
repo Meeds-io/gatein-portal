@@ -594,7 +594,13 @@ public class UserPortalConfigService implements Startable {
       if (CollectionUtils.isEmpty(portalConfigList)) {
         return null;
       }
-      return computePortalSitePath(portalConfigList.get(0).getName(), context);
+      String portalPath = null;
+      int i = 0;
+      while (portalPath == null) {
+        portalPath = computePortalSitePath(portalConfigList.get(i).getName(), context);
+        i++;
+      }
+      return portalPath;
     }
 
     public Collection<UserNode> getPortalSiteNavigations(String siteName, HttpServletRequest context) throws Exception {
