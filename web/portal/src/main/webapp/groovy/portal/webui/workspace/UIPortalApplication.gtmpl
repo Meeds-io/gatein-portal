@@ -23,6 +23,7 @@
   import org.exoplatform.services.resources.ResourceBundleService;
   import org.exoplatform.portal.branding.BrandingService;
   import java.util.ResourceBundle;
+  import org.exoplatform.services.resources.LocaleConfigService;
 
   def rcontext = _ctx.getRequestContext() ;
   def session = rcontext.getRequest().getSession();
@@ -87,6 +88,11 @@
   }
   PortalConfig sitePortalConfig = rcontext.getDynamicPortalConfig();
   String siteId = sitePortalConfig.getStorageId().split("_")[1];
+
+
+  LocaleConfigService localeConfigService = uicomponent.getApplicationComponent(LocaleConfigService.class);
+  def defaultLocaleTag = localeConfigService.getDefaultLocaleConfig().getLocale().toLanguageTag();
+
 %>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="$language" lang="$language" dir="$dir">
   <head id="head">
@@ -154,6 +160,7 @@
      eXo.env.portal.containerName = "<%=PortalContainer.getInstance().getName()%>";
      eXo.env.portal.userName='<%= userName == null ? "" : userName %>';
      eXo.env.portal.language='<%= language %>';
+     eXo.env.portal.defaultLanguage='<%= defaultLocaleTag %>';
      eXo.env.portal.orientation='<%= orientation == Orientation.RT ? "rtl" : "ltr" %>';
      eXo.env.portal.selectedNodeUri = '<%= selectedNodeUri %>';
      eXo.env.portal.previousURI = '<%= previousURI %>';
