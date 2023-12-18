@@ -246,7 +246,7 @@ public class PortalRequestContext extends WebuiRequestContext {
             cacheLevel_ = cache;
         }
 
-        requestURI_ = request_.getRequestURI();
+        requestURI_ = requestPath;
         /*
          * String decodedURI = URLDecoder.decode(requestURI_, "UTF-8");
          *
@@ -267,7 +267,7 @@ public class PortalRequestContext extends WebuiRequestContext {
 
         //
         NodeURL url = createURL(NodeURL.TYPE);
-        url.setResource(new NavigationResource(siteKey, ""));
+        url.setResource(new NavigationResource(siteKey, requestPath));
         portalURI = url.toString();
 
         //
