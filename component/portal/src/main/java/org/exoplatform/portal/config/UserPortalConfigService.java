@@ -63,16 +63,7 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.OrganizationService;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * Created by The eXo Platform SAS Apr 19, 2007 This service is used to load the PortalConfig, Page config and Navigation config
@@ -581,7 +572,7 @@ public class UserPortalConfigService implements Startable {
       if (portalConfig == null) {
         return null;
       }
-      Collection<UserNode> userNodes = getPortalSiteNavigations(portalName, context);
+      Collection<UserNode> userNodes = getPortalSiteNavigations(portalName, SiteType.PORTAL.getName(), context);
       UserNode userNode = getFirstAllowedPageNode(userNodes);
       if (userNode == null) {
         return null;
@@ -603,11 +594,11 @@ public class UserPortalConfigService implements Startable {
       return portalPath;
     }
 
-    public Collection<UserNode> getPortalSiteNavigations(String siteName, HttpServletRequest context) throws Exception {
+    public Collection<UserNode> getPortalSiteNavigations(String siteName, String portalType, HttpServletRequest context) throws Exception {
       HttpUserPortalContext userPortalContext = new HttpUserPortalContext(context);
       UserPortalConfig userPortalConfig = getUserPortalConfig(siteName, context.getRemoteUser(), userPortalContext);
       UserPortal userPortal = userPortalConfig.getUserPortal();
-      UserNavigation navigation = userPortal.getNavigation(new SiteKey(SiteType.PORTAL, siteName));
+      UserNavigation navigation = userPortal.getNavigation(new SiteKey(SiteType.valueOf(portalType.toUpperCase()), siteName));
       UserNodeFilterConfig builder = UserNodeFilterConfig.builder()
                                                          .withReadWriteCheck()
                                                          .withVisibility(Visibility.DISPLAYED, Visibility.TEMPORAL)
@@ -615,6 +606,22 @@ public class UserPortalConfigService implements Startable {
                                                          .build();
       UserNode rootNode = userPortal.getNode(navigation, org.exoplatform.portal.mop.navigation.Scope.ALL, builder, null);
       return rootNode != null ? rootNode.getChildren() : Collections.emptyList();
+    }
+
+    public UserNode getPortalSiteRootNode(String siteName,String siteType, HttpServletRequest context) throws Exception {
+      HttpUserPortalContext userPortalContext = new HttpUserPortalContext(context);
+      UserPortalConfig userPortalConfig = getUserPortalConfig(siteName, context.getRemoteUser(), userPortalContext);
+      if (userPortalConfig == null) {
+        return null;
+      }
+      UserPortal userPortal = userPortalConfig.getUserPortal();
+      UserNavigation navigation = userPortal.getNavigation(new SiteKey(SiteType.valueOf(siteType.toUpperCase()), siteName));
+      UserNodeFilterConfig builder = UserNodeFilterConfig.builder()
+                                                         .withReadWriteCheck()
+                                                         .withVisibility(Visibility.DISPLAYED, Visibility.TEMPORAL)
+                                                         .withTemporalCheck()
+                                                         .build();
+      return userPortal.getNode(navigation, org.exoplatform.portal.mop.navigation.Scope.ALL, builder, null);
     }
 
     public UserNode getFirstAllowedPageNode(Collection<UserNode> userNodes) {
@@ -631,6 +638,29 @@ public class UserPortalConfigService implements Startable {
         }
       }
       return userNode;
+    }
+
+    public String getFirstAllowedPageNode(String portalName, String portalType, String nodePath, HttpServletRequest context) throws Exception {
+      UserNode targetUserNode = getPortalSiteRootNode(portalName, portalType, context);
+      if (targetUserNode == null) {
+        return nodePath;
+      }
+      String[] pathNodesNames = nodePath.split("/");
+      Iterator<String> iterator = Arrays.stream(pathNodesNames).iterator();
+      while (iterator.hasNext()) {
+        targetUserNode = targetUserNode.getChild(iterator.next());
+      }
+      String newPath = null;
+      while (newPath == null) {
+        if (targetUserNode.getPageRef() != null) {
+          newPath = targetUserNode.getURI();
+        } else if (!targetUserNode.getChildren().isEmpty()) {
+          targetUserNode = getFirstAllowedPageNode(targetUserNode.getChildren());
+        } else {
+          targetUserNode = targetUserNode.getParent();
+        }
+      }
+      return newPath;
     }
 
     /**

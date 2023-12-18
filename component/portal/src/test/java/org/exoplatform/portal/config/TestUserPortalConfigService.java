@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.exoplatform.portal.mop.SiteFilter;
+import org.exoplatform.services.test.mock.MockHttpServletRequest;
 import org.gatein.common.util.Tools;
 
 import org.exoplatform.component.test.ConfigurationUnit;
@@ -67,6 +68,8 @@ import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.ConversationState;
 
 import junit.framework.AssertionFailedError;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -863,6 +866,28 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
     }.execute(null);
   }
 
+  public void testGetPortalSiteRootNodeAndFirstAllowedPageNode(){
+    new UnitTest() {
+      public void execute() throws Exception {
+        String siteName = "classic";
+        HttpServletRequest httpRequest = new MockHttpServletRequest("/portal/classic", null, 0, "GET", null);
+        UserNode rootNode = userPortalConfigSer_.getPortalSiteRootNode(siteName, SiteType.PORTAL.getName(), httpRequest);
+        assertNotNull(rootNode);
+      }
+    }.execute(null);
+
+  }
+  public void testGetFirstAllowedPageNode(){
+    new UnitTest() {
+      public void execute() throws Exception {
+        String siteName = "classic";
+        HttpServletRequest httpRequest = new MockHttpServletRequest("/portal/classic", null, 0, null, null);
+        String path = userPortalConfigSer_.getFirstAllowedPageNode(siteName, SiteType.PORTAL.getName(), "home", httpRequest);
+        assertNotNull(path);
+      }
+    }.execute(null);
+
+  }
   private abstract class UnitTest {
 
     /** . */
