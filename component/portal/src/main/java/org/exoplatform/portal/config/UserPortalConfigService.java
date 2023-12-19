@@ -596,6 +596,9 @@ public class UserPortalConfigService implements Startable {
     public Collection<UserNode> getPortalSiteNavigations(String siteName, String portalType, HttpServletRequest context) throws Exception {
       HttpUserPortalContext userPortalContext = new HttpUserPortalContext(context);
       UserPortalConfig userPortalConfig = getUserPortalConfig(siteName, context.getRemoteUser(), userPortalContext);
+      if (userPortalConfig == null) {
+        return Collections.emptyList();
+      }
       UserPortal userPortal = userPortalConfig.getUserPortal();
       UserNavigation navigation = userPortal.getNavigation(new SiteKey(SiteType.valueOf(portalType.toUpperCase()), siteName));
       UserNodeFilterConfig builder = UserNodeFilterConfig.builder()
