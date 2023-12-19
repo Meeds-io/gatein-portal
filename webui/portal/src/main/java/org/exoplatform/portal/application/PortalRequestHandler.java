@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ServiceLoader;
 
+
+
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +35,7 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.*;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.PortalProperties;
+import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.web.ControllerContext;
@@ -150,12 +153,12 @@ public class PortalRequestHandler extends WebRequestHandler {
             res.sendRedirect(req.getContextPath());
             return true;
         }
-
+        UserPortalConfigService portalConfigService = (UserPortalConfigService) PortalContainer.getComponent(UserPortalConfigService.class);
+        requestPath = computeRequestPath(requestPath, requestSiteName, requestSiteType, portalConfigService, req);
         PortalApplication app = controllerContext.getController().getApplication(PortalApplication.PORTAL_APPLICATION_ID);
         PortalRequestContext context = new PortalRequestContext(app, controllerContext, requestSiteType, requestSiteName,
                 requestPath, requestLocale);
 
-        UserPortalConfigService portalConfigService = (UserPortalConfigService) PortalContainer.getComponent(UserPortalConfigService.class);
         PortalConfig persistentPortalConfig = context.getDynamicPortalConfig();
 
         if (context.getUserPortalConfig() == null) {
@@ -296,6 +299,19 @@ public class PortalRequestHandler extends WebRequestHandler {
         }
     }
 
+    private String computeRequestPath(String path,
+                                      String portalName,
+                                      String requestSiteType,
+                                      UserPortalConfigService portalConfigService,
+                                      HttpServletRequest context) throws Exception {
+      if (path.isBlank()) {
+          if (SiteType.GROUP.getName().equals(requestSiteType)){
+              return path;
+          }
+        return portalConfigService.computePortalSitePath(portalName, context).substring(("/"+ requestSiteType + "/"+ portalName + "/").length());
+      }
+      return portalConfigService.getFirstAllowedPageNode(portalName, requestSiteType, path, context);
+    }
     @Override
     protected boolean getRequiresLifeCycle() {
         return true;
