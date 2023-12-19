@@ -305,10 +305,11 @@ public class PortalRequestHandler extends WebRequestHandler {
                                       UserPortalConfigService portalConfigService,
                                       HttpServletRequest context) throws Exception {
       if (path.isBlank()) {
-          if (SiteType.GROUP.getName().equals(requestSiteType)){
-              return path;
-          }
-        return portalConfigService.computePortalSitePath(portalName, context).substring(("/"+ requestSiteType + "/"+ portalName + "/").length());
+        if (SiteType.GROUP.getName().equals(requestSiteType)) {
+          return path;
+        }
+        String newPath = portalConfigService.computePortalSitePath(portalName, context);
+        return newPath == null ? path : newPath.substring(("/" + requestSiteType + "/" + portalName + "/").length());
       }
       return portalConfigService.getFirstAllowedPageNode(portalName, requestSiteType, path, context);
     }
