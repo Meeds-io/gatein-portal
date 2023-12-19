@@ -586,10 +586,9 @@ public class UserPortalConfigService implements Startable {
         return null;
       }
       String portalPath = null;
-      int i = 0;
-      while (portalPath == null) {
-        portalPath = computePortalSitePath(portalConfigList.get(i).getName(), context);
-        i++;
+      Iterator<PortalConfig> iterator = portalConfigList.stream().iterator();
+      while (portalPath == null && iterator.hasNext()) {
+        portalPath = computePortalSitePath(iterator.next().getName(), context);
       }
       return portalPath;
     }
@@ -647,8 +646,11 @@ public class UserPortalConfigService implements Startable {
       }
       String[] pathNodesNames = nodePath.split("/");
       Iterator<String> iterator = Arrays.stream(pathNodesNames).iterator();
-      while (iterator.hasNext()) {
+      while (iterator.hasNext() && targetUserNode != null) {
         targetUserNode = targetUserNode.getChild(iterator.next());
+      }
+      if (targetUserNode == null) {
+          return nodePath;
       }
       String newPath = null;
       while (newPath == null) {
