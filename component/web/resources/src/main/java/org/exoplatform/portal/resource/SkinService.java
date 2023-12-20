@@ -48,7 +48,7 @@ import org.gatein.wci.ServletContainerFactory;
 import org.gatein.wci.WebAppListener;
 import org.picocontainer.Startable;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;

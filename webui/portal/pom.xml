@@ -69,11 +69,5 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>exo.portal.component.api</artifactId>
     </dependency>
-
-    <!-- Third party library -->
-    <dependency>
-      <groupId>org.gatein.captcha</groupId>
-      <artifactId>simplecaptcha</artifactId>
-    </dependency>
   </dependencies>
 </project>

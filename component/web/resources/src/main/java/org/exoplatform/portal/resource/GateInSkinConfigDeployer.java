@@ -22,7 +22,7 @@ package org.exoplatform.portal.resource;
 import java.net.URL;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.exoplatform.commons.xml.DocumentSource;
 import org.exoplatform.container.PortalContainer;

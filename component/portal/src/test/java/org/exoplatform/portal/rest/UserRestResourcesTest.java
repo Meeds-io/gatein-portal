@@ -4,7 +4,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.exoplatform.portal.config.DefaultGroupVisibilityPlugin;

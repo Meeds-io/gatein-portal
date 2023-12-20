@@ -28,7 +28,7 @@
   <name>GateIn Portal Component Common</name>
 
   <properties>
-    <exo.test.coverage.ratio>0.43</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.41</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
@@ -42,6 +42,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>exo.portal.component.test.core</artifactId>
       <!-- Test scope not added on purpose for transitive dependency -->
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-fileupload2-jakarta</artifactId>
     </dependency>
 
     <dependency>

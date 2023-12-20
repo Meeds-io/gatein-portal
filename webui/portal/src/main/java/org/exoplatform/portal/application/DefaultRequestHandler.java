@@ -19,7 +19,9 @@
 
 package org.exoplatform.portal.application;
 
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 

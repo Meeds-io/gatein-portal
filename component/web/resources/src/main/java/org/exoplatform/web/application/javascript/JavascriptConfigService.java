@@ -19,7 +19,7 @@
 
 package org.exoplatform.web.application.javascript;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import java.io.IOException;
 import java.io.Reader;

@@ -22,11 +22,11 @@ package org.exoplatform.portal.application;
 import java.io.IOException;
 import java.util.Enumeration;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.PortalContainer;
@@ -84,7 +84,7 @@ public class PortalController extends AbstractHttpServlet {
     /**
      * Register onInit callback to PortalContainerPostCreateTask and register the servlet context with RootContainer.
      * So that portal.war don't need PortalContainerConfigOwner listener. (extension project will need this listener)
-     * @see org.exoplatform.container.web.AbstractHttpServlet#afterInit(javax.servlet.ServletConfig)
+     * @see org.exoplatform.container.web.AbstractHttpServlet#afterInit(jakarta.servlet.ServletConfig)
      */
     public void afterInit(final ServletConfig config) throws ServletException {
         final PortalContainerPostCreateTask task = new PortalContainerPostCreateTask() {

@@ -6,7 +6,7 @@ import java.net.SocketException;
 import java.nio.charset.Charset;
 import java.util.Date;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.exoplatform.commons.utils.BinaryOutput;
 import org.exoplatform.web.ControllerContext;

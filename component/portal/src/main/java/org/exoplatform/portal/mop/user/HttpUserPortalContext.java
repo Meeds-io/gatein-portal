@@ -3,7 +3,7 @@ package org.exoplatform.portal.mop.user;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.localization.LocaleContextInfoUtils;

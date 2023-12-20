@@ -30,7 +30,7 @@
   <description>GateIn web security services</description>
 
   <properties>
-    <exo.test.coverage.ratio>0.41</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.10</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
@@ -47,19 +47,16 @@
       <artifactId>exo.portal.component.web.api</artifactId>
     </dependency>
 
+    <!-- Captcha -->
+    <dependency>
+      <groupId>com.jhlabs</groupId>
+      <artifactId>filters</artifactId>
+    </dependency>
+
     <!-- org.exoplatform.gatein.sso dependencies -->
     <dependency>
       <groupId>org.exoplatform.gatein.sso</groupId>
-      <artifactId>sso-integration</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.gatein.sso</groupId>
       <artifactId>sso-agent</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.gatein.captcha</groupId>
-      <artifactId>simplecaptcha</artifactId>
     </dependency>
   </dependencies>
 

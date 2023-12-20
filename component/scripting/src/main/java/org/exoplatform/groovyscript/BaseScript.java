@@ -20,6 +20,9 @@ package org.exoplatform.groovyscript;
 
 import java.io.IOException;
 
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+
 import groovy.lang.Binding;
 import groovy.lang.Script;
 
@@ -31,45 +34,47 @@ import groovy.lang.Script;
  */
 public abstract class BaseScript extends Script {
 
-    GroovyPrinter printer;
+  protected static final Log LOG = ExoLogger.getLogger(BaseScript.class);
 
-    protected BaseScript() {
-    }
+  GroovyPrinter              printer;
 
-    protected BaseScript(Binding binding) {
-        super(binding);
-    }
+  protected BaseScript() {
+  }
 
-    @Override
-    public Object getProperty(String property) {
-        if ("out".equals(property)) {
-            return printer;
-        } else {
-            return super.getProperty(property);
-        }
-    }
+  protected BaseScript(Binding binding) {
+    super(binding);
+  }
 
-    @Override
-    public void println(Object o) {
-        printer.println(o);
+  @Override
+  public Object getProperty(String property) {
+    if ("out".equals(property)) {
+      return printer;
+    } else {
+      return super.getProperty(property);
     }
+  }
 
-    @Override
-    public void println() {
-        printer.println();
-    }
+  @Override
+  public void println(Object o) {
+    printer.println(o);
+  }
 
-    @Override
-    public void print(Object o) {
-        printer.print(o);
-    }
+  @Override
+  public void println() {
+    printer.println();
+  }
 
-    public void flush() {
-        try {
-            printer.flush();
-        } catch (IOException e) {
-            // TODO: need to check again
-            // e.printStackTrace();
-        }
+  @Override
+  public void print(Object o) {
+    printer.print(o);
+  }
+
+  public void flush() {
+    try {
+      printer.flush();
+    } catch (IOException e) {
+      LOG.warn("Error flushing content", e);
     }
+  }
+
 }

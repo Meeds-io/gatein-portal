@@ -28,7 +28,7 @@ import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.exception.CSRFException;
 
 import javax.portlet.PortletRequest;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class Event<T> {
 
