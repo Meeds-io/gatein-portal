@@ -17,7 +17,7 @@
 package org.exoplatform.web.login;
 
 import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;

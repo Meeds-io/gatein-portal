@@ -22,8 +22,6 @@ import static org.mockito.Mockito.mockStatic;
 
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
-
 import static org.mockito.Mockito.*;
 
 import org.junit.AfterClass;
@@ -42,6 +40,8 @@ import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.LocalePolicy;
 import org.exoplatform.web.application.Application;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocalizationLifecycleTest {

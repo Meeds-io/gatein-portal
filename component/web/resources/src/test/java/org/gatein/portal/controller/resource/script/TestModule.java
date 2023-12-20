@@ -29,7 +29,7 @@ import java.util.ResourceBundle;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.exoplatform.commons.utils.MapResourceBundle;
 import org.exoplatform.component.test.AbstractGateInTest;

@@ -23,7 +23,7 @@
 
 package org.exoplatform.web.security;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.gatein.wci.security.Credentials;
 

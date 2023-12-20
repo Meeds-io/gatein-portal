@@ -22,7 +22,7 @@ package org.exoplatform.web.application.javascript;
 import java.io.InputStream;
 import java.net.URL;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.exoplatform.commons.utils.Safe;
 import org.exoplatform.container.PortalContainer;

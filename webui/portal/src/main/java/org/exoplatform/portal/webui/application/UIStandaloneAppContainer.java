@@ -19,8 +19,8 @@
 
 package org.exoplatform.portal.webui.application;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.exoplatform.portal.application.StandaloneAppRequestContext;
 import org.exoplatform.web.login.LoginUtils;

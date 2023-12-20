@@ -5,7 +5,7 @@ import static org.mockito.Mockito.*;
 import java.io.ByteArrayInputStream;
 import java.util.*;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.json.JSONObject;
 import org.mockito.ArgumentCaptor;

@@ -22,10 +22,9 @@ package org.exoplatform.web.handler;
 import java.io.Writer;
 import java.net.URLEncoder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.StringUtils;
+import org.gatein.common.text.EntityEncoder;
 
-import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
@@ -35,18 +34,20 @@ import org.exoplatform.upload.UploadService.UploadLimit;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.WebRequestHandler;
-import org.gatein.common.text.EntityEncoder;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Created by The eXo Platform SARL Author : Nhu Dinh Thuan nhudinhthuan@exoplatform.com Dec 9, 2006
  */
 public class UploadHandler extends WebRequestHandler {
 
-    private final String RESTRICT_PUBLIC_PARAM = "public-access-restriction";
+    private static final String RESTRICT_PUBLIC_PARAM = "public-access-restriction";
 
-    private boolean is_restrict_public = false;
+    private boolean             isRestrictToPublic    = false;
 
-    static enum UploadServiceAction {
+    public enum UploadServiceAction {
         PROGRESS, UPLOAD, DELETE, ABORT
     }
 
@@ -54,7 +55,7 @@ public class UploadHandler extends WebRequestHandler {
         if (params != null) {
             ValueParam value = params.getValueParam(RESTRICT_PUBLIC_PARAM);
             if (value != null) {
-                is_restrict_public = Boolean.parseBoolean(value.getValue().trim());
+                isRestrictToPublic = Boolean.parseBoolean(value.getValue().trim());
             }
         }
     }
@@ -65,12 +66,12 @@ public class UploadHandler extends WebRequestHandler {
 
     @Override
     public boolean execute(ControllerContext context) throws Exception {
-        execute(context.getController(), context.getRequest(), context.getResponse());
+        execute(context.getRequest(), context.getResponse());
         return true;
     }
 
-    public void execute(WebAppController controller, HttpServletRequest req, HttpServletResponse res) throws Exception {
-        if (is_restrict_public && req.getRemoteUser() == null) {
+    public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
+        if (isRestrictToPublic && req.getRemoteUser() == null) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -80,12 +81,11 @@ public class UploadHandler extends WebRequestHandler {
 
         res.setHeader("Cache-Control", "no-cache");
 
-        ExoContainer container = ExoContainerContext.getCurrentContainer();
-        UploadService service = (UploadService) container.getComponentInstanceOfType(UploadService.class);
+        UploadService service = ExoContainerContext.getService(UploadService.class);
         if (action == null || action.length() < 1)
             return;
 
-        UploadServiceAction uploadActionService = UploadServiceAction.valueOf(action.toUpperCase());
+        UploadServiceAction uploadActionService = UploadServiceAction.valueOf(StringUtils.upperCase(action));
         if (uploadActionService == UploadServiceAction.PROGRESS) {
             Writer writer = res.getWriter();
             if (uploadIds == null)

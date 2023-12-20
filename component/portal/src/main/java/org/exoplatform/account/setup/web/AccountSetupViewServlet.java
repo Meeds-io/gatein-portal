@@ -2,8 +2,8 @@ package org.exoplatform.account.setup.web;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.*;
 
 import org.exoplatform.container.PortalContainer;
 

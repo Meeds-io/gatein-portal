@@ -26,7 +26,7 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.*;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.exoplatform.component.test.web.WebAppImpl;
 import org.exoplatform.container.PortalContainer;

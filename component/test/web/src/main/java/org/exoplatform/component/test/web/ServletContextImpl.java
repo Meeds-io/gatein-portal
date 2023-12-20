@@ -26,9 +26,9 @@ import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
-import javax.servlet.*;
-import javax.servlet.ServletRegistration.Dynamic;
-import javax.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.*;
+import jakarta.servlet.ServletRegistration.Dynamic;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
 
 import org.gatein.common.NotYetImplemented;
 
@@ -238,17 +238,17 @@ public class ServletContextImpl implements ServletContext {
     }
 
     @Override
-    public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName, String className) {
+    public jakarta.servlet.FilterRegistration.Dynamic addFilter(String filterName, String className) {
       throw new NotYetImplemented();
     }
 
     @Override
-    public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
+    public jakarta.servlet.FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
       throw new NotYetImplemented();
     }
 
     @Override
-    public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName, Class<? extends Filter> filterClass) {
+    public jakarta.servlet.FilterRegistration.Dynamic addFilter(String filterName, Class<? extends Filter> filterClass) {
       throw new NotYetImplemented();
     }
 
