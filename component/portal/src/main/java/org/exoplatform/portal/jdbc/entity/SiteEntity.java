@@ -21,7 +21,7 @@ package org.exoplatform.portal.jdbc.entity;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

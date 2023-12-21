@@ -26,12 +26,12 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.portal.component.identity</artifactId>
   <packaging>jar</packaging>
-  <name>GateIn Portal Component JBoss IDM integration</name>
+  <name>GateIn Portal Component IDM</name>
 
   <properties>
     <sun-opends.version>1.0.0</sun-opends.version>
     <berkeleydb.version>3.2.76</berkeleydb.version>
-    <exo.test.coverage.ratio>0.39</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.40</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
@@ -69,17 +69,6 @@
       <artifactId>exo.portal.component.common</artifactId>
       <type>test-jar</type>
       <!-- Test scope not added on purpose for transitive dependency -->
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.core</groupId>
-      <artifactId>exo.core.component.organization.tests</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.core</groupId>
-      <artifactId>exo.core.component.organization.tests</artifactId>
-      <classifier>test-sources</classifier>
-      <scope>test</scope>
     </dependency>
     <dependency>
        <groupId>sun-opends</groupId>
@@ -149,69 +138,5 @@
         </plugin>
       </plugins>
     </pluginManagement>
-
-    <plugins>
-      <plugin>
-        <groupId>com.jcabi</groupId>
-        <artifactId>jcabi-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack</id>
-            <phase>generate-test-sources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.exoplatform.core</groupId>
-                  <artifactId>exo.core.component.organization.tests</artifactId>
-                  <classifier>test-sources</classifier>
-                  <type>jar</type>
-                  <overWrite>false</overWrite>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${project.build.directory}/org-service-tck-tests</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>add-test-resource</id>
-            <phase>generate-test-sources</phase>
-            <goals>
-              <goal>add-test-resource</goal>
-            </goals>
-            <configuration>
-              <resources>
-                <resource>
-                  <directory>${project.build.directory}/org-service-tck-tests</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>add-test-source</id>
-            <phase>generate-test-sources</phase>
-            <goals>
-              <goal>add-test-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${project.build.directory}/org-service-tck-tests</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
   </build>
 </project>

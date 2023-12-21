@@ -20,7 +20,7 @@ package org.exoplatform.services.organization.auth;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.organization.DisabledUserException;

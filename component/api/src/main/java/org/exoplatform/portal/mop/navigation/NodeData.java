@@ -22,7 +22,7 @@ package org.exoplatform.portal.mop.navigation;
 import java.io.Serializable;
 import java.util.*;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.portal.mop.NodeTarget;
 import org.exoplatform.portal.mop.SiteKey;

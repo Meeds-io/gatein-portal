@@ -22,25 +22,22 @@
 
 package org.picketlink.idm.impl.model.hibernate;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import org.picketlink.idm.spi.model.IdentityObjectCredentialType;
 
 @Entity(name = "HibernateIdentityObjectCredentialType")
 @Table(name = "jbid_io_creden_type")
-@NamedQueries(
-  {
-      @NamedQuery(
-          name = "HibernateIdentityObjectCredentialType.findIdentityCredentialTypeByName",
-          query = "SELECT ct FROM HibernateIdentityObjectCredentialType ct"
-              + " WHERE ct.name = :name"
-      ),
-  }
+@NamedQuery(
+    name = "HibernateIdentityObjectCredentialType.findIdentityCredentialTypeByName",
+    query = "SELECT ct FROM HibernateIdentityObjectCredentialType ct"
+        + " WHERE ct.name = :name"
 )
 public class HibernateIdentityObjectCredentialType implements IdentityObjectCredentialType {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.AUTO, generator="JBID_IO_CREDEN_TYPE_ID_SEQ")
+  @SequenceGenerator(name = "JBID_IO_CREDEN_TYPE_ID_SEQ", sequenceName = "JBID_IO_CREDEN_TYPE_ID_SEQ", allocationSize = 1)
   @Column(name = "ID")
   private Long   id;
 

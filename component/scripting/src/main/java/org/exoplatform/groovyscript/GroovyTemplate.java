@@ -18,7 +18,7 @@
  */
 package org.exoplatform.groovyscript;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
 

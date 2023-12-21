@@ -56,17 +56,17 @@ public class AbstractDAOImpl {
                   log.warn("Unable to set Transaction status to be rollback only", tre);
               }
           } else {
-              orgService.recoverFromIDMError(e);
+              orgService.recoverFromIDMError();
           }
+          // Always throw the original exception to make sure that top layer services
+          // are triggered about the error
+          throw new IllegalStateException(messageToLog, e);
+        } catch (IllegalStateException e1) {
+          throw e1;
         } catch (Exception e1) {
-          // If an error happens when rollbacking the transaction, display the
-          // original error and after that the erro about rollbacking
-          log.warn(messageToLog, e);
-          log.warn("Error while rollbacking IDM Transaction due to previous error", e1);
+          log.warn("Second Exception when rolling back original error {}/{}", messageToLog, e.getMessage(), e1);
+          throw new IllegalStateException(messageToLog, e);
         }
-        // Always throw the original exception to make sure that top layer services
-        // are triggered about the error
-        throw new RuntimeException(messageToLog, e);
     }
 
     protected IdentitySession getIdentitySession() throws Exception {
