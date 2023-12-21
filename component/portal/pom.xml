@@ -33,7 +33,7 @@
     <rest.api.doc.version>1.0</rest.api.doc.version>
     <rest.api.doc.description>Gatein-portal used Rest endpoints</rest.api.doc.description>
 
-    <exo.test.coverage.ratio>0.64</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.65</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
@@ -57,7 +57,7 @@
       <artifactId>exo.portal.component.resources</artifactId>
     </dependency>
 
-    <!-- TODO: Should simply be replace bu org.json -->
+    <!-- TODO: Should simply be replace by org.json -->
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
@@ -104,6 +104,8 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <forkMode>always</forkMode>
+          <forkCount>1</forkCount>
+          <reuseForks>false</reuseForks>
           <runOrder>alphabetical</runOrder>
           <includes>
             <include>**/*TestSuite.java</include>

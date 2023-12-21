@@ -19,7 +19,7 @@
 
 package org.exoplatform.portal.resource;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.cache.future.FutureMap;
 import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.commons.utils.BinaryOutput;

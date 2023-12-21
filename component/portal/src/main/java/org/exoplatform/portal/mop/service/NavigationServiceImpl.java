@@ -21,7 +21,7 @@ package org.exoplatform.portal.mop.service;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.portal.mop.EventType;
 import org.exoplatform.portal.mop.SiteKey;

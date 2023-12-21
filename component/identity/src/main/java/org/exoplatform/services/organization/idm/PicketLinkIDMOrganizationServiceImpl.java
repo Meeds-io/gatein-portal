@@ -125,22 +125,18 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
 
     @Override
     public void start() {
-        try {
-            if (configuration.isUseJTA()) {
-                jtaTransactionLifecycleService.registerListener(new IDMTransactionSyncListener(idmService_));
-            }
-            acceptComponentRequestCall = true;
-
-            RequestLifeCycle.begin(this);
-
-            super.start();
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        } finally {
-            RequestLifeCycle.end();
-        }
-
+      if (configuration.isUseJTA()) {
+        jtaTransactionLifecycleService.registerListener(new IDMTransactionSyncListener(idmService_));
+      }
+      acceptComponentRequestCall = true;
+      RequestLifeCycle.begin(this);
+      try {
+        super.start();
+      } catch (Exception e) {
+        log.error("Error Starting IDM Service", e);
+      } finally {
+        RequestLifeCycle.end();
+      }
     }
 
     @Override
@@ -201,8 +197,8 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
                     idmService_.getIdentitySession().save();
                 }
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                recoverFromIDMError(e);
+                log.error("Error while saving transaction", e);
+                recoverFromIDMError();
             }
         }
     }
@@ -228,7 +224,7 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
                 }
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
-                recoverFromIDMError(e);
+                recoverFromIDMError();
             }
         }
     }
@@ -256,31 +252,27 @@ public class PicketLinkIDMOrganizationServiceImpl extends BaseOrganizationServic
      * Recover from an IDM error
      * Should be used only for non-JTA environment.
      */
-    public void recoverFromIDMError(Exception e) {
+    public void recoverFromIDMError() {
         try {
             // We need to restart Hibernate transaction if it's available. First rollback old one and then start new one
             Transaction idmTransaction = idmService_.getIdentitySession().getTransaction();
             if (idmTransaction != null && idmTransaction.isActive()) {
                 try {
-                  log.warn("IDM Transaction rollback", e);
                   idmTransaction.rollback();
-                  log.info("IDM Transaction has been rolled-backed");
+                  log.warn("IDM Transaction has been rolled-backed");
                 } catch (Exception e1) {
                   log.warn("Error during IDM Transaction rollback.", e1);
                 }
                 try {
-                  log.info("IDM Transaction restart");
                   idmTransaction.start();
-                  log.info("IDM Transaction restarted");
+                  log.warn("IDM Transaction restarted");
                 } catch (Exception e1) {
                   log.warn("Error during IDM Transaction restart, a new transaction will be started", e1);
                   idmService_.getIdentitySession().beginTransaction();
-                  log.info("New IDM Transaction started");
                 }
             } else {
-              log.warn("IDM Transaction rollbacked. New IDM Transaction start", e);
               idmService_.getIdentitySession().beginTransaction();
-              log.info("New IDM Transaction started");
+              log.warn("New IDM Transaction started");
             }
         } catch (Exception e1) {
             log.warn("Error during recovery of old error", e1);

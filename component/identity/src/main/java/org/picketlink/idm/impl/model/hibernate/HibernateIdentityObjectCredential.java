@@ -25,7 +25,7 @@ package org.picketlink.idm.impl.model.hibernate;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -37,21 +37,18 @@ import org.picketlink.idm.spi.model.IdentityObjectCredential;
 
 @Entity(name = "HibernateIdentityObjectCredential")
 @Table(name = "jbid_io_creden")
-@NamedQueries(
-  {
-      @NamedQuery(
-          name = "HibernateIdentityObjectCredential.findCredentialByTypeAndIdentity",
-          query = "SELECT c FROM HibernateIdentityObjectCredential c"
-              + " INNER JOIN c.type type ON type.name = :cTypeName"
-              + " WHERE c.identityObject.id = :ioId"
-      ),
-  }
+@NamedQuery(
+    name = "HibernateIdentityObjectCredential.findCredentialByTypeAndIdentity",
+    query = "SELECT c FROM HibernateIdentityObjectCredential c"
+        + " INNER JOIN c.type type ON type.name = :cTypeName"
+        + " WHERE c.identityObject.id = :ioId"
 )
 public class HibernateIdentityObjectCredential implements IdentityObjectCredential {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.AUTO, generator="JBID_IO_CREDEN_ID_SEQ")
   @Column(name = "ID")
+  @SequenceGenerator(name = "JBID_IO_CREDEN_ID_SEQ", sequenceName = "JBID_IO_CREDEN_ID_SEQ", allocationSize = 1)
   private Long                                         id;
 
   @ManyToOne(fetch = FetchType.EAGER)

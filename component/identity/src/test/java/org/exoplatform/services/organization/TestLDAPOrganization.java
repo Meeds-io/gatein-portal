@@ -2,7 +2,7 @@ package org.exoplatform.services.organization;
 
 import exo.portal.component.identiy.opendsconfig.opends.OpenDSService;
 import junit.framework.Assert;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;

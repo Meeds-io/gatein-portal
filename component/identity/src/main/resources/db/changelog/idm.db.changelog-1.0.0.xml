@@ -377,6 +377,10 @@
     </createIndex>
   </changeSet>
 
+  <!-- 
+
+  Not used anymore after upgrade to Hibernate 6.4.1
+
   <changeSet author="idm" id="1.0.0-17" onValidationFail="MARK_RAN" runOnChange="false" dbms="oracle,postgresql">
     <preConditions onFail="MARK_RAN">
       <not>
@@ -388,6 +392,38 @@
 
   <changeSet author="idm" id="1.0.0-18" dbms="hsqldb">
     <createSequence sequenceName="hibernate_sequence" startValue="1"/>
+  </changeSet>
+  -->
+
+  <changeSet author="idm" id="1.0.0-19" dbms="oracle,postgresql,hsqldb">
+    <createSequence sequenceName="JBID_IO_ID_SEQ" startValue="1" incrementBy="1" />
+    <createSequence sequenceName="JBID_IO_ATTR_ID_SEQ" startValue="1" incrementBy="1" />
+    <createSequence sequenceName="JBID_ATTR_BIN_VALUE_ID_SEQ" startValue="1" incrementBy="1" />
+    <createSequence sequenceName="JBID_IO_CREDEN_ID_SEQ" startValue="1" incrementBy="1" />
+    <createSequence sequenceName="JBID_CREDEN_BIN_VALUE_ID_SEQ" startValue="1" incrementBy="1" />
+    <createSequence sequenceName="JBID_IO_CREDEN_TYPE_ID_SEQ" startValue="1" incrementBy="1" />
+    <createSequence sequenceName="JBID_IO_REL_ID_SEQ" startValue="1" incrementBy="1" />
+    <createSequence sequenceName="JBID_IO_REL_NAME_ID_SEQ" startValue="1" incrementBy="1" />
+    <createSequence sequenceName="JBID_IO_REL_TYPE_ID_SEQ" startValue="1" incrementBy="1" />
+    <createSequence sequenceName="JBID_IO_TYPE_ID_SEQ" startValue="1" incrementBy="1" />
+    <createSequence sequenceName="JBID_REALM_ID_SEQ" startValue="1" incrementBy="1" />
+  </changeSet> 
+
+  <changeSet author="idm" id="1.0.0-20" dbms="postgresql" onValidationFail="MARK_RAN" runOnChange="false">
+    <preConditions onFail="MARK_RAN">
+      <sequenceExists sequenceName="hibernate_sequence" />
+    </preConditions>
+    <sql>SELECT setval(‘JBID_IO_ID_SEQ’, (SELECT MAX(ID) FROM JBID_IO))</sql>
+    <sql>SELECT setval(‘JBID_IO_ATTR_ID_SEQ’, (SELECT MAX(ID) FROM JBID_IO_ATTR))</sql>
+    <sql>SELECT setval(‘JBID_ATTR_BIN_VALUE_ID_SEQ’, (SELECT MAX(ID) FROM JBID_ATTR_BIN_VALUE))</sql>
+    <sql>SELECT setval(‘JBID_IO_CREDEN_ID_SEQ’, (SELECT MAX(ID) FROM JBID_IO_CREDEN))</sql>
+    <sql>SELECT setval(‘JBID_CREDEN_BIN_VALUE_ID_SEQ’, (SELECT MAX(ID) FROM JBID_CREDEN_BIN_VALUE))</sql>
+    <sql>SELECT setval(‘JBID_IO_CREDEN_TYPE_ID_SEQ’, (SELECT MAX(ID) FROM JBID_IO_CREDEN_TYPE))</sql>
+    <sql>SELECT setval(‘JBID_IO_REL_ID_SEQ’, (SELECT MAX(ID) FROM JBID_IO_REL))</sql>
+    <sql>SELECT setval(‘JBID_IO_REL_NAME_ID_SEQ’, (SELECT MAX(ID) FROM JBID_IO_REL_NAME))</sql>
+    <sql>SELECT setval(‘JBID_IO_REL_TYPE_ID_SEQ’, (SELECT MAX(ID) FROM JBID_IO_REL_TYPE))</sql>
+    <sql>SELECT setval(‘JBID_IO_TYPE_ID_SEQ’, (SELECT MAX(ID) FROM JBID_IO_TYPE))</sql>
+    <sql>SELECT setval(‘JBID_REALM_ID_SEQ’, (SELECT MAX(ID) FROM JBID_REALM))</sql>
   </changeSet>
 
 </databaseChangeLog>

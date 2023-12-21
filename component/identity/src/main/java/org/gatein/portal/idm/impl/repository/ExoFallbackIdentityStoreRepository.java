@@ -2,7 +2,7 @@ package org.gatein.portal.idm.impl.repository;
 
 import java.util.*;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.repository.AbstractIdentityStoreRepository;
 import org.picketlink.idm.impl.store.SimpleIdentityStoreInvocationContext;

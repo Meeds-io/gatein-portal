@@ -38,7 +38,7 @@ import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.controller.router.URIWriter;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.gatein.common.io.IOTools;
 import org.gatein.portal.controller.resource.ResourceId;
 import org.gatein.portal.controller.resource.ResourceScope;

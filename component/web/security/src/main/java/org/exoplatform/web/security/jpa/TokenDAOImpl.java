@@ -3,9 +3,9 @@ package org.exoplatform.web.security.jpa;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
 
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import java.util.List;
 
 public class TokenDAOImpl extends GenericDAOJPAImpl<TokenEntity, Long> implements TokenDAO {

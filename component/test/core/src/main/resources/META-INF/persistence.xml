@@ -2,20 +2,22 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
              version="2.2">
-  <persistence-unit name="test" transaction-type="RESOURCE_LOCAL">
+  <persistence-unit name="meeds-jpa-test" transaction-type="RESOURCE_LOCAL">
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
     <non-jta-data-source>java:/comp/env/exo-jpa_portal</non-jta-data-source>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
-      <property name="persistenceUnitName" value="test"></property>
+      <property name="persistenceUnitName" value="meeds-jpa-test"></property>
       <property name="hibernate.archive.scanner" value="org.exoplatform.commons.persistence.impl.JPADatasourceEntityScanner"></property>
       <property name="hibernate.id.new_generator_mappings" value="false"/>
       <property name="hibernate.hbm2ddl.auto" value="none"/>
       <property name="hibernate.show_sql" value="false"/>
-      <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
       <property name="hibernate.current_session_context_class" value="thread"/>
       <property name="hibernate.cache.use_second_level_cache" value="false"/>
       <property name="hibernate.cache.use_query_cache" value="false"/>
+      <property name="hibernate.id.db_structure_naming_strategy" value="legacy"/>
+      <property name="hibernate.identifier_generator_strategy_provider" value="io.meeds.common.persistence.HibernateCustomIdentifierGeneratorStrategyProvider"/>
     </properties>
   </persistence-unit>
 </persistence>

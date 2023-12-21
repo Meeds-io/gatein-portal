@@ -66,7 +66,7 @@
           <name>ref-addresses</name>
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
-          <property name="url" value="jdbc:hsqldb:mem:db1" />
+          <property name="url" value="jdbc:hsqldb:mem:dbjpa;shutdown=true;hsqldb.write_delay=false;hsqldb.tx=mvcc;" />
         </properties-param>
       </init-params>
     </component-plugin>
@@ -91,7 +91,7 @@
           <name>ref-addresses</name>
           <description>ref-addresses</description>
           <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
-          <property name="url" value="jdbc:hsqldb:mem:dbidm" />
+          <property name="url" value="jdbc:hsqldb:mem:dbidm;shutdown=true;hsqldb.write_delay=false;hsqldb.tx=mvcc;" />
         </properties-param>
       </init-params>
     </component-plugin>
