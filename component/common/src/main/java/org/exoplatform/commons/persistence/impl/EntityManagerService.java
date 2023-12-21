@@ -18,7 +18,7 @@
  */
 package org.exoplatform.commons.persistence.impl;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainer;
@@ -28,10 +28,10 @@ import org.exoplatform.services.log.Log;
 
 import org.hibernate.cfg.AvailableSettings;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Persistence;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ import java.util.Properties;
 
 /**
  * This service is responsible to create a single EntityManagerFactory, with the
- * persistence unit name <code>exo-pu</code>.
+ * persistence unit name <code>meeds-jpa</code>.
  * <p>
  * The service is also bound to use of the RequestLifecycle that there is only
  * one EntityManager will be created at beginning of the request lifecycle. The
@@ -51,7 +51,7 @@ import java.util.Properties;
  * @version $Revision$
  */
 public class EntityManagerService implements ComponentRequestLifecycle {
-  public static final String          PERSISTENCE_UNIT_NAME       = "exo-pu";
+  public static final String          PERSISTENCE_UNIT_NAME       = "meeds-jpa";
   private static final Log            LOGGER                      = ExoLogger.getLogger(EntityManagerService.class);
   private static final String         EXO_JPA_DATASOURCE_NAME     = "exo.jpa.datasource.name";
   private static final String         EXO_PREFIX_FOR_HIB_SETTINGS = "exo.jpa.";

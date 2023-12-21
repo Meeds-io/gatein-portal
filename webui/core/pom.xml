@@ -29,7 +29,7 @@
   <name>GateIn Portal WebUI Core</name>
 
   <properties>
-    <exo.test.coverage.ratio>0.13</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.14</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>

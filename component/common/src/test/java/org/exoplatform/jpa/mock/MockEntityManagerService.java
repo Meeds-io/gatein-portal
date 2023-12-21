@@ -17,7 +17,7 @@ package org.exoplatform.jpa.mock;
 
 import java.util.Properties;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 
@@ -41,6 +41,6 @@ public class MockEntityManagerService extends EntityManagerService {
 
   @Override
   public String getPersistenceUnitName() {
-    return "test";
+    return "meeds-jpa-test";
   }
 }

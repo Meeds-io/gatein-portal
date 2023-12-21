@@ -4,8 +4,8 @@ import org.exoplatform.commons.file.storage.dao.FileBinaryDAO;
 import org.exoplatform.commons.file.storage.entity.FileBinaryEntity;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
 
-import javax.persistence.NoResultException;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.TypedQuery;
 
 /**
  * Data Access Object layer for binary data files.

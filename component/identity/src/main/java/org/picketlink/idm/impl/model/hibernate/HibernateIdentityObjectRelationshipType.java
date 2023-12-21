@@ -22,25 +22,22 @@
 
 package org.picketlink.idm.impl.model.hibernate;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
 
 @Entity(name = "HibernateIdentityObjectRelationshipType")
 @Table(name = "jbid_io_rel_type")
-@NamedQueries(
-  {
-      @NamedQuery(
-          name = "HibernateIdentityObjectRelationshipType.findIdentityRelationshipTypeByName",
-          query = "SELECT t FROM HibernateIdentityObjectRelationshipType t"
-              + " WHERE t.name = :name"
-      ),
-  }
+@NamedQuery(
+    name = "HibernateIdentityObjectRelationshipType.findIdentityRelationshipTypeByName",
+    query = "SELECT t FROM HibernateIdentityObjectRelationshipType t"
+        + " WHERE t.name = :name"
 )
 public class HibernateIdentityObjectRelationshipType implements IdentityObjectRelationshipType {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.AUTO, generator="JBID_IO_REL_TYPE_ID_SEQ")
+  @SequenceGenerator(name = "JBID_IO_REL_TYPE_ID_SEQ", sequenceName = "JBID_IO_REL_TYPE_ID_SEQ", allocationSize = 1)
   @Column(name = "ID")
   private Long               id;
 

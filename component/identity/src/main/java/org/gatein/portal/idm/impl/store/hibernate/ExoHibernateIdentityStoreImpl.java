@@ -3,10 +3,10 @@ package org.gatein.portal.idm.impl.store.hibernate;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.gatein.portal.idm.IdentityStoreSource;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.PasswordCredential;
 import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObject;

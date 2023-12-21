@@ -19,58 +19,60 @@
 * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 */
-
 package org.picketlink.idm.impl.model.hibernate;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.*;
-
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.LazyToOne;
-import org.hibernate.annotations.LazyToOneOption;
+
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 
 @Entity(name = "HibernateIdentityObjectRelationshipName")
 @Table(name = "jbid_io_rel_name")
-@NamedQueries(
-  {
-      @NamedQuery(
-          name = "HibernateIdentityObjectRelationshipName.findIdentityObjectRelationshipNameByName",
-          query = "select rn from HibernateIdentityObjectRelationshipName rn where rn.name like :name and rn.realm.name = :realmName"
-      ),
-  }
-)
+@NamedQuery(
+    name = "HibernateIdentityObjectRelationshipName.findIdentityObjectRelationshipNameByName",
+    query = "select rn from HibernateIdentityObjectRelationshipName rn where rn.name like :name and rn.realm.name = :realmName")
 public class HibernateIdentityObjectRelationshipName {
 
-  public static final String  findIdentityObjectRelationshipNameByName =
-                                                                       "select rn from HibernateIdentityObjectRelationshipName rn where rn.name like :name and rn.realm.name = :realmName";
-
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.AUTO, generator="JBID_IO_REL_NAME_ID_SEQ")
+  @SequenceGenerator(name = "JBID_IO_REL_NAME_ID_SEQ", sequenceName = "JBID_IO_REL_NAME_ID_SEQ", allocationSize = 1)
   @Column(name = "ID")
   private Long                id;
 
-  @Column(name = "NAME", nullable = false)
+  @Column(name = "NAME",
+      nullable = false)
   private String              name;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "REALM", nullable = false)
+  @JoinColumn(name = "REALM",
+      nullable = false)
   @Fetch(FetchMode.SELECT)
-  @LazyToOne(LazyToOneOption.PROXY)
   private HibernateRealm      realm;
 
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.LAZY)
   @MapKeyColumn(name = "PROP_NAME")
   @Column(name = "PROP_VALUE")
-  @CollectionTable(name = "jbid_io_rel_name_props", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
+  @CollectionTable(name = "jbid_io_rel_name_props",
+      joinColumns = { @JoinColumn(name = "PROP_ID",
+          referencedColumnName = "ID") })
   @Fetch(FetchMode.SUBSELECT)
-  @LazyCollection(LazyCollectionOption.EXTRA)
-  private Map<String, String> properties                               =
-                                         new HashMap<String, String>();
+  private Map<String, String> properties                               = new HashMap<>();
 
   public HibernateIdentityObjectRelationshipName() {
   }

@@ -26,8 +26,8 @@ import org.exoplatform.services.log.Log;
 
 import java.util.List;
 
-import javax.persistence.NoResultException;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.TypedQuery;
 
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com

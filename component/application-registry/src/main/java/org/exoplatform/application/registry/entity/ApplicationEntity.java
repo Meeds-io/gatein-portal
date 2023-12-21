@@ -20,7 +20,7 @@ package org.exoplatform.application.registry.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 

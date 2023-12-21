@@ -3,7 +3,7 @@ package org.exoplatform.services.organization.idm.externalstore.jpa;
 import java.io.Serializable;
 import java.util.Calendar;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.services.organization.externalstore.model.IDMOperationType;

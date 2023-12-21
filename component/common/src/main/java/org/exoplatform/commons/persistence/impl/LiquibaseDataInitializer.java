@@ -1,12 +1,19 @@
 package org.exoplatform.commons.persistence.impl;
 
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.exception.DatabaseException;
-import liquibase.exception.LiquibaseException;
-import liquibase.resource.ClassLoaderResourceAccessor;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.picocontainer.Startable;
+
 import org.exoplatform.commons.api.persistence.DataInitializer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
@@ -14,15 +21,15 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.naming.InitialContextInitializer;
 
-import org.apache.commons.lang3.StringUtils;
-import org.picocontainer.Startable;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.util.*;
+import liquibase.Liquibase;
+import liquibase.Scope;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
+import liquibase.exception.LiquibaseException;
+import liquibase.resource.ClassLoaderResourceAccessor;
+import liquibase.ui.LoggerUIService;
 
 /**
  * Startable service to initialize all the data with Liquibase.
@@ -67,6 +74,11 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
     }
 
     LOG.info("LiquibaseDataInitializer created with : datasourceName={}, contexts={}", datasourceName, liquibaseContexts);
+    try {
+      Scope.enter(Map.of(Scope.Attr.ui.name(), new LoggerUIService()));
+    } catch (Exception e) {
+      LOG.debug("Error Switching Liquibase logging service");
+    }
   }
 
   public String getDatasourceName() {
