@@ -30,7 +30,7 @@
   <description>Various API supported by GateIn related to web serving</description>
 
   <properties>
-    <exo.test.coverage.ratio>0.34</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.36</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>

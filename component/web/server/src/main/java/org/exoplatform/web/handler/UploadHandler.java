@@ -22,7 +22,7 @@ package org.exoplatform.web.handler;
 import java.io.Writer;
 import java.net.URLEncoder;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.gatein.common.text.EntityEncoder;
 
 import org.exoplatform.container.ExoContainerContext;

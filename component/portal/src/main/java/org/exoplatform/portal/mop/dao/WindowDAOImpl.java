@@ -3,8 +3,8 @@ package org.exoplatform.portal.mop.dao;
 import java.util.Collections;
 import java.util.List;
 
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 
 import org.gatein.api.common.Pagination;
 

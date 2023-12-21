@@ -150,7 +150,6 @@ public class DisabledUserMigrationScript {
         conf_.setProperty("hibernate.connection.url", config.getProperty("hibernate.connection.url"));
         conf_.setProperty("hibernate.connection.username", config.getProperty("hibernate.connection.username"));
         conf_.setProperty("hibernate.connection.password", config.getProperty("hibernate.connection.password"));
-        conf_.setProperty("hibernate.dialect", config.getProperty("hibernate.dialect"));
 
         String config_path = config.getProperty("hibernate.config_path");
         URL url = Thread.currentThread().getContextClassLoader().getResource(config_path);

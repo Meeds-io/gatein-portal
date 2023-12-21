@@ -23,7 +23,7 @@ import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
 import org.exoplatform.services.log.ExoLogger;
 
-import javax.persistence.TypedQuery;
+import jakarta.persistence.TypedQuery;
 import java.util.Date;
 import java.util.List;
 

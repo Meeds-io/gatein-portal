@@ -141,7 +141,7 @@ public class CustomHibernateServiceImpl implements HibernateService, ComponentRe
   }
 
   public Object findExactOne(Session session, String query, String id) throws Exception {
-    Object res = session.createQuery(query).setString("id", id).uniqueResult();
+    Object res = session.createQuery(query).setParameter("id", id).uniqueResult();
     if (res == null) {
       throw new ObjectNotFoundException("Cannot find the object with id: " + id);
     }
@@ -149,7 +149,7 @@ public class CustomHibernateServiceImpl implements HibernateService, ComponentRe
   }
 
   public Object findOne(Session session, String query, String id) throws Exception {
-    List<?> l = session.createQuery(query).setString("id", id).list();
+    List<?> l = session.createQuery(query).setParameter("id", id).list();
     if (l.size() == 0) {
       return null;
     } else if (l.size() > 1) {
@@ -244,4 +244,5 @@ public class CustomHibernateServiceImpl implements HibernateService, ComponentRe
     Session s = threadLocal_.get();
     return s != null && s.isOpen();
   }
+
 }

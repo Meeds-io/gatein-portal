@@ -92,6 +92,8 @@ public class TestOrganization extends AbstractKernelTest {
         mtHandler_ = organizationService.getMembershipTypeHandler();
         membershipHandler_ = organizationService.getMembershipHandler();
 
+        resetData();
+
         createGroup(null, GROUP_1);
         createGroup(GROUP_1, GROUP_2);
         createGroup(GROUP_1, GROUP_3);
@@ -103,15 +105,12 @@ public class TestOrganization extends AbstractKernelTest {
 
     @Override
     protected void tearDown() throws Exception {
-        deleteGroup("/" + GROUP_1);
-
-        deleteUser(USER_1);
-        deleteUser(USER_2);
-        deleteUser(USER_3);
-
-        end();
-
-        super.tearDown();
+        try {
+          resetData();
+        } finally {
+          end();
+          super.tearDown();
+        }
     }
 
     public void testIDMConfiguration(){
@@ -278,27 +277,27 @@ public class TestOrganization extends AbstractKernelTest {
     public void testLastLoginTime() throws Exception {
         UserHandler uHandler = organizationService.getUserHandler();
 
-        User user = uHandler.findUserByName("root");
+        User user = uHandler.findUserByName(USER_1);
         Assert.assertNotNull(user);
 
         // Assert that last login time is updated by default
         Thread.sleep(1);
         Date current = new Date();
         Thread.sleep(1);
-        user = uHandler.findUserByName("root");
+        user = uHandler.findUserByName(USER_1);
         Assert.assertNotNull(user);
         
         Date oldLastLoginTime = user.getLastLoginTime();
         Assert.assertNotNull(oldLastLoginTime);
 
-        Assert.assertTrue(uHandler.authenticate("root", "gtn"));
-        user = uHandler.findUserByName("root");
+        Assert.assertTrue(uHandler.authenticate(USER_1, DEFAULT_PASSWORD));
+        user = uHandler.findUserByName(USER_1);
         Assert.assertTrue(user.getLastLoginTime().equals(oldLastLoginTime));
 
-        Assert.assertTrue(uHandler.authenticate("root", "gtn"));
+        Assert.assertTrue(uHandler.authenticate(USER_1, DEFAULT_PASSWORD));
         updateLoginTimeListener.onEvent(new Event<ConversationRegistry, ConversationState>("nothing", null,
-            new ConversationState(new Identity("root"))));
-        user = uHandler.findUserByName("root");
+            new ConversationState(new Identity(USER_1))));
+        user = uHandler.findUserByName(USER_1);
         Assert.assertTrue(user.getLastLoginTime().after(oldLastLoginTime));
         Assert.assertTrue(user.getLastLoginTime().after(current));
     }
@@ -420,6 +419,7 @@ public class TestOrganization extends AbstractKernelTest {
     }
 
     protected void createGroup(String parent, String name) {
+        restartTransaction();
         GroupHandler groupHandler = organizationService.getGroupHandler();
         try {
             Group parentGroup = null;
@@ -437,6 +437,7 @@ public class TestOrganization extends AbstractKernelTest {
     }
 
     private void deleteGroup(String name) {
+        restartTransaction();
         GroupHandler groupHandler = organizationService.getGroupHandler();
         try {
             Group group = groupHandler.findGroupById(name);
@@ -455,6 +456,7 @@ public class TestOrganization extends AbstractKernelTest {
     }
 
     protected void createUser(String username, String... groups) throws Exception {
+        restartTransaction();
         UserHandler userHandler = organizationService.getUserHandler();
         User user = userHandler.createUserInstance(username);
         user.setPassword(DEFAULT_PASSWORD);
@@ -468,12 +470,20 @@ public class TestOrganization extends AbstractKernelTest {
         userHandler.createUser(user, true);
     }
 
-    protected void deleteUser(String username) {
-        UserHandler userHandler = organizationService.getUserHandler();
-        try {
-            userHandler.removeUser(username, true);
-        } catch (Exception e) {
+    protected void deleteUser(String username) throws Exception {
+      restartTransaction();
+      UserHandler userHandler = organizationService.getUserHandler();
+      if (userHandler.findUserByName(username) != null) {
+        userHandler.removeUser(username, true);
+      }
+    }
 
-        }
-    }    
+    private void resetData() throws Exception {
+      deleteGroup("/" + GROUP_1);
+
+      deleteUser(USER_1);
+      deleteUser(USER_2);
+      deleteUser(USER_3);
+    }
+
 }

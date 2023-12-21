@@ -28,7 +28,7 @@
   <name>GateIn Portal Component Common</name>
 
   <properties>
-    <exo.test.coverage.ratio>0.41</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.40</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>

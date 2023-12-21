@@ -22,25 +22,24 @@
 
 package org.picketlink.idm.impl.model.hibernate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.Type;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 
 @Entity(name = "HibernateIdentityObjectCredentialBinaryValue")
 @Table(name = "jbid_creden_bin_value")
 public class HibernateIdentityObjectCredentialBinaryValue {
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.AUTO, generator="JBID_CREDEN_BIN_VALUE_ID_SEQ")
+  @SequenceGenerator(name = "JBID_CREDEN_BIN_VALUE_ID_SEQ", sequenceName = "JBID_CREDEN_BIN_VALUE_ID_SEQ", allocationSize = 1)
   @Column(name = "BIN_VALUE_ID")
   private Long   id;
 
   @Column(name = "VALUE", length = 10240000)
-  @Type(type = "org.hibernate.type.BinaryType")
   private byte[] value = null;
 
   public HibernateIdentityObjectCredentialBinaryValue() {

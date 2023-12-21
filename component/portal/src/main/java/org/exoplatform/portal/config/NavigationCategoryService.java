@@ -19,7 +19,7 @@ package org.exoplatform.portal.config;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A service to manage categories of Administration Menu
