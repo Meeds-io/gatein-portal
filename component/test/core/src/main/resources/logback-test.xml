@@ -27,7 +27,8 @@
     </encoder>
   </appender>
   <logger name="org.hibernate.engine.jdbc.spi.SqlExceptionHelper" level="ERROR"/>
-  <root level="INFO">
+  <logger name="liquibase.executor.jvm.JdbcExecutor" level="ERROR"/>
+  <root level="${io.meeds.logging.level:-WARN}">
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>

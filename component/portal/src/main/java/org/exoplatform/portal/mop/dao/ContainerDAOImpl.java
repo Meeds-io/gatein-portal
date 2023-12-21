@@ -3,7 +3,7 @@ package org.exoplatform.portal.mop.dao;
 import java.util.Collections;
 import java.util.List;
 
-import javax.persistence.TypedQuery;
+import jakarta.persistence.TypedQuery;
 
 import org.exoplatform.portal.jdbc.entity.ContainerEntity;
 

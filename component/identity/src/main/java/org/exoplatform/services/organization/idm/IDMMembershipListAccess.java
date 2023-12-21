@@ -22,7 +22,7 @@ package org.exoplatform.services.organization.idm;
 import java.io.Serializable;
 import java.util.*;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.LogLevel;

@@ -22,105 +22,120 @@
 
 package org.picketlink.idm.impl.model.hibernate;
 
-import java.util.*;
-
-import javax.persistence.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.picketlink.idm.common.exception.PolicyValidationException;
 import org.picketlink.idm.spi.model.IdentityObject;
 import org.picketlink.idm.spi.model.IdentityObjectCredentialType;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import lombok.Data;
+
 @Entity(name = "HibernateIdentityObject")
 @Table(name = "jbid_io")
-@NamedQueries(
-  {
-      @NamedQuery(
-          name = "HibernateIdentityObject.findIdentityObjectByNameAndTypeIgnoreCase",
-          query = "SELECT o FROM HibernateIdentityObject o WHERE o.realm.name = :realmName AND lower(o.name) = :name AND o.identityType.name = :typeName"
-      ),
-      @NamedQuery(
-          name = "HibernateIdentityObject.findIdentityObjectByNameAndType",
-          query = "SELECT o FROM HibernateIdentityObject o WHERE o.realm.name = :realmName AND o.name = :name AND o.identityType.name = :typeName"
-      ),
-      @NamedQuery(
-          name = "HibernateIdentityObject.countIdentityObjectByNameAndTypeIgnoreCase",
-          query = "SELECT count(o) FROM HibernateIdentityObject o WHERE o.realm.name = :realmName AND lower(o.name) = :name AND o.identityType.name = :typeName"
-      ),
-      @NamedQuery(
-          name = "HibernateIdentityObject.countIdentityObjectByNameAndType",
-          query = "SELECT count(o) FROM HibernateIdentityObject o"
-              + " WHERE o.realm.name = :realmName"
-              + " AND o.name = :name"
-              + " AND o.identityType.name = :typeName"
-      ),
-      @NamedQuery(
-          name = "HibernateIdentityObject.countIdentityObjectsByType",
-          query = "SELECT count(o.id) FROM HibernateIdentityObject o"
-              + " WHERE o.realm.name = :realmName"
-              + " AND o.identityType.name = :typeName"
-      ),
-  }
-)
+@NamedQuery(
+    name = "HibernateIdentityObject.findIdentityObjectByNameAndTypeIgnoreCase",
+    query = "SELECT o FROM HibernateIdentityObject o WHERE o.realm.name = :realmName AND lower(o.name) = :name AND o.identityType.name = :typeName")
+@NamedQuery(
+    name = "HibernateIdentityObject.findIdentityObjectByNameAndType",
+    query = "SELECT o FROM HibernateIdentityObject o WHERE o.realm.name = :realmName AND o.name = :name AND o.identityType.name = :typeName")
+@NamedQuery(
+    name = "HibernateIdentityObject.countIdentityObjectByNameAndTypeIgnoreCase",
+    query = "SELECT count(o) FROM HibernateIdentityObject o WHERE o.realm.name = :realmName AND lower(o.name) = :name AND o.identityType.name = :typeName")
+@NamedQuery(
+    name = "HibernateIdentityObject.countIdentityObjectByNameAndType",
+    query = "SELECT count(o) FROM HibernateIdentityObject o" + " WHERE o.realm.name = :realmName" +
+        " AND o.name = :name" + " AND o.identityType.name = :typeName")
+@NamedQuery(
+    name = "HibernateIdentityObject.countIdentityObjectsByType",
+    query = "SELECT count(o.id) FROM HibernateIdentityObject o" + " WHERE o.realm.name = :realmName" +
+        " AND o.identityType.name = :typeName")
+@Data
 public class HibernateIdentityObject implements IdentityObject {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.AUTO, generator="JBID_IO_ID_SEQ")
+  @SequenceGenerator(name = "JBID_IO_ID_SEQ", sequenceName = "JBID_IO_ID_SEQ", allocationSize = 1)
   @Column(name = "ID")
   private Long                                     id;
 
-  @Column(name = "NAME", unique = true)
+  @Column(name = "NAME",
+      unique = true)
   private String                                   name;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @Fetch(FetchMode.JOIN)
-  @JoinColumn(name = "IDENTITY_TYPE", nullable = false)
+  @JoinColumn(name = "IDENTITY_TYPE",
+      nullable = false)
   private HibernateIdentityObjectType              identityType;
 
-  @OneToMany(orphanRemoval = true, cascade = { CascadeType.ALL }, mappedBy = "fromIdentityObject")
+  @OneToMany(orphanRemoval = true,
+      cascade = { CascadeType.ALL },
+      mappedBy = "fromIdentityObject",
+      fetch = FetchType.LAZY)
   @Fetch(FetchMode.SUBSELECT)
-  @LazyCollection(LazyCollectionOption.EXTRA)
-  private Set<HibernateIdentityObjectRelationship> fromRelationships =
-                                                                     new HashSet<HibernateIdentityObjectRelationship>();
+  private Set<HibernateIdentityObjectRelationship> fromRelationships = new HashSet<>();
 
-  @OneToMany(orphanRemoval = true, cascade = { CascadeType.ALL }, mappedBy = "toIdentityObject")
+  @OneToMany(orphanRemoval = true,
+      cascade = { CascadeType.ALL },
+      mappedBy = "toIdentityObject",
+      fetch = FetchType.LAZY)
   @Fetch(FetchMode.SUBSELECT)
-  @LazyCollection(LazyCollectionOption.EXTRA)
-  private Set<HibernateIdentityObjectRelationship> toRelationships   =
-                                                                   new HashSet<HibernateIdentityObjectRelationship>();
+  private Set<HibernateIdentityObjectRelationship> toRelationships   = new HashSet<>();
 
-  @OneToMany(orphanRemoval = true, cascade = { CascadeType.ALL }, mappedBy = "identityObject")
+  @OneToMany(orphanRemoval = true,
+      cascade = { CascadeType.ALL },
+      mappedBy = "identityObject",
+      fetch = FetchType.LAZY)
   @Fetch(FetchMode.SUBSELECT)
-  @LazyCollection(LazyCollectionOption.EXTRA)
-  private Set<HibernateIdentityObjectAttribute>    attributes        =
-                                                              new HashSet<HibernateIdentityObjectAttribute>();
+  private Set<HibernateIdentityObjectAttribute>    attributes        = new HashSet<>();
 
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.LAZY)
   @MapKeyColumn(name = "PROP_NAME")
   @Column(name = "PROP_VALUE")
-  @CollectionTable(name = "jbid_io_props", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
+  @CollectionTable(name = "jbid_io_props",
+      joinColumns = { @JoinColumn(name = "PROP_ID",
+          referencedColumnName = "ID") })
   @Fetch(FetchMode.SUBSELECT)
-  @LazyCollection(LazyCollectionOption.EXTRA)
-  private Map<String, String>                      properties        = new HashMap<String, String>();
+  private Map<String, String>                      properties        = new HashMap<>();
 
   @OneToMany(
       orphanRemoval = true,
       cascade = CascadeType.REMOVE,
       fetch = FetchType.LAZY,
-      targetEntity = HibernateIdentityObjectCredential.class
-  )
+      targetEntity = HibernateIdentityObjectCredential.class)
   @JoinColumn(name = "IDENTITY_OBJECT_ID")
   @Fetch(FetchMode.SUBSELECT)
-  @LazyCollection(LazyCollectionOption.EXTRA)
-  private Set<HibernateIdentityObjectCredential>   credentials       =
-                                                               new HashSet<HibernateIdentityObjectCredential>();
+  private Set<HibernateIdentityObjectCredential>   credentials       = new HashSet<>();
 
   @ManyToOne(fetch = FetchType.EAGER)
   @Fetch(FetchMode.SELECT)
-  @JoinColumn(name = "REALM", nullable = false)
+  @JoinColumn(name = "REALM",
+      nullable = false)
   private HibernateRealm                           realm;
 
   public HibernateIdentityObject() {
@@ -144,47 +159,17 @@ public class HibernateIdentityObject implements IdentityObject {
     this.id = Long.parseLong(id);
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public HibernateIdentityObjectType getIdentityType() {
-    return identityType;
-  }
-
-  public void setIdentityType(HibernateIdentityObjectType identityType) {
-    this.identityType = identityType;
-  }
-
-  public String getFQDN() {
-    return null;
-  }
-
-  public Set<HibernateIdentityObjectAttribute> getAttributes() {
-    return attributes;
-  }
-
-  public void setAttributes(Set<HibernateIdentityObjectAttribute> attributes) {
-    this.attributes = attributes;
-  }
-
   public void addAttribute(HibernateIdentityObjectAttribute attribute) {
     attribute.setIdentityObject(this);
     this.attributes.add(attribute);
   }
 
   public Map<String, Collection> getAttributesAsMap() {
-    Map<String, Collection> map = new HashMap<String, Collection>();
-
+    Map<String, Collection> map = new HashMap<>();
     for (HibernateIdentityObjectAttribute attribute : attributes) {
       Collection values = attribute.getValues();
       map.put(attribute.getName(), values);
     }
-
     return Collections.unmodifiableMap(map);
   }
 
@@ -193,7 +178,7 @@ public class HibernateIdentityObject implements IdentityObject {
                                                                                  name,
                                                                                  HibernateIdentityObjectAttribute.TYPE_TEXT);
     List<String> list = Arrays.asList(values);
-    Set<String> vals = new HashSet<String>(list);
+    Set<String> vals = new HashSet<>(list);
     attr.setTextValues(vals);
     attributes.add(attr);
   }
@@ -213,46 +198,14 @@ public class HibernateIdentityObject implements IdentityObject {
     }
   }
 
-  public Set<HibernateIdentityObjectRelationship> getFromRelationships() {
-    return fromRelationships;
-  }
-
-  public void setFromRelationships(Set<HibernateIdentityObjectRelationship> fromRelationships) {
-    this.fromRelationships = fromRelationships;
-  }
-
   public void addFromRelationship(HibernateIdentityObjectRelationship fromRelationship) {
     fromRelationship.setFromIdentityObject(this);
     fromRelationships.add(fromRelationship);
   }
 
-  public Set<HibernateIdentityObjectRelationship> getToRelationships() {
-    return toRelationships;
-  }
-
-  public void setToRelationships(Set<HibernateIdentityObjectRelationship> toRelationships) {
-    this.toRelationships = toRelationships;
-  }
-
   public void addToRelationship(HibernateIdentityObjectRelationship toRelationship) {
     toRelationship.setToIdentityObject(this);
     fromRelationships.add(toRelationship);
-  }
-
-  public HibernateRealm getRealm() {
-    return realm;
-  }
-
-  public void setRealm(HibernateRealm realm) {
-    this.realm = realm;
-  }
-
-  public Set<HibernateIdentityObjectCredential> getCredentials() {
-    return credentials;
-  }
-
-  public void setCredentials(Set<HibernateIdentityObjectCredential> credentials) {
-    this.credentials = credentials;
   }
 
   public void addCredential(HibernateIdentityObjectCredential credential) {
@@ -261,10 +214,7 @@ public class HibernateIdentityObject implements IdentityObject {
   }
 
   public boolean hasCredentials() {
-    if (credentials != null && credentials.size() > 0) {
-      return true;
-    }
-    return false;
+    return credentials != null && !credentials.isEmpty();
   }
 
   public boolean hasCredential(IdentityObjectCredentialType type) {
@@ -289,48 +239,8 @@ public class HibernateIdentityObject implements IdentityObject {
     return null;
   }
 
-  public Map<String, String> getProperties() {
-    return properties;
-  }
-
-  public void setProperties(Map<String, String> properties) {
-    this.properties = properties;
-  }
-
   public void validatePolicy() throws PolicyValidationException {
-
+    // No validation
   }
 
-  @Override
-  public String toString() {
-    return "IdentityObject[id=" + getId() + "; name=" + getName() + "; type=" + getIdentityType().getName() + "]";
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof IdentityObject)) {
-      return false;
-    }
-
-    IdentityObject that = (IdentityObject) o;
-
-    if (name != null ? !name.equals(that.getName()) : that.getName() != null) {
-      return false;
-    }
-    if (identityType != null ? !identityType.equals(that.getIdentityType()) : that.getIdentityType() != null) {
-      return false;
-    }
-
-    return true;
-  }
-
-  @Override
-  public int hashCode() {
-    int result = name != null ? name.hashCode() : 0;
-    result = 31 * result + (identityType != null ? identityType.hashCode() : 0);
-    return result;
-  }
 }

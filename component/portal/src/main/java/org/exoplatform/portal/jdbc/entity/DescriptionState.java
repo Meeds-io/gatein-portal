@@ -20,8 +20,8 @@ package org.exoplatform.portal.jdbc.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 

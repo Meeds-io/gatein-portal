@@ -25,108 +25,104 @@ package org.picketlink.idm.impl.model.hibernate;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.*;
-
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.LazyToOne;
-import org.hibernate.annotations.LazyToOneOption;
 import org.picketlink.idm.spi.model.IdentityObjectRelationship;
 import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+
 @Entity(name = "HibernateIdentityObjectRelationship")
 @Table(name = "jbid_io_rel")
-@NamedQueries(
-  {
-      @NamedQuery(
-          name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipWithoutName",
-          query = "SELECT r FROM HibernateIdentityObjectRelationship r"
-              + " WHERE r.type.id = :typeId"
-              + " AND r.fromIdentityObject = :fromIdentityObject"
-              + " AND r.toIdentityObject = :toIdentityObject"
-      ),
-      @NamedQuery(
-          name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipByAttributes",
-          query = "SELECT r FROM HibernateIdentityObjectRelationship r"
-              + " WHERE r.type.id = :typeId"
-              + " AND r.name.name = :name"
-              + " AND r.fromIdentityObject = :fromIdentityObject"
-              + " AND r.toIdentityObject = :toIdentityObject"
-      ),
-      @NamedQuery(
-          name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipsByIdentities",
-          query = "SELECT r FROM HibernateIdentityObjectRelationship r"
-              + " WHERE"
-              + " ("
-              + "   r.fromIdentityObject = :hio1"
-              + "     AND"
-              + "   r.toIdentityObject = :hio2"
-              + " ) OR ("
-              + "   r.fromIdentityObject = :hio2"
-              + "     AND"
-              + "   r.toIdentityObject = :hio1"
-              + " ) "
-      ),
-      @NamedQuery(
-          name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipByIdentityByType",
-          query = "SELECT r FROM HibernateIdentityObjectRelationship r"
-              + " WHERE r.type.name = :typeName"
-              + " AND r.fromIdentityObject = :fromIdentityObject"
-              + " AND r.toIdentityObject = :toIdentityObject"
-      ),
-      @NamedQuery(
-          name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipByIdentity",
-          query = "SELECT r FROM HibernateIdentityObjectRelationship r"
-              + " WHERE r.fromIdentityObject = :fromIdentityObject"
-              + " AND r.toIdentityObject = :toIdentityObject"
-      ),
-      @NamedQuery(
-          name = "HibernateIdentityObjectRelationship.removeRelationshipsByName",
-          query = "DELETE FROM HibernateIdentityObjectRelationship "
-              + " WHERE name.id = :nameId"
-      ),
-  }
+@NamedQuery(
+    name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipWithoutName",
+    query = "SELECT r FROM HibernateIdentityObjectRelationship r" + " WHERE r.type.id = :typeId" +
+        " AND r.fromIdentityObject = :fromIdentityObject" + " AND r.toIdentityObject = :toIdentityObject")
+@NamedQuery(
+          name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipByIdentitiesAndTypeAndName",
+          query = "SELECT r FROM HibernateIdentityObjectRelationship r" +
+          " WHERE r.type.name = :typeName" +
+          " AND r.name.name = :name" +
+          " AND r.fromIdentityObject = :fromIdentityObject" +
+          " AND r.toIdentityObject = :toIdentityObject")
+@NamedQuery(
+    name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipsByIdentities",
+    query = "SELECT r FROM HibernateIdentityObjectRelationship r" + " WHERE" + " (" + "   r.fromIdentityObject = :hio1" +
+        "     AND" + "   r.toIdentityObject = :hio2" + " ) OR (" + "   r.fromIdentityObject = :hio2" + "     AND" +
+        "   r.toIdentityObject = :hio1" + " ) ")
+@NamedQuery(
+    name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipByIdentityByType",
+    query = "SELECT r FROM HibernateIdentityObjectRelationship r" + " WHERE r.type.name = :typeName" +
+        " AND r.fromIdentityObject = :fromIdentityObject" + " AND r.toIdentityObject = :toIdentityObject")
+@NamedQuery(
+    name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipByAttributes",
+    query = "SELECT r FROM HibernateIdentityObjectRelationship r" + " WHERE r.type.id = :typeId" + " AND r.name.name = :name" +
+        " AND r.fromIdentityObject = :fromIdentityObject" + " AND r.toIdentityObject = :toIdentityObject")
+@NamedQuery(
+    name = "HibernateIdentityObjectRelationship.findIdentityObjectRelationshipByIdentity",
+    query = "SELECT r FROM HibernateIdentityObjectRelationship r" + " WHERE r.fromIdentityObject = :fromIdentityObject" +
+        " AND r.toIdentityObject = :toIdentityObject")
+@NamedQuery(
+    name = "HibernateIdentityObjectRelationship.getRelationshipsByName",
+    query = "SELECT r FROM HibernateIdentityObjectRelationship r " +
+        " WHERE r.name.id = :nameId")
+@NamedQuery(
+    name = "HibernateIdentityObjectRelationship.removeRelationshipsByName",
+    query = "DELETE FROM HibernateIdentityObjectRelationship "
+        + " WHERE name.id = :nameId"
 )
 public class HibernateIdentityObjectRelationship implements IdentityObjectRelationship {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.AUTO, generator="JBID_IO_REL_ID_SEQ")
+  @SequenceGenerator(name = "JBID_IO_REL_ID_SEQ", sequenceName = "JBID_IO_REL_ID_SEQ", allocationSize = 1)
   @Column(name = "ID")
   private Long                                    id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "NAME")
   @Fetch(FetchMode.JOIN)
-  @LazyToOne(LazyToOneOption.PROXY)
   private HibernateIdentityObjectRelationshipName name;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "REL_TYPE", nullable = false)
+  @JoinColumn(name = "REL_TYPE",
+      nullable = false)
   @Fetch(FetchMode.SELECT)
-  @LazyToOne(LazyToOneOption.PROXY)
   private HibernateIdentityObjectRelationshipType type;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "FROM_IDENTITY", nullable = false)
+  @JoinColumn(name = "FROM_IDENTITY",
+      nullable = false)
   @Fetch(FetchMode.SELECT)
-  @LazyToOne(LazyToOneOption.PROXY)
   private HibernateIdentityObject                 fromIdentityObject;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "TO_IDENTITY", nullable = false)
+  @JoinColumn(name = "TO_IDENTITY",
+      nullable = false)
   @Fetch(FetchMode.SELECT)
-  @LazyToOne(LazyToOneOption.PROXY)
   private HibernateIdentityObject                 toIdentityObject;
 
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.LAZY)
   @MapKeyColumn(name = "PROP_NAME")
   @Column(name = "PROP_VALUE")
-  @CollectionTable(name = "jbid_io_rel_props", joinColumns = { @JoinColumn(name = "PROP_ID", referencedColumnName = "ID") })
+  @CollectionTable(name = "jbid_io_rel_props",
+      joinColumns = { @JoinColumn(name = "PROP_ID",
+          referencedColumnName = "ID") })
   @Fetch(FetchMode.SUBSELECT)
-  @LazyCollection(LazyCollectionOption.EXTRA)
-  private Map<String, String>                     properties                                = new HashMap<String, String>();
+  private Map<String, String>                     properties = new HashMap<>();
 
   public HibernateIdentityObjectRelationship() {
   }

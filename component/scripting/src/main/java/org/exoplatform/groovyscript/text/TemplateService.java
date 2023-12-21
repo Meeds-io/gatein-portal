@@ -47,7 +47,7 @@ import org.exoplatform.resolver.ResourceResolver;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.gatein.common.io.IOTools;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;

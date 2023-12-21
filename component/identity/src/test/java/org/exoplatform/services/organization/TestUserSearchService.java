@@ -38,12 +38,12 @@ public class TestUserSearchService extends AbstractKernelTest {
     assertTrue(users.getSize() > 1);
 
     Query query = new Query();
-    query.setUserName("*ro*");
+    query.setUserName("*roo*");
     users = userHandler.findUsersByQuery(query);
     assertNotNull(users);
     assertEquals(1, users.getSize());
 
-    searchedUsers = userSearchService.searchUsers("ro");
+    searchedUsers = userSearchService.searchUsers("roo");
     assertNotNull(searchedUsers);
     assertEquals(users.getSize(), searchedUsers.getSize());
   }
