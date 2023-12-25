@@ -1,6 +1,8 @@
-/*
+/**
  * This file is part of the Meeds project (https://meeds.io/).
- * Copyright (C) 2020 - 2022 Meeds Association contact@meeds.io
+ *
+ * Copyright (C) 2020 - 2023 Meeds Association contact@meeds.io
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -9,23 +11,32 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package org.exoplatform.commons.persistence.impl;
+package io.meeds.spring.module.storage;
 
-import org.exoplatform.commons.InitialContextInitializer2;
-import org.exoplatform.container.xml.InitParams;
+import static io.meeds.spring.module.mapper.EntityMapper.*;
 
-public class LiquibaseDataInitializerTestContext extends LiquibaseDataInitializer {
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-  public LiquibaseDataInitializerTestContext(InitialContextInitializer2 initialContextInitializer, InitParams initParams) {
-    super(initialContextInitializer, initParams);
+import io.meeds.spring.module.dao.TestDao;
+import io.meeds.spring.module.entity.TestEntity;
+import io.meeds.spring.module.model.TestModel;
+
+@Component
+public class TestStorage {
+
+  @Autowired
+  private TestDao dao;
+
+  public TestModel save(TestModel model) {
+    TestEntity entity = toEntity(model);
+    entity = dao.save(entity);
+    return fromEntity(entity);
   }
 
-  @Override
-  public void start() { // NOSONAR
-    super.start();
-  }
 }

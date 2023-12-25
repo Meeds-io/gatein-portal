@@ -1,6 +1,8 @@
-/*
+/**
  * This file is part of the Meeds project (https://meeds.io/).
- * Copyright (C) 2020 - 2022 Meeds Association contact@meeds.io
+ *
+ * Copyright (C) 2020 - 2023 Meeds Association contact@meeds.io
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -9,23 +11,32 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package org.exoplatform.commons.persistence.impl;
+package io.meeds.spring.module.service;
 
-import org.exoplatform.commons.InitialContextInitializer2;
-import org.exoplatform.container.xml.InitParams;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public class LiquibaseDataInitializerTestContext extends LiquibaseDataInitializer {
+import io.meeds.spring.kernel.annotation.Exclude;
+import io.meeds.spring.module.model.TestModel;
+import io.meeds.spring.module.storage.TestStorage;
 
-  public LiquibaseDataInitializerTestContext(InitialContextInitializer2 initialContextInitializer, InitParams initParams) {
-    super(initialContextInitializer, initParams);
+@Service
+@Exclude
+public class TestExcludedService {
+
+  @Autowired
+  private TestStorage storage;
+
+  public TestModel save(TestModel model) {
+    if (model == null) {
+      throw new IllegalArgumentException("TestModel is mandatory");
+    }
+    return storage.save(model);
   }
 
-  @Override
-  public void start() { // NOSONAR
-    super.start();
-  }
 }
