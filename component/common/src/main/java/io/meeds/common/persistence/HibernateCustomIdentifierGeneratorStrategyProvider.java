@@ -23,12 +23,26 @@ import java.util.Map;
 
 import org.hibernate.id.IdentityGenerator;
 import org.hibernate.id.enhanced.SequenceStyleGenerator;
+import org.hibernate.id.factory.spi.GenerationTypeStrategyRegistration;
 import org.hibernate.jpa.spi.IdentifierGeneratorStrategyProvider;
 
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
+import jakarta.persistence.GenerationType;
+
+/**
+ * This is used as workaround for Hibernate 6 change behavior with MySQL Dialect to
+ * interpret {@link GenerationType#AUTO} as {@link SequenceStyleGenerator}
+ * instead of {@link IdentityGenerator}. When supporting multiple RDBMS, this
+ * behavior is inconvenient, thus it's simply overridden here.
+ * 
+ * This method of customization was deprecated while in Hibernate 6.3 the replacement using
+ * {@link GenerationTypeStrategyRegistration} doesn't work yet.
+ * 
+ * Thus it will be considered when the Hibernate Engine will support the proposed replacement.
+ */
 public class HibernateCustomIdentifierGeneratorStrategyProvider implements IdentifierGeneratorStrategyProvider {
 
   private static final Log     LOG      = ExoLogger.getLogger(HibernateCustomIdentifierGeneratorStrategyProvider.class);
