@@ -43,8 +43,15 @@ import org.apache.commons.collections.CollectionUtils;
  */
 @SupportedAnnotationTypes("org.exoplatform.commons.api.persistence.ExoEntity")
 public class ExoEntityProcessor extends AbstractProcessor {
+
+  /**
+   * @deprecated will be removed to ease the path of entities listing
+   */
+  @Deprecated(forRemoval = true, since = "1.6.0")
+  public static final String DEPRECATED_ENTITIES_IDX_PATH = "exo-jpa-entities/entities.idx";
+
   /** Path to the generated entities.idx file **/
-  public static final String ENTITIES_IDX_PATH = "exo-jpa-entities/entities.idx";
+  public static final String ENTITIES_IDX_PATH = "jpa-entities.idx";
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) { // NOSONAR
