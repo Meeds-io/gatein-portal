@@ -1,6 +1,8 @@
-/*
+/**
  * This file is part of the Meeds project (https://meeds.io/).
- * Copyright (C) 2020 - 2022 Meeds Association contact@meeds.io
+ *
+ * Copyright (C) 2020 - 2023 Meeds Association contact@meeds.io
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -13,19 +15,24 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package org.exoplatform.commons.persistence.impl;
+package io.meeds.spring.jpa;
 
-import org.exoplatform.commons.InitialContextInitializer2;
-import org.exoplatform.container.xml.InitParams;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-public class LiquibaseDataInitializerTestContext extends LiquibaseDataInitializer {
+import org.exoplatform.commons.persistence.impl.EntityManagerService;
+import org.exoplatform.container.PortalContainer;
 
-  public LiquibaseDataInitializerTestContext(InitialContextInitializer2 initialContextInitializer, InitParams initParams) {
-    super(initialContextInitializer, initParams);
+import jakarta.persistence.EntityManagerFactory;
+
+@Configuration
+public class PersistenceUnitIntegration {
+
+  @Bean
+  public EntityManagerFactory entityManagerFactory() {
+    EntityManagerService entityManagerService = PortalContainer.getInstance()
+                                                               .getComponentInstanceOfType(EntityManagerService.class);
+    return entityManagerService.getEntityManagerFactory();
   }
 
-  @Override
-  public void start() { // NOSONAR
-    super.start();
-  }
 }

@@ -74,19 +74,6 @@ public abstract class AbstractKernelTest extends AbstractGateInTest {
         super(name);
     }
 
-    public static PortalContainer bootContainer(Class<?> clazz) {
-      //
-      bootstrap = new KernelBootstrap(Thread.currentThread().getContextClassLoader());
-
-      // Configure ourselves
-      bootstrap.addConfiguration(clazz);
-      //
-      bootstrap.boot();
-
-      //
-      return bootstrap.getContainer();
-    }
-
     public PortalContainer getContainer() {
         return bootstrap == null ? bootContainer() : bootstrap.getContainer();
     }
@@ -166,7 +153,7 @@ public abstract class AbstractKernelTest extends AbstractGateInTest {
         }
     }
 
-    protected void forceStop() {
+    private void forceStop() {
       RootContainer.getInstance().stop();
       ExoContainerContext.setCurrentContainer(null);
     }
@@ -185,12 +172,21 @@ public abstract class AbstractKernelTest extends AbstractGateInTest {
     }
 
     private PortalContainer bootContainer() {
-      PortalContainer container = bootContainer(getClass());
-      ExoContainerContext.setCurrentContainer(container);
-      return container;
+      //
+      bootstrap = new KernelBootstrap(Thread.currentThread().getContextClassLoader());
+
+      // Configure ourselves
+      bootstrap.addConfiguration(getClass());
+      //
+      bootstrap.boot();
+
+      //
+      PortalContainer portalContainer = bootstrap.getContainer();
+      ExoContainerContext.setCurrentContainer(portalContainer);
+      return portalContainer;
     }
 
-    private static boolean isPortalContainerPresent() {
+    private boolean isPortalContainerPresent() {
       return ExoContainerContext.getCurrentContainerIfPresent() != null && PortalContainer.getInstanceIfPresent() != null;
     }
 
