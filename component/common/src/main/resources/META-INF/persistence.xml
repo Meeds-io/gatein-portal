@@ -10,7 +10,6 @@
     <properties>
       <property name="persistenceUnitName" value="meeds-jpa"></property>
       <property name="hibernate.archive.scanner" value="org.exoplatform.commons.persistence.impl.JPADatasourceEntityScanner"></property>
-      <property name="hibernate.id.new_generator_mappings" value="false"/>
       <property name="hibernate.hbm2ddl.auto" value="none"/>
       <property name="hibernate.show_sql" value="false"/>
       <property name="hibernate.current_session_context_class" value="thread"/>
