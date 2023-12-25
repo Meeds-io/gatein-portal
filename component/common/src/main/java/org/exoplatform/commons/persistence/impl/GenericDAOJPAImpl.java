@@ -37,12 +37,13 @@ import org.exoplatform.commons.api.persistence.GenericDAO;
  * @author <a href="trongtt@gmail.com">Trong Tran</a>
  * @version $Revision$
  * @param <E> Entity type
- * @param <ID> Identity of the entity
+ * @param <I> Identity of the entity
  */
-public class GenericDAOJPAImpl<E, ID extends Serializable> implements GenericDAO<E, ID> {
+public class GenericDAOJPAImpl<E, I extends Serializable> implements GenericDAO<E, I> {
 
   protected Class<E> modelClass;
 
+  @SuppressWarnings("unchecked")
   public GenericDAOJPAImpl() {
     ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
     this.modelClass = (Class<E>) genericSuperclass.getActualTypeArguments()[0];
@@ -62,8 +63,8 @@ public class GenericDAOJPAImpl<E, ID extends Serializable> implements GenericDAO
   }
 
   @Override
-  public E find(ID id) {
-    return (E) getEntityManager().find(modelClass, id);
+  public E find(I id) {
+    return getEntityManager().find(modelClass, id);
   }
 
   /**
