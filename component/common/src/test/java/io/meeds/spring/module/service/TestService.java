@@ -16,17 +16,35 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.kernel.test;
+package io.meeds.spring.module.service;
 
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public class KernelExtension implements BeforeAllCallback {
+import org.exoplatform.commons.api.settings.SettingService;
 
-  @Override
-  public void beforeAll(ExtensionContext context) {
-    Class<?> testClass = context.getTestClass().orElseThrow();
-    AbstractSpringTest.bootContainer(testClass);
+import io.meeds.spring.module.model.TestModel;
+import io.meeds.spring.module.storage.TestStorage;
+
+@Service
+public class TestService {
+
+  // Fake injection from Kernel for Testing Purpose
+  @Autowired
+  private SettingService settingService;
+
+  @Autowired
+  private TestStorage    storage;
+
+  public TestModel save(TestModel model) {
+    if (model == null) {
+      throw new IllegalArgumentException("TestModel is mandatory");
+    }
+    if (settingService == null) {
+      // Fake exception
+      throw new IllegalStateException("SettingService is null");
+    }
+    return storage.save(model);
   }
 
 }
