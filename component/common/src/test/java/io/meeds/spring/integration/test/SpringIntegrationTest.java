@@ -21,8 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -31,23 +29,30 @@ import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.jpa.CommonsDAOJPAImplTest;
 
 import io.meeds.kernel.test.KernelExtension;
-import io.meeds.spring.integration.model.TestModel;
-import io.meeds.spring.integration.service.TestExcludedService;
-import io.meeds.spring.integration.service.TestService;
-import io.meeds.spring.integration.storage.TestStorage;
-import io.meeds.spring.integration.test.dao.TestDao;
-import io.meeds.spring.integration.test.entity.TestEntity;
+import io.meeds.spring.AvailableIntegration;
+import io.meeds.spring.module.dao.TestDao;
+import io.meeds.spring.module.entity.TestEntity;
+import io.meeds.spring.module.model.TestModel;
+import io.meeds.spring.module.service.TestExcludedService;
+import io.meeds.spring.module.service.TestService;
+import io.meeds.spring.module.storage.TestStorage;
 
 @ExtendWith({ SpringExtension.class, KernelExtension.class })
 @SpringBootApplication(scanBasePackages = {
-                                            "io.meeds.spring.integration"
+  SpringIntegrationTest.MODULE_NAME,
+  AvailableIntegration.KERNEL_MODULE,
+  AvailableIntegration.JPA_MODULE,
+  AvailableIntegration.LIQUIBASE_MODULE,
 })
-@EnableJpaRepositories(basePackages = "io.meeds.spring.integration")
-@EnableConfigurationProperties(LiquibaseProperties.class)
+@EnableJpaRepositories(basePackages = SpringIntegrationTest.MODULE_NAME)
 @TestPropertySource(properties = {
-                                   "spring.liquibase.change-log=classpath:db/changelog/test-rdbms.db.changelog.xml",
+  "spring.liquibase.change-log=" + SpringIntegrationTest.CHANGELOG_PATH,
 })
 public class SpringIntegrationTest extends CommonsDAOJPAImplTest { // NOSONAR
+
+  static final String         MODULE_NAME    = "io.meeds.spring.module";
+
+  static final String         CHANGELOG_PATH = "classpath:db/changelog/test-rdbms.db.changelog.xml";
 
   @Autowired
   private SettingService      settingService;
@@ -66,7 +71,7 @@ public class SpringIntegrationTest extends CommonsDAOJPAImplTest { // NOSONAR
 
   @Test
   public void beansInjected() {
-    assertNotNull("Kernel Service not included in Spring context", settingService);
+    assertNotNull("Kernel Component not found in Spring context", settingService);
     assertNotNull("Spring @Repository Bean not found", testDao);
     assertNotNull("Spring @Component Bean not found", testStorage);
     assertNotNull("Spring @Service Bean not found", testService);

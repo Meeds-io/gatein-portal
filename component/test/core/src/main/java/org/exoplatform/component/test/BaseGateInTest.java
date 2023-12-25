@@ -70,4 +70,5 @@ public class BaseGateInTest extends TestCase {
         afe.initCause(t);
         return afe;
     }
+
 }

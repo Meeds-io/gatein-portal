@@ -1,6 +1,8 @@
-/*
+/**
  * This file is part of the Meeds project (https://meeds.io/).
- * Copyright (C) 2020 - 2022 Meeds Association contact@meeds.io
+ *
+ * Copyright (C) 2020 - 2023 Meeds Association contact@meeds.io
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -9,23 +11,33 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package org.exoplatform.commons.persistence.impl;
+package io.meeds.spring.module.mapper;
 
-import org.exoplatform.commons.InitialContextInitializer2;
-import org.exoplatform.container.xml.InitParams;
+import io.meeds.spring.module.entity.TestEntity;
+import io.meeds.spring.module.model.TestModel;
 
-public class LiquibaseDataInitializerTestContext extends LiquibaseDataInitializer {
+public class EntityMapper {
 
-  public LiquibaseDataInitializerTestContext(InitialContextInitializer2 initialContextInitializer, InitParams initParams) {
-    super(initialContextInitializer, initParams);
+  private EntityMapper() {
   }
 
-  @Override
-  public void start() { // NOSONAR
-    super.start();
+  public static TestEntity toEntity(TestModel model) {
+    if (model == null) {
+      return null;
+    }
+    return new TestEntity(model.getId(), model.getText());
   }
+
+  public static TestModel fromEntity(TestEntity entity) {
+    if (entity == null) {
+      return null;
+    }
+    return new TestModel(entity.getId(), entity.getText());
+  }
+
 }

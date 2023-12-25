@@ -13,19 +13,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package org.exoplatform.commons.persistence.impl;
+package io.meeds.spring.web.transaction;
 
-import org.exoplatform.commons.InitialContextInitializer2;
-import org.exoplatform.container.xml.InitParams;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-public class LiquibaseDataInitializerTestContext extends LiquibaseDataInitializer {
+@Configuration
+public class FilterConfiguration {
 
-  public LiquibaseDataInitializerTestContext(InitialContextInitializer2 initialContextInitializer, InitParams initParams) {
-    super(initialContextInitializer, initParams);
+  @Bean
+  public FilterRegistrationBean<PortalTransactionFilter> transactionFilter() {
+    FilterRegistrationBean<PortalTransactionFilter> registrationBean = new FilterRegistrationBean<>();
+    registrationBean.setFilter(new PortalTransactionFilter());
+    registrationBean.addUrlPatterns("/rest/*");
+    registrationBean.setOrder(2);
+    return registrationBean;
   }
 
-  @Override
-  public void start() { // NOSONAR
-    super.start();
-  }
 }
