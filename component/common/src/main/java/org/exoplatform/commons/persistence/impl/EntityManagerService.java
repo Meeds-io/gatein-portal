@@ -27,11 +27,13 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.cfg.JdbcSettings;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
+import lombok.Getter;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -56,6 +58,7 @@ public class EntityManagerService implements ComponentRequestLifecycle {
   private static final String         EXO_JPA_DATASOURCE_NAME     = "exo.jpa.datasource.name";
   private static final String         EXO_PREFIX_FOR_HIB_SETTINGS = "exo.jpa.";
 
+  @Getter
   protected EntityManagerFactory        entityManagerFactory;
 
   protected Properties properties;
@@ -77,7 +80,7 @@ public class EntityManagerService implements ComponentRequestLifecycle {
     // Setting datasource JNDI name. Get it directly from eXo global properties so it is not overridable by addons.
     String datasourceName = PropertyManager.getProperty(EXO_JPA_DATASOURCE_NAME);
     if (StringUtils.isNotBlank(datasourceName)) {
-      properties.put(AvailableSettings.JPA_NON_JTA_DATASOURCE, datasourceName);
+      properties.put(JdbcSettings.JAKARTA_NON_JTA_DATASOURCE, datasourceName);
       LOGGER.info("EntityManagerFactory [{}] - Creating with datasource {}.", getPersistenceUnitName(), datasourceName);
     } else {
       LOGGER.info("EntityManagerFactory [{}] - Creating with default datasource.", getPersistenceUnitName());
@@ -97,11 +100,11 @@ public class EntityManagerService implements ComponentRequestLifecycle {
   }
 
   public String getDatasourceName() {
-    return (String) properties.get(AvailableSettings.JPA_NON_JTA_DATASOURCE);
+    return (String) properties.get(JdbcSettings.JAKARTA_NON_JTA_DATASOURCE);
   }
 
   public void setDatasourceName(String datasourceName) {
-    properties.put(AvailableSettings.JPA_NON_JTA_DATASOURCE, datasourceName);
+    properties.put(JdbcSettings.JAKARTA_NON_JTA_DATASOURCE, datasourceName);
   }
 
   private List<String> getHibernateAvailableSettings() {
