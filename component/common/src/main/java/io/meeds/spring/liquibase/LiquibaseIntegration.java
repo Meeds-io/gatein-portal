@@ -17,6 +17,10 @@
  */
 package io.meeds.spring.liquibase;
 
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -24,25 +28,45 @@ import org.springframework.context.annotation.Configuration;
 
 import org.exoplatform.commons.persistence.impl.LiquibaseDataInitializer;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
 import liquibase.integration.spring.SpringLiquibase;
 
 @Configuration
 @EnableConfigurationProperties(LiquibaseProperties.class)
 public class LiquibaseIntegration {
 
+  private static final Log           LOG      = ExoLogger.getLogger(LiquibaseIntegration.class);
+
   @Bean
   public SpringLiquibase liquibase(LiquibaseProperties liquibaseProperties) {
     LiquibaseDataInitializer liquibaseDataInitializer = PortalContainer.getInstance()
                                                                        .getComponentInstanceOfType(LiquibaseDataInitializer.class);
     SpringLiquibase liquibase = new SpringLiquibase();
-    liquibase.setDataSource(liquibaseDataInitializer.getDatasource());
+    DataSource datasource = liquibaseDataInitializer.getDatasource();
+    liquibase.setDataSource(datasource);
+    liquibase.setContexts(liquibaseDataInitializer.getContexts());
     liquibase.setChangeLog(liquibaseProperties.getChangeLog());
-    liquibase.setContexts(liquibaseProperties.getContexts());
-    liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
+    liquibase.setDefaultSchema(getSchema(datasource, liquibaseProperties));
     liquibase.setDropFirst(liquibaseProperties.isDropFirst());
     liquibase.setShouldRun(liquibaseProperties.isEnabled());
     return liquibase;
+  }
+
+  private String getSchema(DataSource datasource, LiquibaseProperties liquibaseProperties) {
+    try (Database database = DatabaseFactory.getInstance()
+                                            .findCorrectDatabaseImplementation(new JdbcConnection(datasource.getConnection()))) {
+      return database.getDefaultSchemaName();
+    } catch (DatabaseException | SQLException e) {
+      LOG.warn("Error while retrieving default schema name of datasource, attept to use default schema from settings 'spring.liquibase.default-schema'",
+               e);
+      return liquibaseProperties.getDefaultSchema();
+    }
   }
 
 }
