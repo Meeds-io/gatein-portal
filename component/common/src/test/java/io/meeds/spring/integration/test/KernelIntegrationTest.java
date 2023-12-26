@@ -36,7 +36,7 @@ import io.meeds.spring.module.storage.TestStorage;
 @ExtendWith({ SpringExtension.class, KernelExtension.class })
 @SpringBootApplication(scanBasePackages = {
   KernelIntegrationTest.MODULE_NAME,
-  AvailableIntegration.KERNEL_MODULE,
+  AvailableIntegration.KERNEL_TEST_MODULE,
   AvailableIntegration.JPA_MODULE,
   AvailableIntegration.LIQUIBASE_MODULE,
 })

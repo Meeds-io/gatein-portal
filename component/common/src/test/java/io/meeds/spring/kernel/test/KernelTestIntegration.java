@@ -1,38 +1,15 @@
-/**
- * This file is part of the Meeds project (https://meeds.io/).
- *
- * Copyright (C) 2020 - 2023 Meeds Association contact@meeds.io
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3 of the License, or (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- */
-package io.meeds.spring.kernel.utils;
-
-import static io.meeds.spring.kernel.utils.SharedSpringBeanRegistry.hasBeanDefinition;
-import static io.meeds.spring.kernel.utils.SharedSpringBeanRegistry.registerSpringBeansState;
+package io.meeds.spring.kernel.test;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -41,7 +18,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
-import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.spi.ComponentAdapter;
 
@@ -53,39 +29,17 @@ import io.meeds.spring.kernel.annotation.Exclude;
  * into Spring Context in order to be able to use annotations to inject Kernel
  * services
  */
-public class KernelIntegration {
+public class KernelTestIntegration {
 
-  private static final Logger      LOG               = LoggerFactory.getLogger(KernelIntegration.class);
+  private static final Logger LOG = LoggerFactory.getLogger(KernelTestIntegration.class);
 
-  private static final Set<String> KERNEL_BEAN_NAMES = new HashSet<>();
-
-  private KernelIntegration() {
-  }
-
-  public static void integrateSpringContext(PortalContainer portalContainer,
-                                            BeanDefinitionRegistry beanRegistry,
-                                            Supplier<String[]> getBeanDefinitionNamesSupplier,
-                                            Function<String, Object> getBeanFunction,
-                                            Runnable finishSpringContextStartup) {
-    registerKernelComponentsAsSpringBeans(portalContainer, beanRegistry);
-    if (finishSpringContextStartup != null) {
-      LOG.info("Continue Spring context startup with integrated Kernel Services");
-      // Continue startup of Spring
-      finishSpringContextStartup.run();
-      // Register Spring Beans in Kernel Container
-      LOG.info("Inject Spring Beans into Kernel after finishing startup into kernel");
-      registerSpringBeansAsKernelComponents(portalContainer,
-                                            beanRegistry,
-                                            getBeanDefinitionNamesSupplier,
-                                            getBeanFunction);
-    }
+  private KernelTestIntegration() {
   }
 
   public static void registerKernelComponentsAsSpringBeans(PortalContainer portalContainer,
                                                            BeanDefinitionRegistry beanRegistry) {
     LOG.info("Injecting Kernel components into Spring context as beans");
     injectKernelComponentsAsBeans(beanRegistry, portalContainer);
-    registerSpringBeansState(beanRegistry);
   }
 
   public static void registerSpringBeanAsKernelComponent(PortalContainer container,
@@ -97,32 +51,18 @@ public class KernelIntegration {
 
   private static void registerSpringBeansAsKernelComponents(PortalContainer portalContainer,
                                                             BeanDefinitionRegistry beanRegistry,
-                                                            Supplier<String[]> getBeanDefinitionNamesSupplier,
-                                                            Function<String, Object> getBeanFunction) {
-    String[] springBeanDefinitionNames = getBeanDefinitionNamesSupplier.get();
-    registerSpringBeansAsKernelComponents(portalContainer, beanRegistry, springBeanDefinitionNames, getBeanFunction);
-  }
-
-  private static void registerSpringBeansAsKernelComponents(PortalContainer portalContainer,
-                                                            BeanDefinitionRegistry beanRegistry,
                                                             String[] beanDefinitionNames,
                                                             Function<String, Object> getBeanFunction) {
     Stream.of(beanDefinitionNames)
           .filter(beanName -> portalContainer.getComponentAdapter(beanName) == null)
-          .filter(beanName -> !isBeanRegisteredInKernel(beanName))
           .forEach(beanName -> {
             BeanDefinition beanDefinition = getBeanDefinition(beanRegistry, beanName);
-            if (beanDefinition == null) {
-              LOG.debug("Bean {} seems to have an empty definition name", beanName);
-            } else {
+            if (beanDefinition != null) {
               String beanClassName = beanDefinition.getBeanClassName();
               Object bean = getBeanFunction.apply(beanName);
               Class<?> beanClass = getBeanClass(portalContainer, beanClassName, bean);
               if (beanClass != null && portalContainer.getComponentInstanceOfType(beanClass) == null) {
-                LOG.atLevel(PropertyManager.isDevelopping() ? Level.INFO : Level.DEBUG)
-                   .log("Register Spring Bean '{}' as Kernel service", beanClass.getName());
                 portalContainer.registerComponentInstance(beanClass, bean);
-                SharedSpringBeanRegistry.registerBeanDefinition(beanName, beanClass, beanDefinition);
               }
             }
           });
@@ -132,12 +72,12 @@ public class KernelIntegration {
   private static void injectKernelComponentsAsBeans(BeanDefinitionRegistry beanRegistry, PortalContainer portalContainer) {
     List<Class> beanClasses = portalContainer.getComponentAdapters()
                                              .stream()
-                                             .filter(adapter -> !hasBeanDefinition(adapter.getComponentKey().toString()))
                                              .map(adapter -> beanNameToClass(adapter, portalContainer))
                                              .filter(Objects::nonNull)
                                              .distinct()
                                              .toList();
 
+    Set<String> kernelBeanNames = new HashSet<>();
     beanClasses.stream()
                // Avoid having two instances inheriting from the same API
                // interface to not get NoUniqueBeanDefinitionException
@@ -146,13 +86,10 @@ public class KernelIntegration {
                                        .filter(oc -> !oc.equals(c) && oc.isAssignableFrom(c))
                                        .findFirst()
                                        .orElse(null);
-                 if (ec != null || KERNEL_BEAN_NAMES.contains(c.getName())) {
-                   LOG.debug("Kernel Service '{}' is already defined by other Service with Key {}. Registration will be ignored.",
-                             c.getName(),
-                             ec.getName());
+                 if (ec != null || kernelBeanNames.contains(c.getName())) {
                    return false;
                  } else {
-                   KERNEL_BEAN_NAMES.add(c.getName());
+                   kernelBeanNames.add(c.getName());
                    return true;
                  }
                })
@@ -162,20 +99,12 @@ public class KernelIntegration {
   private static Class<?> registerBean(PortalContainer portalContainer, BeanDefinitionRegistry beanRegistry, Class<?> beanClass) {
     RootBeanDefinition beanDefinition = createBeanDefinition(beanClass, portalContainer);
     beanRegistry.registerBeanDefinition(beanClass.getName(), beanDefinition);
-    LOG.debug("Kernel service '{}' injected in Spring context", beanClass.getName());
     return beanClass;
   }
 
   private static <T> RootBeanDefinition createBeanDefinition(Class<T> keyClass, PortalContainer portalContainer) {
     RootBeanDefinition beanDefinition = new RootBeanDefinition(keyClass,
-                                                               () -> {
-                                                                 T instance =
-                                                                            portalContainer.getComponentInstanceOfType(keyClass);
-                                                                 LOG.debug("Getting Kernel Service '{}' to inject in Spring context. Found = {}",
-                                                                           keyClass,
-                                                                           instance != null);
-                                                                 return instance;
-                                                               });
+                                                               () -> portalContainer.getComponentInstanceOfType(keyClass));
     beanDefinition.setLazyInit(true);
     beanDefinition.setDependencyCheck(AbstractBeanDefinition.DEPENDENCY_CHECK_NONE);
     return beanDefinition;
@@ -201,9 +130,6 @@ public class KernelIntegration {
           return beanClass;
         }
       } else {
-        LOG.debug("Ignore registering Spring Bean '{}/{}' as Kernel service",
-                  beanClassName,
-                  bean.getClass().getName());
         return null;
       }
     } catch (ClassNotFoundException e) {
@@ -214,12 +140,7 @@ public class KernelIntegration {
   }
 
   private static BeanDefinition getBeanDefinition(BeanDefinitionRegistry beanRegistry, String beanName) {
-    try {
-      return beanRegistry.getBeanDefinition(beanName);
-    } catch (NoSuchBeanDefinitionException e) {
-      LOG.debug("Can't find Bean with name {}. Ignore adding it into Kernel Container", beanName);
-      return null;
-    }
+    return beanRegistry.containsBeanDefinition(beanName) ? beanRegistry.getBeanDefinition(beanName) : null;
   }
 
   private static boolean isConfigurationBean(Class<?> beanClass) {
@@ -257,10 +178,6 @@ public class KernelIntegration {
         return key.getClass();
       }
     }
-  }
-
-  private static boolean isBeanRegisteredInKernel(String beanName) {
-    return KERNEL_BEAN_NAMES.contains(beanName);
   }
 
 }
