@@ -18,51 +18,23 @@
  */
 package io.meeds.spring.kernel;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.ServletContextAware;
 
-import org.exoplatform.container.PortalContainer;
-
-import io.meeds.spring.kernel.utils.KernelIntegration;
+import jakarta.servlet.ServletContext;
+import lombok.Setter;
 
 @Component
-public class SpringBeanFactoryInterceptor implements BeanFactoryPostProcessor, BeanPostProcessor, ApplicationContextAware {
+public class SpringBeanFactoryInterceptor implements BeanPostProcessor, ServletContextAware {
 
-  private static final Logger    LOG = LoggerFactory.getLogger(SpringBeanFactoryInterceptor.class);
-
-  private PortalContainer        container;
-
-  private ApplicationContext     applicationContext;
-
-  private BeanDefinitionRegistry beanRegistry;
-
-  @Override
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    this.applicationContext = applicationContext;
-  }
-
-  @Override
-  public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-    LOG.info("Integrating Spring Context with Container. Application name = {}", applicationContext.getApplicationName());
-    this.container = PortalContainer.getInstance();
-    this.beanRegistry = (BeanDefinitionRegistry) beanFactory;
-    KernelIntegration.registerKernelComponentsAsSpringBeans(container, beanRegistry);
-  }
+  @Setter
+  private ServletContext servletContext;
 
   @Override
   public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-    KernelIntegration.registerSpringBeanAsKernelComponent(container,
-                                                          beanRegistry,
-                                                          beanName,
-                                                          bean);
+    KernelContainerLifecyclePlugin.addSpringBean(servletContext.getServletContextName(), beanName, bean);
     return bean;
   }
 
