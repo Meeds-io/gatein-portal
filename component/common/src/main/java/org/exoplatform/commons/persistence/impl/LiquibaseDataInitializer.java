@@ -25,6 +25,7 @@ import liquibase.Scope;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import liquibase.ui.LoggerUIService;
@@ -184,17 +185,23 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
    * @param changelogsPath
    */
   protected void applyChangeLog(DataSource datasource, String changelogsPath) {
-    try (Database database = DatabaseFactory.getInstance()
-                                            .findCorrectDatabaseImplementation(new JdbcConnection(datasource.getConnection()))) {
-      try (Liquibase liquibase = new Liquibase(changelogsPath, new ClassLoaderResourceAccessor(), database)) {
-        liquibase.update(liquibaseContexts);
-      }
+    Database database = null;
+    try {
+      database = DatabaseFactory.getInstance()
+              .findCorrectDatabaseImplementation(new JdbcConnection(datasource.getConnection()));
+      Liquibase liquibase = new Liquibase(changelogsPath, new ClassLoaderResourceAccessor(), database);
+      liquibase.update(liquibaseContexts);
     } catch (SQLException e) {
-      LOG.error("Error while getting a JDBC connection from datasource {}", datasourceName, e);
+      LOG.error("Error while getting a JDBC connection from datasource " + datasourceName + " - Cause : " + e.getMessage(), e);
     } catch (LiquibaseException e) {
-      // AutoCommit, database connection is auto closed
-      if (!(e.getCause() instanceof SQLException sqlException && StringUtils.contains(sqlException.getMessage(), "Connection is closed"))) {
-        LOG.error("Error while applying liquibase changelogs {}", changelogsPath, e);
+      LOG.error("Error while applying liquibase changelogs " + changelogsPath + " - Cause : " + e.getMessage(), e);
+    } finally {
+      if (database != null) {
+        try {
+          database.close();
+        } catch (DatabaseException e) {
+          LOG.error("Error while closing database connection - Cause : " + e.getMessage(), e);
+        }
       }
     }
   }
