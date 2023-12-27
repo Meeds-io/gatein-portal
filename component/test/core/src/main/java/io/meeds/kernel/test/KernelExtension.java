@@ -26,7 +26,7 @@ public class KernelExtension implements BeforeAllCallback {
   @Override
   public void beforeAll(ExtensionContext context) {
     Class<?> testClass = context.getTestClass().orElseThrow();
-    AbstractSpringTest.bootContainer(testClass);
+    AbstractSpringTest.setTestClass(testClass);
   }
 
 }
