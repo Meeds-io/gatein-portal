@@ -54,7 +54,6 @@ public class LiquibaseIntegration {
     String schema = getSchema(datasource, liquibaseProperties);
     liquibase.setDefaultSchema(schema);
     liquibase.setLiquibaseSchema(schema);
-
     liquibase.setChangeLog(liquibaseProperties.getChangeLog());
     liquibase.setDropFirst(liquibaseProperties.isDropFirst());
     liquibase.setShouldRun(liquibaseProperties.isEnabled());
