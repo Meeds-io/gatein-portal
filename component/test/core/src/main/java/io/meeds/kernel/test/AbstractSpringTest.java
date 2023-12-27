@@ -27,6 +27,9 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @ConfiguredBy({
   @ConfigurationUnit(scope = ContainerScope.ROOT,
       path = "conf/configuration.xml"),
@@ -34,6 +37,10 @@ import org.exoplatform.container.component.RequestLifeCycle;
       path = "conf/portal/configuration.xml"),
 })
 public abstract class AbstractSpringTest {
+
+  @Setter
+  @Getter
+  private static Class<?>                      testClass;
 
   private static KernelBootstrap               bootstrap;
 
