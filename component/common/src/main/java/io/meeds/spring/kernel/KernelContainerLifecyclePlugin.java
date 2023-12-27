@@ -30,6 +30,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.picocontainer.Startable;
 import org.slf4j.Logger;
@@ -66,7 +67,7 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
   private static boolean                             kernelAlreadyBooted  = false;
 
   public static void addSpringContext(String servletContextName,
-                                      PortalApplicationContext applicationContext,
+                                      ApplicationContext applicationContext,
                                       BeanDefinitionRegistry beanDefinitionRegistry) {
     if (kernelAlreadyBooted) {
       LOG.warn("Adding Spring context '{}' happened too late in Server startup, spring beans will not be injected for this context",
@@ -100,9 +101,12 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
     LOG.info("End spring integration with Kernel Container within {}ms", System.currentTimeMillis() - start);
   }
 
-  private void addKernelToSpring(PortalContainer portalContainer, Collection<ComponentAdapter<?>> kernelComponentAdapters) {
+  public static void addKernelToSpring(PortalContainer portalContainer, Collection<ComponentAdapter<?>> kernelComponentAdapters) {
     kernelComponentAdapters.forEach(adapter -> {
       Class<?> componentKey = componentToBeanName(adapter);
+      if (!componentKey.isInterface() && isComponentDuplicated(portalContainer, componentKey)) {
+        return;
+      }
       springContexts.forEach((servletContextName, applicationContext) -> {
         BeanDefinitionRegistry beanRegistry = springBeanRegistries.get(servletContextName);
         String componentKeyName = componentKey.getName();
@@ -119,7 +123,7 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
     });
   }
 
-  private void addSpringToKernel(PortalContainer portalContainer, Map<String, Map<String, BeanDefinition>> springBeansByContext) {
+  public static void addSpringToKernel(PortalContainer portalContainer, Map<String, Map<String, BeanDefinition>> springBeansByContext) {
     springContexts.forEach((servletContextName, applicationContext) -> {
       Map<String, BeanDefinition> beansMap = springBeansByContext.get(servletContextName);
       beansMap.forEach((beanName, beanDefinition) -> {
@@ -144,7 +148,7 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
     });
   }
 
-  private void addSpringToEachOther(Map<String, Map<String, BeanDefinition>> springBeansByContext) {
+  public static void addSpringToEachOther(Map<String, Map<String, BeanDefinition>> springBeansByContext) {
     springContexts.forEach((senderServletContextName, senderApplicationContext) -> {
       Map<String, BeanDefinition> beansMap = springBeansByContext.get(senderServletContextName);
       springBeanRegistries.entrySet()
@@ -172,8 +176,15 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
     });
   }
 
+  public static Map<String, Map<String, BeanDefinition>> getBeansByServletContext() {
+    return springBeanRegistries.entrySet()
+                               .stream()
+                               .collect(Collectors.toMap(Entry::getKey,
+                                                         e -> getEligibleBeans(e.getValue())));
+  }
+
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private ComponentAdapter<Object> createComponentAdapter(String servletContextName,
+  private static ComponentAdapter<Object> createComponentAdapter(String servletContextName,
                                                           PortalContainer portalContainer,
                                                           String beanName,
                                                           String beanClassName,
@@ -189,7 +200,7 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
     }
   }
 
-  private <T> RootBeanDefinition createBeanDefinition(Class<T> keyClass, PortalContainer portalContainer) {
+  private static <T> RootBeanDefinition createBeanDefinition(Class<T> keyClass, PortalContainer portalContainer) {
     RootBeanDefinition beanDefinition = new RootBeanDefinition(keyClass,
                                                                () -> getComponentInstance(portalContainer, keyClass));
     beanDefinition.setLazyInit(true);
@@ -197,7 +208,7 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
     return beanDefinition;
   }
 
-  private RootBeanDefinition createBeanDefinition(String beanName,
+  private static RootBeanDefinition createBeanDefinition(String beanName,
                                                   Class<Object> beanClassName,
                                                   ApplicationContext senderApplicationContext) {
     RootBeanDefinition receiverBeanDefinition = new RootBeanDefinition(beanClassName,
@@ -208,14 +219,7 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
     return receiverBeanDefinition;
   }
 
-  private Map<String, Map<String, BeanDefinition>> getBeansByServletContext() {
-    return springBeanRegistries.entrySet()
-                               .stream()
-                               .collect(Collectors.toMap(Entry::getKey,
-                                                         e -> getEligibleBeans(e.getValue())));
-  }
-
-  private Map<String, BeanDefinition> getEligibleBeans(BeanDefinitionRegistry beanRegistry) {
+  private static Map<String, BeanDefinition> getEligibleBeans(BeanDefinitionRegistry beanRegistry) {
     String[] beanNames = beanRegistry.getBeanDefinitionNames();
     return Stream.of(beanNames)
                  .map(beanName -> {
@@ -232,7 +236,7 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
   }
 
   @SuppressWarnings("rawtypes")
-  private Class componentToBeanName(ComponentAdapter adapter) { // NOSONAR
+  private static Class componentToBeanName(ComponentAdapter adapter) { // NOSONAR
     Object key = adapter.getComponentKey();
     Class componentKeyClass = getComponentKeyClass(key);
     if (componentKeyClass == null || !isComponentClassValid(componentKeyClass)) {
@@ -247,51 +251,51 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
     }
   }
 
-  private Class<?> beanNameToComponentKey(String... beanClassNames) {
+  private static Class<?> beanNameToComponentKey(String... beanClassNames) {
     Stream<String> componentKeys = Stream.of(beanClassNames);
     List<Class<Object>> componentClasses = componentKeys.filter(Objects::nonNull)
-                                                        .map(this::getClass)
+                                                        .map(KernelContainerLifecyclePlugin::getClass)
                                                         .filter(Objects::nonNull)
                                                         .filter(className -> !Objects.equals(className, Object.class))
                                                         .distinct()
                                                         .toList();
     if (componentClasses.isEmpty()
         // Direct rejection of Services in some cases
-        || componentClasses.stream().anyMatch(this::isServiceBeanRejected)) {
+        || componentClasses.stream().anyMatch(KernelContainerLifecyclePlugin::isServiceBeanRejected)) {
       return null;
     } else {
       Class<Object> beanClassName = componentClasses.stream()
-                                                    .filter(this::isServiceBean)
+                                                    .filter(KernelContainerLifecyclePlugin::isServiceBean)
                                                     .findFirst()
                                                     .orElse(null);
       Class<?>[] componentKeyInterfaces = beanClassName == null ? null : beanClassName.getInterfaces();
       return componentKeyInterfaces == null ? beanClassName :
                                             Arrays.stream(componentKeyInterfaces)
-                                                  .filter(this::isServiceBean)
+                                                  .filter(KernelContainerLifecyclePlugin::isServiceBean)
                                                   .findFirst()
                                                   .orElse(beanClassName);
     }
   }
 
-  private boolean isBeanEligible(String... beanClassNames) {
+  private static boolean isBeanEligible(String... beanClassNames) {
     Stream<String> componentKeys = Stream.of(beanClassNames);
     List<Class<Object>> componentClasses = componentKeys.filter(Objects::nonNull)
-                                                        .map(this::getClass)
+                                                        .map(KernelContainerLifecyclePlugin::getClass)
                                                         .filter(Objects::nonNull)
                                                         .distinct()
                                                         .toList();
     return !componentClasses.isEmpty()
-           && componentClasses.stream().noneMatch(this::isServiceBeanRejected)
-           && componentClasses.stream().anyMatch(this::isServiceBean);
+           && componentClasses.stream().noneMatch(KernelContainerLifecyclePlugin::isServiceBeanRejected)
+           && componentClasses.stream().anyMatch(KernelContainerLifecyclePlugin::isServiceBean);
   }
 
-  private boolean isServiceBeanRejected(Class<?> beanClass) {
+  private static boolean isServiceBeanRejected(Class<?> beanClass) {
     return beanClass.isAnnotationPresent(Exclude.class)
            || beanClass.isAnnotationPresent(Configuration.class)
            || beanClass.isAnnotationPresent(SpringBootApplication.class);
   }
 
-  private boolean isServiceBean(Class<?> beanClass) {
+  private static boolean isServiceBean(Class<?> beanClass) {
     return beanClass.isAnnotationPresent(Service.class)
            && !StringUtils.contains(beanClass.getName(), "org.springframework")
            && !StringUtils.startsWith(beanClass.getName(), "java")
@@ -299,7 +303,7 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
            && !StringUtils.contains(beanClass.getName(), "$");
   }
 
-  private boolean isComponentClassValid(Class<?> componentClass) {
+  private static boolean isComponentClassValid(Class<?> componentClass) {
     return !componentClass.equals(Object.class)
            && !componentClass.isAssignableFrom(PropertyConfigurator.class)
            && !componentClass.equals(Startable.class)
@@ -309,13 +313,13 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
            && !StringUtils.equals(componentClass.getName(), "org.exoplatform.commons.cluster.StartableClusterAware");
   }
 
-  private Object getBeanInstance(ApplicationContext applicationContext, String beanName) {
+  private static Object getBeanInstance(ApplicationContext applicationContext, String beanName) {
     LOG.trace("Retrieve Bean with name '{}' from Spring to Kernel using Application context",
               beanName);
     return applicationContext.getBean(beanName);
   }
 
-  private <T> T getComponentInstance(PortalContainer portalContainer, Class<T> keyClass) {
+  private static <T> T getComponentInstance(PortalContainer portalContainer, Class<T> keyClass) {
     LOG.trace("Getting Kernel Service '{}' requested by a Spring Bean.",
               keyClass);
     try {
@@ -334,7 +338,7 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
     }
   }
 
-  private Class<?> getComponentKeyClass(Object key) {
+  private static Class<?> getComponentKeyClass(Object key) {
     if (key instanceof Class<?> keyClass) {
       return keyClass;
     } else if (key instanceof String keyString) {
@@ -345,11 +349,26 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
     }
   }
 
+  private static boolean isComponentDuplicated(PortalContainer portalContainer, Class<?> componentKey) {
+    Class<?>[] interfaces = componentKey.getInterfaces();
+    return ArrayUtils.isNotEmpty(interfaces)
+           && Arrays.stream(interfaces)
+                    .anyMatch(interfaceClass -> {
+                      boolean componentIsDuplicated = portalContainer.getComponentAdapter(interfaceClass) != null;
+                      if (componentIsDuplicated) {
+                        LOG.debug("Ignore Kernel Component '{}' as it's already injected in Spring context with class '{}'",
+                                  componentKey,
+                                  interfaceClass);
+                      }
+                      return componentIsDuplicated;
+                    });
+  }
+
   @SuppressWarnings("unchecked")
-  private <T> Class<T> getClass(String beanClassName) {
+  private static <T> Class<T> getClass(String beanClassName) {
     try {
       // Must be found in shared library
-      return (Class<T>) this.getClass().getClassLoader().loadClass(beanClassName);
+      return (Class<T>) KernelContainerLifecyclePlugin.class.getClassLoader().loadClass(beanClassName);
     } catch (ClassNotFoundException e) {
       return null;
     }

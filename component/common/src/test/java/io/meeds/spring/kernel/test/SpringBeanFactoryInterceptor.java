@@ -18,29 +18,26 @@
  */
 package io.meeds.spring.kernel.test;
 
+import static io.meeds.kernel.test.AbstractSpringTest.bootContainer;
+import static io.meeds.kernel.test.AbstractSpringTest.getTestClass;
+import static io.meeds.spring.kernel.KernelContainerLifecyclePlugin.addSpringContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-import org.exoplatform.container.PortalContainer;
-
 @Component
-public class SpringBeanFactoryInterceptor implements BeanFactoryPostProcessor, BeanPostProcessor, ApplicationContextAware {
+public class SpringBeanFactoryInterceptor implements BeanFactoryPostProcessor, ApplicationContextAware {
 
-  private static final Logger    LOG = LoggerFactory.getLogger(SpringBeanFactoryInterceptor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SpringBeanFactoryInterceptor.class);
 
-  private PortalContainer        container;
-
-  private ApplicationContext     applicationContext;
-
-  private BeanDefinitionRegistry beanRegistry;
+  private ApplicationContext  applicationContext;
 
   @Override
   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -49,19 +46,11 @@ public class SpringBeanFactoryInterceptor implements BeanFactoryPostProcessor, B
 
   @Override
   public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-    LOG.info("Integrating Spring Context with Container. Application name = {}", applicationContext.getApplicationName());
-    this.container = PortalContainer.getInstance();
-    this.beanRegistry = (BeanDefinitionRegistry) beanFactory;
-    KernelTestIntegration.registerKernelComponentsAsSpringBeans(container, beanRegistry);
-  }
-
-  @Override
-  public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-    KernelTestIntegration.registerSpringBeanAsKernelComponent(container,
-                                                          beanRegistry,
-                                                          beanName,
-                                                          bean);
-    return bean;
+    LOG.info("Integrating Spring Context with Container. Application name = '{}' using Kernel configuration class '{}'",
+             applicationContext.getApplicationName(),
+             getTestClass());
+    addSpringContext("test", applicationContext, (BeanDefinitionRegistry) beanFactory);
+    bootContainer(getTestClass());
   }
 
 }
