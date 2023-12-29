@@ -70,7 +70,7 @@ public class UIApplicationList extends UIContainer {
         }
     }
 
-    public List<Application> getApplications() {
+    public List<Application> getApplications() throws Exception {
         if (selectedCategory == null)
             return null;
 
@@ -80,8 +80,9 @@ public class UIApplicationList extends UIContainer {
         }
 
         UserACL userACL = getApplicationComponent(UserACL.class);
+        ApplicationRegistryService service = getApplicationComponent(ApplicationRegistryService.class);
 
-        List<Application> allApps = selectedCategory.getApplications();
+        List<Application> allApps = service.getApplications(selectedCategory);
         List<Application> apps = new ArrayList<Application>();
 
         for (Application app : allApps) {
