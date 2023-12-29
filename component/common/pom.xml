@@ -60,6 +60,13 @@
   </dependencies>
 
   <build>
+    <!-- Used to add BuildNumber in application.properties -->
+    <resources>
+      <resource>
+        <directory>src/main/resources/</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>com.jcabi</groupId>
