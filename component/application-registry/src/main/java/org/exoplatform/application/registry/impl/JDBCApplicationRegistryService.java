@@ -212,6 +212,7 @@ public class JDBCApplicationRegistryService implements ApplicationRegistryServic
     if (appEntity != null) {
       appEntity = buildAppEntity(appEntity, application);
       appDAO.update(appEntity);
+      layoutStorage.savePermissions(ApplicationEntity.class.getName(), appEntity.getId(), TYPE.ACCESS, application.getAccessPermissions());
     } else {
       throw new IllegalStateException();
     }
