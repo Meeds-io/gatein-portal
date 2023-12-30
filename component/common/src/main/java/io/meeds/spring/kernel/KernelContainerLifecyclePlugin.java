@@ -21,6 +21,7 @@ package io.meeds.spring.kernel;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -30,6 +31,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.picocontainer.Startable;
@@ -90,7 +92,11 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
                StringUtils.join(springContexts.keySet(), ","));
     }
     long start = System.currentTimeMillis();
-    Collection<ComponentAdapter<?>> kernelComponentAdapters = portalContainer.getComponentAdapters();
+    Collection<ComponentAdapter<?>> containerComponentAdapters = portalContainer.getComponentAdapters();
+    Collection<ComponentAdapter<?>> parentComponentAdapters = portalContainer.getParent()
+        != null ? portalContainer.getParent().getComponentAdapters() : Collections.emptyList();
+    Collection<ComponentAdapter<?>> kernelComponentAdapters = CollectionUtils.union(containerComponentAdapters,
+                                                                                    parentComponentAdapters);
     Map<String, Map<String, BeanDefinition>> springBeansByContext = getBeansByServletContext();
     LOG.info("1. Add Kernel Services in all Spring contexts");
     addKernelToSpring(portalContainer, kernelComponentAdapters);
