@@ -15,8 +15,16 @@
  */
 package io.meeds.spring.web.security;
 
+import java.util.function.Supplier;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,15 +33,29 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.ContentTypeOptionsConfig;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.XXssConfig;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.config.annotation.web.configurers.JeeConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.context.ServletContextAware;
+
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.ServletContext;
+import lombok.Setter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true,
     securedEnabled = true,
     jsr250Enabled = true)
-public class WebSecurityConfiguration {
+public class WebSecurityConfiguration implements ServletContextAware {
+
+  private static final Logger LOG = LoggerFactory.getLogger(WebSecurityConfiguration.class);
+
+  @Setter
+  private ServletContext      servletContext;
 
   @Bean
   public static GrantedAuthorityDefaults grantedAuthorityDefaults() {
@@ -41,28 +63,71 @@ public class WebSecurityConfiguration {
     return new GrantedAuthorityDefaults();
   }
 
-  @SuppressWarnings("removal")
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http, PortalAuthenticationManager authenticationProvider) throws Exception {
+  @SuppressWarnings("removal")
+  public SecurityFilterChain filterChain(HttpSecurity http,
+                                         PortalAuthenticationManager authenticationProvider,
+                                         @Qualifier("restRequestMatcher")
+                                         RequestMatcher restRequestMatcher,
+                                         @Qualifier("staticResourcesRequestMatcher")
+                                         RequestMatcher staticResourcesRequestMatcher,
+                                         @Qualifier("accessDeniedHandler")
+                                         AccessDeniedHandler accessDeniedHandler,
+                                         @Qualifier("requestAuthorizationManager")
+                                         AuthorizationManager<RequestAuthorizationContext> requestAuthorizationManager) throws Exception {
     return http.authenticationProvider(authenticationProvider)
+               .jee(JeeConfigurer::and) // NOSONAR no method replacement
+               .csrf(CsrfConfigurer::disable)
+               .headers(headers -> {
+                 headers.cacheControl(CacheControlConfig::disable);
+                 headers.frameOptions(FrameOptionsConfig::disable);
+                 headers.xssProtection(XXssConfig::disable);
+                 headers.contentTypeOptions(ContentTypeOptionsConfig::disable);
+               })
                .authorizeHttpRequests(customizer -> {
                  try {
-                   customizer.anyRequest()
-                             .authenticated()
-                             .and()
-                             .jee(JeeConfigurer::and)
-                             .csrf(CsrfConfigurer::disable)
-                             .headers(headers -> {
-                               headers.cacheControl(CacheControlConfig::disable);
-                               headers.frameOptions(FrameOptionsConfig::disable);
-                               headers.xssProtection(XXssConfig::disable);
-                               headers.contentTypeOptions(ContentTypeOptionsConfig::disable);
-                             });
+                   customizer.requestMatchers(restRequestMatcher)
+                             .access(requestAuthorizationManager);
                  } catch (Exception e) {
-                   throw new IllegalStateException("Unable to configure Security Filter Chain", e);
+                   LOG.error("Error configuring REST endpoints security manager", e);
                  }
+                 customizer.requestMatchers(staticResourcesRequestMatcher)
+                           .permitAll();
+                 customizer.dispatcherTypeMatchers(DispatcherType.INCLUDE,
+                                                   DispatcherType.FORWARD)
+                           .permitAll();
                })
+               .exceptionHandling(exceptionCustomizer -> exceptionCustomizer.accessDeniedHandler(accessDeniedHandler))
                .build();
+  }
+
+  @Bean("restRequestMatcher")
+  public RequestMatcher restRequestMatcher() {
+    return request -> StringUtils.startsWith(request.getRequestURI(), servletContext.getContextPath() + "/rest/");
+  }
+
+  @Bean("staticResourcesRequestMatcher")
+  public RequestMatcher staticResourcesRequestMatcher() {
+    return request -> !StringUtils.startsWith(request.getRequestURI(), servletContext.getContextPath() + "/rest/");
+  }
+
+  @Bean("accessDeniedHandler")
+  public AccessDeniedHandler accessDeniedHandler() {
+    return (request, response, accessDeniedException) -> LOG.warn("Access denied for path {} and method {}",
+                                                                  request.getRequestURI(),
+                                                                  request.getMethod(),
+                                                                  accessDeniedException);
+  }
+
+  @Bean("requestAuthorizationManager")
+  public AuthorizationManager<RequestAuthorizationContext> requestAuthorizationManager() {
+    return (Supplier<Authentication> authentication, RequestAuthorizationContext object) -> {
+      Authentication userAuthentication = authentication.get();
+      // Permit anonymous and authentication users to access
+      // the REST endpoints and rely on jee & secured permission
+      // management
+      return userAuthentication.isAuthenticated() ? new AuthorizationDecision(true) : new AuthorizationDecision(false);
+    };
   }
 
 }
