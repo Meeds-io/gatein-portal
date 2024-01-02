@@ -19,7 +19,6 @@ package org.exoplatform.services.organization.idm;
 import java.util.Calendar;
 
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.listener.Asynchronous;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
@@ -57,7 +56,6 @@ public class UpdateLoginTimeListener extends Listener<ConversationRegistry, Conv
     UserHandler userHandler = organizationService.getUserHandler();
     ConversationState state = event.getData();
     String userId = state.getIdentity().getUserId();
-    RequestLifeCycle.begin(container);
     try {
       User user = (User) state.getAttribute(USER_PROFILE);
       if (user == null) {
