@@ -121,10 +121,12 @@ public class UploadService {
     putToStackInSession(request.getSession(true), uploadId);
 
     double requestContentLength = request.getContentLength();
+    upResource.setEstimatedSize(requestContentLength);
     if (isLimited(upResource, requestContentLength)) {
       upResource.setStatus(UploadResource.FAILED_STATUS);
       return;
     }
+
     File uploadRootPath = new File(uploadLocation_);
     if (!uploadRootPath.exists()) {
       uploadRootPath.mkdirs();
@@ -132,7 +134,6 @@ public class UploadService {
 
     DiskFileItem fileItem = getFileItem(request, upResource);
     upResource.setFileName(fileItem.getName());
-    upResource.setEstimatedSize(requestContentLength);
     upResource.setMimeType(fileItem.getContentType());
     if (upResource.getStatus() == UploadResource.UPLOADED_STATUS) {
       writeFile(upResource, fileItem);
