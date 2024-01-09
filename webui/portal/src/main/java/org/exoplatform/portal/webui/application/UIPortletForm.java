@@ -96,10 +96,10 @@ public class UIPortletForm extends UIFormTabPane {
                                 .addValidator(NotHTMLTagValidator.class, "UIPortletForm.msg.InvalidPortletTitle"))
                 .addUIFormInput(
                         new UIFormStringInput("width", "width", null).addValidator(ExpressionValidator.class,
-                                "(^([1-9]\\d*)(?:px)?$)?", "UIPortletForm.msg.InvalidWidthHeight"))
+                                "^(\\d+(\\.\\d+)?(px|%|em|rem|vw|vh)?|auto|calc\\(.*\\))$", "UIPortletForm.msg.InvalidWidthHeight"))
                 .addUIFormInput(
                         new UIFormStringInput("height", "height", null).addValidator(ExpressionValidator.class,
-                                "(^([1-9]\\d*)(?:px)?$)?", "UIPortletForm.msg.InvalidWidthHeight"))
+                                "^(\\d+(\\.\\d+)?(px|%|em|rem|vw|vh)?|auto|calc\\(.*\\))$", "UIPortletForm.msg.InvalidWidthHeight"))
                 .addUIFormInput(new UICheckBoxInput("showInfoBar", "showInfoBar", false))
                 .addUIFormInput(new UICheckBoxInput("showPortletMode", "showPortletMode", false))
                 .addUIFormInput(new UICheckBoxInput("showWindowState", "showWindowState", false))
@@ -247,9 +247,6 @@ public class UIPortletForm extends UIFormTabPane {
             if (width == null || width.length() == 0) {
                 uiPortlet.setWidth(null);
             } else {
-                if (!width.endsWith("px")) {
-                    width = width.concat("px");
-                }
                 uiPortlet.setWidth(width);
             }
 
@@ -257,9 +254,6 @@ public class UIPortletForm extends UIFormTabPane {
             if (height == null || height.length() == 0) {
                 uiPortlet.setHeight(null);
             } else {
-                if (!height.endsWith("px")) {
-                    height = height.concat("px");
-                }
                 uiPortlet.setHeight(height);
             }
 
