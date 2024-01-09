@@ -96,10 +96,10 @@ public class UIPortletForm extends UIFormTabPane {
                                 .addValidator(NotHTMLTagValidator.class, "UIPortletForm.msg.InvalidPortletTitle"))
                 .addUIFormInput(
                         new UIFormStringInput("width", "width", null).addValidator(ExpressionValidator.class,
-                                "^(\\d+(\\.\\d+)?(px|%|em|rem|vw|vh)?|auto|calc\\(.*\\))$", "UIPortletForm.msg.InvalidWidthHeight"))
+                                "^(\\d+(\\.\\d+)?(px|%|em|rem|vw|vh)|auto|calc\\(.*\\))$", "UIPortletForm.msg.InvalidWidthHeight"))
                 .addUIFormInput(
                         new UIFormStringInput("height", "height", null).addValidator(ExpressionValidator.class,
-                                "^(\\d+(\\.\\d+)?(px|%|em|rem|vw|vh)?|auto|calc\\(.*\\))$", "UIPortletForm.msg.InvalidWidthHeight"))
+                                "^(\\d+(\\.\\d+)?(px|%|em|rem|vw|vh)|auto|calc\\(.*\\))$", "UIPortletForm.msg.InvalidWidthHeight"))
                 .addUIFormInput(new UICheckBoxInput("showInfoBar", "showInfoBar", false))
                 .addUIFormInput(new UICheckBoxInput("showPortletMode", "showPortletMode", false))
                 .addUIFormInput(new UICheckBoxInput("showWindowState", "showWindowState", false))
