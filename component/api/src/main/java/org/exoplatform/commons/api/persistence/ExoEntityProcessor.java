@@ -23,6 +23,8 @@ import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
@@ -42,9 +44,17 @@ import org.apache.commons.collections.CollectionUtils;
  * 7/22/15
  */
 @SupportedAnnotationTypes("org.exoplatform.commons.api.persistence.ExoEntity")
+@SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class ExoEntityProcessor extends AbstractProcessor {
+
+  /**
+   * @deprecated will be removed to ease the path of entities listing
+   */
+  @Deprecated(forRemoval = true, since = "1.6.0")
+  public static final String DEPRECATED_ENTITIES_IDX_PATH = "exo-jpa-entities/entities.idx";
+
   /** Path to the generated entities.idx file **/
-  public static final String ENTITIES_IDX_PATH = "exo-jpa-entities/entities.idx";
+  public static final String ENTITIES_IDX_PATH = "jpa-entities.idx";
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) { // NOSONAR

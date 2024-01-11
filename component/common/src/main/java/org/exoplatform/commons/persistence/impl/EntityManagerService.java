@@ -18,7 +18,7 @@
  */
 package org.exoplatform.commons.persistence.impl;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainer;
@@ -27,11 +27,13 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.cfg.JdbcSettings;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Persistence;
+import lombok.Getter;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -40,7 +42,7 @@ import java.util.Properties;
 
 /**
  * This service is responsible to create a single EntityManagerFactory, with the
- * persistence unit name <code>exo-pu</code>.
+ * persistence unit name <code>meeds-jpa</code>.
  * <p>
  * The service is also bound to use of the RequestLifecycle that there is only
  * one EntityManager will be created at beginning of the request lifecycle. The
@@ -51,11 +53,12 @@ import java.util.Properties;
  * @version $Revision$
  */
 public class EntityManagerService implements ComponentRequestLifecycle {
-  public static final String          PERSISTENCE_UNIT_NAME       = "exo-pu";
+  public static final String          PERSISTENCE_UNIT_NAME       = "meeds-jpa";
   private static final Log            LOGGER                      = ExoLogger.getLogger(EntityManagerService.class);
   private static final String         EXO_JPA_DATASOURCE_NAME     = "exo.jpa.datasource.name";
   private static final String         EXO_PREFIX_FOR_HIB_SETTINGS = "exo.jpa.";
 
+  @Getter
   protected EntityManagerFactory        entityManagerFactory;
 
   protected Properties properties;
@@ -77,7 +80,7 @@ public class EntityManagerService implements ComponentRequestLifecycle {
     // Setting datasource JNDI name. Get it directly from eXo global properties so it is not overridable by addons.
     String datasourceName = PropertyManager.getProperty(EXO_JPA_DATASOURCE_NAME);
     if (StringUtils.isNotBlank(datasourceName)) {
-      properties.put(AvailableSettings.JPA_NON_JTA_DATASOURCE, datasourceName);
+      properties.put(JdbcSettings.JAKARTA_NON_JTA_DATASOURCE, datasourceName);
       LOGGER.info("EntityManagerFactory [{}] - Creating with datasource {}.", getPersistenceUnitName(), datasourceName);
     } else {
       LOGGER.info("EntityManagerFactory [{}] - Creating with default datasource.", getPersistenceUnitName());
@@ -97,11 +100,11 @@ public class EntityManagerService implements ComponentRequestLifecycle {
   }
 
   public String getDatasourceName() {
-    return (String) properties.get(AvailableSettings.JPA_NON_JTA_DATASOURCE);
+    return (String) properties.get(JdbcSettings.JAKARTA_NON_JTA_DATASOURCE);
   }
 
   public void setDatasourceName(String datasourceName) {
-    properties.put(AvailableSettings.JPA_NON_JTA_DATASOURCE, datasourceName);
+    properties.put(JdbcSettings.JAKARTA_NON_JTA_DATASOURCE, datasourceName);
   }
 
   private List<String> getHibernateAvailableSettings() {

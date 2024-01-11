@@ -23,14 +23,24 @@
 package org.picketlink.idm.impl.store.hibernate;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.persistence.Tuple;
 
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -41,7 +51,17 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.helper.Tools;
-import org.picketlink.idm.impl.model.hibernate.*;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObject;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectAttribute;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectAttributeBinaryValue;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectCredential;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectCredentialBinaryValue;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectCredentialType;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectRelationship;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectRelationshipName;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectRelationshipType;
+import org.picketlink.idm.impl.model.hibernate.HibernateIdentityObjectType;
+import org.picketlink.idm.impl.model.hibernate.HibernateRealm;
 import org.picketlink.idm.impl.store.FeaturesMetaDataImpl;
 import org.picketlink.idm.impl.types.SimpleIdentityObject;
 import org.picketlink.idm.spi.configuration.IdentityStoreConfigurationContext;
@@ -49,7 +69,13 @@ import org.picketlink.idm.spi.configuration.metadata.IdentityObjectAttributeMeta
 import org.picketlink.idm.spi.configuration.metadata.IdentityObjectTypeMetaData;
 import org.picketlink.idm.spi.configuration.metadata.IdentityStoreConfigurationMetaData;
 import org.picketlink.idm.spi.configuration.metadata.RealmConfigurationMetaData;
-import org.picketlink.idm.spi.model.*;
+import org.picketlink.idm.spi.model.IdentityObject;
+import org.picketlink.idm.spi.model.IdentityObjectAttribute;
+import org.picketlink.idm.spi.model.IdentityObjectCredential;
+import org.picketlink.idm.spi.model.IdentityObjectCredentialType;
+import org.picketlink.idm.spi.model.IdentityObjectRelationship;
+import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
+import org.picketlink.idm.spi.model.IdentityObjectType;
 import org.picketlink.idm.spi.search.IdentityObjectSearchCriteria;
 import org.picketlink.idm.spi.store.FeaturesMetaData;
 import org.picketlink.idm.spi.store.IdentityObjectSearchCriteriaType;
@@ -58,6 +84,8 @@ import org.picketlink.idm.spi.store.IdentityStoreInvocationContext;
 import org.picketlink.idm.spi.store.IdentityStoreSession;
 
 import org.exoplatform.services.organization.idm.EntityMapperUtils;
+
+import jakarta.persistence.Tuple;
 
 /**
  * @author Boleslaw Dawidowicz
@@ -634,7 +662,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
       /* END SOC-6210 */
       /* BEGIN CAL-1225: User picker in Participants tab is case sensitive */
       if (criteria != null && criteria.getFilter() != null) {
-        String attrValue = criteria.getFilter().replaceAll("\\*", "%");
+        String attrValue = criteria.getFilter().replace("\\*", "%").replace("*", "%");
         String operator = "=";
         if (attrValue.contains("%")) {
           operator = "like";
@@ -669,10 +697,10 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
             queryParams.put(attrParamName, mappedAttributeName);
             /** End eXo customization **/
           } else {
-            Set<String> given = new HashSet<String>(Arrays.asList(entry.getValue()));
+            Set<String> given = new HashSet<>(Arrays.asList(entry.getValue()));
 
             for (String attrValue : given) {
-              attrValue = attrValue.replaceAll("\\*", "%");
+              attrValue = attrValue.replace("\\*", "%").replace("*", "%");
 
               /*
                * BEGIN CAL-1225: User picker in Participants tab is case
@@ -929,7 +957,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
       }
 
       if (criteria != null && criteria.getFilter() != null) {
-        q.setParameter("nameFilter", criteria.getFilter().replaceAll("\\*", "%"));
+        q.setParameter("nameFilter", criteria.getFilter().replace("\\*", "%").replace("*", "%"));
       } else {
         q.setParameter("nameFilter", "%");
       }
@@ -1346,7 +1374,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
       org.hibernate.query.Query<String> query = getHibernateSession(ctx).createQuery(queryString.toString(), String.class);
       query.setParameter("realmName", getRealmName(ctx));
       if (hasFilter) {
-        query.setParameter("name", criteria.getFilter().replaceAll("\\*", "%"));
+        query.setParameter("name", criteria.getFilter().replace("\\*", "%").replace("*", "%"));
       }
 
       if (criteria != null && criteria.isPaged()) {
@@ -1400,7 +1428,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
 
       org.hibernate.query.Query<String> query = getHibernateSession(ctx).createQuery(queryString.toString(), String.class);
       if (hasFilter) {
-        query.setParameter("name", criteria.getFilter().replaceAll("\\*", "%"));
+        query.setParameter("name", criteria.getFilter().replace("\\*", "%").replace("*", "%"));
       }
       if (identity != null) {
         HibernateIdentityObject hibernateObject = safeGet(ctx, identity);
@@ -2558,7 +2586,7 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
   }
 
   private HibernateRealm getHibernateRealmByName(Session hibernateSession, String realmName) {
-    return hibernateSession.createNamedQuery("HibernateRealm.findIRealmByName", HibernateRealm.class)
+    return hibernateSession.createNamedQuery("HibernateRealm.findRealmByName", HibernateRealm.class)
                            .setParameter("name", realmName)
                            .uniqueResult();
   }

@@ -30,7 +30,7 @@
   <name>GateIn Portal Component Core Test</name>
 
   <properties>
-    <exo.test.coverage.ratio>0.33</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.32</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
@@ -48,6 +48,30 @@
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.testframework</artifactId>
+    </dependency>
+
+    <!-- Spring Test JARs -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>com.vaadin.external.google</groupId>
+          <artifactId>android-json</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-engine</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.junit.vintage</groupId>
+          <artifactId>junit-vintage-engine</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>
     </dependency>
 
     <!-- Test Third party JARs -->

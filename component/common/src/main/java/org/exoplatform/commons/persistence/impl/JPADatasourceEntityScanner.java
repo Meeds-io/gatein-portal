@@ -56,26 +56,13 @@ public class JPADatasourceEntityScanner extends AbstractScannerImpl {
         return environment.getRootUrl();
       }
 
+      @SuppressWarnings("removal")
       @Override
       public List<URL> getNonRootUrls() {
         List<URL> nonRootUrls = new ArrayList<>();
         String rootPath = environment.getRootUrl().getPath();
-        try {
-          Enumeration<URL> entityFiles = getClass().getClassLoader().getResources(ExoEntityProcessor.ENTITIES_IDX_PATH);
-          while (entityFiles.hasMoreElements()) {
-            URL url = entityFiles.nextElement();
-            url = new URL(url.toExternalForm()
-                             .replace("!/" + ExoEntityProcessor.ENTITIES_IDX_PATH, "")
-                             .replace("jar:", "")
-                             .replace(ExoEntityProcessor.ENTITIES_IDX_PATH, ""));
-            if (url.getPath().startsWith(rootPath)) {
-              continue;
-            }
-            nonRootUrls.add(url);
-          }
-        } catch (IOException e) {
-          throw new IllegalStateException("Can't access class path loader resources", e);
-        }
+        addPaths(nonRootUrls, rootPath, ExoEntityProcessor.DEPRECATED_ENTITIES_IDX_PATH);
+        addPaths(nonRootUrls, rootPath, ExoEntityProcessor.ENTITIES_IDX_PATH);
         return nonRootUrls;
       }
 
@@ -90,6 +77,25 @@ public class JPADatasourceEntityScanner extends AbstractScannerImpl {
       }
     };
     return super.scan(environmentWrapper, options, params);
+  }
+
+  private void addPaths(List<URL> nonRootUrls, String rootPath, String entitiesIdxPath) {
+    try {
+      Enumeration<URL> entityFiles = getClass().getClassLoader().getResources(entitiesIdxPath);
+      while (entityFiles.hasMoreElements()) {
+        URL url = entityFiles.nextElement();
+        url = new URL(url.toExternalForm()
+                         .replace("!/" + entitiesIdxPath, "")
+                         .replace("jar:", "")
+                         .replace(entitiesIdxPath, ""));
+        if (url.getPath().startsWith(rootPath)) {
+          continue;
+        }
+        nonRootUrls.add(url);
+      }
+    } catch (IOException e) {
+      throw new IllegalStateException("Can't access class path loader resources", e);
+    }
   }
 
 }

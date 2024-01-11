@@ -17,7 +17,6 @@ package org.exoplatform.commons.persistence.impl;
 
 import org.exoplatform.commons.InitialContextInitializer2;
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.services.naming.InitialContextInitializer;
 
 public class LiquibaseDataInitializerTestContext extends LiquibaseDataInitializer {
 

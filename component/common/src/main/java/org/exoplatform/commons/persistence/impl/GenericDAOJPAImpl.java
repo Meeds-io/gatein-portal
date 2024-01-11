@@ -20,12 +20,12 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.internal.SessionFactoryImpl;
@@ -37,12 +37,13 @@ import org.exoplatform.commons.api.persistence.GenericDAO;
  * @author <a href="trongtt@gmail.com">Trong Tran</a>
  * @version $Revision$
  * @param <E> Entity type
- * @param <ID> Identity of the entity
+ * @param <I> Identity of the entity
  */
-public class GenericDAOJPAImpl<E, ID extends Serializable> implements GenericDAO<E, ID> {
+public class GenericDAOJPAImpl<E, I extends Serializable> implements GenericDAO<E, I> {
 
   protected Class<E> modelClass;
 
+  @SuppressWarnings("unchecked")
   public GenericDAOJPAImpl() {
     ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
     this.modelClass = (Class<E>) genericSuperclass.getActualTypeArguments()[0];
@@ -62,8 +63,8 @@ public class GenericDAOJPAImpl<E, ID extends Serializable> implements GenericDAO
   }
 
   @Override
-  public E find(ID id) {
-    return (E) getEntityManager().find(modelClass, id);
+  public E find(I id) {
+    return getEntityManager().find(modelClass, id);
   }
 
   /**

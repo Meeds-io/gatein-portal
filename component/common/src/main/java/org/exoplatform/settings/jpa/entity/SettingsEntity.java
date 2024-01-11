@@ -18,7 +18,7 @@ package org.exoplatform.settings.jpa.entity;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * Created by The eXo Platform SAS

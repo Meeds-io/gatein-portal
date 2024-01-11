@@ -3,7 +3,7 @@ package org.exoplatform.portal.mop.dao;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.persistence.EntityTransaction;
+import jakarta.persistence.EntityTransaction;
 
 import org.gatein.api.common.Pagination;
 

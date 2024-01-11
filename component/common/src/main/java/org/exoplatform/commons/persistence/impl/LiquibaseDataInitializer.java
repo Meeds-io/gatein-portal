@@ -1,12 +1,18 @@
 package org.exoplatform.commons.persistence.impl;
 
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.exception.DatabaseException;
-import liquibase.exception.LiquibaseException;
-import liquibase.resource.ClassLoaderResourceAccessor;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.picocontainer.Startable;
+
 import org.exoplatform.commons.api.persistence.DataInitializer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
@@ -14,49 +20,58 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.naming.InitialContextInitializer;
 
-import org.apache.commons.lang3.StringUtils;
-import org.picocontainer.Startable;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.util.*;
+import liquibase.Liquibase;
+import liquibase.Scope;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
+import liquibase.exception.LiquibaseException;
+import liquibase.resource.ClassLoaderResourceAccessor;
+import liquibase.ui.LoggerUIService;
 
 /**
- * Startable service to initialize all the data with Liquibase.
- * Changelog files are added by external plugins.
+ * Startable service to initialize all the data with Liquibase. Changelog files
+ * are added by external plugins.
  */
 public class LiquibaseDataInitializer implements Startable, DataInitializer {
-  private static final Log LOG = ExoLogger.getLogger(LiquibaseDataInitializer.class);
+  private static final Log       LOG                             = ExoLogger.getLogger(LiquibaseDataInitializer.class);
 
-  public static final String LIQUIBASE_DATASOURCE_PARAM_NAME = "liquibase.datasource";
-  public static final String LIQUIBASE_CONTEXTS_PARAM_NAME = "liquibase.contexts";
-  public static final String LIQUIBASE_DEFAULT_CONTEXTS = "production";
+  public static final String     LIQUIBASE_DATASOURCE_PARAM_NAME = "liquibase.datasource";
 
-  private String datasourceName;
+  public static final String     LIQUIBASE_CONTEXTS_PARAM_NAME   = "liquibase.contexts";
 
-  private String liquibaseContexts;
+  public static final String     LIQUIBASE_DEFAULT_CONTEXTS      = "production";
 
-  private List<ChangeLogsPlugin> changeLogsPlugins = new ArrayList<>();
+  private String                 datasourceName;
 
-  public LiquibaseDataInitializer(InitialContextInitializer initialContextInitializer, InitParams initParams) {
+  private String                 liquibaseContexts;
+
+  private List<ChangeLogsPlugin> changeLogsPlugins               = new ArrayList<>();
+
+  public LiquibaseDataInitializer(InitialContextInitializer initialContextInitializer, // NOSONAR
+                                                                                       // added
+                                                                                       // for
+                                                                                       // dependency
+                                                                                       // injection
+                                                                                       // and
+                                                                                       // prioritization
+                                  InitParams initParams) {
     this(initParams);
   }
 
   public LiquibaseDataInitializer(InitParams initParams) {
     if (initParams == null) {
-      throw new IllegalArgumentException("No InitParams found for LiquibaseDataInitializer service. The datasource name ("
-          + LIQUIBASE_DATASOURCE_PARAM_NAME + ") should be defined at least.");
+      throw new IllegalArgumentException("No InitParams found for LiquibaseDataInitializer service. The datasource name (" +
+          LIQUIBASE_DATASOURCE_PARAM_NAME + ") should be defined at least.");
     }
 
     ValueParam liquibaseDatasourceNameParam = initParams.getValueParam(LIQUIBASE_DATASOURCE_PARAM_NAME);
     if (liquibaseDatasourceNameParam != null && liquibaseDatasourceNameParam.getValue() != null) {
       datasourceName = liquibaseDatasourceNameParam.getValue();
     } else {
-      throw new IllegalArgumentException("Datasource name for LiquibaseDataInitializer must be defined in the init params ("
-          + LIQUIBASE_DATASOURCE_PARAM_NAME + ")");
+      throw new IllegalArgumentException("Datasource name for LiquibaseDataInitializer must be defined in the init params (" +
+          LIQUIBASE_DATASOURCE_PARAM_NAME + ")");
     }
 
     ValueParam liquibaseContextsParam = initParams.getValueParam(LIQUIBASE_CONTEXTS_PARAM_NAME);
@@ -67,6 +82,11 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
     }
 
     LOG.info("LiquibaseDataInitializer created with : datasourceName={}, contexts={}", datasourceName, liquibaseContexts);
+    try {
+      Scope.enter(Map.of(Scope.Attr.ui.name(), new LoggerUIService()));
+    } catch (Exception e) {
+      LOG.debug("Error Switching Liquibase logging service");
+    }
   }
 
   public String getDatasourceName() {
@@ -87,12 +107,12 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
 
   /**
    * Add a changelogs plugin
+   * 
    * @param changeLogsPlugin Changelogs plugin to add
    */
   public void addChangeLogsPlugin(ChangeLogsPlugin changeLogsPlugin) {
     this.changeLogsPlugins.add(changeLogsPlugin);
   }
-
 
   @Override
   public void start() {
@@ -104,6 +124,11 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
     // Nothing to stop
   }
 
+  @Override
+  public DataSource getDatasource() {
+    return getDatasource(datasourceName);
+  }
+
   /**
    * Initialize the data with Liquibase with the default datasource.
    */
@@ -113,15 +138,15 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
   }
 
   /**
-   * Initialize the data with Liquibase with the given datasource.
-   * Iterates over all the changelogs injected by the change logs plugins and executes them.
+   * Initialize the data with Liquibase with the given datasource. Iterates over
+   * all the changelogs injected by the change logs plugins and executes them.
    */
   @Override
-  public void initData(String datasourceName) {
+  public void initData(String datasourceName) { // NOSONAR
     if (changeLogsPlugins.isEmpty()) {
       LOG.info("No data to initialize with Liquibase");
     } else {
-      LOG.info("Starting data initialization with Liquibase with datasource {0}", datasourceName);
+      LOG.info("Starting data initialization with Liquibase with datasource {}", datasourceName);
 
       DataSource datasource = getDatasource(datasourceName);
       for (ChangeLogsPlugin changeLogsPlugin : this.changeLogsPlugins) {
@@ -155,6 +180,7 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
 
   /**
    * Apply changelogs with Liquibase
+   * 
    * @param datasource
    * @param changelogsPath
    */
@@ -163,8 +189,6 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
     try {
       database = DatabaseFactory.getInstance()
               .findCorrectDatabaseImplementation(new JdbcConnection(datasource.getConnection()));
-      // Adding "RANK" in data base reserved words as a workaround until Liquibase metadata reserved keywords update.
-      database.addReservedWords(Arrays.asList("RANK"));
       Liquibase liquibase = new Liquibase(changelogsPath, new ClassLoaderResourceAccessor(), database);
       liquibase.update(liquibaseContexts);
     } catch (SQLException e) {
@@ -172,7 +196,7 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
     } catch (LiquibaseException e) {
       LOG.error("Error while applying liquibase changelogs " + changelogsPath + " - Cause : " + e.getMessage(), e);
     } finally {
-      if(database != null) {
+      if (database != null) {
         try {
           database.close();
         } catch (DatabaseException e) {
@@ -184,6 +208,7 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
 
   /**
    * Lookup for a datasource with the given name
+   * 
    * @param datasourceName Name of the datasource to retrieve
    * @return The datasource with the given name
    */
@@ -200,4 +225,5 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
 
     return dataSource;
   }
+
 }

@@ -20,22 +20,29 @@ package org.exoplatform.portal.jdbc.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.*;
-
-import org.hibernate.annotations.Type;
 import org.json.simple.JSONObject;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+
 @Entity(name = "GateInWindow")
 @ExoEntity
 @Table(name = "PORTAL_WINDOWS")
-@NamedQueries({
-    @NamedQuery(name = "WindowEntity.findByIds", query = "SELECT w FROM GateInWindow w WHERE w.id IN (:ids)"),
-    @NamedQuery(name = "WindowEntity.findByContentIds", query = "SELECT w.id FROM GateInWindow w WHERE w.contentId IN (:contentIds)"),
-    @NamedQuery(name = "WindowEntity.updateContentId", query = "UPDATE GateInWindow SET contentId = :newContentId WHERE contentId = :oldContentId"),
-    @NamedQuery(name = "WindowEntity.deleteByContentId", query = "DELETE GateInWindow WHERE contentId = :contentId"),
-})
+@NamedQuery(name = "WindowEntity.findByIds", query = "SELECT w FROM GateInWindow w WHERE w.id IN (:ids)")
+@NamedQuery(name = "WindowEntity.findByContentIds", query = "SELECT w.id FROM GateInWindow w WHERE w.contentId IN (:contentIds)")
+@NamedQuery(name = "WindowEntity.updateContentId", query = "UPDATE GateInWindow SET contentId = :newContentId WHERE contentId = :oldContentId")
+@NamedQuery(name = "WindowEntity.deleteByContentId", query = "DELETE GateInWindow WHERE contentId = :contentId")
 public class WindowEntity extends ComponentEntity implements Serializable {
 
   private static final long serialVersionUID = 6633792468705838255L;
@@ -83,7 +90,6 @@ public class WindowEntity extends ComponentEntity implements Serializable {
   private String            contentId;
 
   @Lob
-  @Type(type = "org.hibernate.type.MaterializedBlobType")
   @Column(name = "CUSTOMIZATION", length = 10000)
   @Basic(fetch = FetchType.LAZY)
   private byte[]            customization;

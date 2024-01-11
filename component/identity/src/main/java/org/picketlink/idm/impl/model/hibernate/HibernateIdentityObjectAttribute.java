@@ -27,16 +27,30 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.*;
-
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.LazyToOne;
-import org.hibernate.annotations.LazyToOneOption;
 import org.picketlink.idm.spi.model.IdentityObjectAttribute;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 
 @Entity(name = "HibernateIdentityObjectAttribute")
 @Table(name = "jbid_io_attr")
+@NamedQuery(
+    name = "HibernateIdentityObjectAttribute.findIdentityAttributes",
+    query = "SELECT a FROM HibernateIdentityObjectAttribute a INNER JOIN a.identityObject io ON io =:identity")
 public class HibernateIdentityObjectAttribute implements IdentityObjectAttribute {
 
   public static final String                          TYPE_TEXT   = "text";
@@ -44,33 +58,36 @@ public class HibernateIdentityObjectAttribute implements IdentityObjectAttribute
   public static final String                          TYPE_BINARY = "binary";
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.AUTO, generator="JBID_IO_ATTR_ID_SEQ")
+  @SequenceGenerator(name = "JBID_IO_ATTR_ID_SEQ", sequenceName = "JBID_IO_ATTR_ID_SEQ", allocationSize = 1)
   @Column(name = "ATTRIBUTE_ID")
   private Long                                        id;
 
   @ManyToOne
   @Fetch(FetchMode.JOIN)
-  @JoinColumn(name = "IDENTITY_OBJECT_ID", nullable = false)
+  @JoinColumn(name = "IDENTITY_OBJECT_ID",
+      nullable = false)
   private HibernateIdentityObject                     identityObject;
 
   @Column(name = "NAME")
   private String                                      name;
 
-  @Column(name = "ATTRIBUTE_TYPE", nullable = false)
+  @Column(name = "ATTRIBUTE_TYPE",
+      nullable = false)
   private String                                      type;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @ManyToOne(fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL)
   @Fetch(FetchMode.SELECT)
   @JoinColumn(name = "BIN_VALUE_ID")
-  @LazyToOne(LazyToOneOption.PROXY)
   private HibernateIdentityObjectAttributeBinaryValue binaryValue = null;
 
   @ElementCollection(fetch = FetchType.EAGER)
   @Column(name = "ATTR_VALUE")
   @CollectionTable(
       name = "jbid_io_attr_text_values",
-      joinColumns = { @JoinColumn(name = "TEXT_ATTR_VALUE_ID", referencedColumnName = "ATTRIBUTE_ID") }
-  )
+      joinColumns = { @JoinColumn(name = "TEXT_ATTR_VALUE_ID",
+          referencedColumnName = "ATTRIBUTE_ID") })
   @Fetch(FetchMode.JOIN)
   private Set<String>                                 textValues  = new HashSet<String>();
 

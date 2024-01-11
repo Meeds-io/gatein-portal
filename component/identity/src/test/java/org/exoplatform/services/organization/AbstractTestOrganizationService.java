@@ -23,14 +23,25 @@
 
 package org.exoplatform.services.organization;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PageList;
+import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -38,15 +49,10 @@ import org.exoplatform.services.organization.idm.Config;
 import org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl;
 import org.exoplatform.services.organization.idm.UserDAOImpl;
 
-import org.apache.commons.lang3.StringUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 /**
  * Created by The eXo Platform SAS Author : Hoa Pham hoapham@exoplatform.com,phamvuxuanhoa@yahoo.com Oct 27, 2005
  */
-public class AbstractTestOrganizationService {
+public abstract class AbstractTestOrganizationService {
     private static String Group1 = "Group1";
 
     private static String Group2 = "Group2";
@@ -149,15 +155,15 @@ public class AbstractTestOrganizationService {
 
     @Test
     public void testUserPageSize() throws Exception {
-        int initialSize = userHandler_.findAllUsers().getSize();
-
-        for (String name : USERS)
-            createUser(name);
+        for (String name : USERS) {
+          createUser(name);
+        }
 
         Query query = new Query();
+        query.setUserName(USER);
         PageList users = userHandler_.findUsers(query);
         // newly created plus one 'demo' from configuration
-        assertEquals(USERS_LIST_SIZE + initialSize, users.getAll().size());
+        assertEquals(USERS_LIST_SIZE, users.getAll().size());
         assertEquals(1, users.getAvailablePage());
         List<User> usersList = users.getPage(1);
         for (String username : USERS) {
@@ -310,7 +316,11 @@ public class AbstractTestOrganizationService {
     public void testGroup() throws Exception {
         /* Create a parent group with name is: GroupParent */
         String parentName = "GroupParent";
-        Group groupParent = groupHandler_.createGroupInstance();
+        Group groupParent = groupHandler_.findGroupById("/" + parentName);
+        if (groupParent != null) {
+          groupHandler_.removeGroup(groupParent, true);
+        }
+        groupParent = groupHandler_.createGroupInstance();
         groupParent.setGroupName(parentName);
         groupParent.setDescription("This is description");
         groupHandler_.addChild(null, groupParent, true);
@@ -377,6 +387,10 @@ public class AbstractTestOrganizationService {
         groups = groupHandler_.resolveGroupByMembership("demo", "member");
         assertNotNull(groups);
         assertEquals(1, groups.size());
+
+        groupHandler_.removeGroup(groupChild2, true);
+        groupHandler_.removeGroup(groupParent, true);
+        assertNull("Expect ParentGroup is removed", groupHandler_.findGroupById(groupParent.getId()));
     }
 
     @Test

@@ -26,8 +26,13 @@
       <pattern>%date{ISO8601} | %highlight(%-5level) | %msg %green([%logger{40}){}%cyan(&lt;%thread&gt;){}%green(]){} %n%xEx</pattern>
     </encoder>
   </appender>
-  <logger name="org.hibernate.engine.jdbc.spi.SqlExceptionHelper" level="ERROR"/>
-  <root level="INFO">
+  <logger name="org.hibernate.engine.jdbc.spi.SqlExceptionHelper" level="ERROR" />
+  <logger name="liquibase.executor.jvm.JdbcExecutor" level="ERROR" />
+  <logger name="liquibase.database.core.HsqlDatabase" level="ERROR" />
+  <logger name="liquibase.database.core.MySQLDatabase" level="ERROR" />
+  <logger name="liquibase.database.core.PostgresDatabase" level="ERROR" />
+  <logger name="liquibase" level="WARN"/>
+  <root level="${io.meeds.logging.level:-INFO}">
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>

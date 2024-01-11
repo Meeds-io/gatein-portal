@@ -32,7 +32,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.picocontainer.Startable;
 
 import org.exoplatform.commons.api.settings.SettingService;
@@ -76,6 +76,8 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.OrganizationService;
+
+import io.meeds.common.ContainerTransactional;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -732,6 +734,7 @@ public class UserPortalConfigService implements Startable {
         }
     }
 
+    @ContainerTransactional
     public void start() {
         try {
             if (newPortalConfigListener_ == null) {
