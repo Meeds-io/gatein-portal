@@ -84,10 +84,10 @@ public class UIContainerForm extends UIFormTabPane {
                                 .addValidator(NotHTMLTagValidator.class, "UIContainerForm.msg.InvalidContainerTitle"))
                 .addUIFormInput(
                         new UIFormStringInput("width", "width", null).addValidator(ExpressionValidator.class,
-                                "(^([1-9]\\d*)(px|%)$)?", "UIContainerForm.msg.InvalidWidthHeight"))
+                                "^(\\d+(\\.\\d+)?(px|%|em|rem|vw|vh)|auto|calc\\(.*\\))$", "UIContainerForm.msg.InvalidWidthHeight"))
                 .addUIFormInput(
                         new UIFormStringInput("height", "height", null).addValidator(ExpressionValidator.class,
-                                "(^([1-9]\\d*)(px|%)$)?", "UIContainerForm.msg.InvalidWidthHeight"));
+                                "^(\\d+(\\.\\d+)?(px|%|em|rem|vw|vh)|auto|calc\\(.*\\))$", "UIContainerForm.msg.InvalidWidthHeight"));
         addChild(infoInputSet);
         setSelectedTab(infoInputSet.getId());
 
