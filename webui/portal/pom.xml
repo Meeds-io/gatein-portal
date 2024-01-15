@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.exoplatform.gatein.portal</groupId>
     <artifactId>exo.portal.webui</artifactId>
-    <version>6.6.x-meed-SNAPSHOT</version>
+    <version>6.6.0-meed-20240115</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
