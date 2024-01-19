@@ -112,7 +112,7 @@ public class UserFieldValidator {
         }
       }
     } else if (usernameValidation) {
-      if (!Character.isLowerCase(buff[0])) {
+      if (!isLowerCaseLetterOrDigit(buff[0])) {
         String label = getFieldLabel(locale);
         return getLabel(locale, "FirstCharacterUsernameValidator.msg", label);
       }
