@@ -41,8 +41,9 @@ public class UserFieldValidatorTest {
   @Test
   public void testValidateUsername() {
     UserFieldValidator fieldValidator = new UserFieldValidator("field", true, false);
-    assertNotNull(fieldValidator.validate(Locale.ENGLISH, "123"));
-    assertNotNull(fieldValidator.validate(Locale.ENGLISH, "1aa"));
+    assertNull(fieldValidator.validate(Locale.ENGLISH, "123"));
+    assertNull(fieldValidator.validate(Locale.ENGLISH, "1aa"));
+    assertNull(fieldValidator.validate(Locale.ENGLISH, "a1aa"));
     assertNotNull(fieldValidator.validate(Locale.ENGLISH, "aaA"));
     assertNull(fieldValidator.validate(Locale.ENGLISH, "aaa"));
   }
