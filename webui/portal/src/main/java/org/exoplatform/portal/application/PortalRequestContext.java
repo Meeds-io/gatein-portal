@@ -66,6 +66,7 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.services.resources.ResourceBundleManager;
+import org.exoplatform.services.security.IdentityConstants;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.application.JavascriptManager;
 import org.exoplatform.web.application.URLBuilder;
@@ -296,7 +297,7 @@ public class PortalRequestContext extends WebuiRequestContext {
     }
 
     public UserPortalConfig getUserPortalConfig() {
-        String remoteUser = "";
+        String remoteUser = null;
         if (userPortalConfig == null) {
             ConversationState conversationState = ConversationState.getCurrent();
             if (conversationState != null
