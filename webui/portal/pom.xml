@@ -69,5 +69,9 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>exo.portal.component.api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.exoplatform.core</groupId>
+      <artifactId>exo.core.component.security.core</artifactId>
+    </dependency>
   </dependencies>
 </project>

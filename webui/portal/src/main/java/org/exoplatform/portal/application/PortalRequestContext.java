@@ -42,6 +42,7 @@ import org.exoplatform.Constants;
 import org.exoplatform.commons.utils.ExpressionUtil;
 import org.exoplatform.commons.utils.PortalPrinter;
 import org.exoplatform.commons.xml.DOMSerializer;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
@@ -295,8 +296,12 @@ public class PortalRequestContext extends WebuiRequestContext {
     }
 
     public UserPortalConfig getUserPortalConfig() {
+        String remoteUser = "";
         if (userPortalConfig == null) {
-            String remoteUser = getRemoteUser();
+            ConversationState conversationState = ConversationState.getCurrent();
+            if(conversationState != null) {
+              remoteUser = conversationState.getIdentity().getUserId();
+            }
             SiteType siteType = getSiteType();
 
             String portalName = getCurrentPortalSite();
