@@ -42,6 +42,7 @@ import org.exoplatform.Constants;
 import org.exoplatform.commons.utils.ExpressionUtil;
 import org.exoplatform.commons.utils.PortalPrinter;
 import org.exoplatform.commons.xml.DOMSerializer;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
@@ -65,6 +66,7 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.services.resources.ResourceBundleManager;
+import org.exoplatform.services.security.IdentityConstants;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.application.JavascriptManager;
 import org.exoplatform.web.application.URLBuilder;
@@ -110,8 +112,6 @@ public class PortalRequestContext extends WebuiRequestContext {
     public static final String REQUEST_TITLE = "portal:requestTitle".intern();
 
     public static final String REQUEST_METADATA = "portal:requestMetadata".intern();
-
-    private static final String LAST_PORTAL_NAME = "prc.lastPortalName";
 
     private static final String DO_LOGIN_PATTERN = "login";
 
@@ -295,17 +295,18 @@ public class PortalRequestContext extends WebuiRequestContext {
     }
 
     public UserPortalConfig getUserPortalConfig() {
+        String remoteUser = null;
         if (userPortalConfig == null) {
-            String remoteUser = getRemoteUser();
-            SiteType siteType = getSiteType();
+            ConversationState conversationState = ConversationState.getCurrent();
+            if (conversationState != null
+              && conversationState.getIdentity() != null
+              && !IdentityConstants.ANONIM.equals(conversationState.getIdentity().getUserId())) {
+              remoteUser = conversationState.getIdentity().getUserId();
+            }
 
             String portalName = getCurrentPortalSite();
-            HttpSession session = request_.getSession();
             try {
                 userPortalConfig = portalConfigService.getUserPortalConfig(portalName, remoteUser, PortalRequestContext.USER_PORTAL_CONTEXT);
-                if (userPortalConfig != null) {
-                    session.setAttribute(LAST_PORTAL_NAME, portalName);
-                }
             } catch (Exception e) {
                 return null;
             }
@@ -316,12 +317,8 @@ public class PortalRequestContext extends WebuiRequestContext {
 
     private String getCurrentPortalSite() {
       String portalName = null;
-      HttpSession session = request_.getSession();
       if (SiteType.PORTAL == getSiteType()) {
         portalName = getSiteName();
-      }
-      if (portalName == null && session != null) {
-        portalName = (String) session.getAttribute(LAST_PORTAL_NAME);
       }
       if (portalName == null) {
         portalName = portalConfigService.getMetaPortal();
