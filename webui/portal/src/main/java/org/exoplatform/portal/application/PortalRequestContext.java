@@ -299,7 +299,9 @@ public class PortalRequestContext extends WebuiRequestContext {
         String remoteUser = "";
         if (userPortalConfig == null) {
             ConversationState conversationState = ConversationState.getCurrent();
-            if(conversationState != null) {
+            if (conversationState != null
+              && conversationState.getIdentity() != null
+              && !IdentityConstants.ANONIM.equals(conversationState.getIdentity().getUserId())) {
               remoteUser = conversationState.getIdentity().getUserId();
             }
             SiteType siteType = getSiteType();
