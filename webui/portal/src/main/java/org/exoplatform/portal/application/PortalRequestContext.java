@@ -113,8 +113,6 @@ public class PortalRequestContext extends WebuiRequestContext {
 
     public static final String REQUEST_METADATA = "portal:requestMetadata".intern();
 
-    private static final String LAST_PORTAL_NAME = "prc.lastPortalName";
-
     private static final String DO_LOGIN_PATTERN = "login";
 
     /** The path decoded from the request. */
@@ -311,9 +309,6 @@ public class PortalRequestContext extends WebuiRequestContext {
             HttpSession session = request_.getSession();
             try {
                 userPortalConfig = portalConfigService.getUserPortalConfig(portalName, remoteUser, PortalRequestContext.USER_PORTAL_CONTEXT);
-                if (userPortalConfig != null) {
-                    session.setAttribute(LAST_PORTAL_NAME, portalName);
-                }
             } catch (Exception e) {
                 return null;
             }
@@ -324,12 +319,8 @@ public class PortalRequestContext extends WebuiRequestContext {
 
     private String getCurrentPortalSite() {
       String portalName = null;
-      HttpSession session = request_.getSession();
       if (SiteType.PORTAL == getSiteType()) {
         portalName = getSiteName();
-      }
-      if (portalName == null && session != null) {
-        portalName = (String) session.getAttribute(LAST_PORTAL_NAME);
       }
       if (portalName == null) {
         portalName = portalConfigService.getMetaPortal();
