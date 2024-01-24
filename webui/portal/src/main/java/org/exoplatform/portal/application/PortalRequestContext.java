@@ -303,10 +303,8 @@ public class PortalRequestContext extends WebuiRequestContext {
               && !IdentityConstants.ANONIM.equals(conversationState.getIdentity().getUserId())) {
               remoteUser = conversationState.getIdentity().getUserId();
             }
-            SiteType siteType = getSiteType();
 
             String portalName = getCurrentPortalSite();
-            HttpSession session = request_.getSession();
             try {
                 userPortalConfig = portalConfigService.getUserPortalConfig(portalName, remoteUser, PortalRequestContext.USER_PORTAL_CONTEXT);
             } catch (Exception e) {
