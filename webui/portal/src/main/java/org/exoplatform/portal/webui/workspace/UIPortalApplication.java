@@ -408,7 +408,7 @@ public class UIPortalApplication extends UIApplication {
             PortalConfig portalConfig = Util.getPortalRequestContext().getDynamicPortalConfig();
             if (portalConfig != null) {
                 tmp = this.createUIComponent(UIPortal.class, null, null);
-                PortalDataMapper.toUIPortal(tmp, portalConfig);
+                PortalDataMapper.toUIPortalWithMetaLayout(tmp, portalConfig);
                 this.putCachedUIPortal(tmp);
                 tmp.setNavPath(uiPortal.getNavPath());
                 tmp.refreshUIPage();
