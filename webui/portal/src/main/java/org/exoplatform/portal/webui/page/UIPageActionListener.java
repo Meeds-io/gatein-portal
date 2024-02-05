@@ -169,7 +169,7 @@ public class UIPageActionListener {
             UIPortal uiPortal = uiPortalApp.createUIComponent(UIPortal.class, null, null);
 
             // Reset selected navigation on userPortalConfig
-            PortalDataMapper.toUIPortal(uiPortal, pcontext.getDynamicPortalConfig());
+            PortalDataMapper.toUIPortalWithMetaLayout(uiPortal, pcontext.getDynamicPortalConfig());
             return uiPortal;
         }
 

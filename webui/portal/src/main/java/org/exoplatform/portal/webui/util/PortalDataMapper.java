@@ -298,8 +298,16 @@ public class PortalDataMapper {
             portlet.setPortletInPortal(false);
         }
     }
-
+    
     public static void toUIPortal(UIPortal uiPortal, PortalConfig model) throws Exception {
+        buildUIPortal(uiPortal, model, false);
+    }
+    
+    public static void toUIPortalWithMetaLayout(UIPortal uiPortal, PortalConfig model) throws Exception {
+        buildUIPortal(uiPortal, model, true);
+    }
+
+    private static void buildUIPortal(UIPortal uiPortal, PortalConfig model, boolean metaLayout) throws Exception {
         uiPortal.setSiteKey(new SiteKey(model.getType(), model.getName()));
         uiPortal.setStorageId(model.getStorageId());
         uiPortal.setName(model.getName());
@@ -319,7 +327,7 @@ public class PortalDataMapper {
         UserPortalConfigService userPortalConfigService = uiPortal.getApplicationComponent(UserPortalConfigService.class);
         PortalConfig metaSite = userPortalConfigService.getMetaPortalConfig();
 
-        Container layout = model.isDisplayed() ? metaSite.getPortalLayout() : model.getPortalLayout();
+        Container layout = metaLayout && model.isDisplayed() ? metaSite.getPortalLayout() : model.getPortalLayout();
         
         uiPortal.setMoveAppsPermissions(layout.getMoveAppsPermissions());
         uiPortal.setMoveContainersPermissions(layout.getMoveContainersPermissions());
