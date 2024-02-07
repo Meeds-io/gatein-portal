@@ -87,9 +87,6 @@ import junit.framework.AssertionFailedError;
 public class TestDataStorage extends AbstractKernelTest {
 
   /** . */
-  private final String                       testPage = "portal::classic::testPage";
-
-  /** . */
   private LayoutService                        storage_;
   
   /** . */
@@ -728,18 +725,27 @@ public class TestDataStorage extends AbstractKernelTest {
     PortalConfig pConfig = storage_.getPortalConfig(PortalConfig.PORTAL_TYPE, "classic");
     assertNotNull(pConfig);
     assertNotNull("The Group layout of " + pConfig.getName() + " is null", pConfig.getPortalLayout());
+    
+    String groupName = "groupTest2";
+    GroupHandler groupHandler = org.getGroupHandler();
+    Group group = groupHandler.createGroupInstance();
+    group.setGroupName(groupName);
+    group.setDescription("this is a group for test");
+    groupHandler.addChild(null, group, true);
 
-    pConfig = storage_.getPortalConfig(PortalConfig.GROUP_TYPE, "/platform/administrators");
+    pConfig = storage_.getPortalConfig(PortalConfig.GROUP_TYPE, "/groupTest2");
     assertNotNull(pConfig);
     assertNotNull("The Group layout of " + pConfig.getName() + " is null", pConfig.getPortalLayout());
     assertTrue(pConfig.getPortalLayout().getChildren() != null && pConfig.getPortalLayout().getChildren().size() > 1);
     pConfig.getPortalLayout().getChildren().clear();
     storage_.save(pConfig);
 
-    pConfig = storage_.getPortalConfig(PortalConfig.GROUP_TYPE, "/platform/administrators");
+    pConfig = storage_.getPortalConfig(PortalConfig.GROUP_TYPE, "/groupTest2");
     assertNotNull(pConfig);
     assertNotNull("The Group layout of " + pConfig.getName() + " is null", pConfig.getPortalLayout());
     assertTrue(pConfig.getPortalLayout().getChildren() != null && pConfig.getPortalLayout().getChildren().size() == 0);
+    
+    groupHandler.removeGroup(group, false);
 
     pConfig = storage_.getPortalConfig(PortalConfig.USER_TYPE, "root");
     assertNotNull(pConfig);
@@ -753,7 +759,7 @@ public class TestDataStorage extends AbstractKernelTest {
 
     group = groupHandler.createGroupInstance();
     group.setGroupName("groupTest");
-    group.setLabel("group label");
+    group.setLabel("group test label");
 
     groupHandler.addChild(null, group, true);
 
@@ -772,12 +778,28 @@ public class TestDataStorage extends AbstractKernelTest {
     groupHandler.removeGroup(group, false);
     group = groupHandler.findGroupById("/groupTest");
     assertNull(group);
+    
+    group = groupHandler.createGroupInstance();
+    group.setGroupName("groupSite");
+    group.setLabel("group site label");
+
+    groupHandler.addChild(null, group, true);
+
+    group = groupHandler.findGroupById("/groupSite");
+    assertNotNull(group);
+
+    pConfig = storage_.getPortalConfig(PortalConfig.GROUP_TYPE, "/groupSite");
+    assertNull("the Group's PortalConfig is null", pConfig);
+    
+    groupHandler.removeGroup(group, false);
+    group = groupHandler.findGroupById("/groupSite");
+    assertNull(group);
   }
 
   public void testGroupNavigation() throws Exception {
     GroupHandler groupHandler = org.getGroupHandler();
     Group group = groupHandler.createGroupInstance();
-    group.setGroupName("testGroupNavigation");
+    group.setGroupName("groupTest");
     group.setLabel("testGroupNavigation");
 
     groupHandler.addChild(null, group, true);
