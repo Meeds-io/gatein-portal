@@ -339,6 +339,13 @@
       <name>group.portal.config.listener</name>
       <set-method>addListenerPlugin</set-method>
       <type>org.exoplatform.portal.config.GroupPortalConfigListener</type>
+      <init-params>
+        <value-param>
+          <name>group.name.pattern</name>
+          <description>The group name pattern</description>
+          <value>/groupTest</value>
+        </value-param>
+      </init-params>
     </component-plugin>
   </external-component-plugins>
 
