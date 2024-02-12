@@ -259,13 +259,6 @@
       <description>update user groups when first login</description>
       <priority>10</priority>
     </component-plugin>
-    <component-plugin>
-      <name>exo.core.security.ConversationRegistry.register</name>
-      <set-method>addListener</set-method>
-      <type>org.exoplatform.services.organization.idm.UpdateLoginTimeListener</type>
-      <description>update last login time for user</description>
-      <priority>100</priority>
-    </component-plugin>
   </external-component-plugins>    
 
   <external-component-plugins>
