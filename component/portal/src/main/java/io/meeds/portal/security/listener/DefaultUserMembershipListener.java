@@ -18,6 +18,7 @@
  */
 package io.meeds.portal.security.listener;
 
+import java.util.Calendar;
 import java.util.Collection;
 
 import org.apache.commons.codec.binary.StringUtils;
@@ -34,9 +35,12 @@ import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
+import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.ConversationRegistry;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityConstants;
+import org.exoplatform.services.security.IdentityRegistry;
 
 import io.meeds.common.ContainerTransactional;
 import io.meeds.portal.security.constant.UserRegistrationType;
@@ -62,49 +66,76 @@ public class DefaultUserMembershipListener extends Listener<ConversationRegistry
 
   private OrganizationService    organizationService;
 
+  private IdentityRegistry       identityRegistry;
+
+  private ConversationRegistry   conversationRegistry;
+
+  private Authenticator          authenticator;
+
   public DefaultUserMembershipListener(ExoContainer container) {
     this.container = container;
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   @ContainerTransactional
-  public void onEvent(Event<ConversationRegistry, ConversationState> event) throws Exception {
+  public void onEvent(Event<ConversationRegistry, ConversationState> event) throws Exception { // NOSONAR
     if (organizationService == null) {
       organizationService = this.container.getComponentInstanceOfType(OrganizationService.class);
     }
     if (securitySettingService == null) {
       securitySettingService = this.container.getComponentInstanceOfType(SecuritySettingService.class);
     }
+    if (identityRegistry == null) {
+      identityRegistry = this.container.getComponentInstanceOfType(IdentityRegistry.class);
+    }
+    if (conversationRegistry == null) {
+      conversationRegistry = this.container.getComponentInstanceOfType(ConversationRegistry.class);
+    }
+    if (authenticator == null) {
+      authenticator = this.container.getComponentInstanceOfType(Authenticator.class);
+    }
     ConversationState state = event.getData();
     if (state == null
         || state.getIdentity() == null
         || state.getIdentity().getUserId() == null
-        || StringUtils.equals(state.getIdentity().getUserId(), IdentityConstants.ANONIM)
-        || ArrayUtils.isEmpty(securitySettingService.getRegistrationGroupIds())) {
+        || StringUtils.equals(state.getIdentity().getUserId(), IdentityConstants.ANONIM)) {
       return;
     }
-    try {
-      User user = getUser(state);
-      if (user != null
-          && isFirstTimeLogin(user)
-          && allowToAddToDefaultGroups(user)) {
-        LOG.info("First time login for user {}, adding it into default groups", user.getUserName());
-        addUserToDefaultGroups(user);
+    User user = getUser(state);
+    if (user != null) {
+      String username = user.getUserName();
+      try {
+        if (isFirstTimeLogin(user)
+            && !ArrayUtils.isEmpty(securitySettingService.getRegistrationGroupIds())
+            && allowToAddToDefaultGroups(user)) {
+          LOG.info("First time login for user {}, adding it into default groups", username);
+          addUserToDefaultGroups(user);
+
+          identityRegistry.unregister(username);
+          conversationRegistry.unregisterByUserId(username);
+          Identity identity = authenticator.createIdentity(username);
+          state.getIdentity().setMemberships(identity.getMemberships());
+          state.getIdentity().setRoles(identity.getRoles());
+        }
+      } catch (Exception e) {
+        LOG.warn("Error while updating default groups of user {}",
+                 username,
+                 e);
+      } finally {
+        user.setLastLoginTime(Calendar.getInstance().getTime());
+        organizationService.getUserHandler().saveUser(user, true);
       }
-    } catch (Exception e) {
-      LOG.warn("Error while updating default groups of user {}",
-               state.getIdentity().getUserId(),
-               e);
     }
   }
 
   private boolean isFirstTimeLogin(User user) {
-    return user.getLastLoginTime() == null || user.getLastLoginTime().equals(user.getCreatedDate());
+    return user.getLastLoginTime() == null
+           || Math.abs(user.getLastLoginTime().getTime() - user.getCreatedDate().getTime()) < 1000;
   }
 
   private boolean allowToAddToDefaultGroups(User user) throws Exception {
-    return securitySettingService.getRegistrationType() == UserRegistrationType.OPEN
-           || isInternalUser(user);
+    return securitySettingService.getRegistrationType() == UserRegistrationType.OPEN || isInternalUser(user);
   }
 
   private boolean isInternalUser(User user) throws Exception {
