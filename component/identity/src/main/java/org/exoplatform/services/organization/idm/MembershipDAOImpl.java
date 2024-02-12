@@ -137,24 +137,27 @@ public class MembershipDAOImpl extends AbstractDAOImpl implements MembershipHand
         membership.setUserName(user.getUserName());
         membership.setGroupId(g.getId());
 
-        if (broadcast) {
+        try {
+          if (broadcast) {
             preSave(membership, true);
-        }
-
-        if (isAssociationMapped() && getAssociationMapping().equals(mt.getName())) {
+          }
+          
+          if (isAssociationMapped() && getAssociationMapping().equals(mt.getName())) {
             if(!getIdentitySession().getRelationshipManager().isAssociatedByKeys(groupId, user.getUserName())) {
-                getIdentitySession().getRelationshipManager().associateUserByKeys(groupId, user.getUserName());
+              getIdentitySession().getRelationshipManager().associateUserByKeys(groupId, user.getUserName());
             }
-        }
-
-        if (isCreateMembership(mt.getName(), g.getId())) {
+          }
+          
+          if (isCreateMembership(mt.getName(), g.getId())) {
             getIdentitySession().getRoleManager().createRole(mt.getName(), user.getUserName(), groupId);
-        }
-
-        if (broadcast) {
+          }
+          
+          if (broadcast) {
             postSave(membership, true);
+          }
+        } finally {
+          orgService.flush();
         }
-
     }
 
     public void saveMembership(Membership m, boolean broadcast) throws Exception {
