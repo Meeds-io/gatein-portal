@@ -44,10 +44,12 @@ import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.impl.MembershipImpl;
+import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.ConversationRegistry;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityConstants;
+import org.exoplatform.services.security.IdentityRegistry;
 
 import io.meeds.portal.security.constant.UserRegistrationType;
 import io.meeds.portal.security.service.SecuritySettingService;
@@ -71,6 +73,15 @@ public class DefaultUserMembershipListenerTest {
 
   @Mock
   SecuritySettingService                         securitySettingService;
+
+  @Mock
+  IdentityRegistry                               identityRegistry;
+
+  @Mock
+  ConversationRegistry                           conversationRegistry;
+
+  @Mock
+  Authenticator                                  authenticator;
 
   @Mock
   Event<ConversationRegistry, ConversationState> event;
@@ -106,6 +117,9 @@ public class DefaultUserMembershipListenerTest {
   public void setUp() throws Exception {
     when(container.getComponentInstanceOfType(OrganizationService.class)).thenReturn(organizationService);
     when(container.getComponentInstanceOfType(SecuritySettingService.class)).thenReturn(securitySettingService);
+    when(container.getComponentInstanceOfType(IdentityRegistry.class)).thenReturn(identityRegistry);
+    when(container.getComponentInstanceOfType(ConversationRegistry.class)).thenReturn(conversationRegistry);
+    when(container.getComponentInstanceOfType(Authenticator.class)).thenReturn(authenticator);
     when(event.getData()).thenReturn(state);
     when(state.getIdentity()).thenReturn(identity);
     when(identity.getUserId()).thenReturn(USERNAME);
@@ -159,14 +173,13 @@ public class DefaultUserMembershipListenerTest {
   public void testAddConversationStateWhenNoGroups() throws Exception {
     DefaultUserMembershipListener listener = new DefaultUserMembershipListener(container);
     listener.onEvent(event);
-    verifyNoInteractions(organizationService);
-    verify(securitySettingService, times(1)).getRegistrationGroupIds();
+    verify(userHandler).saveUser(user, true);
+    verify(securitySettingService).getRegistrationGroupIds();
   }
 
   @Test
   public void testLoginNotFirstTime() throws Exception {
     DefaultUserMembershipListener listener = new DefaultUserMembershipListener(container);
-    when(securitySettingService.getRegistrationGroupIds()).thenReturn(new String[] { GROUP_ID });
     when(user.getLastLoginTime()).thenReturn(new Date());
     listener.onEvent(event);
     verify(membershipHandler, never()).linkMembership(user, group, membershipType, true);

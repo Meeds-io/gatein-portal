@@ -21,10 +21,7 @@ package org.exoplatform.services.organization;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PageList;
@@ -33,17 +30,11 @@ import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.component.RequestLifeCycle;
-import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.organization.idm.Config;
 import org.exoplatform.services.organization.idm.PicketLinkIDMOrganizationServiceImpl;
-import org.exoplatform.services.organization.idm.UpdateLoginTimeListener;
 import org.exoplatform.services.organization.idm.cache.CacheableGroupHandlerImpl;
 import org.exoplatform.services.organization.idm.cache.CacheableUserProfileHandlerImpl;
 import org.exoplatform.services.organization.impl.UserProfileImpl;
-import org.exoplatform.services.security.ConversationRegistry;
-import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.services.security.Identity;
 
 /**
  * Created by The eXo Platform SARL Author : Tung Pham thanhtungty@gmail.com Nov 13, 2007
@@ -64,8 +55,6 @@ public class TestOrganization extends AbstractKernelTest {
     protected static final String DEFAULT_PASSWORD = "defaultpassword";
     protected static final String DESCRIPTION = " Description";
 
-    protected UpdateLoginTimeListener updateLoginTimeListener;
-
     protected OrganizationService organizationService;
 
     protected UserHandler userHandler_;
@@ -84,7 +73,6 @@ public class TestOrganization extends AbstractKernelTest {
 
         begin();
         PortalContainer container = getContainer();
-        updateLoginTimeListener = new UpdateLoginTimeListener(container);
         organizationService = (OrganizationService) container.getComponentInstance(OrganizationService.class);
         userHandler_ = organizationService.getUserHandler();
         profileHandler_ = organizationService.getUserProfileHandler();
@@ -172,7 +160,7 @@ public class TestOrganization extends AbstractKernelTest {
         handler.addChild(null, newGroup, true);
 
         allGroups = handler.findGroups(null);
-        Assert.assertTrue(allGroups.size() > 0);
+        assertTrue(allGroups.size() > 0);
         boolean found = false;
         for (Object object : allGroups) {
           if (((Group) object).getId().equals("/abc")) {
@@ -185,7 +173,7 @@ public class TestOrganization extends AbstractKernelTest {
     public void testFindGroupFromRoot() throws Exception {
         GroupHandler handler = organizationService.getGroupHandler();
         Collection allGroups = handler.findGroups(null);
-        Assert.assertTrue(allGroups.size() > 0);
+        assertTrue(allGroups.size() > 0);
     }
 
     public void testFindGroupById() throws Exception {
@@ -266,7 +254,7 @@ public class TestOrganization extends AbstractKernelTest {
         Group group = groupHandler.findGroupById(GROUP_1);
         UserHandler uHandler = organizationService.getUserHandler();
         PageList users = uHandler.findUsersByGroup("/platform/administrators");
-        Assert.assertTrue(users.getAvailable() > 0);
+        assertTrue(users.getAvailable() > 0);
 
         List iterator = users.getAll();
         for (Object test : iterator) {
@@ -274,52 +262,24 @@ public class TestOrganization extends AbstractKernelTest {
         }
     }
 
-    public void testLastLoginTime() throws Exception {
-        UserHandler uHandler = organizationService.getUserHandler();
-
-        User user = uHandler.findUserByName(USER_1);
-        Assert.assertNotNull(user);
-
-        // Assert that last login time is updated by default
-        Thread.sleep(1);
-        Date current = new Date();
-        Thread.sleep(1);
-        user = uHandler.findUserByName(USER_1);
-        Assert.assertNotNull(user);
-        
-        Date oldLastLoginTime = user.getLastLoginTime();
-        Assert.assertNotNull(oldLastLoginTime);
-
-        Assert.assertTrue(uHandler.authenticate(USER_1, DEFAULT_PASSWORD));
-        user = uHandler.findUserByName(USER_1);
-        Assert.assertTrue(user.getLastLoginTime().equals(oldLastLoginTime));
-
-        Assert.assertTrue(uHandler.authenticate(USER_1, DEFAULT_PASSWORD));
-        updateLoginTimeListener.onEvent(new Event<ConversationRegistry, ConversationState>("nothing", null,
-            new ConversationState(new Identity(USER_1))));
-        user = uHandler.findUserByName(USER_1);
-        Assert.assertTrue(user.getLastLoginTime().after(oldLastLoginTime));
-        Assert.assertTrue(user.getLastLoginTime().after(current));
-    }
-
     public void testDisplayName() throws Exception {
         UserHandler uHandler = organizationService.getUserHandler();
         User john = uHandler.findUserByName("john");
 
-        Assert.assertNotNull(john);
+        assertNotNull(john);
 
         // Test that fullName is working correctly for "john"
-        Assert.assertEquals("John Anthony", john.getFullName());
+        assertEquals("John Anthony", john.getFullName());
         john.setFullName("Johnny Something");
         uHandler.saveUser(john, false);
         john = uHandler.findUserByName("john");
-        Assert.assertEquals("Johnny Something", john.getFullName());
+        assertEquals("Johnny Something", john.getFullName());
 
         // Now delete fullName and assert that it's "firstName lastName"
         john.setFullName(null);
         uHandler.saveUser(john, false);
         john = uHandler.findUserByName("john");
-        Assert.assertEquals("John Anthony", john.getFullName());
+        assertEquals("John Anthony", john.getFullName());
 
         // TODO: GTNPORTAL-2358 uncomment once displayName will be available
         // // Test that "root" and "john" have displayName but demo not.
