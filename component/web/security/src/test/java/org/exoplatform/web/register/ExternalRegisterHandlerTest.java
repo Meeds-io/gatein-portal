@@ -20,7 +20,7 @@ import static org.exoplatform.web.register.ExternalRegisterHandler.ALREADY_AUTHE
 import static org.exoplatform.web.register.ExternalRegisterHandler.CAPTCHA_PARAM;
 import static org.exoplatform.web.register.ExternalRegisterHandler.EMAIL_PARAM;
 import static org.exoplatform.web.register.ExternalRegisterHandler.EMAIL_VERIFICATION_SENT;
-import static org.exoplatform.web.register.ExternalRegisterHandler.ERROR_MESSAGE_PARAM;
+import static org.exoplatform.web.register.ExternalRegisterHandler.*;
 import static org.exoplatform.web.register.ExternalRegisterHandler.EXPIRED_ACTION_NAME;
 import static org.exoplatform.web.register.ExternalRegisterHandler.FIRSTNAME_PARAM;
 import static org.exoplatform.web.register.ExternalRegisterHandler.LASTNAME_PARAM;
@@ -310,6 +310,7 @@ public class ExternalRegisterHandlerTest {
     assertEquals(EMAIL, applicationParameters.get(EMAIL_PARAM));
     assertEquals(TOKEN_VALUE, applicationParameters.get(TOKEN_ID_PARAM));
     assertEquals("gatein.forgotPassword.usernameChanged", applicationParameters.get(ERROR_MESSAGE_PARAM));
+    assertNull(applicationParameters.get(ERROR_FIELD_PARAM));
     assertEquals(password, applicationParameters.get(PASSWORD_PARAM));
     assertEquals(passwordConfirm, applicationParameters.get(PASSWORD_CONFIRM_PARAM));
 
@@ -320,8 +321,8 @@ public class ExternalRegisterHandlerTest {
   public void testDisplayExternalRegistrationWhenBothPasswordsNotMatch() throws Exception {
     prepareResetPasswordContext();
 
-    String password = "pass1";
-    String passwordConfirm = "pass2";
+    String password = "pass1234";
+    String passwordConfirm = "pass123";
 
     when(request.getParameter(ACTION_PARAM)).thenReturn(SAVE_EXTERNAL_ACTION);
     when(request.getParameter(EMAIL_PARAM)).thenReturn(EMAIL);
@@ -334,6 +335,7 @@ public class ExternalRegisterHandlerTest {
     assertEquals(EMAIL, applicationParameters.get(EMAIL_PARAM));
     assertEquals(TOKEN_VALUE, applicationParameters.get(TOKEN_ID_PARAM));
     assertEquals("gatein.forgotPassword.confirmPasswordNotMatch", applicationParameters.get(ERROR_MESSAGE_PARAM));
+    assertEquals(PASSWORD_CONFIRM_PARAM, applicationParameters.get(ERROR_FIELD_PARAM));
     assertEquals(password, applicationParameters.get(PASSWORD_PARAM));
     assertEquals(passwordConfirm, applicationParameters.get(PASSWORD_CONFIRM_PARAM));
 
@@ -365,6 +367,7 @@ public class ExternalRegisterHandlerTest {
     assertEquals(EMAIL, applicationParameters.get(EMAIL_PARAM));
     assertEquals(TOKEN_VALUE, applicationParameters.get(TOKEN_ID_PARAM));
     assertEquals("onboarding.login.passwordCondition", applicationParameters.get(ERROR_MESSAGE_PARAM));
+    assertEquals(PASSWORD_PARAM, applicationParameters.get(ERROR_FIELD_PARAM));
 
     verify(passwordRecoveryService, never()).sendAccountCreatedConfirmationEmail(any(), any(), any());
   }
@@ -385,6 +388,7 @@ public class ExternalRegisterHandlerTest {
     externalRegisterHandler.execute(controllerContext);
 
     assertEquals("EmptyFieldValidator.msg.empty-input", applicationParameters.get(ERROR_MESSAGE_PARAM));
+    assertEquals(FIRSTNAME_PARAM, applicationParameters.get(ERROR_FIELD_PARAM));
 
     verify(passwordRecoveryService, never()).sendAccountCreatedConfirmationEmail(any(), any(), any());
   }
@@ -405,6 +409,7 @@ public class ExternalRegisterHandlerTest {
     externalRegisterHandler.execute(controllerContext);
 
     assertEquals("EmptyFieldValidator.msg.empty-input", applicationParameters.get(ERROR_MESSAGE_PARAM));
+    assertEquals(LASTNAME_PARAM, applicationParameters.get(ERROR_FIELD_PARAM));
 
     verify(passwordRecoveryService, never()).sendAccountCreatedConfirmationEmail(any(), any(), any());
   }
@@ -427,6 +432,7 @@ public class ExternalRegisterHandlerTest {
     externalRegisterHandler.execute(controllerContext);
 
     assertEquals("external.registration.fail.create.user", applicationParameters.get(ERROR_MESSAGE_PARAM));
+    assertNull(applicationParameters.get(ERROR_FIELD_PARAM));
 
     verify(passwordRecoveryService, never()).sendAccountCreatedConfirmationEmail(any(), any(), any());
   }

@@ -139,6 +139,8 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
 
   public static final String             ERROR_MESSAGE_PARAM                 = "error";
 
+  public static final String             ERROR_FIELD_PARAM                   = "errorField";
+
   public static final String             ALREADY_AUTHENTICATED_MESSAGE_PARAM = "authenticated";
 
   public static final String             EMAIL_VERIFICATION_SENT             = "emailVerificationSent";
@@ -250,6 +252,7 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
       HttpSession session = request.getSession();
       if (!isValidCaptch(session, captcha)) {
         parameters.put(ERROR_MESSAGE_PARAM, resourceBundle.getString("gatein.forgotPassword.captchaError"));
+        parameters.put(ERROR_FIELD_PARAM, CAPTCHA_PARAM);
       } else if (isValidUserAndPassword(username,
                                         requestUsername,
                                         requestEmail,
@@ -322,13 +325,15 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
     String errorMessage = FIRSTNAME_VALIDATOR.validate(locale, firstName);
     if (StringUtils.isBlank(errorMessage)) {
       errorMessage = LASTNAME_VALIDATOR.validate(locale, lastName);
-    }
-    if (StringUtils.isNotBlank(errorMessage)) {
-      parameters.put(ERROR_MESSAGE_PARAM, errorMessage);
-      return false;
+      if (StringUtils.isNotBlank(errorMessage)) {
+        parameters.put(ERROR_MESSAGE_PARAM, errorMessage);
+        parameters.put(ERROR_FIELD_PARAM, LASTNAME_PARAM);
+      }
     } else {
-      return true;
+      parameters.put(ERROR_MESSAGE_PARAM, errorMessage);
+      parameters.put(ERROR_FIELD_PARAM, FIRSTNAME_PARAM);
     }
+    return StringUtils.isBlank(errorMessage);
   }
 
   private boolean isValidUserAndPassword(String tokenUsernameOrEmail, // NOSONAR
@@ -348,12 +353,11 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
       String errorMessage = bundle.getString("gatein.forgotPassword.usernameChanged");
       errorMessage = errorMessage.replace("{0}", tokenUsernameOrEmail);
       parameters.put(ERROR_MESSAGE_PARAM, errorMessage);
-    } else if (!StringUtils.equals(password, confirmPass)) {
-      parameters.put(ERROR_MESSAGE_PARAM, bundle.getString("gatein.forgotPassword.confirmPasswordNotMatch"));
     } else {
       String errorMessage = PASSWORD_VALIDATOR.validate(locale, password);
       if (StringUtils.isNotBlank(errorMessage)) {
         parameters.put(ERROR_MESSAGE_PARAM, errorMessage);
+        parameters.put(ERROR_FIELD_PARAM, PASSWORD_PARAM);
       } else if (!isEmailToken) {
         // User added an email in registration form
         // which wasn't provided at first place in token
@@ -361,7 +365,11 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
         errorMessage = EMAIL_VALIDATOR.validate(locale, email);
         if (StringUtils.isNotBlank(errorMessage)) {
           parameters.put(ERROR_MESSAGE_PARAM, errorMessage);
+          parameters.put(ERROR_FIELD_PARAM, EMAIL_PARAM);
         }
+      } else if (!StringUtils.equals(password, confirmPass)) {
+        parameters.put(ERROR_MESSAGE_PARAM, bundle.getString("gatein.forgotPassword.confirmPasswordNotMatch"));
+        parameters.put(ERROR_FIELD_PARAM, PASSWORD_CONFIRM_PARAM);
       }
     }
     return !parameters.containsKey(ERROR_MESSAGE_PARAM);
