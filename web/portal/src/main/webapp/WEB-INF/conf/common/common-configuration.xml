@@ -198,7 +198,6 @@
         <value>locale.portal.custom</value>
         <value>locale.portal.login</value>
         <value>locale.navigation.portal.global</value>
-        <value>locale.portal.HamburgerMenu</value>
       </values-param>
       <values-param>
         <name>portal.resource.names</name>
