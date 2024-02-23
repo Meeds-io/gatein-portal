@@ -26,14 +26,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
-import jakarta.servlet.http.HttpServletRequest;
-
-import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +35,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import org.exoplatform.portal.config.NavigationCategoryService;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
@@ -70,14 +63,13 @@ import org.exoplatform.services.rest.impl.ContainerResponse;
 import org.exoplatform.services.rest.impl.EnvironmentContext;
 import org.exoplatform.services.test.mock.MockHttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RunWith(MockitoJUnitRunner.class)
 public class NavigationRestTest extends BaseRestServicesTestCase {
 
   @Mock
   private UserPortalConfigService   portalConfigService;
-
-  @Mock
-  private NavigationCategoryService navigationCategoryService;
 
   @Mock
   private LayoutService             layoutService;
@@ -96,7 +88,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    binder.addResource(new NavigationRest(portalConfigService, navigationCategoryService, layoutService, organizationService, userACL), null);
+    binder.addResource(new NavigationRest(portalConfigService, layoutService, organizationService, userACL), null);
   }
 
   @Override
@@ -157,38 +149,6 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     when(userPortal.getNavigations()).thenThrow(IllegalStateException.class);
     resp = launcher.service("GET", path, "", null, null, envctx);
     assertEquals(500, resp.getStatus());
-  }
-
-  @Test
-  public void testGetNavigationCategories() throws Exception {
-    String path = "/v1/navigations/categories";
-
-    EnvironmentContext envctx = new EnvironmentContext();
-    HttpServletRequest httpRequest = new MockHttpServletRequest(path, null, 0, "GET", null);
-    envctx.put(HttpServletRequest.class, httpRequest);
-
-    TreeMap<String, String> navs = new TreeMap<>();
-    navs.put("test", "value");
-    Map<String, Integer> categoriesOrder = new HashMap<>();
-    categoriesOrder.put("test", 12);
-    Map<String, Integer> urisOrder = new HashMap<>();
-    urisOrder.put("test", 15);
-
-    when(navigationCategoryService.getNavigationCategories()).thenReturn(navs);
-    when(navigationCategoryService.getNavigationCategoriesOrder()).thenReturn(categoriesOrder);
-    when(navigationCategoryService.getNavigationUriOrder()).thenReturn(urisOrder);
-
-    ContainerResponse resp = launcher.service("GET", path, "", null, null, envctx);
-
-    assertEquals(200, resp.getStatus());
-    Object entity = resp.getEntity();
-    assertNotNull(entity);
-    assertTrue(entity instanceof String);
-    JSONObject jsonObject = new JSONObject(entity.toString());
-    assertEquals(200, resp.getStatus());
-    assertEquals(navs.get("test"), jsonObject.getJSONObject("navs").get("test"));
-    assertEquals(categoriesOrder.get("test"), jsonObject.getJSONObject("categoriesOrder").get("test"));
-    assertEquals(urisOrder.get("test"), jsonObject.getJSONObject("urisOrder").get("test"));
   }
 
   @Test
