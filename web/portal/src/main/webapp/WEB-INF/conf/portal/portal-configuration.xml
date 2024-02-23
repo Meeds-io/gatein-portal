@@ -92,10 +92,6 @@
   </component>
 
   <component>
-    <type>org.exoplatform.portal.config.NavigationCategoryService</type>
-  </component>
-
-  <component>
     <type>org.exoplatform.settings.rest.SettingResource</type>
   </component>
 
