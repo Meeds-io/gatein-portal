@@ -246,7 +246,7 @@ public class NavigationStorageImpl implements NavigationStorage {
 
   private NodeEntity getRootNode(Long nodeId) {
     NodeEntity entity = this.nodeDAO.find(nodeId);
-    if (entity.getParent() != null) {
+    if (entity.getParent() != null && entity.getParent().getId().longValue() != entity.getId().longValue()) {
       return this.getRootNode(entity.getParent().getId());
     }
     return entity;
