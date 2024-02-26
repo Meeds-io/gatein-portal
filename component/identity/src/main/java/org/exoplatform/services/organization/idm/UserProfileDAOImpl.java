@@ -148,7 +148,6 @@ public class UserProfileDAOImpl extends AbstractDAOImpl implements UserProfileHa
             // Don't rethrow the exception to be compatible with other Org Service implementations
             log.debug("Can NOT find any user with username is NULL");
         } catch (Exception e) {
-            // TODO:
             handleException("Identity operation error: ", e);
         }
 
@@ -164,15 +163,8 @@ public class UserProfileDAOImpl extends AbstractDAOImpl implements UserProfileHa
         }
 
         // Just to avoid to return a shared object between many threads
-        // that would not be thread safe nor corrct
+        // that would not be thread safe nor correct
         if (up == NOT_FOUND) {
-            // julien : integration bug fix
-            // Return an empty profile to avoid NPE in portal
-            // Should clarify what do do (maybe portal should care about returned value)
-            /*UserProfileImpl profile = new UserProfileImpl();
-            profile.setUserName(userName);
-            return profile;*/
-
             //Return NULL as TCK suppose
             return null;
         } else {
@@ -252,17 +244,18 @@ public class UserProfileDAOImpl extends AbstractDAOImpl implements UserProfileHa
             return null;
         }
 
-        Map<String, String> filteredAttrs = new HashMap<String, String>();
+        Map<String, String> filteredAttrs = new HashMap<>();
 
         for (String key : attrs.keySet()) {
             // Check if attribute is part of User interface data
+            String value = null;
             if (!UserDAOImpl.USER_NON_PROFILE_KEYS.contains(key)) {
-                Object value = attrs.get(key).getValue();
-                if (value != null) {
-                    filteredAttrs.put(key, value.toString());
-                } else {
-                    filteredAttrs.put(key, null);
+                if(attrs.get(key).getValues().size() > 1) {
+                   value = attrs.get(key).getValues().toString();
+                } else if (attrs.get(key).getValue() != null) {
+                    value = attrs.get(key).getValue().toString();
                 }
+              filteredAttrs.put(key, value);
             }
 
         }

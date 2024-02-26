@@ -617,7 +617,12 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
         Attribute attr = attrs.get(attrName);
 
         if (attr != null) {
-          IdentityObjectAttribute identityObjectAttribute = new SimpleAttribute(name);
+          IdentityObjectAttribute identityObjectAttribute;
+          if(attrsMap.containsKey(name)) {
+            identityObjectAttribute = attrsMap.get(name);
+          } else {
+            identityObjectAttribute = new SimpleAttribute(name);
+          }
           NamingEnumeration<?> values = attr.getAll();
 
           while (values.hasMoreElements()) {
