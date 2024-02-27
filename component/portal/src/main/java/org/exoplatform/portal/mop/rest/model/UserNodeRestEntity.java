@@ -18,13 +18,17 @@ package org.exoplatform.portal.mop.rest.model;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.user.UserNode;
 
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@EqualsAndHashCode
 public class UserNodeRestEntity {
 
   private UserNode                  userNode;
@@ -54,47 +58,47 @@ public class UserNodeRestEntity {
   }
 
   public String getLabel() {
-    return userNode.getResolvedLabel();
+    return userNode == null ? null : userNode.getResolvedLabel();
   }
 
   public String getLabelKey() {
-    return userNode.getLabel();
+    return userNode == null ? null : userNode.getLabel();
   }
 
   public String getIcon() {
-    return userNode.getIcon();
+    return userNode == null ? null : userNode.getIcon();
   }
 
   public String getId() {
-    return userNode.getId();
+    return userNode == null ? null : userNode.getId();
   }
 
   public String getUri() {
-    return userNode.getURI();
+    return userNode == null ? null : userNode.getURI();
   }
 
   public Visibility getVisibility() {
-    return userNode.getVisibility();
+    return userNode == null ? null : userNode.getVisibility();
   }
 
   public String getName() {
-    return userNode.getName();
+    return userNode == null ? null : userNode.getName();
   }
 
   public long getStartPublicationTime() {
-    return userNode.getStartPublicationTime();
+    return userNode == null ? 0l : userNode.getStartPublicationTime();
   }
 
   public long getEndPublicationTime() {
-    return userNode.getEndPublicationTime();
+    return userNode == null ? 0l : userNode.getEndPublicationTime();
   }
 
   public SiteKey getSiteKey() {
-    return userNode.getNavigation().getKey();
+    return userNode == null ? null : userNode.getNavigation().getKey();
   }
 
   public PageKey getPageKey() {
-    return userNode.getPageRef();
+    return userNode == null ? null : userNode.getPageRef();
   }
 
   public boolean isCanEditPage() {
@@ -122,7 +126,7 @@ public class UserNodeRestEntity {
   }
 
   public String getTarget() {
-    return userNode.getTarget();
+    return userNode == null ? null : userNode.getTarget();
   }
 
   public String getPageLink() {
@@ -134,7 +138,7 @@ public class UserNodeRestEntity {
   }
 
   public long getUpdatedDate() {
-    return userNode.getUpdatedDate();
+    return userNode == null ? 0l : userNode.getUpdatedDate();
   }
 
   public List<UserNodeBreadcrumbItem> getUserNodeBreadcrumbItemList() {
@@ -145,13 +149,4 @@ public class UserNodeRestEntity {
     this.userNodeBreadcrumbItemList = userNodeBreadcrumbItemList;
   }
 
-  @Override
-  public int hashCode() {
-    int result = 17;
-    result = 31 * result + (int) getUpdatedDate();
-    result = 31 * result + (subNodes != null ? Objects.hash(subNodes) : 0);
-    result = 31 * result + (pageAccessPermissions != null ? Objects.hash(pageAccessPermissions) : 0);
-    result = 31 * result + (pageEditPermission != null ? pageEditPermission.hashCode() : 0);
-    return result;
-  }
 }
