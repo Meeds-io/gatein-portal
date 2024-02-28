@@ -29,7 +29,6 @@ import org.exoplatform.portal.config.DefaultGroupVisibilityPluginTest;
 import org.exoplatform.portal.config.DynamicPortalLayoutMatcherPluginTest;
 import org.exoplatform.portal.config.DynamicPortalLayoutMatcherTest;
 import org.exoplatform.portal.config.DynamicPortalLayoutServiceTest;
-import org.exoplatform.portal.config.NavigationCategoryServiceTest;
 import org.exoplatform.portal.config.NewPortalConfigListenerTest;
 import org.exoplatform.portal.config.TestEscape;
 import org.exoplatform.portal.config.TestSerialization;
@@ -72,7 +71,6 @@ import io.meeds.portal.security.service.SecuritySettingServiceTest;
     DynamicPortalLayoutMatcherPluginTest.class,
     DynamicPortalLayoutMatcherTest.class,
     DynamicPortalLayoutServiceTest.class,
-    NavigationCategoryServiceTest.class,
     TestEscape.class,
     TestSerialization.class,
     TestSiteDataImportConserve.class,

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.security.RolesAllowed;
-import jakarta.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -16,13 +14,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.portal.config.NavigationCategoryService;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
@@ -30,6 +24,7 @@ import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.navigation.Scope;
+import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.user.HttpUserPortalContext;
 import org.exoplatform.portal.mop.user.UserNavigation;
@@ -52,6 +47,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Path("/v1/navigations")
 @Tag(name = "v1/navigations", description = "Retrieve sites navigations")
@@ -63,8 +59,6 @@ public class NavigationRest implements ResourceContainer {
 
   private UserPortalConfigService   portalConfigService;
 
-  private NavigationCategoryService navigationCategoryService;
-
   private LayoutService             layoutService;
 
   private OrganizationService       organizationService;
@@ -72,12 +66,10 @@ public class NavigationRest implements ResourceContainer {
   private UserACL                   userACL;
 
   public NavigationRest(UserPortalConfigService portalConfigService,
-                        NavigationCategoryService navigationCategoryService,
                         LayoutService layoutService,
                         OrganizationService organizationService,
                         UserACL userACL) {
     this.portalConfigService = portalConfigService;
-    this.navigationCategoryService = navigationCategoryService;
     this.layoutService = layoutService;
     this.organizationService = organizationService;
     this.userACL = userACL;
@@ -186,25 +178,6 @@ public class NavigationRest implements ResourceContainer {
                           expand,
                           temporalCheck,
                           expandBreadcrumb);
-  }
-
-  @Path("/categories")
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Operation(summary = "Gets navigations categories for UI", description = "Gets navigations categories for UI", method = "GET")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-      @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public Response getNavigationCategories() {
-    try {
-      JSONObject object = new JSONObject();
-      object.put("navs", navigationCategoryService.getNavigationCategories());
-      object.put("categoriesOrder", navigationCategoryService.getNavigationCategoriesOrder());
-      object.put("urisOrder", navigationCategoryService.getNavigationUriOrder());
-      return Response.ok(object.toString()).build();
-    } catch (JSONException e) {
-      LOG.warn("Error parsing navigation categories result", e);
-      return Response.serverError().build();
-    }
   }
 
   private Response getNavigations(HttpServletRequest request, // NOSONAR
