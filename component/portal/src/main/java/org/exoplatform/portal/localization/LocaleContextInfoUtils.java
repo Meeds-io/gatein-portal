@@ -15,8 +15,8 @@ import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.UserProfile;
+import org.exoplatform.services.organization.*;
+import org.exoplatform.services.organization.Query;
 import org.exoplatform.services.resources.*;
 
 /**
@@ -187,6 +187,14 @@ public class LocaleContextInfoUtils {
       // get user profile
       beginContext(organizationService);
       try {
+        if (userId.contains("@")) {
+          org.exoplatform.services.organization.Query query = new Query();
+          query.setEmail(userId);
+          User[] users = organizationService.getUserHandler().findUsersByQuery(query).load(0, 1);
+          if (users.length > 0) {
+            userId = users[0].getUserName();
+          }
+        }
         profile = organizationService.getUserProfileHandler().findUserProfileByName(userId);
       } catch (Exception e) {
         LOG.debug(userId + " profile not found ", e);
