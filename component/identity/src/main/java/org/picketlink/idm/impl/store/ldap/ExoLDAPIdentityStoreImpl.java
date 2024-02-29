@@ -623,6 +623,7 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
           } else {
             identityObjectAttribute = new SimpleAttribute(name);
           }
+
           NamingEnumeration<?> values = attr.getAll();
 
           while (values.hasMoreElements()) {
