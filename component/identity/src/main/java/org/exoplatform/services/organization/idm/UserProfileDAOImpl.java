@@ -163,9 +163,8 @@ public class UserProfileDAOImpl extends AbstractDAOImpl implements UserProfileHa
         }
 
         // Just to avoid to return a shared object between many threads
-        // that would not be thread safe nor corrct
+        // that would not be thread safe nor correct
         if (up == NOT_FOUND) {
-
             //Return NULL as TCK suppose
             return null;
         } else {
