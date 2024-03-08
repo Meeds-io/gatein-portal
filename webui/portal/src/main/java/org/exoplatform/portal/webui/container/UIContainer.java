@@ -19,6 +19,7 @@
 
 package org.exoplatform.portal.webui.container;
 
+
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserACL;
@@ -49,9 +50,6 @@ public class UIContainer extends UIPortalComponent {
     protected String[] moveContainersPermissions;
 
     protected String[] moveAppsPermissions;
-
-    public UIContainer() {
-    }
 
     public String getStorageId() {
         return storageId;
@@ -103,7 +101,7 @@ public class UIContainer extends UIPortalComponent {
 
     public boolean hasMoveContainersPermission() {
         ExoContainer exoContainer = ExoContainerContext.getCurrentContainer();
-        UserACL acl = (UserACL) exoContainer.getComponentInstanceOfType(UserACL.class);
+        UserACL acl = exoContainer.getComponentInstanceOfType(UserACL.class);
         return acl.hasPermission(moveContainersPermissions);
     }
 
