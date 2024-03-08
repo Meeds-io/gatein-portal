@@ -43,6 +43,19 @@ public enum Visibility {
     /**
      * The object visibility is system.
      */
-    SYSTEM
+    SYSTEM,
+
+    /**
+     * The object visibility is system.
+     */
+    DRAFT;
+
+    // Exclude Draft since it shouldn't be visible
+    public static final Visibility[] DEFAULT_VISIBILITIES = new Visibility[] { // NOSONAR
+      DISPLAYED,
+      HIDDEN,
+      TEMPORAL,
+      SYSTEM
+    };
 
 }

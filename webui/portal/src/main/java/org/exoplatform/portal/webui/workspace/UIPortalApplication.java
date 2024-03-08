@@ -43,6 +43,7 @@ import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.resource.*;
 import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.page.UIPage;
+import org.exoplatform.portal.webui.page.UIPageBody;
 import org.exoplatform.portal.webui.page.UIPageActionListener.ChangeNodeActionListener;
 import org.exoplatform.portal.webui.page.UISiteBody;
 import org.exoplatform.portal.webui.portal.PageNodeEvent;
@@ -59,6 +60,7 @@ import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.application.JavascriptManager;
+import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.web.application.javascript.JavascriptConfigParser;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.exoplatform.web.url.MimeType;
@@ -87,6 +89,7 @@ import org.gatein.portal.controller.resource.script.Module;
 import org.gatein.portal.controller.resource.script.ScriptResource;
 import org.json.JSONObject;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -203,12 +206,6 @@ public class UIPortalApplication extends UIApplication {
 
     private Map<SiteKey, UIPortal> all_UIPortals;
 
-    private UIPortal currentSite;
-
-    @Getter
-    @Setter
-    private UIPage   currentPage;
-
     private boolean isAjaxInLastRequest;
 
     private RequestNavigationData   lastNonAjaxRequestNavData;
@@ -321,8 +318,7 @@ public class UIPortalApplication extends UIApplication {
      * @param uiPortal
      */
     public void setCurrentSite(UIPortal uiPortal) {
-        this.currentSite = uiPortal;
-
+        PortalRequestContext.getCurrentInstance().setUiPortal(uiPortal);
         UISiteBody siteBody = this.findFirstComponentOfType(UISiteBody.class);
         if (siteBody != null) {
             // TODO: Check this part carefully
@@ -336,7 +332,7 @@ public class UIPortalApplication extends UIApplication {
      * @return
      */
     public UIPortal getCurrentSite() {
-        return currentSite;
+        return PortalRequestContext.getCurrentInstance().getUiPortal();
     }
 
     /**
@@ -593,7 +589,7 @@ public class UIPortalApplication extends UIApplication {
         }
 
         //
-        SkinConfig skinConfig = skinService.getSkin(Util.getUIPortal().getName(), skin_);
+        SkinConfig skinConfig = skinService.getSkin(getCurrentSite().getName(), skin_);
         if (skinConfig != null) {
             skins.add(skinConfig);
         }
@@ -610,7 +606,7 @@ public class UIPortalApplication extends UIApplication {
 
     private Set<SkinConfig> getPortalPortletSkins() {
         Set<SkinConfig> portletConfigs = new HashSet<SkinConfig>();
-        for (UIComponent child : Util.getUIPortal().getChildren()) {
+        for (UIComponent child : getCurrentSite().getChildren()) {
             getPortalPortletSkinConfig(portletConfigs, child);
         }
         return portletConfigs;
@@ -813,6 +809,12 @@ public class UIPortalApplication extends UIApplication {
             reloadPortalProperties();
             lastPortal = portalName;
         }
+
+        UIPortal uiPortal = getCachedUIPortal(prc.getSiteKey());
+        if (uiPortal != null) {
+          setCurrentSite(uiPortal);
+          uiPortal.refreshUIPage();
+        }
         super.processDecode(context);
     }
 
@@ -834,7 +836,7 @@ public class UIPortalApplication extends UIApplication {
         if (!isAjax) {
           if (isAjaxInLastRequest) {
             isAjaxInLastRequest = false;
-            if (requestNavData.equals(lastNonAjaxRequestNavData) && !requestNavData.equals(lastRequestNavData)
+            if (requestNavData.equals(lastNonAjaxRequestNavData) && isRefreshPage(requestNavData)
                 && pcontext.getPortletParameters().isEmpty()) {
               NodeURL nodeURL = pcontext.createURL(NodeURL.TYPE).setNode(getCurrentSite().getSelectedUserNode());
               pcontext.sendRedirect(nodeURL.toString());
@@ -846,8 +848,10 @@ public class UIPortalApplication extends UIApplication {
 
         isAjaxInLastRequest = isAjax;
 
-        if (!requestNavData.equals(lastRequestNavData)) {
-            lastRequestNavData = requestNavData;
+        if (isRefreshPage(requestNavData)) {
+            if (!isDraftPage() && !isMaximizePortlet()) {
+              lastRequestNavData = requestNavData;
+            }
 
             StringBuilder js = new StringBuilder("eXo.env.server.portalBaseURL=\"");
             js.append(getBaseURL()).append("\";\n");
@@ -877,7 +881,7 @@ public class UIPortalApplication extends UIApplication {
             return;
         }
 
-        if (currentSite == null || currentSite.getSelectedUserNode() == null) {
+        if (getCurrentSite() == null || getCurrentSite().getSelectedUserNode() == null) {
             pcontext.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
 
@@ -900,6 +904,20 @@ public class UIPortalApplication extends UIApplication {
      * skins to reload are set in the {@code <div class="PortalResponseScript">}
      */
     public void processRender(WebuiRequestContext context) throws Exception {
+      String maximizedPortletStorageId = getMaximizedPortletStorageId();
+      if (StringUtils.isNotBlank(maximizedPortletStorageId)) {
+        List<UIPortlet> uiPortlets = new ArrayList<>();
+        findComponentOfType(uiPortlets, UIPortlet.class);
+        UIPortlet maximizedUiPortlet = uiPortlets.stream()
+                                                 .filter(p -> StringUtils.equals(p.getStorageId(), maximizedPortletStorageId))
+                                                 .findFirst()
+                                                 .orElseThrow();
+
+        UIPage uiPage = findFirstComponentOfType(UIPage.class);
+        uiPage.normalizePortletWindowStates();
+        uiPage.setMaximizedUIPortlet(maximizedUiPortlet);
+      }
+      try {
         PortalRequestContext pcontext = (PortalRequestContext) context;
         pcontext.setAttribute("requestStartTime", System.currentTimeMillis());
 
@@ -991,6 +1009,13 @@ public class UIPortalApplication extends UIApplication {
             w.write("</div>");
             w.write("</div>");
         }
+      } finally {
+        if (StringUtils.isNotBlank(maximizedPortletStorageId)) {
+          UIPage uiPage = findFirstComponentOfType(UIPage.class);
+          uiPage.setMaximizedUIPortlet(null);
+          uiPage.normalizePortletWindowStates();
+        }
+      }
     }
 
     private void writeLoadingScripts(PortalRequestContext context) throws Exception {
@@ -1072,34 +1097,6 @@ public class UIPortalApplication extends UIApplication {
     public void reloadPortalProperties() throws Exception {
         PortalRequestContext context = Util.getPortalRequestContext();
         context.refreshPortalConfig();
-
-        String user = context.getRemoteUser();
-        String portalSkin = null;
-        OrganizationService orgService = getApplicationComponent(OrganizationService.class);
-
-        if (user != null) {
-            UserProfile userProfile = orgService.getUserProfileHandler().findUserProfileByName(user);
-            if (userProfile != null) {
-                portalSkin = userProfile.getUserInfoMap().get(Constants.USER_SKIN);
-            } else {
-                if (log.isDebugEnabled())
-                    log.debug("Could not load user profile for " + user + ". Using default portal locale.");
-            }
-        }
-
-        // use the skin from the user profile if available, otherwise use from the portal config
-        if (portalSkin != null && portalSkin.trim().length() > 0) {
-            skin_ = portalSkin;
-        } else {
-            String userPortalConfigSkin = context.getUserPortalConfig().getPortalConfig().getSkin();
-            if (userPortalConfigSkin != null && userPortalConfigSkin.trim().length() > 0) {
-                skin_ = userPortalConfigSkin;
-            } else {
-                skin_ = skinService.getDefaultSkin();
-            }
-        }
-
-        
     }
 
     /**
@@ -1203,4 +1200,31 @@ public class UIPortalApplication extends UIApplication {
     public String getLastPortal() {
       return lastPortal;
     }
+
+    public UIPage getCurrentPage() {
+      return PortalRequestContext.getCurrentInstance().getUiPage();
+    }
+
+    public void setCurrentPage(UIPage currentPage) {
+      PortalRequestContext.getCurrentInstance().setUiPage(currentPage);
+    }
+
+    private boolean isRefreshPage(RequestNavigationData requestNavData) {
+      return !requestNavData.equals(lastRequestNavData) || isDraftPage() || isMaximizePortlet();
+    }
+
+    private boolean isDraftPage() {
+      return ((PortalRequestContext) RequestContext.getCurrentInstance()).isDraftPage();
+    }
+
+    private boolean isMaximizePortlet() {
+      return StringUtils.isNotBlank(getMaximizedPortletStorageId());
+    }
+
+    private String getMaximizedPortletStorageId() {
+      PortalRequestContext prContext = Util.getPortalRequestContext();
+      HttpServletRequest req = prContext.getRequest();
+      return req.getParameter("maximizedPortletId");
+    }
+
 }
