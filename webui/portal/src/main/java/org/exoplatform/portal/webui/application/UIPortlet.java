@@ -960,7 +960,7 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
         try {
             return portletInvoker.invoke(invocation);
         } finally {
-            currentPortlet.remove();;
+            currentPortlet.remove();
         }
     }
 
