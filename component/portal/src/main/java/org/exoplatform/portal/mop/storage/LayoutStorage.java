@@ -146,7 +146,6 @@ public class LayoutStorage {
     return state;
   }
 
-  @SuppressWarnings("rawtypes")
   public <S> String getId(ApplicationState<S> state) {
     if (state instanceof TransientApplicationState) {
       TransientApplicationState<S> tstate = (TransientApplicationState<S>) state;
@@ -597,6 +596,9 @@ public class LayoutStorage {
           results.add(buildWindow(windows.get(id)));
         } else if (type == TYPE.CONTAINER) {
           ContainerEntity srcContainer = containerDAO.find(id);
+          if (srcContainer == null) {
+            continue;
+          }
           JSONObject attrs = parseJsonObject(srcContainer.getProperties());
           String ctype = (String) attrs.get(MappedAttributes.TYPE.getName());
           if (BodyType.PAGE.name().equals(ctype)) {
@@ -616,7 +618,6 @@ public class LayoutStorage {
     return results;
   }
 
-  @SuppressWarnings("rawtypes")
   private List<ComponentEntity> saveChildren(List<ComponentData> children) { // NOSONAR
     List<ComponentEntity> results = new LinkedList<>();
 
@@ -746,7 +747,7 @@ public class LayoutStorage {
   }
 
   @SuppressWarnings({
-      "unchecked", "rawtypes"
+      "unchecked"
   })
   private void savePermissions(Long id, ComponentData srcChild) {
     if (id == null) {

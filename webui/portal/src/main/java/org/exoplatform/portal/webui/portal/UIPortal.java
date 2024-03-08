@@ -38,6 +38,7 @@ import org.exoplatform.portal.webui.portal.UIPortalComponentActionListener.EditP
 import org.exoplatform.portal.webui.portal.UIPortalComponentActionListener.MoveChildActionListener;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.services.listener.*;
+import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.web.login.LoginUtils;
 import org.exoplatform.web.login.LogoutControl;
 import org.exoplatform.web.security.GateInToken;
@@ -66,6 +67,7 @@ import java.util.Map;
   @EventConfig(listeners = ChangeSkinActionListener.class, csrfCheck = false)
 })
 public class UIPortal extends UIContainer {
+
     private SiteKey siteKey;
 
     private String locale;
@@ -78,11 +80,9 @@ public class UIPortal extends UIContainer {
 
     private Properties properties;
 
-    private UserNode navPath;
+    private Map<String, UIPage> allUiPages = new HashMap<>();
 
-    private Map<String, UIPage> all_UIPages;
-
-    private Map<String, String[]> publicParameters_ = new HashMap<String, String[]>();
+    private Map<String, String[]> publicParameters = new HashMap<>();
 
     private UIComponent maximizedUIComponent;
 
@@ -151,23 +151,23 @@ public class UIPortal extends UIContainer {
     }
 
     public Map<String, String[]> getPublicParameters() {
-        return publicParameters_;
+        return publicParameters;
     }
 
     public void setPublicParameters(Map<String, String[]> publicParams) {
-        publicParameters_ = publicParams;
+        publicParameters = publicParams;
     }
 
     public UserNode getNavPath() {
-        if (navPath == null) {
-            PortalRequestContext prc = Util.getPortalRequestContext();
-            navPath = prc.getUserPortalConfig().getUserPortal().getDefaultPath(null);
-        }
-        return navPath;
+      PortalRequestContext prc = PortalRequestContext.getCurrentInstance();
+      if (prc.getNavigationNode() == null) {
+        setNavPath(prc.getUserPortalConfig().getUserPortal().getDefaultPath(null));
+      }
+      return prc.getNavigationNode();
     }
 
     public void setNavPath(UserNode nav) {
-        this.navPath = nav;
+      PortalRequestContext.getCurrentInstance().setUserNode(nav);
     }
 
     /**
@@ -177,22 +177,26 @@ public class UIPortal extends UIContainer {
      * @return the UIPage associated to the specified pageReference or null if not any
      */
     public UIPage getUIPage(String pageReference) {
-        if (all_UIPages == null) {
-            return null;
-        }
-        return this.all_UIPages.get(pageReference);
+      if (isDraftPage()) {
+        return null;
+      } else {
+        return this.allUiPages.get(pageReference);
+      }
     }
 
     public void setUIPage(String pageReference, UIPage uiPage) {
-        if (this.all_UIPages == null) {
-            this.all_UIPages = new HashMap<String, UIPage>(5);
-        }
-        this.all_UIPages.put(pageReference, uiPage);
+      if (!isDraftPage()) {
+        this.allUiPages.put(pageReference, uiPage);
+      }
+    }
+
+    public boolean isDraftPage() {
+      return ((PortalRequestContext) RequestContext.getCurrentInstance()).isDraftPage();
     }
 
     public void clearUIPage(String pageReference) {
-        if (this.all_UIPages != null)
-            this.all_UIPages.remove(pageReference);
+        if (this.allUiPages != null)
+            this.allUiPages.remove(pageReference);
     }
 
     public UserNavigation getUserNavigation() {
@@ -415,8 +419,8 @@ public class UIPortal extends UIContainer {
           return;
         }
         String pageReference = pageKey.format();
-        if (all_UIPages != null && all_UIPages.containsKey(pageReference)) {
-          all_UIPages.remove(pageReference);
+        if (allUiPages != null && allUiPages.containsKey(pageReference)) {
+          allUiPages.remove(pageReference);
         }
       }
     }

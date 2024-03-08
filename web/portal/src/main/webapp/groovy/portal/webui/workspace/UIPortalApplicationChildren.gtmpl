@@ -8,7 +8,7 @@
    <% /* Include extensible templates configured by Kernel configuration to be imported in Page Header */ %>
    <% _ctx.includeTemplates("UIPortalApplication-End-Body") %>
 
-  <script type="text/javascript">
+  <script type="text/javascript" id="jsManager">
     <%=jsManager.getJavaScripts()%>
   </script>
 </body>

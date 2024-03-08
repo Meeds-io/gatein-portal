@@ -600,14 +600,12 @@ public abstract class AbstractTestOrganizationService {
 
     @Test
     public void testUserProfileListener() throws Exception {
-        System.out.println("Trigger testUserProfileListener");
         UserProfileListener l = new UserProfileListener();
         profileHandler_.addUserProfileEventListener(l);
         User user = createUser(USER);
         assertNotNull(user);
         UserProfile profile = profileHandler_.createUserProfileInstance(user.getUserName());
         profile.setAttribute("blah", "blah");
-        System.out.println("Going to save userProfiel");
         profileHandler_.saveUserProfile(profile, true);
         assertTrue(l.preSave && l.postSave);
         assertEquals(l.preSaveCreations, 1);
