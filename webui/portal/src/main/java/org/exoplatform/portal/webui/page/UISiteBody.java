@@ -22,10 +22,12 @@ package org.exoplatform.portal.webui.page;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.portal.application.PortalRequestContext;
+import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
+import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.core.UIComponentDecorator;
 
 /**
@@ -62,6 +64,20 @@ public class UISiteBody extends UIComponentDecorator {
       } else {
         return portalOwner.toUpperCase() + "Site";
       }
+    }
+
+    @Override
+    public UIComponent getUIComponent() {
+      return PortalRequestContext.getCurrentInstance().getUiPortal();
+    }
+
+    public UIPortal getUIPortal() {
+      return (UIPortal) getUIComponent();
+    }
+
+    @Override
+    protected void setChildComponent(UIComponent uicomponent) {
+      PortalRequestContext.getCurrentInstance().setUiPortal((UIPortal) uicomponent);
     }
 
     protected boolean isShowSiteBody(PortalRequestContext requestContext) {

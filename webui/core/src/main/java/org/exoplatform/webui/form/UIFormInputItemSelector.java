@@ -129,7 +129,6 @@ public class UIFormInputItemSelector<T> extends UIFormInputBase<T> {
     }
 
     public void decode(Object input, WebuiRequestContext context) {
-        // System.out.println("\n\n\n == > current input value is "+input+"\n\n");
         if (input == null || String.valueOf(input).length() < 1)
             return;
         setValue(input);

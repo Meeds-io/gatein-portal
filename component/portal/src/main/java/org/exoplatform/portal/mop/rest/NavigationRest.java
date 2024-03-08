@@ -55,7 +55,7 @@ public class NavigationRest implements ResourceContainer {
 
   private static final Log          LOG                  = ExoLogger.getLogger(NavigationRest.class);
 
-  private static final Visibility[] DEFAULT_VISIBILITIES = Visibility.values();
+  private static final Visibility[] DEFAULT_VISIBILITIES = Visibility.DEFAULT_VISIBILITIES;
 
   private UserPortalConfigService   portalConfigService;
 

@@ -99,7 +99,7 @@
   <head id="head">
     <title><%=HTMLEntityEncoder.getInstance().encode(title)%></title>
 
-    <!-- Metadatas -->
+    <%/* Metadatas */%>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="theme-color" content="#476A9C"/>
@@ -120,7 +120,7 @@
 
     <link rel="shortcut icon" href="<%= org.exoplatform.portal.branding.Utils.getFaviconPath() %>" />
 
-    <!-- Styles -->
+    <%/* Styles */%>
     <link id="brandingSkin" rel="stylesheet" type="text/css" href="<%=uicomponent.getBrandingUrl()%>">
     <% for (skinConfig in portalSkins) {
          def url = skinConfig.createURL(rcontext.controllerContext);
@@ -138,16 +138,16 @@
       <link id="${customSkin.id}" rel="stylesheet" type="text/css" href= "$url" skin-type="${customSkin.type}" />
     <% } %>
 
-    <!-- Scripts -->
-    <script type="text/javascript">
+    <%/* Scripts */%>
+    <script type="text/javascript" id="jsConfig">
       var require = <%=jsConfig%>;
     </script>
 
     <% for (url in headerScripts) { %>
-      <script type="text/javascript" src="<%= url %>"></script>
+      <script type="text/javascript" src="<%= url %>" data-id="header-script"></script>
     <% } %>
 
-   <script type="text/javascript">
+   <script type="text/javascript" id="remoteScripts">
      eXo.env.addLoadedRemoteScripts(<%=remoteScripts%>);
      <% if (org.exoplatform.commons.utils.PropertyManager.isDevelopping()) { %>
           eXo.developing = true ;
@@ -210,8 +210,8 @@
      }
    %>
 
-   <!-- 508 Compliancy -->
-   <style type="text/css">
+   <%/* 508 Compliancy */%>
+   <style type="text/css" id="Compliancy508Style">
      .skipHidden {
        position:absolute !important;
        left:-10000px !important;
@@ -225,10 +225,10 @@
        left: auto !important;
      }
    </style>
-   <!-- The android browser on 2.3.x doesn't properly handle rtl so we need to handle this special situation.
+   <%/* The android browser on 2.3.x doesn't properly handle rtl so we need to handle this special situation.
         This old browser it expects right to be positive instead of negative in order to hide the content instead of displaying it.
-        If the page is over 10000px wide and rtl we assume this situation. -->
-   <script type="text/javascript">
+        If the page is over 10000px wide and rtl we assume this situation.  */%>
+   <script type="text/javascript" id="Compliancy508Script">
      if (window.onload) {
        var currentOnLoad = window.onload;
        window.onload = function() { currentOnLoad(); checkRTLWidth() };
@@ -242,14 +242,14 @@
        }
      }
    </script>
-   <!-- /508 Compliancy -->
+   <%/* 508 Compliancy */%>
 
-   <!-- Include extensible templates configured by Kernel configuration to be imported in Page Header -->
+   <%/* Include extensible templates configured by Kernel configuration to be imported in Page Header */%>
    <% _ctx.includeTemplates("UIPortalApplication-head") %>
  </head>
 
  <body style="height: 100%;" class="$bodyClasses" onload="eXo.env.portal.onLoad()">
-   <!-- Include extensible templates configured by Kernel configuration to be imported in the beginning of the body section of the Page -->
+   <%/* Include extensible templates configured by Kernel configuration to be imported in the beginning of the body section of the Page */%>
    <% _ctx.includeTemplates("UIPortalApplication-Start-body") %>
    <div class="visible-tablet"></div>
    <div class="visible-tabletL"></div>

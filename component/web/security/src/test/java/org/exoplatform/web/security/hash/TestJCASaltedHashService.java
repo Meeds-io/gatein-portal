@@ -50,9 +50,7 @@ public class TestJCASaltedHashService extends AbstractKernelTest {
 //        AutoReseedRandom random = new AutoReseedRandom(AutoReseedRandom.DEFAULT_RANDOM_ALGORITHM, AutoReseedRandom.DEFAULT_RANDOM_ALGORITHM_PROVIDER,
 //                AutoReseedRandom.DEFAULT_SEED_LENGTH, 500);
         for (String password : PASSWORDS) {
-            // System.out.println(password);
             String saltedHash = sh.getSaltedHash(password);
-            // System.out.println("h="+saltedHash);
             assertTrue(sh.validate(password, saltedHash));
         }
     }

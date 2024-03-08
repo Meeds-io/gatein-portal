@@ -347,7 +347,6 @@ public class MockServletRequest implements HttpServletRequest {
   }
 
   public Enumeration getLocales() {
-    System.out.println("MOCK get Locale : " + locale);
     Vector v = new Vector();
     v.add(locale);
     return v.elements();
