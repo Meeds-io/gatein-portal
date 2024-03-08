@@ -73,7 +73,6 @@ public class TestTemplateRendering extends AbstractGateInTest {
     public void testDate2() throws Exception {
         Date dateToTest = new Date(0);
         GroovyTemplate template = new GroovyTemplate("<% def date = new Date(0) %>$date");
-        System.out.println("template.getGroovy() = " + template.getGroovy());
         assertEquals(dateFormatFR.format(dateToTest), template.render(Locale.FRENCH));
         assertEquals(dateFormatEN.format(dateToTest), template.render(Locale.ENGLISH));
         assertEquals(dateToTest.toString(), template.render());
@@ -82,7 +81,6 @@ public class TestTemplateRendering extends AbstractGateInTest {
     public void testDate3() throws Exception {
         Date dateToTest = new Date(0);
         GroovyTemplate template = new GroovyTemplate("<%= new Date(0) %>");
-        System.out.println("template.getGroovy() = " + template.getGroovy());
         assertEquals(dateFormatFR.format(dateToTest), template.render(Locale.FRENCH));
         assertEquals(dateFormatEN.format(dateToTest), template.render(Locale.ENGLISH));
         assertEquals(dateToTest.toString(), template.render());

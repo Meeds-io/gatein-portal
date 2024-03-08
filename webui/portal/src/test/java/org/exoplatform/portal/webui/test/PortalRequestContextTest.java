@@ -54,18 +54,14 @@ public class PortalRequestContextTest extends TestCase {
 
   private static MockedStatic<ExpressionUtil> EXPRESSION_UTIL;
 
-  private static MockedStatic<Util>           UTIL;
-
   @BeforeClass
   public static void beforeClass() {
     EXPRESSION_UTIL = mockStatic(ExpressionUtil.class);
-    UTIL = mockStatic(Util.class);
   }
 
   @AfterClass
   public static void afterClass() {
     EXPRESSION_UTIL.close();
-    UTIL.close();
   }
 
   @Test
@@ -83,7 +79,7 @@ public class PortalRequestContextTest extends TestCase {
 
     ResourceBundle bundle = ResourceBundle.getBundle("test");
 
-    UTIL.when(() -> Util.getUIPortal()).thenReturn(uiPortal);
+    when(prc.getUiPortal()).thenReturn(uiPortal);
     EXPRESSION_UTIL.when(() -> ExpressionUtil.getExpressionValue(bundle, "title")).thenCallRealMethod();
 
     doCallRealMethod().when(prc).setPageTitle(anyString());
