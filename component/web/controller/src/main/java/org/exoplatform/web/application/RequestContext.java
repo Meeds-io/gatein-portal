@@ -175,7 +175,11 @@ public abstract class RequestContext {
     }
 
     public static void setCurrentInstance(RequestContext ctx) {
-        tlocal_.set(ctx);
+        if (ctx == null) {
+          tlocal_.remove();
+        } else {
+          tlocal_.set(ctx);
+        }
     }
 
 }

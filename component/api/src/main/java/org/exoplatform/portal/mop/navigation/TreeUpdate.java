@@ -19,6 +19,8 @@
 
 package org.exoplatform.portal.mop.navigation;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.portal.mop.Utils;
 import org.exoplatform.portal.tree.diff.*;
 
@@ -201,7 +203,7 @@ class TreeUpdate<N1, N2> {
             }
 
             //
-            if (!parent.data.name.equals(data.name)) {
+            if (!StringUtils.equals(parent.data.name, data.name)) {
                 parent.name = data.name;
                 if (listener != null) {
                     listener.onRename(parent, parent.getParent(), data.name);
