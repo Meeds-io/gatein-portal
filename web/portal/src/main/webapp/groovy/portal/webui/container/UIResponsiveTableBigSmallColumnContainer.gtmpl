@@ -43,8 +43,13 @@
 			String style = "";
 			String width	= uicomponent.getWidth();
 			String height	= uicomponent.getHeight();
-			if(width != null) style += "width:"+width+";";
-			if(height != null) style += "height:"+height+";";
+            if(width != null) {
+              style += "width: "+width+";"
+              if (!width.contains("calc") && !width.contains("Calc")) {
+                style += "min-width: "+width+";"
+              }
+            }
+            if(height != null) style += "height:"+height+";";
 			if(portalMode == uiPortalApp.CONTAINER_BLOCK_EDIT_MODE || portalMode == uiPortalApp.APP_BLOCK_EDIT_MODE){
 		%>
 		<div class="LAYOUT-CONTAINER LAYOUT-BLOCK">
