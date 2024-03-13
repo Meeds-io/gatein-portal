@@ -120,7 +120,7 @@ public class SettingResource implements ResourceContainer {
     if(currentUser != null) {
       return (context.getName().toUpperCase().equals(Context.USER.getName())
               && (context.getId() == null || currentUser.equals(context.getId())))
-                || (currentUser.equals(userACL.getSuperUser()));
+                || (userACL.isSuperUser() || userACL.isUserInGroup(userACL.getAdminGroups()));
     }
     return false;
   }
