@@ -41,19 +41,6 @@
                   <value>
                     <object type="org.exoplatform.webui.core.model.SelectItemOption">
                       <field name="label">
-                        <string>normalPage.NormalLayout</string>
-                      </field>
-                      <field name="value">
-                        <string>normal</string>
-                      </field>
-                      <field name="icon">
-                        <string>NormalLayout</string>
-                      </field>
-                    </object>
-                  </value>
-                  <value>
-                    <object type="org.exoplatform.webui.core.model.SelectItemOption">
-                      <field name="label">
                         <string>normalPage.EmptyLayout</string>
                       </field>
                       <field name="value">
