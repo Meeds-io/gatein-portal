@@ -28,6 +28,9 @@ import org.exoplatform.container.ExoContainer;
 import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.*;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author Tuan Nguyen
  **/
@@ -60,6 +63,10 @@ public class Container extends ModelObject implements Cloneable {
   protected String                 height;
 
   protected String                 cssClass;
+
+  @Getter
+  @Setter
+  protected String                 borderColor;
 
   protected String                 profiles;
 
@@ -109,6 +116,7 @@ public class Container extends ModelObject implements Cloneable {
     this.width = data.getWidth();
     this.height = data.getHeight();
     this.cssClass = data.getCssClass();
+    this.borderColor = data.getBorderColor();
     this.profiles = data.getProfiles();
     this.accessPermissions = data.getAccessPermissions().toArray(new String[data.getAccessPermissions().size()]);
     List<String> permisssions = data.getMoveAppsPermissions();
@@ -269,6 +277,7 @@ public class Container extends ModelObject implements Cloneable {
                              width,
                              height,
                              cssClass,
+                             borderColor,
                              profiles,
                              Utils.safeImmutableList(accessPermissions),
                              Utils.safeImmutableList(moveAppsPermissions),
