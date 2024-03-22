@@ -410,13 +410,17 @@ public class LayoutStorage {
 
     boolean hasProfiles = StringUtils.isNotBlank(src.getProfiles());
     boolean hasCssClass = StringUtils.isNotBlank(src.getCssClass());
-    if (hasProfiles || hasCssClass) {
+    boolean hasBorderColor = StringUtils.isNotBlank(src.getBorderColor());
+    if (hasProfiles || hasCssClass || hasBorderColor) {
       JSONObject properties = new JSONObject();
       if (hasProfiles) {
         properties.put(MappedAttributes.PROFILES.getName(), src.getProfiles());
       }
       if (hasCssClass) {
         properties.put(MappedAttributes.CSS_CLASS.getName(), src.getCssClass());
+      }
+      if (hasBorderColor) {
+        properties.put(MappedAttributes.BORDER_COLOR.getName(), src.getBorderColor());
       }
       dst.setProperties(properties.toJSONString());
     }
@@ -553,10 +557,14 @@ public class LayoutStorage {
                                                                   PermissionEntity.TYPE.MOVE_CONTAINER);
 
     String cssClass = null;
+    String borderColor = null;
     String profiles = null;
     if (attrs != null) {
       if (attrs.containsKey(MappedAttributes.CSS_CLASS.getName())) {
         cssClass = (String) attrs.get(MappedAttributes.CSS_CLASS.getName());
+      }
+      if (attrs.containsKey(MappedAttributes.BORDER_COLOR.getName())) {
+        borderColor = (String) attrs.get(MappedAttributes.BORDER_COLOR.getName());
       }
       if (attrs.containsKey(MappedAttributes.PROFILES.getName())) {
         profiles = (String) attrs.get(MappedAttributes.PROFILES.getName());
@@ -574,6 +582,7 @@ public class LayoutStorage {
                              entity.getWidth(),
                              entity.getHeight(),
                              cssClass,
+                             borderColor,
                              profiles,
                              buildPermission(access),
                              buildPermission(moveApps),
