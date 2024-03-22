@@ -90,6 +90,7 @@ public class PageData extends ContainerData {
             width,
             height,
             cssClass,
+            null,
             profiles,
             accessPermissions,
             moveAppsPermissions,
