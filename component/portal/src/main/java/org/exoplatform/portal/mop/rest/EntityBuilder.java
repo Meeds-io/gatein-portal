@@ -151,6 +151,9 @@ public class EntityBuilder {
       if (PageType.LINK.equals(PageType.valueOf(userNodePage.getType()))) {
         nodeUri = userNodePage.getLink();
       } else {
+        if (siteName.contains(("/spaces/"))) {
+          siteName = "g/" + siteName.replaceAll("/",":");
+        }
         nodeUri = new StringBuilder("/").append(portalName)
                                         .append("/")
                                         .append(siteName)
