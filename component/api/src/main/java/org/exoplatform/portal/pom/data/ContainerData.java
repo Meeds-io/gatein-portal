@@ -67,6 +67,9 @@ public class ContainerData extends ComponentData {
     private final String cssClass;
 
     /** . */
+    private final String borderColor;
+
+    /** . */
     private final String profiles;
 
     /** . */
@@ -95,6 +98,7 @@ public class ContainerData extends ComponentData {
          height,
          null,
          null,
+         null,
          accessPermissions,
          moveAppsPermissions,
          moveContainersPermissions,
@@ -117,6 +121,42 @@ public class ContainerData extends ComponentData {
                          List<String> moveAppsPermissions,
                          List<String> moveContainersPermissions,
                          List<ComponentData> children) {
+      this(storageId,
+           id,
+           name,
+           icon,
+           template,
+           factoryId,
+           title,
+           description,
+           width,
+           height,
+           cssClass,
+           null,
+           profiles,
+           accessPermissions,
+           moveAppsPermissions,
+           moveContainersPermissions,
+           children);
+    }
+
+    public ContainerData(String storageId,
+                         String id,
+                         String name,
+                         String icon,
+                         String template,
+                         String factoryId,
+                         String title,
+                         String description,
+                         String width,
+                         String height,
+                         String cssClass,
+                         String borderColor,
+                         String profiles,
+                         List<String> accessPermissions,
+                         List<String> moveAppsPermissions,
+                         List<String> moveContainersPermissions,
+                         List<ComponentData> children) {
         super(storageId, null);
 
         //
@@ -130,6 +170,7 @@ public class ContainerData extends ComponentData {
         this.width = width;
         this.height = height;
         this.cssClass = cssClass;
+        this.borderColor = borderColor;
         this.profiles = profiles;
         this.accessPermissions = accessPermissions;
         this.moveAppsPermissions = moveAppsPermissions;
