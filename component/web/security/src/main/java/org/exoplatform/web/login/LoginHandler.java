@@ -266,21 +266,20 @@ public class LoginHandler extends JspBasedWebHandler {
     }
   }
 
-  private String getUserNameByEmail(String email,
+  private String getUserNameByEmail(String identifier,
                                     ControllerContext context,
                                     StringBuilder loginPath) throws Exception {
     UserHandler userHandler = organizationService.getUserHandler();
     if (userHandler != null) {
       Query emailQuery = new Query();
-      emailQuery.setEmail(email);
+      emailQuery.setEmail(identifier);
       ListAccess<User> users;
       try {
         users = userHandler.findUsersByQuery(emailQuery);
         if (users != null && users.getSize() > 0) {
           return users.load(0, 1)[0].getUserName();
         } else {
-          LOG.debug("Can not get users by email");
-          dispatch(context, loginPath.toString(), LoginStatus.FAILED);
+          return identifier;
         }
       } catch (RuntimeException e) {
         LOG.warn("Can not login with an email associated to many users");
