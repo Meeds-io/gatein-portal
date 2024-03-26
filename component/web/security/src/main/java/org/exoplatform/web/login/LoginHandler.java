@@ -182,15 +182,26 @@ public class LoginHandler extends JspBasedWebHandler {
     if (request.getRemoteUser() == null) {
       if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
         // email authentication
+        String realUsername = getExactUserName(username);
         if (username.contains("@")) {
-          String userNameByEmail = getUserNameByEmail(username, context, loginPath);
-          if (StringUtils.isBlank(userNameByEmail)) {
-            return true;
+          if (realUsername == null) {
+            //no user exist with username=credential
+            //check by email
+            String userNameByEmail = getUserNameByEmail(username, context, loginPath);
+            if (StringUtils.isBlank(userNameByEmail)) {
+              return true;
+            } else {
+              username = userNameByEmail;
+            }
           } else {
-            username = userNameByEmail;
+            //a user exists with username=credential
+            //priority to username
+            if (caseInsensitive) {
+              username = realUsername;
+            }
           }
         } else if (caseInsensitive) {
-          username = getExactUserName(username);
+          username = realUsername;
         }
 
         Credentials credentials = new Credentials(username, password);
@@ -347,14 +358,14 @@ public class LoginHandler extends JspBasedWebHandler {
     try {
       User user = organizationService.getUserHandler().findUserByName(username);
       if (user != null) {
-        username = user.getUserName();
+        return user.getUserName();
       }
     } catch (Exception exception) {
       LOG.warn("Error while retrieving user " + username + " from IDM stores ", exception);
     } finally {
       RequestLifeCycle.end();
     }
-    return username;
+    return null;
   }
 
   private void dispatch(ControllerContext controllerContext, String dispatchPath, LoginStatus status) throws Exception {
