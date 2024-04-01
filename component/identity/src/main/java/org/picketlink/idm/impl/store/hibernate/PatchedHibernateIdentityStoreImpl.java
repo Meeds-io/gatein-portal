@@ -661,17 +661,67 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
       }
       /* END SOC-6210 */
       /* BEGIN CAL-1225: User picker in Participants tab is case sensitive */
+      String enabledValue = null;
+      boolean isFiltredByEmail = false ;
       if (criteria != null && criteria.getFilter() != null) {
         String attrValue = criteria.getFilter().replace("\\*", "%").replace("*", "%");
         String operator = "=";
         if (attrValue.contains("%")) {
           operator = "like";
         }
+        if (criteria.getValues() != null && criteria.getValues().containsKey("enabled") &&
+                criteria.getValues().get("enabled").length != 0 && !criteria.getValues().containsKey("email")) {
+
+          enabledValue = criteria.getValues().get("enabled")[0];
+        }
+        if ("USER".equals(hibernateTypeName) && criteria.isFiltered() && "false".equals(enabledValue)) {
+          isFiltredByEmail = true;
+          criteria.getValues().put("email", new String[]{attrValue});
+          int i = criteria.getValues().size();
+          String mappedAttributeName = null;
+          try {
+            mappedAttributeName = resolveAttributeStoreMapping(hibernateType, "email");
+          } catch (IdentityException e) {
+            // Nothing
+          }
+          String attrTableJoinName = "attrs" + i;
+          String textValuesTableJoinName = "textValues" + i;
+          String attrParamName = "attr" + i;
+          String textValueParamName = "textValue" + i;
+
+          hqlBuilderSelect.append(" join io.attributes as " + attrTableJoinName);
+          hqlBuilderSelect.append(" join " + attrTableJoinName + ".textValues as " + textValuesTableJoinName);
+          /*
+           * BEGIN CAL-1225: User picker in Participants tab is case
+           * sensitive
+           */
+
+          hqlBuilderConditions.append(" and (( ");
+          hqlBuilderConditions.append(attrTableJoinName + ".name = :" + attrParamName);
+          if (isAllowNotCaseSensitiveSearch()) {
+            hqlBuilderConditions.append(" and lower(" + textValuesTableJoinName + ") " + operator + " :"
+                + textValueParamName + " ) or ( ");
+          } else {
+            hqlBuilderConditions.append(" and " + textValuesTableJoinName + " " + operator + " :" + textValueParamName + " ) or ( ");
+          }
+          /*
+           * END CAL-1225: User picker in Participants tab is case sensitive
+           */
+
+          queryParams.put(attrParamName, mappedAttributeName);
+          queryParams.put(textValueParamName, attrValue);
+        } else {
+          hqlBuilderConditions.append(" and ");
+        }
+
         if (isAllowNotCaseSensitiveSearch()) {
           attrValue = attrValue.toLowerCase();
-          hqlBuilderConditions.append(" and lower(io.name) " + operator + " :ioName");
+          hqlBuilderConditions.append("(lower(io.name) " + operator + " :ioName)");
         } else {
-          hqlBuilderConditions.append(" and io.name " + operator + " :ioName");
+          hqlBuilderConditions.append("(io.name " + operator + " :ioName)");
+        }
+        if (isFiltredByEmail) {
+          hqlBuilderConditions.append("))");
         }
         queryParams.put("ioName", attrValue);
       }
@@ -693,54 +743,58 @@ public class PatchedHibernateIdentityStoreImpl implements IdentityStore, Seriali
             String attrTableJoinName = "attrs" + i;
             String attrParamName = "attr" + i;
             hqlBuilderConditions.append(" and not exists(from io.attributes as " + attrTableJoinName + " where "
-                + attrTableJoinName + ".name = :" + attrParamName + ")");
+                + attrTableJoinName + ".name = :" + attrParamName+ ")");
             queryParams.put(attrParamName, mappedAttributeName);
             /** End eXo customization **/
           } else {
             Set<String> given = new HashSet<>(Arrays.asList(entry.getValue()));
 
             for (String attrValue : given) {
-              attrValue = attrValue.replace("\\*", "%").replace("*", "%");
+              
+              if (!isFiltredByEmail || isFiltredByEmail && !"email".equals(entry.getKey())) {
+                attrValue = attrValue.replace("\\*", "%").replace("*", "%");
 
-              /*
-               * BEGIN CAL-1225: User picker in Participants tab is case
-               * sensitive
-               */
-              String operator = "=";
-              if (attrValue.contains("%")) {
-                operator = "like";
-              }
-              if (isAllowNotCaseSensitiveSearch()) {
-                attrValue = attrValue.toLowerCase();
-              }
-              /*
-               * END CAL-1225: User picker in Participants tab is case sensitive
-               */
-              i++;
-              String attrTableJoinName = "attrs" + i;
-              String textValuesTableJoinName = "textValues" + i;
-              String attrParamName = "attr" + i;
-              String textValueParamName = "textValue" + i;
+                /*
+                 * BEGIN CAL-1225: User picker in Participants tab is case
+                 * sensitive
+                 */
+                String operator = "=";
+                if (attrValue.contains("%")) {
+                  operator = "like";
+                }
+                if (isAllowNotCaseSensitiveSearch()) {
+                  attrValue = attrValue.toLowerCase();
+                }
+                /*
+                 * END CAL-1225: User picker in Participants tab is case sensitive
+                 */
+                i++;
+                String attrTableJoinName = "attrs" + i;
+                String textValuesTableJoinName = "textValues" + i;
+                String attrParamName = "attr" + i;
+                String textValueParamName = "textValue" + i;
 
-              hqlBuilderSelect.append(" join io.attributes as " + attrTableJoinName);
-              hqlBuilderSelect.append(" join " + attrTableJoinName + ".textValues as " + textValuesTableJoinName);
-              /*
-               * BEGIN CAL-1225: User picker in Participants tab is case
-               * sensitive
-               */
-              hqlBuilderConditions.append(" and " + attrTableJoinName + ".name = :" + attrParamName);
-              if (isAllowNotCaseSensitiveSearch()) {
-                hqlBuilderConditions.append(" and lower(" + textValuesTableJoinName + ") " + operator + " :"
-                    + textValueParamName);
-              } else {
-                hqlBuilderConditions.append(" and " + textValuesTableJoinName + " " + operator + " :" + textValueParamName);
-              }
-              /*
-               * END CAL-1225: User picker in Participants tab is case sensitive
-               */
+                hqlBuilderSelect.append(" join io.attributes as " + attrTableJoinName);
+                hqlBuilderSelect.append(" join " + attrTableJoinName + ".textValues as " + textValuesTableJoinName);
+                /*
+                 * BEGIN CAL-1225: User picker in Participants tab is case
+                 * sensitive
+                 */
 
-              queryParams.put(attrParamName, mappedAttributeName);
-              queryParams.put(textValueParamName, attrValue);
+                hqlBuilderConditions.append(" and " +attrTableJoinName + ".name = :" + attrParamName);
+                if (isAllowNotCaseSensitiveSearch()) {
+                  hqlBuilderConditions.append(" and lower(" + textValuesTableJoinName + ") " + operator + " :"
+                          + textValueParamName);
+                } else {
+                  hqlBuilderConditions.append(" and " + textValuesTableJoinName + " " + operator + " :" + textValueParamName);
+                }
+                /*
+                 * END CAL-1225: User picker in Participants tab is case sensitive
+                 */
+
+                queryParams.put(attrParamName, mappedAttributeName);
+                queryParams.put(textValueParamName, attrValue);
+              }
             }
           }
         }
