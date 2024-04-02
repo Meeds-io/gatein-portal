@@ -200,7 +200,7 @@ public class LoginHandler extends JspBasedWebHandler {
               username = realUsername;
             }
           }
-        } else if (caseInsensitive) {
+        } else if (caseInsensitive && realUsername != null) {
           username = realUsername;
         }
 
