@@ -194,12 +194,13 @@ public class UserFieldValidator {
     String label = getLabel(locale, "UIRegisterForm.label." + field);
     return label == null ? null : label.replace(" :", "").replace(":", "");
   }
+
   private static boolean isLowerCaseLetterOrDigit(char character) {
     return Character.isDigit(character) || (character >= 'a' && character <= 'z');
   }
 
   private static boolean isSymbol(char c) {
-    return c == '_' || c == '.' || c == '-' || c == '@' ;
+    return c == '_' || c == '.' || c == '-' ;
   }
 
   private static String getLabel(Locale locale, String key, Object... values) {
