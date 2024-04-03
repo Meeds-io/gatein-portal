@@ -19,31 +19,22 @@
 
 package org.exoplatform.portal.webui.page;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.portlet.WindowState;
-
-import org.apache.commons.lang3.StringUtils;
-
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.config.model.PageBody;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.user.UserNode;
-import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
 import org.exoplatform.portal.webui.util.Util;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.core.UIComponentDecorator;
-import org.exoplatform.services.log.Log;
-import org.exoplatform.services.log.ExoLogger;
 
 /**
  * May 19, 2006
@@ -56,7 +47,7 @@ public class UIPageBody extends UIComponentDecorator {
     /** . */
     private final Log log = ExoLogger.getLogger(UIPageBody.class);
 
-    public UIPageBody(PageBody model) {
+    public UIPageBody() {
         setId("UIPageBody");
     }
 
@@ -66,14 +57,6 @@ public class UIPageBody extends UIComponentDecorator {
 
     public void setStorageId(String storageId) {
         this.storageId = storageId;
-    }
-
-    public UIPageBody() {
-        setId("UIPageBody");
-    }
-
-    public void init(PageBody model) {
-        setId("UIPageBody");
     }
 
     public String getPageName() {
@@ -137,8 +120,7 @@ public class UIPageBody extends UIComponentDecorator {
         PageContext pageContext = null;
         String pageReference = null;
         ExoContainer appContainer = context.getApplication().getApplicationServiceContainer();
-        UserPortalConfigService userPortalConfigService = (UserPortalConfigService) appContainer
-                .getComponentInstanceOfType(UserPortalConfigService.class);
+        UserPortalConfigService userPortalConfigService = appContainer.getComponentInstanceOfType(UserPortalConfigService.class);
 
         if (pageNode != null && pageNode.getPageRef() != null) {
             pageReference = pageNode.getPageRef().format();
@@ -172,6 +154,6 @@ public class UIPageBody extends UIComponentDecorator {
     }
 
     private PortalRequestContext getRequestContext() {
-      return (PortalRequestContext) PortalRequestContext.getCurrentInstance();
+      return PortalRequestContext.getCurrentInstance();
     }
 }
