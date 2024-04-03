@@ -357,7 +357,9 @@ public class PortalDataMapper {
             UIPortlet uiPortlet = uiContainer.createUIComponent(context, UIPortlet.class, null, null);
             uiPortlet.setStorageId(application.getStorageId());
             if (application.getStorageName() != null) {
-                uiPortlet.setStorageName(application.getStorageName());
+              uiPortlet.setStorageName(application.getStorageName());
+            } else {
+              uiPortlet.setStorageName(application.getStorageId());
             }
             toUIPortlet(uiPortlet, application);
             uiComponent = uiPortlet;
