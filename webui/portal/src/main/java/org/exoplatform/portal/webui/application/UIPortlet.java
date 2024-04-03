@@ -164,11 +164,6 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
     /** A field storing localized value of javax.portlet.title * */
     private String configuredTitle;
 
-    public UIPortlet() {
-        // That value will be overriden when it is mapped onto a data storage
-        storageName = UUID.randomUUID().toString();
-    }
-
     public String getStorageId() {
         return storageId;
     }
@@ -178,7 +173,10 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
     }
 
     public String getStorageName() {
-        return storageName;
+      if (storageName == null) {
+        storageName = UUID.randomUUID().toString();
+      }
+      return storageName;
     }
 
     public void setStorageName(String storageName) {
@@ -186,7 +184,7 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
     }
 
     public String getWindowId() {
-        return storageName;
+        return getStorageName();
     }
 
     /**
@@ -205,7 +203,7 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
     }
 
     public String getId() {
-        return storageName;
+        return storageId == null ? getStorageName() : storageId;
     }
 
     public String getApplicationId() {
@@ -815,7 +813,7 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
         invocation.setInstanceContext(instanceContext);
         invocation.setServerContext(new ExoServerContext(servletRequest, prc.getResponse()));
         invocation.setUserContext(new ExoUserContext(servletRequest, userProfile));
-        invocation.setWindowContext(new AbstractWindowContext(storageName));
+        invocation.setWindowContext(new AbstractWindowContext(getStorageName()));
         invocation.setPortalContext(PORTAL_CONTEXT);
         invocation.setSecurityContext(new AbstractSecurityContext(servletRequest));
 

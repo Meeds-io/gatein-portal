@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.exoplatform.commons.addons.AddOnService;
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
@@ -37,6 +35,8 @@ import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.EventListener;
 
+import lombok.SneakyThrows;
+
 @ComponentConfig(events = { @EventConfig(listeners = UIAddOnContainer.EditContainerActionListener.class),
         @EventConfig(listeners = DeleteComponentActionListener.class, confirm = "UIContainer.deleteContainer") })
 public class UIAddOnContainer extends UIContainer {
@@ -46,27 +46,26 @@ public class UIAddOnContainer extends UIContainer {
     private boolean initialized = false;
 
     @Override
+    @SneakyThrows
     public List<UIComponent> getChildren() {
-        if (!initialized) {
-            ExoContainer container = ExoContainerContext.getCurrentContainer();
-            AddOnService service = (AddOnService)container.getComponentInstanceOfType(AddOnService.class);
-
-            List<Application<?>> apps = service.getApplications(this.getName());
-            Container model = new Container();
-            model.setChildren(new ArrayList<ModelObject>(apps));
-            try {
-                UIContainer tmp = new UIContainer();
-                PortalDataMapper.toUIContainer(tmp, model);
-                for (UIComponent comp : tmp.getChildren()) {
-                    comp.setParent(this);
-                }
-                this.setChildren(tmp.getChildren());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            initialized = true;
+      if (!initialized) {
+        AddOnService addonService = getApplicationComponent(AddOnService.class);
+        List<Application<?>> apps = addonService.getApplications(this.getName());
+        for (int i = 0; i < apps.size(); i++) {
+          Application<?> app = apps.get(i);
+          app.setStorageName(this.getName() + "-" + i);
         }
-        return super.getChildren();
+        Container model = new Container();
+        model.setChildren(new ArrayList<>(apps));
+        UIContainer tmp = new UIContainer();
+        PortalDataMapper.toUIContainer(tmp, model);
+        for (UIComponent comp : tmp.getChildren()) {
+          comp.setParent(this);
+        }
+        this.setChildren(tmp.getChildren());
+        initialized = true;
+      }
+      return super.getChildren();
     }
 
     @Override
