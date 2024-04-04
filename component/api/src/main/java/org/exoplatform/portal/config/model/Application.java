@@ -20,12 +20,10 @@
 package org.exoplatform.portal.config.model;
 
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.portal.application.Preference;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.ApplicationData;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
-import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
 
 /**
  * May 13, 2004
@@ -86,6 +84,8 @@ public class Application<S> extends ModelObject implements Cloneable {
         this.theme = data.getTheme();
         this.width = data.getWidth();
         this.height = data.getHeight();
+        this.cssClass = data.getCssClass();
+        this.borderColor = data.getBorderColor();
         this.properties = new Properties(data.getProperties());
         this.accessPermissions = data.getAccessPermissions().toArray(new String[data.getAccessPermissions().size()]);
         this.type = data.getType();
@@ -226,7 +226,7 @@ public class Application<S> extends ModelObject implements Cloneable {
     @Override
     public ApplicationData build() {
         return new ApplicationData<S>(storageId, storageName, getType(), state, id, title, icon, description, showInfoBar,
-                showApplicationState, showApplicationMode, theme, width, height, Utils.safeImmutableMap(properties),
+                showApplicationState, showApplicationMode, theme, width, height, cssClass, borderColor, Utils.safeImmutableMap(properties),
                 Utils.safeImmutableList(accessPermissions));
     }
 
