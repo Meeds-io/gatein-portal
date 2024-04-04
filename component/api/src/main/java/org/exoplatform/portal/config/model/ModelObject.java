@@ -26,6 +26,9 @@ import org.exoplatform.portal.pom.data.ModelData;
 import org.exoplatform.portal.pom.data.PageData;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
@@ -37,6 +40,22 @@ public abstract class ModelObject {
 
     /** The storage name that is unique among a container context. */
     String storageName;
+
+    @Getter
+    @Setter
+    String width;
+
+    @Getter
+    @Setter
+    String height;
+
+    @Getter
+    @Setter
+    String cssClass;
+
+    @Getter
+    @Setter
+    String borderColor;
 
     /**
      * Create a new object.
