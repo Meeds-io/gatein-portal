@@ -428,7 +428,7 @@ public class LayoutStorage {
     return dst;
   }
 
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private WindowEntity buildWindowEntity(WindowEntity dst, ApplicationData srcChild) {
     if (dst == null) {
       dst = new WindowEntity();
@@ -455,7 +455,6 @@ public class LayoutStorage {
     dst.setDescription(srcChild.getDescription());
     dst.setHeight(srcChild.getHeight());
     dst.setIcon(srcChild.getIcon());
-    dst.setProperties(toJSONString(srcChild.getProperties()));
     dst.setShowApplicationMode(srcChild.isShowApplicationMode());
     dst.setShowApplicationState(srcChild.isShowApplicationState());
     dst.setShowInfoBar(srcChild.isShowInfoBar());
@@ -463,6 +462,20 @@ public class LayoutStorage {
     dst.setTitle(srcChild.getTitle());
     dst.setWidth(srcChild.getWidth());
 
+    boolean hasCssClass = StringUtils.isNotBlank(srcChild.getCssClass());
+    boolean hasBorderColor = StringUtils.isNotBlank(srcChild.getBorderColor());
+    if (hasCssClass || hasBorderColor) {
+      JSONObject properties = srcChild.getProperties() == null ? new JSONObject() : new JSONObject(srcChild.getProperties());
+      if (hasCssClass) {
+        properties.put(MappedAttributes.CSS_CLASS.getName(), srcChild.getCssClass());
+      }
+      if (hasBorderColor) {
+        properties.put(MappedAttributes.BORDER_COLOR.getName(), srcChild.getBorderColor());
+      }
+      dst.setProperties(properties.toJSONString());
+    } else {
+      dst.setProperties(toJSONString(srcChild.getProperties()));
+    }
     return dst;
   }
 
@@ -517,6 +530,18 @@ public class LayoutStorage {
                                                                  windowEntity.getId(),
                                                                  PermissionEntity.TYPE.ACCESS);
 
+    String cssClass = null;
+    String borderColor = null;
+    JSONObject attrs = windowEntity.getProperties() == null ? null : parseJsonObject(windowEntity.getProperties());
+    if (attrs != null) {
+      if (attrs.containsKey(MappedAttributes.CSS_CLASS.getName())) {
+        cssClass = (String) attrs.get(MappedAttributes.CSS_CLASS.getName());
+      }
+      if (attrs.containsKey(MappedAttributes.BORDER_COLOR.getName())) {
+        borderColor = (String) attrs.get(MappedAttributes.BORDER_COLOR.getName());
+      }
+    }
+
     return new ApplicationData(String.valueOf(windowEntity.getId()),
                                null,
                                appType,
@@ -531,6 +556,8 @@ public class LayoutStorage {
                                windowEntity.getTheme(),
                                windowEntity.getWidth(),
                                windowEntity.getHeight(),
+                               cssClass,
+                               borderColor,
                                properties,
                                buildPermission(access));
   }

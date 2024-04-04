@@ -75,15 +75,35 @@ public class ApplicationData<S> extends ComponentData {
     private final String height;
 
     /** . */
+    private final String cssClass;
+
+    /** . */
+    private final String borderColor;
+
+    /** . */
     private final Map<String, String> properties;
 
     /** . */
     private final List<String> accessPermissions;
 
-    public ApplicationData(String storageId, String storageName, ApplicationType<S> type, ApplicationState<S> state, String id,
-            String title, String icon, String description, boolean showInfoBar, boolean showApplicationState,
-            boolean showApplicationMode, String theme, String width, String height, Map<String, String> properties,
-            List<String> accessPermissions) {
+    public ApplicationData(String storageId,
+                           String storageName,
+                           ApplicationType<S> type,
+                           ApplicationState<S> state,
+                           String id,
+                           String title,
+                           String icon,
+                           String description,
+                           boolean showInfoBar,
+                           boolean showApplicationState,
+                           boolean showApplicationMode,
+                           String theme,
+                           String width,
+                           String height,
+                           String cssClass,
+                           String borderColor,
+                           Map<String, String> properties,
+                           List<String> accessPermissions) {
         super(storageId, storageName);
 
         //
@@ -99,6 +119,8 @@ public class ApplicationData<S> extends ComponentData {
         this.theme = theme;
         this.width = width;
         this.height = height;
+        this.cssClass = cssClass;
+        this.borderColor = borderColor;
         this.properties = properties;
         this.accessPermissions = accessPermissions;
     }

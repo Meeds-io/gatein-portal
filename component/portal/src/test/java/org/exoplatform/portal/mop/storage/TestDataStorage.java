@@ -250,12 +250,33 @@ public class TestDataStorage extends AbstractKernelTest {
     storage_.create(portal);
     assertEquals(1, events.size());
 
+    String borderColor = "#ff1200";
+    String cssClass = "custom-class";
+    String height = "20px";
+    String width = "30px";
+
     Page page = new Page();
     page.setOwnerType(PortalConfig.PORTAL_TYPE);
     page.setOwnerId(portal.getName());
     page.setName("foo");
     page.setShowMaxWindow(false);
     page.setHideSharedLayout(false);
+
+    Container container = new Container();
+    container.setTemplate("test");
+    container.setHeight(height);
+    container.setWidth(width);
+    container.setBorderColor(borderColor);
+    container.setCssClass(cssClass);
+    page.setChildren(new ArrayList<>(Collections.singletonList(container)));
+
+    Application<Portlet> application = new Application<>(ApplicationType.PORTLET);
+    application.setHeight(height);
+    application.setWidth(width);
+    application.setBorderColor(borderColor);
+    application.setCssClass(cssClass);
+    application.setState(new TransientApplicationState<>("test/test",  null));
+    container.setChildren(new ArrayList<>(Collections.singletonList(application)));
 
     //
     try {
@@ -282,13 +303,27 @@ public class TestDataStorage extends AbstractKernelTest {
     storage_.save(page2);
     assertEquals(3, events.size());
 
+    pageService.save(page.build());
+
     page2 = storage_.getPage(page.getPageId());
     assertNotNull(page2);
     assertEquals("portal::" + portal.getName() + "::foo", page2.getPageId());
     assertEquals("portal", page2.getOwnerType());
     assertEquals(portal.getName(), page2.getOwnerId());
     assertEquals("foo", page2.getName());
-    assertEquals(0, page2.getChildren().size());
+    assertEquals(1, page2.getChildren().size());
+
+    ModelObject childObject = page2.getChildren().get(0);
+    assertEquals(height, childObject.getHeight());
+    assertEquals(width, childObject.getWidth());
+    assertEquals(cssClass, childObject.getCssClass());
+    assertEquals(borderColor, childObject.getBorderColor());
+
+    childObject = ((Container) childObject).getChildren().get(0);
+    assertEquals(height, childObject.getHeight());
+    assertEquals(width, childObject.getWidth());
+    assertEquals(cssClass, childObject.getCssClass());
+    assertEquals(borderColor, childObject.getBorderColor());
 
     pageContext = pageService.loadPage(page.getPageKey());
     assertEquals("MyTitle", pageContext.getState().getDisplayName());
