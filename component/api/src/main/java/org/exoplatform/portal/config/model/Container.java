@@ -28,9 +28,6 @@ import org.exoplatform.container.ExoContainer;
 import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.*;
 
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * @author Tuan Nguyen
  **/
@@ -58,16 +55,6 @@ public class Container extends ModelObject implements Cloneable {
 
   protected String                 description;
 
-  protected String                 width;
-
-  protected String                 height;
-
-  protected String                 cssClass;
-
-  @Getter
-  @Setter
-  protected String                 borderColor;
-
   protected String                 profiles;
 
   // Here to please jibx binding but not used anymore
@@ -83,7 +70,7 @@ public class Container extends ModelObject implements Cloneable {
 
   public Container() {
     setDefaultPermissions();
-    children = new ArrayList<ModelObject>();
+    children = new ArrayList<>();
   }
 
   public Container(String storageId) {
@@ -165,22 +152,6 @@ public class Container extends ModelObject implements Cloneable {
     this.children = children;
   }
 
-  public String getHeight() {
-    return height;
-  }
-
-  public void setHeight(String height) {
-    this.height = height;
-  }
-
-  public String getWidth() {
-    return width;
-  }
-
-  public void setWidth(String width) {
-    this.width = width;
-  }
-
   public String getDescription() {
     return description;
   }
@@ -245,14 +216,6 @@ public class Container extends ModelObject implements Cloneable {
   // Here to please jibx binding but not used anymore
   public void setDecorator(String decorator) {
     // Here to please jibx binding but not used anymore
-  }
-
-  public String getCssClass() {
-    return cssClass;
-  }
-
-  public void setCssClass(String cssClass) {
-    this.cssClass = cssClass;
   }
 
   public String getProfiles() {
