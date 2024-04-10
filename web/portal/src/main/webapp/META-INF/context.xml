@@ -30,7 +30,7 @@
       className='org.gatein.sso.integration.SSODelegateValve'
       ssoDelegationEnabled="${gatein.sso.valve.enabled}"
       delegateValveClassName="${gatein.sso.valve.class}"
-      samlSPConfigFile="${exo.conf.dir}/saml2/picketlink-sp.xml" />
+      samlSPConfigFile="${gatein.sso.saml.config.file}" />
   <Valve
       className='org.apache.catalina.authenticator.FormAuthenticator'
       characterEncoding='UTF-8'/>
