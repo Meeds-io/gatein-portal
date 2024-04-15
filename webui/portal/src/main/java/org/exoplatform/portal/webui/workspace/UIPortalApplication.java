@@ -1210,7 +1210,10 @@ public class UIPortalApplication extends UIApplication {
     }
 
     private boolean isRefreshPage(RequestNavigationData requestNavData) {
-      return !requestNavData.equals(lastRequestNavData) || isDraftPage() || isMaximizePortlet();
+      return !requestNavData.equals(lastRequestNavData)
+          || getCurrentSite() == null
+          || isDraftPage()
+          || isMaximizePortlet();
     }
 
     private boolean isDraftPage() {
