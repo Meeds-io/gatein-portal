@@ -3,6 +3,7 @@
   def jsManager = rcontext.getJavascriptManager();
   jsManager.require("SHARED/bodyScrollListener", "bodyScrollListener");
   uicomponent.renderChildren();
+  uicomponent.includePortletScripts();
 %>
 </div>
    <% /* Include extensible templates configured by Kernel configuration to be imported in Page Header */ %>

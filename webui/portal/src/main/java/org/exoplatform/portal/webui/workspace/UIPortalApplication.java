@@ -96,6 +96,8 @@ import java.io.Writer;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.portlet.PortletMode;
+
 /**
  * This extends the UIApplication and hence is a sibling of UIPortletApplication (used by any eXo Portlets as the Parent class
  * to build the portlet component tree). The UIPortalApplication is responsible to build its subtree according to some
@@ -581,15 +583,16 @@ public class UIPortalApplication extends UIApplication {
      * - skin for specific site<br>
      */
     public Collection<SkinConfig> getPortalSkins() {
+        String skin = getSkin();
         List<SkinConfig> skins = null;
         if (skinVisitor == null) {
-          skins = new ArrayList<>(skinService.getPortalSkins(skin_));
+          skins = new ArrayList<>(skinService.getPortalSkins(skin));
         } else {
           skins = new ArrayList<>(getPortalSkins(skinVisitor));
         }
 
         //
-        SkinConfig skinConfig = skinService.getSkin(getCurrentSite().getName(), skin_);
+        SkinConfig skinConfig = skinService.getSkin(getCurrentSite().getName(), skin);
         if (skinConfig != null) {
             skins.add(skinConfig);
         }
@@ -613,7 +616,7 @@ public class UIPortalApplication extends UIApplication {
     }
 
     private Collection<SkinConfig> getCustomSkins() {
-        return skinService.getCustomPortalSkins(skin_);
+        return skinService.getCustomPortalSkins(getSkin());
     }
 
     private void getPortalPortletSkinConfig(Set<SkinConfig> portletConfigs, UIComponent component) {
@@ -630,7 +633,16 @@ public class UIPortalApplication extends UIApplication {
     }
 
     public String getSkin() {
-        return skin_;
+        if (skin_ == null) {
+          String siteSkin = getCurrentSite().getSkin();
+          if (siteSkin == null) {
+            return skinService.getDefaultSkin();
+          } else {
+            return siteSkin;
+          }
+        } else {
+          return skin_;
+        }
     }
 
     public void setSkin(String skin) {
@@ -668,13 +680,14 @@ public class UIPortalApplication extends UIApplication {
             }
         }
 
+        String skin = getSkin();
         List<SkinConfig> additionalSkins = portletSkins.stream()
                                                        .filter(portletSkin -> portletSkin instanceof SkinConfig skinConfig
                                                                               && CollectionUtils.isNotEmpty(skinConfig.getAdditionalModules()))
                                                        .map(portletSkin -> ((SkinConfig) portletSkin).getAdditionalModules())
                                                        .flatMap(List::stream)
                                                        .distinct()
-                                                       .map(module -> skinService.getPortalSkin(module, skin_))
+                                                       .map(module -> skinService.getPortalSkin(module, skin))
                                                        .filter(Objects::nonNull)
                                                        .toList();
         portletSkins.addAll(additionalSkins);
@@ -757,7 +770,7 @@ public class UIPortalApplication extends UIApplication {
     private SkinConfig getPortletSkinConfig(UIPortlet portlet) {
         String portletId = portlet.getSkinId();
         if (portletId != null) {
-            return skinService.getSkin(portletId, skin_);
+            return skinService.getSkin(portletId, getSkin());
         } else {
             return null;
         }
@@ -1050,7 +1063,7 @@ public class UIPortalApplication extends UIApplication {
         for (UIPortlet uiPortlet : uiportlets) {
             String skinId = uiPortlet.getSkinId();
             if (skinId != null) {
-                SkinConfig skinConfig = skinService.getSkin(skinId, skin_);
+                SkinConfig skinConfig = skinService.getSkin(skinId, getSkin());
                 if (skinConfig != null) {
                     if (portalPortletSkins.contains(skinConfig)) {
                         reloadPortalPortletSkins = true;
@@ -1195,6 +1208,19 @@ public class UIPortalApplication extends UIApplication {
             default:
                 throw new IllegalStateException("Unexpected "+ UIPortalApplication.class.getName() +".modeState value "+ modeState +".");
         }
+    }
+    
+    @SuppressWarnings("rawtypes")
+    public void includePortletScripts() {
+      PortalRequestContext pcontext = PortalRequestContext.getCurrentInstance();
+      JavascriptManager jsMan = pcontext.getJavascriptManager();
+      List<UIPortlet> portlets = new ArrayList<>();
+      getCurrentPage().findComponentOfType(portlets, UIPortlet.class);
+      for (UIPortlet uiPortlet : portlets) {
+        if (!uiPortlet.isLazyResourcesLoading()) {
+          jsMan.loadScriptResource(ResourceScope.PORTLET, uiPortlet.getApplicationId());
+        }
+      }
     }
 
     public String getLastPortal() {

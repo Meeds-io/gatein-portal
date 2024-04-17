@@ -203,7 +203,7 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
     }
 
     public String getId() {
-        return storageId == null ? getStorageName() : storageId;
+        return storageId == null ? "UIPortlet-" + getStorageName() : storageId;
     }
 
     public String getApplicationId() {
@@ -333,7 +333,18 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
     }
 
     public PortletMode getCurrentPortletMode() {
+      String maximizedPortletMode = getMaximizedPortletMode();
+      if (StringUtils.isBlank(maximizedPortletMode)) {
         return currentPortletMode_;
+      } else if (maximizedPortletMode.equals(PortletMode.VIEW.toString())) {
+        return PortletMode.VIEW;
+      } else if (maximizedPortletMode.equals(PortletMode.HELP.toString())) {
+        return PortletMode.HELP;
+      } else if (maximizedPortletMode.equals(PortletMode.EDIT.toString())) {
+        return PortletMode.EDIT;
+      } else {
+        return new PortletMode(maximizedPortletMode);
+      }
     }
 
     public void setCurrentPortletMode(PortletMode mode) {
@@ -1033,10 +1044,6 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
                 lazyResourcesLoading = false;
               }
             }
-            JavascriptManager jsMan = context.getJavascriptManager();
-            if (!lazyResourcesLoading) {
-              jsMan.loadScriptResource(ResourceScope.PORTLET, getApplicationId());
-            }
 
             FragmentResponse fragmentResponse = (FragmentResponse) pir;
             switch (fragmentResponse.getType()) {
@@ -1056,6 +1063,7 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
             if (fragmentResponse.getProperties() != null) {
                 // setup transport headers
                 if (fragmentResponse.getProperties().getTransportHeaders() != null) {
+                    JavascriptManager jsMan = context.getJavascriptManager();
                     MultiValuedPropertyMap<String> transportHeaders = fragmentResponse.getProperties().getTransportHeaders();
                     for (String key : transportHeaders.keySet()) {
                         if (JAVASCRIPT_DEPENDENCY.equals(key)) {
@@ -1123,4 +1131,15 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
 
         return markup;
     }
+
+    public boolean isLazyResourcesLoading() {
+      return lazyResourcesLoading != null && lazyResourcesLoading.booleanValue();
+    }
+
+    private String getMaximizedPortletMode() {
+      PortalRequestContext prContext = Util.getPortalRequestContext();
+      HttpServletRequest req = prContext.getRequest();
+      return req.getParameter("maximizedPortletMode");
+    }
+
 }

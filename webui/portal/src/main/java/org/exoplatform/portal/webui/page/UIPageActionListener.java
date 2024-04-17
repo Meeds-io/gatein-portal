@@ -155,8 +155,7 @@ public class UIPageActionListener {
             }
 
             showedUIPortal.refreshUIPage();
-            pcontext.ignoreAJAXUpdateOnPortlets(true);
-            pcontext.addUIComponentToUpdateByAjax(uiPortalApp.getChildById(UIPortalApplication.UI_WORKING_WS_ID));
+            pcontext.ignoreAJAXUpdateOnPortlets(!pcontext.useAjax());
         }
 
         private UIPortal buildUIPortal(UIPortalApplication uiPortalApp, PortalRequestContext pcontext)
