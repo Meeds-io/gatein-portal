@@ -760,9 +760,15 @@ public class PortalRequestContext extends WebuiRequestContext {
                 controllerContext.getParameter(RequestNavigationData.REQUEST_PATH));
     }
 
-    @SuppressWarnings("unchecked")
     public static PortalRequestContext getCurrentInstance() {
-        return (PortalRequestContext) RequestContext.getCurrentInstance();
+        RequestContext currentInstance = RequestContext.getCurrentInstance();
+        if (currentInstance == null) {
+          return null;
+        } else if (currentInstance instanceof PortalRequestContext portalRequestContext) {
+          return portalRequestContext;
+        } else {
+          return (PortalRequestContext) currentInstance.getParentAppRequestContext();
+        }
     }
 
 }
