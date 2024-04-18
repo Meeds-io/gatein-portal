@@ -22,8 +22,12 @@ package org.exoplatform.application.registry;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.exoplatform.portal.config.model.ApplicationType;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Created by the eXo platform team User: Benjamin Mestrallet Date: 15 juin 2004
@@ -57,6 +61,10 @@ public class Application implements Serializable {
 
   /** . */
   private String            contentId;
+
+  @Getter
+  @Setter
+  private List<String>      supportedModes;
 
   public String getContentId() {
     return contentId;
