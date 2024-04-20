@@ -69,7 +69,6 @@ import org.exoplatform.portal.pom.data.ComponentData;
 import org.exoplatform.portal.pom.data.ContainerData;
 import org.exoplatform.portal.pom.data.PortalData;
 import org.exoplatform.portal.pom.data.PortalKey;
-import org.exoplatform.portal.pom.data.RedirectData;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -332,7 +331,6 @@ public class SiteStorageImpl implements SiteStorage {
                                                                     entity.getId(),
                                                                     PermissionEntity.TYPE.EDIT);
     String editPermission = CollectionUtils.isEmpty(editPermissionsList) ? null : editPermissionsList.get(0);
-    List<RedirectData> redirects = Collections.emptyList();
 
     Map<String, String> properties = new HashMap<>();
     if (StringUtils.isNotBlank(entity.getProperties())) {
@@ -356,7 +354,6 @@ public class SiteStorageImpl implements SiteStorage {
                           entity.getSkin(),
                           rootContainer,
                           entity.isDefaultSiteBody(),
-                          redirects,
                           entity.isDisplayed(),
                           entity.getDisplayOrder(),
                           entity.getBannerFileId());
