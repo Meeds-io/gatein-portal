@@ -25,6 +25,9 @@ import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.ApplicationData;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * May 13, 2004
  *
@@ -52,10 +55,6 @@ public class Application<S> extends ModelObject implements Cloneable {
 
     private String theme;
 
-    private String width;
-
-    private String height;
-
     private Properties properties;
 
     private String[] accessPermissions;
@@ -64,6 +63,10 @@ public class Application<S> extends ModelObject implements Cloneable {
 
     /** We cannot allow the type to change once the object is created. */
     private final ApplicationType<S> type;
+
+    @Getter
+    @Setter
+    private ModelStyle             style;
 
     public Application(ApplicationData<S> data) {
         super(data.getStorageId());
@@ -224,10 +227,51 @@ public class Application<S> extends ModelObject implements Cloneable {
     }
 
     @Override
+    public String getCssClass() {
+      if (cssClass == null && style == null) {
+        return null;
+      } else {
+        StringBuilder cssClasses = new StringBuilder();
+        if (cssClass != null) {
+          cssClasses.append(cssClass);
+        }
+        if (style != null) {
+          cssClasses.append(" ");
+          cssClasses.append(style.getCssClass());
+        }
+        return cssClasses.toString();
+      }
+    }
+
+    @Override
+    public String getBorderColor() {
+      if (style != null && style.getBorderColor() != null) {
+        return style.getBorderColor();
+      } else {
+        return super.getBorderColor();
+      }
+    }
+
+    @Override
     public ApplicationData build() {
-        return new ApplicationData<S>(storageId, storageName, getType(), state, id, title, icon, description, showInfoBar,
-                showApplicationState, showApplicationMode, theme, width, height, cssClass, borderColor, Utils.safeImmutableMap(properties),
-                Utils.safeImmutableList(accessPermissions));
+      return new ApplicationData<S>(getStorageId(),
+                                    getStorageName(),
+                                    getType(),
+                                    getState(),
+                                    getId(),
+                                    getTitle(),
+                                    getIcon(),
+                                    getDescription(),
+                                    getShowInfoBar(),
+                                    getShowApplicationState(),
+                                    getShowApplicationMode(),
+                                    getTheme(),
+                                    getWidth(),
+                                    getHeight(),
+                                    getCssClass(),
+                                    getBorderColor(),
+                                    Utils.safeImmutableMap(properties),
+                                    Utils.safeImmutableList(accessPermissions));
     }
 
     public static Application<Portlet> createPortletApplication(ApplicationData<Portlet> data) {

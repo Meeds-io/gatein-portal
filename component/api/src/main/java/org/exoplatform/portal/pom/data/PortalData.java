@@ -63,8 +63,6 @@ public class PortalData extends ModelData {
 
   private final String              description;
 
-  private final List<RedirectData>  redirects;
-
   private final boolean             displayed;
 
   private final int                 displayOrder;
@@ -82,7 +80,6 @@ public class PortalData extends ModelData {
     this.properties = null;
     this.skin = null;
     this.portalLayout = null;
-    this.redirects = null;
     this.defaultLayout = false;
     this.displayed = true;
     this.displayOrder = 0;
@@ -99,7 +96,6 @@ public class PortalData extends ModelData {
                     Map<String, String> properties,
                     String skin,
                     ContainerData portalLayout,
-                    List<RedirectData> redirects,
                     boolean displayed,
                     int displayOrder,
                     long bannerFileId) {
@@ -115,7 +111,6 @@ public class PortalData extends ModelData {
          skin,
          portalLayout,
          false,
-         redirects,
          displayed,
          displayOrder,
          bannerFileId);
@@ -133,7 +128,6 @@ public class PortalData extends ModelData {
                     String skin,
                     ContainerData portalLayout,
                     boolean defaultLayout,
-                    List<RedirectData> redirects,
                     boolean displayed,
                     int displayOrder,
                     long bannerFileId) {
@@ -149,7 +143,6 @@ public class PortalData extends ModelData {
     this.properties = properties;
     this.skin = skin;
     this.portalLayout = portalLayout;
-    this.redirects = redirects;
     this.defaultLayout = defaultLayout;
     this.displayed = displayed;
     this.displayOrder = displayOrder;
