@@ -26,9 +26,6 @@ import java.util.Map;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.PortalData;
-import org.exoplatform.portal.pom.data.RedirectConditionData;
-import org.exoplatform.portal.pom.data.RedirectData;
-import org.exoplatform.portal.pom.data.RedirectMappingsData;
 
 /**
  * May 13, 2004
@@ -81,9 +78,6 @@ public class PortalConfig extends ModelObject implements Cloneable {
 
   private long                      bannerFileId;
 
-    // TODO: storing this as a LinkedHashMap might make more sense (ordered + able to retrieve element based on redirect name
-    private ArrayList<PortalRedirect> portalRedirects;
-
     public PortalConfig() {
         this(PORTAL_TYPE);
     }
@@ -120,7 +114,6 @@ public class PortalConfig extends ModelObject implements Cloneable {
         this.skin = data.getSkin();
         this.portalLayout = new Container(data.getPortalLayout());
         this.defaultLayout = data.isDefaultLayout();
-        this.portalRedirects = buildPortalRedirects(data.getRedirects());
         this.displayed = data.isDisplayed();
         this.displayOrder = data.getDisplayOrder();
         this.bannerFileId = data.getBannerFileId();
@@ -196,17 +189,6 @@ public class PortalConfig extends ModelObject implements Cloneable {
 
     public void setDefaultLayout(boolean defaultLayout) {
       this.defaultLayout = defaultLayout;
-    }
-
-    public void setPortalRedirects(ArrayList<PortalRedirect> portalRedirects) {
-        this.portalRedirects = portalRedirects;
-    }
-
-    public ArrayList<PortalRedirect> getPortalRedirects() {
-        if (portalRedirects == null) {
-            portalRedirects = new ArrayList<PortalRedirect>();
-        }
-        return portalRedirects;
     }
 
     public Properties getProperties() {
@@ -389,55 +371,7 @@ public class PortalConfig extends ModelObject implements Cloneable {
         List<String> accessPermissions = Utils.safeImmutableList(this.accessPermissions);
         Map<String, String> properties = Utils.safeImmutableMap(this.properties);
         return new PortalData(storageId, name, type, locale, label, description, accessPermissions, editPermission, properties,
-                skin, portalLayout.build(), defaultLayout, buildRedirectData(), displayed, displayOrder, bannerFileId);
-    }
-
-    private ArrayList<RedirectData> buildRedirectData() {
-        if (portalRedirects != null) {
-            ArrayList<RedirectData> redirects = new ArrayList<RedirectData>();
-            for (PortalRedirect portalRedirect : portalRedirects) {
-                redirects.add(portalRedirect.build());
-            }
-            return redirects;
-        } else {
-            return null;
-        }
-    }
-
-    private ArrayList<PortalRedirect> buildPortalRedirects(List<RedirectData> redirectsData) {
-        if (redirectsData != null) {
-            ArrayList<PortalRedirect> portalRedirects = new ArrayList<PortalRedirect>();
-            for (RedirectData redirectData : redirectsData) {
-                PortalRedirect portalRedirect = new PortalRedirect();
-                portalRedirect.setName(redirectData.getRedirectName());
-                portalRedirect.setRedirectSite(redirectData.getRedirectSiteName());
-                portalRedirect.setEnabled(redirectData.isEnabled());
-                portalRedirect.setConditions(buildRedirectConditions(redirectData.getConditions()));
-                portalRedirect.setMappings(buildRedirectMappings(redirectData.getMappings()));
-                portalRedirects.add(portalRedirect);
-            }
-            return portalRedirects;
-        }
-        return null;
-    }
-
-    private ArrayList<RedirectCondition> buildRedirectConditions(List<RedirectConditionData> conditionsData) {
-        ArrayList<RedirectCondition> redirectConditions = new ArrayList<RedirectCondition>();
-
-        for (RedirectConditionData conditionData : conditionsData) {
-            RedirectCondition redirectCondition = conditionData.build();
-            redirectConditions.add(redirectCondition);
-        }
-
-        return redirectConditions;
-    }
-
-    private RedirectMappings buildRedirectMappings(RedirectMappingsData mappingsData) {
-        if (mappingsData != null) {
-            return mappingsData.build();
-        } else {
-            return null;
-        }
+                skin, portalLayout.build(), defaultLayout, displayed, displayOrder, bannerFileId);
     }
 
     public void useMetaPortalLayout() {

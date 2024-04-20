@@ -29,7 +29,6 @@ import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.commons.utils.Safe;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.Constants;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.application.RequestNavigationData;
 import org.exoplatform.portal.branding.BrandingService;
@@ -43,7 +42,6 @@ import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.resource.*;
 import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.page.UIPage;
-import org.exoplatform.portal.webui.page.UIPageBody;
 import org.exoplatform.portal.webui.page.UIPageActionListener.ChangeNodeActionListener;
 import org.exoplatform.portal.webui.page.UISiteBody;
 import org.exoplatform.portal.webui.portal.PageNodeEvent;
@@ -52,8 +50,6 @@ import org.exoplatform.portal.webui.portal.UISharedLayout;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.LocaleContextInfo;
@@ -76,9 +72,6 @@ import org.exoplatform.webui.core.UIContainer;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.url.ComponentURL;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.gatein.pc.api.info.PortletInfo;
 import org.gatein.pc.portlet.impl.info.ContainerPortletInfo;
 import org.gatein.portal.controller.resource.ResourceId;
@@ -95,8 +88,6 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import javax.portlet.PortletMode;
 
 /**
  * This extends the UIApplication and hence is a sibling of UIPortletApplication (used by any eXo Portlets as the Parent class
@@ -1218,7 +1209,11 @@ public class UIPortalApplication extends UIApplication {
       uiViewWorkingWorkspace.findComponentOfType(portlets, UIPortlet.class);
       for (UIPortlet uiPortlet : portlets) {
         if (!uiPortlet.isLazyResourcesLoading()) {
-          jsMan.loadScriptResource(ResourceScope.PORTLET, uiPortlet.getApplicationId());
+          try {
+            jsMan.loadScriptResource(ResourceScope.PORTLET, uiPortlet.getApplicationId());
+          } catch (Exception e) {
+            log.warn("Can't load JS resource for portlet {}", uiPortlet.getName(), e);
+          }
         }
       }
     }

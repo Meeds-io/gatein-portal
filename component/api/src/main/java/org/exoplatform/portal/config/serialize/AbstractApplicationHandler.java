@@ -21,6 +21,7 @@ package org.exoplatform.portal.config.serialize;
 
 import org.exoplatform.portal.application.Preference;
 import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.config.model.Properties;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
@@ -127,6 +128,12 @@ public class AbstractApplicationHandler implements IMarshaller, IUnmarshaller, I
         String icon = nextOptionalTag(ctx, "icon");
         String width = nextOptionalTag(ctx, "width");
         String height = nextOptionalTag(ctx, "height");
+        String cssClass = nextOptionalTag(ctx, "cssClass");
+
+        ModelStyle style = null;
+        if (ctx.isAt(m_uri, "style")) {
+          style = (ModelStyle) ctx.unmarshalElement();
+        }
 
         //
         Properties properties = null;
@@ -149,7 +156,9 @@ public class AbstractApplicationHandler implements IMarshaller, IUnmarshaller, I
         app.setIcon(icon);
         app.setWidth(width);
         app.setHeight(height);
+        app.setCssClass(cssClass);
         app.setProperties(properties);
+        app.setStyle(style);
 
         //
         return app;
