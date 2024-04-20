@@ -21,9 +21,14 @@ package org.exoplatform.portal.config.serialize;
 
 import org.exoplatform.portal.application.Preference;
 import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.config.model.Properties;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
+
+import java.util.Collections;
+
+import org.apache.commons.lang3.StringUtils;
 import org.jibx.runtime.IAliasable;
 import org.jibx.runtime.IMarshaller;
 import org.jibx.runtime.IMarshallingContext;
@@ -120,13 +125,19 @@ public class AbstractApplicationHandler implements IMarshaller, IUnmarshaller, I
         String theme = nextOptionalTag(ctx, "theme");
         String title = nextOptionalTag(ctx, "title");
         String accessPermissions = nextOptionalTag(ctx, "access-permissions");
-        boolean showInfoBar = nextOptionalBooleanTag(ctx, "show-info-bar", true);
-        boolean showApplicationState = nextOptionalBooleanTag(ctx, "show-application-state", true);
-        boolean showApplicationMode = nextOptionalBooleanTag(ctx, "show-application-mode", true);
+        boolean showInfoBar = nextOptionalBooleanTag(ctx, "show-info-bar", false);
+        boolean showApplicationState = nextOptionalBooleanTag(ctx, "show-application-state", false);
+        boolean showApplicationMode = nextOptionalBooleanTag(ctx, "show-application-mode", false);
         String description = nextOptionalTag(ctx, "description");
         String icon = nextOptionalTag(ctx, "icon");
         String width = nextOptionalTag(ctx, "width");
         String height = nextOptionalTag(ctx, "height");
+        String cssClass = nextOptionalTag(ctx, "cssClass");
+
+        ModelStyle style = null;
+        if (ctx.isAt(m_uri, "style")) {
+          style = (ModelStyle) ctx.unmarshalElement();
+        }
 
         //
         Properties properties = null;
@@ -141,7 +152,8 @@ public class AbstractApplicationHandler implements IMarshaller, IUnmarshaller, I
         app.setId(id);
         app.setTheme(theme);
         app.setTitle(title);
-        app.setAccessPermissions(JibxArraySerialize.deserializeStringArray(accessPermissions));
+        app.setAccessPermissions(StringUtils.isBlank(accessPermissions) ? new String[] { "Everyone" } :
+                                                                        JibxArraySerialize.deserializeStringArray(accessPermissions));
         app.setShowInfoBar(showInfoBar);
         app.setShowApplicationState(showApplicationState);
         app.setShowApplicationMode(showApplicationMode);
@@ -149,7 +161,9 @@ public class AbstractApplicationHandler implements IMarshaller, IUnmarshaller, I
         app.setIcon(icon);
         app.setWidth(width);
         app.setHeight(height);
+        app.setCssClass(cssClass);
         app.setProperties(properties);
+        app.setStyle(style);
 
         //
         return app;

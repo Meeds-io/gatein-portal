@@ -101,7 +101,6 @@ public class TestJDBCNavigationServiceWrapper extends AbstractKernelTest {
                                          null,
                                          null,
                                          container,
-                                         null,
                                          true,
                                          88,
                                          0);
