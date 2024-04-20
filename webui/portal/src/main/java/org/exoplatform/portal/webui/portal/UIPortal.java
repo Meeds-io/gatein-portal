@@ -53,7 +53,6 @@ import org.exoplatform.webui.event.EventListener;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,8 +84,6 @@ public class UIPortal extends UIContainer {
     private Map<String, String[]> publicParameters = new HashMap<>();
 
     private UIComponent maximizedUIComponent;
-
-    private ArrayList<PortalRedirect> portalRedirects;
 
     private boolean useDynamicLayout;
 
@@ -218,7 +215,7 @@ public class UIPortal extends UIContainer {
         uiPageBody.setPageBody(getSelectedUserNode(), this);
     }
 
-    public UserNode getSelectedUserNode() throws Exception {
+    public UserNode getSelectedUserNode() {
         return getNavPath();
     }
 
@@ -275,10 +272,7 @@ public class UIPortal extends UIContainer {
 
     public Boolean isShowInfobar() {
         String value = getProperty(PortalProperties.SHOW_PORTLET_INFO, "1");
-        if (Integer.parseInt(value) == 1) {
-            return true;
-        }
-        return false;
+        return Integer.parseInt(value) == 1;
     }
 
     public void setShowInfobar(Boolean value) {
@@ -366,14 +360,6 @@ public class UIPortal extends UIContainer {
             return null;
         }
 
-    }
-
-    public void setRedirects(ArrayList<PortalRedirect> portalRedirects) {
-        this.portalRedirects = portalRedirects;
-    }
-
-    public ArrayList<PortalRedirect> getPortalRedirects() {
-        return portalRedirects;
     }
 
     @Override
