@@ -46,6 +46,10 @@
 		<%} %>
 <%
 	}
+  String hiddenClass = "";
+  if(editMode == EditMode.NO_EDIT && (portletContent == null || org.apache.commons.lang3.StringUtils.isBlank(portletContent.toString()))) {
+    hiddenClass = "hidden";
+  }
 
 	if (editMode != EditMode.BLOCK) {
 		if(uicomponent.getShowInfoBar()) {
@@ -165,13 +169,9 @@
 			{
 				cssStyle += "height: "+ windowHeight +";";
 			}
-			String hiddenClass = "";
-			if(portletContent == null || org.apache.commons.lang3.StringUtils.isBlank(portletContent.toString())) {
-			  hiddenClass = "hidden";
-			}
  %>
- 				<div id="<%=editMode == EditMode.NO_EDIT ? portletId : "EditMode-"+ portletId%>">
-					<div class="PORTLET-FRAGMENT $hiddenClass" style="${cssStyle}">
+ 				<div id="<%=editMode == EditMode.NO_EDIT ? portletId : "EditMode-"+ portletId%>" class="$hiddenClass">
+					<div class="PORTLET-FRAGMENT" style="${cssStyle}">
  						<% 
 							if(hasAccessPermission)
               {
