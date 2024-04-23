@@ -3,7 +3,7 @@
 
   This file is part of the Meeds project (https://meeds.io/).
 
-  Copyright (C) 2023 Meeds Association contact@meeds.io
+  Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -44,7 +44,7 @@
     <xs:element name="section-columns" type="sectionColumnsType"/>
     <xs:element name="cell" type="cellType"/>
     <xs:element name="column" type="columnType"/>
-    <xs:element name="style" type="styleType"/>
+    <xs:element name="css-style" type="styleType"/>
 
     <!-- A top node-navigation element -->
     <xs:element name="node-navigation" type="nodeNavigationType"/>
@@ -208,7 +208,7 @@
             <xs:element name="width" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element name="height" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element name="cssClass" type="xs:string" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="style" type="styleType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="css-style" type="styleType" minOccurs="0" maxOccurs="1" />
         </xs:sequence>
     </xs:group>
 

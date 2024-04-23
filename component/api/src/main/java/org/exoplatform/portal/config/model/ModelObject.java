@@ -36,26 +36,26 @@ import lombok.Setter;
 public abstract class ModelObject {
 
     /** Storage id. */
-    String storageId;
+    protected String storageId;
 
     /** The storage name that is unique among a container context. */
-    String storageName;
+    protected String storageName;
 
     @Getter
     @Setter
-    String width;
+    protected String width;
 
     @Getter
     @Setter
-    String height;
+    protected String height;
 
     @Getter
     @Setter
-    String cssClass;
+    protected String cssClass;
 
     @Getter
     @Setter
-    String borderColor;
+    protected String borderColor;
 
     /**
      * Create a new object.

@@ -20,8 +20,8 @@
 -->
 <page-set
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_objects_1_11 http://www.gatein.org/xml/ns/gatein_objects_1_11"
-    xmlns="http://www.gatein.org/xml/ns/gatein_objects_1_11">
+    xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_objects_1_12 http://www.gatein.org/xml/ns/gatein_objects_1_12"
+    xmlns="http://www.gatein.org/xml/ns/gatein_objects_1_12">
 
   <page profiles="unknown">
     <name>register</name>
@@ -90,6 +90,81 @@
       <access-permissions>Everyone</access-permissions>
       <show-info-bar>false</show-info-bar>
     </portlet-application>
+  </page>
+
+  <page>
+    <name>sections</name>
+    <title>TestTitle</title>
+    <access-permissions>Everyone</access-permissions>
+    <edit-permission>*:/platform/administrators</edit-permission>
+    <container template="system:/groovy/portal/webui/container/UIPageLayout.gtmpl">
+      <section-columns
+        cssClass="TEST-columns-section-class"
+        mobile-columns-style="true"
+        sticky-beahvior="true">
+        <access-permissions>Everyone</access-permissions>
+        <column
+          col-span="9"
+          cssClass="TEST-column-class"
+          profiles="">
+          <access-permissions>Everyone</access-permissions>
+          <portlet-application>
+            <portlet>
+              <application-ref>test</application-ref>
+              <portlet-ref>TestPortlet</portlet-ref>
+            </portlet>
+            <css-style>
+              <margin-top>16</margin-top>
+              <margin-bottom>8</margin-bottom>
+              <margin-right>4</margin-right>
+              <margin-left>0</margin-left>
+              <radius-top-right>16</radius-top-right>
+              <radius-top-left>8</radius-top-left>
+              <radius-bottom-right>4</radius-bottom-right>
+              <radius-bottom-left>0</radius-bottom-left>
+              <mobile-hidden>true</mobile-hidden>
+              <border-color>#CCAABB</border-color>
+            </css-style>
+          </portlet-application>
+        </column>
+        <!-- Minimum declaration of a column -->
+        <column col-span="3" />
+      </section-columns>
+      <section-grid
+        id=""
+        rows="2"
+        cols="4"
+        cssClass="TEST-grid-section-class"
+        profiles="">
+        <access-permissions>Everyone</access-permissions>
+        <cell
+          col-span="2"
+          row-span="3"
+          cssClass="TEST-grid-cell-class">
+          <access-permissions>Everyone</access-permissions>
+          <css-style>
+            <margin-top>0</margin-top>
+            <margin-bottom>4</margin-bottom>
+            <margin-right>8</margin-right>
+            <margin-left>16</margin-left>
+            <radius-top-right>0</radius-top-right>
+            <radius-top-left>4</radius-top-left>
+            <radius-bottom-right>8</radius-bottom-right>
+            <radius-bottom-left>16</radius-bottom-left>
+            <mobile-hidden>true</mobile-hidden>
+            <border-color>#EE3355</border-color>
+          </css-style>
+          <portlet-application>
+            <portlet>
+              <application-ref>test</application-ref>
+              <portlet-ref>TestPortlet</portlet-ref>
+            </portlet>
+          </portlet-application>
+        </cell>
+        <cell />
+        <cell />
+      </section-grid>
+    </container>
   </page>
 
 </page-set>
