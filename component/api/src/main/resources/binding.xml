@@ -40,7 +40,7 @@
            unmarshaller="org.exoplatform.portal.config.serialize.PortletApplicationHandler">
   </mapping>
 
-  <mapping name="style" label="style" class="org.exoplatform.portal.config.model.ModelStyle">
+  <mapping name="css-style" label="css-style" class="org.exoplatform.portal.config.model.ModelStyle">
     <value name="margin-top" field="marginTop" usage="optional" />
     <value name="margin-bottom" field="marginBottom" usage="optional" />
     <value name="margin-right" field="marginRight" usage="optional" />
@@ -61,7 +61,7 @@
     <value name="read-only" field="readOnly" usage="optional"/>
   </mapping>
 
-  <mapping name="cell" label="cell" class="org.exoplatform.portal.config.model.Cell">
+  <mapping name="cell" label="cell" class="org.exoplatform.portal.config.serialize.model.Cell">
     <value name="id" usage="optional" field="id" style="attribute"/>
     <value name="col-span" field="colSpan" default="1" usage="optional" style="attribute"/>
     <value name="row-span" field="rowSpan" default="1" usage="optional" style="attribute"/>
@@ -75,14 +75,15 @@
       serializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.serializePermissions"
       deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions" />
     <structure
-      field="style"
+      field="cssStyle"
+      map-as="org.exoplatform.portal.config.model.ModelStyle"
       usage="optional" />
     <collection field="children" ordered="false">
       <structure map-as="org.exoplatform.portal.config.serialize.PortletApplication" usage="optional"/>
     </collection>
   </mapping>
 
-  <mapping name="column" label="column" class="org.exoplatform.portal.config.model.Column">
+  <mapping name="column" label="column" class="org.exoplatform.portal.config.serialize.model.Column">
     <value name="id" usage="optional" field="id" style="attribute"/>
     <value name="col-span" field="colSpan" usage="optional" style="attribute"/>
     <value name="cssClass" field="cssClass" usage="optional" style="attribute"/>
@@ -99,7 +100,7 @@
     </collection>
   </mapping>
 
-  <mapping name="section-grid" label="section-grid" class="org.exoplatform.portal.config.model.GridSection">
+  <mapping name="section-grid" label="section-grid" class="org.exoplatform.portal.config.serialize.model.GridSection">
     <value name="id" usage="optional" field="id" style="attribute"/>
     <value name="cols" field="colsCount" usage="optional" style="attribute"/>
     <value name="rows" field="rowsCount" usage="optional" style="attribute"/>
@@ -113,11 +114,11 @@
       serializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.serializePermissions"
       deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions" />
     <collection field="children" ordered="false">
-      <structure map-as="org.exoplatform.portal.config.model.Cell" usage="optional"/>
+      <structure map-as="org.exoplatform.portal.config.serialize.model.Cell" usage="optional"/>
     </collection>
   </mapping>
 
-  <mapping name="section-columns" label="section-columns" class="org.exoplatform.portal.config.model.FlexSection">
+  <mapping name="section-columns" label="section-columns" class="org.exoplatform.portal.config.serialize.model.FlexSection">
     <value name="id" usage="optional" field="id" style="attribute"/>
     <value name="height" field="height" usage="optional" style="attribute"/>
     <value name="cssClass" field="cssClass" usage="optional" style="attribute"/>
@@ -132,7 +133,7 @@
       serializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.serializePermissions"
       deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions" />
     <collection field="children" ordered="false">
-      <structure map-as="org.exoplatform.portal.config.model.Column" usage="optional"/>
+      <structure map-as="org.exoplatform.portal.config.serialize.model.Column" usage="optional"/>
     </collection>
   </mapping>
 
@@ -175,8 +176,8 @@
       serializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.serializePermissions"
       deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions"/>
     <collection field="children" ordered="false">
-      <structure map-as="org.exoplatform.portal.config.model.GridSection" usage="optional"/>
-      <structure map-as="org.exoplatform.portal.config.model.FlexSection" usage="optional"/>
+      <structure map-as="org.exoplatform.portal.config.serialize.model.GridSection" usage="optional"/>
+      <structure map-as="org.exoplatform.portal.config.serialize.model.FlexSection" usage="optional"/>
       <structure map-as="org.exoplatform.portal.config.model.Container" usage="optional"/>
       <structure map-as="org.exoplatform.portal.config.model.PageBody" usage="optional"/>
       <structure map-as="org.exoplatform.portal.config.model.SiteBody" usage="optional"/>
@@ -201,14 +202,6 @@
           deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions"/>
     <value name="move-containers-permissions" field="moveContainersPermissions" usage="optional" default="Everyone" serializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.serializePermissions"
           deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions"/>
-    <collection field="children" ordered="false">
-      <structure map-as="org.exoplatform.portal.config.model.Container" usage="optional"/>
-      <structure map-as="org.exoplatform.portal.config.model.PageBody" usage="optional"/>
-      <structure map-as="org.exoplatform.portal.config.serialize.PortletApplication" usage="optional"/>
-    </collection>
-  </mapping>
-
-  <mapping name="page-template" label="page-template" class="org.exoplatform.portal.config.model.PageContainerTemplate">
     <collection field="children" ordered="false">
       <structure map-as="org.exoplatform.portal.config.model.Container" usage="optional"/>
       <structure map-as="org.exoplatform.portal.config.model.PageBody" usage="optional"/>

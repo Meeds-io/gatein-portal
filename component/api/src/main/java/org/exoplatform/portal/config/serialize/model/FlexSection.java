@@ -16,11 +16,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package org.exoplatform.portal.config.model;
+package org.exoplatform.portal.config.serialize.model;
+
+import org.exoplatform.portal.config.model.Container;
 
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Used for deserializing from pages.xml using JibX
+ */
 @Setter
 @Getter
 public class FlexSection extends Container {

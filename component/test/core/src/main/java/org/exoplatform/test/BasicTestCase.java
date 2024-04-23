@@ -62,14 +62,6 @@ public class BasicTestCase extends TestCase {
     t = System.currentTimeMillis() - t;
   }
 
-  protected static void info(String s) {
-    System.out.println("  INFO: " + s);
-  }
-
-  protected static void error(String s) {
-    System.out.println("ERROR: " + s);
-  }
-
   protected String getDescription() {
     return "Run test " + getClass().getName();
   }
