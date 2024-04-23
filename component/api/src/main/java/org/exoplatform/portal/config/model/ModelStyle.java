@@ -47,37 +47,21 @@ public class ModelStyle {
 
   public String getCssClass() { // NOSONAR
     StringBuilder cssClass = new StringBuilder();
-    if (marginTop != null) {
-      cssClass.append(" mt-");
-      int margin = Math.abs((marginTop - 20) / 4);
-      if (margin < 0) {
-        cssClass.append("n");
-      }
-      cssClass.append(margin);
+    if (marginTop != null && marginTop >= 0) {
+      cssClass.append(" mt-n");
+      cssClass.append(Math.abs((marginTop - 20) / 4));
     }
-    if (marginBottom != null) {
-      cssClass.append(" mb-");
-      int margin = Math.abs((marginBottom - 20) / 4);
-      if (margin < 0) {
-        cssClass.append("n");
-      }
-      cssClass.append(margin);
+    if (marginBottom != null && marginBottom >= 0) {
+      cssClass.append(" mb-n");
+      cssClass.append(Math.abs((marginBottom - 20) / 4));
     }
-    if (marginRight != null) {
-      cssClass.append(" me-");
-      int margin = Math.abs((marginRight - 20) / 4);
-      if (margin < 0) {
-        cssClass.append("n");
-      }
-      cssClass.append(margin);
+    if (marginRight != null && marginRight >= 0) {
+      cssClass.append(" me-n");
+      cssClass.append(Math.abs((marginRight - 20) / 4));
     }
-    if (marginLeft != null) {
-      cssClass.append(" ms-");
-      int margin = Math.abs((marginLeft - 20) / 4);
-      if (margin < 0) {
-        cssClass.append("n");
-      }
-      cssClass.append(margin);
+    if (marginLeft != null && marginLeft >= 0) {
+      cssClass.append(" ms-n");
+      cssClass.append(Math.abs((marginLeft - 20) / 4));
     }
     if (radiusTopRight != null) {
       cssClass.append(" brtr-");

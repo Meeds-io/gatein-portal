@@ -48,6 +48,7 @@ import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.service.NavigationService;
 import org.exoplatform.portal.mop.storage.PageStorage;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
 /**
  * Created by The eXo Platform SARL Author : Tung Pham thanhtungty@gmail.com Nov
@@ -135,6 +136,91 @@ public class TestLoadedPOM extends AbstractConfigTest {
       assertEquals("subpage", subNode.getName());
       assertEquals(SiteKey.portal("profiles").page("subpage"), subNode.getState().getPageRef());
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public void testPageWithSections() throws Exception {
+    Page page = layoutService.getPage("portal::profiles::sections");
+    assertNotNull(page);
+    assertEquals(1, page.getChildren().size());
+    Container sectionsParent = (Container) page.getChildren().get(0);
+    assertEquals("system:/groovy/portal/webui/container/UIPageLayout.gtmpl", sectionsParent.getTemplate());
+
+    assertEquals(2, sectionsParent.getChildren().size());
+
+    Container columnsSection = (Container) sectionsParent.getChildren().get(0);
+    assertEquals(2, columnsSection.getChildren().size());
+    assertEquals("FlexContainer", columnsSection.getTemplate());
+    assertNotNull(columnsSection.getCssClass());
+    assertTrue("'grid-cols-md-12' not found", columnsSection.getCssClass().contains("grid-cols-md-12"));
+    assertTrue("'grid-cols-lg-12' not found", columnsSection.getCssClass().contains("grid-cols-lg-12"));
+    assertTrue("'grid-cols-xl-12' not found", columnsSection.getCssClass().contains("grid-cols-xl-12"));
+    assertTrue("'layout-mobile-columns' not found", columnsSection.getCssClass().contains("layout-mobile-columns"));
+    assertTrue("'layout-sticky-application' not found", columnsSection.getCssClass().contains("layout-sticky-application"));
+    assertFalse("'grid-rows' should not be present", columnsSection.getCssClass().contains("grid-rows"));
+    assertTrue("'TEST-columns-section-class' not found", columnsSection.getCssClass().contains("TEST-columns-section-class"));
+
+    Container column = (Container) columnsSection.getChildren().get(0);
+    assertEquals(1, column.getChildren().size());
+    assertEquals("CellContainer", column.getTemplate());
+    assertNull(column.getBorderColor());
+    assertNotNull(column.getCssClass());
+    assertTrue("'flex-cell' not found", column.getCssClass().contains("flex-cell"));
+    assertTrue("'grid-cell-colspan-md-9' not found", column.getCssClass().contains("grid-cell-colspan-md-9"));
+    assertTrue("'grid-cell-colspan-lg-9' not found", column.getCssClass().contains("grid-cell-colspan-lg-9"));
+    assertTrue("'grid-cell-colspan-xl-9' not found", column.getCssClass().contains("grid-cell-colspan-xl-9"));
+    assertTrue("'grid-cell-rowspan-md-1' not found", column.getCssClass().contains("grid-cell-rowspan-md-1"));
+    assertTrue("'grid-cell-rowspan-lg-1' not found", column.getCssClass().contains("grid-cell-rowspan-lg-1"));
+    assertTrue("'grid-cell-rowspan-xl-1' not found", column.getCssClass().contains("grid-cell-rowspan-xl-1"));
+    assertTrue("'TEST-column-class' custom class not found", column.getCssClass().contains("TEST-column-class"));
+
+    Application<Portlet> columnApplication = (Application<Portlet>) column.getChildren().get(0);
+    assertEquals("#CCAABB", columnApplication.getBorderColor());
+    assertNotNull(columnApplication.getCssClass());
+    assertTrue("'mt-n1' not found", columnApplication.getCssClass().contains("mt-n1"));
+    assertTrue("'mb-n3' not found", columnApplication.getCssClass().contains("mb-n3"));
+    assertTrue("'me-n4' not found", columnApplication.getCssClass().contains("me-n4"));
+    assertTrue("'ms-n5' not found", columnApplication.getCssClass().contains("ms-n5"));
+    assertTrue("'brtr-4' not found", columnApplication.getCssClass().contains("brtr-4"));
+    assertTrue("'brtl-2' not found", columnApplication.getCssClass().contains("brtl-2"));
+    assertTrue("'brbr-1' not found", columnApplication.getCssClass().contains("brbr-1"));
+    assertTrue("'brbl-0' not found", columnApplication.getCssClass().contains("brbl-0"));
+    assertTrue("'hidden-sm-and-down' not found", columnApplication.getCssClass().contains("hidden-sm-and-down"));
+
+    Container gridSection = (Container) sectionsParent.getChildren().get(1);
+    assertEquals(3, gridSection.getChildren().size());
+    assertEquals("GridContainer", gridSection.getTemplate());
+    assertNotNull(gridSection.getCssClass());
+    assertTrue("'grid-cols-md-4' not found", gridSection.getCssClass().contains("grid-cols-md-4"));
+    assertTrue("'grid-cols-lg-4' not found", gridSection.getCssClass().contains("grid-cols-lg-4"));
+    assertTrue("'grid-cols-xl-4' not found", gridSection.getCssClass().contains("grid-cols-xl-4"));
+    assertTrue("'grid-rows-md-2' not found", gridSection.getCssClass().contains("grid-rows-md-2"));
+    assertTrue("'grid-rows-lg-2' not found", gridSection.getCssClass().contains("grid-rows-lg-2"));
+    assertTrue("'grid-rows-xl-2' not found", gridSection.getCssClass().contains("grid-rows-xl-2"));
+    assertTrue("'TEST-grid-section-class' not found", gridSection.getCssClass().contains("TEST-grid-section-class"));
+
+    Container cell = (Container) gridSection.getChildren().get(0);
+    assertEquals(1, cell.getChildren().size());
+    assertEquals("CellContainer", cell.getTemplate());
+    assertEquals("#EE3355", cell.getBorderColor());
+    assertNotNull(cell.getCssClass());
+    assertTrue("'grid-cell' not found", cell.getCssClass().contains("grid-cell"));
+    assertTrue("'grid-cell-colspan-md-2' not found", cell.getCssClass().contains("grid-cell-colspan-md-2"));
+    assertTrue("'grid-cell-colspan-lg-2' not found", cell.getCssClass().contains("grid-cell-colspan-lg-2"));
+    assertTrue("'grid-cell-colspan-xl-2' not found", cell.getCssClass().contains("grid-cell-colspan-xl-2"));
+    assertTrue("'grid-cell-rowspan-md-3' not found", cell.getCssClass().contains("grid-cell-rowspan-md-3"));
+    assertTrue("'grid-cell-rowspan-lg-3' not found", cell.getCssClass().contains("grid-cell-rowspan-lg-3"));
+    assertTrue("'grid-cell-rowspan-xl-3' not found", cell.getCssClass().contains("grid-cell-rowspan-xl-3"));
+    assertTrue("'TEST-grid-cell-class' custom class not found", cell.getCssClass().contains("TEST-grid-cell-class"));
+    assertTrue("'mt-n5' not found", cell.getCssClass().contains("mt-n5"));
+    assertTrue("'mb-n4' not found", cell.getCssClass().contains("mb-n4"));
+    assertTrue("'me-n3' not found", cell.getCssClass().contains("me-n3"));
+    assertTrue("'ms-n1' not found", cell.getCssClass().contains("ms-n1"));
+    assertTrue("'brtr-0' not found", cell.getCssClass().contains("brtr-0"));
+    assertTrue("'brtl-1' not found", cell.getCssClass().contains("brtl-1"));
+    assertTrue("'brbr-2' not found", cell.getCssClass().contains("brbr-2"));
+    assertTrue("'brbl-4' not found", cell.getCssClass().contains("brbl-4"));
+    assertTrue("'hidden-sm-and-down' not found", cell.getCssClass().contains("hidden-sm-and-down"));
   }
 
   public void testNavigation() throws Exception {

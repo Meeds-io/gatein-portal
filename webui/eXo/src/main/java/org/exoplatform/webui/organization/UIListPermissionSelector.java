@@ -240,13 +240,6 @@ public class UIListPermissionSelector extends UISelector<String[]> {
         }
     }
 
-    // static public class CloseActionListener extends EventListener<UIPopupWindow> {
-    // public void execute(Event<UIPopupWindow> event) throws Exception {
-    // // UIPopupWindow uiPopupWindow = event.getSource();
-    // System.out.println("\n\n\n+++++++++++++++++++>>>>>>>>>>>>>>>>>> HUN");
-    // }
-    // }
-
     public static class ChangePublicModeActionListener extends EventListener<UIListPermissionSelector> {
         public void execute(Event<UIListPermissionSelector> event) throws Exception {
             UIListPermissionSelector uicom = event.getSource();

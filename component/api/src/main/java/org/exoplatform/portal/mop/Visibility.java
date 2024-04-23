@@ -46,7 +46,7 @@ public enum Visibility {
     SYSTEM,
 
     /**
-     * The object visibility is system.
+     * The object visibility is draft.
      */
     DRAFT;
 
