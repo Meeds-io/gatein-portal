@@ -132,7 +132,6 @@ public class ObjectWriter extends ObjectOutputStream {
                 if (currentTypeModel instanceof ClassTypeModel<?>) {
                     for (FieldModel<?, ?> fieldModel : currentTypeModel.getFields()) {
                         if (!fieldModel.isTransient()) {
-                            // System.out.println("About to serialize field " + fieldModel + " of type " + currentTypeModel);
                             Object fieldValue = fieldModel.get(obj);
                             if (fieldValue == null) {
                                 output.writeObject(DataKind.NULL_VALUE);

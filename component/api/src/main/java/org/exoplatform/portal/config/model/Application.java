@@ -66,7 +66,7 @@ public class Application<S> extends ModelObject implements Cloneable {
 
     @Getter
     @Setter
-    private ModelStyle             style;
+    private ModelStyle             cssStyle;
 
     public Application(ApplicationData<S> data) {
         super(data.getStorageId());
@@ -228,25 +228,25 @@ public class Application<S> extends ModelObject implements Cloneable {
 
     @Override
     public String getCssClass() {
-      if (cssClass == null && style == null) {
+      if (cssClass == null && cssStyle == null) {
         return null;
+      } else if (cssStyle == null) {
+        return cssClass;
+      } else if (cssClass == null) {
+        return cssStyle.getCssClass();
       } else {
         StringBuilder cssClasses = new StringBuilder();
-        if (cssClass != null) {
-          cssClasses.append(cssClass);
-        }
-        if (style != null) {
-          cssClasses.append(" ");
-          cssClasses.append(style.getCssClass());
-        }
+        cssClasses.append(cssStyle.getCssClass());
+        cssClasses.append(" ");
+        cssClasses.append(cssClass);
         return cssClasses.toString();
       }
     }
 
     @Override
     public String getBorderColor() {
-      if (style != null && style.getBorderColor() != null) {
-        return style.getBorderColor();
+      if (cssStyle != null && cssStyle.getBorderColor() != null) {
+        return cssStyle.getBorderColor();
       } else {
         return super.getBorderColor();
       }

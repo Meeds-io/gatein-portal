@@ -16,16 +16,26 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package org.exoplatform.portal.config.model;
+package org.exoplatform.portal.config.serialize.model;
+
+import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelStyle;
 
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Used for deserializing from pages.xml using JibX
+ */
 @Setter
 @Getter
-public class Column extends Container {
+public class Cell extends Container {
 
   private int        colSpan = 1;
+
+  private int        rowSpan = 1;
+
+  private ModelStyle cssStyle;
 
   @Override
   public String getCssClass() {
@@ -33,14 +43,27 @@ public class Column extends Container {
     if (cssClass != null) {
       cssClasses.append(cssClass);
     }
-    cssClasses.append(" flex-cell");
+    cssClasses.append(" grid-cell");
     cssClasses.append(" grid-cell-colspan-md-").append(colSpan);
     cssClasses.append(" grid-cell-colspan-lg-").append(colSpan);
     cssClasses.append(" grid-cell-colspan-xl-").append(colSpan);
-    cssClasses.append(" grid-cell-rowspan-md-1");
-    cssClasses.append(" grid-cell-rowspan-lg-1");
-    cssClasses.append(" grid-cell-rowspan-xl-1");
+    cssClasses.append(" grid-cell-rowspan-md-").append(rowSpan);
+    cssClasses.append(" grid-cell-rowspan-lg-").append(rowSpan);
+    cssClasses.append(" grid-cell-rowspan-xl-").append(rowSpan);
+    if (cssStyle != null) {
+      cssClasses.append(" ");
+      cssClasses.append(cssStyle.getCssClass());
+    }
     return cssClasses.toString();
+  }
+
+  @Override
+  public String getBorderColor() {
+    if (cssStyle != null && cssStyle.getBorderColor() != null) {
+      return cssStyle.getBorderColor();
+    } else {
+      return super.getBorderColor();
+    }
   }
 
   @Override
