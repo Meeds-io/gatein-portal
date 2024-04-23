@@ -59,8 +59,23 @@ public class TestJDBCNavigationService extends AbstractKernelTest {
     }
 
     protected void createSite(SiteType type, String siteName) throws Exception {
-        ContainerData container = new ContainerData(null, "testcontainer_" + siteName, "", "", "", "", "", "", "",
-                "", "", "", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+      ContainerData container = new ContainerData(null,
+                                                  "testcontainer_" + siteName,
+                                                  "",
+                                                  "",
+                                                  "",
+                                                  "",
+                                                  "",
+                                                  "",
+                                                  "",
+                                                  "",
+                                                  "",
+                                                  "",
+                                                  "",
+                                                  Collections.emptyList(),
+                                                  Collections.emptyList(),
+                                                  Collections.emptyList(),
+                                                  Collections.emptyList());
         PortalData portal = new PortalData(null,
                                            siteName,
                                            type.getName(),

@@ -99,14 +99,4 @@ public final class CharsUtil {
         return -1;
     }
 
-    /*
-     * public static void main(String args[]){ String yahoo =" nhu dinh thuan nhu      dinh  "; String pattern = "dinh";
-     * System.out.println(indexOf(yahoo.toCharArray(), pattern.toCharArray(), 7));
-     * System.out.println(indexOf(yahoo.toCharArray(), 'd', 0)); pattern = "DiNh";
-     * System.out.println(indexOf(yahoo.toCharArray(), pattern.toCharArray(), 7));
-     * System.out.println(indexOfIgnoreCase(yahoo.toCharArray(), pattern.toCharArray(), 7));
-     *
-     * char [] data = cutAndTrim(yahoo.toCharArray(), 19, 31); System.out.println("|"+new String(data)+"|"); data =
-     * cutBySpace(yahoo.toCharArray(), 1); System.out.println("|"+new String(data)+"|"); }
-     */
 }

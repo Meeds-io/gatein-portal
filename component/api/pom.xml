@@ -30,7 +30,7 @@
   <name>GateIn Portal Component API</name>
 
   <properties>
-    <exo.test.coverage.ratio>0</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.01</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
@@ -290,6 +290,11 @@
           <artifactId>slf4j-api</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

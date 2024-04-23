@@ -135,7 +135,7 @@ public class AbstractApplicationHandler implements IMarshaller, IUnmarshaller, I
         String cssClass = nextOptionalTag(ctx, "cssClass");
 
         ModelStyle style = null;
-        if (ctx.isAt(m_uri, "style")) {
+        if (ctx.isAt(m_uri, "css-style")) {
           style = (ModelStyle) ctx.unmarshalElement();
         }
 
@@ -163,7 +163,7 @@ public class AbstractApplicationHandler implements IMarshaller, IUnmarshaller, I
         app.setHeight(height);
         app.setCssClass(cssClass);
         app.setProperties(properties);
-        app.setStyle(style);
+        app.setCssStyle(style);
 
         //
         return app;

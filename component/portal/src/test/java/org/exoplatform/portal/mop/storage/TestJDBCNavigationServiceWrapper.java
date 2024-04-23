@@ -86,6 +86,7 @@ public class TestJDBCNavigationServiceWrapper extends AbstractKernelTest {
                                                   "",
                                                   "",
                                                   "",
+                                                  "",
                                                   Collections.emptyList(),
                                                   Collections.emptyList(),
                                                   Collections.emptyList(),

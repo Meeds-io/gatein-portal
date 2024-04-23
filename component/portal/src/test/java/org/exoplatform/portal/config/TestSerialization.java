@@ -36,9 +36,23 @@ public class TestSerialization extends AbstractGateInTest {
     private final BodyData body = new BodyData("foo", BodyType.PAGE);
 
     /** . */
-    private final ContainerData container = new ContainerData("foo01", "foo02", "foo03", "foo04", "foo05", "foo06", "foo07",
-            "foo08", "foo09", "foo10", "foo11", "foo12", Collections.singletonList("foo11"), Collections.singletonList("foo11"),
-            Collections.singletonList("foo11"), Collections.<ComponentData> singletonList(body));
+    private final ContainerData container = new ContainerData("foo01",
+                                                            "foo02",
+                                                            "foo03",
+                                                            "foo04",
+                                                            "foo05",
+                                                            "foo06",
+                                                            "foo07",
+                                                            "foo08",
+                                                            "foo09",
+                                                            "foo10",
+                                                            "foo11",
+                                                            "foo11.1",
+                                                            "foo12",
+                                                            Collections.singletonList("foo11"),
+                                                            Collections.singletonList("foo11"),
+                                                            Collections.singletonList("foo11"),
+                                                            Collections.<ComponentData> singletonList(body));
 
     public void testNavigationKey() throws Exception {
         NavigationKey key = new NavigationKey("foo", "bar");
@@ -79,6 +93,7 @@ public class TestSerialization extends AbstractGateInTest {
         assertEquals(container.getWidth(), clone.getWidth());
         assertEquals(container.getHeight(), clone.getHeight());
         assertEquals(container.getAccessPermissions(), clone.getAccessPermissions());
+        assertEquals(container.getBorderColor(), clone.getBorderColor());
         List<ComponentData> clonedChildren = container.getChildren();
         assertEquals(1, clonedChildren.size());
         assertEquals("foo", clonedChildren.get(0).getStorageId());
