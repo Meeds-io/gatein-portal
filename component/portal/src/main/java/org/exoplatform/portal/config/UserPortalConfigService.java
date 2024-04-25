@@ -671,12 +671,11 @@ public class UserPortalConfigService implements Startable {
       while (iterator.hasNext() && targetUserNode != null) {
         targetUserNode = targetUserNode.getChild(iterator.next());
       }
-      if (targetUserNode == null) {
-          return nodePath;
-      }
       String newPath = null;
       while (newPath == null) {
-        if (targetUserNode.getPageRef() != null) {
+        if (targetUserNode == null) {
+          return nodePath;
+        } else if (targetUserNode.getPageRef() != null) {
           newPath = targetUserNode.getURI();
         } else if (!targetUserNode.getChildren().isEmpty()) {
           targetUserNode = getFirstAllowedPageNode(targetUserNode.getChildren());
