@@ -31,14 +31,14 @@
 
   <groupId>org.exoplatform.gatein.portal</groupId>
   <artifactId>exo.portal.parent</artifactId>
-  <version>6.6.x-SNAPSHOT</version>
+  <version>7.0.x-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>GateIn - Portal</name>
 
   <properties>
-    <org.exoplatform.gatein.sso.version>6.6.x-SNAPSHOT</org.exoplatform.gatein.sso.version>
-    <org.exoplatform.gatein.pc.version>6.6.x-SNAPSHOT</org.exoplatform.gatein.pc.version>
+    <org.exoplatform.gatein.sso.version>7.0.x-SNAPSHOT</org.exoplatform.gatein.sso.version>
+    <org.exoplatform.gatein.pc.version>7.0.x-SNAPSHOT</org.exoplatform.gatein.pc.version>
     
     <!-- Sonar properties -->
     <sonar.organization>meeds-io</sonar.organization>
