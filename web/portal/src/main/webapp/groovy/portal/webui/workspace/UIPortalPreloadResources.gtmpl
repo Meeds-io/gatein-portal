@@ -1,18 +1,14 @@
 <%
 def rcontext = _ctx.getRequestContext() ;
-%>
-<%
+
 /* Loading needed Fonts files in top of the page as a 'preload' resource to include it in response when using HTTP/2 */
-%>
-  <!-- Fonts Preload -->
-  <link rel="preload" href="/platform-ui/skin/fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/platform-ui/skin/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/platform-ui/skin/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/platform-ui/skin/fonts/materialdesignicons-webfont.woff2?v=5.9.55" as="font" type="font/woff2" crossorigin>
-<%
-// Loading needed stylesheets in top of the page as a 'preload' resource to include it in response
-%>
-  <link rel="preload" as="style" type="text/css" href="<%=uicomponent.getBrandingUrl()%>">
+%><%/* Fonts Preload */%>
+<link rel="preload" href="/platform-ui/skin/fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/platform-ui/skin/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/platform-ui/skin/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/platform-ui/skin/fonts/materialdesignicons-webfont.woff2?v=5.9.55" as="font" type="font/woff2" crossorigin>
+<%/* Loading needed stylesheets in top of the page as a 'preload' resource to include it in response*/%>
+<link rel="preload" as="style" type="text/css" href="<%=uicomponent.getBrandingUrl()%>">
 <%
 // Loading needed stylesheets in top of the page as a 'preload' resource to include it in response
 def portalSkins = uicomponent.getPortalSkins();
@@ -20,8 +16,7 @@ def portalSkins = uicomponent.getPortalSkins();
 for (skinConfig in portalSkins) {
   def url = skinConfig.createURL(rcontext.controllerContext);
   url.setOrientation(orientation);
-%>
-  <link rel="preload" href= "$url" as="style" type="text/css" />
+%><link rel="preload" href= "$url" as="style" type="text/css" />
 <%
 }
 /* Preloded Portlet Skins */
@@ -29,15 +24,12 @@ def portletSkins = uicomponent.getPortletSkins();
 for (portletSkin in portletSkins) {
   def url = portletSkin.createURL(rcontext.controllerContext);
   url.setOrientation(orientation);
-%>
-  <link rel="preload" href= "$url" as="style" type="text/css" />
-<%
+%><link rel="preload" href= "$url" as="style" type="text/css" /><%
 }
 /* Preloded Portlet Stylesheets */
 def portletAdditionalStylesheets = uicomponent.getPortletStylesheets();
 for (portletStylesheet in portletAdditionalStylesheets) {
-%>
-  <link rel="preload" href= "$portletStylesheet" as="style" type="text/css" />
+%><link rel="preload" href= "$portletStylesheet" as="style" type="text/css" />
 <%
 }
 /* Preloded Custom Skins */
@@ -45,8 +37,7 @@ def customSkins = uicomponent.getCustomSkins();
 for (customSkin in customSkins) {
  def url = customSkin.createURL(rcontext.controllerContext);
  url.setOrientation(orientation);
-%>
-  <link rel="preload" href= "$url" as="style" type="text/css" />
+%><link rel="preload" href= "$url" as="style" type="text/css" />
 <%
 }
 /* Preloded Scripts */
@@ -58,8 +49,7 @@ def scriptsIds = scriptsIdsMap.keySet();
 for (scriptsId in scriptsIds) {
   def isRemote = scriptsIdsMap.get(scriptsId) || !jsConfigPaths.has(scriptsId);
   def scriptPath = isRemote ? scriptsId : (jsConfigPaths.get(scriptsId) + ".js");
-%>
-  <link rel="preload" href= "$scriptPath" as="script" type="text/javascript" <%=isRemote ? "crossorigin" : "" %>/>
+%><link rel="preload" href= "$scriptPath" as="script" type="text/javascript" <%=isRemote ? "crossorigin" : "" %>/>
 <% 
 }
 %>

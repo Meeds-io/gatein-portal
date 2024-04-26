@@ -55,16 +55,7 @@ public class Container extends ModelObject implements Cloneable {
 
   protected String                 description;
 
-  protected String                 width;
-
-  protected String                 height;
-
-  protected String                 cssClass;
-
   protected String                 profiles;
-
-  // Here to please jibx binding but not used anymore
-  protected String                 decorator;
 
   protected String[]               accessPermissions;
 
@@ -76,27 +67,18 @@ public class Container extends ModelObject implements Cloneable {
 
   public Container() {
     setDefaultPermissions();
-    children = new ArrayList<ModelObject>();
+    children = new ArrayList<>();
   }
 
   public Container(String storageId) {
     super(storageId);
     setDefaultPermissions();
     //
-    this.children = new ArrayList<ModelObject>();
+    this.children = new ArrayList<>();
   }
 
   public Container(ContainerData data) {
     super(data.getStorageId());
-
-    //
-    ArrayList<ModelObject> children = new ArrayList<ModelObject>();
-    for (ComponentData child : data.getChildren()) {
-      ModelObject m = ModelObject.build(child);
-      if (m != null) {
-        children.add(ModelObject.build(child));
-      }
-    }
 
     //
     this.id = data.getId();
@@ -109,13 +91,20 @@ public class Container extends ModelObject implements Cloneable {
     this.width = data.getWidth();
     this.height = data.getHeight();
     this.cssClass = data.getCssClass();
+    this.borderColor = data.getBorderColor();
     this.profiles = data.getProfiles();
     this.accessPermissions = data.getAccessPermissions().toArray(new String[data.getAccessPermissions().size()]);
     List<String> permisssions = data.getMoveAppsPermissions();
     this.moveAppsPermissions = permisssions != null ? permisssions.toArray(new String[permisssions.size()]) : null;
     permisssions = data.getMoveContainersPermissions();
     this.moveContainersPermissions = permisssions != null ? permisssions.toArray(new String[permisssions.size()]) : null;
-    this.children = children;
+    this.children = new ArrayList<>();
+    for (ComponentData child : data.getChildren()) {
+      ModelObject m = ModelObject.build(child);
+      if (m != null) {
+        children.add(ModelObject.build(child));
+      }
+    }
   }
 
   private void setDefaultPermissions() {
@@ -155,22 +144,6 @@ public class Container extends ModelObject implements Cloneable {
 
   public void setChildren(ArrayList<ModelObject> children) {
     this.children = children;
-  }
-
-  public String getHeight() {
-    return height;
-  }
-
-  public void setHeight(String height) {
-    this.height = height;
-  }
-
-  public String getWidth() {
-    return width;
-  }
-
-  public void setWidth(String width) {
-    this.width = width;
   }
 
   public String getDescription() {
@@ -229,24 +202,6 @@ public class Container extends ModelObject implements Cloneable {
     this.moveContainersPermissions = moveContainersPermissions;
   }
 
-  public String getDecorator() {
-    // Here to please jibx binding but not used anymore
-    return null;
-  }
-
-  // Here to please jibx binding but not used anymore
-  public void setDecorator(String decorator) {
-    // Here to please jibx binding but not used anymore
-  }
-
-  public String getCssClass() {
-    return cssClass;
-  }
-
-  public void setCssClass(String cssClass) {
-    this.cssClass = cssClass;
-  }
-
   public String getProfiles() {
     return profiles;
   }
@@ -257,54 +212,50 @@ public class Container extends ModelObject implements Cloneable {
 
   @Override
   public ContainerData build() {
-    List<ComponentData> children = buildChildren();
-    return new ContainerData(storageId,
-                             id,
-                             name,
-                             icon,
-                             template,
-                             factoryId,
-                             title,
-                             description,
-                             width,
-                             height,
-                             cssClass,
-                             profiles,
+    return new ContainerData(getStorageId(),
+                             getId(),
+                             getName(),
+                             getIcon(),
+                             getTemplate(),
+                             getFactoryId(),
+                             getTitle(),
+                             getDescription(),
+                             getWidth(),
+                             getHeight(),
+                             getCssClass(),
+                             getBorderColor(),
+                             getProfiles(),
                              Utils.safeImmutableList(accessPermissions),
                              Utils.safeImmutableList(moveAppsPermissions),
                              Utils.safeImmutableList(moveContainersPermissions),
-                             children);
+                             buildChildren());
   }
 
   @Override
   public void resetStorage() {
     super.resetStorage();
-    if (children != null && !children.isEmpty()) {
-      for (ModelObject child : children) {
+    if (getChildren() != null && !getChildren().isEmpty()) {
+      for (ModelObject child : getChildren()) {
         child.resetStorage();
       }
     }
   }
 
   @Override
-  public Container clone() {
-    try {
-      return (Container) super.clone();
-    } catch (CloneNotSupportedException e) {
-      return new Container(build());
-    }
+  public Container clone() { // NOSONAR
+    return new Container(build());
   }
 
-  protected List<ComponentData> buildChildren() {
-    if (StringUtils.isNotBlank(profiles)) {
-      Set<String> activeProfiles = Tools.parseCommaList(profiles);
+  protected List<ComponentData> buildChildren() { // NOSONAR
+    if (StringUtils.isNotBlank(getProfiles())) {
+      Set<String> activeProfiles = Tools.parseCommaList(getProfiles());
       if (ExoContainer.getProfiles()
                       .stream()
                       .noneMatch(activeProfiles::contains)) {
         return Collections.emptyList();
       }
     }
-    if (children != null && !children.isEmpty()) {
+    if (getChildren() != null && !getChildren().isEmpty()) {
       ArrayList<ComponentData> dataChildren = new ArrayList<>();
       for (int i = 0; i < children.size(); i++) {
         ModelObject node = children.get(i);

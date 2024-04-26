@@ -62,4 +62,5 @@ public class PageTemplateService {
   public List<SelectItemOption<String>> getPageTemplates() {
     return categories.stream().map(SelectItemCategory::getSelectItemOptions).flatMap(Collection::stream).toList();
   }
+
 }

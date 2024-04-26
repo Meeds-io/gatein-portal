@@ -146,7 +146,6 @@ public class LayoutStorage {
     return state;
   }
 
-  @SuppressWarnings("rawtypes")
   public <S> String getId(ApplicationState<S> state) {
     if (state instanceof TransientApplicationState) {
       TransientApplicationState<S> tstate = (TransientApplicationState<S>) state;
@@ -411,7 +410,8 @@ public class LayoutStorage {
 
     boolean hasProfiles = StringUtils.isNotBlank(src.getProfiles());
     boolean hasCssClass = StringUtils.isNotBlank(src.getCssClass());
-    if (hasProfiles || hasCssClass) {
+    boolean hasBorderColor = StringUtils.isNotBlank(src.getBorderColor());
+    if (hasProfiles || hasCssClass || hasBorderColor) {
       JSONObject properties = new JSONObject();
       if (hasProfiles) {
         properties.put(MappedAttributes.PROFILES.getName(), src.getProfiles());
@@ -419,13 +419,16 @@ public class LayoutStorage {
       if (hasCssClass) {
         properties.put(MappedAttributes.CSS_CLASS.getName(), src.getCssClass());
       }
+      if (hasBorderColor) {
+        properties.put(MappedAttributes.BORDER_COLOR.getName(), src.getBorderColor());
+      }
       dst.setProperties(properties.toJSONString());
     }
 
     return dst;
   }
 
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private WindowEntity buildWindowEntity(WindowEntity dst, ApplicationData srcChild) {
     if (dst == null) {
       dst = new WindowEntity();
@@ -452,7 +455,6 @@ public class LayoutStorage {
     dst.setDescription(srcChild.getDescription());
     dst.setHeight(srcChild.getHeight());
     dst.setIcon(srcChild.getIcon());
-    dst.setProperties(toJSONString(srcChild.getProperties()));
     dst.setShowApplicationMode(srcChild.isShowApplicationMode());
     dst.setShowApplicationState(srcChild.isShowApplicationState());
     dst.setShowInfoBar(srcChild.isShowInfoBar());
@@ -460,6 +462,20 @@ public class LayoutStorage {
     dst.setTitle(srcChild.getTitle());
     dst.setWidth(srcChild.getWidth());
 
+    boolean hasCssClass = StringUtils.isNotBlank(srcChild.getCssClass());
+    boolean hasBorderColor = StringUtils.isNotBlank(srcChild.getBorderColor());
+    if (hasCssClass || hasBorderColor) {
+      JSONObject properties = srcChild.getProperties() == null ? new JSONObject() : new JSONObject(srcChild.getProperties());
+      if (hasCssClass) {
+        properties.put(MappedAttributes.CSS_CLASS.getName(), srcChild.getCssClass());
+      }
+      if (hasBorderColor) {
+        properties.put(MappedAttributes.BORDER_COLOR.getName(), srcChild.getBorderColor());
+      }
+      dst.setProperties(properties.toJSONString());
+    } else {
+      dst.setProperties(toJSONString(srcChild.getProperties()));
+    }
     return dst;
   }
 
@@ -514,6 +530,18 @@ public class LayoutStorage {
                                                                  windowEntity.getId(),
                                                                  PermissionEntity.TYPE.ACCESS);
 
+    String cssClass = null;
+    String borderColor = null;
+    JSONObject attrs = windowEntity.getProperties() == null ? null : parseJsonObject(windowEntity.getProperties());
+    if (attrs != null) {
+      if (attrs.containsKey(MappedAttributes.CSS_CLASS.getName())) {
+        cssClass = (String) attrs.get(MappedAttributes.CSS_CLASS.getName());
+      }
+      if (attrs.containsKey(MappedAttributes.BORDER_COLOR.getName())) {
+        borderColor = (String) attrs.get(MappedAttributes.BORDER_COLOR.getName());
+      }
+    }
+
     return new ApplicationData(String.valueOf(windowEntity.getId()),
                                null,
                                appType,
@@ -528,6 +556,8 @@ public class LayoutStorage {
                                windowEntity.getTheme(),
                                windowEntity.getWidth(),
                                windowEntity.getHeight(),
+                               cssClass,
+                               borderColor,
                                properties,
                                buildPermission(access));
   }
@@ -554,10 +584,14 @@ public class LayoutStorage {
                                                                   PermissionEntity.TYPE.MOVE_CONTAINER);
 
     String cssClass = null;
+    String borderColor = null;
     String profiles = null;
     if (attrs != null) {
       if (attrs.containsKey(MappedAttributes.CSS_CLASS.getName())) {
         cssClass = (String) attrs.get(MappedAttributes.CSS_CLASS.getName());
+      }
+      if (attrs.containsKey(MappedAttributes.BORDER_COLOR.getName())) {
+        borderColor = (String) attrs.get(MappedAttributes.BORDER_COLOR.getName());
       }
       if (attrs.containsKey(MappedAttributes.PROFILES.getName())) {
         profiles = (String) attrs.get(MappedAttributes.PROFILES.getName());
@@ -575,6 +609,7 @@ public class LayoutStorage {
                              entity.getWidth(),
                              entity.getHeight(),
                              cssClass,
+                             borderColor,
                              profiles,
                              buildPermission(access),
                              buildPermission(moveApps),
@@ -597,6 +632,9 @@ public class LayoutStorage {
           results.add(buildWindow(windows.get(id)));
         } else if (type == TYPE.CONTAINER) {
           ContainerEntity srcContainer = containerDAO.find(id);
+          if (srcContainer == null) {
+            continue;
+          }
           JSONObject attrs = parseJsonObject(srcContainer.getProperties());
           String ctype = (String) attrs.get(MappedAttributes.TYPE.getName());
           if (BodyType.PAGE.name().equals(ctype)) {
@@ -616,7 +654,6 @@ public class LayoutStorage {
     return results;
   }
 
-  @SuppressWarnings("rawtypes")
   private List<ComponentEntity> saveChildren(List<ComponentData> children) { // NOSONAR
     List<ComponentEntity> results = new LinkedList<>();
 
@@ -746,7 +783,7 @@ public class LayoutStorage {
   }
 
   @SuppressWarnings({
-      "unchecked", "rawtypes"
+      "unchecked"
   })
   private void savePermissions(Long id, ComponentData srcChild) {
     if (id == null) {

@@ -50,14 +50,19 @@ import org.exoplatform.portal.config.*;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserNode;
+import org.exoplatform.portal.mop.user.UserNodeFilterConfig;
+import org.exoplatform.portal.mop.user.UserNodeFilterConfig.Builder;
 import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.portal.mop.user.UserPortalContext;
 import org.exoplatform.portal.url.PortalURLContext;
+import org.exoplatform.portal.webui.page.UIPage;
+import org.exoplatform.portal.webui.page.UIPageBody;
 import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.portal.webui.workspace.UIPortalApplication;
@@ -69,6 +74,7 @@ import org.exoplatform.services.resources.ResourceBundleManager;
 import org.exoplatform.services.security.IdentityConstants;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.application.JavascriptManager;
+import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.web.application.URLBuilder;
 import org.exoplatform.web.security.sso.SSOHelper;
 import org.exoplatform.web.url.PortalURL;
@@ -151,6 +157,9 @@ public class PortalRequestContext extends WebuiRequestContext {
     @Setter
     private boolean hideSharedLayout;
 
+    @Setter
+    private Boolean draftPage;
+
     private boolean forceFullUpdate = false;
 
     private Writer writer_;
@@ -181,6 +190,18 @@ public class PortalRequestContext extends WebuiRequestContext {
     private UserPortalConfig userPortalConfig;
 
     private PortalConfig currentPortalConfig;
+
+    @Getter
+    @Setter
+    private UIPortal                       uiPortal;
+
+    @Getter
+    @Setter
+    private UIPage                         uiPage;
+
+    @Getter
+    @Setter
+    private UserNode                       userNode;
 
     public JavascriptManager getJavascriptManager() {
         return jsmanager_;
@@ -294,6 +315,27 @@ public class PortalRequestContext extends WebuiRequestContext {
         }
     }
 
+    public boolean isDraftPage() {
+      if (draftPage == null) {
+        UserNode navigationNode = getNavigationNode();
+        draftPage = navigationNode != null && navigationNode.getVisibility() == Visibility.DRAFT;
+      }
+      return draftPage.booleanValue();
+    }
+
+    public UserNode getNavigationNode() {
+      if (userNode != null) {
+        return userNode;
+      }
+      UserPortal userPortal = getUserPortalConfig().getUserPortal();
+      UserNavigation navigation = userPortal.getNavigation(siteKey);
+      if (navigation != null) {
+        Builder builder = UserNodeFilterConfig.builder().withReadCheck();
+        userNode = userPortal.resolvePath(navigation, builder.build(), nodePath_);
+      }
+      return userNode;
+    }
+
     public UserPortalConfig getUserPortalConfig() {
         String remoteUser = null;
         if (userPortalConfig == null) {
@@ -401,7 +443,7 @@ public class PortalRequestContext extends WebuiRequestContext {
 
         //
         if (title == null) {
-            UIPortal uiportal = Util.getUIPortal();
+            UIPortal uiportal = getUiPortal();
 
             //
             UserNode node = uiportal.getSelectedUserNode();
@@ -717,4 +759,16 @@ public class PortalRequestContext extends WebuiRequestContext {
                 controllerContext.getParameter(RequestNavigationData.REQUEST_SITE_NAME),
                 controllerContext.getParameter(RequestNavigationData.REQUEST_PATH));
     }
+
+    public static PortalRequestContext getCurrentInstance() {
+        RequestContext currentInstance = RequestContext.getCurrentInstance();
+        if (currentInstance == null) {
+          return null;
+        } else if (currentInstance instanceof PortalRequestContext portalRequestContext) {
+          return portalRequestContext;
+        } else {
+          return (PortalRequestContext) currentInstance.getParentAppRequestContext();
+        }
+    }
+
 }

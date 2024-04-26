@@ -170,7 +170,6 @@ public class PortalDataMapper {
         model.setSkin(uiPortal.getSkin());
         model.setModifiable(uiPortal.isModifiable());
         model.setProperties(uiPortal.getProperties());
-        model.setPortalRedirects(uiPortal.getPortalRedirects());
         model.setDefaultLayout(uiPortal.isUseDynamicLayout());
 
         model.setPortalLayout(new Container());
@@ -322,7 +321,6 @@ public class PortalDataMapper {
         uiPortal.setAccessPermissions(model.getAccessPermissions());
         uiPortal.setEditPermission(model.getEditPermission());
         uiPortal.setProperties(model.getProperties());
-        uiPortal.setRedirects(model.getPortalRedirects());
         uiPortal.setUseDynamicLayout(model.isDefaultLayout());
         UserPortalConfigService userPortalConfigService = uiPortal.getApplicationComponent(UserPortalConfigService.class);
         PortalConfig metaSite = userPortalConfigService.getMetaPortalConfig();
@@ -357,7 +355,9 @@ public class PortalDataMapper {
             UIPortlet uiPortlet = uiContainer.createUIComponent(context, UIPortlet.class, null, null);
             uiPortlet.setStorageId(application.getStorageId());
             if (application.getStorageName() != null) {
-                uiPortlet.setStorageName(application.getStorageName());
+              uiPortlet.setStorageName(application.getStorageName());
+            } else {
+              uiPortlet.setStorageName(application.getStorageId());
             }
             toUIPortlet(uiPortlet, application);
             uiComponent = uiPortlet;

@@ -23,18 +23,18 @@ import org.exoplatform.container.ExoContainer;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.config.model.PageBody;
+import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.user.UserNode;
 import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
 import org.exoplatform.portal.webui.util.Util;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.core.UIComponentDecorator;
-import org.exoplatform.services.log.Log;
-import org.exoplatform.services.log.ExoLogger;
 
 /**
  * May 19, 2006
@@ -44,12 +44,10 @@ public class UIPageBody extends UIComponentDecorator {
 
     private String storageId;
 
-    private String pageName;
-
     /** . */
     private final Log log = ExoLogger.getLogger(UIPageBody.class);
 
-    public UIPageBody(PageBody model) {
+    public UIPageBody() {
         setId("UIPageBody");
     }
 
@@ -61,45 +59,53 @@ public class UIPageBody extends UIComponentDecorator {
         this.storageId = storageId;
     }
 
-    public UIPageBody() {
-        setId("UIPageBody");
-    }
-
-    public void init(PageBody model) {
-        setId("UIPageBody");
-    }
-
     public String getPageName() {
-      return pageName;
+      UIPage uiPage = getUIPage();
+      return uiPage == null ? null : uiPage.getName();
     }
 
     public void setPageBody(UserNode pageNode, UIPortal uiPortal) throws Exception {
-        PortalRequestContext context = Util.getPortalRequestContext();
-        uiPortal.setMaximizedUIComponent(null);
+      PortalRequestContext context = Util.getPortalRequestContext();
+      uiPortal.setMaximizedUIComponent(null);
 
-        UIPage uiPage = getUIPage(pageNode, uiPortal, context);
+      UIPage uiPage = getUIPage();
+      if (uiPage == null) {
+        uiPage = getUIPage(pageNode, uiPortal, context);
         if (uiPage == null) {
-            setUIComponent(null);
-            return;
+          setUIComponent(null);
+          return;
         }
-
         setUIComponent(uiPage);
-        pageName = uiPage.getName();
-        if (uiPage.isShowMaxWindow()) {
-          context.setShowMaxWindow(true);
+      }
+
+      if (uiPage.isShowMaxWindow()) {
+        context.setShowMaxWindow(true);
+      }
+      if (uiPage.isHideSharedLayout()) {
+        context.setHideSharedLayout(true);
+      }
+      if (context.isShowMaxWindow()) {
+        uiPortal.setMaximizedUIComponent(uiPage);
+      } else {
+        UIComponent maximizedComponent = uiPortal.getMaximizedUIComponent();
+        if (maximizedComponent instanceof UIPage) {
+          uiPortal.setMaximizedUIComponent(null);
         }
-        if (uiPage.isHideSharedLayout()) {
-          context.setHideSharedLayout(true);
-        }
-        Util.getUIPortalApplication().setCurrentPage(uiPage);
-        if (context.isShowMaxWindow()) {
-            uiPortal.setMaximizedUIComponent(uiPage);
-        } else {
-            UIComponent maximizedComponent = uiPortal.getMaximizedUIComponent();
-            if (maximizedComponent instanceof UIPage) {
-                uiPortal.setMaximizedUIComponent(null);
-            }
-        }
+      }
+    }
+
+    @Override
+    public UIComponent getUIComponent() {
+      return PortalRequestContext.getCurrentInstance().getUiPage();
+    }
+
+    @Override
+    protected void setChildComponent(UIComponent uicomponent) {
+      PortalRequestContext.getCurrentInstance().setUiPage((UIPage) uicomponent);
+    }
+
+    public UIPage getUIPage() {
+      return (UIPage) getUIComponent();
     }
 
     /**
@@ -114,8 +120,7 @@ public class UIPageBody extends UIComponentDecorator {
         PageContext pageContext = null;
         String pageReference = null;
         ExoContainer appContainer = context.getApplication().getApplicationServiceContainer();
-        UserPortalConfigService userPortalConfigService = (UserPortalConfigService) appContainer
-                .getComponentInstanceOfType(UserPortalConfigService.class);
+        UserPortalConfigService userPortalConfigService = appContainer.getComponentInstanceOfType(UserPortalConfigService.class);
 
         if (pageNode != null && pageNode.getPageRef() != null) {
             pageReference = pageNode.getPageRef().format();
@@ -129,26 +134,26 @@ public class UIPageBody extends UIComponentDecorator {
             return null;
         }
 
-        UIPage uiPage = uiPortal.getUIPage(pageReference);
-        if (uiPage != null) {
-            return uiPage;
-        }
-
+        getRequestContext().setDraftPage(pageNode.getVisibility() == Visibility.DRAFT);
         try {
-            UIPageFactory clazz = UIPageFactory.getInstance(pageContext.getState().getFactoryId());
-            uiPage = clazz.createUIPage(context);
-
-            Page page = userPortalConfigService.getDataStorage().getPage(pageReference);
-            pageContext.update(page);
-            PortalDataMapper.toUIPage(uiPage, page);
-            uiPortal.setUIPage(pageReference, uiPage);
+            UIPage uiPage = uiPortal.getUIPage(pageReference);
+            if (uiPage == null) {
+              UIPageFactory clazz = UIPageFactory.getInstance(pageContext.getState().getFactoryId());
+              uiPage = clazz.createUIPage(context);
+              Page page = userPortalConfigService.getDataStorage().getPage(pageReference);
+              pageContext.update(page);
+              PortalDataMapper.toUIPage(uiPage, page);
+            }
+            return uiPage;
         } catch (Exception e) {
             if (log.isDebugEnabled()) {
                 log.debug("Could not handle page '" + pageContext.getKey().format() + "'.", e);
             }
             throw e;
         }
+    }
 
-        return uiPage;
+    private PortalRequestContext getRequestContext() {
+      return PortalRequestContext.getCurrentInstance();
     }
 }

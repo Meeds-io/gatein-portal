@@ -58,9 +58,8 @@ public class TestSkipCommentReader extends TestCase {
         skipCommentReader.setCommentBlockHandler(new CommentBlockHandler.OrientationCommentBlockHandler());
 
         for (int i = 0; i < 30; i++) {
-            String line = skipCommentReader.readLine();
-            System.out.println(line);
-            line = skipCommentReader.readLine();
+            skipCommentReader.readLine();
+            skipCommentReader.readLine();
         }
     }
 

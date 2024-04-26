@@ -20,12 +20,13 @@
 package org.exoplatform.portal.config.model;
 
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.portal.application.Preference;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.ApplicationData;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
-import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * May 13, 2004
@@ -54,10 +55,6 @@ public class Application<S> extends ModelObject implements Cloneable {
 
     private String theme;
 
-    private String width;
-
-    private String height;
-
     private Properties properties;
 
     private String[] accessPermissions;
@@ -66,6 +63,10 @@ public class Application<S> extends ModelObject implements Cloneable {
 
     /** We cannot allow the type to change once the object is created. */
     private final ApplicationType<S> type;
+
+    @Getter
+    @Setter
+    private ModelStyle             cssStyle;
 
     public Application(ApplicationData<S> data) {
         super(data.getStorageId());
@@ -86,6 +87,8 @@ public class Application<S> extends ModelObject implements Cloneable {
         this.theme = data.getTheme();
         this.width = data.getWidth();
         this.height = data.getHeight();
+        this.cssClass = data.getCssClass();
+        this.borderColor = data.getBorderColor();
         this.properties = new Properties(data.getProperties());
         this.accessPermissions = data.getAccessPermissions().toArray(new String[data.getAccessPermissions().size()]);
         this.type = data.getType();
@@ -224,10 +227,51 @@ public class Application<S> extends ModelObject implements Cloneable {
     }
 
     @Override
+    public String getCssClass() {
+      if (cssClass == null && cssStyle == null) {
+        return null;
+      } else if (cssStyle == null) {
+        return cssClass;
+      } else if (cssClass == null) {
+        return cssStyle.getCssClass();
+      } else {
+        StringBuilder cssClasses = new StringBuilder();
+        cssClasses.append(cssStyle.getCssClass());
+        cssClasses.append(" ");
+        cssClasses.append(cssClass);
+        return cssClasses.toString();
+      }
+    }
+
+    @Override
+    public String getBorderColor() {
+      if (cssStyle != null && cssStyle.getBorderColor() != null) {
+        return cssStyle.getBorderColor();
+      } else {
+        return super.getBorderColor();
+      }
+    }
+
+    @Override
     public ApplicationData build() {
-        return new ApplicationData<S>(storageId, storageName, getType(), state, id, title, icon, description, showInfoBar,
-                showApplicationState, showApplicationMode, theme, width, height, Utils.safeImmutableMap(properties),
-                Utils.safeImmutableList(accessPermissions));
+      return new ApplicationData<S>(getStorageId(),
+                                    getStorageName(),
+                                    getType(),
+                                    getState(),
+                                    getId(),
+                                    getTitle(),
+                                    getIcon(),
+                                    getDescription(),
+                                    getShowInfoBar(),
+                                    getShowApplicationState(),
+                                    getShowApplicationMode(),
+                                    getTheme(),
+                                    getWidth(),
+                                    getHeight(),
+                                    getCssClass(),
+                                    getBorderColor(),
+                                    Utils.safeImmutableMap(properties),
+                                    Utils.safeImmutableList(accessPermissions));
     }
 
     public static Application<Portlet> createPortletApplication(ApplicationData<Portlet> data) {
