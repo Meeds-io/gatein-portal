@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,6 +36,8 @@ import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.configuration.ConfigurationManager;
+import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
@@ -47,6 +50,8 @@ import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.portal.mop.storage.DescriptionStorage;
 import org.exoplatform.portal.mop.storage.PageStorage;
 import org.exoplatform.portal.mop.storage.SiteStorage;
 import org.exoplatform.portal.mop.user.UserNavigation;
@@ -62,9 +67,11 @@ import org.exoplatform.services.organization.GroupHandler;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
+import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.test.mock.MockHttpServletRequest;
+import org.exoplatform.test.mocks.servlet.MockServletRequest;
 
 import jakarta.servlet.http.HttpServletRequest;
 import junit.framework.AssertionFailedError;
@@ -154,6 +161,58 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
       map.put(nav.getKey().getType().getName() + "::" + nav.getKey().getName(), nav);
     }
     return map;
+  }
+
+  public void testComputePortalSitePath() {
+    new UnitTest() {
+      public void execute() throws Exception {
+        NewPortalConfig config = new NewPortalConfig("classpath:/org/exoplatform/portal/config/conf");
+        config.setOwnerType("portal");
+        config.setOverrideMode(true);
+        config.setImportMode("merge");
+        HashSet<String> owners = new HashSet<>();
+        owners.add("test2");
+        config.setPredefinedOwner(owners);
+        NewPortalConfigListener newPortalConfigListener = new NewPortalConfigListener(userPortalConfigSer_,
+                                                                                      layoutService,
+                                                                                      getContainer().getComponentInstanceOfType(ConfigurationManager.class),
+                                                                                      new InitParams(),
+                                                                                      getContainer().getComponentInstanceOfType(NavigationService.class),
+                                                                                      getContainer().getComponentInstanceOfType(DescriptionStorage.class),
+                                                                                      getContainer().getComponentInstanceOfType(UserACL.class),
+                                                                                      getContainer().getComponentInstanceOfType(LocaleConfigService.class));
+        newPortalConfigListener.initPortalConfigDB(config);
+        newPortalConfigListener.initPageDB(config);
+        newPortalConfigListener.initPageNavigationDB(config);
+
+        UserPortalConfig userPortalCfg = userPortalConfigSer_.getUserPortalConfig("test2", "root");
+        assertNotNull(userPortalCfg);
+        PortalConfig portalCfg = userPortalCfg.getPortalConfig();
+        assertNotNull(portalCfg);
+        assertEquals(PortalConfig.PORTAL_TYPE, portalCfg.getType());
+        assertEquals("test2", portalCfg.getName());
+
+        String path = userPortalConfigSer_.computePortalSitePath("test2", new MockServletRequest(null, Locale.ENGLISH) {
+          @Override
+          public String getRemoteUser() {
+            return "root";
+          }
+        });
+        assertEquals("/portal/test2/test", path);
+
+        restartTransaction();
+        layoutService.remove(PageKey.parse("portal::test2::test"));
+        restartTransaction();
+
+        path = userPortalConfigSer_.computePortalSitePath("test2", new MockServletRequest(null, Locale.ENGLISH) {
+          @Override
+          public String getRemoteUser() {
+            return "root";
+          }
+        });
+        assertEquals("/portal/test2/home/page", path);
+      }
+    }.execute("root");
   }
 
   public void testUpdatePortalConfig() {
@@ -246,13 +305,14 @@ public class TestUserPortalConfigService extends AbstractConfigTest {
     new UnitTest() {
       public void execute() throws Exception {
         userPortalConfigSer_.removeUserPortalConfig("jazz");
-        assertEquals(5, userPortalConfigSer_.getUserPortalSites().size());
+        int size = userPortalConfigSer_.getUserPortalSites().size();
+        assertTrue(size >= 5);
 
         String originalGlobalPortal = userPortalConfigSer_.globalPortal_;
         userPortalConfigSer_.globalPortal_ = "system";
         userPortalConfigSer_.siteFilter.setExcludedSiteName(userPortalConfigSer_.getGlobalPortal());
         try {
-          assertEquals(4, userPortalConfigSer_.getUserPortalSites().size());
+          assertEquals(size - 1, userPortalConfigSer_.getUserPortalSites().size());
         } finally {
           userPortalConfigSer_.globalPortal_ = originalGlobalPortal;
         }
