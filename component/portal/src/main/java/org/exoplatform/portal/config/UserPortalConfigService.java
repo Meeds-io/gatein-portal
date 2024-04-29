@@ -621,7 +621,7 @@ public class UserPortalConfigService implements Startable {
         return Collections.emptyList();
       }
       UserNodeFilterConfig builder = UserNodeFilterConfig.builder()
-                                                         .withReadWriteCheck()
+                                                         .withReadCheck()
                                                          .withVisibility(Visibility.DISPLAYED, Visibility.TEMPORAL)
                                                          .withTemporalCheck()
                                                          .build();
@@ -648,7 +648,7 @@ public class UserPortalConfigService implements Startable {
     public UserNode getFirstAllowedPageNode(Collection<UserNode> userNodes) {
       UserNode userNode = null;
       for (UserNode node : userNodes) {
-        if (node.getPageRef() != null) {
+        if (node.getPageRef() != null && layoutService.getPage(node.getPageRef()) != null) {
           userNode = node;
           break;
         } else if (node.getChildren() != null && !node.getChildren().isEmpty()) {
