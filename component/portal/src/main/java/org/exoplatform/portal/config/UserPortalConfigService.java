@@ -631,7 +631,16 @@ public class UserPortalConfigService implements Startable {
 
     public UserNode getPortalSiteRootNode(String siteName,String siteType, HttpServletRequest context) throws Exception {
       HttpUserPortalContext userPortalContext = new HttpUserPortalContext(context);
-      UserPortalConfig userPortalConfig = getUserPortalConfig(siteName, context.getRemoteUser(), userPortalContext);
+      UserPortalConfig userPortalConfig = null;
+      String username = context.getRemoteUser();
+      if (StringUtils.equalsIgnoreCase(siteType, PortalConfig.PORTAL_TYPE)) {
+        userPortalConfig = getUserPortalConfig(siteName, username, userPortalContext);
+      } else {
+        PortalConfig defaultPortalConfig = getUserPortalSites().stream().findFirst().orElse(null);
+        if (defaultPortalConfig != null) {
+          userPortalConfig = getUserPortalConfig(defaultPortalConfig.getName(), username, userPortalContext);
+        }
+      }
       if (userPortalConfig == null) {
         return null;
       }

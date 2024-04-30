@@ -908,14 +908,17 @@ public class UIPortalApplication extends UIApplication {
      * skins to reload are set in the {@code <div class="PortalResponseScript">}
      */
     public void processRender(WebuiRequestContext context) throws Exception {
-      String maximizedPortletStorageId = getMaximizedPortletStorageId();
-      if (StringUtils.isNotBlank(maximizedPortletStorageId)) {
+      String maximizedPortletId = getMaximizedPortletId();
+      if (StringUtils.isNotBlank(maximizedPortletId)) {
         List<UIPortlet> uiPortlets = new ArrayList<>();
-        findComponentOfType(uiPortlets, UIPortlet.class);
+        getCurrentPage().findComponentOfType(uiPortlets, UIPortlet.class);
         UIPortlet maximizedUiPortlet = uiPortlets.stream()
-                                                 .filter(p -> StringUtils.equals(p.getStorageId(), maximizedPortletStorageId))
+                                                 .filter(p -> StringUtils.equals(p.getStorageId(), maximizedPortletId)
+                                                              || StringUtils.equals(p.getId(), maximizedPortletId))
                                                  .findFirst()
-                                                 .orElseThrow();
+                                                 .orElseThrow(() -> new IllegalStateException(String.format("Portlet with id %s to maximize wasn't found in page with title '%s'",
+                                                                                                            maximizedPortletId,
+                                                                                                            getCurrentPage().getTitle())));
 
         UIPage uiPage = findFirstComponentOfType(UIPage.class);
         uiPage.normalizePortletWindowStates();
@@ -1014,7 +1017,7 @@ public class UIPortalApplication extends UIApplication {
             w.write("</div>");
         }
       } finally {
-        if (StringUtils.isNotBlank(maximizedPortletStorageId)) {
+        if (StringUtils.isNotBlank(maximizedPortletId)) {
           UIPage uiPage = findFirstComponentOfType(UIPage.class);
           uiPage.setMaximizedUIPortlet(null);
           uiPage.normalizePortletWindowStates();
@@ -1242,10 +1245,10 @@ public class UIPortalApplication extends UIApplication {
     }
 
     private boolean isMaximizePortlet() {
-      return StringUtils.isNotBlank(getMaximizedPortletStorageId());
+      return StringUtils.isNotBlank(getMaximizedPortletId());
     }
 
-    private String getMaximizedPortletStorageId() {
+    private String getMaximizedPortletId() {
       PortalRequestContext prContext = Util.getPortalRequestContext();
       HttpServletRequest req = prContext.getRequest();
       return req.getParameter("maximizedPortletId");
