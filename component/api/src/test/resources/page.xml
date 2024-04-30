@@ -57,6 +57,7 @@
             <border-color>#CCAABB</border-color>
           </css-style>
         </portlet-application>
+        <container />
       </column>
       <!-- Minimum declaration of a column -->
       <column col-span="3" />

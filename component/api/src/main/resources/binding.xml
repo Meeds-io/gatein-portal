@@ -97,6 +97,7 @@
       deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions" />
     <collection field="children" ordered="false">
       <structure map-as="org.exoplatform.portal.config.serialize.PortletApplication" usage="optional"/>
+      <structure map-as="org.exoplatform.portal.config.model.Container" usage="optional"/>
     </collection>
   </mapping>
 
