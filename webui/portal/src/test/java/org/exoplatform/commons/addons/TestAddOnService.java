@@ -26,6 +26,7 @@ import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
 @ConfiguredBy({
    @ConfigurationUnit(
@@ -44,7 +45,7 @@ public class TestAddOnService extends AbstractKernelTest {
     }
 
     public void testGetApplications() {
-        List<Application<?>> apps = service.getApplications("AddOnContainer");
+        List<Application<Portlet>> apps = service.getApplications("AddOnContainer");
         assertEquals(1, apps.size());
         
         assertEquals("SampleAddOn/helloAddOn", ((TransientApplicationState)apps.get(0).getState()).getContentId());
