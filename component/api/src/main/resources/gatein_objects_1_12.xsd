@@ -288,7 +288,10 @@
     <xs:complexType name="columnType">
         <xs:sequence>
           <xs:element name="access-permissions" type="xs:string" minOccurs="0" maxOccurs="1" />
-          <xs:element name="portlet-application" type="portletApplicationType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="portlet-application" type="portletApplicationType" minOccurs="1" maxOccurs="1" />
+            <xs:element name="container" type="containerType" minOccurs="1" maxOccurs="1" />
+          </xs:choice>
         </xs:sequence>
         <xs:attribute name="id" type="xs:string" />
         <xs:attribute name="col-span">
