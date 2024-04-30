@@ -21,10 +21,10 @@ package org.exoplatform.portal.webui.page;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.page.PageContext;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.user.UserNode;
 import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
@@ -120,11 +120,11 @@ public class UIPageBody extends UIComponentDecorator {
         PageContext pageContext = null;
         String pageReference = null;
         ExoContainer appContainer = context.getApplication().getApplicationServiceContainer();
-        UserPortalConfigService userPortalConfigService = appContainer.getComponentInstanceOfType(UserPortalConfigService.class);
+        LayoutService layoutService = appContainer.getComponentInstanceOfType(LayoutService.class);
 
         if (pageNode != null && pageNode.getPageRef() != null) {
             pageReference = pageNode.getPageRef().format();
-            pageContext = userPortalConfigService.getPage(pageNode.getPageRef());
+            pageContext = layoutService.getPageContext(pageNode.getPageRef());
         }
 
         // The page has been deleted
@@ -140,7 +140,7 @@ public class UIPageBody extends UIComponentDecorator {
             if (uiPage == null) {
               UIPageFactory clazz = UIPageFactory.getInstance(pageContext.getState().getFactoryId());
               uiPage = clazz.createUIPage(context);
-              Page page = userPortalConfigService.getDataStorage().getPage(pageReference);
+              Page page = layoutService.getPage(pageReference);
               pageContext.update(page);
               PortalDataMapper.toUIPage(uiPage, page);
             }

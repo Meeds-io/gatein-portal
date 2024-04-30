@@ -20,35 +20,38 @@ package org.exoplatform.commons.addons;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.pom.data.ApplicationData;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
 public class AddOnServiceImpl implements AddOnService {
 
-    private List<ApplicationDecorator<?>> apps = new ArrayList<ApplicationDecorator<?>>();
+    private List<ApplicationDecorator<Portlet>> apps = new ArrayList<ApplicationDecorator<Portlet>>();
 
     @Override
-    public List<Application<?>> getApplications(String containerName) {
-        List<Application<?>> apps = new LinkedList<Application<?>>();
-
-        for (ApplicationDecorator<?> app : this.apps) {
-          if (app.getContainerName().equals(containerName)) {
-            apps.add(app.getApp());
-          }
-        }
-        return apps;
+    public List<Application<Portlet>> getApplications(String containerName) {
+      return this.apps.stream()
+                      .filter(app -> app.getContainerName().equals(containerName))
+                      .map(ApplicationDecorator::getApp)
+                      .toList();
     }
 
     @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void addPlugin(AddOnPlugin plugin) {
       for (Application<?> app : plugin.getApplications()) {
+        if (StringUtils.isBlank(app.getId())) {
+          app.setId(UUID.randomUUID().toString());
+        }
         apps.add(new ApplicationDecorator(app, plugin.getPriority(), plugin.getContainerName()));
       }
-      Collections.sort(apps, new Comparator<ApplicationDecorator<?>>() {
+      Collections.sort(apps, new Comparator<ApplicationDecorator<?>>() { // NOSONAR
           @Override
           public int compare(ApplicationDecorator<?> o1, ApplicationDecorator<?> o2) {
             if (o1.getAppPriority() != o2.getAppPriority()) {
