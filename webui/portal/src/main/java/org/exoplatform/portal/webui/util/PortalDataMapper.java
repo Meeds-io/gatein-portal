@@ -221,6 +221,7 @@ public class PortalDataMapper {
         uiPortlet.setShowPortletMode(model.getShowApplicationMode());
         uiPortlet.setProperties(model.getProperties());
         uiPortlet.setTheme(model.getTheme());
+        uiPortlet.setId(model.getId());
         if (model.getAccessPermissions() != null)
             uiPortlet.setAccessPermissions(model.getAccessPermissions());
         uiPortlet.setModifiable(model.isModifiable());

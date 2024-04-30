@@ -94,11 +94,11 @@ public class UIContainer extends UIComponent {
 
     @SuppressWarnings("unchecked")
     public <T extends UIComponent> T getChildById(String id) {
-
-        if (children == null) {
+        List<UIComponent> subComponents = getChildren();
+        if (subComponents == null) {
             return null;
         }
-        for (UIComponent child : children) {
+        for (UIComponent child : subComponents) {
             if (id.equals(child.getId())) {
                 return (T) child;
             }
@@ -110,20 +110,22 @@ public class UIContainer extends UIComponent {
 
     @SuppressWarnings("unchecked")
     public <T extends UIComponent> T getChild(int idx) {
-        if (children == null) {
+        List<UIComponent> subComponents = getChildren();
+        if (subComponents == null) {
             return null;
         }
-        if (children.size() <= idx) {
+        if (subComponents.size() <= idx) {
             return null;
         }
-        return (T) children.get(idx);
+        return (T) subComponents.get(idx);
     }
 
     public <T extends UIComponent> T getChild(Class<T> clazz) {
-        if (children == null) {
+        List<UIComponent> subComponents = getChildren();
+        if (subComponents == null) {
             return null;
         }
-        for (UIComponent uichild : children) {
+        for (UIComponent uichild : subComponents) {
             if (clazz.isInstance(uichild)) {
                 return clazz.cast(uichild);
             }
@@ -135,15 +137,16 @@ public class UIContainer extends UIComponent {
 
     @SuppressWarnings("unchecked")
     public <T extends UIComponent> T replaceChild(String targetChildId, UIComponent newComponent) throws Exception {
-        if (children == null) {
+        List<UIComponent> subComponents = getChildren();
+        if (subComponents == null) {
             throw new Exception("Cannot  find the child : " + targetChildId);
         }
-        for (int i = 0; i < this.children.size(); i++) {
-            UIComponent child = this.children.get(i);
+        for (int i = 0; i < subComponents.size(); i++) {
+            UIComponent child = subComponents.get(i);
             if (targetChildId.equals(child.getId())) {
                 child.setParent(null);
                 newComponent.setParent(this);
-                children.set(i, newComponent);
+                subComponents.set(i, newComponent);
                 return (T) child;
             }
         }
@@ -171,15 +174,14 @@ public class UIContainer extends UIComponent {
 
     @SuppressWarnings("unchecked")
     public <T extends UIComponent> T findComponentById(String id) {
-        if (getId() != null) {
-            if (getId().equals(id)) {
-                return (T) this;
-            }
+        List<UIComponent> subComponents = getChildren();
+        if (getId() != null && getId().equals(id)) {
+            return (T) this;
         }
-        if (children == null) {
+        if (subComponents == null) {
             return null;
         }
-        for (UIComponent uichild : children) {
+        for (UIComponent uichild : subComponents) {
             UIComponent found = uichild.findComponentById(id);
             if (found != null) {
                 return (T) found;
@@ -195,13 +197,14 @@ public class UIContainer extends UIComponent {
      */
 
     public <T extends UIComponent> T findFirstComponentOfType(Class<T> type) {
+        List<UIComponent> subComponents = getChildren();
         if (type.isInstance(this)) {
             return type.cast(this);
         }
         if (children == null) {
             return null;
         }
-        for (UIComponent uichild : children) {
+        for (UIComponent uichild : subComponents) {
             T found = uichild.findFirstComponentOfType(type);
             if (found != null) {
                 return found;
@@ -211,13 +214,14 @@ public class UIContainer extends UIComponent {
     }
 
     public <T> void findComponentOfType(List<T> list, Class<T> type) {
+        List<UIComponent> subComponents = getChildren();
         if (type.isInstance(this) && !list.contains(this)) {
             list.add(type.cast(this));
         }
-        if (children == null) {
+        if (subComponents == null) {
             return;
         }
-        for (UIComponent uichild : children) {
+        for (UIComponent uichild : subComponents) {
             uichild.findComponentOfType(list, type);
         }
     }
@@ -285,8 +289,7 @@ public class UIContainer extends UIComponent {
     }
 
     public void renderChildren(WebuiRequestContext context) throws Exception {
-        List<UIComponent> list = getChildren();
-        for (UIComponent child : list) {
+        for (UIComponent child : getChildren()) {
             if (child.isRendered()) {
                 child.processRender(context);
             }
