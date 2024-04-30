@@ -20,10 +20,11 @@ package org.exoplatform.commons.addons;
 import java.util.List;
 
 import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
 public interface AddOnService {
 
     void addPlugin(AddOnPlugin plugin);
 
-    List<Application<?>> getApplications(String containerName);
+    List<Application<Portlet>> getApplications(String containerName);
 }

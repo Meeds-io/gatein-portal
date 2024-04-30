@@ -203,7 +203,7 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
     }
 
     public String getId() {
-        return storageId == null ? "UIPortlet-" + getStorageName() : storageId;
+        return storageId == null ? super.getId() : storageId;
     }
 
     public String getApplicationId() {

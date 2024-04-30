@@ -29,6 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -62,7 +63,6 @@ import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.portal.mop.user.UserPortalContext;
 import org.exoplatform.portal.url.PortalURLContext;
 import org.exoplatform.portal.webui.page.UIPage;
-import org.exoplatform.portal.webui.page.UIPageBody;
 import org.exoplatform.portal.webui.portal.UIPortal;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.portal.webui.workspace.UIPortalApplication;
@@ -90,6 +90,7 @@ import org.exoplatform.webui.url.ComponentURL;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 
 import org.gatein.common.http.QueryStringParser;
 import org.w3c.dom.Element;
@@ -323,6 +324,7 @@ public class PortalRequestContext extends WebuiRequestContext {
       return draftPage.booleanValue();
     }
 
+    @SneakyThrows
     public UserNode getNavigationNode() {
       if (userNode != null) {
         return userNode;
@@ -331,7 +333,14 @@ public class PortalRequestContext extends WebuiRequestContext {
       UserNavigation navigation = userPortal.getNavigation(siteKey);
       if (navigation != null) {
         Builder builder = UserNodeFilterConfig.builder().withReadCheck();
-        userNode = userPortal.resolvePath(navigation, builder.build(), nodePath_);
+        if (StringUtils.isBlank(nodePath_)) {
+          userNode = portalConfigService.getPortalSiteRootNode(siteKey.getName(), siteKey.getTypeName(), request_);
+          if (userNode != null) {
+            userNode = portalConfigService.getFirstAllowedPageNode(Collections.singletonList(userNode));
+          }
+        } else {
+          userNode = userPortal.resolvePath(navigation, builder.build(), nodePath_);
+        }
       }
       return userNode;
     }
