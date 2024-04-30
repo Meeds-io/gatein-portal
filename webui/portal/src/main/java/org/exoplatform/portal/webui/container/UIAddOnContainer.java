@@ -24,6 +24,7 @@ import org.exoplatform.commons.addons.AddOnService;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.webui.portal.UIPortalComponentActionListener.DeleteComponentActionListener;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
 import org.exoplatform.portal.webui.util.Util;
@@ -50,11 +51,7 @@ public class UIAddOnContainer extends UIContainer {
     public List<UIComponent> getChildren() {
       if (!initialized) {
         AddOnService addonService = getApplicationComponent(AddOnService.class);
-        List<Application<?>> apps = addonService.getApplications(this.getName());
-        for (int i = 0; i < apps.size(); i++) {
-          Application<?> app = apps.get(i);
-          app.setStorageName(this.getName() + "-" + i);
-        }
+        List<Application<Portlet>> apps = addonService.getApplications(this.getName());
         Container model = new Container();
         model.setChildren(new ArrayList<>(apps));
         UIContainer tmp = new UIContainer();
