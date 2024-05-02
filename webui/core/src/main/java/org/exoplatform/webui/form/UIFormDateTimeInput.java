@@ -145,8 +145,8 @@ public class UIFormDateTimeInput extends UIFormInputBase<String> {
         if (!getDatePattern_().contains("HH")) {
             setDatePattern_(getDatePattern_().replaceAll("H", "HH"));
         }
-        if (getDatePattern_().contains(" a")) {
-            setDatePattern_(getDatePattern_().replaceAll(" a", ""));
+        if (getDatePattern_().contains(" a") || getDatePattern_().contains(" a")) {
+            setDatePattern_(getDatePattern_().replaceAll(" a", "").replaceAll(" a", ""));
         }
 
         dateFormat_ = new SimpleDateFormat(getDatePattern_());
