@@ -452,4 +452,10 @@
     </addColumn>
   </changeSet>
 
+  <changeSet author="portal" id="1.0.0-41" dbms="mysql">
+      <sql>
+          ALTER TABLE PORTAL_PAGES MODIFY COLUMN DISPLAY_NAME varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+      </sql>
+  </changeSet>
+
 </databaseChangeLog>
