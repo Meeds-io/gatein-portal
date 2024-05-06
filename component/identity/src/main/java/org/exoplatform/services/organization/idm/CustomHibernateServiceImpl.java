@@ -35,8 +35,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
-import org.exoplatform.commons.utils.PrivilegedSystemHelper;
-import org.exoplatform.commons.utils.SecurityHelper;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.xml.InitParams;
@@ -62,11 +60,7 @@ public class CustomHibernateServiceImpl implements HibernateService, ComponentRe
   public CustomHibernateServiceImpl(InitParams initParams) {
     threadLocal_ = new ThreadLocal<Session>();
     PropertiesParam param = initParams.getPropertiesParam("hibernate.properties");
-    conf_ = SecurityHelper.doPrivilegedAction(new PrivilegedAction<IdmHibernateConfiguration>() {
-      public IdmHibernateConfiguration run() {
-        return new IdmHibernateConfiguration();
-      }
-    });
+    conf_ = new IdmHibernateConfiguration();
     Iterator<?> properties = param.getPropertyIterator();
     while (properties.hasNext()) {
       Property p = (Property) properties.next();
@@ -76,7 +70,7 @@ public class CustomHibernateServiceImpl implements HibernateService, ComponentRe
     // Replace the potential "java.io.tmpdir" variable in the connection URL
     String connectionURL = conf_.getProperty("hibernate.connection.url");
     if (connectionURL != null) {
-      connectionURL = connectionURL.replace("${java.io.tmpdir}", PrivilegedSystemHelper.getProperty("java.io.tmpdir"));
+      connectionURL = connectionURL.replace("${java.io.tmpdir}", System.getProperty("java.io.tmpdir"));
       conf_.setProperty("hibernate.connection.url", connectionURL);
     }
   }
