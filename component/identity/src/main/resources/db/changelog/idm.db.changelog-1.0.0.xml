@@ -426,4 +426,10 @@
     <sql>SELECT setval('JBID_REALM_ID_SEQ', (SELECT MAX(ID) FROM JBID_REALM))</sql>
   </changeSet>
 
+  <changeSet author="idm" id="1.0.0-21" dbms="mysql">
+    <sql>
+      ALTER TABLE jbid_io_attr_text_values MODIFY COLUMN ATTR_VALUE VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
 </databaseChangeLog>
