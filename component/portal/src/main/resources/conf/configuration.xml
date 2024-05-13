@@ -21,17 +21,10 @@
 
 -->
 <configuration
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
-  xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
-
-  <!-- SecureRandomService configured at RootContainer scope to be initialized just once per JVM -->
-  <component>
-    <key>org.exoplatform.web.security.security.SecureRandomService</key>
-    <type>org.exoplatform.web.security.security.SecureRandomService</type>
-  </component>
-
-  <external-component-plugins>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+    xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+   <external-component-plugins>
     <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
     <component-plugin>
       <name>PortalRDBMSChangeLogsPlugin</name>
@@ -41,7 +34,7 @@
         <values-param>
           <name>changelogs</name>
           <description>Change logs of Portal RDBMS</description>
-          <value>db/changelog/gatein-token.db.changelog-1.0.0.xml</value>
+          <value>db/changelog/portal-rdbms.db.changelog-1.0.0.xml</value>
         </values-param>
       </init-params>
     </component-plugin>
