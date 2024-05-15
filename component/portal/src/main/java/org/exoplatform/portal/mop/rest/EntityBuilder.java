@@ -86,23 +86,21 @@ public class EntityBuilder {
           resultNode.setPageEditPermission(editPermission);
         }
         if (userNodePage.getAccessPermissions() != null) {
-          List<Map<String, Object>> accessPermissions = new ArrayList<>();
-          if (userNodePage.getAccessPermissions().length == 1 && userNodePage.getAccessPermissions()[0].equals("Everyone")) {
+          List<Map<String, Object>> accessPermissions = Arrays.stream(userNodePage.getAccessPermissions()).map(permission -> {
+            String[] permissionArray = permission.split(":");
             Map<String, Object> accessPermission = new HashMap<>();
-            accessPermission.put("membershipType", userNodePage.getAccessPermissions()[0]);
-            accessPermissions.add(accessPermission);
-          } else {
-            accessPermissions = Arrays.stream(userNodePage.getAccessPermissions()).map(permission -> {
-              Map<String, Object> accessPermission = new HashMap<>();
+            if(permissionArray.length == 1) {
+              accessPermission.put("membershipType", userNodePage.getAccessPermissions()[0]);
+            } else {
               try {
                 accessPermission.put("membershipType", permission.split(":")[0]);
                 accessPermission.put(GROUP, organizationService.getGroupHandler().findGroupById(permission.split(":")[1]));
               } catch (Exception e) {
                 LOG.warn("Error when getting group with id {}", permission.split(":")[1], e);
               }
-              return accessPermission;
-            }).collect(Collectors.toList());
-          }
+            }
+            return accessPermission;
+          }).collect(Collectors.toList());
           resultNode.setPageAccessPermissions(accessPermissions);
         }
       }
