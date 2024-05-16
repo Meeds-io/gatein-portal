@@ -44,9 +44,11 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
 
 public class EntityBuilder {
-  private static final Log   LOG   = ExoLogger.getLogger(EntityBuilder.class);
+  private static final Log   LOG             = ExoLogger.getLogger(EntityBuilder.class);
 
-  public static final String GROUP = "group";
+  public static final String GROUP           = "group";
+
+  public static final String MEMBERSHIP_TYPE = "membershipType";
 
   private EntityBuilder() { // NOSONAR
   }
@@ -76,10 +78,15 @@ public class EntityBuilder {
           resultNode.setCanEditPage(userACL.hasEditPermission(userNodePage));
           Map<String, Object> editPermission = new HashMap<>();
           try {
-            editPermission.put("membershipType", userNodePage.getEditPermission().split(":")[0]);
-            editPermission.put(GROUP,
-                               organizationService.getGroupHandler()
-                                                  .findGroupById(userNodePage.getEditPermission().split(":")[1]));
+            String[] editPermissionExpression = userNodePage.getEditPermission().split(":");
+            if(editPermissionExpression.length == 1) {
+              editPermission.put(MEMBERSHIP_TYPE, userNodePage.getEditPermission());
+            } else {
+              editPermission.put(MEMBERSHIP_TYPE, editPermissionExpression[0]);
+              editPermission.put(GROUP,
+                      organizationService.getGroupHandler()
+                              .findGroupById(editPermissionExpression[1]));
+            }
           } catch (Exception e) {
             LOG.warn("Error when getting group with id {}", userNodePage.getEditPermission().split(":")[1], e);
           }
@@ -90,10 +97,10 @@ public class EntityBuilder {
             String[] permissionArray = permission.split(":");
             Map<String, Object> accessPermission = new HashMap<>();
             if(permissionArray.length == 1) {
-              accessPermission.put("membershipType", userNodePage.getAccessPermissions()[0]);
+              accessPermission.put(MEMBERSHIP_TYPE, userNodePage.getAccessPermissions()[0]);
             } else {
               try {
-                accessPermission.put("membershipType", permission.split(":")[0]);
+                accessPermission.put(MEMBERSHIP_TYPE, permission.split(":")[0]);
                 accessPermission.put(GROUP, organizationService.getGroupHandler().findGroupById(permission.split(":")[1]));
               } catch (Exception e) {
                 LOG.warn("Error when getting group with id {}", permission.split(":")[1], e);
