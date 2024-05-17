@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -36,6 +37,7 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.core.Authentication;
 import org.springframework.security.config.annotation.web.configurers.JeeConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -113,10 +115,18 @@ public class WebSecurityConfiguration implements ServletContextAware {
 
   @Bean("accessDeniedHandler")
   public AccessDeniedHandler accessDeniedHandler() {
-    return (request, response, accessDeniedException) -> LOG.warn("Access denied for path {} and method {}",
-                                                                  request.getRequestURI(),
-                                                                  request.getMethod(),
-                                                                  accessDeniedException);
+    return (request, response, accessDeniedException) -> {
+      LOG.warn("Access denied for path {} and method {}",
+               request.getRequestURI(),
+               request.getMethod(),
+               accessDeniedException);
+      if (!response.isCommitted()) {
+        // Put exception into request scope (perhaps of use to a view)
+        request.setAttribute(WebAttributes.ACCESS_DENIED_403, accessDeniedException);
+        // Set the 403 status code.
+        response.setStatus(HttpStatus.FORBIDDEN.value());
+      }
+    };
   }
 
   @Bean("requestAuthorizationManager")
