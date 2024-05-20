@@ -11,8 +11,6 @@ import org.exoplatform.container.*;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.portal.Constants;
-import org.exoplatform.portal.config.UserPortalConfigService;
-import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
@@ -23,14 +21,16 @@ import org.exoplatform.services.resources.*;
  * This class is used to ease {@link LocaleContextInfo} object build
  */
 public class LocaleContextInfoUtils {
-  
-  private static final String LOCALE_COOKIE = "LOCALE";
-  
-  private static final String PREV_LOCALE_SESSION_ATTR = "org.gatein.LAST_LOCALE";
-  
-  private static final String LOCALE_SESSION_ATTR = "org.gatein.LOCALE";
-  
-  private static final Log LOG = ExoLogger.getLogger(LocaleContextInfoUtils.class);
+
+  private static final String      LOCALE_COOKIE            = "LOCALE";
+
+  private static final String      PREV_LOCALE_SESSION_ATTR = "org.gatein.LAST_LOCALE";
+
+  private static final String      LOCALE_SESSION_ATTR      = "org.gatein.LOCALE";
+
+  private static final Log         LOG                      = ExoLogger.getLogger(LocaleContextInfoUtils.class);
+
+  private static final Set<Locale> SUPPORTED_LOCALES        = new HashSet<>();
 
   /**
    * Computes locale of currently authenticated user based on multiple
@@ -64,7 +64,8 @@ public class LocaleContextInfoUtils {
   }
 
   /**
-   *  Helper method for setters invocation on {@link LocaleContextInfo} object
+   * Helper method for setters invocation on {@link LocaleContextInfo} object
+   * 
    * @param request
    * @return a built {@link LocaleContextInfo} object
    */
@@ -72,7 +73,6 @@ public class LocaleContextInfoUtils {
     LocaleContextInfo localeCtx = new LocaleContextInfo();
     // start with setting supported locales and and portal locale
     localeCtx.setSupportedLocales(getSupportedLocales());
-    localeCtx.setPortalLocale(getPortalLocale());
     // check request nullability before proceeding
     if (request == null) {
       return localeCtx;
@@ -80,8 +80,8 @@ public class LocaleContextInfoUtils {
     //
     String username = request.getRemoteUser();
     // get session locale
-    String lastLocaleLangauge = getPreviousLocale(request) == null ? null : getPreviousLocale(request).toString();
-    Locale sessionLocale = lastLocaleLangauge == null ? getSessionLocale(request) : LocaleUtils.toLocale(lastLocaleLangauge);
+    Locale previousLocale = getPreviousLocale(request);
+    Locale sessionLocale = previousLocale == null ? getSessionLocale(request) : previousLocale;
     localeCtx.setSessionLocale(sessionLocale);
     // continue setting localCtx with data fetched from request
     localeCtx.setUserProfileLocale(getUserLocale(username));
@@ -90,9 +90,10 @@ public class LocaleContextInfoUtils {
     localeCtx.setRemoteUser(username);
     return localeCtx;
   }
-  
+
   /**
    * Helper method for setters invocation on {@link LocaleContextInfo} object
+   * 
    * @param userId
    * @return a built {@link LocaleContextInfo} object
    */
@@ -101,12 +102,10 @@ public class LocaleContextInfoUtils {
     localeCtx.setSupportedLocales(getSupportedLocales());
     localeCtx.setUserProfileLocale(getUserLocale(userId));
     localeCtx.setRemoteUser(userId);
-    localeCtx.setPortalLocale(getPortalLocale());
     return localeCtx;
   }
-  
+
   /**
-   *
    * @param request
    * @return
    */
@@ -115,7 +114,7 @@ public class LocaleContextInfoUtils {
     if (cookies != null) {
       for (Cookie cookie : cookies) {
         if (LOCALE_COOKIE.equals(cookie.getName())) {
-          List<Locale> locales = new ArrayList<Locale>();
+          List<Locale> locales = new ArrayList<>();
           locales.add(LocaleContextInfo.getLocale(cookie.getValue()));
           return locales;
         }
@@ -123,43 +122,47 @@ public class LocaleContextInfoUtils {
     }
     return Collections.emptyList();
   }
-  
+
   /**
    * Get current session locale
+   * 
    * @param request
    * @return
    */
   private static Locale getSessionLocale(HttpServletRequest request) {
     return getLocaleFromSession(request, LOCALE_SESSION_ATTR);
   }
-  
+
   /**
    * Get previous session locale
+   * 
    * @param request
    * @return
    */
   private static Locale getPreviousLocale(HttpServletRequest request) {
     return getLocaleFromSession(request, PREV_LOCALE_SESSION_ATTR);
   }
-  
+
   /**
    * Helper method to retrieve supportedLocales from LocaleConfigService
+   * 
    * @return supportedLocales
    */
-  public static  Set<Locale> getSupportedLocales() {
-    LocaleConfigService localeConfigService = ExoContainerContext.getCurrentContainer()
-            .getComponentInstanceOfType(LocaleConfigService.class);
-    Set<Locale> supportedLocales = new HashSet<>();
-    if (localeConfigService != null) {
-      for (LocaleConfig lc : localeConfigService.getLocalConfigs()) {
-        supportedLocales.add(lc.getLocale());
+  public static Set<Locale> getSupportedLocales() {
+    if (SUPPORTED_LOCALES.isEmpty()) {
+      LocaleConfigService localeConfigService = ExoContainerContext.getService(LocaleConfigService.class);
+      if (localeConfigService != null) {
+        for (LocaleConfig lc : localeConfigService.getLocalConfigs()) {
+          SUPPORTED_LOCALES.add(lc.getLocale());
+        }
       }
     }
-    return supportedLocales;
+    return SUPPORTED_LOCALES;
   }
-  
+
   /**
    * Get session locale
+   * 
    * @param request
    * @param attrName
    * @return
@@ -171,9 +174,10 @@ public class LocaleContextInfoUtils {
       lang = (String) session.getAttribute(attrName);
     return (lang != null) ? LocaleContextInfo.getLocale(lang) : null;
   }
-  
+
   /**
    * Helper method to retrieve user locale from UserProfile
+   * 
    * @param userId
    * @return user locale
    */
@@ -181,9 +185,9 @@ public class LocaleContextInfoUtils {
     String lang = "";
     UserProfile profile = null;
     //
-    if(userId != null) {
+    if (userId != null) {
       OrganizationService organizationService = ExoContainerContext.getCurrentContainer()
-                .getComponentInstanceOfType(OrganizationService.class);
+                                                                   .getComponentInstanceOfType(OrganizationService.class);
       // get user profile
       beginContext(organizationService);
       try {
@@ -194,7 +198,7 @@ public class LocaleContextInfoUtils {
         endContext(organizationService);
       }
       // fetch profile lang
-      if(profile != null) {
+      if (profile != null) {
         lang = profile.getAttribute(Constants.USER_LANGUAGE);
       }
       if (lang != null && lang.trim().length() > 0) {
@@ -203,31 +207,10 @@ public class LocaleContextInfoUtils {
     }
     return null;
   }
-  
-  /**
-   *  Helper method to get portal locale from portal config
-   * @return return portalLocale, if not set then return the JVM Locale
-   */
-  private static Locale getPortalLocale() {
-    String lang = "";
-    //
-    ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
-    if (currentContainer instanceof RootContainer) {
-      currentContainer = PortalContainer.getInstance();
-    }
-    UserPortalConfigService userPortalConfigService = currentContainer.getComponentInstanceOfType(UserPortalConfigService.class);
-    if(userPortalConfigService != null) {
-      PortalConfig config = userPortalConfigService.getMetaPortalConfig();
-      if (config != null) {
-        lang = config.getLocale();
-      }
-    }
-    //  return portal Locale, if not set then return the JVM Locale
-    return (lang != null && lang.trim().length() > 0) ? LocaleUtils.toLocale(lang) : Locale.getDefault();
-  }
-  
+
   /**
    * Begin request life cycle for OrganizationService
+   * 
    * @param orgService
    */
   private static void beginContext(OrganizationService orgService) {
@@ -235,9 +218,10 @@ public class LocaleContextInfoUtils {
       RequestLifeCycle.begin((ComponentRequestLifecycle) orgService);
     }
   }
-  
+
   /**
    * End RequestLifeCycle for OrganizationService
+   * 
    * @param orgService
    */
   private static void endContext(OrganizationService orgService) {
@@ -245,5 +229,5 @@ public class LocaleContextInfoUtils {
       RequestLifeCycle.end();
     }
   }
-  
+
 }
