@@ -24,13 +24,16 @@
   import org.exoplatform.portal.branding.BrandingService;
   import java.util.ResourceBundle;
   import org.exoplatform.services.resources.LocaleConfigService;
+  import org.exoplatform.portal.mop.user.UserNode;
 
   def rcontext = _ctx.getRequestContext() ;
   def session = rcontext.getRequest().getSession();
   def userName = rcontext.getRemoteUser();
   def productName = uicomponent.getApplicationComponent(ProductInformations.class).getProductName();
   def productLink = uicomponent.getApplicationComponent(ProductInformations.class).getProductLink();
-  def selectedNodeUri = Util.getUIPortal().getSelectedUserNode().getURI();
+  UserNode selectedUserNode = Util.getUIPortal().getSelectedUserNode();
+  def selectedNodeId = selectedUserNode.getId();
+  def selectedNodeUri = selectedUserNode.getURI();
   def previousURI = session.getAttribute("previousURI");
   session.setAttribute("previousURI", selectedNodeUri);
   def portal = org.exoplatform.portal.webui.util.Util.getUIPortal();
@@ -163,6 +166,7 @@
      eXo.env.portal.language='<%= language %>';
      eXo.env.portal.defaultLanguage='<%= defaultLocaleTag %>';
      eXo.env.portal.orientation='<%= orientation == Orientation.RT ? "rtl" : "ltr" %>';
+     eXo.env.portal.selectedNodeId = '<%= selectedNodeId %>';
      eXo.env.portal.selectedNodeUri = '<%= selectedNodeUri %>';
      eXo.env.portal.previousURI = '<%= previousURI %>';
      eXo.env.portal.rest = '<%= PortalContainer.getCurrentRestContextName() %>';
