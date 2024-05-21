@@ -59,7 +59,7 @@ public class PageParsingTest extends TestCase {
       assertTrue("'TEST-columns-section-class' not found in:" + cssClasses, cssClasses.contains("TEST-columns-section-class"));
 
       Container column = (Container) columnsSection.getChildren().get(0);
-      assertEquals(1, column.getChildren().size());
+      assertEquals(2, column.getChildren().size());
       assertEquals("CellContainer", column.getTemplate());
       assertNull(column.getBorderColor());
       assertNotNull(column.getCssClass());
@@ -84,6 +84,8 @@ public class PageParsingTest extends TestCase {
       assertTrue("'brbr-1' not found", columnApplication.getCssClass().contains("brbr-1"));
       assertTrue("'brbl-0' not found", columnApplication.getCssClass().contains("brbl-0"));
       assertTrue("'hidden-sm-and-down' not found", columnApplication.getCssClass().contains("hidden-sm-and-down"));
+
+      assertTrue(column.getChildren().get(1) instanceof Container);
 
       Container gridSection = (Container) sectionsParent.getChildren().get(1);
       assertEquals(3, gridSection.getChildren().size());

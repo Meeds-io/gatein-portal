@@ -40,7 +40,7 @@ public class FlexSection extends Container {
     if (cssClass != null) {
       cssClasses.append(cssClass);
     }
-    cssClasses.append(" d-flex flex-column d-md-grid");
+    cssClasses.append(" d-flex flex-column d-md-grid grid-cols");
     cssClasses.append(" grid-cols-md-12");
     cssClasses.append(" grid-cols-lg-12");
     cssClasses.append(" grid-cols-xl-12");
