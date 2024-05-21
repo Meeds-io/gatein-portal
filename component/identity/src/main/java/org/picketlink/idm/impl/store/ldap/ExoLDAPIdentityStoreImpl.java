@@ -3,11 +3,13 @@ package org.picketlink.idm.impl.store.ldap;
 import org.apache.commons.lang3.StringUtils;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.NotYetImplementedException;
+import org.picketlink.idm.impl.api.SimpleAttribute;
 import org.picketlink.idm.impl.configuration.ExoIdentityStoreConfigurationContext;
 import org.picketlink.idm.impl.helper.Tools;
 import org.picketlink.idm.impl.model.ldap.LDAPIdentityObjectImpl;
 import org.picketlink.idm.spi.configuration.IdentityStoreConfigurationContext;
 import org.picketlink.idm.spi.model.IdentityObject;
+import org.picketlink.idm.spi.model.IdentityObjectAttribute;
 import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
 import org.picketlink.idm.spi.model.IdentityObjectType;
 import org.picketlink.idm.spi.search.IdentityObjectSearchCriteria;
@@ -37,6 +39,7 @@ import java.util.regex.Pattern;
 public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
 
   public static final String MODIFICATION_DATE_SINCE = "modificationDateSince";
+  public static final String FAILED_TO_CLOSE_LDAP_CONNECTION_MESSAGE = "Failed to close LDAP connection";
 
   private static Logger      log                     = Logger.getLogger(LDAPIdentityStoreImpl.class.getName());
 
@@ -153,10 +156,7 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
       try {
         ldapContext.close();
       } catch (NamingException e) {
-        if (log.isLoggable(Level.FINER)) {
-          log.log(Level.FINER, "Exception occurred: ", e);
-        }
-        throw new IdentityException("Failed to close LDAP connection", e);
+        log.log(Level.SEVERE, FAILED_TO_CLOSE_LDAP_CONNECTION_MESSAGE, e);
       }
     }
     if (log.isLoggable(Level.FINER)) {
@@ -295,10 +295,7 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
       try {
         ldapContext.close();
       } catch (NamingException e) {
-        if (log.isLoggable(Level.FINER)) {
-          log.log(Level.FINER, "Exception occurred: ", e);
-        }
-        throw new IdentityException("Failed to close LDAP connection", e);
+        log.log(Level.SEVERE, FAILED_TO_CLOSE_LDAP_CONNECTION_MESSAGE, e);
       }
     }
     if (criteria != null && criteria.isPaged()) {
@@ -565,4 +562,126 @@ public class ExoLDAPIdentityStoreImpl extends LDAPIdentityStoreImpl {
     }
   }
 
+  @Override
+  public Map<String, IdentityObjectAttribute> getAttributes(IdentityStoreInvocationContext ctx,
+                                                            IdentityObject identity) throws IdentityException
+  {
+
+    if (log.isLoggable(Level.FINER))
+    {
+      Tools.logMethodIn(
+              log,
+              Level.FINER,
+              "getAttributes",
+              new Object[]{
+                      "IdentityObject", identity
+              });
+    }
+
+    // Cache
+
+    if (getCache() != null)
+    {
+      Map<String, IdentityObjectAttribute> cachedAttributes = getCache().
+              getIdentityObjectAttributes(getNamespace(), identity);
+
+      if (cachedAttributes != null)
+      {
+        return cachedAttributes;
+      }
+    }
+
+    Map<String, IdentityObjectAttribute> attrsMap = new HashMap<>();
+
+    LDAPIdentityObjectImpl ldapIdentity = getSafeLDAPIO(ctx, identity);
+
+
+    LdapContext ldapContext = getLDAPContext(ctx);
+
+    try
+    {
+      Set<String> mappedNames = getTypeConfiguration(ctx, identity.getIdentityType()).getMappedAttributesNames();
+
+      // as this is valid LDAPIdentityObjectImpl DN is obtained from the Id
+
+      String dn = ldapIdentity.getDn();
+
+      // Escape JNDI special characters
+      Name jndiName = new CompositeName().add(dn);
+      Attributes attrs = ldapContext.getAttributes(jndiName);
+
+      for (Iterator<String> iterator = mappedNames.iterator(); iterator.hasNext();)
+      {
+        String name = iterator.next();
+        String attrName = getTypeConfiguration(ctx, identity.getIdentityType()).getAttributeMapping(name);
+        Attribute attr = attrs.get(attrName);
+
+        if (attr != null) {
+          IdentityObjectAttribute identityObjectAttribute;
+          if(attrsMap.containsKey(name)) {
+            identityObjectAttribute = attrsMap.get(name);
+          } else {
+            identityObjectAttribute = new SimpleAttribute(name);
+          }
+          
+          NamingEnumeration<?> values = attr.getAll();
+
+          while (values.hasMoreElements()) {
+            String value = values.nextElement().toString();
+
+            // check if the value is the DN of another identity type
+            IdentityObject identityObject = findIdentityObject(ctx, value);
+            // If it is an identity object, let's add its ID
+            if(identityObject != null) {
+              identityObjectAttribute.addValue(identityObject.getName());
+            } else { // Otherwise, we add the String value as is
+              identityObjectAttribute.addValue(value);
+            }
+          }
+          attrsMap.put(name, identityObjectAttribute);
+        } else {
+          log.fine("No such attribute ('" + attrName + "') in entry: " + dn);
+        }
+      }
+    }
+    catch (NamingException e)
+    {
+      if (log.isLoggable(Level.FINER))
+      {
+        log.log(Level.FINER, "Exception occurred: ", e);
+      }
+
+      throw new IdentityException("Cannot get attributes value.", e);
+    }
+    finally
+    {
+      try
+      {
+        ldapContext.close();
+      }
+      catch (NamingException e)
+      {
+        log.log(Level.SEVERE, FAILED_TO_CLOSE_LDAP_CONNECTION_MESSAGE, e);
+      }
+    }
+
+    // Cache
+
+    if (getCache() != null)
+    {
+      getCache().putIdentityObjectAttributes(getNamespace(), identity, attrsMap);
+    }
+
+    if (log.isLoggable(Level.FINER))
+    {
+      Tools.logMethodOut(
+              log,
+              Level.FINER,
+              "getAttributes",
+              attrsMap);
+    }
+
+    return attrsMap;
+
+  }
 }
