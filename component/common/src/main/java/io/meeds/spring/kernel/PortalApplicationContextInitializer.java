@@ -15,10 +15,13 @@
  */
 package io.meeds.spring.kernel;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.ApplicationContextFactory;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+
+import org.exoplatform.container.ExoContainer;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -36,6 +39,7 @@ public abstract class PortalApplicationContextInitializer extends SpringBootServ
     System.setProperty("org.springframework.boot.logging.LoggingSystem", "none");
 
     this.servletContext = servletContext;
+    this.servletContext.setInitParameter("spring.profiles.active", StringUtils.join(ExoContainer.getProfiles(), ","));
     this.beanFactory = new DefaultListableBeanFactory();
     super.onStartup(servletContext);
   }
