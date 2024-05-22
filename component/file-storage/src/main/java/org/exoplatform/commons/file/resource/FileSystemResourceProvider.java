@@ -23,13 +23,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.model.FileItem;
-import org.exoplatform.commons.utils.SecurityHelper;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 
 import java.io.*;
 import java.net.URL;
-import java.security.PrivilegedAction;
 
 /**
  * This class provide file system implementation of the File RDBMS API.
@@ -163,17 +161,7 @@ public class FileSystemResourceProvider implements BinaryProvider {
   }
 
   public void remove(String name) throws IOException {
-    PrivilegedAction<Boolean> action = new PrivilegedAction<Boolean>() {
-      public Boolean run() {
-        try {
-          ((TreeFile) getFile(name)).delete();
-        } catch (IOException e) {
-          return false;
-        }
-        return true;
-      }
-    };
-    SecurityHelper.doPrivilegedAction(action);
+    ((TreeFile) getFile(name)).delete();
   }
 
   @Override
@@ -182,17 +170,12 @@ public class FileSystemResourceProvider implements BinaryProvider {
     if (file == null || !file.exists()) {
       throw new FileNotFoundException("Cannot delete file " + getFilePath(fileInfo) + " since it does not exist");
     } else {
-      PrivilegedAction<Boolean> action = new PrivilegedAction<Boolean>() {
-        public Boolean run() {
-          try {
-            ((TreeFile) getFile(fileInfo.getChecksum())).delete();
-          } catch (IOException e) {
-            return false;
-          }
-          return true;
-        }
-      };
-      return SecurityHelper.doPrivilegedAction(action);
+      try {
+        ((TreeFile) getFile(fileInfo.getChecksum())).delete();
+      } catch (IOException e) {
+        return false;
+      }
+      return true;
     }
   }
 

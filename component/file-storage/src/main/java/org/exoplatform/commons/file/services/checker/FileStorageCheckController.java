@@ -23,7 +23,6 @@ import org.exoplatform.commons.file.resource.BinaryProvider;
 import org.exoplatform.commons.file.services.job.FileStorageCleanJob;
 import org.exoplatform.commons.file.storage.DataStorage;
 import org.exoplatform.commons.utils.PropertyManager;
-import org.exoplatform.commons.utils.SecurityHelper;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.picocontainer.Startable;
@@ -33,8 +32,6 @@ import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
 
 import java.io.*;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedExceptionAction;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -74,57 +71,52 @@ public class FileStorageCheckController implements Startable {
       if (FileStorageCleanJob.isEnabled().get()) {
         FileStorageCleanJob.setEnabled(false);
       }
-      SecurityHelper.doPrivilegedAction(new PrivilegedAction<Boolean>() {
-        public Boolean run() {
-          try {
-            LOG.info("Start File Storage Check Consistency");
-            boolean isConsistent = true;
-            int offset = 0;
-            boolean hasNext = true;
-            while (hasNext) {
-              List<FileInfo> list = dataStorage.getAllFilesInfo(offset, pageSize);
+      try {
+        LOG.info("Start File Storage Check Consistency");
+        boolean isConsistent = true;
+        int offset = 0;
+        boolean hasNext = true;
+        while (hasNext) {
+          List<FileInfo> list = dataStorage.getAllFilesInfo(offset, pageSize);
 
-              if (list == null || list.isEmpty()) {
-                break;
-              }
-              if (list.size() < pageSize) {
-                hasNext = false;
-              }
-              for (FileInfo fileInfo : list) {
-                String checksum = fileInfo.getChecksum();
-                if (checksum != null && !checksum.isEmpty()) {
-                  if (!binaryProvider.exists(checksum)) {
-                    isConsistent = false;
-                    report.writeLine("File not exist in file storage File ID : " + fileInfo.getId() + " File name : "
-                        + fileInfo.getName() + " , Path : " + binaryProvider.getFilePath(fileInfo.getChecksum()));
-                  }
-                } else {
-                  isConsistent = false;
-                  report.writeLine("File metaData with empty checksum File ID : " + fileInfo.getId() + " File name : "
-                      + fileInfo.getName() + " , Path : ");
-                }
-              }
-              offset += pageSize;
-            }
-            if (isConsistent) {
-              report.writeLine(REPORT_CONSISTENT_MESSAGE);
-              LOG.info("Finish File Storage Check Consistency : " + REPORT_CONSISTENT_MESSAGE);
-            } else {
-              report.writeLine(REPORT_NOT_CONSISTENT_MESSAGE);
-              LOG.info("Finish File Storage Check Consistency : " + REPORT_NOT_CONSISTENT_MESSAGE);
-            }
-          } catch (Exception e) {
-            try {
-              report.writeLine("Processing File Storage Check Consistency Error ");
-              report.writeStackTrace(e);
-            } catch (IOException e1) {
-              LOG.error(e1.getMessage());
-            }
-            LOG.error(e.getMessage());
+          if (list == null || list.isEmpty()) {
+            break;
           }
-          return true;
+          if (list.size() < pageSize) {
+            hasNext = false;
+          }
+          for (FileInfo fileInfo : list) {
+            String checksum = fileInfo.getChecksum();
+            if (checksum != null && !checksum.isEmpty()) {
+              if (!binaryProvider.exists(checksum)) {
+                isConsistent = false;
+                report.writeLine("File not exist in file storage File ID : " + fileInfo.getId() + " File name : "
+                                     + fileInfo.getName() + " , Path : " + binaryProvider.getFilePath(fileInfo.getChecksum()));
+              }
+            } else {
+              isConsistent = false;
+              report.writeLine("File metaData with empty checksum File ID : " + fileInfo.getId() + " File name : "
+                                   + fileInfo.getName() + " , Path : ");
+            }
+          }
+          offset += pageSize;
         }
-      });
+        if (isConsistent) {
+          report.writeLine(REPORT_CONSISTENT_MESSAGE);
+          LOG.info("Finish File Storage Check Consistency : " + REPORT_CONSISTENT_MESSAGE);
+        } else {
+          report.writeLine(REPORT_NOT_CONSISTENT_MESSAGE);
+          LOG.info("Finish File Storage Check Consistency : " + REPORT_NOT_CONSISTENT_MESSAGE);
+        }
+      } catch (Exception e) {
+        try {
+          report.writeLine("Processing File Storage Check Consistency Error ");
+          report.writeStackTrace(e);
+        } catch (IOException e1) {
+          LOG.error(e1.getMessage());
+        }
+        LOG.error(e.getMessage());
+      }
     } catch (Exception ex) {
       LOG.error(ex.getMessage());
       return "Failed Operation";
@@ -169,14 +161,9 @@ public class FileStorageCheckController implements Startable {
                                        "report-filesStorage-" + new SimpleDateFormat("dd-MMM-yy-HH-mm").format(new Date())
                                            + ".txt");
 
-      SecurityHelper.doPrivilegedIOExceptionAction(new PrivilegedExceptionAction<Void>() {
-        public Void run() throws IOException {
-          reportPath = reportFile.getAbsolutePath();
-          writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reportPath)));
+      reportPath = reportFile.getAbsolutePath();
+      writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reportPath)));
 
-          return null;
-        }
-      });
 
     }
 

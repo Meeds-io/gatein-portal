@@ -20,13 +20,10 @@ package org.exoplatform.commons.file.resource;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.security.PrivilegedAction;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.*;
 
-import org.exoplatform.commons.utils.PrivilegedFileHelper;
-import org.exoplatform.commons.utils.SecurityHelper;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -64,7 +61,7 @@ public class FileCleaner extends WorkerThread {
                                                                                            }
                                                                                            while ((file =
                                                                                                         files.poll()) != null) {
-                                                                                             PrivilegedFileHelper.delete(file);
+                                                                                             file.delete();
                                                                                            }
                                                                                          }
                                                                                        };
@@ -102,13 +99,7 @@ public class FileCleaner extends WorkerThread {
     if (start)
       start();
 
-    PrivilegedAction<Object> action = new PrivilegedAction<Object>() {
-      public Object run() {
-        registerShutdownHook();
-        return null;
-      }
-    };
-    SecurityHelper.doPrivilegedAction(action);
+    registerShutdownHook();
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("FileCleaner instantiated name= " + getName() + " timeout= " + timeout);
@@ -119,7 +110,7 @@ public class FileCleaner extends WorkerThread {
    * @param file
    */
   public void addFile(File file) {
-    if (PrivilegedFileHelper.exists(file)) {
+    if (file.exists()) {
       files.offer(file);
     }
   }
@@ -141,18 +132,8 @@ public class FileCleaner extends WorkerThread {
       }
     }
     // Remove the hook for final cleaning up
-    SecurityHelper.doPrivilegedAction(new PrivilegedAction<Object>() {
-      public Void run() {
-        try {
-          Runtime.getRuntime().removeShutdownHook(hook);
-        } catch (IllegalStateException e) {
-          if (LOG.isTraceEnabled()) {
-            LOG.trace("An exception occurred: " + e.getMessage());
-          }
-        }
-        return null;
-      }
-    });
+    Runtime.getRuntime().removeShutdownHook(hook);
+
     if (files != null && files.size() > 0)
       LOG.warn("There are uncleared files: " + files.size());
 
@@ -167,16 +148,16 @@ public class FileCleaner extends WorkerThread {
     File file = null;
     Set<File> notRemovedFiles = new HashSet<File>();
     while ((file = files.poll()) != null) {
-      if (PrivilegedFileHelper.exists(file)) {
-        if (!PrivilegedFileHelper.delete(file)) {
+      if (file.exists()) {
+        if (!file.delete()) {
           notRemovedFiles.add(file);
 
           if (LOG.isDebugEnabled())
             LOG.debug("Could not delete " + (file.isDirectory() ? "directory" : "file")
-                + ". Will try next time: " + PrivilegedFileHelper.getAbsolutePath(file));
+                + ". Will try next time: " + file.getAbsolutePath());
         } else if (LOG.isDebugEnabled()) {
           LOG.debug((file.isDirectory() ? "Directory" : "File") + " deleted : "
-              + PrivilegedFileHelper.getAbsolutePath(file));
+              + file.getAbsolutePath());
         }
       }
     }

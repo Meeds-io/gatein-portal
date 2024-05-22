@@ -23,12 +23,10 @@ import groovy.lang.GroovyCodeSource;
 
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilerConfiguration;
-import org.exoplatform.commons.utils.SecurityHelper;
 import org.gatein.common.classloader.DelegatingClassLoader;
 
 import java.io.Reader;
 import java.io.StringReader;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -189,11 +187,7 @@ public class GroovyScriptBuilder {
     }
 
     private ClassLoader prepareClassLoader() {
-        final ClassLoader tccl = SecurityHelper.doPrivilegedAction(new PrivilegedAction<ClassLoader>() {
-            public ClassLoader run() {
-                return Thread.currentThread().getContextClassLoader();
-            }
-        });
+        final ClassLoader tccl =  Thread.currentThread().getContextClassLoader();
 
         return new DelegatingClassLoader(tccl,
             GroovyClassLoader.class.getClassLoader(),

@@ -25,7 +25,6 @@ import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Properties;
 
-import org.exoplatform.commons.utils.SecurityHelper;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -160,12 +159,7 @@ public class DisabledUserMigrationScript {
             conf_.addURL(url);
         }
 
-        sessionFactory_ = SecurityHelper.doPrivilegedAction(new PrivilegedAction<SessionFactory>() {
-            public SessionFactory run() {
-                SessionFactory factory = conf_.configure().buildSessionFactory();
-                return factory;
-            }
-        });
+        sessionFactory_ = conf_.configure().buildSessionFactory();
     }
 
     private void setupPicketlink(Properties config) throws Exception {
