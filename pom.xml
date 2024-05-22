@@ -26,7 +26,7 @@
   <parent>
     <artifactId>maven-parent-pom</artifactId>
     <groupId>org.exoplatform</groupId>
-    <version>27-M02</version>
+    <version>27-M03</version>
   </parent>
 
   <groupId>org.exoplatform.gatein.portal</groupId>
