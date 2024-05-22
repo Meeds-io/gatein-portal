@@ -44,7 +44,7 @@ import org.apache.commons.collections.CollectionUtils;
  * 7/22/15
  */
 @SupportedAnnotationTypes("org.exoplatform.commons.api.persistence.ExoEntity")
-@SupportedSourceVersion(SourceVersion.RELEASE_17)
+@SupportedSourceVersion(SourceVersion.RELEASE_21)
 public class ExoEntityProcessor extends AbstractProcessor {
 
   /**
