@@ -33,7 +33,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.exoplatform.commons.serialization.api.annotations.Serialized;
-import org.exoplatform.commons.utils.PrivilegedSystemHelper;
 import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -101,7 +100,7 @@ public class UserConfigurableValidator extends MultipleConditionsValidator {
                             log.debug(e);
                         }
                     } else {
-                        properties = PrivilegedSystemHelper.getProperties();
+                        properties = System.getProperties();
                     }
 
                     if (properties != null) {

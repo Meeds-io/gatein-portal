@@ -23,11 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
-
-import org.exoplatform.commons.utils.SecurityHelper;
 
 /**
  * This is an utility class : File operation Created by The eXo Platform SAS
@@ -65,24 +60,7 @@ public final class FileUtils {
    *           occurred.
    */
   public static boolean createNewFile(final File file) throws IOException {
-    PrivilegedExceptionAction<Boolean> action = new PrivilegedExceptionAction<Boolean>() {
-      public Boolean run() throws Exception {
-        return file.createNewFile();
-      }
-    };
-    try {
-      return SecurityHelper.doPrivilegedExceptionAction(action);
-    } catch (PrivilegedActionException pae) {
-      Throwable cause = pae.getCause();
-
-      if (cause instanceof IOException) {
-        throw (IOException) cause;
-      } else if (cause instanceof RuntimeException) {
-        throw (RuntimeException) cause;
-      } else {
-        throw new RuntimeException(cause);
-      }
-    }
+    return file.createNewFile();
   }
 
   /**
@@ -93,12 +71,7 @@ public final class FileUtils {
    * @return boolean
    */
   public static boolean exists(final File file) {
-    PrivilegedAction<Boolean> action = new PrivilegedAction<Boolean>() {
-      public Boolean run() {
-        return file.exists();
-      }
-    };
-    return SecurityHelper.doPrivilegedAction(action);
+    return file.exists();
   }
 
   /**
@@ -108,12 +81,7 @@ public final class FileUtils {
    * @return boolean
    */
   public static boolean mkdirs(final File file) {
-    PrivilegedAction<Boolean> action = new PrivilegedAction<Boolean>() {
-      public Boolean run() {
-        return file.mkdirs();
-      }
-    };
-    return SecurityHelper.doPrivilegedAction(action);
+    return file.mkdirs();
   }
 
   /**

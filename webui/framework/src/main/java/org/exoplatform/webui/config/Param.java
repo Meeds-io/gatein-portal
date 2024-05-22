@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.security.PrivilegedAction;
 
 import org.exoplatform.commons.utils.IOUtil;
-import org.exoplatform.commons.utils.SecurityHelper;
 import org.exoplatform.resolver.ResourceResolver;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.xml.object.XMLObject;
@@ -105,11 +104,7 @@ public class Param {
     }
 
     private ClassLoader prepareClassLoader() {
-        final ClassLoader tccl = SecurityHelper.doPrivilegedAction(new PrivilegedAction<ClassLoader>() {
-            public ClassLoader run() {
-                return Thread.currentThread().getContextClassLoader();
-            }
-        });
+        final ClassLoader tccl =  Thread.currentThread().getContextClassLoader();
 
         return new DelegatingClassLoader(tccl, GroovyShell.class.getClassLoader());
     }
