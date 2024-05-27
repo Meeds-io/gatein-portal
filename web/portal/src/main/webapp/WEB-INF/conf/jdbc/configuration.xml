@@ -66,14 +66,6 @@
   <component>
     <type>org.exoplatform.settings.jpa.dao.SettingsDAO</type>
   </component>
-  <component>
-    <key>org.exoplatform.application.registry.dao.ApplicationDAO</key>
-    <type>org.exoplatform.application.registry.dao.ApplicationDAOImpl</type>
-  </component>
-  <component>
-    <key>org.exoplatform.application.registry.dao.CategoryDAO</key>
-    <type>org.exoplatform.application.registry.dao.CategoryDAOImpl</type>
-  </component>
 
   <component>
     <key>org.exoplatform.portal.mop.storage.SiteStorage</key>
