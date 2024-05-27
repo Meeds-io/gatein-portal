@@ -60,7 +60,6 @@
     <module>component</module>
     <module>webui</module>
     <module>web</module>
-    <module>portlet</module>
   </modules>
 
   <dependencyManagement>
@@ -139,13 +138,6 @@
 
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.portlet</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.web</artifactId>
         <version>${project.version}</version>
         <type>pom</type>
@@ -160,9 +152,14 @@
 
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.webui</artifactId>
+        <artifactId>exo.portal.component.test.core</artifactId>
         <version>${project.version}</version>
-        <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo.portal.component.test.web</artifactId>
+        <version>${project.version}</version>
       </dependency>
 
       <dependency>
@@ -258,18 +255,6 @@
 
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.application-registry</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.application-registry</artifactId>
-        <type>test-jar</type>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.component.scripting</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -342,24 +327,12 @@
 
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.webui.framework</artifactId>
+        <artifactId>exo.portal.component.management</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.webui.framework</artifactId>
-        <type>test-jar</type>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.webui.portlet</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.webui.portlet</artifactId>
+        <artifactId>exo.portal.component.management</artifactId>
         <type>test-jar</type>
         <version>${project.version}</version>
       </dependency>
@@ -373,54 +346,6 @@
         <groupId>${project.groupId}</groupId>
         <artifactId>exo.portal.webui.portal</artifactId>
         <type>test-jar</type>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.webui.eXo</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.webui.eXo</artifactId>
-        <type>test-jar</type>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.webui.core</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.webui.core</artifactId>
-        <type>test-jar</type>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.management</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.management</artifactId>
-        <type>test-jar</type>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.test.core</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.component.test.web</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -437,12 +362,7 @@
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>exo.portal.portlet.exoadmin</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
