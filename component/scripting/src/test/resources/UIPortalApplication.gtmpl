@@ -81,10 +81,6 @@
         boolean canKeepState = sessionAliveLevel == null ? false : !sessionAliveLevel.equals(PortalProperties.SESSION_NEVER) ;
       %>
 
-      eXo.portal.portalMode = <%= uicomponent.getModeState() %>;
-      eXo.portal.portalEditLevel = '<%= uicomponent.getEditLevel().toString() %>';
-      eXo.portal.fullPreview = '<%= org.exoplatform.portal.webui.page.UIPage.isFullPreview() %>';
-
       eXo.session.level = '$sessionAliveLevel';
       eXo.session.canKeepState = $canKeepState;
       eXo.session.isOpen = $uicomponent.isSessionOpen ;

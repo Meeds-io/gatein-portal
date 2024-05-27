@@ -41,7 +41,6 @@
     <module>file-storage</module>
     <module>pc</module>
     <module>resources</module>
-    <module>application-registry</module>
     <module>portal</module>
     <module>web</module>
     <module>scripting</module>

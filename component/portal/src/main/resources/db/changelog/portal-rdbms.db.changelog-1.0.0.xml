@@ -8,60 +8,6 @@
   <property name="autoIncrement" value="true" dbms="mysql,mssql,h2,hsqldb" />
   <property name="autoIncrement" value="false" dbms="oracle,postgresql" />
 
-  <!-- Application Registry -->
-  <changeSet author="portal" id="1.0.0-1">
-    <createTable tableName="PORTAL_APP_CATEGORIES">
-      <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
-        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_PORTAL_APP_CATEGORY"/>
-      </column>
-      <column name="NAME" type="NVARCHAR(200)"/>
-      <column name="DISPLAY_NAME" type="NVARCHAR(200)"/>
-      <column name="DESCRIPTION" type="LONGTEXT" />
-      <column name="CREATED_DATE" type="BIGINT"/>
-      <column name="MODIFIED_DATE" type="BIGINT"/>
-    </createTable>
-    <modifySql dbms="mysql">
-      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
-    </modifySql>
-  </changeSet>
-  <changeSet author="portal" id="1.0.0-2" dbms="oracle,postgresql">
-    <createSequence sequenceName="SEQ_GTN_APPLICATION_CAT_ID" startValue="1"/>
-  </changeSet>
-
-  <changeSet author="portal" id="1.0.0-3">
-    <createTable tableName="PORTAL_APPLICATIONS">
-      <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
-        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_PORTAL_APPLICATION"/>
-      </column>
-      <column name="DISPLAY_NAME" type="NVARCHAR(200)"/>
-      <column name="DESCRIPTION" type="LONGTEXT" />
-      <column name="CREATED_DATE" type="BIGINT"/>
-      <column name="MODIFIED_DATE" type="BIGINT"/>
-      <column name="APP_NAME" type="NVARCHAR(200)"/>
-      <column name="TYPE" type="VARCHAR(50)" />
-      <column name="CONTENT_ID" type="VARCHAR(200)" />
-      <column name="CATEGORY_ID" type="BIGINT">
-        <constraints nullable="false"/>
-      </column>
-    </createTable>
-    <modifySql dbms="mysql">
-      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
-    </modifySql>
-  </changeSet>
-  <changeSet author="portal" id="1.0.0-4" dbms="oracle,postgresql">
-    <createSequence sequenceName="SEQ_GTN_APPLICATION_ID" startValue="1"/>
-  </changeSet>
-  <changeSet author="portal" id="1.0.0-5">
-    <addForeignKeyConstraint constraintName="FK_PORTAL_APP_CATEGORY"
-                             baseTableName="PORTAL_APPLICATIONS" baseColumnNames="CATEGORY_ID"
-                             referencedTableName="PORTAL_APP_CATEGORIES" referencedColumnNames="ID"
-                             onDelete="CASCADE" onUpdate="NO ACTION" />
-    <addUniqueConstraint columnNames="CATEGORY_ID, CONTENT_ID" constraintName="UK_PORTAL_APP_CONTENT_CATEGORY"
-                         tableName="PORTAL_APPLICATIONS"/>
-    <addUniqueConstraint columnNames="CATEGORY_ID, APP_NAME" constraintName="UK_PORTAL_APP_NAME_CATEGORY"
-                         tableName="PORTAL_APPLICATIONS"/>
-  </changeSet>
-
   <!-- Site -->
   <changeSet author="portal" id="1.0.0-6">
     <createTable tableName="PORTAL_SITES">
@@ -317,8 +263,7 @@
   </changeSet>
 
   <changeSet author="portal" id="1.0.0-29" dbms="hsqldb">
-    <createSequence sequenceName="SEQ_GTN_APPLICATION_CAT_ID" startValue="1" />
-    <createSequence sequenceName="SEQ_GTN_APPLICATION_ID" startValue="1" />
+    <validCheckSum>ANY</validCheckSum>
     <createSequence sequenceName="SEQ_SITE_ID_GENERATOR" startValue="1" />
     <createSequence sequenceName="SEQ_PAGE_ID_GENERATOR" startValue="1" />
     <createSequence sequenceName="SEQ_GTN_NAVIGATION_NODE_ID" startValue="1" />
