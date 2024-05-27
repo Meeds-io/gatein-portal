@@ -39,14 +39,6 @@
   </component>
 
   <component>
-    <type>org.exoplatform.portal.application.ApplicationStatisticService</type>
-  </component>
-
-  <component>
-    <type>org.exoplatform.portal.application.PortalStatisticService</type>
-  </component>
-
-  <component>
     <type>org.exoplatform.web.application.javascript.JavascriptConfigService</type>
   </component>
 

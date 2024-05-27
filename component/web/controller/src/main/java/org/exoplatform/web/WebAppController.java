@@ -99,7 +99,7 @@ public class WebAppController implements Startable {
      * Must have 'controller.config' as init parameter configuration (in xml)
      * that point to the controller.xml used to initialize navigation controller
      *
-     * This service component is a container for applications: PortalApplication, PortletApplication, StandaloneApplication....
+     * This service component is a container for applications: PortalApplication, PortletApplication....
      * It use the navigation controller to route the request to corresponding handlers (config as service plugin)
      *
      * @param params the init params

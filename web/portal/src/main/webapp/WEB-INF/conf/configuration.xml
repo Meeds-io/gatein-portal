@@ -51,7 +51,6 @@
   <!-- Portal related services -->
   <import>war:/conf/portal/portal-configuration.xml</import>
   <import>war:/conf/portal/files-configuration.xml</import>
-  <import>war:/conf/portal/application-registry-configuration.xml</import>
   <import>war:/conf/portal/controller-configuration.xml</import>
   <import>war:/conf/portal/web-configuration.xml</import>
   <import>war:/conf/portal/module-configuration.xml</import>
