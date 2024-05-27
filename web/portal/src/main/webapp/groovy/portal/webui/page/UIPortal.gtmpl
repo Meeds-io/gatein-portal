@@ -1,0 +1,11 @@
+<div class="UIPortal" id="UIPortal">
+	<div class="UIComponentBlock">
+		<div class="VIEW-PORTAL VIEW-BLOCK">
+			<div id="$uicomponent.id">
+				<div class="UIRowContainer">
+					<% uicomponent.renderChildren();%>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
