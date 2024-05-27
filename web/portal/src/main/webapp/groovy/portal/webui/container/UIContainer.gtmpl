@@ -2,15 +2,14 @@
 	import org.exoplatform.commons.utils.ExpressionUtil;
 	import org.exoplatform.portal.webui.workspace.UIPortalApplication;
 	import org.exoplatform.commons.utils.HTMLEntityEncoder;
-	import org.exoplatform.portal.webui.workspace.UIPortalApplication.EditMode;
 	
 	def rcontext = _ctx.getRequestContext();
 	ResourceBundle res = rcontext.getApplicationResourceBundle();
 	
 	UIPortalApplication uiPortalApp = rcontext.getUIApplication();
-	boolean hasAccessPermission = uicomponent.hasAccessPermission();
-	if(!uiPortalApp.isEditing() && !hasAccessPermission) return;
-	EditMode editMode = uiPortalApp.getEditMode();
+	if(!uicomponent.hasAccessPermission()) {
+	  return;
+  }
 
 	String cssStyle = "";
 	String uiComponentWidth = uicomponent.getWidth();
@@ -27,69 +26,15 @@
 	if(componentId.startsWith("UIContainer-")){
 		uicomponent.setId(componentId.substring("UIContainer-".length()));
 	}
-  
-  if (uiPortalApp.isEditing())
-  {
-     def reqJS = rcontext.getJavascriptManager().require("SHARED/portal", "portal");
-     reqJS.addScripts("portal.UIPortal.initMouseHover('" + uicomponent.id + "');");
-%>  
-<div class="UIContainer <%=uiComponentClass%> EdittingContainer<%=uicomponent.getPermissionClasses()%>"
-				id="${uicomponent.id}" ${cssStyle}>
-<%
-  }
-  else
-  {   
 %>
-<div class="UIContainer <%=uiComponentClass%> <%=hasAccessPermission?"": "ProtectedContainer"%>" id="${uicomponent.id}" ${cssStyle}>
-<%
-  }
-%>
-	<div class="NormalContainerBlock UIComponentBlock">
-		<%
-			if (editMode == EditMode.BLOCK) {
-		%>
-			<div class="LAYOUT-CONTAINER LAYOUT-BLOCK">
-		<%} else {%>
-			<div class="VIEW-CONTAINER VIEW-BLOCK">
-		<%} %> 
-        <div class="UIIntermediateContainer">
-  				<%if(hasAccessPermission) {%>
-  					<div id="${uicomponent.id}Children" class="UIRowContainer <%=(editMode != EditMode.NO_EDIT && uicomponent.getChildren().size() == 0) ? "EmptyContainer" : ""%>">
-  							<%uicomponent.renderChildren();%>
-  					</div>
-          <% } else { %>
-            <div id="${uicomponent.id}Children" class="ProtectedContent">
-              <%=_ctx.appRes("UIPortlet.label.protectedContent")%>
-            </div>
-          <% } %>
-  			</div>
+<div class="UIContainer <%=uiComponentClass%>" id="${uicomponent.id}" ${cssStyle}>
+  <div class="NormalContainerBlock UIComponentBlock">
+    <div class="VIEW-CONTAINER VIEW-BLOCK">
+      <div class="UIIntermediateContainer">
+        <div id="${uicomponent.id}Children" class="UIRowContainer">
+          <% uicomponent.renderChildren();%>
+        </div>
       </div>
-
-		<%if (editMode != EditMode.NO_EDIT) {%>
-			<div class="EDITION-BLOCK EDITION-CONTAINER" style="display: none;position: relative;">
-				<div style="position: absolute; top: -86px;">
-					<div class="NewLayer" style="display: none; visibility: hidden;"><span></span></div>
-					<div class="CONTROL-CONTAINER CONTROL-BLOCK uiInfoBar">
-						<%/*Begin InfoBar*/%>
-						
-							<i class="uiIconDragDrop uiIconWhite"  rel="tooltip" data-placement="right"   title="<%=_ctx.appRes("UIContainer.title.DragControlArea")%>"></i>
-							<% 
-								String strTitle = uicomponent.getTitle() != null ?
-									ExpressionUtil.getExpressionValue(res, uicomponent.getTitle()) :
-									_ctx.appRes("UIContainer.title.Container"); 			
-								strTitle = hasAccessPermission ? strTitle : _ctx.appRes("UIPortlet.label.protectedContent");																					
-							%>
-							<i class="uiIconContainerConfig uiIconWhite"></i>
-							<span><%=HTMLEntityEncoder.getInstance().encode(strTitle)%></span>
-							<%if(hasAccessPermission) {%>
-								<a href="javascript:void(0);" onclick="<%=uicomponent.event("EditContainer")%>" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIContainer.tooltip.editContainer")%>"><i class="uiIconEdit uiIconWhite"></i></a>
-								<a href="javascript:void(0);" onclick="<%=uicomponent.event("DeleteComponent")%>" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIContainer.tooltip.closeContainer")%>"><i class="uiIconTrash uiIconWhite"></i></a>
-							<%}%>
-												
-						<%/*End InfoBar*/ %>
-					</div>
-				</div>	
-			</div>	
-		<%} %>
-	</div>
+    </div>
+  </div>
 </div>
