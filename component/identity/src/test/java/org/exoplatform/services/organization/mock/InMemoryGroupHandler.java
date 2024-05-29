@@ -175,7 +175,7 @@ public class InMemoryGroupHandler implements GroupHandler {
 
   @Override
   public ListAccess<Group> findGroupChildren(Group parent, String keyword) {
-    List<Group> childGroups = groupChildsById.computeIfAbsent(parent.getId(), key -> Collections.emptyMap())
+    List<Group> childGroups = groupChildsById.computeIfAbsent(parent.getId(), key -> new HashMap<>())
                                              .values()
                                              .stream()
                                              .filter(group -> StringUtils.contains(group.getLabel(), keyword)
@@ -185,7 +185,7 @@ public class InMemoryGroupHandler implements GroupHandler {
   }
 
   public Collection<Group> findGroups(Group parent) {
-    return groupChildsById.computeIfAbsent(parent.getId(), key -> Collections.emptyMap())
+    return groupChildsById.computeIfAbsent(parent.getId(), key -> new HashMap<>())
                           .values()
                           .stream()
                           .map(ObjectUtils::clone)
