@@ -40,11 +40,9 @@ import jakarta.persistence.Transient;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.portal.mop.SiteType;
 
-@ExoEntity
 @Entity(name = "GateInPage")
 @SequenceGenerator(name = "SEQ_GTN_ID_GENERATOR", sequenceName = "SEQ_GTN_PAGE_ID", allocationSize = 1)
 @Table(name = "PORTAL_PAGES")

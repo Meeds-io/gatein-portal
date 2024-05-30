@@ -27,10 +27,7 @@ import jakarta.persistence.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
 @Entity(name = "GateInContainer")
-@ExoEntity
 @Table(name = "PORTAL_CONTAINERS")
 @NamedQueries({ @NamedQuery(name = "ContainerEntity.findByIds", query = "SELECT c FROM GateInContainer c WHERE c.id in (:ids)") })
 public class ContainerEntity extends ComponentEntity implements Serializable {

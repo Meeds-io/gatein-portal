@@ -26,11 +26,9 @@ import jakarta.persistence.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.portal.mop.SiteType;
 
 @Entity(name = "GateInSite")
-@ExoEntity
 @Table(name = "PORTAL_SITES")
 @NamedQuery(
   name = "SiteEntity.findByKey",
