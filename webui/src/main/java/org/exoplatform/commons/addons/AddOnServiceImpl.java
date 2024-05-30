@@ -32,7 +32,7 @@ import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
 public class AddOnServiceImpl implements AddOnService {
 
-    private List<ApplicationDecorator<Portlet>> apps = new ArrayList<ApplicationDecorator<Portlet>>();
+    private List<ApplicationDecorator<Portlet>> apps = new ArrayList<>();
 
     @Override
     public List<Application<Portlet>> getApplications(String containerName) {
