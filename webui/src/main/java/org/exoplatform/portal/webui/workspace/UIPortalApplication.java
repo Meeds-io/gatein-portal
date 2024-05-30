@@ -1235,14 +1235,12 @@ public class UIPortalApplication extends UIApplication {
       return ((PortalRequestContext) RequestContext.getCurrentInstance()).isDraftPage();
     }
 
-    private boolean isMaximizePortlet() {
-      return StringUtils.isNotBlank(getMaximizedPortletId());
+    public boolean isMaximizePortlet() {
+      return StringUtils.isNotBlank(PortalRequestContext.getCurrentInstance().getMaximizedPortletId());
     }
 
-    private String getMaximizedPortletId() {
-      PortalRequestContext prContext = Util.getPortalRequestContext();
-      HttpServletRequest req = prContext.getRequest();
-      return req.getParameter("maximizedPortletId");
+    public String getMaximizedPortletId() {
+      return PortalRequestContext.getCurrentInstance().getMaximizedPortletId();
     }
 
 }

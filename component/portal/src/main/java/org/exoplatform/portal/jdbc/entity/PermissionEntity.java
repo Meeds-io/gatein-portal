@@ -22,10 +22,7 @@ import java.io.Serializable;
 
 import jakarta.persistence.*;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
 @Entity(name = "GateInPermission")
-@ExoEntity
 @Table(name = "PORTAL_PERMISSIONS")
 @NamedQueries({
   @NamedQuery(name = "PermissionEntity.deleteByRefId", query = "DELETE GateInPermission p WHERE p.referenceType = :refType AND p.referenceId = :refId"),
