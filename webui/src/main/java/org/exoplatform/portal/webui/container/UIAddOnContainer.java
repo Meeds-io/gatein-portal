@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.exoplatform.commons.addons.AddOnService;
+import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
@@ -41,7 +42,7 @@ public class UIAddOnContainer extends UIContainer {
     @Override
     @SneakyThrows
     public List<UIComponent> getChildren() {
-      if (!initialized) {
+      if (!initialized || PortalRequestContext.getCurrentInstance().isNoCache()) {
         AddOnService addonService = getApplicationComponent(AddOnService.class);
         List<Application<Portlet>> apps = addonService.getApplications(this.getName());
         Container model = new Container();

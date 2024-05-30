@@ -171,7 +171,7 @@ public class UIPortal extends UIContainer {
      * @return the UIPage associated to the specified pageReference or null if not any
      */
     public UIPage getUIPage(String pageReference) {
-      if (isDraftPage()) {
+      if (isDraftPage() || isNoCache()) {
         return null;
       } else {
         return this.allUiPages.get(pageReference);
@@ -186,6 +186,10 @@ public class UIPortal extends UIContainer {
 
     public boolean isDraftPage() {
       return ((PortalRequestContext) RequestContext.getCurrentInstance()).isDraftPage();
+    }
+
+    public boolean isNoCache() {
+      return ((PortalRequestContext) RequestContext.getCurrentInstance()).isNoCache();
     }
 
     public void clearUIPage(String pageReference) {

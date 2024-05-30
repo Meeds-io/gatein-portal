@@ -42,7 +42,6 @@ import jakarta.persistence.PreRemove;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.mop.NodeTarget;
@@ -50,7 +49,6 @@ import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.services.listener.ListenerService;
 
 @Entity(name = "GateInNavigationNode")
-@ExoEntity
 @Table(name = "PORTAL_NAVIGATION_NODES")
 @NamedQueries({
     @NamedQuery(name = "NodeEntity.findByPage", query = "SELECT n FROM GateInNavigationNode n INNER JOIN n.page p WHERE p.id = :pageId") })
