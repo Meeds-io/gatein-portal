@@ -23,10 +23,7 @@ import java.io.Serializable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
 @Embeddable
-@ExoEntity
 public class DescriptionState implements Serializable { 
 
   private static final long serialVersionUID = 8153489837379310510L;

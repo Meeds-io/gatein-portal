@@ -21,7 +21,6 @@ package org.exoplatform.portal.application;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -102,6 +101,7 @@ import org.w3c.dom.Element;
  * It mainly implements the abstract methods and overide some.
  */
 public class PortalRequestContext extends WebuiRequestContext {
+
     protected static Log log = ExoLogger.getLogger("portal:PortalRequestContext");
 
     public static final int PUBLIC_ACCESS = 0;
@@ -161,6 +161,9 @@ public class PortalRequestContext extends WebuiRequestContext {
     @Setter
     private Boolean draftPage;
 
+    @Setter
+    private Boolean noCache;
+
     private boolean forceFullUpdate = false;
 
     private Writer writer_;
@@ -174,6 +177,8 @@ public class PortalRequestContext extends WebuiRequestContext {
     private Map<String, String[]> parameterMap;
 
     private Locale locale = Locale.ENGLISH;
+
+    private List<Runnable> endRequestRunnables;
 
     /** . */
     private final URLFactoryService urlFactory;
@@ -315,6 +320,13 @@ public class PortalRequestContext extends WebuiRequestContext {
             return null;
         }
     }
+    
+    public boolean isNoCache() {
+      if (noCache == null) {
+        noCache = StringUtils.equals("true", getRequest().getParameter("noCache"));
+      }
+      return noCache.booleanValue();
+    }
 
     public boolean isDraftPage() {
       if (draftPage == null) {
@@ -442,6 +454,19 @@ public class PortalRequestContext extends WebuiRequestContext {
         }
       }
       return this.currentPortalConfig;
+    }
+    
+    public void addOnRequestEnd(Runnable runnable) {
+      if (endRequestRunnables == null) {
+        endRequestRunnables = new ArrayList<>();
+      }
+      endRequestRunnables.add(runnable);
+    }
+
+    public void onRequestEnd() {
+      if (endRequestRunnables != null) {
+        endRequestRunnables.forEach(Runnable::run);
+      }
     }
 
     public String getTitle() throws Exception {
@@ -767,6 +792,14 @@ public class PortalRequestContext extends WebuiRequestContext {
         return new RequestNavigationData(controllerContext.getParameter(RequestNavigationData.REQUEST_SITE_TYPE),
                 controllerContext.getParameter(RequestNavigationData.REQUEST_SITE_NAME),
                 controllerContext.getParameter(RequestNavigationData.REQUEST_PATH));
+    }
+
+    public boolean isMaximizePortlet() {
+      return StringUtils.isNotBlank(getMaximizedPortletId());
+    }
+
+    public String getMaximizedPortletId() {
+      return getRequest().getParameter("maximizedPortletId");
     }
 
     public static PortalRequestContext getCurrentInstance() {

@@ -16,9 +16,17 @@
  */
 package org.exoplatform.settings.jpa.entity;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 
 /**
  * Created by The eXo Platform SAS
@@ -27,7 +35,6 @@ import jakarta.persistence.*;
  * Mar 07, 2017
  */
 @Entity(name = "SettingsEntity")
-@ExoEntity
 @Table(name = "STG_SETTINGS")
 @NamedQueries({
     @NamedQuery(name = "SettingsEntity.getSettingsByContextAndScope", query = "SELECT s FROM SettingsEntity s " +

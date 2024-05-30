@@ -22,11 +22,9 @@ import java.io.Serializable;
 
 import jakarta.persistence.*;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
 import org.exoplatform.portal.mop.SiteType;
 
 @Entity(name = "GateInNavigation")
-@ExoEntity
 @Table(name = "PORTAL_NAVIGATIONS")
 @NamedQueries({
   @NamedQuery(name = "NavigationEntity.findByOwner", query = "SELECT nav FROM GateInNavigation nav INNER JOIN nav.owner s WHERE s.siteType = :ownerType AND s.name = :ownerId"),

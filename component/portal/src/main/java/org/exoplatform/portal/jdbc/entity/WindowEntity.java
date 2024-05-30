@@ -22,8 +22,6 @@ import java.io.Serializable;
 
 import org.json.simple.JSONObject;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +35,6 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity(name = "GateInWindow")
-@ExoEntity
 @Table(name = "PORTAL_WINDOWS")
 @NamedQuery(name = "WindowEntity.findByIds", query = "SELECT w FROM GateInWindow w WHERE w.id IN (:ids)")
 @NamedQuery(name = "WindowEntity.findByContentIds", query = "SELECT w.id FROM GateInWindow w WHERE w.contentId IN (:contentIds)")
@@ -53,13 +50,13 @@ public class WindowEntity extends ComponentEntity implements Serializable {
   @Column(name = "ID")
   protected Long            id;
 
-  @Column(name = "TITLE", length = 200)
+  @Column(name = "TITLE")
   private String            title;
 
-  @Column(name = "ICON", length = 200)
+  @Column(name = "ICON")
   private String            icon;
 
-  @Column(name = "DESCRIPTION", length = 2000)
+  @Column(name = "DESCRIPTION")
   private String            description;
 
   @Column(name = "SHOW_INFO_BAR")
@@ -71,26 +68,26 @@ public class WindowEntity extends ComponentEntity implements Serializable {
   @Column(name = "SHOW_APP_MODE")
   private boolean           showApplicationMode;
 
-  @Column(name = "THEME", length = 200)
+  @Column(name = "THEME")
   private String            theme;
 
-  @Column(name = "WIDTH", length = 20)
+  @Column(name = "WIDTH")
   private String            width;
 
-  @Column(name = "HEIGHT", length = 20)
+  @Column(name = "HEIGHT")
   private String            height;
 
-  @Column(name = "PROPERTIES", length = 2000)
+  @Column(name = "PROPERTIES")
   private String            properties       = getJSONString(new JSONObject());
 
   @Column(name = "APP_TYPE")
   private AppType           appType;
 
-  @Column(name = "CONTENT_ID", length = 200)
+  @Column(name = "CONTENT_ID")
   private String            contentId;
 
   @Lob
-  @Column(name = "CUSTOMIZATION", length = 10000)
+  @Column(name = "CUSTOMIZATION")
   @Basic(fetch = FetchType.LAZY)
   private byte[]            customization;
 
