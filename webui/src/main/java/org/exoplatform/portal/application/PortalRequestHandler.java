@@ -128,69 +128,66 @@ public class PortalRequestHandler extends WebRequestHandler {
      */
     @Override
     public boolean execute(ControllerContext controllerContext) throws Exception {
-        HttpServletRequest req = controllerContext.getRequest();
-        HttpServletResponse res = controllerContext.getResponse();
+      HttpServletRequest req = controllerContext.getRequest();
+      HttpServletResponse res = controllerContext.getResponse();
 
-        log.debug("Session ID = " + req.getSession().getId());
+      log.debug("Session ID = " + req.getSession().getId());
 
-        // watch out: this might get overriden later, if the portal itself has a configuration for this value
-        res.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
-        res.setHeader("Pragma","no-cache");
-        res.setHeader("Expires","0");
+      // watch out: this might get overriden later, if the portal itself has a
+      // configuration for this value
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Expires", "0");
 
-        //
-        String requestPath = controllerContext.getParameter(REQUEST_PATH);
-        String requestSiteType = controllerContext.getParameter(REQUEST_SITE_TYPE);
-        String requestSiteName = controllerContext.getParameter(REQUEST_SITE_NAME);
+      //
+      String requestPath = controllerContext.getParameter(REQUEST_PATH);
+      String requestSiteType = controllerContext.getParameter(REQUEST_SITE_TYPE);
+      String requestSiteName = controllerContext.getParameter(REQUEST_SITE_NAME);
 
-        //
-        Locale requestLocale;
-        String lang = controllerContext.getParameter(LANG);
-        if (lang == null || lang.length() == 0) {
-            requestLocale = null;
-        } else {
-            requestLocale = I18N.parseTagIdentifier(lang);
-        }
+      //
+      Locale requestLocale;
+      String lang = controllerContext.getParameter(LANG);
+      if (lang == null || lang.length() == 0) {
+        requestLocale = null;
+      } else {
+        requestLocale = I18N.parseTagIdentifier(lang);
+      }
 
-        if (requestSiteName == null) {
-            res.sendRedirect(req.getContextPath());
-            return true;
-        }
-        UserPortalConfigService portalConfigService = (UserPortalConfigService) PortalContainer.getComponent(UserPortalConfigService.class);
-        requestPath = computeRequestPath(requestPath, requestSiteName, requestSiteType, portalConfigService, req);
-        PortalApplication app = controllerContext.getController().getApplication(PortalApplication.PORTAL_APPLICATION_ID);
-        PortalRequestContext context = new PortalRequestContext(app, controllerContext, requestSiteType, requestSiteName,
-                requestPath, requestLocale);
-
+      if (requestSiteName == null) {
+        res.sendRedirect(req.getContextPath());
+        return true;
+      }
+      UserPortalConfigService portalConfigService =
+                                                  (UserPortalConfigService) PortalContainer.getComponent(UserPortalConfigService.class);
+      requestPath = computeRequestPath(requestPath, requestSiteName, requestSiteType, portalConfigService, req);
+      PortalApplication app = controllerContext.getController().getApplication(PortalApplication.PORTAL_APPLICATION_ID);
+      PortalRequestContext context = new PortalRequestContext(app,
+                                                              controllerContext,
+                                                              requestSiteType,
+                                                              requestSiteName,
+                                                              requestPath,
+                                                              requestLocale);
+      try {
         PortalConfig persistentPortalConfig = context.getDynamicPortalConfig();
-
         if (context.getUserPortalConfig() == null) {
-            if (persistentPortalConfig == null
-                || StringUtils.equals(persistentPortalConfig.getName(), portalConfigService.getGlobalPortal())) {
-                return false;
-            } else if (req.getRemoteUser() == null) {
-                context.requestAuthenticationLogin();
-            } else {
-                context.sendRedirect("/portal/" + portalConfigService.getMetaPortal() + "/page-not-found");
-            }
-        } else if (persistentPortalConfig != null && StringUtils.equals(persistentPortalConfig.getName(), portalConfigService.getGlobalPortal())) {
+          if (persistentPortalConfig == null
+              || StringUtils.equals(persistentPortalConfig.getName(), portalConfigService.getGlobalPortal())) {
+            return false;
+          } else if (req.getRemoteUser() == null) {
+            context.requestAuthenticationLogin();
+          } else {
+            context.sendRedirect("/portal/" + portalConfigService.getMetaPortal() + "/page-not-found");
+          }
+        } else if (persistentPortalConfig != null
+                   && StringUtils.equals(persistentPortalConfig.getName(), portalConfigService.getGlobalPortal())) {
           return false;
         } else {
-            if (persistentPortalConfig != null) {
-                String cacheControl = persistentPortalConfig.getProperty(PortalProperties.CACHE_CONTROL);
-                if (cacheControl != null) {
-                    // GTNPORTAL-3361
-                    // Previously, the Cache-Control was set to no-cache at all times, the reason for that being unclear.
-                    // A feature request to allow portals to set their own policy caused this change, but we might
-                    // revert if there are bad side-effects. If so, please replace this comment with the background information,
-                    // so that it gets documented why the no-cache setting is forced.
-                    res.setHeader("Cache-Control", URLEncoder.encode(cacheControl, "UTF-8"));
-                }
-            }
-            processRequest(context, app);
+          processRequest(context, app);
         }
-
         return true;
+      } finally {
+        context.onRequestEnd();
+      }
     }
 
     /**
