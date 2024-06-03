@@ -24,6 +24,8 @@
 
   <display-name>portal</display-name>
 
+  <absolute-ordering/>
+
   <distributable/>
 
   <!-- ================================================================== -->
@@ -302,6 +304,8 @@
     <role-name>users</role-name>
   </security-role>
 
-  <absolute-ordering/>
+  <session-config>
+    <tracking-mode>COOKIE</tracking-mode>
+  </session-config>
 
 </web-app>
