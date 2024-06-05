@@ -87,10 +87,6 @@ eXo.loadJS = function(path) {
   request.setRequestHeader("Cache-Control", "max-age=86400") ;
 
   request.send(null) ;
-  eXo.session.itvDestroy() ;
-  if(eXo.session.canKeepState && eXo.session.isOpen && eXo.env.portal.accessMode == 'private') {
-    eXo.session.itvInit() ;
-  }
   try {
     eval(request.responseText) ;
   } catch(err) {
@@ -123,26 +119,6 @@ eXo.env.server.createPortalURL = function(targetComponentId, actionName, useAjax
  */
 eXo.portal.logout = function() {
 	window.location = eXo.env.server.createPortalURL("UIPortal", "Logout", false) ;
-} ;
-
-eXo.session.openUrl = null ;
-eXo.session.itvTime = null ;
-eXo.session.itvObj = null;
-
-eXo.session.itvInit = function() {
-	if(!eXo.session.openUrl) eXo.session.openUrl = eXo.env.server.createPortalURL("UIPortal", "Ping", false) ;
-	if(!eXo.session.itvTime) eXo.session.itvTime = 1800;
-	if(eXo.session.itvTime > 0) eXo.session.itvObj = window.setTimeout("eXo.session.itvOpen()", (eXo.session.itvTime - 10)*1000) ;
-} ;
-
-eXo.session.itvOpen = function() {
-	var result = ajaxAsyncGetRequest(eXo.session.openUrl, false) ;
-	if(!isNaN(result)) eXo.session.itvTime = parseInt(result) ;
-} ;
-
-eXo.session.itvDestroy = function() {
-	window.clearTimeout(eXo.session.itvObj) ;
-	eXo.session.itvObj = null ;
 } ;
 
 eXo.debug = function(message) {

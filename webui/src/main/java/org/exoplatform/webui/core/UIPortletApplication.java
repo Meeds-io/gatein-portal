@@ -130,7 +130,6 @@ public abstract class UIPortletApplication extends UIApplication {
             Writer w = context.getWriter();
 
             Set<UIComponent> list = context.getUIComponentToUpdateByAjax();
-            // if(list == null) list = app.getDefaultUIComponentToUpdateByAjax(context) ;
             if (list != null) {
                 for (UIComponent uicomponent : list) {
                     renderBlockToUpdate(uicomponent, context, w);
