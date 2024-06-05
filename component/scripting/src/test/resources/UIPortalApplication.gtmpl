@@ -76,15 +76,6 @@
       eXo.env.server.context = '<%=docBase%>' ;
       eXo.env.server.portalBaseURL = '<%=rcontext.getURLBuilder().getBaseURL()%>' ;
       eXo.env.client.skin = '$skin' ;
-      <%
-        String sessionAliveLevel = (portal == null ? null : portal.sessionAlive) ;
-        boolean canKeepState = sessionAliveLevel == null ? false : !sessionAliveLevel.equals(PortalProperties.SESSION_NEVER) ;
-      %>
-
-      eXo.session.level = '$sessionAliveLevel';
-      eXo.session.canKeepState = $canKeepState;
-      eXo.session.isOpen = $uicomponent.isSessionOpen ;
-      eXo.session.itvTime = ${(rcontext).getRequest().getSession().getMaxInactiveInterval()} ;
     </script>
   </head>
 
@@ -116,7 +107,6 @@
 
     <script type="text/javascript">
         eXo.core.Browser.onLoad();
-      <%if(canKeepState && uicomponent.isSessionOpen) {%> eXo.session.itvInit() ;<%}%>
     </script>
   </body>
 </html>
