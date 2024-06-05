@@ -35,14 +35,17 @@ import lombok.SneakyThrows;
 @ComponentConfig
 public class UIAddOnContainer extends UIContainer {
 
-    public static final String ADDON_CONTAINER = "addonContainer";
+    public static final String   ADDON_CONTAINER  = "addonContainer";
 
-    private boolean initialized = false;
+    private ThreadLocal<Boolean> childrenComputed = new ThreadLocal<>(); // NOSONAR, remove already called async
+
+    private boolean              initialized      = false;
 
     @Override
     @SneakyThrows
     public List<UIComponent> getChildren() {
-      if (!initialized || PortalRequestContext.getCurrentInstance().isNoCache()) {
+      if (!initialized
+          || (PortalRequestContext.getCurrentInstance().isNoCache() && childrenComputed.get() == null)) {
         AddOnService addonService = getApplicationComponent(AddOnService.class);
         List<Application<Portlet>> apps = addonService.getApplications(this.getName());
         Container model = new Container();
@@ -54,6 +57,9 @@ public class UIAddOnContainer extends UIContainer {
         }
         this.setChildren(tmp.getChildren());
         initialized = true;
+
+        childrenComputed.set(true);
+        PortalRequestContext.getCurrentInstance().addOnRequestEnd(childrenComputed::remove);
       }
       return super.getChildren();
     }

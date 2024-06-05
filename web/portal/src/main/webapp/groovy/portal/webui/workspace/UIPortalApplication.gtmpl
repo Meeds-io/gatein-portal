@@ -173,15 +173,6 @@
      eXo.env.server.portalURLTemplate = "<%=uicomponent.getPortalURLTemplate()%>";
      eXo.env.client.skin = "$skin";
      eXo.env.client.assetsVersion = "<%=org.gatein.portal.controller.resource.ResourceRequestHandler.VERSION%>";
-     <% 
-       String sessionAliveLevel = (portal == null ? null : portal.sessionAlive);
-       boolean canKeepState = sessionAliveLevel == null ? false : !sessionAliveLevel.equals(PortalProperties.SESSION_NEVER) ;
-     %>
-     eXo.session.level = "$sessionAliveLevel";
-     eXo.session.canKeepState = $canKeepState;
-     eXo.session.isOpen = <%=uicomponent.isSessionOpen()%> ;
-     eXo.session.itvTime = ${session.getMaxInactiveInterval()} ;
-
      eXo.env.portal.onLoadCallbacks = eXo.env.portal.onLoadCallbacks || [];
      eXo.env.portal.addOnLoadCallback = callback => {
        eXo.env.portal.onLoadCallbacks.push(callback);
