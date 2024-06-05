@@ -18,32 +18,16 @@
 package io.meeds.spring.integration.test;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import org.exoplatform.jpa.CommonsDAOJPAImplTest;
 
-import io.meeds.kernel.test.KernelExtension;
-import io.meeds.spring.AvailableIntegration;
 import io.meeds.spring.module.dao.TestDao;
 import io.meeds.spring.module.service.TestExcludedService;
 import io.meeds.spring.module.service.TestService;
 import io.meeds.spring.module.storage.TestStorage;
 
-@ExtendWith({ SpringExtension.class, KernelExtension.class })
-@SpringBootApplication(scanBasePackages = {
-  KernelIntegrationTest.MODULE_NAME,
-  AvailableIntegration.KERNEL_TEST_MODULE,
-  AvailableIntegration.JPA_MODULE,
-  AvailableIntegration.LIQUIBASE_MODULE,
-})
-@EnableJpaRepositories(basePackages = KernelIntegrationTest.MODULE_NAME)
-@TestPropertySource(properties = {
-  "spring.liquibase.change-log=" + KernelIntegrationTest.CHANGELOG_PATH,
-})
+@SpringJUnitConfig(CommonsDAOJPAImplTest.class)
 public class KernelIntegrationTest extends CommonsDAOJPAImplTest { // NOSONAR
 
   static final String MODULE_NAME    = "io.meeds.spring.module";
