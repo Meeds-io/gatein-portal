@@ -23,7 +23,6 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.listener.Asynchronous;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
-import org.exoplatform.services.listener.ListenerBase;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -34,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * Created by The eXo Platform SARL
  * Author : Dang Van Minh
@@ -43,7 +43,7 @@ import java.util.Map;
  */
 public class EventManagerImpl<S, D> extends ListenerService implements EventManager<S, D> {
 
-    private Map<String, List<ListenerBase<S, D>>> listenerMap = new HashMap<>();
+    private Map<String, List<Listener<S, D>>> listenerMap = new HashMap<String, List<Listener<S, D>>>();
 
     private static final Log LOG = ExoLogger.getLogger(EventManagerImpl.class);
 
@@ -67,19 +67,19 @@ public class EventManagerImpl<S, D> extends ListenerService implements EventMana
      * {@inheritDoc}
      */
     @Override
-    public void addEventListener(String eventName, ListenerBase<S, D> listener) {
+    public void addEventListener(String eventName, Listener<S, D> listener) {
         // Check is Listener or its superclass asynchronous, if so - wrap it in AsynchronousListener.
         Class<?> listenerClass = listener.getClass();
         do {
             if (listenerClass.isAnnotationPresent(Asynchronous.class)) {
-                listener = new AsynchronousListener<>(listener);
+                listener = new AsynchronousListener<S, D>(listener);
                 break;
             }
             listenerClass = listenerClass.getSuperclass();
         } while (listenerClass != null);
-        List<ListenerBase<S, D>> list = listenerMap.get(eventName);
+        List<Listener<S, D>> list = listenerMap.get(eventName);
         if (list == null) {
-            list = new ArrayList<>();
+            list = new ArrayList<Listener<S, D>>();
         }
         list.add(listener);
         listenerMap.put(eventName, list);
@@ -97,8 +97,8 @@ public class EventManagerImpl<S, D> extends ListenerService implements EventMana
      * {@inheritDoc}
      */
     @Override
-    public void removeEventListener(String eventName, ListenerBase<S, D> listener) {
-        List<ListenerBase<S, D>> listeners = getEventListeners(eventName);
+    public void removeEventListener(String eventName, Listener<S, D> listener) {
+        List<Listener<S, D>> listeners = getEventListeners(eventName);
         listeners.remove(listener);
         if(listeners.size() == 0) listenerMap.remove(eventName);
         listenerMap.put(eventName, listeners);
@@ -109,9 +109,9 @@ public class EventManagerImpl<S, D> extends ListenerService implements EventMana
      */
     @Override
     public void broadcastEvent(Event<S, D> event) {
-        List<ListenerBase<S, D>> listeners = getEventListeners(event.getEventName());
+        List<Listener<S, D>> listeners = getEventListeners(event.getEventName());
         if (listeners.size() == 0) return;
-        for (ListenerBase<S, D> listener : listeners) {
+        for (Listener<S, D> listener : listeners) {
             try {
                 listener.onEvent(event);
             } catch (Exception e) {
@@ -124,9 +124,9 @@ public class EventManagerImpl<S, D> extends ListenerService implements EventMana
      * {@inheritDoc}
      */
     @Override
-    public List<ListenerBase<S, D>> getEventListeners(String type) {
+    public List<Listener<S, D>> getEventListeners(String type) {
     	if(!listenerMap.containsKey(type)) {
-    		return new ArrayList<>();
+    		return new ArrayList<Listener<S, D>>();
     	}
         return listenerMap.get(type);
     }

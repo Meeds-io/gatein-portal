@@ -19,7 +19,6 @@ package org.exoplatform.commons.api.event;
 
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
-import org.exoplatform.services.listener.ListenerBase;
 
 import java.util.List;
 
@@ -39,11 +38,11 @@ public interface EventManager<S, D> {
     
     /**
      * Registers a listener for a given event group in the event system.
-     * @param listener An instance of <code>ListenerBase</code> object.
+     * @param listener An instance of <code>Listener</code> object.
      * @param eventName Name of the event group.
      * @LevelAPI Experimental
      */
-    public void addEventListener(String eventName, ListenerBase<S, D> listener);    
+    public void addEventListener(String eventName, Listener<S, D> listener);    
 
     /**
      * Unregisters a listener out of the event system.  
@@ -54,11 +53,11 @@ public interface EventManager<S, D> {
     
     /**
      * Unregisters a listener out of a given event group in the event system.  
-     * @param listener An instance of <code>ListenerBase</code> object.
+     * @param listener An instance of <code>Listener</code> object.
      * @param eventName Name of the event group.
      * @LevelAPI Experimental
      */
-    public void removeEventListener(String eventName, ListenerBase<S, D> listener);    
+    public void removeEventListener(String eventName, Listener<S, D> listener);    
 
     /**
      * Broadcasts an event to a dedicated listener 
@@ -77,6 +76,6 @@ public interface EventManager<S, D> {
      * @return The list of listeners which are registered.
      * @LevelAPI Experimental
      */
-    public List<ListenerBase<S, D>> getEventListeners(String type);
+    public List<Listener<S, D>> getEventListeners(String type);
 
 }
