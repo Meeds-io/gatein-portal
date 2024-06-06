@@ -6,22 +6,50 @@ import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.settings.jpa.SettingContextDAO;
 import org.exoplatform.settings.jpa.SettingScopeDAO;
 import org.exoplatform.settings.jpa.SettingsDAO;
+
+import io.meeds.kernel.test.KernelExtension;
+import io.meeds.spring.AvailableIntegration;
+import io.meeds.spring.kernel.KernelCacheConfiguration;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith({ SpringExtension.class, KernelExtension.class })
+@SpringBootApplication(scanBasePackages = {
+  CommonsDAOJPAImplTest.MODULE_NAME,
+  AvailableIntegration.KERNEL_TEST_MODULE,
+  AvailableIntegration.JPA_MODULE,
+  AvailableIntegration.LIQUIBASE_MODULE,
+})
+@EnableJpaRepositories(basePackages = CommonsDAOJPAImplTest.MODULE_NAME)
+@ContextConfiguration(classes = { KernelCacheConfiguration.class })
+@TestPropertySource(properties = {
+  "spring.liquibase.change-log=" + CommonsDAOJPAImplTest.CHANGELOG_PATH,
+})
 @ConfiguredBy({
   @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
   @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
   @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.settings-configuration-local.xml")
 })
-public class CommonsDAOJPAImplTest extends BaseTest {
+public class CommonsDAOJPAImplTest extends BaseTest { // NOSONAR
+
+  protected static final String MODULE_NAME    = "io.meeds.spring.module";
+
+  protected static final String CHANGELOG_PATH = "classpath:db/changelog/test-rdbms.db.changelog.xml";
+
   protected SettingContextDAO settingContextDAO;
 
   protected SettingScopeDAO   settingScopeDAO;
 
   protected SettingsDAO       settingsDAO;
 
-
+  @Override
   public void setUp() {
     super.setUp();
 
@@ -36,12 +64,7 @@ public class CommonsDAOJPAImplTest extends BaseTest {
     cleanDB();
   }
 
-  public void testInit() {
-    assertNotNull(settingContextDAO);
-    assertNotNull(settingScopeDAO);
-    assertNotNull(settingsDAO);
-  }
-
+  @Override
   public void tearDown() {
     // Clean Data
     cleanDB();
@@ -61,6 +84,12 @@ public class CommonsDAOJPAImplTest extends BaseTest {
   @Override
   protected void afterRunBare() {
     super.afterRunBare();
+  }
+
+  public void testInit() {
+    assertNotNull(settingContextDAO);
+    assertNotNull(settingScopeDAO);
+    assertNotNull(settingsDAO);
   }
 
   private void cleanDB() {
