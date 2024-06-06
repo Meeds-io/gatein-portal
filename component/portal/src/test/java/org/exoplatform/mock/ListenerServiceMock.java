@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
+import org.exoplatform.services.listener.ListenerBase;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -39,7 +40,7 @@ public class ListenerServiceMock extends ListenerService {
 
   private static final Log                  LOG       = ExoLogger.getLogger("exo.kernel.component.common.ListenerService");
 
-  private final Map<String, List<Listener>> listeners = new ConcurrentHashMap<>();
+  private final Map<String, List<ListenerBase>> listeners = new ConcurrentHashMap<>();
 
   public ListenerServiceMock(ExoContainerContext ctx) {
     super(ctx, null, null);
@@ -51,18 +52,18 @@ public class ListenerServiceMock extends ListenerService {
   }
 
   @Override
-  public synchronized void addListener(String eventName, Listener listener) {
-    listeners.computeIfAbsent(eventName, key -> new Vector<Listener>())
+  public synchronized void addListener(String eventName, ListenerBase listener) {
+    listeners.computeIfAbsent(eventName, key -> new Vector<ListenerBase>())
              .add(listener);
   }
 
   @Override
-  public <S, D> void broadcast(String name, S source, D data) throws Exception {
-    List<Listener> list = listeners.get(name);
+  public <S, D> void broadcast(String name, S source, D data) {
+    List<ListenerBase> list = listeners.get(name);
     if (list == null) {
       return;
     }
-    for (Listener<S, D> listener : list) {
+    for (ListenerBase<S, D> listener : list) {
       try {
         listener.onEvent(new Event<>(name, source, data));
       } catch (Exception e) {
@@ -72,12 +73,12 @@ public class ListenerServiceMock extends ListenerService {
   }
 
   @Override
-  public <T extends Event> void broadcast(T event) throws Exception {
-    List<Listener> list = listeners.get(event.getEventName());
+  public <T extends Event> void broadcast(T event) {
+    List<ListenerBase> list = listeners.get(event.getEventName());
     if (list == null) {
       return;
     }
-    for (Listener listener : list) {
+    for (ListenerBase listener : list) {
       try {
         listener.onEvent(event);
       } catch (Exception e) {
