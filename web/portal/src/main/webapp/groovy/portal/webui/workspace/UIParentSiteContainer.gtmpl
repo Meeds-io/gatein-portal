@@ -10,7 +10,7 @@
   </div>
   <div id="ParentSiteRightContainer">
     <div id="ParentSiteContainerChildren">
-      <%uicomponent.renderChildren();%>
+      <% uicomponent.renderChildren();%>
     </div>
   </div>
 </div>

@@ -24,10 +24,7 @@ import java.util.Map;
 
 import jakarta.persistence.*;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
 @Entity(name = "GateInDescription")
-@ExoEntity
 @Table(name = "PORTAL_DESCRIPTIONS")
 @NamedQueries({
   @NamedQuery(name = "DescriptionEntity.getByRefId", query = "SELECT d FROM GateInDescription d WHERE d.referenceId = :refId") })

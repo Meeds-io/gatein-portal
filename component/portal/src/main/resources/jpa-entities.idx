@@ -1,0 +1,9 @@
+org.exoplatform.portal.jdbc.entity.DescriptionEntity
+org.exoplatform.portal.jdbc.entity.DescriptionState
+org.exoplatform.portal.jdbc.entity.ContainerEntity
+org.exoplatform.portal.jdbc.entity.PermissionEntity
+org.exoplatform.portal.jdbc.entity.SiteEntity
+org.exoplatform.portal.jdbc.entity.WindowEntity
+org.exoplatform.portal.jdbc.entity.NodeEntity
+org.exoplatform.portal.jdbc.entity.NavigationEntity
+org.exoplatform.portal.jdbc.entity.PageEntity

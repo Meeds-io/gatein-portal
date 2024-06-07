@@ -1,0 +1,3 @@
+org.exoplatform.settings.jpa.entity.ContextEntity
+org.exoplatform.settings.jpa.entity.ScopeEntity
+org.exoplatform.settings.jpa.entity.SettingsEntity

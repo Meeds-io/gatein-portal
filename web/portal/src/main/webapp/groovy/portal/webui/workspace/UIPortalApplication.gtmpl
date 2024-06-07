@@ -101,55 +101,49 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="$language" lang="$language" dir="$dir">
   <head id="head">
     <title><%=HTMLEntityEncoder.getInstance().encode(title)%></title>
-
     <%/* Metadatas */%>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="theme-color" content="#476A9C"/>
-
-    <% if (portal.viewport != null) { %>
-      <meta name="viewport" content = "${portal.viewport}"/>
-    <% } %>
-    <% if (metaInformation!= null) {
+    <% if (portal.viewport != null) {
+    %><meta name="viewport" content = "${portal.viewport}"/>
+    <% }
+      if (metaInformation!= null) {
          Iterator<String> keys = metaInformation.keySet().iterator();
          while (keys.hasNext()) {
            String metaName = keys.next();
-           String metaContent = metaInformation.get(metaName); %>
-      <meta name="<%=metaName%>" content="<%=metaContent%>" />
-    <%   } %>
-    <% } %>
-
-    <% _ctx.includeTemplates("UIPortalApplication-Start-head") %>
-
+           String metaContent = metaInformation.get(metaName);
+    %><meta name="<%=metaName%>" content="<%=metaContent%>" /><% 
+         }
+      }
+      _ctx.includeTemplates("UIPortalApplication-Start-head"); %>
     <link rel="shortcut icon" href="<%= org.exoplatform.portal.branding.Utils.getFaviconPath() %>" />
-
     <%/* Styles */%>
     <link id="brandingSkin" rel="stylesheet" type="text/css" href="<%=uicomponent.getBrandingUrl()%>">
     <% for (skinConfig in portalSkins) {
          def url = skinConfig.createURL(rcontext.controllerContext);
-         url.setOrientation(orientation); %>
-      <link id="${skinConfig.id}" rel="stylesheet" type="text/css" href="$url" skin-type="${skinConfig.type}" />
-    <% } %>
-    <% for (portletSkin in portletSkins) {
+         url.setOrientation(orientation);
+    %><link id="${skinConfig.id}" rel="stylesheet" type="text/css" href="$url" skin-type="${skinConfig.type}" />
+    <% }
+       for (portletSkin in portletSkins) {
          def url = portletSkin.createURL(rcontext.controllerContext);
-         url.setOrientation(orientation); %>
-      <link id="${portletSkin.id}" rel="stylesheet" type="text/css" href= "$url" skin-type="${portletSkin.type}" />
-    <% } %>
-    <% for (customSkin in customSkins) {
+         url.setOrientation(orientation);
+    %><link id="${portletSkin.id}" rel="stylesheet" type="text/css" href= "$url" skin-type="${portletSkin.type}" />
+    <% }
+       for (customSkin in customSkins) {
          def url = customSkin.createURL(rcontext.controllerContext);
-         url.setOrientation(orientation); %>
-      <link id="${customSkin.id}" rel="stylesheet" type="text/css" href= "$url" skin-type="${customSkin.type}" />
-    <% } %>
-
-    <%/* Scripts */%>
+         url.setOrientation(orientation);
+    %><link id="${customSkin.id}" rel="stylesheet" type="text/css" href= "$url" skin-type="${customSkin.type}" />
+    <% }
+    /* Scripts */
+      if (!rcontext.isMaximizePortlet()) { %>
     <script type="text/javascript" id="jsConfig">
       var require = <%=jsConfig%>;
     </script>
-
-    <% for (url in headerScripts) { %>
-      <script type="text/javascript" src="<%= url %>" data-id="header-script"></script>
+    <% }
+       for (url in headerScripts) {
+    %><script type="text/javascript" src="<%= url %>" data-id="header-script"></script>
     <% } %>
-
    <script type="text/javascript" id="remoteScripts">
      eXo.env.addLoadedRemoteScripts(<%=remoteScripts%>);
      <% if (org.exoplatform.commons.utils.PropertyManager.isDevelopping()) { %>
@@ -179,18 +173,6 @@
      eXo.env.server.portalURLTemplate = "<%=uicomponent.getPortalURLTemplate()%>";
      eXo.env.client.skin = "$skin";
      eXo.env.client.assetsVersion = "<%=org.gatein.portal.controller.resource.ResourceRequestHandler.VERSION%>";
-     <% 
-       String sessionAliveLevel = (portal == null ? null : portal.sessionAlive);
-       boolean canKeepState = sessionAliveLevel == null ? false : !sessionAliveLevel.equals(PortalProperties.SESSION_NEVER) ;
-     %>
-     eXo.portal.portalMode = <%= uicomponent.getModeState() %>;
-     eXo.portal.portalEditLevel = '<%= uicomponent.getEditLevel().toString() %>';
-     eXo.portal.fullPreview = '<%= org.exoplatform.portal.webui.page.UIPage.isFullPreview() %>';
-     eXo.session.level = "$sessionAliveLevel";
-     eXo.session.canKeepState = $canKeepState;
-     eXo.session.isOpen = <%=uicomponent.isSessionOpen()%> ;
-     eXo.session.itvTime = ${session.getMaxInactiveInterval()} ;
-
      eXo.env.portal.onLoadCallbacks = eXo.env.portal.onLoadCallbacks || [];
      eXo.env.portal.addOnLoadCallback = callback => {
        eXo.env.portal.onLoadCallbacks.push(callback);

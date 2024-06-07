@@ -1,5 +1,8 @@
 <%
 def rcontext = _ctx.getRequestContext() ;
+if (rcontext.isMaximizePortlet()) {
+  return;
+}
 
 /* Loading needed Fonts files in top of the page as a 'preload' resource to include it in response when using HTTP/2 */
 %><%/* Fonts Preload */%>
