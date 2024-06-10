@@ -71,7 +71,7 @@ public class TestJDBCNavigationService extends AbstractKernelTest {
                                                   "",
                                                   "",
                                                   "",
-                                                  "",
+                                                  null,
                                                   Collections.emptyList(),
                                                   Collections.emptyList(),
                                                   Collections.emptyList(),

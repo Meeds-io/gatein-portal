@@ -71,8 +71,8 @@ import org.exoplatform.services.log.Log;
 
 public class LayoutServiceImpl implements LayoutService {
 
-  private static final Log       LOG           = ExoLogger.getLogger(LayoutServiceImpl.class);
-  
+  private static final Log       LOG                     = ExoLogger.getLogger(LayoutServiceImpl.class);
+
   private static final String    SITE_DEAULT_BANNER_PATH = "site.default.banner.path";
 
   private ListenerService        listenerService;
@@ -83,14 +83,14 @@ public class LayoutServiceImpl implements LayoutService {
 
   private LayoutStorage          layoutStorage;
 
-  private Map<String, Container> sharedLayouts = new HashMap<>();
+  private Map<String, Container> sharedLayouts           = new HashMap<>();
 
-  private FileService fileService;
-  
+  private FileService            fileService;
+
   private PortalContainer        portalContainer;
 
   private InitParams             initParams;
-  
+
   public LayoutServiceImpl(ListenerService listenerService,
                            SiteStorage siteStorage,
                            PageStorage pageStorage,
@@ -202,6 +202,11 @@ public class LayoutServiceImpl implements LayoutService {
   }
 
   @Override
+  public Page getPage(long id) {
+    return pageStorage.getPage(id);
+  }
+
+  @Override
   public Page getPage(PageKey pageKey) {
     return pageStorage.getPage(pageKey);
   }
@@ -309,7 +314,7 @@ public class LayoutServiceImpl implements LayoutService {
   }
 
   @SuppressWarnings({
-      "unchecked", "rawtypes"
+                      "unchecked", "rawtypes"
   })
   public <T> LazyPageList<T> findLazyPageList(Query<T> q) { // NOSONAR
     Class<T> type = q.getClassType();
@@ -340,7 +345,8 @@ public class LayoutServiceImpl implements LayoutService {
         public PortalData[] load(int offset, int limit) throws Exception {
           SiteType siteType = ownerType == null ? SiteType.PORTAL : SiteType.valueOf(ownerType.toUpperCase());
           return getSiteNames(offset, limit).stream()
-                                            .map(siteName -> siteStorage.getPortalConfig(new SiteKey(siteType.getName(), siteName)))
+                                            .map(siteName -> siteStorage.getPortalConfig(new SiteKey(siteType.getName(),
+                                                                                                     siteName)))
                                             .toList()
                                             .toArray(new PortalData[siteNames.size()]);
         }
@@ -396,8 +402,10 @@ public class LayoutServiceImpl implements LayoutService {
   @Override
   public List<PortalConfig> getSites(SiteFilter filter) {
     List<SiteKey> portalKeysList = siteStorage.getSitesKeys(filter);
-    return portalKeysList.isEmpty() ? Collections.emptyList()
-                                                            : portalKeysList.stream().map(siteKey -> new PortalConfig(siteStorage.getPortalConfig(siteKey))).toList();
+    return portalKeysList.isEmpty() ? Collections.emptyList() :
+                                    portalKeysList.stream()
+                                                  .map(siteKey -> new PortalConfig(siteStorage.getPortalConfig(siteKey)))
+                                                  .toList();
   }
 
   @Override
@@ -413,15 +421,17 @@ public class LayoutServiceImpl implements LayoutService {
       FileItem fileItem = fileService.getFile(portalConfig.getBannerFileId());
       return fileItem == null || fileItem.getFileInfo() == null ? null : fileItem.getAsStream();
     } catch (FileStorageException | IOException e) {
-      return null ;
+      return null;
     }
   }
-  
+
   @Override
   public InputStream getDefaultSiteBannerStream(String siteName) {
     InputStream defaultSiteBanner = portalContainer.getPortalContext()
-                                    .getResourceAsStream(System.getProperty("sites." + siteName
-                                        + ".defaultBannerPath", "/images/sites/banner/" + siteName.toLowerCase() + ".png"));
+                                                   .getResourceAsStream(System.getProperty("sites." + siteName +
+                                                       ".defaultBannerPath",
+                                                                                           "/images/sites/banner/" +
+                                                                                               siteName.toLowerCase() + ".png"));
     if (defaultSiteBanner == null && initParams != null) {
       ValueParam siteDefaultBannerPath = initParams.getValueParam(SITE_DEAULT_BANNER_PATH);
       if (siteDefaultBannerPath != null && siteDefaultBannerPath.getValue() != null) {

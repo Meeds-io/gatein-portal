@@ -34,6 +34,6 @@ public class SiteBody extends ModelObject {
 
     @Override
     public ModelData build() {
-        return new BodyData(storageId, BodyType.SITE);
+        return new BodyData(storageId, BodyType.SITE, null);
     }
 }

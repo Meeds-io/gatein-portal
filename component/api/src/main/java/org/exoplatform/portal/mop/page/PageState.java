@@ -6,6 +6,8 @@ import java.util.*;
 import org.exoplatform.commons.utils.Safe;
 
 import lombok.Getter;
+import lombok.Setter;
+
 import org.exoplatform.portal.mop.PageType;
 
 /**
@@ -17,6 +19,11 @@ import org.exoplatform.portal.mop.PageType;
 public class PageState implements Serializable {
 
   private static final long serialVersionUID = 7874166775312871923L;
+
+  /** . */
+  @Getter
+  @Setter
+  private String            storageId;
 
   /** . */
   final String              editPermission;
