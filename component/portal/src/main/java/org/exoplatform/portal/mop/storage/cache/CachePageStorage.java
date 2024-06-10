@@ -10,13 +10,18 @@ import org.exoplatform.portal.mop.storage.LayoutStorage;
 import org.exoplatform.portal.mop.storage.PageStorageImpl;
 import org.exoplatform.portal.pom.data.PageData;
 import org.exoplatform.services.cache.CacheService;
+import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.listener.ListenerService;
 
 public class CachePageStorage extends PageStorageImpl {
 
-  public static final String                              PAGE_CACHE_NAME = "portal.PageService";
+  public static final String                              PAGE_CACHE_NAME     = "portal.PageService";
+
+  public static final String                              PAGE_KEY_CACHE_NAME = "portal.PageKeyById";
 
   private final FutureExoCache<PageKey, PageData, Object> pageFutureCache;
+
+  private final ExoCache<Long, PageKey>                   pageKeyByIdCache;
 
   public CachePageStorage(CacheService cacheService,
                           ListenerService listenerService,
@@ -31,6 +36,7 @@ public class CachePageStorage extends PageStorageImpl {
         return pageData == null ? PageData.NULL_OBJECT : pageData;
       }
     }, cacheService.getCacheInstance(PAGE_CACHE_NAME));
+    pageKeyByIdCache = cacheService.getCacheInstance(PAGE_KEY_CACHE_NAME);
   }
 
   @Override
@@ -74,6 +80,16 @@ public class CachePageStorage extends PageStorageImpl {
   public PageData getPage(org.exoplatform.portal.pom.data.PageKey key) {
     PageData pageData = pageFutureCache.get(null, key.toMopPageKey());
     return pageData == null || pageData.isNull() ? null : pageData;
+  }
+
+  @Override
+  protected PageKey getPageKey(long id) {
+    PageKey pageKey = pageKeyByIdCache.get(id);
+    if (pageKey == null) {
+      pageKey = super.getPageKey(id);
+      pageKeyByIdCache.put(id, pageKey);
+    }
+    return pageKey;
   }
 
 }

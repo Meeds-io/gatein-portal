@@ -45,6 +45,7 @@ import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.CloneApplicationState;
+import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.config.model.PersistentApplicationState;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.jdbc.entity.ComponentEntity;
@@ -408,23 +409,41 @@ public class LayoutStorage {
     dst.setTitle(src.getTitle());
     dst.setWidth(src.getWidth());
 
-    boolean hasProfiles = StringUtils.isNotBlank(src.getProfiles());
-    boolean hasCssClass = StringUtils.isNotBlank(src.getCssClass());
-    boolean hasBorderColor = StringUtils.isNotBlank(src.getBorderColor());
-    if (hasProfiles || hasCssClass || hasBorderColor) {
-      JSONObject properties = new JSONObject();
-      if (hasProfiles) {
-        properties.put(MappedAttributes.PROFILES.getName(), src.getProfiles());
-      }
-      if (hasCssClass) {
-        properties.put(MappedAttributes.CSS_CLASS.getName(), src.getCssClass());
-      }
-      if (hasBorderColor) {
-        properties.put(MappedAttributes.BORDER_COLOR.getName(), src.getBorderColor());
-      }
-      dst.setProperties(properties.toJSONString());
+    JSONObject properties = new JSONObject();
+    if (StringUtils.isNotBlank(src.getProfiles())) {
+      properties.put(MappedAttributes.PROFILES.getName(), src.getProfiles());
     }
-
+    if (StringUtils.isNotBlank(src.getCssClass())) {
+      properties.put(MappedAttributes.CSS_CLASS.getName(), src.getCssClass());
+    }
+    ModelStyle cssStyle = src.getCssStyle();
+    if (cssStyle != null) {
+      if (StringUtils.isNotBlank(cssStyle.getBorderColor())) {
+        properties.put(MappedAttributes.BORDER_COLOR.getName(), cssStyle.getBorderColor());
+      }
+      if (StringUtils.isNotBlank(cssStyle.getBackgroundColor())) {
+        properties.put(MappedAttributes.BACKGROUND_COLOR.getName(), cssStyle.getBackgroundColor());
+      }
+      if (StringUtils.isNotBlank(cssStyle.getBackgroundImage())) {
+        properties.put(MappedAttributes.BACKGROUND_IMAGE.getName(), cssStyle.getBackgroundImage());
+      }
+      if (StringUtils.isNotBlank(cssStyle.getBackgroundEffect())) {
+        properties.put(MappedAttributes.BACKGROUND_EFFECT.getName(), cssStyle.getBackgroundEffect());
+      }
+      if (StringUtils.isNotBlank(cssStyle.getBackgroundSize())) {
+        properties.put(MappedAttributes.BACKGROUND_SIZE.getName(), cssStyle.getBackgroundSize());
+      }
+      if (StringUtils.isNotBlank(cssStyle.getBackgroundRepeat())) {
+        properties.put(MappedAttributes.BACKGROUND_REPEAT.getName(), cssStyle.getBackgroundRepeat());
+      }
+      if (StringUtils.isNotBlank(cssStyle.getBorderSize())) {
+        properties.put(MappedAttributes.BORDER_SIZE.getName(), cssStyle.getBorderSize());
+      }
+      if (StringUtils.isNotBlank(cssStyle.getBoxShadow())) {
+        properties.put(MappedAttributes.BOX_SHADOW.getName(), cssStyle.getBoxShadow());
+      }
+    }
+    dst.setProperties(properties.toJSONString());
     return dst;
   }
 
@@ -463,14 +482,37 @@ public class LayoutStorage {
     dst.setWidth(srcChild.getWidth());
 
     boolean hasCssClass = StringUtils.isNotBlank(srcChild.getCssClass());
-    boolean hasBorderColor = StringUtils.isNotBlank(srcChild.getBorderColor());
-    if (hasCssClass || hasBorderColor) {
+    if (hasCssClass || srcChild.getCssStyle() != null) {
       JSONObject properties = srcChild.getProperties() == null ? new JSONObject() : new JSONObject(srcChild.getProperties());
       if (hasCssClass) {
         properties.put(MappedAttributes.CSS_CLASS.getName(), srcChild.getCssClass());
       }
-      if (hasBorderColor) {
-        properties.put(MappedAttributes.BORDER_COLOR.getName(), srcChild.getBorderColor());
+      ModelStyle cssStyle = srcChild.getCssStyle();
+      if (cssStyle != null) {
+        if (StringUtils.isNotBlank(cssStyle.getBorderColor())) {
+          properties.put(MappedAttributes.BORDER_COLOR.getName(), cssStyle.getBorderColor());
+        }
+        if (StringUtils.isNotBlank(cssStyle.getBackgroundColor())) {
+          properties.put(MappedAttributes.BACKGROUND_COLOR.getName(), cssStyle.getBackgroundColor());
+        }
+        if (StringUtils.isNotBlank(cssStyle.getBackgroundImage())) {
+          properties.put(MappedAttributes.BACKGROUND_IMAGE.getName(), cssStyle.getBackgroundImage());
+        }
+        if (StringUtils.isNotBlank(cssStyle.getBackgroundEffect())) {
+          properties.put(MappedAttributes.BACKGROUND_EFFECT.getName(), cssStyle.getBackgroundEffect());
+        }
+        if (StringUtils.isNotBlank(cssStyle.getBackgroundSize())) {
+          properties.put(MappedAttributes.BACKGROUND_SIZE.getName(), cssStyle.getBackgroundSize());
+        }
+        if (StringUtils.isNotBlank(cssStyle.getBackgroundRepeat())) {
+          properties.put(MappedAttributes.BACKGROUND_REPEAT.getName(), cssStyle.getBackgroundRepeat());
+        }
+        if (StringUtils.isNotBlank(cssStyle.getBorderSize())) {
+          properties.put(MappedAttributes.BORDER_SIZE.getName(), cssStyle.getBorderSize());
+        }
+        if (StringUtils.isNotBlank(cssStyle.getBoxShadow())) {
+          properties.put(MappedAttributes.BOX_SHADOW.getName(), cssStyle.getBoxShadow());
+        }
       }
       dst.setProperties(properties.toJSONString());
     } else {
@@ -509,7 +551,7 @@ public class LayoutStorage {
   }
 
   @SuppressWarnings({
-      "unchecked", "rawtypes"
+                      "unchecked", "rawtypes"
   })
   private ApplicationData buildWindow(WindowEntity windowEntity) {
     ApplicationType<?> appType = convertAppType(windowEntity.getAppType());
@@ -530,15 +572,37 @@ public class LayoutStorage {
                                                                  windowEntity.getId(),
                                                                  PermissionEntity.TYPE.ACCESS);
 
-    String cssClass = null;
-    String borderColor = null;
     JSONObject attrs = windowEntity.getProperties() == null ? null : parseJsonObject(windowEntity.getProperties());
+    ModelStyle cssStyle = null;
+    String cssClass = null;
     if (attrs != null) {
+      cssStyle = new ModelStyle();
       if (attrs.containsKey(MappedAttributes.CSS_CLASS.getName())) {
         cssClass = (String) attrs.get(MappedAttributes.CSS_CLASS.getName());
       }
       if (attrs.containsKey(MappedAttributes.BORDER_COLOR.getName())) {
-        borderColor = (String) attrs.get(MappedAttributes.BORDER_COLOR.getName());
+        cssStyle.setBorderColor((String) attrs.get(MappedAttributes.BORDER_COLOR.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.BORDER_SIZE.getName())) {
+        cssStyle.setBorderSize((String) attrs.get(MappedAttributes.BORDER_SIZE.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.BOX_SHADOW.getName())) {
+        cssStyle.setBoxShadow((String) attrs.get(MappedAttributes.BOX_SHADOW.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.BACKGROUND_COLOR.getName())) {
+        cssStyle.setBackgroundColor((String) attrs.get(MappedAttributes.BACKGROUND_COLOR.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.BACKGROUND_IMAGE.getName())) {
+        cssStyle.setBackgroundImage((String) attrs.get(MappedAttributes.BACKGROUND_IMAGE.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.BACKGROUND_EFFECT.getName())) {
+        cssStyle.setBackgroundEffect((String) attrs.get(MappedAttributes.BACKGROUND_EFFECT.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.BACKGROUND_SIZE.getName())) {
+        cssStyle.setBackgroundSize((String) attrs.get(MappedAttributes.BACKGROUND_SIZE.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.BACKGROUND_REPEAT.getName())) {
+        cssStyle.setBackgroundRepeat((String) attrs.get(MappedAttributes.BACKGROUND_REPEAT.getName()));
       }
     }
 
@@ -557,7 +621,7 @@ public class LayoutStorage {
                                windowEntity.getWidth(),
                                windowEntity.getHeight(),
                                cssClass,
-                               borderColor,
+                               cssStyle,
                                properties,
                                buildPermission(access));
   }
@@ -584,14 +648,36 @@ public class LayoutStorage {
                                                                   PermissionEntity.TYPE.MOVE_CONTAINER);
 
     String cssClass = null;
-    String borderColor = null;
     String profiles = null;
+    ModelStyle cssStyle = null;
     if (attrs != null) {
+      cssStyle = new ModelStyle();
       if (attrs.containsKey(MappedAttributes.CSS_CLASS.getName())) {
         cssClass = (String) attrs.get(MappedAttributes.CSS_CLASS.getName());
       }
       if (attrs.containsKey(MappedAttributes.BORDER_COLOR.getName())) {
-        borderColor = (String) attrs.get(MappedAttributes.BORDER_COLOR.getName());
+        cssStyle.setBorderColor((String) attrs.get(MappedAttributes.BORDER_COLOR.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.BORDER_SIZE.getName())) {
+        cssStyle.setBorderSize((String) attrs.get(MappedAttributes.BORDER_SIZE.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.BOX_SHADOW.getName())) {
+        cssStyle.setBoxShadow((String) attrs.get(MappedAttributes.BOX_SHADOW.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.BACKGROUND_COLOR.getName())) {
+        cssStyle.setBackgroundColor((String) attrs.get(MappedAttributes.BACKGROUND_COLOR.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.BACKGROUND_IMAGE.getName())) {
+        cssStyle.setBackgroundImage((String) attrs.get(MappedAttributes.BACKGROUND_IMAGE.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.BACKGROUND_EFFECT.getName())) {
+        cssStyle.setBackgroundEffect((String) attrs.get(MappedAttributes.BACKGROUND_EFFECT.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.BACKGROUND_SIZE.getName())) {
+        cssStyle.setBackgroundSize((String) attrs.get(MappedAttributes.BACKGROUND_SIZE.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.BACKGROUND_REPEAT.getName())) {
+        cssStyle.setBackgroundRepeat((String) attrs.get(MappedAttributes.BACKGROUND_REPEAT.getName()));
       }
       if (attrs.containsKey(MappedAttributes.PROFILES.getName())) {
         profiles = (String) attrs.get(MappedAttributes.PROFILES.getName());
@@ -609,8 +695,8 @@ public class LayoutStorage {
                              entity.getWidth(),
                              entity.getHeight(),
                              cssClass,
-                             borderColor,
                              profiles,
+                             cssStyle,
                              buildPermission(access),
                              buildPermission(moveApps),
                              buildPermission(moveConts),
@@ -638,7 +724,35 @@ public class LayoutStorage {
           JSONObject attrs = parseJsonObject(srcContainer.getProperties());
           String ctype = (String) attrs.get(MappedAttributes.TYPE.getName());
           if (BodyType.PAGE.name().equals(ctype)) {
-            BodyData body = new BodyData(String.valueOf(id), BodyType.PAGE);
+            ModelStyle cssStyle = null;
+            if (attrs != null) {
+              cssStyle = new ModelStyle();
+              if (attrs.containsKey(MappedAttributes.BORDER_COLOR.getName())) {
+                cssStyle.setBorderColor((String) attrs.get(MappedAttributes.BORDER_COLOR.getName()));
+              }
+              if (attrs.containsKey(MappedAttributes.BACKGROUND_COLOR.getName())) {
+                cssStyle.setBackgroundColor((String) attrs.get(MappedAttributes.BACKGROUND_COLOR.getName()));
+              }
+              if (attrs.containsKey(MappedAttributes.BACKGROUND_IMAGE.getName())) {
+                cssStyle.setBackgroundImage((String) attrs.get(MappedAttributes.BACKGROUND_IMAGE.getName()));
+              }
+              if (attrs.containsKey(MappedAttributes.BACKGROUND_EFFECT.getName())) {
+                cssStyle.setBackgroundEffect((String) attrs.get(MappedAttributes.BACKGROUND_EFFECT.getName()));
+              }
+              if (attrs.containsKey(MappedAttributes.BACKGROUND_SIZE.getName())) {
+                cssStyle.setBackgroundSize((String) attrs.get(MappedAttributes.BACKGROUND_SIZE.getName()));
+              }
+              if (attrs.containsKey(MappedAttributes.BACKGROUND_REPEAT.getName())) {
+                cssStyle.setBackgroundRepeat((String) attrs.get(MappedAttributes.BACKGROUND_REPEAT.getName()));
+              }
+              if (attrs.containsKey(MappedAttributes.BORDER_SIZE.getName())) {
+                cssStyle.setBorderSize((String) attrs.get(MappedAttributes.BORDER_SIZE.getName()));
+              }
+              if (attrs.containsKey(MappedAttributes.BOX_SHADOW.getName())) {
+                cssStyle.setBoxShadow((String) attrs.get(MappedAttributes.BOX_SHADOW.getName()));
+              }
+            }
+            BodyData body = new BodyData(String.valueOf(id), BodyType.PAGE, cssStyle);
             results.add(body);
           } else {
             results.add(buildContainer(containers.get(id),
@@ -783,7 +897,7 @@ public class LayoutStorage {
   }
 
   @SuppressWarnings({
-      "unchecked"
+                      "unchecked"
   })
   private void savePermissions(Long id, ComponentData srcChild) {
     if (id == null) {

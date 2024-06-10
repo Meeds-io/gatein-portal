@@ -79,7 +79,7 @@ public class TestJDBCNavigationServiceUpdate extends AbstractKernelTest {
                                                 "",
                                                 "",
                                                 "",
-                                                "",
+                                                null,
                                                 Collections.emptyList(),
                                                 Collections.emptyList(),
                                                 Collections.emptyList(),

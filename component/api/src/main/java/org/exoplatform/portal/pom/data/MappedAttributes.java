@@ -53,6 +53,20 @@ public class MappedAttributes {
 
   public static final Key<String>  BORDER_COLOR       = Key.create("border-color", ValueType.STRING);
 
+  public static final Key<String>  BACKGROUND_COLOR   = Key.create("background-color", ValueType.STRING);
+
+  public static final Key<String>  BACKGROUND_IMAGE   = Key.create("background-image", ValueType.STRING);
+
+  public static final Key<String>  BACKGROUND_EFFECT  = Key.create("background-effect", ValueType.STRING);
+
+  public static final Key<String>  BACKGROUND_REPEAT  = Key.create("background-repeat", ValueType.STRING);
+
+  public static final Key<String>  BACKGROUND_SIZE    = Key.create("background-size", ValueType.STRING);
+
+  public static final Key<String>  BORDER_SIZE        = Key.create("border-size", ValueType.STRING);
+
+  public static final Key<String>  BOX_SHADOW         = Key.create("box-shadow", ValueType.STRING);
+
   /** . */
   public static final Key<String>  PROFILES           = Key.create("profiles", ValueType.STRING);
 

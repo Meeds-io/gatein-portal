@@ -18,32 +18,50 @@
  */
 package org.exoplatform.portal.config.model;
 
+import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
-public class ModelStyle {
+public class ModelStyle implements Serializable {
 
-  private Integer marginTop;
+  private static final long serialVersionUID = 3688402796115766370L;
 
-  private Integer marginBottom;
+  private Integer           marginTop;
 
-  private Integer marginRight;
+  private Integer           marginBottom;
 
-  private Integer marginLeft;
+  private Integer           marginRight;
 
-  private Integer radiusTopRight;
+  private Integer           marginLeft;
 
-  private Integer radiusTopLeft;
+  private Integer           radiusTopRight;
 
-  private Integer radiusBottomRight;
+  private Integer           radiusTopLeft;
 
-  private Integer radiusBottomLeft;
+  private Integer           radiusBottomRight;
 
-  private Boolean mobileHidden;
+  private Integer           radiusBottomLeft;
 
-  private String  borderColor;
+  private Boolean           mobileHidden;
+
+  private String            borderColor;
+
+  private String            borderSize;
+
+  private String            boxShadow;
+
+  private String            backgroundColor;
+
+  private String            backgroundImage;
+
+  private String            backgroundEffect;
+
+  private String            backgroundSize;
+
+  private String            backgroundRepeat;
 
   public String getCssClass() { // NOSONAR
     StringBuilder cssClass = new StringBuilder();

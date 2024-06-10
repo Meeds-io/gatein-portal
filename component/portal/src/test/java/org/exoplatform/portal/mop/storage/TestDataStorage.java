@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 eXo Platform SAS.
+  * Copyright (C) 2009 eXo Platform SAS.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -266,14 +266,12 @@ public class TestDataStorage extends AbstractKernelTest {
     container.setTemplate("test");
     container.setHeight(height);
     container.setWidth(width);
-    container.setBorderColor(borderColor);
     container.setCssClass(cssClass);
     page.setChildren(new ArrayList<>(Collections.singletonList(container)));
 
     Application<Portlet> application = new Application<>(ApplicationType.PORTLET);
     application.setHeight(height);
     application.setWidth(width);
-    application.setBorderColor(borderColor);
     application.setCssClass(cssClass);
     application.setState(new TransientApplicationState<>("test/test",  null));
     container.setChildren(new ArrayList<>(Collections.singletonList(application)));
@@ -317,13 +315,11 @@ public class TestDataStorage extends AbstractKernelTest {
     assertEquals(height, childObject.getHeight());
     assertEquals(width, childObject.getWidth());
     assertEquals(cssClass, childObject.getCssClass());
-    assertEquals(borderColor, childObject.getBorderColor());
 
     childObject = ((Container) childObject).getChildren().get(0);
     assertEquals(height, childObject.getHeight());
     assertEquals(width, childObject.getWidth());
-    assertEquals(cssClass, childObject.getCssClass());
-    assertEquals(borderColor, childObject.getBorderColor());
+    assertEquals(cssClass.trim(), childObject.getCssClass().trim());
 
     pageContext = pageService.loadPage(page.getPageKey());
     assertEquals("MyTitle", pageContext.getState().getDisplayName());
@@ -903,7 +899,7 @@ public class TestDataStorage extends AbstractKernelTest {
                                                 "",
                                                 "",
                                                 "",
-                                                "",
+                                                null,
                                                 Collections.emptyList(),
                                                 Collections.emptyList(),
                                                 Collections.emptyList(),

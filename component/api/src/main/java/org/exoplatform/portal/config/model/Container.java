@@ -91,7 +91,7 @@ public class Container extends ModelObject implements Cloneable {
     this.width = data.getWidth();
     this.height = data.getHeight();
     this.cssClass = data.getCssClass();
-    this.borderColor = data.getBorderColor();
+    this.cssStyle = data.getCssStyle();
     this.profiles = data.getProfiles();
     this.accessPermissions = data.getAccessPermissions().toArray(new String[data.getAccessPermissions().size()]);
     List<String> permisssions = data.getMoveAppsPermissions();
@@ -223,8 +223,8 @@ public class Container extends ModelObject implements Cloneable {
                              getWidth(),
                              getHeight(),
                              getCssClass(),
-                             getBorderColor(),
                              getProfiles(),
+                             getCssStyle(),
                              Utils.safeImmutableList(accessPermissions),
                              Utils.safeImmutableList(moveAppsPermissions),
                              Utils.safeImmutableList(moveContainersPermissions),

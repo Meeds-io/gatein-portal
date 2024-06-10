@@ -118,4 +118,6 @@ public interface PageStorage extends PageService {
 
   Page getPage(PageKey pageKey);
 
+  Page getPage(long id);
+
 }

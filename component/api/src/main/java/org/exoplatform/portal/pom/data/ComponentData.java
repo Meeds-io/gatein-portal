@@ -18,6 +18,8 @@
  */
 package org.exoplatform.portal.pom.data;
 
+import org.exoplatform.portal.config.model.ModelStyle;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -31,9 +33,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public abstract class ComponentData extends ModelData {
 
-    private static final long serialVersionUID = 7604813006448463333L;
+  private static final long serialVersionUID = 7604813006448463333L;
 
-    ComponentData(String storageId, String storageName) {
-        super(storageId, storageName);
-    }
+  private ModelStyle        cssStyle;
+
+  ComponentData(String storageId, String storageName, ModelStyle cssStyle) {
+    super(storageId, storageName);
+    this.cssStyle = cssStyle;
+  }
 }
