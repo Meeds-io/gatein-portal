@@ -163,7 +163,6 @@ public class TestLoadedPOM extends AbstractConfigTest {
     Container column = (Container) columnsSection.getChildren().get(0);
     assertEquals(1, column.getChildren().size());
     assertEquals("CellContainer", column.getTemplate());
-    assertNull(column.getBorderColor());
     assertNotNull(column.getCssClass());
     assertTrue("'flex-cell' not found", column.getCssClass().contains("flex-cell"));
     assertTrue("'grid-cell-colspan-md-9' not found", column.getCssClass().contains("grid-cell-colspan-md-9"));
@@ -175,7 +174,6 @@ public class TestLoadedPOM extends AbstractConfigTest {
     assertTrue("'TEST-column-class' custom class not found", column.getCssClass().contains("TEST-column-class"));
 
     Application<Portlet> columnApplication = (Application<Portlet>) column.getChildren().get(0);
-    assertEquals("#CCAABB", columnApplication.getBorderColor());
     assertNotNull(columnApplication.getCssClass());
     assertTrue("'mt-n1' not found", columnApplication.getCssClass().contains("mt-n1"));
     assertTrue("'mb-n3' not found", columnApplication.getCssClass().contains("mb-n3"));
@@ -202,7 +200,6 @@ public class TestLoadedPOM extends AbstractConfigTest {
     Container cell = (Container) gridSection.getChildren().get(0);
     assertEquals(1, cell.getChildren().size());
     assertEquals("CellContainer", cell.getTemplate());
-    assertEquals("#EE3355", cell.getBorderColor());
     assertNotNull(cell.getCssClass());
     assertTrue("'grid-cell' not found", cell.getCssClass().contains("grid-cell"));
     assertTrue("'grid-cell-colspan-md-2' not found", cell.getCssClass().contains("grid-cell-colspan-md-2"));

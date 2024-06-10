@@ -18,6 +18,8 @@
  */
 package org.exoplatform.portal.pom.data;
 
+import org.exoplatform.portal.config.model.ModelStyle;
+
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
@@ -27,8 +29,8 @@ public class BodyData extends ComponentData {
     /** . */
     private final BodyType type;
 
-    public BodyData(String storageId, BodyType type) {
-        super(storageId, null);
+    public BodyData(String storageId, BodyType type, ModelStyle cssStyle) {
+        super(storageId, null, cssStyle);
 
         //
         this.type = type;

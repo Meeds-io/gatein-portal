@@ -19,7 +19,6 @@
 package org.exoplatform.portal.config.serialize.model;
 
 import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.config.model.ModelStyle;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -34,8 +33,6 @@ public class Cell extends Container {
   private int        colSpan = 1;
 
   private int        rowSpan = 1;
-
-  private ModelStyle cssStyle;
 
   @Override
   public String getCssClass() {
@@ -55,15 +52,6 @@ public class Cell extends Container {
       cssClasses.append(cssStyle.getCssClass());
     }
     return cssClasses.toString();
-  }
-
-  @Override
-  public String getBorderColor() {
-    if (cssStyle != null && cssStyle.getBorderColor() != null) {
-      return cssStyle.getBorderColor();
-    } else {
-      return super.getBorderColor();
-    }
   }
 
   @Override

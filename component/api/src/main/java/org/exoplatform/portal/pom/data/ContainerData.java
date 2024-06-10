@@ -20,6 +20,8 @@ package org.exoplatform.portal.pom.data;
 
 import java.util.List;
 
+import org.exoplatform.portal.config.model.ModelStyle;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -67,9 +69,6 @@ public class ContainerData extends ComponentData {
     private final String cssClass;
 
     /** . */
-    private final String borderColor;
-
-    /** . */
     private final String profiles;
 
     /** . */
@@ -93,13 +92,13 @@ public class ContainerData extends ComponentData {
                          String width,
                          String height,
                          String cssClass,
-                         String borderColor,
                          String profiles,
+                         ModelStyle cssStyle,
                          List<String> accessPermissions,
                          List<String> moveAppsPermissions,
                          List<String> moveContainersPermissions,
                          List<ComponentData> children) {
-        super(storageId, null);
+        super(storageId, null, cssStyle);
 
         //
         this.id = id;
@@ -112,7 +111,6 @@ public class ContainerData extends ComponentData {
         this.width = width;
         this.height = height;
         this.cssClass = cssClass;
-        this.borderColor = borderColor;
         this.profiles = profiles;
         this.accessPermissions = accessPermissions;
         this.moveAppsPermissions = moveAppsPermissions;

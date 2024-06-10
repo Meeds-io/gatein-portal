@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
+import org.exoplatform.portal.config.model.ModelStyle;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,98 +31,95 @@ import lombok.EqualsAndHashCode;
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
- * @param <S> can be of type org.exoplatform.portal.pom.spi.portlet.Portlet only, see {@link ApplicationType}
+ * @param <S> can be of type org.exoplatform.portal.pom.spi.portlet.Portlet
+ *          only, see {@link ApplicationType}
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ApplicationData<S> extends ComponentData {
 
-    private static final long serialVersionUID = -9136595444062927185L;
+  private static final long         serialVersionUID = -9136595444062927185L;
 
-    /** . */
-    private final ApplicationType<S> type;
+  /** . */
+  private final ApplicationType<S>  type;
 
-    /** . */
-    private final ApplicationState<S> state;
+  /** . */
+  private final ApplicationState<S> state;
 
-    /** . */
-    private final String id;
+  /** . */
+  private final String              id;
 
-    /** . */
-    private final String title;
+  /** . */
+  private final String              title;
 
-    /** . */
-    private final String icon;
+  /** . */
+  private final String              icon;
 
-    /** . */
-    private final String description;
+  /** . */
+  private final String              description;
 
-    /** . */
-    private final boolean showInfoBar;
+  /** . */
+  private final boolean             showInfoBar;
 
-    /** . */
-    private final boolean showApplicationState;
+  /** . */
+  private final boolean             showApplicationState;
 
-    /** . */
-    private final boolean showApplicationMode;
+  /** . */
+  private final boolean             showApplicationMode;
 
-    /** . */
-    private final String theme;
+  /** . */
+  private final String              theme;
 
-    /** . */
-    private final String width;
+  /** . */
+  private final String              width;
 
-    /** . */
-    private final String height;
+  /** . */
+  private final String              height;
 
-    /** . */
-    private final String cssClass;
+  /** . */
+  private final String              cssClass;
 
-    /** . */
-    private final String borderColor;
+  /** . */
+  private final Map<String, String> properties;
 
-    /** . */
-    private final Map<String, String> properties;
+  /** . */
+  private final List<String>        accessPermissions;
 
-    /** . */
-    private final List<String> accessPermissions;
+  public ApplicationData(String storageId,
+                         String storageName,
+                         ApplicationType<S> type,
+                         ApplicationState<S> state,
+                         String id,
+                         String title,
+                         String icon,
+                         String description,
+                         boolean showInfoBar,
+                         boolean showApplicationState,
+                         boolean showApplicationMode,
+                         String theme,
+                         String width,
+                         String height,
+                         String cssClass,
+                         ModelStyle cssStyle,
+                         Map<String, String> properties,
+                         List<String> accessPermissions) {
+    super(storageId, storageName, cssStyle);
 
-    public ApplicationData(String storageId,
-                           String storageName,
-                           ApplicationType<S> type,
-                           ApplicationState<S> state,
-                           String id,
-                           String title,
-                           String icon,
-                           String description,
-                           boolean showInfoBar,
-                           boolean showApplicationState,
-                           boolean showApplicationMode,
-                           String theme,
-                           String width,
-                           String height,
-                           String cssClass,
-                           String borderColor,
-                           Map<String, String> properties,
-                           List<String> accessPermissions) {
-        super(storageId, storageName);
-
-        //
-        this.type = type;
-        this.state = state;
-        this.id = id;
-        this.title = title;
-        this.icon = icon;
-        this.description = description;
-        this.showInfoBar = showInfoBar;
-        this.showApplicationState = showApplicationState;
-        this.showApplicationMode = showApplicationMode;
-        this.theme = theme;
-        this.width = width;
-        this.height = height;
-        this.cssClass = cssClass;
-        this.borderColor = borderColor;
-        this.properties = properties;
-        this.accessPermissions = accessPermissions;
-    }
+    //
+    this.type = type;
+    this.state = state;
+    this.id = id;
+    this.title = title;
+    this.icon = icon;
+    this.description = description;
+    this.showInfoBar = showInfoBar;
+    this.showApplicationState = showApplicationState;
+    this.showApplicationMode = showApplicationMode;
+    this.theme = theme;
+    this.width = width;
+    this.height = height;
+    this.cssClass = cssClass;
+    this.properties = properties;
+    this.accessPermissions = accessPermissions;
+  }
 }

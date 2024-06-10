@@ -50,6 +50,12 @@ public class PageStorageImpl extends AbstractPageStorage {
   }
 
   @Override
+  public Page getPage(long id) {
+    PageKey key = getPageKey(id);
+    return getPage(key);
+  }
+
+  @Override
   public Page getPage(PageKey key) {
     if (key == null) {
       throw new IllegalArgumentException(NO_NULL_KEY_ACCEPTED);
@@ -222,6 +228,11 @@ public class PageStorageImpl extends AbstractPageStorage {
                                             String pageTitle) {
     List<PageContext> pages = findPages(siteType, siteName, pageTitle, from, limit);
     return new QueryResult<>(from, pages.size(), pages);
+  }
+
+  protected PageKey getPageKey(long id) {
+    PageEntity pageEntity = pageDAO.find(id);
+    return pageEntity == null ? null : new PageKey(pageEntity.getOwnerType(), pageEntity.getOwnerId(), pageEntity.getName());
   }
 
   private List<PageContext> findPages(SiteType siteType, String siteName, String pageTitle, int from, int limit) {

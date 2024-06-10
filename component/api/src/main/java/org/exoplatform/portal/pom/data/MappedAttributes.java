@@ -35,63 +35,79 @@ public class MappedAttributes {
   }
 
   /** . */
-  public static final Key<String>  ID                 = Key.create("id", ValueType.STRING);
+  public static final Key<String>  ID                  = Key.create("id", ValueType.STRING);
 
   /** . */
-  public static final Key<String>  NAME               = Key.create("name", ValueType.STRING);
+  public static final Key<String>  NAME                = Key.create("name", ValueType.STRING);
 
   /** . */
-  public static final Key<Boolean> SHOW_MAX_WINDOW    = Key.create("show-max-window", ValueType.BOOLEAN);
+  public static final Key<Boolean> SHOW_MAX_WINDOW     = Key.create("show-max-window", ValueType.BOOLEAN);
 
-  public static final Key<Boolean> HIDE_SHARED_LAYOUT = Key.create("hide-shared-layout", ValueType.BOOLEAN);
-
-  /** . */
-  public static final Key<String>  FACTORY_ID         = Key.create("factory-id", ValueType.STRING);
+  public static final Key<Boolean> HIDE_SHARED_LAYOUT  = Key.create("hide-shared-layout", ValueType.BOOLEAN);
 
   /** . */
-  public static final Key<String>  CSS_CLASS          = Key.create("css-class", ValueType.STRING);
-
-  public static final Key<String>  BORDER_COLOR       = Key.create("border-color", ValueType.STRING);
+  public static final Key<String>  FACTORY_ID          = Key.create("factory-id", ValueType.STRING);
 
   /** . */
-  public static final Key<String>  PROFILES           = Key.create("profiles", ValueType.STRING);
+  public static final Key<String>  CSS_CLASS           = Key.create("css-class", ValueType.STRING);
+
+  public static final Key<String>  BORDER_COLOR        = Key.create("border-color", ValueType.STRING);
+
+  public static final Key<String>  BACKGROUND_COLOR    = Key.create("background-color", ValueType.STRING);
+
+  public static final Key<String>  BACKGROUND_IMAGE    = Key.create("background-image", ValueType.STRING);
+
+  public static final Key<String>  BACKGROUND_EFFECT   = Key.create("background-effect", ValueType.STRING);
+
+  public static final Key<String>  BACKGROUND_POSITION = Key.create("background-position", ValueType.STRING);
+
+  public static final Key<String>  BACKGROUND_REPEAT   = Key.create("background-repeat", ValueType.STRING);
+
+  public static final Key<String>  BACKGROUND_SIZE     = Key.create("background-size", ValueType.STRING);
+
+  public static final Key<String>  BORDER_SIZE         = Key.create("border-size", ValueType.STRING);
+
+  public static final Key<String>  BOX_SHADOW          = Key.create("box-shadow", ValueType.STRING);
 
   /** . */
-  public static final Key<Integer> PRIORITY           = Key.create("priority", ValueType.INTEGER);
+  public static final Key<String>  PROFILES            = Key.create("profiles", ValueType.STRING);
 
   /** . */
-  public static final Key<String>  ICON               = Key.create("icon", ValueType.STRING);
+  public static final Key<Integer> PRIORITY            = Key.create("priority", ValueType.INTEGER);
 
   /** . */
-  public static final Key<String>  URI                = Key.create("uri", ValueType.STRING);
+  public static final Key<String>  ICON                = Key.create("icon", ValueType.STRING);
 
   /** . */
-  public static final Key<String>  TEMPLATE           = Key.create("template", ValueType.STRING);
+  public static final Key<String>  URI                 = Key.create("uri", ValueType.STRING);
 
   /** . */
-  public static final Key<String>  LOCALE             = Key.create("locale", ValueType.STRING);
+  public static final Key<String>  TEMPLATE            = Key.create("template", ValueType.STRING);
 
   /** . */
-  public static final Key<String>  SKIN               = Key.create("skin", ValueType.STRING);
+  public static final Key<String>  LOCALE              = Key.create("locale", ValueType.STRING);
 
   /** . */
-  public static final Key<String>  WIDTH              = Key.create("width", ValueType.STRING);
+  public static final Key<String>  SKIN                = Key.create("skin", ValueType.STRING);
 
   /** . */
-  public static final Key<String>  HEIGHT             = Key.create("height", ValueType.STRING);
+  public static final Key<String>  WIDTH               = Key.create("width", ValueType.STRING);
 
   /** . */
-  public static final Key<String>  TYPE               = Key.create("type", ValueType.STRING);
+  public static final Key<String>  HEIGHT              = Key.create("height", ValueType.STRING);
 
   /** . */
-  public static final Key<Boolean> SHOW_INFO_BAR      = Key.create("showinfobar", ValueType.BOOLEAN);
+  public static final Key<String>  TYPE                = Key.create("type", ValueType.STRING);
 
   /** . */
-  public static final Key<Boolean> SHOW_MODE          = Key.create("showmode", ValueType.BOOLEAN);
+  public static final Key<Boolean> SHOW_INFO_BAR       = Key.create("showinfobar", ValueType.BOOLEAN);
 
   /** . */
-  public static final Key<Boolean> SHOW_WINDOW_STATE  = Key.create("showwindowstate", ValueType.BOOLEAN);
+  public static final Key<Boolean> SHOW_MODE           = Key.create("showmode", ValueType.BOOLEAN);
 
   /** . */
-  public static final Key<String>  THEME              = Key.create("theme", ValueType.STRING);
+  public static final Key<Boolean> SHOW_WINDOW_STATE   = Key.create("showwindowstate", ValueType.BOOLEAN);
+
+  /** . */
+  public static final Key<String>  THEME               = Key.create("theme", ValueType.STRING);
 }

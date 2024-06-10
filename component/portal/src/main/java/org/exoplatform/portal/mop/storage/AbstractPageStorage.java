@@ -128,6 +128,7 @@ public abstract class AbstractPageStorage implements PageStorage {
                         editPermission, // editPermission
                         entity.isShowMaxWindow(), // showMaxWindow
                         entity.isHideSharedLayout(),
+                        null, // cssStyle
                         moveAppsPermissions,
                         moveContainersPermissions,
                         entity.getPageType() != null ? entity.getPageType().name() : null,
