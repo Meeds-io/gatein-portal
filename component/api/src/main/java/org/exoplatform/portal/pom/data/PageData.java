@@ -20,6 +20,8 @@ package org.exoplatform.portal.pom.data;
 
 import java.util.List;
 
+import org.exoplatform.portal.config.model.ModelStyle;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -75,6 +77,7 @@ public class PageData extends ContainerData {
                     String editPermission,
                     boolean showMaxWindow,
                     boolean hideSharedLayout,
+                    ModelStyle cssStyle,
                     List<String> moveAppsPermissions,
                     List<String> moveContainersPermissions,
                     String type,
@@ -90,8 +93,8 @@ public class PageData extends ContainerData {
             width,
             height,
             cssClass,
-            null,
             profiles,
+            cssStyle,
             accessPermissions,
             moveAppsPermissions,
             moveContainersPermissions,

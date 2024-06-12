@@ -21,6 +21,7 @@ package org.exoplatform.portal.config;
 
 import java.util.*;
 
+import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.mop.PageType;
 import org.gatein.common.io.IOTools;
 
@@ -33,7 +34,7 @@ import org.exoplatform.portal.pom.data.*;
  */
 public class TestSerialization extends AbstractGateInTest {
     /** . */
-    private final BodyData body = new BodyData("foo", BodyType.PAGE);
+    private final BodyData body = new BodyData("foo", BodyType.PAGE, null);
 
     /** . */
     private final ContainerData container = new ContainerData("foo01",
@@ -47,8 +48,8 @@ public class TestSerialization extends AbstractGateInTest {
                                                             "foo09",
                                                             "foo10",
                                                             "foo11",
-                                                            "foo11.1",
                                                             "foo12",
+                                                            new ModelStyle(),
                                                             Collections.singletonList("foo11"),
                                                             Collections.singletonList("foo11"),
                                                             Collections.singletonList("foo11"),
@@ -93,7 +94,6 @@ public class TestSerialization extends AbstractGateInTest {
         assertEquals(container.getWidth(), clone.getWidth());
         assertEquals(container.getHeight(), clone.getHeight());
         assertEquals(container.getAccessPermissions(), clone.getAccessPermissions());
-        assertEquals(container.getBorderColor(), clone.getBorderColor());
         List<ComponentData> clonedChildren = container.getChildren();
         assertEquals(1, clonedChildren.size());
         assertEquals("foo", clonedChildren.get(0).getStorageId());
@@ -120,6 +120,7 @@ public class TestSerialization extends AbstractGateInTest {
                                 "foo16",
                                 true,
                                 true,
+                                new ModelStyle(),
                                 Collections.singletonList("foo13"),
                                 Collections.singletonList("foo13"),
                                 PageType.LINK.name(),

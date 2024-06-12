@@ -37,6 +37,6 @@ public class PageBody extends ModelObject {
 
     @Override
     public ModelData build() {
-        return new BodyData(storageId, BodyType.PAGE);
+        return new BodyData(storageId, BodyType.PAGE, cssStyle);
     }
 }

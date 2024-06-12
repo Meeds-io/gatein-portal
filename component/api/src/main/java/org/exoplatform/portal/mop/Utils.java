@@ -71,7 +71,7 @@ public class Utils {
     }
 
     public static PageState toPageState(Page page) {
-      return new PageState(page.getTitle(),
+      PageState pageState = new PageState(page.getTitle(),
                            page.getDescription(),
                            page.isShowMaxWindow(),
                            page.isHideSharedLayout(),
@@ -83,10 +83,12 @@ public class Utils {
                            page.getMoveContainersPermissions() != null ? Arrays.asList(page.getMoveContainersPermissions())                                                                       : null,
                            page.getType(),
                            page.getLink());
+      pageState.setStorageId(page.getStorageId());
+      return pageState;
     }
 
     public static PageState toPageState(PageData page) {
-      return new PageState(page.getTitle(),
+      PageState pageState = new PageState(page.getTitle(),
                            page.getDescription(),
                            page.isShowMaxWindow(),
                            page.isHideSharedLayout(),
@@ -98,6 +100,8 @@ public class Utils {
                            page.getMoveContainersPermissions(),
                            page.getType(),
                            page.getLink());
+      pageState.setStorageId(page.getStorageId());
+      return pageState;
     }
 
     private static class ComparableComparator<T extends Comparable<T>> implements Comparator<T> {

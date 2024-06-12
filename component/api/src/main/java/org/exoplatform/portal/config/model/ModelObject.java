@@ -55,7 +55,7 @@ public abstract class ModelObject {
 
     @Getter
     @Setter
-    protected String borderColor;
+    protected ModelStyle cssStyle;
 
     /**
      * Create a new object.

@@ -76,7 +76,7 @@ public class TestJCBCNavigationServiceRebase extends AbstractKernelTest {
                                                 "",
                                                 "",
                                                 "",
-                                                "",
+                                                null,
                                                 Collections.emptyList(),
                                                 Collections.emptyList(),
                                                 Collections.emptyList(),

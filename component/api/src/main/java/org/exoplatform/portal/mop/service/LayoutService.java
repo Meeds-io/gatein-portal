@@ -134,6 +134,15 @@ public interface LayoutService extends DataStorage {
   Page getPage(String pageId);
 
   /**
+   * This method should load the Page object from the database according to the
+   * technical identifier of the page
+   *
+   * @param id - UUID of page
+   * @return {@link Page}
+   */
+  Page getPage(long id);
+
+  /**
    * Retrieves Page designated by its key
    * 
    * @param  pageKey {@link PageKey}

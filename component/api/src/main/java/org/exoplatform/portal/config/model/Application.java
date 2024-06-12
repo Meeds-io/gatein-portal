@@ -25,9 +25,6 @@ import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.ApplicationData;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * May 13, 2004
  *
@@ -64,10 +61,6 @@ public class Application<S> extends ModelObject implements Cloneable {
     /** We cannot allow the type to change once the object is created. */
     private final ApplicationType<S> type;
 
-    @Getter
-    @Setter
-    private ModelStyle             cssStyle;
-
     public Application(ApplicationData<S> data) {
         super(data.getStorageId());
 
@@ -88,7 +81,7 @@ public class Application<S> extends ModelObject implements Cloneable {
         this.width = data.getWidth();
         this.height = data.getHeight();
         this.cssClass = data.getCssClass();
-        this.borderColor = data.getBorderColor();
+        this.cssStyle = data.getCssStyle();
         this.properties = new Properties(data.getProperties());
         this.accessPermissions = data.getAccessPermissions().toArray(new String[data.getAccessPermissions().size()]);
         this.type = data.getType();
@@ -244,15 +237,6 @@ public class Application<S> extends ModelObject implements Cloneable {
     }
 
     @Override
-    public String getBorderColor() {
-      if (cssStyle != null && cssStyle.getBorderColor() != null) {
-        return cssStyle.getBorderColor();
-      } else {
-        return super.getBorderColor();
-      }
-    }
-
-    @Override
     public ApplicationData build() {
       return new ApplicationData<S>(getStorageId(),
                                     getStorageName(),
@@ -269,7 +253,7 @@ public class Application<S> extends ModelObject implements Cloneable {
                                     getWidth(),
                                     getHeight(),
                                     getCssClass(),
-                                    getBorderColor(),
+                                    getCssStyle(),
                                     Utils.safeImmutableMap(properties),
                                     Utils.safeImmutableList(accessPermissions));
     }
