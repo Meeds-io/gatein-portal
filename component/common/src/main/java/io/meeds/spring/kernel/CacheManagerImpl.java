@@ -24,9 +24,11 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
+import org.springframework.core.env.Environment;
 
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
@@ -38,10 +40,14 @@ public class CacheManagerImpl implements CacheManager {
   @Setter
   private CacheService       cacheService;
 
+  @Setter
+  private Environment        environment;
+
   private Map<String, Cache> cacheInstances = new ConcurrentHashMap<>();
 
-  public CacheManagerImpl(CacheService cacheService) {
+  public CacheManagerImpl(CacheService cacheService, Environment environment) {
     this.cacheService = cacheService;
+    this.environment = environment;
   }
 
   @Override
@@ -52,7 +58,23 @@ public class CacheManagerImpl implements CacheManager {
   @Override
   public Cache getCache(String name) {
     return cacheInstances.computeIfAbsent(name, k -> {
+      boolean isNew = cacheService.getAllCacheInstances()
+                                  .stream()
+                                  .map(ExoCache::getName)
+                                  .noneMatch(n -> StringUtils.equals(n, name));
       ExoCache<Serializable, Object> cacheInstance = cacheService.getCacheInstance(name);
+      if (isNew) {
+        String ttl = environment.getProperty("meeds.cache." + name + ".ttl", "");
+        if (StringUtils.isNotBlank(ttl)) {
+          cacheInstance.setLiveTime(Integer.parseInt(ttl));
+        }
+
+        String maxElements = environment.getProperty("meeds.cache." + name + ".max", "");
+        if (StringUtils.isNotBlank(maxElements)) {
+          cacheInstance.setMaxSize(Integer.parseInt(maxElements));
+        }
+      }
+
       return new AbstractValueAdaptingCache(false) {
 
         @Override

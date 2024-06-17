@@ -22,6 +22,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 import org.exoplatform.services.cache.CacheService;
 
@@ -34,8 +35,8 @@ import org.exoplatform.services.cache.CacheService;
 public class KernelCacheConfiguration {
 
   @Bean
-  public CacheManager cacheManager(CacheService cacheService) {
-    return new CacheManagerImpl(cacheService);
+  public CacheManager cacheManager(CacheService cacheService, Environment environment) {
+    return new CacheManagerImpl(cacheService, environment);
   }
 
 }
