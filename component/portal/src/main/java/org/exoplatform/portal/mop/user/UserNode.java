@@ -33,6 +33,7 @@ import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.storage.DescriptionStorage;
 import org.exoplatform.services.resources.ResourceBundleService;
+
 import org.gatein.common.util.EmptyResourceBundle;
 
 /**
@@ -172,14 +173,15 @@ public class UserNode {
       return cachedResolvedLabel;
     }
 
-    String resolvedLabel = null;
+    String resolvedLabel = context.getState().getLabel();
 
     //
     String id = context.getId();
 
     //
     Locale userLocale = owner.navigation.portal.context.getUserLocale();
-    if (context.getState().getLabel() != null) {
+    if (context.getState().getLabel() != null
+        && ExpressionUtil.isResourceBindingExpression(context.getState().getLabel())) {
       ResourceBundle bundle = owner.navigation.getBundle();
       if (bundle == EmptyResourceBundle.INSTANCE) {
         ResourceBundleService resourceBundleService = ExoContainerContext.getService(ResourceBundleService.class);
