@@ -29,7 +29,7 @@
     <version>27-M03</version>
   </parent>
 
-  <groupId>org.exoplatform.gatein.portal</groupId>
+  <groupId>io.meeds.gatein.portal</groupId>
   <artifactId>exo.portal.parent</artifactId>
   <version>7.0.x-SNAPSHOT</version>
   <packaging>pom</packaging>
@@ -37,11 +37,12 @@
   <name>GateIn - Portal</name>
 
   <properties>
-    <org.exoplatform.gatein.sso.version>7.0.x-SNAPSHOT</org.exoplatform.gatein.sso.version>
-    <org.exoplatform.gatein.pc.version>7.0.x-SNAPSHOT</org.exoplatform.gatein.pc.version>
+    <io.meeds.gatein.sso.version>7.0.x-SNAPSHOT</io.meeds.gatein.sso.version>
+    <io.meeds.gatein.pc.version>7.0.x-SNAPSHOT</io.meeds.gatein.pc.version>
     
     <!-- Sonar properties -->
     <sonar.organization>meeds-io</sonar.organization>
+    <exo.snapshots.repo.url>https://repository.exoplatform.org/content/repositories/meeds-snapshots</exo.snapshots.repo.url>
   </properties>
 
   <scm>
@@ -61,18 +62,18 @@
     <dependencies>
       <!-- GateIn-PC dependencies -->
       <dependency>
-        <groupId>org.exoplatform.gatein.pc</groupId>
+        <groupId>io.meeds.gatein.pc</groupId>
         <artifactId>pc-parent</artifactId>
-        <version>${org.exoplatform.gatein.pc.version}</version>
+        <version>${io.meeds.gatein.pc.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
 
       <!-- GateIn-SSO dependencies -->
       <dependency>
-        <groupId>org.exoplatform.gatein.sso</groupId>
+        <groupId>io.meeds.gatein.sso</groupId>
         <artifactId>sso-parent</artifactId>
-        <version>${org.exoplatform.gatein.sso.version}</version>
+        <version>${io.meeds.gatein.sso.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

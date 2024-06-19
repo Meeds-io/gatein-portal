@@ -18,7 +18,7 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <groupId>org.exoplatform.gatein.portal</groupId>
+    <groupId>io.meeds.gatein.portal</groupId>
     <artifactId>exo.portal.component.web</artifactId>
     <version>7.0.x-SNAPSHOT</version>
   </parent>
@@ -53,9 +53,9 @@
       <artifactId>filters</artifactId>
     </dependency>
 
-    <!-- org.exoplatform.gatein.sso dependencies -->
+    <!-- io.meeds.gatein.sso dependencies -->
     <dependency>
-      <groupId>org.exoplatform.gatein.sso</groupId>
+      <groupId>io.meeds.gatein.sso</groupId>
       <artifactId>sso-agent</artifactId>
     </dependency>
   </dependencies>

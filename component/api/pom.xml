@@ -20,7 +20,7 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <groupId>org.exoplatform.gatein.portal</groupId>
+    <groupId>io.meeds.gatein.portal</groupId>
     <artifactId>exo.portal.component</artifactId>
     <version>7.0.x-SNAPSHOT</version>
   </parent>
@@ -35,7 +35,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.exoplatform.kernel</groupId>
+      <groupId>io.meeds.kernel</groupId>
       <artifactId>exo.kernel.component.common</artifactId>
       <exclusions>
         <exclusion>
@@ -50,23 +50,23 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.kernel</groupId>
+      <groupId>io.meeds.kernel</groupId>
       <artifactId>exo.kernel.container</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.kernel</groupId>
+      <groupId>io.meeds.kernel</groupId>
       <artifactId>exo.kernel.component.cache</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.kernel</groupId>
+      <groupId>io.meeds.kernel</groupId>
       <artifactId>exo.kernel.component.command</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.core</groupId>
+      <groupId>io.meeds.core</groupId>
       <artifactId>exo.core.component.database</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.core</groupId>
+      <groupId>io.meeds.core</groupId>
       <artifactId>exo.core.component.organization.api</artifactId>
       <exclusions>
         <exclusion>
@@ -77,39 +77,39 @@
     </dependency>
 
     <dependency>
-      <groupId>org.exoplatform.ws</groupId>
+      <groupId>io.meeds.ws</groupId>
       <artifactId>exo.ws.commons</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.ws</groupId>
+      <groupId>io.meeds.ws</groupId>
       <artifactId>exo.ws.frameworks.json</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.ws</groupId>
+      <groupId>io.meeds.ws</groupId>
       <artifactId>exo.ws.rest.core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.ws</groupId>
+      <groupId>io.meeds.ws</groupId>
       <artifactId>exo.ws.rest.ext</artifactId>
     </dependency>
 
-    <!-- org.exoplatform.gatein.wci dependencies -->
+    <!-- io.meeds.gatein.wci dependencies -->
     <dependency>
-      <groupId>org.exoplatform.gatein.wci</groupId>
+      <groupId>io.meeds.gatein.wci</groupId>
       <artifactId>wci-wci</artifactId>
     </dependency>
 
-    <!-- org.exoplatform.gatein.pc dependencies -->
+    <!-- io.meeds.gatein.pc dependencies -->
     <dependency>
-      <groupId>org.exoplatform.gatein.pc</groupId>
+      <groupId>io.meeds.gatein.pc</groupId>
       <artifactId>pc-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.gatein.pc</groupId>
+      <groupId>io.meeds.gatein.pc</groupId>
       <artifactId>pc-portlet</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.gatein.pc</groupId>
+      <groupId>io.meeds.gatein.pc</groupId>
       <artifactId>pc-federation</artifactId>
     </dependency>
 

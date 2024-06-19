@@ -18,7 +18,7 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <groupId>org.exoplatform.gatein.portal</groupId>
+    <groupId>io.meeds.gatein.portal</groupId>
     <artifactId>exo.portal.component</artifactId>
     <version>7.0.x-SNAPSHOT</version>
   </parent>
@@ -54,7 +54,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.exoplatform.kernel</groupId>
+      <groupId>io.meeds.kernel</groupId>
       <artifactId>exo.kernel.component.ext.cache.impl.infinispan.v8</artifactId>
       <!--
         Make it here provided to avoid transitive dependency for upper layers
