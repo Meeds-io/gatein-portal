@@ -53,6 +53,12 @@ public class MappedAttributes {
 
   public static final Key<String>  BORDER_COLOR        = Key.create("border-color", ValueType.STRING);
 
+  public static final Key<String>  TEXT_COLOR          = Key.create("text-color", ValueType.STRING);
+
+  public static final Key<String>  TEXT_HEADER_COLOR   = Key.create("text-header-color", ValueType.STRING);
+
+  public static final Key<String>  TEXT_SUBTITLE_COLOR = Key.create("text-subtitle-color", ValueType.STRING);
+
   public static final Key<String>  BACKGROUND_COLOR    = Key.create("background-color", ValueType.STRING);
 
   public static final Key<String>  BACKGROUND_IMAGE    = Key.create("background-image", ValueType.STRING);
