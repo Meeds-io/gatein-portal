@@ -24,10 +24,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.exoplatform.portal.mop.service.LayoutService;
+
 import org.gatein.common.net.media.MediaType;
 import org.gatein.pc.api.Portlet;
 import org.gatein.pc.api.info.ModeInfo;
 import org.gatein.pc.api.info.PortletInfo;
+import org.gatein.pc.portlet.impl.info.ContainerPortletInfo;
 
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Application;
@@ -249,7 +251,10 @@ public class PortalDataMapper {
         if (supportModes.size() > 1)
             supportModes.remove("view");
         uiPortlet.setSupportModes(supportModes);
-    }
+        if (portletInfo instanceof ContainerPortletInfo containerPortletInfo) {
+          uiPortlet.setCssClass(containerPortletInfo.getInitParameter("layout-css-class"));
+        }
+      }
 
     public static void toUIContainer(UIContainer uiContainer, Container model) throws Exception {
         uiContainer.setStorageId(model.getStorageId());
