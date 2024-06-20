@@ -445,6 +445,15 @@ public class LayoutStorage {
       if (StringUtils.isNotBlank(cssStyle.getBoxShadow())) {
         properties.put(MappedAttributes.BOX_SHADOW.getName(), cssStyle.getBoxShadow());
       }
+      if (StringUtils.isNotBlank(cssStyle.getTextColor())) {
+        properties.put(MappedAttributes.TEXT_COLOR.getName(), cssStyle.getTextColor());
+      }
+      if (StringUtils.isNotBlank(cssStyle.getTextHeaderColor())) {
+        properties.put(MappedAttributes.TEXT_HEADER_COLOR.getName(), cssStyle.getTextHeaderColor());
+      }
+      if (StringUtils.isNotBlank(cssStyle.getTextSubtitleColor())) {
+        properties.put(MappedAttributes.TEXT_SUBTITLE_COLOR.getName(), cssStyle.getTextSubtitleColor());
+      }
     }
     dst.setProperties(properties.toJSONString());
     return dst;
@@ -518,6 +527,15 @@ public class LayoutStorage {
         }
         if (StringUtils.isNotBlank(cssStyle.getBoxShadow())) {
           properties.put(MappedAttributes.BOX_SHADOW.getName(), cssStyle.getBoxShadow());
+        }
+        if (StringUtils.isNotBlank(cssStyle.getTextColor())) {
+          properties.put(MappedAttributes.TEXT_COLOR.getName(), cssStyle.getTextColor());
+        }
+        if (StringUtils.isNotBlank(cssStyle.getTextHeaderColor())) {
+          properties.put(MappedAttributes.TEXT_HEADER_COLOR.getName(), cssStyle.getTextHeaderColor());
+        }
+        if (StringUtils.isNotBlank(cssStyle.getTextSubtitleColor())) {
+          properties.put(MappedAttributes.TEXT_SUBTITLE_COLOR.getName(), cssStyle.getTextSubtitleColor());
         }
       }
       dst.setProperties(properties.toJSONString());
@@ -613,6 +631,15 @@ public class LayoutStorage {
       if (attrs.containsKey(MappedAttributes.BACKGROUND_REPEAT.getName())) {
         cssStyle.setBackgroundRepeat((String) attrs.get(MappedAttributes.BACKGROUND_REPEAT.getName()));
       }
+      if (attrs.containsKey(MappedAttributes.TEXT_COLOR.getName())) {
+        cssStyle.setTextColor((String) attrs.get(MappedAttributes.TEXT_COLOR.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.TEXT_HEADER_COLOR.getName())) {
+        cssStyle.setTextHeaderColor((String) attrs.get(MappedAttributes.TEXT_HEADER_COLOR.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.TEXT_SUBTITLE_COLOR.getName())) {
+        cssStyle.setTextSubtitleColor((String) attrs.get(MappedAttributes.TEXT_SUBTITLE_COLOR.getName()));
+      }
     }
 
     return new ApplicationData(String.valueOf(windowEntity.getId()),
@@ -691,6 +718,15 @@ public class LayoutStorage {
       if (attrs.containsKey(MappedAttributes.BACKGROUND_REPEAT.getName())) {
         cssStyle.setBackgroundRepeat((String) attrs.get(MappedAttributes.BACKGROUND_REPEAT.getName()));
       }
+      if (attrs.containsKey(MappedAttributes.TEXT_COLOR.getName())) {
+        cssStyle.setTextColor((String) attrs.get(MappedAttributes.TEXT_COLOR.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.TEXT_HEADER_COLOR.getName())) {
+        cssStyle.setTextHeaderColor((String) attrs.get(MappedAttributes.TEXT_HEADER_COLOR.getName()));
+      }
+      if (attrs.containsKey(MappedAttributes.TEXT_SUBTITLE_COLOR.getName())) {
+        cssStyle.setTextSubtitleColor((String) attrs.get(MappedAttributes.TEXT_SUBTITLE_COLOR.getName()));
+      }
       if (attrs.containsKey(MappedAttributes.PROFILES.getName())) {
         profiles = (String) attrs.get(MappedAttributes.PROFILES.getName());
       }
@@ -765,6 +801,15 @@ public class LayoutStorage {
               }
               if (attrs.containsKey(MappedAttributes.BOX_SHADOW.getName())) {
                 cssStyle.setBoxShadow((String) attrs.get(MappedAttributes.BOX_SHADOW.getName()));
+              }
+              if (attrs.containsKey(MappedAttributes.TEXT_COLOR.getName())) {
+                cssStyle.setTextColor((String) attrs.get(MappedAttributes.TEXT_COLOR.getName()));
+              }
+              if (attrs.containsKey(MappedAttributes.TEXT_HEADER_COLOR.getName())) {
+                cssStyle.setTextHeaderColor((String) attrs.get(MappedAttributes.TEXT_HEADER_COLOR.getName()));
+              }
+              if (attrs.containsKey(MappedAttributes.TEXT_SUBTITLE_COLOR.getName())) {
+                cssStyle.setTextSubtitleColor((String) attrs.get(MappedAttributes.TEXT_SUBTITLE_COLOR.getName()));
               }
             }
             BodyData body = new BodyData(String.valueOf(id), BodyType.PAGE, cssStyle);
