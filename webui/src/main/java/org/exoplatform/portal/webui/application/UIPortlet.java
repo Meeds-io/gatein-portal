@@ -106,6 +106,8 @@ import org.exoplatform.webui.event.Event.Phase;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * This UI component represent a portlet window on a page. <br>
@@ -194,6 +196,10 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
 
     /** A field storing localized value of javax.portlet.title * */
     private String configuredTitle;
+
+    @Getter
+    @Setter
+    private String cssClass;
 
     public String getStorageId() {
         return storageId;
@@ -1068,8 +1074,8 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
         if (pir instanceof FragmentResponse) {
             if (lazyResourcesLoading == null) {
               PortletInfo portletInfo = producedOfferedPortlet.getInfo();
-              if (portletInfo instanceof ContainerPortletInfo) {
-                String prefetchResources = ((ContainerPortletInfo) portletInfo).getInitParameter("prefetch.resources");
+              if (portletInfo instanceof ContainerPortletInfo containerPortletInfo) {
+                String prefetchResources = containerPortletInfo.getInitParameter("prefetch.resources");
                 lazyResourcesLoading = StringUtils.equals(prefetchResources, "true");
               } else {
                 lazyResourcesLoading = false;
