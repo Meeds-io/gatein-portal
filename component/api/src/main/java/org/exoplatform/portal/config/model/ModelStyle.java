@@ -65,6 +65,12 @@ public class ModelStyle implements Serializable {
 
   private String            backgroundRepeat;
 
+  private String            textColor;
+
+  private String            textHeaderColor;
+
+  private String            textSubtitleColor;
+
   public String getCssClass() { // NOSONAR
     StringBuilder cssClass = new StringBuilder();
     if (marginTop != null && marginTop >= 0) {
