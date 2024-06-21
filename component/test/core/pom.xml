@@ -19,15 +19,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <parent>
+<<<<<<< HEAD
     <groupId>io.meeds.gatein.portal</groupId>
     <artifactId>exo.portal.component.test</artifactId>
     <version>7.0.x-SNAPSHOT</version>
+=======
+    <groupId>io.meeds.portal</groupId>
+    <artifactId>portal.component.test</artifactId>
+    <version>7.0.x-mips-SNAPSHOT</version>
+>>>>>>> 931b8fb64 (feat: Rename Meeds Artifact ids - MEED-7065)
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>exo.portal.component.test.core</artifactId>
+  <artifactId>portal.component.test.core</artifactId>
   <packaging>jar</packaging>
-  <name>GateIn Portal Component Core Test</name>
+  <name>Meeds Portal Component Core Test</name>
 
   <properties>
     <exo.test.coverage.ratio>0.32</exo.test.coverage.ratio>
@@ -36,7 +42,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.api</artifactId>
+      <artifactId>portal.component.api</artifactId>
     </dependency>
 
     <!-- Test JARs -->

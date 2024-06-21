@@ -24,15 +24,21 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
+<<<<<<< HEAD
     <groupId>io.meeds.gatein.portal</groupId>
     <artifactId>exo.portal.parent</artifactId>
     <version>7.0.x-SNAPSHOT</version>
+=======
+    <groupId>io.meeds.portal</groupId>
+    <artifactId>portal.parent</artifactId>
+    <version>7.0.x-mips-SNAPSHOT</version>
+>>>>>>> 931b8fb64 (feat: Rename Meeds Artifact ids - MEED-7065)
   </parent>
 
-  <artifactId>exo.portal.component</artifactId>
+  <artifactId>portal.component</artifactId>
   <packaging>pom</packaging>
 
-  <name>GateIn Portal Component</name>
+  <name>Meeds Portal Component</name>
 
   <modules>
     <module>api</module>
