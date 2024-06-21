@@ -20,15 +20,9 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-<<<<<<< HEAD
-    <groupId>io.meeds.gatein.portal</groupId>
-    <artifactId>exo.portal.component</artifactId>
-    <version>7.0.x-SNAPSHOT</version>
-=======
     <groupId>io.meeds.portal</groupId>
     <artifactId>portal.component</artifactId>
-    <version>7.0.x-mips-SNAPSHOT</version>
->>>>>>> 931b8fb64 (feat: Rename Meeds Artifact ids - MEED-7065)
+    <version>7.0.x-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>portal.component.api</artifactId>

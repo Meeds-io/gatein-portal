@@ -25,8 +25,8 @@
 
   <parent>
     <artifactId>maven-parent-pom</artifactId>
-    <groupId>org.exoplatform</groupId>
-    <version>27-M03</version>
+    <groupId>io.meeds</groupId>
+    <version>27-M04</version>
   </parent>
 
   <groupId>io.meeds.portal</groupId>
@@ -42,7 +42,7 @@
     
     <!-- Sonar properties -->
     <sonar.organization>meeds-io</sonar.organization>
-    <exo.snapshots.repo.url>https://repository.exoplatform.org/content/repositories/meeds-snapshots</exo.snapshots.repo.url>
+    
   </properties>
 
   <scm>
