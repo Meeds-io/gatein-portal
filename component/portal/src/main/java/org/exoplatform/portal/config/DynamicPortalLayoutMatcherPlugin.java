@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 import org.apache.commons.lang3.StringUtils;
 
+import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.configuration.ConfigurationManager;
@@ -116,7 +117,11 @@ public class DynamicPortalLayoutMatcherPlugin extends BaseComponentPlugin {
           sitePortalConfig.useMetaPortalLayout();
         } else {
           Container portalContainer = portalLayout.clone();
-          portalContainer.resetStorage();
+          try {
+            portalContainer.resetStorage();
+          } catch (ObjectNotFoundException e) {
+            throw new IllegalStateException("Error while resetting portal layout container", e);
+          }
           sitePortalConfig.setPortalLayout(portalContainer);
         }
       } else if (getLayoutTemplate() != null) {

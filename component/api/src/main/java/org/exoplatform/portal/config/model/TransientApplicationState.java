@@ -19,12 +19,15 @@
 
 package org.exoplatform.portal.config.model;
 
+import lombok.ToString;
+
 /**
  * The transient state of an application when it has not yet been stored in the database.
  *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@ToString
 public class TransientApplicationState<S> extends ApplicationState<S> {
 
     /** The owner type. */

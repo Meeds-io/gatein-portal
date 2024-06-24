@@ -19,6 +19,7 @@
 
 package org.exoplatform.portal.config.model;
 
+import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.pom.data.ApplicationData;
 import org.exoplatform.portal.pom.data.BodyData;
 import org.exoplatform.portal.pom.data.ContainerData;
@@ -82,7 +83,12 @@ public abstract class ModelObject {
         this.storageName = storageName;
     }
 
-    public void resetStorage() {
+    public void checkStorage() throws ObjectNotFoundException {
+      // A method to use to check consistency of storage information
+    }
+
+    public void resetStorage() throws ObjectNotFoundException {
+      checkStorage();
       this.storageId = null;
       this.storageName = null;
     }
