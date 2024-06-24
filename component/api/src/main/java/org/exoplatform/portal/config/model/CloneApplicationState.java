@@ -18,10 +18,13 @@
  */
 package org.exoplatform.portal.config.model;
 
+import lombok.ToString;
+
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@ToString
 public class CloneApplicationState<S> extends ApplicationState<S> {
 
     /** . */
