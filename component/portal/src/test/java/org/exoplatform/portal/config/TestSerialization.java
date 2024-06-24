@@ -21,6 +21,7 @@ package org.exoplatform.portal.config;
 
 import java.util.*;
 
+import org.exoplatform.portal.config.model.ApplicationBackgroundStyle;
 import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.mop.PageType;
 import org.gatein.common.io.IOTools;
@@ -50,6 +51,7 @@ public class TestSerialization extends AbstractGateInTest {
                                                             "foo11",
                                                             "foo12",
                                                             new ModelStyle(),
+                                                            new ApplicationBackgroundStyle(),
                                                             Collections.singletonList("foo11"),
                                                             Collections.singletonList("foo11"),
                                                             Collections.singletonList("foo11"),
@@ -120,7 +122,6 @@ public class TestSerialization extends AbstractGateInTest {
                                 "foo16",
                                 true,
                                 true,
-                                new ModelStyle(),
                                 Collections.singletonList("foo13"),
                                 Collections.singletonList("foo13"),
                                 PageType.LINK.name(),
