@@ -19,12 +19,15 @@
 
 package org.exoplatform.portal.config.model;
 
+import lombok.ToString;
+
 /**
  * Represents the state of the application when it is bound to the database.
  *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
+@ToString
 public class PersistentApplicationState<S> extends ApplicationState<S> {
 
     /** The id of the content state. */

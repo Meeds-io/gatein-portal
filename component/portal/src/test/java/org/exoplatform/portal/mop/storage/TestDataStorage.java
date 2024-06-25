@@ -19,16 +19,20 @@
 
 package org.exoplatform.portal.mop.storage;
 
+import static org.junit.Assert.assertThrows;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.gatein.common.transaction.JTAUserTransactionLifecycleService;
 
+import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
@@ -325,6 +329,50 @@ public class TestDataStorage extends AbstractKernelTest {
     assertEquals("MyTitle", pageContext.getState().getDisplayName());
     assertEquals(true, pageContext.getState().getShowMaxWindow());
     assertEquals(true, pageContext.getState().isHideSharedLayout());
+  }
+
+  @SuppressWarnings("unchecked")
+  public void testSaveOutdatedPage() throws Exception {
+    PortalConfig portal = new PortalConfig();
+    portal.setType("portal");
+    portal.setName("test" + new Random().nextInt());
+    portal.setLocale("en");
+    portal.setLabel("Test Random Site");
+    portal.setDescription("Test Random Site");
+    portal.setAccessPermissions(new String[] { UserACL.EVERYONE });
+
+    //
+    storage_.create(portal);
+
+    Page page = new Page();
+    page.setOwnerType(PortalConfig.PORTAL_TYPE);
+    page.setOwnerId(portal.getName());
+    page.setName("foo");
+
+    Application<Portlet> application = new Application<>(ApplicationType.PORTLET);
+    application.setState(new TransientApplicationState<>("test/test",  null));
+    page.setChildren(new ArrayList<>(Collections.singletonList(application)));
+
+    pageService.savePage(new PageContext(page.getPageKey(), null));
+    storage_.save(page);
+
+    page = storage_.getPage(page.getPageKey());
+    application = ((Application<Portlet>)page.getChildren().get(0));
+    assertNotNull(application.getStorageId());
+    application.resetStorage();
+    assertNull(application.getStorageId());
+    application.checkStorage();
+
+    // Conserve reference of previously created application
+    page = storage_.getPage(page.getPageKey());
+    Application<Portlet> storedApplication = ((Application<Portlet>)page.getChildren().get(0));
+
+    // Delete reference of application on page
+    page.setChildren(new ArrayList<>());
+    storage_.save(page);
+
+    assertThrows(ObjectNotFoundException.class, storedApplication::resetStorage);
+    assertThrows(ObjectNotFoundException.class, storedApplication::checkStorage);
   }
 
   public void testChangingPortletThemeInPage() throws Exception {
