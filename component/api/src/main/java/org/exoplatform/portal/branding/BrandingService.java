@@ -65,6 +65,36 @@ public interface BrandingService {
    */
   Long getLoginBackgroundId();
 
+  /**
+   * @return Page Background File details
+   */
+  Background getPageBackground();
+
+  /**
+   * @return Page Background File technical identifier
+   */
+  Long getPageBackgroundId();
+
+  /**
+   * @return Page Background Color
+   */
+  String getPageBackgroundColor();
+
+  /**
+   * @return Page Background Size
+   */
+  String getPageBackgroundSize();
+
+  /**
+   * @return Page Background Position
+   */
+  String getPageBackgroundPosition();
+
+  /**
+   * @return Page Background repeat directive
+   */
+  String getPageBackgroundRepeat();
+
   Logo getLogo();
 
   /**
@@ -97,6 +127,11 @@ public interface BrandingService {
    * @return {@link Background} URL to retrieve login background
    */
   String getLoginBackgroundPath();
+
+  /**
+   * @return {@link Background} URL to retrieve page background
+   */
+  String getPageBackgroundPath();
 
   void updateTopBarTheme(String style);
 
