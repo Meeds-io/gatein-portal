@@ -47,6 +47,7 @@ import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.*;
+import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
@@ -62,7 +63,9 @@ import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.portal.mop.user.UserPortalContext;
 import org.exoplatform.portal.url.PortalURLContext;
 import org.exoplatform.portal.webui.page.UIPage;
+import org.exoplatform.portal.webui.page.UIPageFactory;
 import org.exoplatform.portal.webui.portal.UIPortal;
+import org.exoplatform.portal.webui.util.PortalDataMapper;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.portal.webui.workspace.UIPortalApplication;
 import org.exoplatform.services.log.ExoLogger;
@@ -204,6 +207,10 @@ public class PortalRequestContext extends WebuiRequestContext {
     @Getter
     @Setter
     private UIPage                         uiPage;
+
+    @Getter
+    @Setter
+    private Page                           page;
 
     @Getter
     @Setter
@@ -392,6 +399,32 @@ public class PortalRequestContext extends WebuiRequestContext {
     public void refreshPortalConfig() {
         this.userPortalConfig = null;
         this.currentPortalConfig = null;
+    }
+
+    public UIPage getUIPage(UserNode pageNode, UIPortal uiPortal) throws Exception {
+      PageContext pageContext = null;
+      String pageReference = null;
+      if (pageNode != null && pageNode.getPageRef() != null) {
+        pageReference = pageNode.getPageRef().format();
+        pageContext = layoutService.getPageContext(pageNode.getPageRef());
+      }
+
+      // The page has been deleted
+      if (pageContext == null) {
+        // Clear the UIPage from cache in UIPortal
+        uiPortal.clearUIPage(pageReference);
+        return null;
+      } else {
+        setDraftPage(pageNode.getVisibility() == Visibility.DRAFT);
+        this.page = layoutService.getPage(pageReference);
+        if (uiPortal.getUIPage(pageReference) == null) {
+          UIPageFactory clazz = UIPageFactory.getInstance(pageContext.getState().getFactoryId());
+          this.uiPage = clazz.createUIPage(this);
+          pageContext.update(this.page);
+          PortalDataMapper.toUIPage(this.uiPage, this.page);
+        }
+        return this.uiPage;
+      }
     }
 
     public String getInitialURI() {
