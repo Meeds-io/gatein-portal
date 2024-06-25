@@ -93,6 +93,10 @@ public class Branding implements Serializable {
 
   @Getter
   @Setter
+  private String              customCss;
+
+  @Getter
+  @Setter
   private Map<String, String> themeStyle       = new HashMap<>();
 
   @Getter
