@@ -89,6 +89,10 @@ public class Branding implements Serializable {
 
   @Getter
   @Setter
+  private String              pageWidth;
+
+  @Getter
+  @Setter
   private Map<String, String> themeStyle       = new HashMap<>();
 
   @Getter

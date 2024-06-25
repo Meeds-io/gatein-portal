@@ -133,6 +133,11 @@ public interface BrandingService {
    */
   String getPageBackgroundPath();
 
+  /**
+   * @return Page width
+   */
+  String getPageWidth();
+
   void updateTopBarTheme(String style);
 
   /**
