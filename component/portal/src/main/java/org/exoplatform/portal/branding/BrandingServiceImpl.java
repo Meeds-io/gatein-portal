@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -128,6 +129,8 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   public static final String   BRANDING_PAGE_BG_COLOR_KEY        = "page.backgroundColor";
 
   public static final String   BRANDING_PAGE_BG_REPEAT_KEY       = "page.backgroundRepeat";
+
+  public static final String   BRANDING_PAGE_WIDTH_KEY           = "page.width";
 
   public static final String   BRANDING_PAGE_BG_POSITION_KEY     = "page.backgroundPosition";
 
@@ -271,6 +274,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     branding.setPageBackgroundPosition(getPageBackgroundPosition());
     branding.setPageBackgroundSize(getPageBackgroundSize());
     branding.setPageBackgroundRepeat(getPageBackgroundRepeat());
+    branding.setPageWidth(getPageWidth());
     branding.setThemeStyle(getThemeStyle());
     branding.setLoginTitle(getLoginTitle());
     branding.setLoginSubtitle(getLoginSubtitle());
@@ -311,6 +315,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   @Override
   public void updateBrandingInformation(Branding branding) {
+    validateCSSInputs(branding);
     try {
       updateCompanyName(branding.getCompanyName(), false);
       updateSiteName(branding.getSiteName(), false);
@@ -325,6 +330,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
       updatePageBackgroundSize(branding.getPageBackgroundSize(), false);
       updatePageBackgroundPosition(branding.getPageBackgroundPosition(), false);
       updatePageBackgroundRepeat(branding.getPageBackgroundRepeat(), false);
+      updatePageWidth(branding.getPageWidth(), false);
       updateThemeStyle(branding.getThemeStyle(), false);
       updateLoginTitle(branding.getLoginTitle());
       updateLoginSubtitle(branding.getLoginSubtitle());
@@ -386,6 +392,18 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     SettingValue<String> value = (SettingValue<String>) settingService.get(Context.GLOBAL,
                                                                            Scope.GLOBAL,
                                                                            BRANDING_PAGE_BG_REPEAT_KEY);
+    if (value != null && StringUtils.isNotBlank(value.getValue())) {
+      return value.getValue();
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public String getPageWidth() {
+    SettingValue<String> value = (SettingValue<String>) settingService.get(Context.GLOBAL,
+                                                                           Scope.GLOBAL,
+                                                                           BRANDING_PAGE_WIDTH_KEY);
     if (value != null && StringUtils.isNotBlank(value.getValue())) {
       return value.getValue();
     } else {
@@ -848,6 +866,10 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     updatePropertyValue(value, updateLastUpdatedTime, BRANDING_PAGE_BG_REPEAT_KEY);
   }
 
+  private void updatePageWidth(String value, boolean updateLastUpdatedTime) {
+    updatePropertyValue(value, updateLastUpdatedTime, BRANDING_PAGE_WIDTH_KEY);
+  }
+
   private void updateCompanyName(String companyName, boolean updateLastUpdatedTime) {
     updatePropertyValue(companyName, updateLastUpdatedTime, BRANDING_COMPANY_NAME_SETTING_KEY);
   }
@@ -1029,7 +1051,6 @@ public class BrandingServiceImpl implements BrandingService, Startable {
         }
       }
     }
-
     return this.themeCSSContent;
   }
 
@@ -1093,6 +1114,29 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     }
     if (updateLastUpdatedTime) {
       updateLastUpdatedTime(System.currentTimeMillis());
+    }
+  }
+
+  private void validateCSSInputs(Branding branding) { // NOSONAR
+    Arrays.asList(branding.getPageBackgroundColor(),
+                  branding.getPageBackgroundPosition(),
+                  branding.getPageBackgroundRepeat(),
+                  branding.getPageBackgroundSize(),
+                  branding.getLoginBackgroundTextColor(),
+                  branding.getPageBackgroundColor(),
+                  branding.getPageBackgroundColor(),
+                  branding.getPageBackgroundColor(),
+                  branding.getPageBackgroundColor(),
+                  branding.getPageBackgroundColor())
+          .forEach(this::validateCSSStyleValue);
+    branding.getThemeStyle().values().forEach(this::validateCSSStyleValue);
+  }
+
+  private void validateCSSStyleValue(String value) {
+    if (StringUtils.isNotBlank(value)
+        && (value.contains("javascript") || value.contains("eval"))) {
+      throw new IllegalArgumentException(String.format("Invalid css value input %s",
+                                                       value));
     }
   }
 

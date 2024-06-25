@@ -95,6 +95,9 @@
   if (brandingService.getPageBackgroundPosition() != null) {
     bodyStyle += "--allPagesBackgroundPosition: " + brandingService.getPageBackgroundPosition() + ";";
   }
+  if (brandingService.getPageWidth() != null) {
+    bodyStyle += "--allPagesWidth: " + brandingService.getPageWidth() + ";";
+  }
   def userHomeLink = uicomponent.getUserHomePage();
 
   def stickyMenu = false;
