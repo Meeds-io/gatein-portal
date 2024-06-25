@@ -41,6 +41,7 @@ import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessCompiler.Configuration;
 import com.github.sommeri.less4j.core.ThreadUnsafeLessCompiler;
 
+import org.exoplatform.commons.api.settings.ExoFeatureService;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
@@ -132,6 +133,8 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   public static final String   BRANDING_PAGE_WIDTH_KEY           = "page.width";
 
+  public static final String   BRANDING_CUSTOM_CSS               = "page.customCss";
+
   public static final String   BRANDING_PAGE_BG_POSITION_KEY     = "page.backgroundPosition";
 
   public static final String   BRANDING_PAGE_BG_SIZE_KEY         = "page.backgroundSize";
@@ -147,6 +150,8 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   public static final String   LOGIN_BACKGROUND_NAME             = "loginBackground.png";
 
   public static final String   PAGE_BACKGROUND_NAME              = "pageBackground.png";
+
+  public static final String   BRANDING_CUSTOM_STYLE_FEATURE     = "customStylesheet";
 
   public static final String   BRANDING_DEFAULT_LOGO_PATH        = "/skin/images/logo/DefaultLogo.png";                    // NOSONAR
 
@@ -169,6 +174,8 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   private UploadService        uploadService;
 
   private ConfigurationManager configurationManager;
+
+  private ExoFeatureService    featureService;
 
   private String               defaultCompanyName                = "";
 
@@ -202,6 +209,8 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   private String               themeCSSContent                   = null;
 
+  private String               customCss                         = null;
+
   private Logo                 logo                              = null;
 
   private Favicon              favicon                           = null;
@@ -210,12 +219,13 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   private Background           pageBackground                    = null;
 
-  public BrandingServiceImpl(PortalContainer container,
+  public BrandingServiceImpl(PortalContainer container, // NOSONAR
                              ConfigurationManager configurationManager,
                              SettingService settingService,
                              FileService fileService,
                              UploadService uploadService,
                              LocaleConfigService localeConfigService,
+                             ExoFeatureService featureService,
                              InitParams initParams) {
     this.container = container;
     this.configurationManager = configurationManager;
@@ -223,9 +233,27 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     this.fileService = fileService;
     this.uploadService = uploadService;
     this.localeConfigService = localeConfigService;
+    this.featureService = featureService;
 
     this.loadLanguages();
     this.loadInitParams(initParams);
+  }
+
+  public BrandingServiceImpl(PortalContainer container, // NOSONAR
+                             ConfigurationManager configurationManager,
+                             SettingService settingService,
+                             FileService fileService,
+                             UploadService uploadService,
+                             LocaleConfigService localeConfigService,
+                             InitParams initParams) {
+    this(container,
+         configurationManager,
+         settingService,
+         fileService,
+         uploadService,
+         localeConfigService,
+         null,
+         initParams);
   }
 
   @Override
@@ -275,6 +303,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     branding.setPageBackgroundSize(getPageBackgroundSize());
     branding.setPageBackgroundRepeat(getPageBackgroundRepeat());
     branding.setPageWidth(getPageWidth());
+    branding.setCustomCss(getCustomCss());
     branding.setThemeStyle(getThemeStyle());
     branding.setLoginTitle(getLoginTitle());
     branding.setLoginSubtitle(getLoginSubtitle());
@@ -331,6 +360,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
       updatePageBackgroundPosition(branding.getPageBackgroundPosition(), false);
       updatePageBackgroundRepeat(branding.getPageBackgroundRepeat(), false);
       updatePageWidth(branding.getPageWidth(), false);
+      updateCustomCss(branding.getCustomCss(), false);
       updateThemeStyle(branding.getThemeStyle(), false);
       updateLoginTitle(branding.getLoginTitle());
       updateLoginSubtitle(branding.getLoginSubtitle());
@@ -404,6 +434,18 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     SettingValue<String> value = (SettingValue<String>) settingService.get(Context.GLOBAL,
                                                                            Scope.GLOBAL,
                                                                            BRANDING_PAGE_WIDTH_KEY);
+    if (value != null && StringUtils.isNotBlank(value.getValue())) {
+      return value.getValue();
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public String getCustomCss() {
+    SettingValue<String> value = (SettingValue<String>) settingService.get(Context.GLOBAL,
+                                                                           Scope.GLOBAL,
+                                                                           BRANDING_CUSTOM_CSS);
     if (value != null && StringUtils.isNotBlank(value.getValue())) {
       return value.getValue();
     } else {
@@ -870,6 +912,11 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     updatePropertyValue(value, updateLastUpdatedTime, BRANDING_PAGE_WIDTH_KEY);
   }
 
+  private void updateCustomCss(String value, boolean updateLastUpdatedTime) {
+    this.customCss = null;
+    updatePropertyValue(value, updateLastUpdatedTime, BRANDING_CUSTOM_CSS);
+  }
+
   private void updateCompanyName(String companyName, boolean updateLastUpdatedTime) {
     updatePropertyValue(companyName, updateLastUpdatedTime, BRANDING_COMPANY_NAME_SETTING_KEY);
   }
@@ -1051,7 +1098,22 @@ public class BrandingServiceImpl implements BrandingService, Startable {
         }
       }
     }
+    if (StringUtils.isNotBlank(getCustomCssContent())
+        && featureService != null
+        && featureService.isActiveFeature(BRANDING_CUSTOM_STYLE_FEATURE)) {
+      this.themeCSSContent += "\n" + this.customCss;
+    }
     return this.themeCSSContent;
+  }
+
+  private String getCustomCssContent() {
+    if (this.customCss == null) {
+      this.customCss = getCustomCss();
+      if (this.customCss == null) {
+        this.customCss = "";
+      }
+    }
+    return this.customCss;
   }
 
   private InputStream getUploadDataAsStream(String uploadId) throws FileNotFoundException {
@@ -1118,7 +1180,8 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   }
 
   private void validateCSSInputs(Branding branding) { // NOSONAR
-    Arrays.asList(branding.getPageBackgroundColor(),
+    Arrays.asList(branding.getCustomCss(),
+                  branding.getPageBackgroundColor(),
                   branding.getPageBackgroundPosition(),
                   branding.getPageBackgroundRepeat(),
                   branding.getPageBackgroundSize(),

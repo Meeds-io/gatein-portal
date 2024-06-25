@@ -55,6 +55,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import org.exoplatform.commons.api.settings.ExoFeatureService;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
@@ -105,13 +106,13 @@ public class BrandingServiceImplTest {
     siteName.setValue("Meeds");
     initParams.addParam(siteName);
 
-    BrandingService brandingService = new BrandingServiceImpl(container,
-                                                              configurationManager,
-                                                              settingService,
-                                                              fileService,
-                                                              uploadService,
-                                                              localeConfigService,
-                                                              initParams);
+    BrandingService brandingService = newBrandingService(settingService,
+                                                         fileService,
+                                                         uploadService,
+                                                         localeConfigService,
+                                                         configurationManager,
+                                                         container,
+                                                         initParams);
 
     // When
     Branding brandingInformation = brandingService.getBrandingInformation();
@@ -157,13 +158,13 @@ public class BrandingServiceImplTest {
     initParams.addParam(companyName);
     initParams.addParam(themeStyle);
 
-    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
-                                                                  configurationManager,
-                                                                  settingService,
-                                                                  fileService,
-                                                                  uploadService,
-                                                                  localeConfigService,
-                                                                  initParams);
+    BrandingServiceImpl brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
     brandingService.start();
 
     // When
@@ -238,13 +239,13 @@ public class BrandingServiceImplTest {
     initParams.addParam(companyName);
     initParams.addParam(themeStyle);
 
-    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
-                                                                  configurationManager,
-                                                                  settingService,
-                                                                  fileService,
-                                                                  uploadService,
-                                                                  localeConfigService,
-                                                                  initParams);
+    BrandingServiceImpl brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
     brandingService.start();
 
     // When
@@ -295,13 +296,13 @@ public class BrandingServiceImplTest {
     siteName.setValue("Meeds");
     initParams.addParam(siteName);
 
-    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
-                                                                  configurationManager,
-                                                                  settingService,
-                                                                  fileService,
-                                                                  uploadService,
-                                                                  localeConfigService,
-                                                                  initParams);
+    BrandingServiceImpl brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
 
     // When
     Branding brandingInformation = brandingService.getBrandingInformation();
@@ -344,13 +345,13 @@ public class BrandingServiceImplTest {
     loginBgPathParam.setValue(loginBgPath);
     initParams.addParam(loginBgPathParam);
 
-    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
-                                                                  configurationManager,
-                                                                  settingService,
-                                                                  fileService,
-                                                                  uploadService,
-                                                                  localeConfigService,
-                                                                  initParams);
+    BrandingServiceImpl brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
 
     ServletContext context = mock(ServletContext.class);
     when(container.getPortalContext()).thenReturn(context);
@@ -427,13 +428,13 @@ public class BrandingServiceImplTest {
     themeStyle.setValues(variables);
     initParams.addParam(themeStyle);
 
-    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
-                                                                  configurationManager,
-                                                                  settingService,
-                                                                  fileService,
-                                                                  uploadService,
-                                                                  localeConfigService,
-                                                                  initParams);
+    BrandingServiceImpl brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
 
     Branding newBranding = new Branding();
     newBranding.setCompanyName("New Company Name");
@@ -534,13 +535,13 @@ public class BrandingServiceImplTest {
     companyName.setValue("Default Company Name");
     initParams.addParam(companyName);
 
-    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
-                                                                  configurationManager,
-                                                                  settingService,
-                                                                  fileService,
-                                                                  uploadService,
-                                                                  localeConfigService,
-                                                                  initParams);
+    BrandingServiceImpl brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
 
     Branding newBranding = new Branding();
     Logo logo = new Logo();
@@ -608,13 +609,13 @@ public class BrandingServiceImplTest {
     companyName.setValue("Default Company Name");
     initParams.addParam(companyName);
 
-    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
-                                                                  configurationManager,
-                                                                  settingService,
-                                                                  fileService,
-                                                                  uploadService,
-                                                                  localeConfigService,
-                                                                  initParams);
+    BrandingServiceImpl brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
 
     Branding newBranding = new Branding();
     Favicon favicon = new Favicon();
@@ -659,13 +660,13 @@ public class BrandingServiceImplTest {
     LocaleConfigService localeConfigService = mock(LocaleConfigService.class);
     InitParams initParams = new InitParams();
 
-    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
-                                                                  configurationManager,
-                                                                  settingService,
-                                                                  fileService,
-                                                                  uploadService,
-                                                                  localeConfigService,
-                                                                  initParams);
+    BrandingServiceImpl brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
 
     assertNull(brandingService.getLoginBackgroundPath());
 
@@ -676,13 +677,13 @@ public class BrandingServiceImplTest {
     loginBgPath.setValue(imagePath);
     initParams.addParam(loginBgPath);
 
-    brandingService = new BrandingServiceImpl(container,
-                                              configurationManager,
-                                              settingService,
-                                              fileService,
-                                              uploadService,
-                                              localeConfigService,
-                                              initParams);
+    brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
 
     ServletContext context = mock(ServletContext.class);
     when(container.getPortalContext()).thenReturn(context);
@@ -706,13 +707,13 @@ public class BrandingServiceImplTest {
     LocaleConfigService localeConfigService = mock(LocaleConfigService.class);
     InitParams initParams = new InitParams();
 
-    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
-                                                                  configurationManager,
-                                                                  settingService,
-                                                                  fileService,
-                                                                  uploadService,
-                                                                  localeConfigService,
-                                                                  initParams);
+    BrandingServiceImpl brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
 
     assertNull(brandingService.getFaviconPath());
 
@@ -723,13 +724,13 @@ public class BrandingServiceImplTest {
     faviconPathParam.setValue(imagePath);
     initParams.addParam(faviconPathParam);
 
-    brandingService = new BrandingServiceImpl(container,
-                                              configurationManager,
-                                              settingService,
-                                              fileService,
-                                              uploadService,
-                                              localeConfigService,
-                                              initParams);
+    brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
 
     ServletContext context = mock(ServletContext.class);
     when(container.getPortalContext()).thenReturn(context);
@@ -753,13 +754,13 @@ public class BrandingServiceImplTest {
     LocaleConfigService localeConfigService = mock(LocaleConfigService.class);
     InitParams initParams = new InitParams();
 
-    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
-                                                                  configurationManager,
-                                                                  settingService,
-                                                                  fileService,
-                                                                  uploadService,
-                                                                  localeConfigService,
-                                                                  initParams);
+    BrandingServiceImpl brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
 
     assertNull(brandingService.getLogoPath());
 
@@ -770,13 +771,13 @@ public class BrandingServiceImplTest {
     logoPathParam.setValue(imagePath);
     initParams.addParam(logoPathParam);
 
-    brandingService = new BrandingServiceImpl(container,
-                                              configurationManager,
-                                              settingService,
-                                              fileService,
-                                              uploadService,
-                                              localeConfigService,
-                                              initParams);
+    brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
 
     ServletContext context = mock(ServletContext.class);
     when(container.getPortalContext()).thenReturn(context);
@@ -800,13 +801,13 @@ public class BrandingServiceImplTest {
     LocaleConfigService localeConfigService = mock(LocaleConfigService.class);
     InitParams initParams = new InitParams();
 
-    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
-                                                                  configurationManager,
-                                                                  settingService,
-                                                                  fileService,
-                                                                  uploadService,
-                                                                  localeConfigService,
-                                                                  initParams);
+    BrandingServiceImpl brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
 
     assertNull(brandingService.getLoginBackgroundPath());
 
@@ -852,13 +853,13 @@ public class BrandingServiceImplTest {
     LocaleConfigService localeConfigService = mock(LocaleConfigService.class);
     InitParams initParams = new InitParams();
 
-    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
-                                                                  configurationManager,
-                                                                  settingService,
-                                                                  fileService,
-                                                                  uploadService,
-                                                                  localeConfigService,
-                                                                  initParams);
+    BrandingServiceImpl brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
     long fileId = 2l;
 
     when(settingService.get(Context.GLOBAL,
@@ -907,13 +908,13 @@ public class BrandingServiceImplTest {
     when(localeConfigService.getLocalConfigs()).thenReturn(Arrays.asList(newLocaleConfig(Locale.ENGLISH),
                                                                          newLocaleConfig(Locale.FRENCH)));
 
-    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
-                                                                  configurationManager,
-                                                                  settingService,
-                                                                  fileService,
-                                                                  uploadService,
-                                                                  localeConfigService,
-                                                                  initParams);
+    BrandingServiceImpl brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
 
     assertNotNull(brandingService.getLoginTitle());
     assertEquals(1, brandingService.getLoginTitle().size());
@@ -983,13 +984,13 @@ public class BrandingServiceImplTest {
     when(localeConfigService.getLocalConfigs()).thenReturn(Arrays.asList(newLocaleConfig(Locale.ENGLISH),
                                                                          newLocaleConfig(Locale.FRENCH)));
 
-    BrandingServiceImpl brandingService = new BrandingServiceImpl(container,
-                                                                  configurationManager,
-                                                                  settingService,
-                                                                  fileService,
-                                                                  uploadService,
-                                                                  localeConfigService,
-                                                                  initParams);
+    BrandingServiceImpl brandingService = newBrandingService(settingService,
+                       fileService,
+                       uploadService,
+                       localeConfigService,
+                       configurationManager,
+                       container,
+                       initParams);
 
     assertNotNull(brandingService.getLoginSubtitle());
     assertEquals(1, brandingService.getLoginSubtitle().size());
@@ -1048,6 +1049,23 @@ public class BrandingServiceImplTest {
     LocaleConfigImpl localeConfig = new LocaleConfigImpl();
     localeConfig.setLocale(locale);
     return localeConfig;
+  }
+
+  private BrandingServiceImpl newBrandingService(SettingService settingService,
+                                                 FileService fileService,
+                                                 UploadService uploadService,
+                                                 LocaleConfigService localeConfigService,
+                                                 ConfigurationManager configurationManager,
+                                                 PortalContainer container,
+                                                 InitParams initParams) {
+    return new BrandingServiceImpl(container,
+                                   configurationManager,
+                                   settingService,
+                                   fileService,
+                                   uploadService,
+                                   localeConfigService,
+                                   mock(ExoFeatureService.class),
+                                   initParams);
   }
 
 }
