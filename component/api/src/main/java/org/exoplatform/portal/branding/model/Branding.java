@@ -69,7 +69,27 @@ public class Branding implements Serializable {
 
   @Getter
   @Setter
-  private Map<String, String> themeStyle      = new HashMap<>();
+  private Background          pageBackground;
+
+  @Getter
+  @Setter
+  private String              pageBackgroundColor;
+
+  @Getter
+  @Setter
+  private String              pageBackgroundSize;
+
+  @Getter
+  @Setter
+  private String              pageBackgroundRepeat;
+
+  @Getter
+  @Setter
+  private String              pageBackgroundPosition;
+
+  @Getter
+  @Setter
+  private Map<String, String> themeStyle       = new HashMap<>();
 
   @Getter
   @Setter
