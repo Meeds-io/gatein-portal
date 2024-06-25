@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 
+import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.commons.utils.Tools;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.portal.pom.config.Utils;
@@ -232,7 +233,17 @@ public class Container extends ModelObject implements Cloneable {
   }
 
   @Override
-  public void resetStorage() {
+  public void checkStorage() throws ObjectNotFoundException {
+    super.checkStorage();
+    if (getChildren() != null && !getChildren().isEmpty()) {
+      for (ModelObject child : getChildren()) {
+        child.checkStorage();
+      }
+    }
+  }
+
+  @Override
+  public void resetStorage() throws ObjectNotFoundException {
     super.resetStorage();
     if (getChildren() != null && !getChildren().isEmpty()) {
       for (ModelObject child : getChildren()) {

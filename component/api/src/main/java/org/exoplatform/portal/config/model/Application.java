@@ -19,6 +19,7 @@
 
 package org.exoplatform.portal.config.model;
 
+import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.pom.config.Utils;
@@ -271,20 +272,33 @@ public class Application<S> extends ModelObject implements Cloneable {
     }
 
     @Override
-    public void resetStorage() {
+    public void checkStorage() throws ObjectNotFoundException {
       if (!(this.state instanceof TransientApplicationState)) {
-        try {
-          LayoutService dataStorage = ExoContainerContext.getService(LayoutService.class);
-          Portlet preferences = (Portlet) dataStorage.load(this.state, this.type);
-          String contentId = dataStorage.getId(this.state);
+        LayoutService dataStorage = ExoContainerContext.getService(LayoutService.class);
+        String contentId = dataStorage.getId(this.state);
+        if (contentId == null) {
+          throw new ObjectNotFoundException(String.format("Application of type %s with state %s",
+                                                          this.type,
+                                                          this.state));
+        }
+      }
+    }
 
-          if (this.type == ApplicationType.PORTLET) {
-            this.state = new TransientApplicationState(contentId, preferences);
-          } else {
-            // No other application type is supported
-          }
-        } catch (Exception e) {
-          throw new IllegalStateException("Error while building transient application state", e);
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    public void resetStorage() throws ObjectNotFoundException {
+      if (!(this.state instanceof TransientApplicationState)) {
+        LayoutService dataStorage = ExoContainerContext.getService(LayoutService.class);
+        Portlet preferences = (Portlet) dataStorage.load(this.state, this.type);
+        String contentId = dataStorage.getId(this.state);
+        if (contentId == null) {
+          throw new ObjectNotFoundException(String.format("Application of type %s with state %s",
+                                                          this.type,
+                                                          this.state));
+        } else if (this.type == ApplicationType.PORTLET) {
+          this.state = new TransientApplicationState(contentId, preferences);
+        } else {
+          // No other application type is supported
         }
       }
       super.resetStorage();
@@ -292,11 +306,7 @@ public class Application<S> extends ModelObject implements Cloneable {
 
     @Override
     public Application clone() {
-      try {
-        return (Application) super.clone();
-      } catch (CloneNotSupportedException e) {
-        return new Application(build());
-      }
+      return new Application(build());
     }
 
 }
