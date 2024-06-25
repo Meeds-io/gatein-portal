@@ -407,4 +407,8 @@
     <modifyDataType tableName="PORTAL_WINDOWS" columnName="CUSTOMIZATION" newDataType="LONGBLOB" />
   </changeSet>
 
+  <changeSet author="portal" id="1.0.0-43">
+    <modifyDataType tableName="PORTAL_CONTAINERS" columnName="WIDTH" newDataType="NVARCHAR(200)" />
+  </changeSet>
+
 </databaseChangeLog>
