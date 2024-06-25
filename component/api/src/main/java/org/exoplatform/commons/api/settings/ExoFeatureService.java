@@ -19,6 +19,12 @@ package org.exoplatform.commons.api.settings;
 public interface ExoFeatureService {
 
   /**
+   * An event to trigger using ListenerService when a feature status changes
+   * using API
+   */
+  public final String FEATURE_STATUS_CHANGED_EVENT = "feature.status.changed";
+
+  /**
    * Check the status of a feature
    * 
    * @param featureName

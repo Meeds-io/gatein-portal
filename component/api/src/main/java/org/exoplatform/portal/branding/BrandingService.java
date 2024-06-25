@@ -138,6 +138,11 @@ public interface BrandingService {
    */
   String getPageWidth();
 
+  /**
+   * @return Page custom additional css
+   */
+  String getCustomCss();
+
   void updateTopBarTheme(String style);
 
   /**
