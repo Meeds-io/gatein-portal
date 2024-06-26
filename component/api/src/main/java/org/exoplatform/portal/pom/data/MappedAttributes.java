@@ -113,6 +113,14 @@ public class MappedAttributes {
 
   public static final Key<String>  BOX_SHADOW                 = Key.create("box-shadow", ValueType.STRING);
 
+  public static final Key<String>  MARGIN_TOP                 = Key.create("margin-top", ValueType.STRING);
+
+  public static final Key<String>  MARGIN_BOTTOM              = Key.create("margin-bottom", ValueType.STRING);
+
+  public static final Key<String>  MARGIN_LEFT                = Key.create("margin-left", ValueType.STRING);
+
+  public static final Key<String>  MARGIN_RIGHT               = Key.create("margin-right", ValueType.STRING);
+
   public static final Key<String>  RADIUS_TOP_RIGHT_SHADOW    = Key.create("radius-top-right", ValueType.STRING);
 
   public static final Key<String>  RADIUS_TOP_LEFT_SHADOW     = Key.create("radius-top-left", ValueType.STRING);
