@@ -838,6 +838,18 @@ public class LayoutStorage {
     if (attrs.containsKey(MappedAttributes.BOX_SHADOW.getName())) {
       cssStyle.setBoxShadow((String) attrs.get(MappedAttributes.BOX_SHADOW.getName()));
     }
+    if (attrs.containsKey(MappedAttributes.MARGIN_TOP.getName())) {
+      cssStyle.setMarginTop(Integer.parseInt((String) attrs.get(MappedAttributes.MARGIN_TOP.getName())));
+    }
+    if (attrs.containsKey(MappedAttributes.MARGIN_BOTTOM.getName())) {
+      cssStyle.setMarginBottom(Integer.parseInt((String) attrs.get(MappedAttributes.MARGIN_BOTTOM.getName())));
+    }
+    if (attrs.containsKey(MappedAttributes.MARGIN_RIGHT.getName())) {
+      cssStyle.setMarginRight(Integer.parseInt((String) attrs.get(MappedAttributes.MARGIN_RIGHT.getName())));
+    }
+    if (attrs.containsKey(MappedAttributes.MARGIN_LEFT.getName())) {
+      cssStyle.setMarginLeft(Integer.parseInt((String) attrs.get(MappedAttributes.MARGIN_LEFT.getName())));
+    }
     if (attrs.containsKey(MappedAttributes.RADIUS_TOP_RIGHT_SHADOW.getName())) {
       cssStyle.setRadiusTopRight(Integer.parseInt((String) attrs.get(MappedAttributes.RADIUS_TOP_RIGHT_SHADOW.getName())));
     }
@@ -952,6 +964,18 @@ public class LayoutStorage {
     }
     if (StringUtils.isNotBlank(cssStyle.getBoxShadow())) {
       properties.put(MappedAttributes.BOX_SHADOW.getName(), cssStyle.getBoxShadow());
+    }
+    if (cssStyle.getMarginTop() != null) {
+      properties.put(MappedAttributes.MARGIN_TOP.getName(), cssStyle.getMarginTop().toString());
+    }
+    if (cssStyle.getMarginBottom() != null) {
+      properties.put(MappedAttributes.MARGIN_BOTTOM.getName(), cssStyle.getMarginBottom().toString());
+    }
+    if (cssStyle.getMarginRight() != null) {
+      properties.put(MappedAttributes.MARGIN_RIGHT.getName(), cssStyle.getMarginRight().toString());
+    }
+    if (cssStyle.getMarginLeft() != null) {
+      properties.put(MappedAttributes.MARGIN_LEFT.getName(), cssStyle.getMarginLeft().toString());
     }
     if (cssStyle.getRadiusTopRight() != null) {
       properties.put(MappedAttributes.RADIUS_TOP_RIGHT_SHADOW.getName(), cssStyle.getRadiusTopRight().toString());
