@@ -18,15 +18,15 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <groupId>org.exoplatform.gatein.portal</groupId>
-    <artifactId>exo.portal.parent</artifactId>
+    <groupId>io.meeds.portal</groupId>
+    <artifactId>portal.parent</artifactId>
     <version>7.0.x-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>exo.portal.webui.portal</artifactId>
+  <artifactId>portal.webui.portal</artifactId>
   <packaging>jar</packaging>
-  <name>GateIn Portal WebUI Portal</name>
+  <name>Meeds Portal WebUI Portal</name>
 
   <properties>
     <exo.test.coverage.ratio>0.05</exo.test.coverage.ratio>
@@ -35,35 +35,35 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.resources</artifactId>
+      <artifactId>portal.component.resources</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.management</artifactId>
+      <artifactId>portal.component.management</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.portal</artifactId>
+      <artifactId>portal.component.portal</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.file-storage</artifactId>
+      <artifactId>portal.component.file-storage</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.pc</artifactId>
+      <artifactId>portal.component.pc</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.api</artifactId>
+      <artifactId>portal.component.api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.web.security</artifactId>
+      <artifactId>portal.component.web.security</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.scripting</artifactId>
+      <artifactId>portal.component.scripting</artifactId>
     </dependency>
   </dependencies>
   <build>

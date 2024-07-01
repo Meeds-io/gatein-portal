@@ -18,15 +18,15 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <groupId>org.exoplatform.gatein.portal</groupId>
-    <artifactId>exo.portal.component</artifactId>
+    <groupId>io.meeds.portal</groupId>
+    <artifactId>portal.component</artifactId>
     <version>7.0.x-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>exo.portal.component.identity</artifactId>
+  <artifactId>portal.component.identity</artifactId>
   <packaging>jar</packaging>
-  <name>GateIn Portal Component IDM</name>
+  <name>Meeds Portal Component IDM</name>
 
   <properties>
     <sun-opends.version>1.0.0</sun-opends.version>
@@ -37,7 +37,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.common</artifactId>
+      <artifactId>portal.component.common</artifactId>
     </dependency>
 
     <dependency>
@@ -54,11 +54,11 @@
     </dependency>
 
     <dependency>
-      <groupId>org.exoplatform.kernel</groupId>
+      <groupId>io.meeds.kernel</groupId>
       <artifactId>exo.kernel.component.ext.cache.impl.infinispan.v8</artifactId>
       <!--
         Make it here provided to avoid transitive dependency for upper layers
-        and is added in exo.portal.web.portal for runtime usage
+        and is added in portal.web.portal for runtime usage
        -->
       <scope>provided</scope>
     </dependency>
@@ -66,7 +66,7 @@
     <!-- Test scope -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.common</artifactId>
+      <artifactId>portal.component.common</artifactId>
       <type>test-jar</type>
       <!-- Test scope not added on purpose for transitive dependency -->
     </dependency>

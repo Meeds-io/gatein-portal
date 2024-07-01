@@ -18,16 +18,16 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <groupId>org.exoplatform.gatein.portal</groupId>
-    <artifactId>exo.portal.component.web</artifactId>
+    <groupId>io.meeds.portal</groupId>
+    <artifactId>portal.component.web</artifactId>
     <version>7.0.x-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>exo.portal.component.web.controller</artifactId>
+  <artifactId>portal.component.web.controller</artifactId>
   <packaging>jar</packaging>
-  <name>GateIn Portal Component Web Controller</name>
-  <description>The GateIn web controller takes care of managing portal requests and delegate the processing to
+  <name>Meeds Portal Component Web Controller</name>
+  <description>The web controller takes care of managing portal requests and delegate the processing to
     the appropriate subsystem.
   </description>
 
@@ -38,12 +38,12 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.portal</artifactId>
+      <artifactId>portal.component.portal</artifactId>
     </dependency>
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.portal</artifactId>
+      <artifactId>portal.component.portal</artifactId>
       <type>test-jar</type>
     </dependency>
 
