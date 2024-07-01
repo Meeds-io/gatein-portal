@@ -19,15 +19,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <parent>
-    <groupId>org.exoplatform.gatein.portal</groupId>
-    <artifactId>exo.portal.component.test</artifactId>
+    <groupId>io.meeds.portal</groupId>
+    <artifactId>portal.component.test</artifactId>
     <version>7.0.x-exo-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>exo.portal.component.test.web</artifactId>
+  <artifactId>portal.component.test.web</artifactId>
   <packaging>jar</packaging>
-  <name>GateIn Portal Component Web Test</name>
+  <name>Meeds Portal Component Web Test</name>
 
   <properties>
     <exo.test.coverage.ratio>0</exo.test.coverage.ratio>
@@ -36,7 +36,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>exo.portal.component.test.core</artifactId>
+      <artifactId>portal.component.test.core</artifactId>
     </dependency>
   </dependencies>
 
