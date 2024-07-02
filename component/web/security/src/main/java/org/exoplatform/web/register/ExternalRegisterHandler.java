@@ -553,7 +553,7 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
   }
 
   private String unAccent(String src) {
-    return Normalizer.normalize(src, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").replace("'", "");
+    return Normalizer.normalize(src, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").replace("'", "").replace("`", "");
   }
 
   private void wrapForAutomaticLogin(HttpServletRequest request,
