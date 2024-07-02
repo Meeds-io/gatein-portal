@@ -79,22 +79,26 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
                           @ApiResponse(responseCode = "304", description = "Resource not modified"),
                           @ApiResponse(responseCode = "500", description = "Server error when retrieving branding information")
   })
-  public Response getBrandingInformation(@Context
-  Request request) {
+  public Response getBrandingInformation(
+                                         @Context
+                                         Request request,
+                                         @Parameter(description = "Whether force refresh information from database or not")
+                                         @QueryParam("forceRefresh")
+                                         String forceRefresh) {
     try {
+      boolean refresh = StringUtils.equals("true", forceRefresh);
       long lastUpdated = brandingService.getLastUpdatedTime();
-      EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
+      EntityTag eTag = refresh ? null : new EntityTag(String.valueOf(lastUpdated));
 
       //
       Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
       if (builder == null) {
-        Branding brandingInformation = brandingService.getBrandingInformation(false);
+        Branding brandingInformation = brandingService.getBrandingInformation(refresh);
         builder = Response.ok(brandingInformation);
         CacheControl cc = new CacheControl();
         cc.setMustRevalidate(true);
         builder.tag(eTag);
         builder.lastModified(new Date(lastUpdated));
-        builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
         builder.cacheControl(cc);
       }
       return builder.build();
