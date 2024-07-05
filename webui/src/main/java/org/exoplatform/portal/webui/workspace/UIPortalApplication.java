@@ -649,7 +649,13 @@ public class UIPortalApplication extends UIApplication {
     public Set<Skin> getPortletSkins() {
         // Determine portlets visible on the page
         List<UIPortlet> uiportlets = new ArrayList<>();
-        uiWorkingWorkspace.findComponentOfType(uiportlets, UIPortlet.class);
+        getCurrentPage().findComponentOfType(uiportlets, UIPortlet.class);
+        if (!PortalRequestContext.getCurrentInstance().isMaximizePortlet()) {
+          getCurrentSite().findComponentOfType(uiportlets, UIPortlet.class);
+        }
+        if (!PortalRequestContext.getCurrentInstance().isHideSharedLayout()) {
+          uiWorkingWorkspace.findComponentOfType(uiportlets, UIPortlet.class);
+        }
         List<Skin> portletSkins = new ArrayList<>();
         Set<SkinConfig> portalPortletSkins = getPortalPortletSkins();
         // don't merge portlet if portlet not available
