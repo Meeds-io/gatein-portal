@@ -29,42 +29,49 @@ import org.exoplatform.container.ExoContainer;
 import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.*;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author Tuan Nguyen
  **/
 public class Container extends ModelObject implements Cloneable {
 
-  public static final String       EVERYONE                              = "Everyone";
+  public static final String           EVERYONE                              = "Everyone";
 
-  public static final List<String> DEFAULT_ACCESS_PERMISSIONS            = Collections.singletonList(EVERYONE);
+  public static final List<String>     DEFAULT_ACCESS_PERMISSIONS            = Collections.singletonList(EVERYONE);
 
-  public static final List<String> DEFAULT_MOVE_APPLICATIONS_PERMISSIONS = Collections.singletonList(EVERYONE);
+  public static final List<String>     DEFAULT_MOVE_APPLICATIONS_PERMISSIONS = Collections.singletonList(EVERYONE);
 
-  public static final List<String> DEFAULT_MOVE_CONTAINERS_PERMISSIONS   = Collections.singletonList(EVERYONE);
+  public static final List<String>     DEFAULT_MOVE_CONTAINERS_PERMISSIONS   = Collections.singletonList(EVERYONE);
 
-  protected String                 id;
+  protected String                     id;
 
-  protected String                 name;
+  protected String                     name;
 
-  protected String                 icon;
+  protected String                     icon;
 
-  protected String                 template;
+  protected String                     template;
 
-  protected String                 factoryId;
+  protected String                     factoryId;
 
-  protected String                 title;
+  protected String                     title;
 
-  protected String                 description;
+  protected String                     description;
 
-  protected String                 profiles;
+  protected String                     profiles;
 
-  protected String[]               accessPermissions;
+  protected String[]                   accessPermissions;
 
-  protected String[]               moveAppsPermissions;
+  protected String[]                   moveAppsPermissions;
 
-  protected String[]               moveContainersPermissions;
+  protected String[]                   moveContainersPermissions;
 
-  protected ArrayList<ModelObject> children;
+  protected ArrayList<ModelObject>     children;
+
+  @Getter
+  @Setter
+  protected ApplicationBackgroundStyle appBackgroundStyle;
 
   public Container() {
     setDefaultPermissions();
@@ -93,6 +100,7 @@ public class Container extends ModelObject implements Cloneable {
     this.height = data.getHeight();
     this.cssClass = data.getCssClass();
     this.cssStyle = data.getCssStyle();
+    this.appBackgroundStyle = data.getAppBackgroundStyle();
     this.profiles = data.getProfiles();
     this.accessPermissions = data.getAccessPermissions().toArray(new String[data.getAccessPermissions().size()]);
     List<String> permisssions = data.getMoveAppsPermissions();
@@ -226,6 +234,7 @@ public class Container extends ModelObject implements Cloneable {
                              getCssClass(),
                              getProfiles(),
                              getCssStyle(),
+                             getAppBackgroundStyle(),
                              Utils.safeImmutableList(accessPermissions),
                              Utils.safeImmutableList(moveAppsPermissions),
                              Utils.safeImmutableList(moveContainersPermissions),

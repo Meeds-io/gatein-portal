@@ -75,25 +75,30 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   @RolesAllowed("users")
   @Operation(summary = "Get Branding information", description = "Get Branding information", method = "GET")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-      @ApiResponse(responseCode = "304", description = "Resource not modified"),
-      @ApiResponse(responseCode = "500", description = "Server error when retrieving branding information")
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "304", description = "Resource not modified"),
+                          @ApiResponse(responseCode = "500", description = "Server error when retrieving branding information")
   })
-  public Response getBrandingInformation(@Context Request request) {
+  public Response getBrandingInformation(
+                                         @Context
+                                         Request request,
+                                         @Parameter(description = "Whether force refresh information from database or not")
+                                         @QueryParam("forceRefresh")
+                                         String forceRefresh) {
     try {
+      boolean refresh = StringUtils.equals("true", forceRefresh);
       long lastUpdated = brandingService.getLastUpdatedTime();
-      EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
+      EntityTag eTag = refresh ? null : new EntityTag(String.valueOf(lastUpdated));
 
       //
       Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
       if (builder == null) {
-        Branding brandingInformation = brandingService.getBrandingInformation(false);
+        Branding brandingInformation = brandingService.getBrandingInformation(refresh);
         builder = Response.ok(brandingInformation);
         CacheControl cc = new CacheControl();
         cc.setMustRevalidate(true);
         builder.tag(eTag);
         builder.lastModified(new Date(lastUpdated));
-        builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
         builder.cacheControl(cc);
       }
       return builder.build();
@@ -109,8 +114,8 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Update Branding information", description = "Update Branding information", method = "POST")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "Branding information updated"),
-      @ApiResponse(responseCode = "500", description = "Server error when updating branding information")
+                          @ApiResponse(responseCode = "204", description = "Branding information updated"),
+                          @ApiResponse(responseCode = "500", description = "Server error when updating branding information")
   })
   public Response updateBrandingInformation(Branding branding) {
     try {
@@ -127,9 +132,9 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   @Produces(IMAGE_MIME_TYPE)
   @Operation(summary = "Get Branding logo", description = "Get Branding logo", method = "GET")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Branding logo retrieved"),
-      @ApiResponse(responseCode = "404", description = "Branding logo not found"),
-      @ApiResponse(responseCode = "500", description = "Server error when retrieving branding logo")
+                          @ApiResponse(responseCode = "200", description = "Branding logo retrieved"),
+                          @ApiResponse(responseCode = "404", description = "Branding logo not found"),
+                          @ApiResponse(responseCode = "500", description = "Server error when retrieving branding logo")
   })
   public Response getBrandingLogo(
                                   @Context
@@ -172,13 +177,62 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   }
 
   @GET
+  @Path("/pageBackground")
+  @Produces(IMAGE_MIME_TYPE)
+  @Operation(summary = "Get Default Page Background image", description = "Get Default Page Background image", method = "GET")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Request fullfilled"),
+    @ApiResponse(responseCode = "404", description = "Object not found"),
+  })
+  public Response getPageBackground(
+                                    @Context
+                                    Request request,
+                                    @Parameter(description = "The value of lastModified parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'")
+                                    @QueryParam("lastModified")
+                                    String lastModified,
+                                    @Parameter(description = "The value of version parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'")
+                                    @QueryParam("v")
+                                    String version) {
+
+    Background background = brandingService.getPageBackground();
+    if (background == null || background.getData() == null) {
+      throw new WebApplicationException(Response.Status.NOT_FOUND);
+    }
+
+    //
+    long lastUpdated = background.getUpdatedDate();
+    EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
+
+    //
+    Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
+    if (builder == null) {
+      InputStream stream = new ByteArrayInputStream(background.getData());
+      builder = Response.ok(stream, IMAGE_MIME_TYPE);
+      // If the query has a lastModified parameter, it means that the client
+      // will change the lastModified entry when it really changes
+      // Which means that we can cache the image in browser side
+      // for a long time
+      if (StringUtils.isNotBlank(lastModified) || StringUtils.isNotBlank(version)) {
+        CacheControl cc = new CacheControl();
+        cc.setMaxAge(CACHE_IN_SECONDS);
+        cc.setPrivate(false);
+        builder.tag(eTag);
+        builder.lastModified(new Date(lastUpdated));
+        builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
+        builder.cacheControl(cc);
+      }
+    }
+    return builder.build();
+  }
+
+  @GET
   @Path("/favicon")
   @Produces(IMAGE_MIME_TYPE)
   @Operation(summary = "Get Branding favicon", description = "Get Branding favicon", method = "GET")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Branding favicon retrieved"),
-      @ApiResponse(responseCode = "404", description = "Branding favicon not found"),
-      @ApiResponse(responseCode = "500", description = "Server error when retrieving branding favicon")
+                          @ApiResponse(responseCode = "200", description = "Branding favicon retrieved"),
+                          @ApiResponse(responseCode = "404", description = "Branding favicon not found"),
+                          @ApiResponse(responseCode = "500", description = "Server error when retrieving branding favicon")
   })
   public Response getBrandingFavicon(
                                      @Context
@@ -220,11 +274,12 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   @GET
   @Path("/loginBackground")
   @Produces(IMAGE_MIME_TYPE)
-  @Operation(summary = "Get authentication pages left panel background", description = "Get authentication pages left panel background", method = "GET")
+  @Operation(summary = "Get authentication pages left panel background",
+             description = "Get authentication pages left panel background", method = "GET")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Request fullfilled"),
-      @ApiResponse(responseCode = "404", description = "Resource not found"),
-      @ApiResponse(responseCode = "500", description = "Server error when retrieving resource")
+                          @ApiResponse(responseCode = "200", description = "Request fullfilled"),
+                          @ApiResponse(responseCode = "404", description = "Resource not found"),
+                          @ApiResponse(responseCode = "500", description = "Server error when retrieving resource")
   })
   public Response getLoginBackground(
                                      @Context
@@ -267,9 +322,9 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   @Path("/css")
   @Operation(summary = "Get Branding CSS content", description = "Get Branding CSS content", method = "GET")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Branding css retrieved"),
-      @ApiResponse(responseCode = "304", description = "Branding css not modified"),
-      @ApiResponse(responseCode = "500", description = "Server error when retrieving branding css")
+                          @ApiResponse(responseCode = "200", description = "Branding css retrieved"),
+                          @ApiResponse(responseCode = "304", description = "Branding css not modified"),
+                          @ApiResponse(responseCode = "500", description = "Server error when retrieving branding css")
   })
   public Response getBrandingCSS(
                                  @Context

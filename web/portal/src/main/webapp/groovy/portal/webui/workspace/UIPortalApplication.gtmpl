@@ -62,10 +62,10 @@
   }
   def title = rcontext.getTitle();
 
+  BrandingService brandingService = uicomponent.getApplicationComponent(BrandingService.class);
   if (portal.getSiteKey().getType() == org.exoplatform.portal.mop.SiteType.PORTAL) {
     ResourceBundleService resourceBundleService = uicomponent.getApplicationComponent(ResourceBundleService.class);
     ResourceBundle bundle = resourceBundleService.getResourceBundle("locale.portlet.Portlets", rcontext.getLocale());
-    BrandingService brandingService = uicomponent.getApplicationComponent(BrandingService.class);
     if (portal.getSiteKey().getName().equals("public")) {
       title = brandingService.getCompanyName() + " - " + bundle.getString("publicSite.title.suffix");
     } else if (portal.getSiteKey().getName().equals("administration")) {
@@ -78,6 +78,25 @@
   def bodyClasses = session.getAttribute("UIPortalApplication.body.class");
   if (bodyClasses == null) {
     bodyClasses = "";
+  }
+  def bodyStyle = "";
+  if (brandingService.getPageBackgroundColor() != null) {
+    bodyStyle += "--allPagesBackgroundColor: " + brandingService.getPageBackgroundColor() + ";";
+  }
+  if (brandingService.getPageBackgroundPath() != null) {
+    bodyStyle += "--allPagesBackgroundImage: url(" + brandingService.getPageBackgroundPath() + ");";
+  }
+  if (brandingService.getPageBackgroundRepeat() != null) {
+    bodyStyle += "--allPagesBackgroundRepeat: " + brandingService.getPageBackgroundRepeat() + ";";
+  }
+  if (brandingService.getPageBackgroundSize() != null) {
+    bodyStyle += "--allPagesBackgroundSize: " + brandingService.getPageBackgroundSize() + ";";
+  }
+  if (brandingService.getPageBackgroundPosition() != null) {
+    bodyStyle += "--allPagesBackgroundPosition: " + brandingService.getPageBackgroundPosition() + ";";
+  }
+  if (brandingService.getPageWidth() != null) {
+    bodyStyle += "--allPagesWidth: " + brandingService.getPageWidth() + ";";
   }
   def userHomeLink = uicomponent.getUserHomePage();
 
@@ -234,7 +253,7 @@
    <% _ctx.includeTemplates("UIPortalApplication-head") %>
  </head>
 
- <body style="height: 100%;" class="$bodyClasses" onload="eXo.env.portal.onLoad()">
+ <body style="height: 100%;$bodyStyle" class="$bodyClasses" onload="eXo.env.portal.onLoad()">
    <%/* Include extensible templates configured by Kernel configuration to be imported in the beginning of the body section of the Page */%>
    <% _ctx.includeTemplates("UIPortalApplication-Start-body") %>
    <div class="visible-tablet"></div>
