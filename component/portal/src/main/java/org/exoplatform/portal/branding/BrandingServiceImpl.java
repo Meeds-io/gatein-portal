@@ -279,7 +279,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   public Branding getBrandingInformation(boolean retrieveBinaries) {
     Branding branding = new Branding();
     branding.setDefaultLanguage(getDefaultLanguage());
-    branding.setSupportedLanguages(Collections.unmodifiableMap(supportedLanguages));
+    branding.setSupportedLanguages(loadLanguages());
     branding.setCompanyName(getCompanyName());
     branding.setCompanyLink(getCompanyLink());
     branding.setSiteName(getSiteName());
@@ -771,6 +771,11 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     }
   }
 
+  @Override
+  public String getDefaultLanguage() {
+    return getDefaultLocale().toLanguageTag();
+  }
+
   /**
    * Load init params
    * 
@@ -839,29 +844,27 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     }
   }
 
-  private void loadLanguages() {
+  private Map<String, String> loadLanguages() {
     Locale defaultLocale = getDefaultLocale();
-    this.supportedLanguages =
-                            localeConfigService.getLocalConfigs() == null ? Collections.singletonMap(defaultLocale.getLanguage(),
-                                                                                                     getLocaleDisplayName(defaultLocale,
-                                                                                                                          defaultLocale)) :
-                                                                          localeConfigService.getLocalConfigs()
-                                                                                             .stream()
-                                                                                             .filter(localeConfig -> !StringUtils.equals(localeConfig.getLocaleName(),
-                                                                                                                                         "ma"))
-                                                                                             .collect(Collectors.toMap(LocaleConfig::getLocaleName,
-                                                                                                                       localeConfig -> getLocaleDisplayName(defaultLocale,
-                                                                                                                                                            localeConfig.getLocale())));
+    this.supportedLanguages = localeConfigService.getLocalConfigs()
+        == null ?
+                Collections.singletonMap(defaultLocale.getLanguage(),
+                                         getLocaleDisplayName(defaultLocale,
+                                                              defaultLocale)) :
+                localeConfigService.getLocalConfigs()
+                                   .stream()
+                                   .filter(localeConfig -> !StringUtils.equals(localeConfig.getLocaleName(),
+                                                                               "ma"))
+                                   .collect(Collectors.toMap(LocaleConfig::getLocaleName,
+                                                             localeConfig -> getLocaleDisplayName(defaultLocale,
+                                                                                                  localeConfig.getLocale())));
+    return this.supportedLanguages;
   }
 
   private Locale getDefaultLocale() {
     return localeConfigService.getDefaultLocaleConfig() == null ? Locale.getDefault() :
                                                                 localeConfigService.getDefaultLocaleConfig()
                                                                                    .getLocale();
-  }
-
-  private String getDefaultLanguage() {
-    return getDefaultLocale().toLanguageTag();
   }
 
   private String getLocaleDisplayName(Locale defaultLocale, Locale locale) {
