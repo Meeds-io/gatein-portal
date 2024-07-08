@@ -67,6 +67,7 @@ import org.exoplatform.web.security.sso.SSOHelper;
 
 import io.meeds.portal.security.constant.UserRegistrationType;
 import io.meeds.portal.security.service.SecuritySettingService;
+import io.meeds.spring.web.localization.HttpRequestLocaleWrapper;
 
 public class LoginHandler extends JspBasedWebHandler {
 
@@ -154,7 +155,7 @@ public class LoginHandler extends JspBasedWebHandler {
 
   @Override
   public boolean execute(ControllerContext context) throws Exception { // NOSONAR
-    HttpServletRequest request = context.getRequest();
+    HttpServletRequest request = new HttpRequestLocaleWrapper(context.getRequest());
     HttpServletResponse response = context.getResponse();
     try {
       // We set the character encoding now to UTF-8 before obtaining parameters

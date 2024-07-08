@@ -43,7 +43,8 @@ public class HttpRequestLocaleWrapper extends HttpServletRequestWrapper {
   public Locale getLocale() {
     if (locale == null) {
       LocaleContextInfo localeCtx = LocaleContextInfoUtils.buildLocaleContextInfo((HttpServletRequest) getRequest());
-      locale = ExoContainerContext.getService(LocalePolicy.class).determineLocale(localeCtx);
+      LocalePolicy localePolicyService = ExoContainerContext.getService(LocalePolicy.class);
+      locale = localePolicyService == null ? getRequest().getLocale() : localePolicyService.determineLocale(localeCtx);
     }
     return locale;
   }
