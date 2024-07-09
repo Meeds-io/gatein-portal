@@ -19,6 +19,7 @@
 
 package org.exoplatform.portal.resource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.cache.future.FutureMap;
 import org.exoplatform.commons.cache.future.Loader;
@@ -426,6 +427,8 @@ public class SkinService extends AbstractResourceService implements Startable {
       skinConfig = new SimpleSkin(module, skinName, cssPath, priority, additionalModules);
       skinConfig.setType("portlet-skin");
       skinConfigs_.put(key, skinConfig);
+    } else if (CollectionUtils.isNotEmpty(additionalModules)) {
+      skinConfig.getAdditionalModules().addAll(additionalModules);
     }
   }
 
