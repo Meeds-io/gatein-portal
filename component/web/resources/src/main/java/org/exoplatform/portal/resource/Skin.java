@@ -41,9 +41,21 @@ public interface Skin {
      *
      * @param context the controller context
      * @return the skin URL
-     * @throws NullPointerException if the controller context argument is null
+     * @deprecated use #createURL() instead
      */
-    SkinURL createURL(ControllerContext context) throws NullPointerException;
+    @Deprecated(forRemoval = true, since = "7.0")
+    default SkinURL createURL(ControllerContext context) {
+      return createURL();
+    }
+
+    /**
+     * Creates and return a skin URL.
+     *
+     * @return the skin URL
+     */
+    default SkinURL createURL() {
+      return createURL(null);
+    }
 
     /**
      * Returns the priority number
@@ -56,6 +68,13 @@ public interface Skin {
 
     default String getType() {
       return "custom";
+    }
+
+    /**
+     * @return
+     */
+    default int getFileContentHash() {
+      return 0;
     }
 
 }
