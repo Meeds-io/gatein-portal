@@ -85,7 +85,7 @@ public class LocaleContextInfoUtils {
     localeCtx.setSessionLocale(sessionLocale);
     // continue setting localCtx with data fetched from request
     localeCtx.setUserProfileLocale(getUserLocale(username));
-    localeCtx.setBrowserLocales(Collections.list(request.getLocales()));
+    localeCtx.setBrowserLocales(request.getLocales() == null ? null : Collections.list(request.getLocales()));
     localeCtx.setCookieLocales(getCookieLocales(request));
     localeCtx.setRemoteUser(username);
     return localeCtx;

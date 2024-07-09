@@ -51,6 +51,8 @@ import org.exoplatform.web.application.JspBasedWebHandler;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.exoplatform.web.controller.QualifiedName;
 
+import io.meeds.spring.web.localization.HttpRequestLocaleWrapper;
+
 /**
  * @author <a href="mailto:tuyennt@exoplatform.com">Tuyen Nguyen The</a>.
  */
@@ -118,7 +120,7 @@ public class PasswordRecoveryHandler extends JspBasedWebHandler {
 
   @Override
   public boolean execute(ControllerContext controllerContext) throws Exception {// NOSONAR
-    HttpServletRequest request = controllerContext.getRequest();
+    HttpServletRequest request = new HttpRequestLocaleWrapper(controllerContext.getRequest());
     HttpServletResponse response = controllerContext.getResponse();
 
     Locale locale = request.getLocale();

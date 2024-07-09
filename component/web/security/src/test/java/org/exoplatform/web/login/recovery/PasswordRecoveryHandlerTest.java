@@ -55,7 +55,6 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.gatein.wci.security.Credentials;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -83,7 +82,7 @@ import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.controller.router.Router;
 import org.exoplatform.web.security.security.CookieTokenService;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class PasswordRecoveryHandlerTest {
 
   private static final Locale     REQUEST_LOCALE = Locale.ENGLISH;
@@ -293,7 +292,7 @@ public class PasswordRecoveryHandlerTest {
     assertEquals(username, applicationParameters.get(USERNAME_PARAM));
 
     verify(passwordRecoveryService, never()).changePass(any(), any(), any(), any());
-    verify(passwordRecoveryService, times(1)).sendRecoverPasswordEmail(user, REQUEST_LOCALE, request);
+    verify(passwordRecoveryService, times(1)).sendRecoverPasswordEmail(eq(user), eq(REQUEST_LOCALE), any(HttpServletRequest.class));
 
     assertFalse(applicationParameters.containsKey(SUCCESS_MESSAGE_PARAM));
     assertEquals("gatein.forgotPassword.emailSendFailure", applicationParameters.get(ERROR_MESSAGE_PARAM));
@@ -330,7 +329,7 @@ public class PasswordRecoveryHandlerTest {
     assertEquals(username, applicationParameters.get(USERNAME_PARAM));
 
     verify(passwordRecoveryService, never()).changePass(any(), any(), any(), any());
-    verify(passwordRecoveryService, times(1)).sendRecoverPasswordEmail(user, REQUEST_LOCALE, request);
+    verify(passwordRecoveryService, times(1)).sendRecoverPasswordEmail(eq(user), eq(REQUEST_LOCALE), any(HttpServletRequest.class));
 
     assertFalse(applicationParameters.containsKey(ERROR_MESSAGE_PARAM));
     assertEquals("gatein.forgotPassword.emailSendSuccessful", applicationParameters.get(SUCCESS_MESSAGE_PARAM));

@@ -235,4 +235,9 @@ public interface BrandingService {
    */
   String getLoginSubtitle(Locale locale);
 
+  /**
+   * @return default platform language
+   */
+  String getDefaultLanguage();
+
 }

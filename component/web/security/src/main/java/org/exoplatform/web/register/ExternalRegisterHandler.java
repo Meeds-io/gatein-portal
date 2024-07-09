@@ -70,6 +70,7 @@ import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 import org.exoplatform.web.security.security.RemindPasswordTokenService;
 
 import io.meeds.portal.security.service.SecuritySettingService;
+import io.meeds.spring.web.localization.HttpRequestLocaleWrapper;
 
 import nl.captcha.Captcha;
 import nl.captcha.servlet.CaptchaServletUtil;
@@ -203,7 +204,7 @@ public class ExternalRegisterHandler extends JspBasedWebHandler {
 
   @Override
   public boolean execute(ControllerContext controllerContext) throws Exception {// NOSONAR
-    HttpServletRequest request = controllerContext.getRequest();
+    HttpServletRequest request = new HttpRequestLocaleWrapper(controllerContext.getRequest());
     HttpServletResponse response = controllerContext.getResponse();
 
     Map<String, Object> parameters = new HashMap<>();

@@ -171,10 +171,9 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
                         for (Iterator<LocaleConfig> iter = localeConfigs.iterator(); iter.hasNext();){
                             LocaleConfig localeConfig = iter.next();
                             //Skip loaded resources before container startup
-                            if (localeList_.contains(localeConfig.getLocale().getLanguage())){
-                                continue;
+                            if (!localeList_.contains(localeConfig.getLocale().toLanguageTag())){
+                                loadResourcesForLocale(localeConfig.getLocale());
                             }
-                            loadResourcesForLocale(localeConfig.getLocale());
                         }
                     }
                 },"ResourceBundleThread").start();
@@ -364,7 +363,7 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
         for (String resource : getInitResources_()) {
             initResources(resource, locale, cl);
         }
-        localeList_.add(locale.getLanguage());
+        localeList_.add(locale.toLanguageTag());
     }
 
     /**
@@ -542,7 +541,7 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
         ResourceBundle get(String id) {
             ResourceBundle res = null;
             //local resources is not yet loaded
-            if (!localeList_.contains(locale.getLanguage())){
+            if (!localeList_.contains(locale.toLanguageTag())){
                 //force the load of local resources
                 loadResourcesForLocale(locale);
             }
@@ -587,7 +586,7 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
                 outputBundled = new MapResourceBundle(locale);
                 for (int i = 0; i < name.length; i++) {
                     //local resources is not yet loaded
-                    if (!localeList_.contains(locale.getLanguage())){
+                    if (!localeList_.contains(locale.toLanguageTag())){
                         //force the load of local resources
                         loadResourcesForLocale(locale);
                     }
