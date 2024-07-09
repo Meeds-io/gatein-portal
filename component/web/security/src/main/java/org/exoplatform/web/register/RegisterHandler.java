@@ -60,6 +60,8 @@ import org.exoplatform.web.application.javascript.JavascriptConfigService;
 import org.exoplatform.web.login.UIParamsExtension;
 import org.exoplatform.web.login.recovery.PasswordRecoveryService;
 
+import io.meeds.spring.web.localization.HttpRequestLocaleWrapper;
+
 import nl.captcha.Captcha;
 import nl.captcha.servlet.CaptchaServletUtil;
 import nl.captcha.text.producer.DefaultTextProducer;
@@ -145,7 +147,7 @@ public class RegisterHandler extends JspBasedWebHandler {
 
   @Override
   public boolean execute(ControllerContext controllerContext) throws Exception {
-    HttpServletRequest request = controllerContext.getRequest();
+    HttpServletRequest request = new HttpRequestLocaleWrapper(controllerContext.getRequest());
     HttpServletResponse response = controllerContext.getResponse();
 
     // If user is already authenticated, no registration form is required

@@ -41,8 +41,6 @@ import org.exoplatform.portal.branding.model.Background;
 import org.exoplatform.portal.branding.model.Branding;
 import org.exoplatform.portal.branding.model.Favicon;
 import org.exoplatform.portal.branding.model.Logo;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,8 +52,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Path("/v1/platform/branding")
 @Tag(name = "/v1/platform/branding", description = "Managing branding information")
 public class BrandingRestResourcesV1 implements ResourceContainer {
-
-  private static final Log    LOG                    = ExoLogger.getLogger(BrandingRestResourcesV1.class);
 
   private static final String IMAGE_MIME_TYPE        = "image/png";
 
@@ -75,37 +71,11 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   @RolesAllowed("users")
   @Operation(summary = "Get Branding information", description = "Get Branding information", method = "GET")
   @ApiResponses(value = {
-                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "304", description = "Resource not modified"),
-                          @ApiResponse(responseCode = "500", description = "Server error when retrieving branding information")
+                        @ApiResponse(responseCode = "200", description = "Request fulfilled"),
   })
-  public Response getBrandingInformation(
-                                         @Context
-                                         Request request,
-                                         @Parameter(description = "Whether force refresh information from database or not")
-                                         @QueryParam("forceRefresh")
-                                         String forceRefresh) {
-    try {
-      boolean refresh = StringUtils.equals("true", forceRefresh);
-      long lastUpdated = brandingService.getLastUpdatedTime();
-      EntityTag eTag = refresh ? null : new EntityTag(String.valueOf(lastUpdated));
-
-      //
-      Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
-      if (builder == null) {
-        Branding brandingInformation = brandingService.getBrandingInformation(refresh);
-        builder = Response.ok(brandingInformation);
-        CacheControl cc = new CacheControl();
-        cc.setMustRevalidate(true);
-        builder.tag(eTag);
-        builder.lastModified(new Date(lastUpdated));
-        builder.cacheControl(cc);
-      }
-      return builder.build();
-    } catch (Exception e) {
-      LOG.error("Error when retrieving branding information", e);
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-    }
+  public Response getBrandingInformation() {
+    Branding brandingInformation = brandingService.getBrandingInformation(false);
+    return Response.ok(brandingInformation).build();
   }
 
   @PUT
@@ -115,16 +85,10 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   @Operation(summary = "Update Branding information", description = "Update Branding information", method = "POST")
   @ApiResponses(value = {
                           @ApiResponse(responseCode = "204", description = "Branding information updated"),
-                          @ApiResponse(responseCode = "500", description = "Server error when updating branding information")
   })
   public Response updateBrandingInformation(Branding branding) {
-    try {
-      brandingService.updateBrandingInformation(branding);
-      return Response.noContent().build();
-    } catch (Exception e) {
-      LOG.error("Error when updating branding information", e);
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-    }
+    brandingService.updateBrandingInformation(branding);
+    return Response.noContent().build();
   }
 
   @GET
