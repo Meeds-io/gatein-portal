@@ -71,7 +71,7 @@ public class UISharedLayoutTest {
       }
 
       @Override
-      protected boolean isShowSharedLayout(PortalRequestContext requestContext) {
+      public boolean isShowSharedLayout(PortalRequestContext requestContext) {
         return !pcontext.isHideSharedLayout();
       }
     };
