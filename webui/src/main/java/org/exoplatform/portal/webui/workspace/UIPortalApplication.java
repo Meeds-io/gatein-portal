@@ -96,6 +96,7 @@ import java.util.stream.Collectors;
  * part that can display the normal or webos portal layouts - UIPopupWindow: a popup window that display or not
  */
 @ComponentConfig(lifecycle = UIPortalApplicationLifecycle.class, template = "system:/groovy/portal/webui/workspace/UIPortalApplication.gtmpl", events = { @EventConfig(listeners = ChangeNodeActionListener.class, csrfCheck = false) })
+@SuppressWarnings("rawtypes")
 public class UIPortalApplication extends UIApplication {
 
     /**
@@ -598,14 +599,6 @@ public class UIPortalApplication extends UIApplication {
           + "/v1/platform/branding/css?v=" + lastUpdatedTime;
     }
 
-    private Set<SkinConfig> getPortalPortletSkins() {
-        Set<SkinConfig> portletConfigs = new HashSet<SkinConfig>();
-        for (UIComponent child : getCurrentSite().getChildren()) {
-            getPortalPortletSkinConfig(portletConfigs, child);
-        }
-        return portletConfigs;
-    }
-
     private Collection<SkinConfig> getCustomSkins() {
         return skinService.getCustomPortalSkins(getSkin());
     }
@@ -647,46 +640,45 @@ public class UIPortalApplication extends UIApplication {
      * @return the portlet skins
      */
     public Set<Skin> getPortletSkins() {
-        // Determine portlets visible on the page
-        List<UIPortlet> uiportlets = new ArrayList<>();
-        getCurrentPage().findComponentOfType(uiportlets, UIPortlet.class);
-        if (!PortalRequestContext.getCurrentInstance().isMaximizePortlet()) {
+      PortalRequestContext requestContext = PortalRequestContext.getCurrentInstance();
+      UISharedLayout sharedLayout = uiWorkingWorkspace.findFirstComponentOfType(UISharedLayout.class);
+      // Determine portlets visible on the page
+      List<UIPortlet> uiportlets = new ArrayList<>();
+      if (sharedLayout.isShowSharedLayout(requestContext)) {
+        sharedLayout.findComponentOfType(uiportlets, UIPortlet.class);
+      } else {
+        UIPage currentPage = getCurrentPage();
+        if (!requestContext.isMaximizePortlet() && !currentPage.isShowMaxWindow()) {
           getCurrentSite().findComponentOfType(uiportlets, UIPortlet.class);
+        } else {
+          currentPage.findComponentOfType(uiportlets, UIPortlet.class);
         }
-        if (!PortalRequestContext.getCurrentInstance().isHideSharedLayout()) {
-          uiWorkingWorkspace.findComponentOfType(uiportlets, UIPortlet.class);
+      }
+      List<Skin> portletSkins = new ArrayList<>();
+      //
+      for (UIPortlet uiPortlet : uiportlets) {
+        SkinConfig skinConfig = getPortletSkinConfig(uiPortlet);
+        if (skinConfig != null) {
+          portletSkins.add(skinConfig);
         }
-        List<Skin> portletSkins = new ArrayList<>();
-        Set<SkinConfig> portalPortletSkins = getPortalPortletSkins();
-        // don't merge portlet if portlet not available
-        if (!portalPortletSkins.isEmpty()) {
-            portletSkins.add(skinService.merge(portalPortletSkins, PORTAL_PORTLETS_SKIN_ID));
-        }
+      }
 
-        //
-        for (UIPortlet uiPortlet : uiportlets) {
-            SkinConfig skinConfig = getPortletSkinConfig(uiPortlet);
-            if (skinConfig != null && !portalPortletSkins.contains(skinConfig)) {
-                portletSkins.add(skinConfig);
-            }
-        }
-
-        String skin = getSkin();
-        List<SkinConfig> additionalSkins = portletSkins.stream()
-                                                       .filter(portletSkin -> portletSkin instanceof SkinConfig skinConfig
-                                                                              && CollectionUtils.isNotEmpty(skinConfig.getAdditionalModules()))
-                                                       .map(portletSkin -> ((SkinConfig) portletSkin).getAdditionalModules())
-                                                       .flatMap(List::stream)
-                                                       .distinct()
-                                                       .map(module -> skinService.getPortalSkin(module, skin))
-                                                       .filter(Objects::nonNull)
-                                                       .toList();
-        portletSkins.addAll(additionalSkins);
-        return portletSkins.stream()
-                           .filter(Objects::nonNull)
-                           .filter(c -> !(c instanceof SkinConfig skinConfig) || skinConfig.getCSSPath() != null)
-                           .sorted((s1, s2) -> s1.getCSSPriority() - s2.getCSSPriority())
-                           .collect(Collectors.toSet());
+      String skin = getSkin();
+      List<SkinConfig> additionalSkins = portletSkins.stream()
+                                                     .filter(portletSkin -> portletSkin instanceof SkinConfig skinConfig
+                                                                            && CollectionUtils.isNotEmpty(skinConfig.getAdditionalModules()))
+                                                     .map(portletSkin -> ((SkinConfig) portletSkin).getAdditionalModules())
+                                                     .flatMap(List::stream)
+                                                     .distinct()
+                                                     .map(module -> skinService.getPortalSkin(module, skin))
+                                                     .filter(Objects::nonNull)
+                                                     .toList();
+      portletSkins.addAll(additionalSkins);
+      return portletSkins.stream()
+                         .filter(Objects::nonNull)
+                         .filter(c -> !(c instanceof SkinConfig skinConfig) || skinConfig.getCSSPath() != null)
+                         .sorted((s1, s2) -> s1.getCSSPriority() - s2.getCSSPriority())
+                         .collect(Collectors.toSet());
     }
 
     /**
@@ -1031,9 +1023,10 @@ public class UIPortalApplication extends UIApplication {
     }
 
     private String getAddSkinScript(ControllerContext context, Set<UIComponent> updateComponents) {
-        if (updateComponents == null)
-            return null;
-        List<UIPortlet> uiportlets = new ArrayList<UIPortlet>();
+        if (updateComponents == null) {
+          return null;
+        }
+        List<UIPortlet> uiportlets = new ArrayList<>();
         for (UIComponent uicomponent : updateComponents) {
             if (uicomponent instanceof UIContainer) {
                 UIContainer uiContainer = (UIContainer) uicomponent;
@@ -1048,20 +1041,14 @@ public class UIPortalApplication extends UIApplication {
             }
         }
 
-        List<SkinConfig> skins = new ArrayList<SkinConfig>();
-        Set<SkinConfig> portalPortletSkins = getPortalPortletSkins();
-        boolean reloadPortalPortletSkins = false;
+        List<SkinConfig> skins = new ArrayList<>();
         for (UIPortlet uiPortlet : uiportlets) {
             String skinId = uiPortlet.getSkinId();
             if (skinId != null) {
-                SkinConfig skinConfig = skinService.getSkin(skinId, getSkin());
-                if (skinConfig != null) {
-                    if (portalPortletSkins.contains(skinConfig)) {
-                        reloadPortalPortletSkins = true;
-                    } else {
-                        skins.add(skinConfig);
-                    }
-                }
+              SkinConfig skinConfig = skinService.getSkin(skinId, getSkin());
+              if (skinConfig != null) {
+                skins.add(skinConfig);
+              }
             }
         }
         StringBuilder b = new StringBuilder(1000);
@@ -1069,13 +1056,6 @@ public class UIPortalApplication extends UIApplication {
             SkinURL url = ele.createURL(context);
             url.setOrientation(orientation_);
             b.append("skin.addSkin('").append(ele.getId()).append("','").append(url).append("');\n");
-        }
-
-        if (reloadPortalPortletSkins) {
-            Skin skin = skinService.merge(portalPortletSkins, PORTAL_PORTLETS_SKIN_ID);
-            SkinURL url = skin.createURL(context);
-            url.setOrientation(orientation_);
-            b.append("skin.addSkin('").append(skin.getId()).append("','").append(url).append("', true);\n");
         }
 
         return b.toString();
