@@ -18,9 +18,21 @@
  */
 package org.exoplatform.portal.resource.config.tasks;
 
-import org.exoplatform.portal.resource.config.xml.SkinConfigParser;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.portal.resource.SkinConfig;
+import org.exoplatform.portal.resource.SkinService;
+import org.exoplatform.portal.resource.config.xml.SkinConfigParser;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.resources.Orientation;
+
+import lombok.SneakyThrows;
 
 /**
  * @author <a href="trong.tran@exoplatform.com">Trong Tran</a>
@@ -29,61 +41,84 @@ import org.w3c.dom.NodeList;
 
 public abstract class AbstractSkinModule {
 
-    protected String skinName;
-    protected String cssPath;
-    protected boolean overwrite;
-    protected String cssPriority;
+  protected static final Log   LOG         = ExoLogger.getLogger(AbstractSkinModule.class);
 
-    public AbstractSkinModule(String name) {
-        skinName = name;
-    }
+  private static final boolean DEVELOPPING = PropertyManager.isDevelopping();
 
-    protected void bindingSkinName(Element element) {
-        NodeList nodes = element.getElementsByTagName(SkinConfigParser.SKIN_NAME_TAG);
-        if (nodes == null || nodes.getLength() < 1) {
-            return;
-        }
-        this.skinName = nodes.item(0).getFirstChild().getNodeValue();
-    }
+  protected String             skinName;
 
-    protected void bindingCSSPath(Element element) {
-        NodeList nodes = element.getElementsByTagName(SkinConfigParser.CSS_PATH_TAG);
-        if (nodes == null || nodes.getLength() < 1) {
-            return;
-        }
-        this.cssPath = nodes.item(0).getFirstChild().getNodeValue();
-    }
+  protected String             cssPath;
 
-    protected void bindingOverwrite(Element element) {
-        NodeList nodes = element.getElementsByTagName(SkinConfigParser.OVERWRITE);
-        if (nodes == null || nodes.getLength() < 1) {
-            return;
-        }
-        String overwrite = nodes.item(0).getFirstChild().getNodeValue();
-        setOverwrite("true".equals(overwrite));
-    }
+  protected boolean            overwrite;
 
-    protected void bindingCSSPriority(Element element) {
-        NodeList nodes = element.getElementsByTagName(SkinConfigParser.CSS_PRIORITY_TAG);
-        if (nodes == null || nodes.getLength() < 1) {
-            return;
-        }
-        this.cssPriority = nodes.item(0).getFirstChild().getNodeValue();
-    }
+  protected String             cssPriority;
 
-    public void setSkinName(String name) {
-        this.skinName = name;
-    }
+  AbstractSkinModule(String name) {
+    skinName = name;
+  }
 
-    public void setCSSPath(String _cssPath) {
-        this.cssPath = _cssPath;
+  protected void bindingSkinName(Element element) {
+    NodeList nodes = element.getElementsByTagName(SkinConfigParser.SKIN_NAME_TAG);
+    if (nodes == null || nodes.getLength() < 1) {
+      return;
     }
+    this.skinName = nodes.item(0).getFirstChild().getNodeValue();
+  }
 
-    public void setOverwrite(boolean _overwrite) {
-        this.overwrite = _overwrite;
+  protected void bindingCSSPath(Element element) {
+    NodeList nodes = element.getElementsByTagName(SkinConfigParser.CSS_PATH_TAG);
+    if (nodes == null || nodes.getLength() < 1) {
+      return;
     }
+    this.cssPath = nodes.item(0).getFirstChild().getNodeValue();
+  }
 
-    public void setCSSPriority(String _cssPriority) {
-        this.cssPriority = _cssPriority;
+  protected void bindingOverwrite(Element element) {
+    NodeList nodes = element.getElementsByTagName(SkinConfigParser.OVERWRITE);
+    if (nodes == null || nodes.getLength() < 1) {
+      return;
     }
+    setOverwrite("true".equals(nodes.item(0).getFirstChild().getNodeValue()));
+  }
+
+  protected void bindingCSSPriority(Element element) {
+    NodeList nodes = element.getElementsByTagName(SkinConfigParser.CSS_PRIORITY_TAG);
+    if (nodes == null || nodes.getLength() < 1) {
+      return;
+    }
+    this.cssPriority = nodes.item(0).getFirstChild().getNodeValue();
+  }
+
+  public void setSkinName(String name) {
+    this.skinName = name;
+  }
+
+  public void setCSSPath(String cssPath) {
+    this.cssPath = cssPath;
+  }
+
+  public void setOverwrite(boolean overwrite) {
+    this.overwrite = overwrite;
+  }
+
+  public void setCSSPriority(String cssPriority) {
+    this.cssPriority = cssPriority;
+  }
+
+  @SneakyThrows
+  public void initSkinModuleCache(SkinService skinService, String fullCSSPath, SkinConfig skin) {
+    if (StringUtils.isBlank(skin.getCSSPath())) {
+      LOG.debug("Ignore caching empty CSS file for module {}", skin.getModule());
+      return;
+    }
+    ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
+    try {
+      skinService.getSkinModuleFile(fullCSSPath, skin.getFileContentHash(), Orientation.LT, !DEVELOPPING);
+    } catch (Exception e) {
+      LOG.debug("Error while initializing cache of CSS with path {}. Will reattempt in first portal request", fullCSSPath, e);
+    } finally {
+      ExoContainerContext.setCurrentContainer(null);
+    }
+  }
+
 }

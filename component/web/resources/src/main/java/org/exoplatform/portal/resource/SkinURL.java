@@ -39,7 +39,17 @@ public interface SkinURL {
     /**
      * This method is used to compute the path of a CSS.
      *
-     * @return the CSS path, containing the orientation suffix.
+     * @return the CSS path, containing the orientation parameter.
      */
     String toString();
+
+    /**
+     * This method is used to compute the path of a CSS.
+     * 
+     * @param orientation {@link Orientation}
+     * @return the CSS path, containing the orientation parameter.
+     */
+    default String toString(Orientation orientation) {
+      return toString();
+    }
 }
