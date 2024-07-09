@@ -53,6 +53,7 @@ import jakarta.servlet.ServletContext;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -65,20 +66,13 @@ import java.util.regex.Pattern;
 @RESTEndpoint(path = "skinservice")
 public class SkinService extends AbstractResourceService implements Startable {
 
-  protected static Log                                           log                     =
-                                                                     ExoLogger.getLogger("portal.SkinService");
+  protected static Log                                           log                     = ExoLogger.getLogger("portal.SkinService");
 
   private static final String                                    LEFT_P                  = "\\(";
 
   private static final String                                    RIGHT_P                 = "\\)";
 
-  /** Immutable and therefore thread safe. */
-  private static final Pattern                                   IMPORT_PATTERN          = Pattern.compile("(@import\\s+" + "url"
-      + LEFT_P + "['\"]?" + ")([^'\";]+.css)(" + "['\"]?" + RIGHT_P + "\\s*;)");
-
-  /** Immutable and therefore thread safe. */
-  private static final Pattern                                   BACKGROUND_PATTERN      =
-                                                                                    Pattern.compile("(background[^;])+([^;]*;)");
+  private static final Pattern                                   BACKGROUND_PATTERN      = Pattern.compile("(background[^;])+([^;]*;)");
 
   private static final Pattern                                   FONT_FACE_PATTERN       = Pattern.compile("(src[^;])+([^;]*;)");
 
@@ -86,12 +80,10 @@ public class SkinService extends AbstractResourceService implements Startable {
       + "['\"]?)([^'\";" + RIGHT_P + "]+)(['\"]?\\))");
 
   /** Immutable and therefore thread safe. */
-  private static final Pattern                                   LT                      =
-                                                                    Pattern.compile(".*/\\*.*orientation=lt.*\\*/.*");
+  private static final Pattern                                   LT                      = Pattern.compile(".*/\\*.*orientation=lt.*\\*/.*");
 
   /** Immutable and therefore thread safe. */
-  private static final Pattern                                   RT                      =
-                                                                    Pattern.compile(".*/\\*.*orientation=rt.*\\*/.*");
+  private static final Pattern                                   RT                      = Pattern.compile(".*/\\*.*orientation=rt.*\\*/.*");
 
   public static final String                                     DEFAULT_SKIN_PARAM_NAME = "skin.default";
 
@@ -169,16 +161,16 @@ public class SkinService extends AbstractResourceService implements Startable {
         }
 
         StringBuffer sb = new StringBuffer();
-        processCSSRecursively(context.controller, sb, true, skin, context.orientation);
-        String css = sb.toString();
-        try {
-          if (SkinService.this.compressor.isSupported(ResourceType.STYLESHEET)) {
-            css = SkinService.this.compressor.compress(css, ResourceType.STYLESHEET);
-          }
-        } catch (Exception e) {
-          log.warn("Error when compressing CSS " + key + " for orientation " + context + " will use normal CSS instead", e);
+        try (Reader sourceReader = skin.read()) {
+          processCSSRecursively(skin.getContextPath() + skin.getParentPath(),
+                                sourceReader,
+                                sb,
+                                context.orientation);
         }
-
+        String css = sb.toString();
+        if (SkinService.this.compressor.isSupported(ResourceType.STYLESHEET)) {
+          css = SkinService.this.compressor.compress(css, ResourceType.STYLESHEET);
+        }
         return new CachedStylesheet(css);
       }
     };
@@ -549,8 +541,13 @@ public class SkinService extends AbstractResourceService implements Startable {
       StringBuffer sb = new StringBuffer();
       Resource skin = getCSSResource(resource, resource);
       if (skin != null) {
-        processCSSRecursively(context, sb, false, skin, orientation);
-        byte[] bytes = sb.toString().getBytes("UTF-8");
+        try (Reader sourceReader = skin.read()) {
+          processCSSRecursively(skin.getContextPath() + skin.getParentPath(),
+                                sourceReader,
+                                sb,
+                                orientation);
+        }
+        byte[] bytes = sb.toString().getBytes(StandardCharsets.UTF_8);
         renderer.setExpiration(MAX_AGE);
         if (context.getResponse() != null) {
           context.getResponse().setContentLength(bytes.length);
@@ -912,7 +909,6 @@ public class SkinService extends AbstractResourceService implements Startable {
    * Apply CSS for Skin <br>
    * If skin is null, do nothing
    *
-   * @param context
    * @param appendable
    * @param merge
    * @param skin
@@ -920,75 +916,20 @@ public class SkinService extends AbstractResourceService implements Startable {
    * @throws RenderingException
    * @throws IOException
    */
-  private void processCSSRecursively(ControllerContext context,
-                                     Appendable appendable,
-                                     boolean merge,
-                                     Resource skin,
-                                     Orientation orientation) throws RenderingException, IOException {
-    if (skin == null) {
-      return;
-    }
-    // The root URL for the entry
-    String basePath = skin.getContextPath() + skin.getParentPath();
-
-    //
-    Reader tmp = skin.read();
-    if (tmp == null) {
-      throw new RenderingException("No skin resolved for path " + skin.getResourcePath());
-    }
-    BufferedReader reader = new SkipCommentReader(tmp, new CommentBlockHandler.OrientationCommentBlockHandler());
-    try {
+  public void processCSSRecursively(String basePath,
+                                    Reader sourceReader,
+                                    Appendable appendable,
+                                    Orientation orientation) throws IOException {
+    try (BufferedReader reader = new SkipCommentReader(sourceReader, new CommentBlockHandler.OrientationCommentBlockHandler())) {
       String line = reader.readLine();
       while (line != null) {
         line = proccessOrientation(line, orientation);
         line = processURL(BACKGROUND_PATTERN, line, basePath);
         line = processURL(FONT_FACE_PATTERN, line, basePath);
-
-        Matcher matcher = IMPORT_PATTERN.matcher(line);
-        while (matcher.find()) {
-          String includedPath = matcher.group(2);
-          if (!includedPath.startsWith("/")) {
-            includedPath = basePath + includedPath;
-          }
-
-          StringBuffer strReplace = new StringBuffer();
-          if (merge) {
-            Resource ssskin = getCSSResource(includedPath, basePath + skin.getFileName());
-            processCSSRecursively(context, strReplace, merge, ssskin, orientation);
-          } else {
-            // Remove leading '/' and trailing '.css'
-            String resource = includedPath.substring(1, includedPath.length() - ".css".length());
-
-            //
-            Map<QualifiedName, String> params = new HashMap<QualifiedName, String>();
-            params.put(ResourceRequestHandler.VERSION_QN, ResourceRequestHandler.VERSION);
-            params.put(ResourceRequestHandler.ORIENTATION_QN, orientation == Orientation.RT ? "rt" : "lt");
-            params.put(ResourceRequestHandler.COMPRESS_QN, merge ? "min" : "");
-            params.put(WebAppController.HANDLER_PARAM, "skin");
-            params.put(ResourceRequestHandler.RESOURCE_QN, resource);
-            StringBuilder embeddedPath = new StringBuilder();
-            context.renderURL(params, new URIWriter(embeddedPath, MimeType.PLAIN));
-
-            //
-            strReplace.append(matcher.group(1));
-            strReplace.append(embeddedPath);
-            strReplace.append(matcher.group(3));
-          }
-          String str = strReplace.toString().replaceAll("\\$", "\\\\\\$");
-          // Add one more "\" before ISO-in-CSS-content character: for example:
-          // "\00a0" -> "\\00a0"
-          // because method Matcher#appendReplacement() will ignore one
-          str = str.replaceAll("(\\\\[0-9a-fA-F]{4})", "\\\\$1");
-          matcher.appendReplacement((StringBuffer) appendable, str);
-        }
-        matcher.appendTail((StringBuffer) appendable);
-
         if ((line = reader.readLine()) != null) {
           appendable.append("\n");
         }
       }
-    } finally {
-      Safe.close(reader);
     }
   }
 
