@@ -44,8 +44,12 @@ import org.w3c.dom.NodeList;
  */
 public class PortletSkinTask extends AbstractSkinModule implements SkinConfigTask {
 
+    @Getter
+    @Setter
     private String applicationName;
 
+    @Getter
+    @Setter
     private String portletName;
 
     @Getter
@@ -62,8 +66,7 @@ public class PortletSkinTask extends AbstractSkinModule implements SkinConfigTas
         if (nodes == null || nodes.getLength() < 1) {
             return;
         }
-        String applicationName = nodes.item(0).getFirstChild().getNodeValue();
-        setApplicationName(applicationName);
+        this.applicationName = nodes.item(0).getFirstChild().getNodeValue();
     }
 
     private void bindingPortletName(Element element) {
@@ -71,8 +74,7 @@ public class PortletSkinTask extends AbstractSkinModule implements SkinConfigTas
         if (nodes == null || nodes.getLength() < 1) {
             return;
         }
-        String portletName = nodes.item(0).getFirstChild().getNodeValue();
-        setPortletName(portletName);
+        this.portletName = nodes.item(0).getFirstChild().getNodeValue();
     }
 
     protected void bindingAdditionalModules(Element element) {
@@ -85,15 +87,7 @@ public class PortletSkinTask extends AbstractSkinModule implements SkinConfigTas
       for (int i = 0; i < length; i++) {
         filteredPortalModuleNames.add(nodes.item(i).getFirstChild().getNodeValue());
       }
-      setAdditionalModules(filteredPortalModuleNames);
-    }
-
-    public void setApplicationName(String _applicationName) {
-        this.applicationName = _applicationName;
-    }
-
-    public void setPortletName(String _portletName) {
-        this.portletName = _portletName;
+      this.additionalModules = filteredPortalModuleNames;
     }
 
     public void execute(SkinService skinService, ServletContext scontext) {
@@ -107,8 +101,7 @@ public class PortletSkinTask extends AbstractSkinModule implements SkinConfigTas
             applicationName = scontext.getContextPath();
         }
         String moduleName = applicationName + "/" + portletName;
-        String contextPath = scontext.getContextPath();
-        String fullCSSPath = cssPath == null ? null : contextPath + cssPath;
+        String fullCSSPath = cssPath == null ? null : "/" + applicationName + cssPath;
         int priority;
         try {
             priority = Integer.valueOf(cssPriority);
@@ -116,7 +109,7 @@ public class PortletSkinTask extends AbstractSkinModule implements SkinConfigTas
             priority = Integer.MAX_VALUE;
         }
         skinService.addSkin(moduleName, skinName, fullCSSPath, priority, overwrite, additionalModules);
-        updateSkinDependentManager(contextPath, moduleName, skinName);
+        updateSkinDependentManager("/" + applicationName, moduleName, skinName);
     }
 
     private void updateSkinDependentManager(String webApp, String moduleName, String skinName) {
