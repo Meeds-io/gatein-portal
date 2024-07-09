@@ -19,23 +19,30 @@
 
 package org.exoplatform.portal.resource;
 
-import java.io.IOException;
+import java.io.File;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.configuration.ConfigurationManager;
+import org.exoplatform.portal.resource.compressor.ResourceType;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.web.ControllerContext;
-import org.exoplatform.web.WebAppController;
-import org.exoplatform.web.controller.QualifiedName;
-import org.exoplatform.web.controller.router.URIWriter;
-import org.exoplatform.web.url.MimeType;
 
-import org.exoplatform.services.log.ExoLogger;
-
-import org.apache.commons.lang3.StringUtils;
-import org.gatein.portal.controller.resource.ResourceRequestHandler;
+import lombok.Getter;
 
 /**
  * An implementation of the skin config. Created by The eXo Platform SAS Jan 19,
@@ -43,21 +50,29 @@ import org.gatein.portal.controller.resource.ResourceRequestHandler;
  */
 class SimpleSkin implements SkinConfig {
 
-  private final String       module;
+  private static final Log     LOG   = ExoLogger.getLogger(SimpleSkin.class);
 
-  private final String       name;
+  private final String         module;
 
-  private final String       cssPath;
+  private final String         name;
 
-  private final String       id;
+  private final String         cssPath;
 
-  private final int          priority;
+  private final String         id;
 
-  private final boolean      filtered;
+  private final int            priority;
 
-  private final List<String> additionalModules;
+  private final boolean        filtered;
 
-  private String             type;
+  private final List<String>   additionalModules;
+
+  private String               type;
+
+  @Getter
+  private Map<Integer, String> urls  = new HashMap<>();
+
+  @Getter
+  private Map<Integer, File>   files = new HashMap<>();
 
   public SimpleSkin(SkinService service, String module, String name, String cssPath) {
     this(service, module, name, cssPath, Integer.MAX_VALUE);
@@ -68,9 +83,9 @@ class SimpleSkin implements SkinConfig {
     this.name = name;
     this.cssPath = cssPath;
     this.id = module.replace('/', '_');
-    priority = cssPriority;
-    additionalModules = null;
-    filtered = false;
+    this.priority = cssPriority;
+    this.additionalModules = null;
+    this.filtered = false;
   }
 
   public SimpleSkin(String module, String name, String cssPath, int cssPriority, List<String> additionalModules) {
@@ -145,9 +160,6 @@ class SimpleSkin implements SkinConfig {
   }
 
   public SkinURL createURL(final ControllerContext context) {
-    if (context == null) {
-      throw new NullPointerException("No controller context provided");
-    }
     if (StringUtils.isBlank(this.cssPath)) {
       return null;
     }
@@ -161,27 +173,42 @@ class SimpleSkin implements SkinConfig {
         this.orientation = orientation;
       }
 
+      public Orientation getOrientation() {
+        return orientation == null ? Orientation.LT : Orientation.RT;
+      }
+
       @Override
       public String toString() {
-        try {
-          String resource = cssPath.substring(1, cssPath.length() - ".css".length());
+        return urls.computeIfAbsent(Objects.hash(orientation, compress), k -> {
+          ConfigurationManager configurationManager = ExoContainerContext.getService(ConfigurationManager.class);
+          SkinService skinService = ExoContainerContext.getService(SkinService.class);
 
-          //
-          Map<QualifiedName, String> params = new HashMap<QualifiedName, String>();
-          params.put(ResourceRequestHandler.VERSION_QN, ResourceRequestHandler.VERSION);
-          params.put(ResourceRequestHandler.ORIENTATION_QN, orientation == Orientation.RT ? "rt" : "lt");
-          params.put(ResourceRequestHandler.COMPRESS_QN, compress ? "min" : "");
-          params.put(WebAppController.HANDLER_PARAM, "skin");
-          params.put(ResourceRequestHandler.RESOURCE_QN, resource);
-          StringBuilder url = new StringBuilder();
-          context.renderURL(params, new URIWriter(url, MimeType.PLAIN));
-
-          //
-          return url.toString();
-        } catch (IOException e) {
-          ExoLogger.getLogger(this.getClass()).error(e.getMessage(), e);
-          return null;
-        }
+          String absolutePath = ("/" + cssPath).replace("//", "/");
+          try (InputStream inputStream = configurationManager.getInputStream(absolutePath)) {
+            String fileContent = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+            File file = File.createTempFile(module, ".css");
+            file.deleteOnExit();
+            try (Reader sourceReader = new StringReader(fileContent)) {
+              StringBuilder sb = new StringBuilder();
+              skinService.processCSSRecursively(absolutePath,
+                                                sourceReader,
+                                                sb,
+                                                orientation);
+              fileContent = sb.toString();
+            }
+            if (skinService.compressor.isSupported(ResourceType.STYLESHEET)) {
+              fileContent = skinService.compressor.compress(fileContent, ResourceType.STYLESHEET);
+            }
+            FileUtils.write(file, fileContent, StandardCharsets.UTF_8);
+            int fileContentHash = fileContent.hashCode();
+            int hash = Objects.hash(fileContentHash, orientation, compress);
+            files.put(hash, file);
+            return absolutePath + "?orientation=" + getOrientation().name() + "&minify=" + compress + "&hash=" + fileContentHash;
+          } catch (Exception e) {
+            LOG.error("Error while processing CSS file {}", absolutePath, e);
+            return null;
+          }
+        });
       }
     };
   }
