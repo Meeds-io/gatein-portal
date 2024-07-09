@@ -44,8 +44,8 @@ public class MainResourceResolver implements ResourceResolver {
     private final Log                          log = ExoLogger.getLogger(MainResourceResolver.class);
 
     public MainResourceResolver() {
-        this.contexts = new HashMap<String, SimpleResourceContext>();
-        this.resolvers = new CopyOnWriteArrayList<ResourceResolver>();
+        this.contexts = new HashMap<>();
+        this.resolvers = new CopyOnWriteArrayList<>();
     }
 
     /**
