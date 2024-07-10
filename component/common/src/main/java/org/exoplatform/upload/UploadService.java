@@ -66,13 +66,13 @@ public class UploadService {
 
   private List<MimeTypeUploadPlugin>  plugins;
 
-  private Map<String, UploadResource> uploadResources        = new LinkedHashMap<String, UploadResource>();
+  private Map<String, UploadResource> uploadResources        = new LinkedHashMap<>();
 
   private String                      uploadLocation_;
 
   private UploadLimit                 defaultUploadLimitMB_;
 
-  private Map<String, UploadLimit>    uploadLimits           = new LinkedHashMap<String, UploadLimit>();
+  private Map<String, UploadLimit>    uploadLimits           = new LinkedHashMap<>();
 
   public static final String          UPLOAD_RESOURCES_STACK = "uploadResourcesStack";
 
@@ -184,8 +184,11 @@ public class UploadService {
     upResource.setStoreLocation(uploadLocation_ + "/" + uploadId + "." + fileName);
     upResource.setEstimatedSize(contentLength);
     File fileStore = new File(upResource.getStoreLocation());
-    if (!fileStore.exists())
-      fileStore.createNewFile();
+    if (!fileStore.exists() && fileStore.createNewFile()) {
+      fileStore.deleteOnExit();
+    } else {
+      throw new IllegalStateException("Wasn't able to create a file with uploadId " + uploadId);
+    }
     FileOutputStream output = new FileOutputStream(fileStore);
     reader.readBodyData(inputStream, contentType, output);
 
@@ -261,11 +264,11 @@ public class UploadService {
 
       if (upResource.getStoreLocation() != null) {
         File file = new File(upResource.getStoreLocation());
-        file.delete();
+        if (!file.delete()) {
+          file.deleteOnExit();
+        }
       }
     }
-
-    // uploadLimitsMB_.remove(uploadId);
   }
 
   /**
@@ -384,10 +387,16 @@ public class UploadService {
   }
 
   private void writeFile(UploadResource upResource, DiskFileItem diskFileItem) {
+    DiskFileItem fileItem = null;
     try {
-      diskFileItem.write(Paths.get(upResource.getStoreLocation()));
+      fileItem = diskFileItem.write(Paths.get(upResource.getStoreLocation()));
     } catch (IOException e) {
       throw new IllegalStateException("Upload id " + upResource.getUploadId() + " can't be uploaded", e);
+    } finally {
+      if (fileItem != null
+          && fileItem.getPath() != null) {
+        fileItem.getPath().toFile().deleteOnExit();
+      }
     }
   }
 

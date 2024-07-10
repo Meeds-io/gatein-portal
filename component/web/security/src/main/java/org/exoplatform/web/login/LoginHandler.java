@@ -186,8 +186,8 @@ public class LoginHandler extends JspBasedWebHandler {
         String realUsername = getExactUserName(username);
         if (username.contains("@")) {
           if (realUsername == null) {
-            //no user exist with username=credential
-            //check by email
+            // no user exist with username=credential
+            // check by email
             String userNameByEmail = getUserNameByEmail(username, context, loginPath);
             if (StringUtils.isBlank(userNameByEmail)) {
               return true;
@@ -195,8 +195,8 @@ public class LoginHandler extends JspBasedWebHandler {
               username = userNameByEmail;
             }
           } else {
-            //a user exists with username=credential
-            //priority to username
+            // a user exists with username=credential
+            // priority to username
             if (caseInsensitive) {
               username = realUsername;
             }
@@ -311,8 +311,8 @@ public class LoginHandler extends JspBasedWebHandler {
       CookieTokenService tokenService = AbstractTokenService.getInstance(CookieTokenService.class);
       String cookieToken = tokenService.createToken(username);
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Found a remember me request parameter, created a persistent token " + cookieToken
-            + " for it and set it up " + "in the next response");
+        LOG.debug("Found a remember me request parameter, created a persistent token " + cookieToken + " for it and set it up " +
+            "in the next response");
       }
       Cookie cookie = new Cookie(LoginUtils.COOKIE_NAME, cookieToken);
       cookie.setPath("/");
@@ -351,7 +351,7 @@ public class LoginHandler extends JspBasedWebHandler {
   /**
    * Get exact username from database
    * 
-   * @param  username
+   * @param username
    * @return
    */
   private String getExactUserName(String username) {
@@ -373,7 +373,7 @@ public class LoginHandler extends JspBasedWebHandler {
     HttpServletRequest request = controllerContext.getRequest();
     HttpServletResponse response = controllerContext.getResponse();
 
-    List<String> additionalJSModules = getExtendedJSModules(controllerContext, request);
+    List<String> additionalJSModules = getExtendedJSModules();
     List<String> additionalCSSModules = Collections.singletonList("portal/login");
 
     super.prepareDispatch(controllerContext,
@@ -385,9 +385,9 @@ public class LoginHandler extends JspBasedWebHandler {
     servletContext.getRequestDispatcher(dispatchPath).include(request, response);
   }
 
-  private List<String> getExtendedJSModules(ControllerContext controllerContext, HttpServletRequest request) throws Exception {
+  private List<String> getExtendedJSModules() {
     List<String> additionalJSModules = new ArrayList<>();
-    JSONObject jsConfig = javascriptConfigService.getJSConfig(controllerContext, request.getLocale());
+    JSONObject jsConfig = javascriptConfigService.getJSConfig();
     if (jsConfig.has(JS_PATHS_PARAM)) {
       JSONObject jsConfigPaths = jsConfig.getJSONObject(JS_PATHS_PARAM);
       Iterator<String> keys = jsConfigPaths.keys();
