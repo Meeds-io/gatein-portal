@@ -21,66 +21,38 @@ package org.gatein.portal.controller.resource;
 
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode.Exclude;
 
 /**
  * Identify a resource.
  *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
+@Data
+@AllArgsConstructor
 public class ResourceId implements Serializable {
 
-    /** . */
-    private final ResourceScope scope;
+  private static final long   serialVersionUID = 2610396048227292902L;
 
-    /** . */
-    private final String name;
+  private final ResourceScope scope;
 
-    /** . */
-    private boolean isFullId;
+  private final String        name;
 
-    public ResourceId(ResourceScope scope, String name) {
-        this(scope, name, true);
+  @Exclude
+  private boolean             isFullId;
+
+  public ResourceId(ResourceScope scope, String name) {
+    this(scope, name, true);
+  }
+
+  @Override
+  public String toString() {
+    if (isFullId) {
+      return scope + "/" + name;
+    } else {
+      return name;
     }
-
-    public ResourceId(ResourceScope scope, String name, boolean isFullId) {
-        this.scope = scope;
-        this.name = name;
-        this.isFullId = isFullId;
-    }
-
-    public ResourceScope getScope() {
-        return scope;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setFullId(boolean isFullId) {
-        this.isFullId = isFullId;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj instanceof ResourceId) {
-            ResourceId that = (ResourceId) obj;
-            return scope == that.scope && name.equals(that.name);
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return scope.hashCode() ^ name.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        if (!isFullId)
-            return name;
-        return scope + "/" + name;
-    }
+  }
 }

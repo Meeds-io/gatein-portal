@@ -90,7 +90,7 @@ public abstract class AbstractTokenService<T extends Token, K> implements Starta
     public AbstractTokenService(InitParams initParams) throws TokenServiceInitializationException {
         List<String> params = initParams.getValuesParam(SERVICE_CONFIG).getValues();
         this.name = params.get(0);
-        long configValue = new Long(params.get(1));
+        long configValue = Long.parseLong(params.get(1));
         this.validityMillis = TimeoutEnum.valueOf(params.get(2)).toMilisecond(configValue);
         this.tokenByteLength = DEFAULT_TOKEN_BYTE_LENGTH;
         ValueParam delayParam = initParams.getValueParam(CLEANUP_PERIOD_TIME);
@@ -99,6 +99,7 @@ public abstract class AbstractTokenService<T extends Token, K> implements Starta
         }
     }
 
+    @Override
     public void start() {
         if(delay_time > 0) {
          // start a thread, garbage expired cookie token every [DELAY_TIME]
@@ -122,6 +123,7 @@ public abstract class AbstractTokenService<T extends Token, K> implements Starta
         }
     }
 
+    @Override
     public void stop() {
         if(executor != null) {
             executor.shutdown();
@@ -213,7 +215,7 @@ public abstract class AbstractTokenService<T extends Token, K> implements Starta
     public abstract long size();
 
     private enum TimeoutEnum {
-        SECOND(1000), MINUTE(1000 * 60), HOUR(1000 * 60 * 60), DAY(1000 * 60 * 60 * 24);
+        SECOND(1000), MINUTE(1000l * 60), HOUR(1000l * 60 * 60), DAY(1000l * 60 * 60 * 24);
 
         private long multiply;
 
