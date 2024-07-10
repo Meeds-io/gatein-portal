@@ -34,6 +34,9 @@ import java.util.regex.Matcher;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
+
+import lombok.Getter;
+
 import org.gatein.portal.controller.resource.ResourceId;
 import org.gatein.portal.controller.resource.script.Module.Local.Content;
 
@@ -68,6 +71,7 @@ public class ScriptResource extends BaseScriptResource<ScriptResource> implement
     final String alias;
 
     /** . */
+    @Getter
     final ScriptGroup group;
 
     ScriptResource(ScriptGraph graph, ResourceId id, FetchMode fetchMode) {
@@ -223,10 +227,6 @@ public class ScriptResource extends BaseScriptResource<ScriptResource> implement
     @Override
     public String toString() {
         return "ScriptResource[id=" + id + "]";
-    }
-
-    public ScriptGroup getGroup() {
-        return group;
     }
 
     public class DepInfo {

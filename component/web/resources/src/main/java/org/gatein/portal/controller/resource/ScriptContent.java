@@ -16,43 +16,55 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.gatein.portal.controller.resource;
 
-import java.io.Serializable;
-import java.util.Locale;
+import java.io.File;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode.Exclude;
+import com.mchange.io.FileUtils;
+
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
-@Data
-public class ScriptKey implements Serializable {
+public class ScriptContent {
 
-  private static final long  serialVersionUID   = 8421109092217952533L;
-
-  public static final String SCOPE_QUERY_PARAM  = "scope";
-
-  public static final String MINIFY_QUERY_PARAM = "minify";
-
-  public static final String HASH_QUERY_PARAM   = "hash";
+  public static final ScriptContent NOT_FOUND = new ScriptContent(new byte[0], 0);
 
   @Getter
-  final ResourceId           id;
+  private File                      file;
 
   @Getter
-  final boolean              minified;
+  private long                      hash;
 
-  @Exclude
-  final Locale               locale;
+  @Getter
+  private byte[]                    bytes;
 
-  public ScriptKey(ResourceId id, boolean minified, Locale locale) {
-    this.id = id;
-    this.minified = minified;
-    this.locale = locale;
+  /**
+   * Used in prod mode
+   */
+  public ScriptContent(File file, long hash) {
+    this.file = file;
+    this.hash = hash;
   }
 
+  /**
+   * Used in dev mode
+   */
+  public ScriptContent(byte[] bytes, long hash) {
+    this.bytes = bytes;
+    this.hash = hash;
+  }
+
+  @SneakyThrows
+  public byte[] getContentAsBytes() {
+    if (this.bytes != null && this.bytes.length > 0) {
+      return this.bytes;
+    } else if (file != null) {
+      return FileUtils.getBytes(file);
+    } else {
+      return null; // NOSONAR
+    }
+  }
 }

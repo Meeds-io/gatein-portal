@@ -89,7 +89,6 @@ public abstract class JspBasedWebHandler extends WebRequestHandler {
                               List<String> additionalCSSModules,
                               Consumer<JSONObject> extendUIParameters) throws Exception {
     HttpServletRequest request = context.getRequest();
-
     HttpServletResponse response = context.getResponse();
     response.setContentType(TEXT_HTML_CONTENT_TYPE);
 
@@ -127,7 +126,7 @@ public abstract class JspBasedWebHandler extends WebRequestHandler {
       javascriptManager.require(applicationModule, "app").addScripts("app.init(" + params.toString() + ");");
     }
 
-    JSONObject jsConfig = javascriptConfigService.getJSConfig(context, locale);
+    JSONObject jsConfig = javascriptConfigService.getJSConfig();
     request.setAttribute("jsConfig", jsConfig.toString());
 
     if (jsConfig.has(JS_PATHS_PARAM)) {
@@ -149,12 +148,11 @@ public abstract class JspBasedWebHandler extends WebRequestHandler {
     request.setAttribute("brandingThemeUrl", brandingThemeUrl);
     request.setAttribute("brandingFavicon", brandingService.getFaviconPath());
 
-    List<String> skinUrls = getPageSkins(context, additionalCSSModules, localeConfig.getOrientation());
+    List<String> skinUrls = getPageSkins(additionalCSSModules, localeConfig.getOrientation());
     request.setAttribute("skinUrls", skinUrls);
   }
 
-  private List<String> getPageSkins(ControllerContext controllerContext,
-                                    List<String> additionalCSSModules,
+  private List<String> getPageSkins(List<String> additionalCSSModules,
                                     Orientation orientation) {
     String skinName = skinService.getDefaultSkin();
 
@@ -175,7 +173,7 @@ public abstract class JspBasedWebHandler extends WebRequestHandler {
     Collection<SkinConfig> customSkins = skinService.getCustomPortalSkins(skinName);
     skins.addAll(customSkins);
     return skins.stream().map(skin -> {
-      SkinURL url = skin.createURL(controllerContext);
+      SkinURL url = skin.createURL();
       if (url == null) {
         return null;
       }
@@ -197,7 +195,7 @@ public abstract class JspBasedWebHandler extends WebRequestHandler {
       boolean isRemote = scriptEntry.getValue().booleanValue();
       String scriptId = scriptEntry.getKey();
       if (!isRemote && jsConfigPaths.has(scriptId)) {
-        String scriptPath = jsConfigPaths.getString(scriptId) + ".js";
+        String scriptPath = jsConfigPaths.getString(scriptId);
         pageScripts.add(scriptPath);
       }
     }
@@ -211,7 +209,7 @@ public abstract class JspBasedWebHandler extends WebRequestHandler {
     for (Entry<String, Boolean> moduleEntry : scriptsURLs.entrySet()) {
       String module = moduleEntry.getKey();
       String url = jsConfigPaths.has(module) ? jsConfigPaths.getString(module) : null;
-      headerScripts.add(url != null ? url + ".js" : module);
+      headerScripts.add(url != null ? url : module);
     }
     return headerScripts;
   }

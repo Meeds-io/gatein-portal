@@ -33,7 +33,8 @@ import org.exoplatform.services.log.Log;
 import org.gatein.wci.WebApp;
 
 /**
- * An listener for listening the ADDED and REMOVED events of the webapp to deploy/undeploy Javascript configured in
+ * An listener for listening the ADDED and REMOVED events of the webapp to
+ * deploy/undeploy Javascript configured in
  * <code>/WEB-INF/gatein-resources.xml</code> file.
  *
  * @author <a href="trongtt@gmail.com">Trong Tran</a>
@@ -41,63 +42,68 @@ import org.gatein.wci.WebApp;
  */
 public class JavascriptConfigDeployer extends AbstractResourceDeployer {
 
-    /**
-     * Logger
-     */
-    private static final Log LOG = ExoLogger.getLogger(JavascriptConfigDeployer.class);
+  /**
+   * Logger
+   */
+  private static final Log              LOG = ExoLogger.getLogger(JavascriptConfigDeployer.class);
 
-    /** . */
-    private final JavascriptConfigService javascriptService;
+  /** . */
+  private final JavascriptConfigService javascriptService;
 
-    /**
-     * The name of the portal container
-     */
-    private final String portalContainerName;
+  /**
+   * The name of the portal container
+   */
+  private final String                  portalContainerName;
 
-    public JavascriptConfigDeployer(String portalContainerName, JavascriptConfigService javascriptService) {
-        this.javascriptService = javascriptService;
-        this.portalContainerName = portalContainerName;
-    }
+  public JavascriptConfigDeployer(String portalContainerName, JavascriptConfigService javascriptService) {
+    this.javascriptService = javascriptService;
+    this.portalContainerName = portalContainerName;
+  }
 
-    protected void add(final WebApp webApp, URL url) {
-        try {
-                final PortalContainerPostInitTask task = new PortalContainerPostInitTask() {
-                    public void execute(ServletContext scontext, PortalContainer portalContainer) {
-                        register(scontext, portalContainer);
-                        javascriptService.registerContext(webApp);
-                    }
-                };
-                PortalContainer.addInitTask(webApp.getServletContext(), task, portalContainerName);
-        } catch (Exception ex) {
-            LOG.error(
-                    "An error occurs while registering 'Javascript in gatein-resources.xml' from the context '"
-                            + (webApp.getServletContext() == null ? "unknown" : webApp.getServletContext()
-                                    .getServletContextName()) + "'", ex);
+  protected void add(final WebApp webApp, URL url) {
+    try {
+      final PortalContainerPostInitTask task = new PortalContainerPostInitTask() {
+        public void execute(ServletContext scontext, PortalContainer portalContainer) {
+          register(scontext);
+          javascriptService.registerContext(webApp);
         }
+      };
+      PortalContainer.addInitTask(webApp.getServletContext(), task, portalContainerName);
+    } catch (Exception ex) {
+      LOG.error(
+                "An error occurs while registering 'Javascript in gatein-resources.xml' from the context '" +
+                    (webApp.getServletContext() == null ? "unknown" :
+                                                        webApp.getServletContext()
+                                                              .getServletContextName()) +
+                    "'",
+                ex);
     }
+  }
 
-    protected void remove(WebApp webApp) {
-        javascriptService.unregisterServletContext(webApp);
-        try {
-            JavascriptConfigParser.unregisterResources(javascriptService, webApp.getServletContext());
-        } catch (Exception ex) {
-            LOG.error(
-                "An error occured while removing script resources for the context '"
-                    + webApp.getServletContext().getServletContextName() + "'", ex);
-        }
+  protected void remove(WebApp webApp) {
+    javascriptService.unregisterServletContext(webApp);
+    try {
+      JavascriptConfigParser.unregisterResources(javascriptService, webApp.getServletContext());
+    } catch (Exception ex) {
+      LOG.error(
+                "An error occured while removing script resources for the context '" +
+                    webApp.getServletContext().getServletContextName() + "'",
+                ex);
     }
+  }
 
-    private void register(ServletContext scontext, PortalContainer container) {
-        InputStream is = null;
-        try {
-            is = scontext.getResourceAsStream(AbstractResourceDeployer.GATEIN_CONFIG_RESOURCE);
-            JavascriptConfigParser.processConfigResource(is, javascriptService, scontext);
-        } catch (Exception ex) {
-            LOG.error(
-                    "An error occurs while processing 'Javascript in gatein-resources.xml' from the context '"
-                            + scontext.getServletContextName() + "'", ex);
-        } finally {
-            Safe.close(is);
-        }
+  private void register(ServletContext scontext) {
+    InputStream is = null;
+    try {
+      is = scontext.getResourceAsStream(AbstractResourceDeployer.GATEIN_CONFIG_RESOURCE);
+      JavascriptConfigParser.processConfigResource(is, javascriptService, scontext);
+    } catch (Exception ex) {
+      LOG.error(
+                "An error occurs while processing 'Javascript in gatein-resources.xml' from the context '" +
+                    scontext.getServletContextName() + "'",
+                ex);
+    } finally {
+      Safe.close(is);
     }
+  }
 }
