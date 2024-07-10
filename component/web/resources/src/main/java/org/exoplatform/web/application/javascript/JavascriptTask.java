@@ -22,46 +22,73 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import jakarta.servlet.ServletContext;
-
+import org.apache.commons.collections.CollectionUtils;
+import org.gatein.portal.controller.resource.ResourceId;
 import org.gatein.portal.controller.resource.script.ScriptResource;
+
+import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+
+import jakarta.servlet.ServletContext;
+import lombok.SneakyThrows;
 
 /**
  * @author <a href="mailto:hoang281283@gmail.com">Minh Hoang TO</a>
  * @version $Id$
- *
  */
 public class JavascriptTask {
 
-    private List<ScriptResourceDescriptor> descriptors;
+  private static final Log               LOG         = ExoLogger.getExoLogger(JavascriptTask.class);
 
-    public JavascriptTask() {
-        descriptors = new ArrayList<ScriptResourceDescriptor>();
-    }
+  private static final boolean           DEVELOPPING = PropertyManager.isDevelopping();
 
-    public void execute(JavascriptConfigService service, ServletContext scontext) {
-        for (ScriptResourceDescriptor desc : descriptors) {
-            String contextPath = null;
-            if (desc.modules.size() > 0) {
-                contextPath = desc.modules.get(0).getContextPath();
-            }
+  private List<ScriptResourceDescriptor> descriptors;
 
-            ScriptResource resource = service.scripts.addResource(desc.id, desc.fetchMode, desc.alias, desc.group, contextPath);
-            if (resource != null) {
-                for (Javascript module : desc.modules) {
-                    module.addModuleTo(resource);
-                }
-                for (Locale locale : desc.getSupportedLocales()) {
-                    resource.addSupportedLocale(locale);
-                }
-                for (DependencyDescriptor dependency : desc.dependencies) {
-                    resource.addDependency(dependency.getResourceId(), dependency.getAlias(), dependency.getPluginResource());
-                }
-            }
+  public JavascriptTask() {
+    descriptors = new ArrayList<>();
+  }
+
+  public void execute(JavascriptConfigService javascriptService, ServletContext scontext) {
+    for (ScriptResourceDescriptor desc : descriptors) {
+      String contextPath = scontext.getContextPath();
+      if (CollectionUtils.isNotEmpty(desc.modules)) {
+        contextPath = desc.modules.get(0).getContextPath();
+      }
+
+      ScriptResource resource = javascriptService.getScriptGraph()
+                                                 .addResource(desc.id, desc.fetchMode, desc.alias, desc.group, contextPath);
+      if (resource != null) {
+        resource.setContextPath(contextPath);
+        for (Javascript module : desc.modules) {
+          module.addModuleTo(resource);
         }
+        for (Locale locale : desc.getSupportedLocales()) {
+          resource.addSupportedLocale(locale);
+        }
+        for (DependencyDescriptor dependency : desc.dependencies) {
+          resource.addDependency(dependency.getResourceId(), dependency.getAlias(), dependency.getPluginResource());
+        }
+      }
     }
+  }
 
-    public void addDescriptor(ScriptResourceDescriptor desc) {
-        descriptors.add(desc);
+  public void addDescriptor(ScriptResourceDescriptor desc) {
+    descriptors.add(desc);
+  }
+
+  @SneakyThrows
+  public void initJSModuleCache(JavascriptConfigService javascriptService, ResourceId resourceId) {
+    ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
+    try {
+      javascriptService.getScriptContent(resourceId.getScope(), resourceId.getName(), !DEVELOPPING);
+    } catch (Exception e) {
+      LOG.debug("Error while initializing cache of JS with id {}. Will reattempt in first portal request", resourceId, e);
+    } finally {
+      ExoContainerContext.setCurrentContainer(null);
     }
+  }
+
 }

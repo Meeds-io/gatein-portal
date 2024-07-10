@@ -320,12 +320,12 @@ public class SkinService extends AbstractResourceService implements Startable {
    * @throws IOException if file not found or an error occurred while reading it
    */
   public String getSkinModuleFileContent(String fileWebAppPath) throws IOException {
-    ServletContext servletContext = contexts.values()
-                                            .stream()
-                                            .filter(c -> fileWebAppPath.startsWith(c.getContextPath()))
-                                            .map(WebApp::getServletContext)
-                                            .findFirst()
-                                            .orElse(null);
+    ServletContext servletContext = Collections.unmodifiableCollection(contexts.values())
+                                               .stream()
+                                               .filter(c -> fileWebAppPath.startsWith(c.getContextPath()))
+                                               .map(WebApp::getServletContext)
+                                               .findFirst()
+                                               .orElse(null);
     if (servletContext == null) {
       throw new IllegalStateException("Can't retrieve ServletContext of path " + fileWebAppPath);
     }

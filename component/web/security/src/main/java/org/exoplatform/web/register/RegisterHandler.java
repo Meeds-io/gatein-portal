@@ -192,7 +192,7 @@ public class RegisterHandler extends JspBasedWebHandler {
     // Invalidate the Captcha
     request.getSession().removeAttribute(NAME);
 
-    List<String> additionalJSModules = getExtendedJSModules(controllerContext, request);
+    List<String> additionalJSModules = getExtendedJSModules();
     List<String> additionalCSSModules = Collections.singletonList("portal/login");
 
     super.prepareDispatch(controllerContext,
@@ -236,9 +236,9 @@ public class RegisterHandler extends JspBasedWebHandler {
     }
   }
 
-  private List<String> getExtendedJSModules(ControllerContext controllerContext, HttpServletRequest request) throws Exception {
+  private List<String> getExtendedJSModules() {
     List<String> additionalJSModules = new ArrayList<>();
-    JSONObject jsConfig = javascriptConfigService.getJSConfig(controllerContext, request.getLocale());
+    JSONObject jsConfig = javascriptConfigService.getJSConfig();
     if (jsConfig.has(JS_PATHS_PARAM)) {
       JSONObject jsConfigPaths = jsConfig.getJSONObject(JS_PATHS_PARAM);
       Iterator<String> keys = jsConfigPaths.keys();
