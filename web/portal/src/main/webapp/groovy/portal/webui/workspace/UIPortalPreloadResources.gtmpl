@@ -1,4 +1,6 @@
 <%
+import java.util.HashSet;
+
 def rcontext = _ctx.getRequestContext() ;
 if (rcontext.isMaximizePortlet()) {
   return;
@@ -49,10 +51,14 @@ def jsConfig = uicomponent.getJSConfig();
 def jsConfigPaths = jsConfig.get("paths");
 def scriptsIdsMap = jsManager.getPageScripts();
 def scriptsIds = scriptsIdsMap.keySet();
+def scriptPaths = new HashSet<>();
 for (scriptsId in scriptsIds) {
   def isRemote = scriptsIdsMap.get(scriptsId) || !jsConfigPaths.has(scriptsId);
-  def scriptPath = isRemote ? scriptsId : (jsConfigPaths.get(scriptsId) + ".js");
+  def scriptPath = isRemote ? scriptsId : jsConfigPaths.get(scriptsId);
+  if (!scriptPaths.contains(scriptPath)) {
+    scriptPaths.add(scriptPath);
 %><link rel="preload" href= "$scriptPath" as="script" type="text/javascript" <%=isRemote ? "crossorigin" : "" %>/>
 <% 
+  }
 }
 %>

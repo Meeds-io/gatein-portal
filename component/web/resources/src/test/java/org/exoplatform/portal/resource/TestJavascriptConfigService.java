@@ -151,7 +151,7 @@ public class TestJavascriptConfigService extends AbstractWebResourceTest {
     }
 
     public void testGetJSConfig() throws Exception {
-        JSONObject config = jsService.getJSConfig(CONTROLLER_CONTEXT, null);
+        JSONObject config = jsService.getJSConfig();
 
         // All SCRIPTS and remote resource have to had dependencies declared in shim configuration
         JSONObject shim = config.getJSONObject("shim");
@@ -170,27 +170,27 @@ public class TestJavascriptConfigService extends AbstractWebResourceTest {
         JSONObject paths = config.getJSONObject("paths");
         assertNotNull(paths);
         // Return remote module/script url as it's declared in gatein-resources.xml
-        assertEquals("http://js/remote1", paths.getString("remote1"));
-        assertEquals("http://js/remote2", paths.getString("remote2"));
+        assertEquals("http://js/remote1.js", paths.getString("remote1"));
+        assertEquals("http://js/remote2.js", paths.getString("remote2"));
 
         // module1 and module2 are grouped
-        assertEquals("mock_url_of_fooGroup", paths.getString("SHARED/module1"));
-        assertEquals("mock_url_of_fooGroup", paths.getString("SHARED/module2"));
+        assertTrue(paths.getString("SHARED/module1").contains("/mockwebapp/js/fooGroup.js"));
+        assertTrue(paths.getString("SHARED/module2").contains("/mockwebapp/js/fooGroup.js"));
 
         // navController url for scripts
-        assertEquals("mock_url_of_script1", paths.getString("SHARED/script1"));
-        assertEquals("mock_url_of_script2", paths.getString("SHARED/script2"));
+        assertTrue(paths.getString("SHARED/script1").contains("/mockwebapp/js/script1.js"));
+        assertTrue(paths.getString("SHARED/script2").contains("/mockwebapp/js/script2.js"));
     }
 
     public void testGenerateURL() throws Exception {
         ResourceId remote1 = new ResourceId(ResourceScope.SHARED, "remote1");
-        String remoteURL = jsService.generateURL(CONTROLLER_CONTEXT, remote1, false, false, null);
+        String remoteURL = jsService.generateURL(remote1);
         // Return remote module/script url as it's declared in gatein-resources.xml
         assertEquals("http://js/remote1.js", remoteURL);
 
         ResourceId module1 = new ResourceId(ResourceScope.SHARED, "module1");
-        remoteURL = jsService.generateURL(CONTROLLER_CONTEXT, module1, false, false, null);
-        assertEquals("mock_url_of_module1.js", remoteURL);
+        remoteURL = jsService.generateURL(module1);
+        assertEquals("/mockwebapp/js/module1.js?hash=-55414319&scope=SHARED&minify=true", remoteURL);
     }
 
     public void testGenerateURLWithLocale() throws Exception {
@@ -198,17 +198,17 @@ public class TestJavascriptConfigService extends AbstractWebResourceTest {
       resource.addSupportedLocale(Locale.ENGLISH);
       resource.addSupportedLocale(Locale.FRENCH);
 
-      JSONObject config = jsService.getJSConfig(CONTROLLER_CONTEXT, Locale.ENGLISH);
+      JSONObject config = jsService.getJSConfig();
       assertNotNull(config);
       assertNotNull(config.getJSONObject("paths"));
       assertNotNull(config.getJSONObject("paths").getString("SHARED/text"));
-      assertEquals("mock_url_of_text-en", config.getJSONObject("paths").getString("SHARED/text"));
+      assertEquals("/mockwebapp/js/text.js?hash=1278397679&scope=SHARED&minify=true", config.getJSONObject("paths").getString("SHARED/text"));
 
-      config = jsService.getJSConfig(CONTROLLER_CONTEXT, Locale.FRENCH);
+      config = jsService.getJSConfig();
       assertNotNull(config);
       assertNotNull(config.getJSONObject("paths"));
       assertNotNull(config.getJSONObject("paths").getString("SHARED/text"));
-      assertEquals("mock_url_of_text-fr", config.getJSONObject("paths").getString("SHARED/text"));
+      assertTrue(config.getJSONObject("paths").getString("SHARED/text").contains("/mockwebapp/js/text.js"));
     }
 
     public void testNormalize() throws Exception {
