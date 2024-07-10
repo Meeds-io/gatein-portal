@@ -55,7 +55,7 @@
     def url = !jsConfig.has("paths") ? null :
               (!jsConfig.get("paths").has(module) ? null :
                 jsConfig.get("paths").get(module));
-    headerScripts.add(url != null ? url + ".js" : module);
+    headerScripts.add(url != null ? url : module);
     if (scriptsURLs.get(module)) {
       remoteScripts.put(module);
     }

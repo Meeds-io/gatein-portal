@@ -550,12 +550,9 @@ public class UIPortalApplication extends UIApplication {
     /**
      * Return a map of GMD resource ids and their URLs that point to ResourceRequestHandler.
      * this map will be used by GateIn JS module loader (currently, it is requirejs)
-     * @throws Exception
      */
-    public JSONObject getJSConfig() throws Exception {
-        JavascriptConfigService service = getApplicationComponent(JavascriptConfigService.class);
-        PortalRequestContext prc = PortalRequestContext.getCurrentInstance();
-        return service.getJSConfig(prc.getControllerContext(), prc.getLocale());
+    public JSONObject getJSConfig() {
+      return getApplicationComponent(JavascriptConfigService.class).getJSConfig();
     }
 
     public Collection<SkinConfig> getPortalSkins(SkinVisitor visitor) {

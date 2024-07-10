@@ -22,6 +22,8 @@ package org.exoplatform.portal.resource.config.tasks;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -83,8 +85,10 @@ public class PortletSkinTask extends AbstractSkinModule implements SkinConfigTas
     }
     SkinConfig skin = skinService.addSkin(moduleName, skinName, fullCSSPath, priority, overwrite, additionalModules);
     updateSkinDependentManager("/" + applicationName, moduleName, skinName);
-    // Cache CSS on stratup
-    CompletableFuture.runAsync(() -> initSkinModuleCache(skinService, fullCSSPath, skin));
+    try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
+      // Cache CSS on startup
+      CompletableFuture.runAsync(() -> initSkinModuleCache(skinService, fullCSSPath, skin), executorService);
+    }
   }
 
   @Override
