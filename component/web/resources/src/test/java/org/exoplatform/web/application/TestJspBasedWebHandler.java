@@ -100,7 +100,7 @@ public class TestJspBasedWebHandler {
     jsConfigPaths.put(additionalJSModuleName, additionalJSModulePath);
     jsConfigPaths.put(applicationJSModuleName, applicationJSModulePath);
 
-    when(javascriptConfigService.getJSConfig(any(), any())).thenReturn(jsConfig);
+    when(javascriptConfigService.getJSConfig()).thenReturn(jsConfig);
 
     HttpServletResponse response = mock(HttpServletResponse.class);
 
