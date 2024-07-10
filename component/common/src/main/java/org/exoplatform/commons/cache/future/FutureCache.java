@@ -26,6 +26,8 @@ import java.util.concurrent.ExecutionException;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
+import lombok.Getter;
+
 /**
  * <p>
  * A future cache that prevents the loading of the same resource twice. This
@@ -59,6 +61,7 @@ import org.exoplatform.services.log.Log;
 public abstract class FutureCache<K, V, C> {
 
   /** . */
+  @Getter
   final Loader<K, V, C>                              loader;
 
   /** . */

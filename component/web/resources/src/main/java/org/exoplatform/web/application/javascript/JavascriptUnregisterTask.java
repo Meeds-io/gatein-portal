@@ -28,23 +28,22 @@ import java.util.List;
 /**
  * @author <a href="mailto:mstrukel@redhat.com">Marko Strukelj</a>
  * @version $Id$
- *
  */
 public class JavascriptUnregisterTask {
 
-    private List<ScriptResourceDescriptor> descriptors;
+  private List<ScriptResourceDescriptor> descriptors;
 
-    public JavascriptUnregisterTask() {
-        descriptors = new ArrayList<ScriptResourceDescriptor>();
-    }
+  public JavascriptUnregisterTask() {
+    descriptors = new ArrayList<>();
+  }
 
-    public void execute(JavascriptConfigService service, ServletContext scontext) {
-        for (ScriptResourceDescriptor desc : descriptors) {
-            service.scripts.removeResource(desc.id, scontext.getContextPath());
-        }
+  public void execute(JavascriptConfigService service, ServletContext scontext) {
+    for (ScriptResourceDescriptor desc : descriptors) {
+      service.getScriptGraph().removeResource(desc.id, scontext.getContextPath());
     }
+  }
 
-    public void addDescriptor(ScriptResourceDescriptor desc) {
-        descriptors.add(desc);
-    }
+  public void addDescriptor(ScriptResourceDescriptor desc) {
+    descriptors.add(desc);
+  }
 }
