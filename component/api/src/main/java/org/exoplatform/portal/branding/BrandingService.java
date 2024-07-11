@@ -51,8 +51,6 @@ public interface BrandingService {
 
   void updateSiteName(String siteName);
 
-  String getTopBarTheme();
-
   Long getLogoId();
 
   /**
@@ -142,8 +140,6 @@ public interface BrandingService {
    * @return Page custom additional css
    */
   String getCustomCss();
-
-  void updateTopBarTheme(String style);
 
   /**
    * Update branding logo. If the logo object contains the image data, they are

@@ -19,7 +19,6 @@
 
 package org.exoplatform.portal.application;
 
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Locale;
 import java.util.ServiceLoader;
@@ -31,7 +30,6 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.config.StaleModelException;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.config.model.PortalProperties;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;

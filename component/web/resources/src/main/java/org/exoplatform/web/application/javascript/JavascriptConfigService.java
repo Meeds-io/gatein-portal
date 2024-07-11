@@ -146,7 +146,7 @@ public class JavascriptConfigService extends AbstractResourceService implements 
       } finally {
         LOG.info("End caching Javascript data within {}ms", System.currentTimeMillis() - start);
         ExoContainerContext.setCurrentContainer(null);
-        executorService.shutdown();
+        executorService.shutdownNow();
       }
     });
   }

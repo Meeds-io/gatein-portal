@@ -18,21 +18,12 @@
  */
 package org.exoplatform.portal.resource.config.tasks;
 
-import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import org.exoplatform.commons.utils.PropertyManager;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.resource.SkinConfig;
-import org.exoplatform.portal.resource.SkinService;
 import org.exoplatform.portal.resource.config.xml.SkinConfigParser;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.resources.Orientation;
-
-import lombok.SneakyThrows;
 
 /**
  * @author <a href="trong.tran@exoplatform.com">Trong Tran</a>
@@ -42,8 +33,6 @@ import lombok.SneakyThrows;
 public abstract class AbstractSkinModule {
 
   protected static final Log   LOG         = ExoLogger.getLogger(AbstractSkinModule.class);
-
-  private static final boolean DEVELOPPING = PropertyManager.isDevelopping();
 
   protected String             skinName;
 
@@ -76,9 +65,10 @@ public abstract class AbstractSkinModule {
   protected void bindingOverwrite(Element element) {
     NodeList nodes = element.getElementsByTagName(SkinConfigParser.OVERWRITE);
     if (nodes == null || nodes.getLength() < 1) {
-      return;
+      setOverwrite(false);
+    } else {
+      setOverwrite("true".equals(nodes.item(0).getFirstChild().getNodeValue()));
     }
-    setOverwrite("true".equals(nodes.item(0).getFirstChild().getNodeValue()));
   }
 
   protected void bindingCSSPriority(Element element) {

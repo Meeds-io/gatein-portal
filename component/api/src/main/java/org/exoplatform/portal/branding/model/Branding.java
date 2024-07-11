@@ -45,11 +45,11 @@ public class Branding implements Serializable {
 
   @Getter
   @Setter
-  private Map<String, String> supportedLanguages;
+  private String              direction;
 
   @Getter
   @Setter
-  private String              topBarTheme;
+  private Map<String, String> supportedLanguages;
 
   @Getter
   @Setter
