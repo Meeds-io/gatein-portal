@@ -19,17 +19,50 @@
 
 package org.exoplatform.portal.resource;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.gatein.portal.controller.resource.ResourceRequestHandler;
+import org.gatein.wci.ServletContainerFactory;
+import org.gatein.wci.WebApp;
+import org.gatein.wci.WebAppListener;
+import org.picocontainer.Startable;
+
 import org.exoplatform.commons.cache.future.FutureMap;
 import org.exoplatform.commons.cache.future.Loader;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.exoplatform.management.annotations.*;
+import org.exoplatform.management.annotations.Impact;
+import org.exoplatform.management.annotations.ImpactType;
+import org.exoplatform.management.annotations.Managed;
+import org.exoplatform.management.annotations.ManagedDescription;
 import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
 import org.exoplatform.management.rest.annotations.RESTEndpoint;
@@ -40,26 +73,10 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.web.ControllerContext;
-import org.gatein.portal.controller.resource.ResourceRequestHandler;
-import org.gatein.wci.ServletContainerFactory;
-import org.gatein.wci.WebApp;
-import org.gatein.wci.WebAppListener;
-import org.picocontainer.Startable;
 
 import jakarta.servlet.ServletContext;
 import lombok.Getter;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import lombok.SneakyThrows;
 
 @Managed
 @NameTemplate({ @Property(key = "view", value = "portal"), @Property(key = "service", value = "management"),
@@ -227,6 +244,25 @@ public class SkinService extends AbstractResourceService implements Startable {
   }
 
   /**
+   * Cache data after startup
+   */
+  public void initData() {
+    long start = System.currentTimeMillis();
+    LOG.info("Start caching CSS data");
+    ExecutorService executorService = Executors.newSingleThreadExecutor(); // NOSONAR
+    executorService.execute(() -> {
+      ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
+      try {
+        skinConfigs.values().parallelStream().forEach(this::initSkinModuleCache);
+      } finally {
+        LOG.info("End caching CSS data within {}ms", System.currentTimeMillis() - start);
+        ExoContainerContext.setCurrentContainer(null);
+        executorService.shutdown();
+      }
+    });
+  }
+
+  /**
    * Get all available skin
    *
    * @return all available skin
@@ -287,10 +323,10 @@ public class SkinService extends AbstractResourceService implements Startable {
    * @return {@link File} representing the CSS File content
    * @throws IOException when an error happens while reading file
    */
-  public String getSkinModuleFile(String fileWebAppPath,
-                                  int fileContentHash,
-                                  Orientation orientation,
-                                  boolean compress) throws IOException {
+  public String getSkinModuleContent(String fileWebAppPath,
+                                     int fileContentHash,
+                                     Orientation orientation,
+                                     boolean compress) throws IOException {
     if (DEVELOPPING) {
       return getSkinModuleFileContent(fileWebAppPath, orientation, compress);
     } else {
@@ -329,7 +365,8 @@ public class SkinService extends AbstractResourceService implements Startable {
     if (servletContext == null) {
       throw new IllegalStateException("Can't retrieve ServletContext of path " + fileWebAppPath);
     }
-    try (InputStream inputStream = servletContext.getResourceAsStream(fileWebAppPath.replaceFirst(servletContext.getContextPath(), ""))) {
+    try (InputStream inputStream = servletContext.getResourceAsStream(fileWebAppPath.replaceFirst(servletContext.getContextPath(),
+                                                                                                  ""))) {
       return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
     }
   }
@@ -411,9 +448,14 @@ public class SkinService extends AbstractResourceService implements Startable {
    * @param overwrite if any previous skin should be replaced by that one
    * @param filtered if true, then the portal skin will be loaded only when
    *          required by a portlet
-   * @return 
+   * @return
    */
-  public SkinConfig addPortalSkin(String module, String skinName, String cssPath, int priority, boolean overwrite, boolean filtered) {
+  public SkinConfig addPortalSkin(String module,
+                                  String skinName,
+                                  String cssPath,
+                                  int priority,
+                                  boolean overwrite,
+                                  boolean filtered) {
     availableSkins.add(skinName);
     SkinKey key = new SkinKey(module, skinName);
     SkinConfig skinConfig = portalSkins.get(key);
@@ -473,11 +515,11 @@ public class SkinService extends AbstractResourceService implements Startable {
   }
 
   public SkinConfig addSkin(String module,
-                      String skinName,
-                      String cssPath,
-                      int priority,
-                      boolean overwrite,
-                      List<String> additionalModules) {
+                            String skinName,
+                            String cssPath,
+                            int priority,
+                            boolean overwrite,
+                            List<String> additionalModules) {
     availableSkins.add(skinName);
     SkinKey key = new SkinKey(module, skinName);
     SkinConfig skinConfig = skinConfigs.get(key);
@@ -532,13 +574,15 @@ public class SkinService extends AbstractResourceService implements Startable {
    * Render css content of the file specified by the given URI
    *
    * @param context
-   * @param renderer the webapp's {@link org.exoplatform.portal.resource.ResourceRenderer}
+   * @param renderer the webapp's
+   *          {@link org.exoplatform.portal.resource.ResourceRenderer}
    * @param compress
    * @throws IOException
    * @return <code>true</code> if the <code>CSS resource </code>is found and
    *         rendered; <code>false</code> otherwise.
    * @deprecated since not used for CSS content retrieval anymore. Kept for
-   *             retro compatibility with UIs making static reference to Portal Skin CSS paths
+   *             retro compatibility with UIs making static reference to Portal
+   *             Skin CSS paths
    */
   @Deprecated(forRemoval = true, since = "7.0")
   public boolean renderCSS(ControllerContext context, ResourceRenderer renderer, boolean compress) throws IOException {
@@ -975,6 +1019,25 @@ public class SkinService extends AbstractResourceService implements Startable {
       }
     }
     return fileContent;
+  }
+
+  @SneakyThrows
+  public void initSkinModuleCache(SkinConfig skin) {
+    if (StringUtils.isBlank(skin.getCSSPath())) {
+      LOG.debug("Ignore caching empty CSS file for module {}", skin.getModule());
+      return;
+    }
+    ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
+    String fullCSSPath = null;
+    try {
+      fullCSSPath = skin.createURL().toString();
+      fullCSSPath = fullCSSPath.substring(0, fullCSSPath.indexOf("?"));
+      getSkinModuleContent(fullCSSPath, skin.getFileContentHash(), Orientation.LT, !DEVELOPPING);
+    } catch (Exception e) {
+      LOG.warn("Error while initializing cache of CSS with path {}", fullCSSPath, e);
+    } finally {
+      ExoContainerContext.setCurrentContainer(null);
+    }
   }
 
 }
