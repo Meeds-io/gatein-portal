@@ -20,7 +20,6 @@ import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_SITE_
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_SUBTITLE_SETTING_KEY;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_THEME_VARIABLES;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_TITLE_SETTING_KEY;
-import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_TOPBAR_THEME_SETTING_KEY;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.FILE_API_NAME_SPACE;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.LOGIN_BACKGROUND_NAME;
 import static org.junit.Assert.assertEquals;
@@ -438,8 +437,7 @@ public class BrandingServiceImplTest {
 
     Branding newBranding = new Branding();
     newBranding.setCompanyName("New Company Name");
-    newBranding.setTopBarTheme("Pink");
-    newBranding.setThemeStyle(new HashMap<String, String>());
+    newBranding.setThemeStyle(new HashMap<>());
     newBranding.getThemeStyle().put("primaryColor", primaryColorNewValue);
     newBranding.getThemeStyle().put("primaryBackground", primaryBackgroundNewValue);
     newBranding.getThemeStyle().put("secondaryColor", secondaryColorNewValue);
@@ -455,7 +453,7 @@ public class BrandingServiceImplTest {
     brandingService.updateBrandingInformation(newBranding);
 
     // Then
-    verify(settingService, times(5)).set(settingContext.capture(),
+    verify(settingService, times(4)).set(settingContext.capture(),
                                          settingScope.capture(),
                                          settingKey.capture(),
                                          settingValue.capture());
@@ -479,21 +477,16 @@ public class BrandingServiceImplTest {
     assertEquals(BRANDING_COMPANY_NAME_SETTING_KEY, keys.get(0));
     assertEquals("New Company Name", values.get(0).getValue());
 
-    assertEquals(Context.GLOBAL, contexts.get(1));
-    assertEquals(Scope.GLOBAL, scopes.get(1));
-    assertEquals(BRANDING_TOPBAR_THEME_SETTING_KEY, keys.get(1));
-    assertEquals("Pink", values.get(1).getValue());
-
+    assertEquals(BRANDING_CONTEXT, contexts.get(1));
+    assertEquals(BRANDING_SCOPE, scopes.get(1));
     assertEquals(BRANDING_CONTEXT, contexts.get(2));
     assertEquals(BRANDING_SCOPE, scopes.get(2));
-    assertEquals(BRANDING_CONTEXT, contexts.get(3));
-    assertEquals(BRANDING_SCOPE, scopes.get(3));
 
-    String firstThemeColorParam = keys.get(2);
-    String firstThemeColorValue = values.get(2).getValue().toString();
+    String firstThemeColorParam = keys.get(1);
+    String firstThemeColorValue = values.get(1).getValue().toString();
 
-    String secondThemeColorParam = keys.get(3);
-    String secondThemeColorValue = values.get(3).getValue().toString();
+    String secondThemeColorParam = keys.get(2);
+    String secondThemeColorValue = values.get(2).getValue().toString();
 
     assertEquals("primaryColor", secondThemeColorParam);
     assertEquals("primaryBackground", firstThemeColorParam);

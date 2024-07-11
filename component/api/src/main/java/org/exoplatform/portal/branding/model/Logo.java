@@ -33,4 +33,9 @@ public class Logo extends BrandingFile implements Cloneable {
     return new Logo(getUploadId(), getSize(), getData(), getUpdatedDate(), getFileId());
   }
 
+  @Override
+  @SuppressWarnings("unchecked")
+  public Logo cloneFile() {
+    return this.clone();
+  }
 }
