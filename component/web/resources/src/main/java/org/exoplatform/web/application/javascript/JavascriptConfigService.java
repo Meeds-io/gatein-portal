@@ -19,10 +19,6 @@
 
 package org.exoplatform.web.application.javascript;
 
-import jakarta.servlet.ServletContext;
-import lombok.Getter;
-import lombok.SneakyThrows;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -30,23 +26,44 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.gatein.portal.controller.resource.ResourceId;
+import org.gatein.portal.controller.resource.ResourceScope;
+import org.gatein.portal.controller.resource.ScriptContent;
+import org.gatein.portal.controller.resource.ScriptKey;
+import org.gatein.portal.controller.resource.ScriptLoader;
+import org.gatein.portal.controller.resource.script.BaseScriptResource;
+import org.gatein.portal.controller.resource.script.FetchMode;
+import org.gatein.portal.controller.resource.script.Module;
+import org.gatein.portal.controller.resource.script.ScriptGraph;
+import org.gatein.portal.controller.resource.script.ScriptGroup;
+import org.gatein.portal.controller.resource.script.ScriptResource;
+import org.gatein.portal.controller.resource.script.ScriptResource.DepInfo;
+import org.gatein.wci.ServletContainerFactory;
+import org.gatein.wci.WebApp;
+import org.gatein.wci.WebAppListener;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.picocontainer.Startable;
 
 import org.exoplatform.commons.cache.future.FutureMap;
 import org.exoplatform.commons.utils.CompositeReader;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.management.annotations.Impact;
 import org.exoplatform.management.annotations.ImpactType;
 import org.exoplatform.management.annotations.Managed;
@@ -61,24 +78,10 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
-import org.gatein.portal.controller.resource.ResourceId;
-import org.gatein.portal.controller.resource.ResourceScope;
-import org.gatein.portal.controller.resource.ScriptKey;
-import org.gatein.portal.controller.resource.ScriptLoader;
-import org.gatein.portal.controller.resource.ScriptContent;
-import org.gatein.portal.controller.resource.script.BaseScriptResource;
-import org.gatein.portal.controller.resource.script.FetchMode;
-import org.gatein.portal.controller.resource.script.Module;
-import org.gatein.portal.controller.resource.script.ScriptGraph;
-import org.gatein.portal.controller.resource.script.ScriptGroup;
-import org.gatein.portal.controller.resource.script.ScriptResource;
-import org.gatein.portal.controller.resource.script.ScriptResource.DepInfo;
-import org.gatein.wci.ServletContainerFactory;
-import org.gatein.wci.WebApp;
-import org.gatein.wci.WebAppListener;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.picocontainer.Startable;
+
+import jakarta.servlet.ServletContext;
+import lombok.Getter;
+import lombok.SneakyThrows;
 
 @Managed
 @NameTemplate({ @Property(key = "view", value = "portal"), @Property(key = "service", value = "management"),
@@ -105,7 +108,7 @@ public class JavascriptConfigService extends AbstractResourceService implements 
   @Getter
   private final ScriptGraph                                 scriptGraph;
 
-  private final Map<String, String>                         scriptURLs      = new HashMap<>();
+  private final Map<String, String>                         scriptURLs      = new ConcurrentHashMap<>();
 
   private final FutureMap<ScriptKey, ScriptContent, Object> scriptCache     = new FutureMap<>(new ScriptLoader());
 
@@ -117,6 +120,89 @@ public class JavascriptConfigService extends AbstractResourceService implements 
     //
     this.scriptGraph = new ScriptGraph();
     this.deployer = new JavascriptConfigDeployer(context.getPortalContainerName(), this);
+  }
+
+  @Override
+  public void start() {
+    ServletContainerFactory.getServletContainer().addWebAppListener(deployer);
+  }
+
+  @Override
+  public void stop() {
+    ServletContainerFactory.getServletContainer().removeWebAppListener(deployer);
+  }
+
+  /**
+   * Cache data after startup
+   */
+  public void initData() {
+    long start = System.currentTimeMillis();
+    LOG.info("Start caching Javascript data");
+    ExecutorService executorService = Executors.newSingleThreadExecutor(); // NOSONAR
+    executorService.execute(() -> {
+      ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
+      try {
+        getAllResources().parallelStream().forEach(this::generateUrl);
+      } finally {
+        LOG.info("End caching Javascript data within {}ms", System.currentTimeMillis() - start);
+        ExoContainerContext.setCurrentContainer(null);
+        executorService.shutdown();
+      }
+    });
+  }
+
+  @Managed
+  @ManagedDescription("Retrieve all javascript modules IDs")
+  @Impact(ImpactType.READ)
+  public Collection<String> getJavascriptKeys() {
+    List<String> keys = new ArrayList<>();
+    Set<ScriptKey> cacheKeys = scriptCache.getKeys();
+    for (ScriptKey scriptKey : cacheKeys) {
+      keys.add(scriptKey.getId().toString());
+    }
+    return keys;
+  }
+
+  @Managed
+  @ManagedDescription("Reload all javascript modules")
+  @Impact(ImpactType.WRITE)
+  public void reloadJavascripts() {
+    scriptCache.clear();
+  }
+
+  @Managed
+  @ManagedDescription("Reload a selected javascript module by its ID")
+  @Impact(ImpactType.WRITE)
+  public void reloadJavascript(
+                               @ManagedDescription("JS Module: SCOPE/NAME")
+                               @ManagedName("jsModule")
+                               String jsModule) {
+    String[] scriptIdParts = jsModule.split("/");
+    if (scriptIdParts.length != 2) {
+      throw new IllegalArgumentException("js module have to be identified by 'SCOPE/id' like 'SHARED/jquery' ");
+    }
+
+    ResourceId resource = new ResourceId(ResourceScope.valueOf(scriptIdParts[0]), scriptIdParts[1]);
+    LocaleConfigService localeService = ExoContainerContext.getCurrentContainer()
+                                                           .getComponentInstanceOfType(LocaleConfigService.class);
+    Collection<LocaleConfig> localConfigs = localeService.getLocalConfigs();
+    for (LocaleConfig localeConfig : localConfigs) {
+      ScriptKey key = new ScriptKey(resource, true, localeConfig.getLocale());
+      scriptCache.remove(key);
+    }
+    ScriptKey key = new ScriptKey(resource, true, null);
+    scriptCache.remove(key);
+  }
+
+  @SneakyThrows
+  public ScriptContent getScriptContent(ResourceScope scope, String module, boolean compress) {
+    ResourceId resource = new ResourceId(scope, module);
+    ScriptKey key = new ScriptKey(resource, compress, Locale.ENGLISH);
+    if (DEVELOPPING) {
+      return scriptCache.getLoader().retrieve(null, key);
+    } else {
+      return scriptCache.get(null, key);
+    }
   }
 
   public Reader getScript(ResourceId resourceId, Locale locale) throws Exception {
@@ -234,7 +320,18 @@ public class JavascriptConfigService extends AbstractResourceService implements 
     }
   }
 
-  public String generateURL(ResourceId id) {
+  public String generateUrl(ScriptResource resource) {
+    if (resource.getGroup() != null) {
+      ResourceId grpId = resource.getGroup().getId();
+      String key = grpId.toString();
+      return scriptURLs.computeIfAbsent(key, k -> generateUrl(grpId));
+    } else {
+      String key = resource.getId().toString();
+      return scriptURLs.computeIfAbsent(key, k -> generateUrl(resource.getId()));
+    }
+  }
+
+  public String generateUrl(ResourceId id) {
     @SuppressWarnings("rawtypes")
     BaseScriptResource resource = null;
     if (ResourceScope.GROUP.equals(id.getScope())) {
@@ -258,7 +355,9 @@ public class JavascriptConfigService extends AbstractResourceService implements 
         fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
       }
       return resource.getContextPath() + "/js/" + fileName + ".js?" + ScriptKey.HASH_QUERY_PARAM + "=" +
-          scriptContent.getHash() + "&" + ScriptKey.SCOPE_QUERY_PARAM + "=" + id.getScope() + "&" + ScriptKey.MINIFY_QUERY_PARAM + "=" + (!DEVELOPPING);
+          scriptContent.getHash() + "&" + ScriptKey.SCOPE_QUERY_PARAM + "=" + id.getScope() + "&" +
+          ScriptKey.MINIFY_QUERY_PARAM +
+          "=" + (!DEVELOPPING);
     }
     return null;
   }
@@ -288,26 +387,7 @@ public class JavascriptConfigService extends AbstractResourceService implements 
               shim.put(name, new JSONObject().put("deps", deps));
             }
           }
-
-          String url;
-          ScriptGroup group = resource.getGroup();
-          if (group != null) {
-            ResourceId grpId = group.getId();
-            String key = grpId.toString();
-            url = scriptURLs.get(key);
-            if (url == null) {
-              url = generateURL(grpId);
-              scriptURLs.put(key, url);
-            }
-          } else {
-            String key = resource.getId().toString();
-            url = scriptURLs.get(key);
-            if (url == null) {
-              url = generateURL(resource.getId());
-              scriptURLs.put(key, url);
-            }
-          }
-          paths.put(name, url);
+          paths.put(name, generateUrl(resource));
         }
       }
 
@@ -321,70 +401,6 @@ public class JavascriptConfigService extends AbstractResourceService implements 
 
   public ScriptResource getResource(ResourceId resource) {
     return scriptGraph.getResource(resource);
-  }
-
-  @Override
-  public void start() {
-    ServletContainerFactory.getServletContainer().addWebAppListener(deployer);
-  }
-
-  @Override
-  public void stop() {
-    ServletContainerFactory.getServletContainer().removeWebAppListener(deployer);
-  }
-
-  @Managed
-  @ManagedDescription("Retrieve all javascript modules IDs")
-  @Impact(ImpactType.READ)
-  public Collection<String> getJavascriptKeys() {
-    List<String> keys = new ArrayList<>();
-    Set<ScriptKey> cacheKeys = scriptCache.getKeys();
-    for (ScriptKey scriptKey : cacheKeys) {
-      keys.add(scriptKey.getId().toString());
-    }
-    return keys;
-  }
-
-  @Managed
-  @ManagedDescription("Reload all javascript modules")
-  @Impact(ImpactType.WRITE)
-  public void reloadJavascripts() {
-    scriptCache.clear();
-  }
-
-  @Managed
-  @ManagedDescription("Reload a selected javascript module by its ID")
-  @Impact(ImpactType.WRITE)
-  public void reloadJavascript(
-                               @ManagedDescription("JS Module: SCOPE/NAME")
-                               @ManagedName("jsModule")
-                               String jsModule) {
-    String[] scriptIdParts = jsModule.split("/");
-    if (scriptIdParts.length != 2) {
-      throw new IllegalArgumentException("js module have to be identified by 'SCOPE/id' like 'SHARED/jquery' ");
-    }
-
-    ResourceId resource = new ResourceId(ResourceScope.valueOf(scriptIdParts[0]), scriptIdParts[1]);
-    LocaleConfigService localeService = ExoContainerContext.getCurrentContainer()
-                                                           .getComponentInstanceOfType(LocaleConfigService.class);
-    Collection<LocaleConfig> localConfigs = localeService.getLocalConfigs();
-    for (LocaleConfig localeConfig : localConfigs) {
-      ScriptKey key = new ScriptKey(resource, true, localeConfig.getLocale());
-      scriptCache.remove(key);
-    }
-    ScriptKey key = new ScriptKey(resource, true, null);
-    scriptCache.remove(key);
-  }
-
-  @SneakyThrows
-  public ScriptContent getScriptContent(ResourceScope scope, String module, boolean compress) {
-    ResourceId resource = new ResourceId(scope, module);
-    ScriptKey key = new ScriptKey(resource, compress, Locale.ENGLISH);
-    if (DEVELOPPING) {
-      return scriptCache.getLoader().retrieve(null, key);
-    } else {
-      return scriptCache.get(null, key);
-    }
   }
 
   private Reader getJavascript(Module module, Locale locale) {
@@ -532,4 +548,5 @@ public class JavascriptConfigService extends AbstractResourceService implements 
       sub.close();
     }
   }
+
 }
