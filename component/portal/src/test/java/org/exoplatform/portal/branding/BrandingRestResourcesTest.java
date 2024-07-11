@@ -65,7 +65,6 @@ public class BrandingRestResourcesTest extends BaseRestServicesTestCase {
 
     Branding branding = new Branding();
     branding.setCompanyName("test1");
-    branding.setTopBarTheme("Dark");
     when(brandingService.getBrandingInformation(false)).thenReturn(branding);
 
     // When
@@ -78,7 +77,6 @@ public class BrandingRestResourcesTest extends BaseRestServicesTestCase {
     assertTrue(entity instanceof Branding);
     Branding brandingResp = (Branding) entity;
     assertEquals("test1", brandingResp.getCompanyName());
-    assertEquals("Dark", brandingResp.getTopBarTheme());
   }
 
   public void testUpdateBrandingInformation() throws Exception {
@@ -90,10 +88,8 @@ public class BrandingRestResourcesTest extends BaseRestServicesTestCase {
 
     Branding branding = new Branding();
     branding.setCompanyName("test1");
-    branding.setTopBarTheme("Dark");
     JSONObject jsonBranding = new JSONObject();
     jsonBranding.put("companyName", branding.getCompanyName());
-    jsonBranding.put("topBarTheme", branding.getTopBarTheme());
 
     ArgumentCaptor<Branding> brandingArgumentCaptor = ArgumentCaptor.forClass(Branding.class);
 
@@ -112,7 +108,6 @@ public class BrandingRestResourcesTest extends BaseRestServicesTestCase {
     assertNotNull(brandingArgumentCaptor);
     Branding caturedBranding = brandingArgumentCaptor.getValue();
     assertEquals("test1", caturedBranding.getCompanyName());
-    assertEquals("Dark", caturedBranding.getTopBarTheme());
   }
 
   public void testGetBrandingFavicon() throws Exception {

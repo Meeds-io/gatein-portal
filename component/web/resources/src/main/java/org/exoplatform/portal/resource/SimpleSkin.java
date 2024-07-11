@@ -114,6 +114,11 @@ public class SimpleSkin implements SkinConfig {
   }
 
   @Override
+  public void setCSSPath(String cssPath) {
+    this.cssPath = cssPath;
+  }
+
+  @Override
   public int getFileContentHash() {
     if (DEVELOPPING) {
       return 0;
