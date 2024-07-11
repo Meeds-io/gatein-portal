@@ -19,14 +19,9 @@
 
 package org.exoplatform.portal.resource.config.tasks;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import org.exoplatform.portal.resource.SkinConfig;
 import org.exoplatform.portal.resource.SkinDependentManager;
 import org.exoplatform.portal.resource.SkinService;
 import org.exoplatform.portal.resource.config.xml.SkinConfigParser;
@@ -70,12 +65,8 @@ public class PortalSkinTask extends AbstractSkinModule implements SkinConfigTask
     } catch (Exception e) {
       priority = Integer.MAX_VALUE;
     }
-    SkinConfig portalSkin = skinService.addPortalSkin(moduleName, skinName, fullCSSPath, priority, overwrite, filtered);
+    skinService.addPortalSkin(moduleName, skinName, fullCSSPath, priority, overwrite, filtered);
     updateSkinDependentManager(contextPath, moduleName, skinName);
-    try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
-      // Cache CSS on startup
-      CompletableFuture.runAsync(() -> initSkinModuleCache(skinService, fullCSSPath, portalSkin), executorService);
-    }
   }
 
   @Override
