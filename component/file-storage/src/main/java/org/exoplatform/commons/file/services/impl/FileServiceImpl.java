@@ -141,9 +141,10 @@ public class FileServiceImpl implements FileService {
   @Override
   public FileInfo deleteFile(long id) {
     FileInfo fileInfo = dataStorage.getFileInfo(id);
-    if (fileInfo != null) {
-      fileInfo.setDeleted(true);
+    if (fileInfo == null) {
+      return null;
     }
+    fileInfo.setDeleted(true);
     FileInfo newFileInfo = dataStorage.updateFileInfo(fileInfo);
     try {
       listenerService.broadcast(FILE_DELETED_EVENT, newFileInfo, null);

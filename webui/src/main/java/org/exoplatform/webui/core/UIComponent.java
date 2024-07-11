@@ -36,7 +36,6 @@ import org.exoplatform.webui.core.lifecycle.Lifecycle;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.Event.Phase;
 import org.exoplatform.webui.event.EventListener;
-import org.exoplatform.webui.event.MonitorEvent;
 
 /** Created by The eXo Platform SAS May 7, 2006 */
 @Serialized
@@ -110,30 +109,15 @@ public abstract class UIComponent {
     //
 
     public void processDecode(WebuiRequestContext context) throws Exception {
-        MonitorEvent<UIComponent> mevent = createMonitorEvent(Event.Phase.DECODE, context);
-        getLifecycle().processDecode(this, context);
-        if (mevent != null) {
-            mevent.setEndExecutionTime(System.currentTimeMillis());
-            mevent.broadcast();
-        }
+      getLifecycle().processDecode(this, context);
     }
 
     public void processAction(WebuiRequestContext context) throws Exception {
-        MonitorEvent<UIComponent> mevent = createMonitorEvent(Event.Phase.PROCESS, context);
-        getLifecycle().processAction(this, context);
-        if (mevent != null) {
-            mevent.setEndExecutionTime(System.currentTimeMillis());
-            mevent.broadcast();
-        }
+      getLifecycle().processAction(this, context);
     }
 
     public void processRender(WebuiRequestContext context) throws Exception {
-        MonitorEvent<UIComponent> mevent = createMonitorEvent(Event.Phase.RENDER, context);
-        getLifecycle().processRender(this, context);
-        if (mevent != null) {
-            mevent.setEndExecutionTime(System.currentTimeMillis());
-            mevent.broadcast();
-        }
+      getLifecycle().processRender(this, context);
     }
 
     private Lifecycle<UIComponent> getLifecycle() throws Exception {
@@ -395,27 +379,6 @@ public abstract class UIComponent {
             event.setEventListeners(econfig.getCachedEventListeners());
             event.setCsrfCheck(econfig.isCsrfCheck());
             return event;
-        }
-        return null;
-    }
-
-    private MonitorEvent<UIComponent> createMonitorEvent(Phase phase, WebuiRequestContext context) throws Exception {
-        if (config == null) {
-            return null;
-        }
-        org.exoplatform.webui.config.Event econfig = config
-                .getUIComponentEventConfig(MonitorEvent.UICOMPONENT_LIFECYCLE_MONITOR_EVENT);
-        if (econfig == null) {
-            return null;
-        }
-        Phase executionPhase = econfig.getExecutionPhase();
-        if (executionPhase == phase || executionPhase == Event.Phase.ANY) {
-            MonitorEvent<UIComponent> mevent = new MonitorEvent<UIComponent>(this,
-                    MonitorEvent.UICOMPONENT_LIFECYCLE_MONITOR_EVENT, context);
-            mevent.setEventListeners(econfig.getCachedEventListeners());
-            mevent.setStartExecutionTime(System.currentTimeMillis());
-            mevent.setExecutionPhase(phase);
-            return mevent;
         }
         return null;
     }

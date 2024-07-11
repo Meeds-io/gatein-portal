@@ -72,7 +72,6 @@ import org.exoplatform.webui.core.UIContainer;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.url.ComponentURL;
 
-import org.gatein.pc.api.info.PortletInfo;
 import org.gatein.pc.portlet.impl.info.ContainerPortletInfo;
 import org.gatein.portal.controller.resource.ResourceId;
 import org.gatein.portal.controller.resource.ResourceScope;
@@ -82,7 +81,6 @@ import org.gatein.portal.controller.resource.script.Module;
 import org.gatein.portal.controller.resource.script.ScriptResource;
 import org.json.JSONObject;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -284,14 +282,6 @@ public class UIPortalApplication extends UIApplication {
     skinVisitor = getApplicationComponent(SkinVisitor.class);
     layoutService = getApplicationComponent(LayoutService.class);
 
-    // userPortalConfig_ =
-    // (UserPortalConfig)context.getAttribute(UserPortalConfig.class);
-    // if (userPortalConfig_ == null)
-    // throw new Exception("Can't load user portal config");
-
-    // dang.tung - set portal language by user preference -> browser ->
-    // default
-    // ------------------------------------------------------------------------------
     LocaleConfigService localeConfigService = getApplicationComponent(LocaleConfigService.class);
 
     Locale locale = context.getLocale();
@@ -309,15 +299,9 @@ public class UIPortalApplication extends UIApplication {
       localeConfig = localeConfigService.getLocaleConfig(Locale.ENGLISH.getLanguage());
     }
     setOrientation(localeConfig.getOrientation());
-
-    // -------------------------------------------------------------------------------
     context.setUIApplication(this);
 
-    this.all_UIPortals = new HashMap<SiteKey, UIPortal>(5);
-
-    JavascriptManager jsMan = context.getJavascriptManager();
-    // Add JS resource of current portal
-
+    this.all_UIPortals = new HashMap<>();
     this.lastPortalOwner = context.getPortalOwner();
     initWorkspaces();
   }
@@ -542,8 +526,8 @@ public class UIPortalApplication extends UIApplication {
 
     //
     JavascriptConfigService service = getApplicationComponent(JavascriptConfigService.class);
-    Map<String, Boolean> ret = new LinkedHashMap<String, Boolean>();
-    Map<String, Boolean> tmp = new LinkedHashMap<String, Boolean>();
+    Map<String, Boolean> ret = new LinkedHashMap<>();
+    Map<String, Boolean> tmp = new LinkedHashMap<>();
     Map<ScriptResource, FetchMode> resolved = service.resolveIds(requiredResources);
     for (ScriptResource rs : resolved.keySet()) {
       ResourceId id = rs.getId();
@@ -609,28 +593,15 @@ public class UIPortalApplication extends UIApplication {
     return skins;
   }
 
+  public Collection<SkinConfig> getCustomSkins() {
+    return skinService.getCustomPortalSkins(getSkin());
+  }
+
   public String getBrandingUrl() {
     BrandingService brandingService = getApplicationComponent(BrandingService.class);
     long lastUpdatedTime = brandingService.getLastUpdatedTime();
     return "/" + PortalContainer.getCurrentPortalContainerName() + "/" + PortalContainer.getCurrentRestContextName() +
         "/v1/platform/branding/css?v=" + lastUpdatedTime;
-  }
-
-  private Collection<SkinConfig> getCustomSkins() {
-    return skinService.getCustomPortalSkins(getSkin());
-  }
-
-  private void getPortalPortletSkinConfig(Set<SkinConfig> portletConfigs, UIComponent component) {
-    if (component instanceof UIPortlet) {
-      SkinConfig portletConfig = getPortletSkinConfig((UIPortlet) component);
-      if (portletConfig != null) {
-        portletConfigs.add(portletConfig);
-      }
-    } else if (component instanceof UIContainer) {
-      for (UIComponent child : ((UIContainer) component).getChildren()) {
-        getPortalPortletSkinConfig(portletConfigs, child);
-      }
-    }
   }
 
   public String getSkin() {

@@ -86,7 +86,7 @@ public class TestGateInResourceParser {
                                           eq(SKIN_NAME),
                                           argThat(s -> s.contains("/skin/portal/webui/component/UIBannerPortlet/DefaultStylesheet.css")),
                                           anyInt(),
-                                          eq(true),
+                                          eq(false),
                                           argThat(list -> CollectionUtils.isNotEmpty(list)
                                                           && list.size() == 1
                                                           && list.contains(FILTERED_MODULE)));
@@ -94,13 +94,13 @@ public class TestGateInResourceParser {
                                           eq(SKIN_NAME),
                                           argThat(s -> s.contains("/skin/portal/webui/component/UIFooterPortlet/DefaultStylesheet.css")),
                                           anyInt(),
-                                          eq(true),
+                                          eq(false),
                                           argThat(CollectionUtils::isEmpty));
     verify(skinService, times(1)).addSkin(eq("web/NavigationPortlet"),
                                           eq(SKIN_NAME),
                                           argThat(s -> s == null),
                                           anyInt(),
-                                          eq(true),
+                                          eq(false),
                                           argThat(list -> CollectionUtils.isNotEmpty(list)
                                                           && list.size() == 1
                                                           && list.contains(FILTERED_MODULE)));
@@ -108,13 +108,13 @@ public class TestGateInResourceParser {
                                                 eq(SKIN_NAME),
                                                 argThat(s -> s.contains("/skin/Stylesheet.css")),
                                                 anyInt(),
-                                                eq(true),
+                                                eq(false),
                                                 eq(false));
     verify(skinService, times(1)).addPortalSkin(eq(FILTERED_MODULE),
                                                 eq(SKIN_NAME),
                                                 argThat(s -> s.contains("/skin/FilteredStylesheet.css")),
                                                 anyInt(),
-                                                eq(true),
+                                                eq(false),
                                                 eq(true));
   }
 

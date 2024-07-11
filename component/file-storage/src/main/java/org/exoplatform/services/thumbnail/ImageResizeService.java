@@ -1,8 +1,6 @@
 /*
  * This file is part of the Meeds project (https://meeds.io/).
- *
- * Copyright (C) 2020 - 2023 Meeds Association contact@meeds.io
- *
+ * Copyright (C) 2022 Meeds Association contact@meeds.io
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -15,27 +13,23 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package org.exoplatform.portal.branding.model;
+package org.exoplatform.services.thumbnail;
 
-import lombok.NoArgsConstructor;
+@FunctionalInterface
+public interface ImageResizeService {
 
-@NoArgsConstructor
-public class Background extends BrandingFile implements Cloneable {
 
-  private static final long serialVersionUID = 4603820249597850279L;
+    /**
+     * Create a scaled image by resizing an initial given image
+     *
+     * @param image Target image content to be resized
+     * @param width Target resized image width
+     * @param height Target resized image height
+     * @param fitExact Fit resized image to the exact given with and height (true) or automatic fit (false)
+     * @param ultraQuality return an ultra quality resized image (may take more execution time)
+     * @return byte array of image content
+     * @throws Exception
+     */
+    byte[] scaleImage(byte[] image, int width, int height, boolean fitExact, boolean ultraQuality) throws Exception;
 
-  public Background(String uploadId, long size, byte[] data, long updatedDate, long fileId) {
-    super(uploadId, size, data, updatedDate, fileId);
-  }
-
-  @Override
-  public Background clone() { // NOSONAR
-    return new Background(getUploadId(), getSize(), getData(), getUpdatedDate(), getFileId());
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public Background cloneFile() {
-    return this.clone();
-  }
 }
