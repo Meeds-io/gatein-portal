@@ -19,8 +19,8 @@
 
 package org.exoplatform.portal.resource;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.exoplatform.portal.resource.compressor.ResourceCompressor;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
@@ -43,10 +43,10 @@ public abstract class AbstractResourceService {
     /** . */
     protected final Map<String, WebApp> contexts;
 
-    public AbstractResourceService(ResourceCompressor compressor) {
+    protected AbstractResourceService(ResourceCompressor compressor) {
         this.compressor = compressor;
         this.mainResolver = new MainResourceResolver();
-        this.contexts = new HashMap<String, WebApp>();
+        this.contexts = new ConcurrentHashMap<>();
     }
 
     /**
@@ -55,7 +55,9 @@ public abstract class AbstractResourceService {
      * @param resolver a resolver to add
      */
     public void addResourceResolver(ResourceResolver resolver) {
-        mainResolver.resolvers.addIfAbsent(resolver);
+      if (!mainResolver.resolvers.contains(resolver)) {
+        mainResolver.resolvers.add(resolver);
+      }
     }
 
     public void registerContext(WebApp app) {

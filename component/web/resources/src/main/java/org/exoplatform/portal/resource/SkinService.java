@@ -257,7 +257,7 @@ public class SkinService extends AbstractResourceService implements Startable {
       } finally {
         LOG.info("End caching CSS data within {}ms", System.currentTimeMillis() - start);
         ExoContainerContext.setCurrentContainer(null);
-        executorService.shutdown();
+        executorService.shutdownNow();
       }
     });
   }
@@ -530,8 +530,15 @@ public class SkinService extends AbstractResourceService implements Startable {
       skinConfig = new SimpleSkin(module, skinName, cssPath, priority, additionalModules);
       skinConfig.setType("portlet-skin");
       skinConfigs.put(key, skinConfig);
-    } else if (CollectionUtils.isNotEmpty(additionalModules)) {
-      skinConfig.getAdditionalModules().addAll(additionalModules);
+    } else {
+      if (CollectionUtils.isNotEmpty(additionalModules)) {
+        skinConfig.getAdditionalModules().addAll(additionalModules);
+      }
+      if (skinConfig.getCSSPath() == null && cssPath != null) {
+        skinConfig.setType("portlet-skin");
+        skinConfig.setCSSPath(cssPath);
+        skinConfig.setPriority(priority);
+      }
     }
     return skinConfig;
   }
