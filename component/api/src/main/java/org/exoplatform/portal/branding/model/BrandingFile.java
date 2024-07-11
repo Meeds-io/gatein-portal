@@ -24,6 +24,7 @@ import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("unchecked")
 public class BrandingFile implements Serializable {
 
   private static final long serialVersionUID = 944573860716303922L;
@@ -47,5 +48,9 @@ public class BrandingFile implements Serializable {
   @Getter
   @Setter
   private long              fileId;
+
+  public <T> T cloneFile() {
+    return (T) new BrandingFile(uploadId, size, data, updatedDate, fileId);
+  }
 
 }
