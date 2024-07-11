@@ -112,4 +112,15 @@ public interface ResourceBundleService {
      * @return the name of the shared resource bundle
      */
     String[] getSharedResourceBundleNames();
+
+    /**
+     * Return resource bundle content 
+     * 
+     * @param resourceBundleName Resource bundle FQN
+     * @param locale {@link Locale}
+     * @return Json Content in string representation
+     */
+    default String getResourceBundleContent(String resourceBundleName, Locale locale) {
+      throw new UnsupportedOperationException();
+    }
 }

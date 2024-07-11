@@ -184,12 +184,12 @@ public class TestJavascriptConfigService extends AbstractWebResourceTest {
 
     public void testGenerateURL() throws Exception {
         ResourceId remote1 = new ResourceId(ResourceScope.SHARED, "remote1");
-        String remoteURL = jsService.generateURL(remote1);
+        String remoteURL = jsService.generateUrl(remote1);
         // Return remote module/script url as it's declared in gatein-resources.xml
         assertEquals("http://js/remote1.js", remoteURL);
 
         ResourceId module1 = new ResourceId(ResourceScope.SHARED, "module1");
-        remoteURL = jsService.generateURL(module1);
+        remoteURL = jsService.generateUrl(module1);
         assertEquals("/mockwebapp/js/module1.js?hash=-55414319&scope=SHARED&minify=true", remoteURL);
     }
 
