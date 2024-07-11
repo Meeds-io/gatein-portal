@@ -22,6 +22,7 @@ package org.exoplatform.portal.application;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,7 @@ import org.exoplatform.portal.resource.SkinService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.Orientation;
+import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
 
 import jakarta.servlet.FilterChain;
@@ -50,11 +52,9 @@ public class ResourceRequestFilter extends AbstractFilter {
 
   private static final String     CACHE_CONTROL_HEADER_NAME  = "Cache-Control";
 
-  private static final String     CACHE_CONTROL_HEADER_VALUE =
-                                                             "public, " + ResourceRequestHandler.MAX_AGE;
+  private static final String     CACHE_CONTROL_HEADER_VALUE = "public, " + ResourceRequestHandler.MAX_AGE;
 
-  protected static Log            log                        =
-                                      ExoLogger.getLogger(ResourceRequestFilter.class);
+  protected static Log            log                        = ExoLogger.getLogger(ResourceRequestFilter.class);
 
   public static final String      IF_MODIFIED_SINCE          = "If-Modified-Since";
 
@@ -65,6 +65,8 @@ public class ResourceRequestFilter extends AbstractFilter {
   private JavascriptConfigService javascriptService;
 
   private SkinService             skinService;
+
+  private ResourceBundleService   resourceBundleService;
 
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
@@ -95,6 +97,14 @@ public class ResourceRequestFilter extends AbstractFilter {
           writeStaticResourceContent(httpResponse, bytes, "text/javascript");
           return;
         }
+      }
+    } else if (servletPath.startsWith("/i18n/")) {
+      String lang = httpRequest.getParameter("lang");
+      String resourceBundleName = servletPath.replace("/i18n/", "");
+      String i18N = getResourceBundleContent(resourceBundleName, lang);
+      if (i18N != null) {
+        writeStaticResourceContent(httpResponse, i18N.getBytes(StandardCharsets.UTF_8), "application/json");
+        return;
       }
     }
     // All other static resources caching basic HTTP Headers
@@ -132,10 +142,14 @@ public class ResourceRequestFilter extends AbstractFilter {
                                       String fileContentHash,
                                       String orientation,
                                       String compress) throws IOException {
-    return getSkinService().getSkinModuleFile(httpRequest.getContextPath() + httpRequest.getServletPath(),
-                                              Integer.parseInt(fileContentHash),
-                                              Orientation.valueOf(orientation),
-                                              StringUtils.equals("true", compress));
+    return getSkinService().getSkinModuleContent(httpRequest.getContextPath() + httpRequest.getServletPath(),
+                                                 Integer.parseInt(fileContentHash),
+                                                 Orientation.valueOf(orientation),
+                                                 StringUtils.equals("true", compress));
+  }
+
+  private String getResourceBundleContent(String resourceBundleName, String lang) {
+    return getResourceBundleService().getResourceBundleContent(resourceBundleName, Locale.forLanguageTag(lang));
   }
 
   private JavascriptConfigService getJavascriptService() {
@@ -152,4 +166,10 @@ public class ResourceRequestFilter extends AbstractFilter {
     return skinService;
   }
 
+  public ResourceBundleService getResourceBundleService() {
+    if (resourceBundleService == null) {
+      resourceBundleService = ExoContainerContext.getService(ResourceBundleService.class);
+    }
+    return resourceBundleService;
+  }
 }

@@ -323,7 +323,7 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
      */
     public String getSuitedTheme(String skin) {
         if (skin == null) {
-            skin = Util.getUIPortalApplication().getSkin();
+            skin = PortalRequestContext.getCurrentInstance().getSkin();
         }
         Map<String, String> themeMap = stringToThemeMap(getTheme());
         if (themeMap.containsKey(skin)) {
@@ -339,7 +339,7 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
      */
     public void putSuitedTheme(String skin, String theme) {
         if (skin == null) {
-            skin = Util.getUIPortalApplication().getSkin();
+            skin = PortalRequestContext.getCurrentInstance().getSkin();
         }
         Map<String, String> themeMap = stringToThemeMap(getTheme());
         themeMap.put(skin, theme);
