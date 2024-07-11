@@ -37,10 +37,8 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 
-import org.exoplatform.portal.branding.model.Background;
 import org.exoplatform.portal.branding.model.Branding;
-import org.exoplatform.portal.branding.model.Favicon;
-import org.exoplatform.portal.branding.model.Logo;
+import org.exoplatform.portal.branding.model.BrandingFile;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -71,7 +69,7 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   @RolesAllowed("users")
   @Operation(summary = "Get Branding information", description = "Get Branding information", method = "GET")
   @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
   })
   public Response getBrandingInformation() {
     Branding brandingInformation = brandingService.getBrandingInformation(false);
@@ -82,7 +80,7 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   @RolesAllowed("administrators")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  @Operation(summary = "Update Branding information", description = "Update Branding information", method = "POST")
+  @Operation(summary = "Update Branding information", description = "Update Branding information", method = "PUT")
   @ApiResponses(value = {
                           @ApiResponse(responseCode = "204", description = "Branding information updated"),
   })
@@ -103,41 +101,10 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   public Response getBrandingLogo(
                                   @Context
                                   Request request,
-                                  @Parameter(description = "The value of lastModified parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'")
-                                  @QueryParam("lastModified")
-                                  String lastModified,
                                   @Parameter(description = "The value of version parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'")
                                   @QueryParam("v")
                                   String version) {
-
-    Logo logo = brandingService.getLogo();
-    if (logo == null || logo.getData() == null) {
-      throw new WebApplicationException(Response.Status.NOT_FOUND);
-    }
-
-    //
-    long lastUpdated = logo.getUpdatedDate();
-    EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
-
-    //
-    Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
-    if (builder == null) {
-      InputStream stream = new ByteArrayInputStream(logo.getData());
-      builder = Response.ok(stream, IMAGE_MIME_TYPE);
-      // If the query has a lastModified parameter, it means that the client
-      // will change the lastModified entry when it really changes
-      // Which means that we can cache the image in browser side
-      // for a long time
-      if (StringUtils.isNotBlank(lastModified) || StringUtils.isNotBlank(version)) {
-        CacheControl cc = new CacheControl();
-        cc.setMaxAge(CACHE_IN_SECONDS);
-        builder.tag(eTag);
-        builder.lastModified(new Date(lastUpdated));
-        builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
-        builder.cacheControl(cc);
-      }
-    }
-    return builder.build();
+    return getBrandingFileResponse(brandingService.getLogo(), request, version);
   }
 
   @GET
@@ -145,48 +112,16 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   @Produces(IMAGE_MIME_TYPE)
   @Operation(summary = "Get Default Page Background image", description = "Get Default Page Background image", method = "GET")
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Request fullfilled"),
-    @ApiResponse(responseCode = "404", description = "Object not found"),
+                          @ApiResponse(responseCode = "200", description = "Request fullfilled"),
+                          @ApiResponse(responseCode = "404", description = "Object not found"),
   })
   public Response getPageBackground(
                                     @Context
                                     Request request,
-                                    @Parameter(description = "The value of lastModified parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'")
-                                    @QueryParam("lastModified")
-                                    String lastModified,
                                     @Parameter(description = "The value of version parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'")
                                     @QueryParam("v")
                                     String version) {
-
-    Background background = brandingService.getPageBackground();
-    if (background == null || background.getData() == null) {
-      throw new WebApplicationException(Response.Status.NOT_FOUND);
-    }
-
-    //
-    long lastUpdated = background.getUpdatedDate();
-    EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
-
-    //
-    Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
-    if (builder == null) {
-      InputStream stream = new ByteArrayInputStream(background.getData());
-      builder = Response.ok(stream, IMAGE_MIME_TYPE);
-      // If the query has a lastModified parameter, it means that the client
-      // will change the lastModified entry when it really changes
-      // Which means that we can cache the image in browser side
-      // for a long time
-      if (StringUtils.isNotBlank(lastModified) || StringUtils.isNotBlank(version)) {
-        CacheControl cc = new CacheControl();
-        cc.setMaxAge(CACHE_IN_SECONDS);
-        cc.setPrivate(false);
-        builder.tag(eTag);
-        builder.lastModified(new Date(lastUpdated));
-        builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
-        builder.cacheControl(cc);
-      }
-    }
-    return builder.build();
+    return getBrandingFileResponse(brandingService.getPageBackground(), request, version);
   }
 
   @GET
@@ -201,38 +136,10 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   public Response getBrandingFavicon(
                                      @Context
                                      Request request,
-                                     @Parameter(description = "The value of lastModified parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'")
-                                     @QueryParam("lastModified")
-                                     String lastModified,
                                      @Parameter(description = "The value of version parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'")
                                      @QueryParam("v")
                                      String version) {
-    Favicon favicon = brandingService.getFavicon();
-    if (favicon == null || favicon.getData() == null) {
-      throw new WebApplicationException(Response.Status.NOT_FOUND);
-    }
-
-    long lastUpdated = favicon.getUpdatedDate();
-    EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
-
-    Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
-    if (builder == null) {
-      InputStream stream = new ByteArrayInputStream(favicon.getData());
-      builder = Response.ok(stream, IMAGE_MIME_TYPE);
-      // If the query has a lastModified parameter, it means that the client
-      // will change the lastModified entry when it really changes
-      // Which means that we can cache the image in browser side
-      // for a long time
-      if (StringUtils.isNotBlank(lastModified) || StringUtils.isNotBlank(version)) {
-        CacheControl cc = new CacheControl();
-        cc.setMaxAge(CACHE_IN_SECONDS);
-        builder.tag(eTag);
-        builder.lastModified(new Date(lastUpdated));
-        builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
-        builder.cacheControl(cc);
-      }
-    }
-    return builder.build();
+    return getBrandingFileResponse(brandingService.getFavicon(), request, version);
   }
 
   @GET
@@ -248,38 +155,10 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
   public Response getLoginBackground(
                                      @Context
                                      Request request,
-                                     @Parameter(description = "The value of lastModified parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'")
-                                     @QueryParam("lastModified")
-                                     String lastModified,
                                      @Parameter(description = "The value of version parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'")
                                      @QueryParam("v")
                                      String version) {
-    Background loginBackground = brandingService.getLoginBackground();
-    if (loginBackground == null || loginBackground.getData() == null) {
-      throw new WebApplicationException(Response.Status.NOT_FOUND);
-    }
-
-    long lastUpdated = loginBackground.getUpdatedDate();
-    EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
-
-    Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
-    if (builder == null) {
-      InputStream stream = new ByteArrayInputStream(loginBackground.getData());
-      builder = Response.ok(stream, IMAGE_MIME_TYPE);
-      // If the query has a lastModified parameter, it means that the client
-      // will change the lastModified entry when it really changes
-      // Which means that we can cache the image in browser side
-      // for a long time
-      if (StringUtils.isNotBlank(lastModified) || StringUtils.isNotBlank(version)) {
-        CacheControl cc = new CacheControl();
-        cc.setMaxAge(CACHE_IN_SECONDS);
-        builder.tag(eTag);
-        builder.lastModified(new Date(lastUpdated));
-        builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
-        builder.cacheControl(cc);
-      }
-    }
-    return builder.build();
+    return getBrandingFileResponse(brandingService.getLoginBackground(), request, version);
   }
 
   @GET
@@ -296,31 +175,55 @@ public class BrandingRestResourcesV1 implements ResourceContainer {
                                  @Parameter(description = "The value of lastModified parameter will determine whether the query should be cached by browser or not. If not set, no 'expires HTTP Header will be sent'")
                                  @QueryParam("v")
                                  String lastModified) {
-    //
     long lastUpdated = brandingService.getLastUpdatedTime();
     EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
-
-    //
     Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
-    if (builder == null) {
+    if (builder == null || StringUtils.isBlank(lastModified)) {
       String themeCSS = brandingService.getThemeCSSContent();
       builder = Response.ok(themeCSS, "text/css");
       builder.tag(eTag);
+      CacheControl cc = new CacheControl();
+      cc.setMaxAge(86400);
+      builder.type("text/css");
+      builder.lastModified(new Date(lastUpdated));
+      if (StringUtils.isNotBlank(lastModified)) {
+        builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
+      }
+      // If the query has a lastModified parameter, it means that the client
+      // will change the lastModified entry when it really changes
+      // Which means that we can cache the image in browser side
+      // for a long time
+      builder.cacheControl(cc);
     }
-    CacheControl cc = new CacheControl();
-    cc.setMaxAge(86400);
-    builder.type("text/css");
-    builder.tag(eTag);
-    builder.lastModified(new Date(lastUpdated));
-    if (StringUtils.isNotBlank(lastModified)) {
-      builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
+    return builder.build();
+  }
+
+  private Response getBrandingFileResponse(BrandingFile iconFile,
+                                           Request request,
+                                           String version) {
+    if (iconFile == null || iconFile.getData() == null) {
+      throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
-    // If the query has a lastModified parameter, it means that the client
-    // will change the lastModified entry when it really changes
-    // Which means that we can cache the image in browser side
-    // for a long time
-    builder.cacheControl(cc);
-    return builder.cacheControl(cc).build();
+    long lastUpdated = iconFile.getUpdatedDate();
+    EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
+    Response.ResponseBuilder builder = request.evaluatePreconditions(eTag);
+    if (builder == null || StringUtils.isBlank(version)) {
+      InputStream stream = new ByteArrayInputStream(iconFile.getData());
+      builder = Response.ok(stream, IMAGE_MIME_TYPE);
+      // If the query has a lastModified parameter, it means that the client
+      // will change the lastModified entry when it really changes
+      // Which means that we can cache the image in browser side
+      // for a long time
+      if (StringUtils.isNotBlank(version)) {
+        builder.tag(eTag);
+        builder.lastModified(new Date(lastUpdated));
+        builder.expires(new Date(System.currentTimeMillis() + CACHE_IN_MILLI_SECONDS));
+        CacheControl cc = new CacheControl();
+        cc.setMaxAge(CACHE_IN_SECONDS);
+        builder.cacheControl(cc);
+      }
+    }
+    return builder.build();
   }
 
 }

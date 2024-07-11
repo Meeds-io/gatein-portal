@@ -33,4 +33,9 @@ public class Favicon extends BrandingFile implements Cloneable {
     return new Favicon(getUploadId(), getSize(), getData(), getUpdatedDate(), getFileId());
   }
 
+  @Override
+  @SuppressWarnings("unchecked")
+  public Favicon cloneFile() {
+    return this.clone();
+  }
 }
