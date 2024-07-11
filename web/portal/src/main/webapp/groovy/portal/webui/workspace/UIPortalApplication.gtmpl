@@ -123,7 +123,6 @@
     <%/* Metadatas */%>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="theme-color" content="#476A9C"/>
     <% if (portal.viewport != null) {
     %><meta name="viewport" content = "${portal.viewport}"/>
     <% }
