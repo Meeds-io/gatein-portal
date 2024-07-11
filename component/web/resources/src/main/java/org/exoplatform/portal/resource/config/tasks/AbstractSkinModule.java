@@ -105,20 +105,4 @@ public abstract class AbstractSkinModule {
     this.cssPriority = cssPriority;
   }
 
-  @SneakyThrows
-  public void initSkinModuleCache(SkinService skinService, String fullCSSPath, SkinConfig skin) {
-    if (StringUtils.isBlank(skin.getCSSPath())) {
-      LOG.debug("Ignore caching empty CSS file for module {}", skin.getModule());
-      return;
-    }
-    ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
-    try {
-      skinService.getSkinModuleFile(fullCSSPath, skin.getFileContentHash(), Orientation.LT, !DEVELOPPING);
-    } catch (Exception e) {
-      LOG.debug("Error while initializing cache of CSS with path {}. Will reattempt in first portal request", fullCSSPath, e);
-    } finally {
-      ExoContainerContext.setCurrentContainer(null);
-    }
-  }
-
 }
