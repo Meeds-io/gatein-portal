@@ -72,8 +72,6 @@ import org.exoplatform.upload.UploadService;
 @SuppressWarnings("unchecked")
 public class BrandingServiceImpl implements BrandingService, Startable {
 
-  private static final String  BRANDING_UPDATED_EVENT            = "branding.updated";
-
   private static final Log     LOG                               = ExoLogger.getExoLogger(BrandingServiceImpl.class);
 
   public static final String   BRANDING_RESET_ATTACHMENT_ID      = "0";
