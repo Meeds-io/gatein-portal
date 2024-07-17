@@ -27,6 +27,8 @@ import org.exoplatform.portal.branding.model.Logo;
 
 public interface BrandingService {
 
+  static final String BRANDING_UPDATED_EVENT = "branding.updated";
+
   Branding getBrandingInformation();
 
   Branding getBrandingInformation(boolean retrieveBinaries);
