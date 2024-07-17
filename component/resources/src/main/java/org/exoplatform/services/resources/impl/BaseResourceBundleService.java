@@ -63,6 +63,14 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
   protected static final Log                                                  LOG         =
                                                                                   ExoLogger.getLogger("org.exoplatform.services.resources");
 
+  /**
+   * Default Crowdin language different from default platform language
+   */
+  protected static final Locale                                               DEFAULT_CROWDIN_LOCALE = Locale.ENGLISH;
+
+  protected static final String                                               DEFAULT_CROWDIN_LANGUAGE =
+                                                                                                       DEFAULT_CROWDIN_LOCALE.toLanguageTag();
+
   protected ClassLoader                                                       cl;
 
   /**
@@ -165,7 +173,7 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
     final List<String> initResources = initResources_;
     final Collection<LocaleConfig> localeConfigs = localeService_.getLocalConfigs();
     // Load resources for default local
-    loadResourcesForLocale(localeService_.getDefaultLocaleConfig().getLocale());
+    loadResourcesForLocale(DEFAULT_CROWDIN_LOCALE);
 
     PortalContainer.addInitTask(portalContainer_.getPortalContext(), new PortalContainerPostInitTask() {
       @Override
@@ -226,7 +234,7 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
   protected void initResources(String baseName, Locale locale, ClassLoader cl) {
     String name = baseName.replace('.', '/');
     try {
-      Locale defaultLocale = localeService_.getDefaultLocaleConfig().getLocale();
+      Locale defaultLocale = DEFAULT_CROWDIN_LOCALE;
       String language = locale.getLanguage();
       String country = locale.getCountry();
       String variant = locale.getVariant();
@@ -497,7 +505,7 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
     ResourceBundle get(String id) {
       ResourceBundle parent = null, result = null;
       try {
-        Locale defaultLocale = localeService_.getDefaultLocaleConfig().getLocale();
+        Locale defaultLocale = DEFAULT_CROWDIN_LOCALE;
 
         String rootId = name + "_" + defaultLocale.getLanguage();
         parent = getContent(rootId, null, defaultLocale);
@@ -556,7 +564,7 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
         loadResourcesForLocale(locale);
       }
       try {
-        String rootId = name + "_" + localeService_.getDefaultLocaleConfig().getLanguage();
+        String rootId = name + "_" + DEFAULT_CROWDIN_LANGUAGE;
         ResourceBundle parent = getResourceBundleFromDb(rootId, null, locale);
         res = getResourceBundleFromDb(id, parent, locale);
         if (res == null) {
