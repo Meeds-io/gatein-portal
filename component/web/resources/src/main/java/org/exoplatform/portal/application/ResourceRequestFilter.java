@@ -32,6 +32,7 @@ import org.gatein.portal.controller.resource.ScriptContent;
 import org.gatein.portal.controller.resource.ScriptKey;
 
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.web.AbstractFilter;
 import org.exoplatform.portal.resource.SimpleSkin;
 import org.exoplatform.portal.resource.SkinService;
@@ -72,40 +73,46 @@ public class ResourceRequestFilter extends AbstractFilter {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
     HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-    String servletPath = httpRequest.getServletPath();
-    if (servletPath.endsWith(".css")) {
-      String fileContentHash = httpRequest.getParameter(SimpleSkin.HASH_QUERY_PARAM);
-      String orientation = httpRequest.getParameter(SimpleSkin.ORIENTATION_QUERY_PARAM);
-      String compress = httpRequest.getParameter(SimpleSkin.MINIFY_QUERY_PARAM);
-      if (fileContentHash != null && orientation != null && compress != null) {
-        // CSS Module resource
-        String fileContent = getSkinModuleContent(httpRequest, fileContentHash, orientation, compress);
-        if (fileContent != null) {
-          byte[] bytes = fileContent.getBytes(StandardCharsets.UTF_8);
-          writeStaticResourceContent(httpResponse, bytes, "text/css");
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(PortalContainer.getInstance().getPortalClassLoader());
+    try {
+      String servletPath = httpRequest.getServletPath();
+      if (servletPath.endsWith(".css")) {
+        String fileContentHash = httpRequest.getParameter(SimpleSkin.HASH_QUERY_PARAM);
+        String orientation = httpRequest.getParameter(SimpleSkin.ORIENTATION_QUERY_PARAM);
+        String compress = httpRequest.getParameter(SimpleSkin.MINIFY_QUERY_PARAM);
+        if (fileContentHash != null && orientation != null && compress != null) {
+          // CSS Module resource
+          String fileContent = getSkinModuleContent(httpRequest, fileContentHash, orientation, compress);
+          if (fileContent != null) {
+            byte[] bytes = fileContent.getBytes(StandardCharsets.UTF_8);
+            writeStaticResourceContent(httpResponse, bytes, "text/css");
+            return;
+          }
+        }
+      } else if (servletPath.endsWith(".js")) {
+        String scope = httpRequest.getParameter(ScriptKey.SCOPE_QUERY_PARAM);
+        String compress = httpRequest.getParameter(ScriptKey.MINIFY_QUERY_PARAM);
+        if (scope != null && compress != null) {
+          // JS Module resource
+          ScriptContent script = getScriptContent(httpRequest, scope, compress);
+          if (script != null) {
+            byte[] bytes = script.getContentAsBytes();
+            writeStaticResourceContent(httpResponse, bytes, "text/javascript");
+            return;
+          }
+        }
+      } else if (servletPath.startsWith("/i18n/")) {
+        String lang = httpRequest.getParameter("lang");
+        String resourceBundleName = servletPath.replace("/i18n/", "");
+        String i18N = getResourceBundleContent(resourceBundleName, lang);
+        if (i18N != null) {
+          writeStaticResourceContent(httpResponse, i18N.getBytes(StandardCharsets.UTF_8), "application/json");
           return;
         }
       }
-    } else if (servletPath.endsWith(".js")) {
-      String scope = httpRequest.getParameter(ScriptKey.SCOPE_QUERY_PARAM);
-      String compress = httpRequest.getParameter(ScriptKey.MINIFY_QUERY_PARAM);
-      if (scope != null && compress != null) {
-        // JS Module resource
-        ScriptContent script = getScriptContent(httpRequest, scope, compress);
-        if (script != null) {
-          byte[] bytes = script.getContentAsBytes();
-          writeStaticResourceContent(httpResponse, bytes, "text/javascript");
-          return;
-        }
-      }
-    } else if (servletPath.startsWith("/i18n/")) {
-      String lang = httpRequest.getParameter("lang");
-      String resourceBundleName = servletPath.replace("/i18n/", "");
-      String i18N = getResourceBundleContent(resourceBundleName, lang);
-      if (i18N != null) {
-        writeStaticResourceContent(httpResponse, i18N.getBytes(StandardCharsets.UTF_8), "application/json");
-        return;
-      }
+    } finally {
+      Thread.currentThread().setContextClassLoader(contextClassLoader);
     }
     // All other static resources caching basic HTTP Headers
     httpResponse.setHeader(CACHE_CONTROL_HEADER_NAME, CACHE_CONTROL_HEADER_VALUE);
