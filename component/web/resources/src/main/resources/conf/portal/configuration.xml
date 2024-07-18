@@ -28,4 +28,15 @@
     <name>ResourceInitContainerLifecyclePlugin</name>
     <type>org.exoplatform.portal.application.ResourceInitContainerLifecyclePlugin</type>
   </container-lifecycle-plugin>
+
+  <component>
+    <key>AssetsVersion</key>
+    <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
+    <init-params>
+      <properties-param>
+        <name>AssetsVersion</name>
+        <property name="gatein.assets.version" value="${gatein.assets.version:@project.version@-@buildTimestamp@}"/>
+      </properties-param>
+    </init-params>
+  </component>
 </configuration>

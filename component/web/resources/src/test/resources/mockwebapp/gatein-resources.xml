@@ -26,7 +26,14 @@
   <portal-skin>
     <skin-name>TestSkin</skin-name>
     <css-path>/skin/core/Stylesheet.css</css-path>
-    <css-priority>0</css-priority>
+    <css-priority>-1</css-priority>
+  </portal-skin>
+
+  <portal-skin>
+    <skin-name>OtherSkin</skin-name>
+    <skin-module>customModuleOtherSkin</skin-module>
+    <css-path>/skin/core/Stylesheet.css</css-path>
+    <css-priority>-1</css-priority>
   </portal-skin>
 
   <portal-skin>
@@ -46,7 +53,7 @@
     <skin-name>TestSkin</skin-name>
     <skin-module>Module3</skin-module>
     <css-path>/skin/module3/Stylesheet.css</css-path>
-    <css-priority>1</css-priority>
+    <css-priority>2</css-priority>
   </portal-skin>
 
   <portal-skin>
