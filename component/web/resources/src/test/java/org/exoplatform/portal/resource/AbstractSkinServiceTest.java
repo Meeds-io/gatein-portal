@@ -18,23 +18,6 @@
  */
 package org.exoplatform.portal.resource;
 
-import org.exoplatform.commons.utils.PropertyManager;
-import org.exoplatform.commons.xml.DocumentSource;
-import org.exoplatform.component.test.AbstractKernelTest;
-import org.exoplatform.component.test.ConfigurationUnit;
-import org.exoplatform.component.test.ConfiguredBy;
-import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.component.test.web.ServletContextImpl;
-import org.exoplatform.component.test.web.WebAppImpl;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.portal.resource.config.tasks.PortalSkinTask;
-import org.exoplatform.portal.resource.config.xml.SkinConfigParser;
-import org.exoplatform.services.resources.Orientation;
-import org.exoplatform.test.mocks.servlet.MockServletRequest;
-import org.exoplatform.web.ControllerContext;
-import org.exoplatform.web.controller.QualifiedName;
-import org.exoplatform.web.controller.router.Router;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -47,15 +30,40 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
+
+import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.commons.xml.DocumentSource;
+import org.exoplatform.component.test.AbstractKernelTest;
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
+import org.exoplatform.component.test.web.ServletContextImpl;
+import org.exoplatform.component.test.web.WebAppImpl;
+import org.exoplatform.portal.resource.config.xml.SkinConfigParser;
+import org.exoplatform.test.mocks.servlet.MockServletRequest;
+import org.exoplatform.web.ControllerContext;
+import org.exoplatform.web.controller.QualifiedName;
+import org.exoplatform.web.controller.router.Router;
+
 import jakarta.servlet.ServletContext;
 
 @ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-configuration.xml") })
-public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
-  private static final String           DEFAULT_MODULE_NAME = "Core";
+public abstract class AbstractSkinServiceTest extends AbstractKernelTest { // NOSONAR
 
-  // The value must be the same with the version property in
-  // META-INF/maven/org.exoplatform.gatein.portal/exo.portal.component.web.resources/pom.properties
-  protected static final String         ASSETS_VERSION = "PORTAL-VERSION";
+  private static final String MODULE1 = "Module1";
+
+  private static final String MODULE3 = "Module3";
+
+  private static final String MODULE2 = "Module2";
+
+  private static final String MODULE1_CSS_PATH = "/skin/module1/Stylesheet.css"; // NOSONAR
+
+  private static final String MODULE3_CSS_PATH = "/skin/module3/Stylesheet.css"; // NOSONAR
+
+  private static final String MODULE2_CSS_PATH = "/skin/module2/Stylesheet.css"; // NOSONAR
+
+  private static final String TEST_SKIN = "TestSkin";
 
   protected SkinService                 skinService;
 
@@ -78,11 +86,9 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
   @Override
   protected void setUp() throws Exception {
     // Set running mode at starting up
-    PropertyManager.setProperty(PropertyManager.DEVELOPING, String.valueOf(isDevelopingMode()));
-
-    PortalContainer portalContainer = getContainer();
-
-    skinService = (SkinService) portalContainer.getComponentInstanceOfType(SkinService.class);
+    skinService = getContainer().getComponentInstanceOfType(SkinService.class);
+    skinService.setDeveloping(isDevelopingMode());
+    SimpleSkin.setDeveloping(isDevelopingMode());
 
     controllerCtx = getControllerContext();
 
@@ -104,6 +110,7 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
     }
   }
 
+  @Override
   protected void tearDown() throws Exception {
     resResolver.reset();
     for (SkinKey key : skinsToDelete) {
@@ -115,37 +122,37 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
   }
 
   public void testInitializing() throws Exception {
-    assertEquals(1, skinService.getAvailableSkinNames().size());
-    assertTrue(skinService.getAvailableSkinNames().contains("TestSkin"));
+    assertEquals(2, skinService.getAvailableSkinNames().size());
+    assertTrue(skinService.getAvailableSkinNames().contains(TEST_SKIN));
     assertTrue(skinService.mainResolver.resolvers.contains(resResolver));
   }
 
   public void testPortalSkin() {
     String contextPath = mockServletContext.getContextPath();
 
-    SkinConfig portalSkin = skinService.getPortalSkin(DEFAULT_MODULE_NAME, "TestSkin");
+    SkinConfig portalSkin = skinService.getPortalSkin(MODULE1, TEST_SKIN);
     assertNotNull(portalSkin);
-    assertEquals(DEFAULT_MODULE_NAME, portalSkin.getModule());
-    assertEquals(contextPath + "/skin/core/Stylesheet.css", portalSkin.getCSSPath());
+    assertEquals(MODULE1, portalSkin.getModule());
+    assertEquals(contextPath + MODULE1_CSS_PATH, portalSkin.getCSSPath());
 
-    portalSkin = skinService.getPortalSkin("Module2", "TestSkin");
+    portalSkin = skinService.getPortalSkin(MODULE2, TEST_SKIN);
     assertNotNull(portalSkin);
-    assertEquals("Module2", portalSkin.getModule());
-    assertEquals(contextPath + "/skin/module2/Stylesheet.css", portalSkin.getCSSPath());
+    assertEquals(MODULE2, portalSkin.getModule());
+    assertEquals(contextPath + MODULE2_CSS_PATH, portalSkin.getCSSPath());
 
-    portalSkin = skinService.getPortalSkin("Module3", "TestSkin");
+    portalSkin = skinService.getPortalSkin(MODULE3, TEST_SKIN);
     assertNotNull(portalSkin);
-    assertEquals("Module3", portalSkin.getModule());
-    assertEquals(contextPath + "/skin/module3/Stylesheet.css", portalSkin.getCSSPath());
+    assertEquals(MODULE3, portalSkin.getModule());
+    assertEquals(contextPath + MODULE3_CSS_PATH, portalSkin.getCSSPath());
 
-    portalSkin = skinService.getPortalSkin("Module1", "TestSkin");
+    portalSkin = skinService.getPortalSkin(MODULE1, TEST_SKIN);
     assertNotNull(portalSkin);
-    assertEquals("Module1", portalSkin.getModule());
-    assertEquals(contextPath + "/skin/module1/Stylesheet.css", portalSkin.getCSSPath());
+    assertEquals(MODULE1, portalSkin.getModule());
+    assertEquals(contextPath + MODULE1_CSS_PATH, portalSkin.getCSSPath());
   }
 
   public void testRemovePortalSkin() {
-    String skinName = "TestSkin";
+    String skinName = TEST_SKIN;
     String module = "ToDeletePortalSkin";
     String cssPath = mockServletContext.getContextPath() + "/skin/core/Stylesheet.css";
 
@@ -164,33 +171,28 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
   }
 
   public void testPortalSkinAndPriority() {
-    Collection<SkinConfig> portalSkinConfigs = skinService.getPortalSkins("TestSkin");
+    Collection<SkinConfig> portalSkinConfigs = skinService.getPortalSkins(TEST_SKIN);
     String contextPath = mockServletContext.getContextPath();
     assertNotNull(portalSkinConfigs);
-    assertEquals(4, portalSkinConfigs.size());
+    assertEquals(3, portalSkinConfigs.size());
 
     SkinConfig[] array = new SkinConfig[4];
     portalSkinConfigs.toArray(array);
 
     SkinConfig portalSkin = array[0];
     assertNotNull(portalSkin);
-    assertEquals(DEFAULT_MODULE_NAME, portalSkin.getModule());
-    assertEquals(contextPath + "/skin/core/Stylesheet.css", portalSkin.getCSSPath());
+    assertEquals(MODULE2, portalSkin.getModule());
+    assertEquals(contextPath + MODULE2_CSS_PATH, portalSkin.getCSSPath());
 
     portalSkin = array[1];
     assertNotNull(portalSkin);
-    assertEquals("Module2", portalSkin.getModule());
-    assertEquals(contextPath + "/skin/module2/Stylesheet.css", portalSkin.getCSSPath());
+    assertEquals(MODULE3, portalSkin.getModule());
+    assertEquals(contextPath + MODULE3_CSS_PATH, portalSkin.getCSSPath());
 
     portalSkin = array[2];
     assertNotNull(portalSkin);
-    assertEquals("Module3", portalSkin.getModule());
-    assertEquals(contextPath + "/skin/module3/Stylesheet.css", portalSkin.getCSSPath());
-
-    portalSkin = array[3];
-    assertNotNull(portalSkin);
-    assertEquals("Module1", portalSkin.getModule());
-    assertEquals(contextPath + "/skin/module1/Stylesheet.css", portalSkin.getCSSPath());
+    assertEquals(MODULE1, portalSkin.getModule());
+    assertEquals(contextPath + MODULE1_CSS_PATH, portalSkin.getCSSPath());
   }
 
   public void testPortalSkinVisitor() {
@@ -201,25 +203,40 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
                                              Set<Entry<SkinKey, SkinConfig>> skinConfigs) {
         Collection<SkinConfig> list = new HashSet<>();
         for (Entry<SkinKey, SkinConfig> entry : portalSkins) {
-          if (entry.getKey().getModule().equals(DEFAULT_MODULE_NAME)) {
+          if (entry.getKey().getModule().equals("Core")) {
             list.add(entry.getValue());
           }
         }
         return list;
       }
     });
+    assertNotNull(portalSkinConfigs);
+    assertEquals(0, portalSkinConfigs.size());
 
+    portalSkinConfigs = skinService.findSkins(new SkinVisitor() {
+      @Override
+      public Collection<SkinConfig> getSkins(Set<Entry<SkinKey, SkinConfig>> portalSkins,
+                                             Set<Entry<SkinKey, SkinConfig>> skinConfigs) {
+        Collection<SkinConfig> list = new HashSet<>();
+        for (Entry<SkinKey, SkinConfig> entry : portalSkins) {
+          if (entry.getKey().getModule().equals(MODULE1)) {
+            list.add(entry.getValue());
+          }
+        }
+        return list;
+      }
+    });
     assertNotNull(portalSkinConfigs);
     assertEquals(1, portalSkinConfigs.size());
     SkinConfig[] arr = portalSkinConfigs.toArray(new SkinConfig[1]);
     SkinConfig portalSkin = arr[0];
     assertNotNull(portalSkin);
-    assertEquals(DEFAULT_MODULE_NAME, portalSkin.getModule());
-    assertEquals(contextPath + "/skin/core/Stylesheet.css", portalSkin.getCSSPath());
+    assertEquals(MODULE1, portalSkin.getModule());
+    assertEquals(contextPath + MODULE1_CSS_PATH, portalSkin.getCSSPath());
   }
 
   public void testPortletSkin() {
-    SkinConfig portletSkin = skinService.getSkin("mockwebapp/FirstPortlet", "TestSkin");
+    SkinConfig portletSkin = skinService.getSkin("mockwebapp/FirstPortlet", TEST_SKIN);
     String contextPath = mockServletContext.getContextPath();
     assertNotNull(portletSkin);
     assertNotNull(portletSkin.getAdditionalModules());
@@ -227,9 +244,9 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
     assertEquals("AdditionalModule", portletSkin.getAdditionalModules().get(0));
     assertEquals(contextPath + "/skin/FirstPortlet.css", portletSkin.getCSSPath());
 
-    portletSkin = skinService.getSkin("mockwebapp/SecondPortlet", "TestSkin");
+    portletSkin = skinService.getSkin("mockwebapp/SecondPortlet", TEST_SKIN);
     assertNotNull(portletSkin);
-    assertNull(portletSkin.getAdditionalModules());
+    assertTrue(CollectionUtils.isEmpty(portletSkin.getAdditionalModules()));
     assertEquals(contextPath + "/skin/SecondPortlet.css", portletSkin.getCSSPath());
   }
 
@@ -292,7 +309,7 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest {
   public static ControllerContext newControllerContext(Router router, String requestURI) {
     try {
       MockServletRequest request = new MockServletRequest(null,
-                                                          new URL("http://localhost" + requestURI),
+                                                          new URL("http://localhost/portal" + requestURI),
                                                           "/portal",
                                                           null,
                                                           false);

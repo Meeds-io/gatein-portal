@@ -45,8 +45,6 @@ import lombok.Setter;
 @Data
 public class SimpleSkin implements SkinConfig {
 
-  private static final boolean DEVELOPPING             = PropertyManager.isDevelopping();
-
   public static final String   ORIENTATION_QUERY_PARAM = "orientation";
 
   public static final String   MINIFY_QUERY_PARAM      = "minify";
@@ -54,6 +52,9 @@ public class SimpleSkin implements SkinConfig {
   public static final String   HASH_QUERY_PARAM        = "hash";
 
   private static final Log     LOG                     = ExoLogger.getLogger(SimpleSkin.class);
+
+  @Setter
+  private static boolean       developing              = PropertyManager.isDevelopping();
 
   private String               module;
 
@@ -119,8 +120,13 @@ public class SimpleSkin implements SkinConfig {
   }
 
   @Override
+  public int getCSSPriority() {
+    return getPriority();
+  }
+
+  @Override
   public int getFileContentHash() {
-    if (DEVELOPPING) {
+    if (developing) {
       return 0;
     } else if (fileContentHash == 0) {
       String absolutePath = ("/" + cssPath).replace("//", "/"); // NOSONAR
@@ -156,7 +162,7 @@ public class SimpleSkin implements SkinConfig {
           return urls.computeIfAbsent(Objects.hash(cssOrientation), k -> {
             String absolutePath = ("/" + cssPath).replace("//", "/"); // NOSONAR
             return absolutePath + "?" + ORIENTATION_QUERY_PARAM + "=" + cssOrientation.name() + "&" +
-                MINIFY_QUERY_PARAM + "=" + !DEVELOPPING + "&" + HASH_QUERY_PARAM + "=" + getFileContentHash();
+                MINIFY_QUERY_PARAM + "=" + !developing + "&" + HASH_QUERY_PARAM + "=" + getFileContentHash();
           });
         }
       };

@@ -22,6 +22,7 @@ package org.gatein.portal.controller.resource.script;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.web.WebAppController;
@@ -79,8 +80,8 @@ public class BaseScriptResource<R extends Resource<R>> extends Resource<R> {
         this.parameters = parameters;
         this.minParameters = minifiedParameters;
         this.graph = graph;
-        this.parametersMap = new HashMap<>();
-        this.minParametersMap = new HashMap<>();
+        this.parametersMap = new ConcurrentHashMap<>();
+        this.minParametersMap = new ConcurrentHashMap<>();
     }
 
     public Map<QualifiedName, String> getParameters(boolean minified, Locale locale) {
