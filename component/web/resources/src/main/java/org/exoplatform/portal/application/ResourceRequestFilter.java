@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.Random;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +32,7 @@ import org.gatein.portal.controller.resource.ResourceScope;
 import org.gatein.portal.controller.resource.ScriptContent;
 import org.gatein.portal.controller.resource.ScriptKey;
 
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.web.AbstractFilter;
@@ -43,31 +45,56 @@ import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.web.application.javascript.JavascriptConfigService;
 
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@SuppressWarnings("deprecation")
 public class ResourceRequestFilter extends AbstractFilter {
 
-  private static final String     CACHE_CONTROL_HEADER_NAME  = "Cache-Control";
+  private static final Log        LOG                       = ExoLogger.getLogger(ResourceRequestFilter.class);
 
-  private static final String     CACHE_CONTROL_HEADER_VALUE = "public, " + ResourceRequestHandler.MAX_AGE;
+  private static final String     CACHE_CONTROL_HEADER_NAME = "Cache-Control";
 
-  protected static Log            log                        = ExoLogger.getLogger(ResourceRequestFilter.class);
+  public static final String      IF_MODIFIED_SINCE         = "If-Modified-Since";
 
-  public static final String      IF_MODIFIED_SINCE          = "If-Modified-Since";
+  public static final String      LAST_MODIFIED             = "Last-Modified";
 
-  public static final String      LAST_MODIFIED              = "Last-Modified";
+  public static final String      EXPIRES                   = "Expires";
 
-  public static final String      EXPIRES                    = "Expires";
+  public static final long        DEFAULT_MAX_AGE           = 31536000l;
+
+  /**
+   * can't be final, the RootContainer sometimes is built after init
+   */
+  public static long              maxAge                    = getMaxAge();                                     // NOSONAR
+
+  /**
+   * can't be final, the RootContainer sometimes is built after init
+   */
+  public static String            version                   = getVersion();                                    // NOSONAR
 
   private JavascriptConfigService javascriptService;
 
   private SkinService             skinService;
 
   private ResourceBundleService   resourceBundleService;
+
+  @Override
+  protected void afterInit(FilterConfig config) throws ServletException {
+    super.afterInit(config);
+    if (StringUtils.isBlank(version)) {
+      version = getVersion(); // NOSONAR can't be final, the RootContainer
+      // sometimes is built after init
+      maxAge = getMaxAge(); // NOSONAR can't be final, the RootContainer sometimes
+      // is built after init
+      ResourceRequestHandler.MAX_AGE = maxAge; // NOSONAR
+      ResourceRequestHandler.VERSION = version; // NOSONAR
+    }
+  }
 
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
@@ -87,7 +114,7 @@ public class ResourceRequestFilter extends AbstractFilter {
           if (fileContent != null) {
             byte[] bytes = fileContent.getBytes(StandardCharsets.UTF_8);
             writeStaticResourceContent(httpResponse, bytes, "text/css");
-            return;
+            return; // NOSONAR not redundant jump
           }
         }
       } else if (servletPath.endsWith(".js")) {
@@ -99,7 +126,7 @@ public class ResourceRequestFilter extends AbstractFilter {
           if (script != null) {
             byte[] bytes = script.getContentAsBytes();
             writeStaticResourceContent(httpResponse, bytes, "text/javascript");
-            return;
+            return; // NOSONAR not redundant jump
           }
         }
       } else if (servletPath.startsWith("/i18n/")) {
@@ -108,27 +135,27 @@ public class ResourceRequestFilter extends AbstractFilter {
         String i18N = getResourceBundleContent(resourceBundleName, lang);
         if (i18N != null) {
           writeStaticResourceContent(httpResponse, i18N.getBytes(StandardCharsets.UTF_8), "application/json");
-          return;
+          return; // NOSONAR not redundant jump
         }
       }
     } finally {
       Thread.currentThread().setContextClassLoader(contextClassLoader);
     }
     // All other static resources caching basic HTTP Headers
-    httpResponse.setHeader(CACHE_CONTROL_HEADER_NAME, CACHE_CONTROL_HEADER_VALUE);
+    httpResponse.setHeader(CACHE_CONTROL_HEADER_NAME, "public, " + maxAge);
     httpResponse.setDateHeader(ResourceRequestFilter.LAST_MODIFIED, System.currentTimeMillis());
     httpResponse.setDateHeader(ResourceRequestFilter.EXPIRES,
-                               System.currentTimeMillis() + ResourceRequestHandler.MAX_AGE * 1000);
+                               System.currentTimeMillis() + maxAge * 1000);
     chain.doFilter(request, response);
   }
 
   private void writeStaticResourceContent(HttpServletResponse httpResponse, byte[] bytes, String mimeType) throws IOException {
     httpResponse.setContentType(mimeType);
     httpResponse.setContentLength(bytes.length);
-    httpResponse.setHeader(CACHE_CONTROL_HEADER_NAME, CACHE_CONTROL_HEADER_VALUE);
+    httpResponse.setHeader(CACHE_CONTROL_HEADER_NAME, "public, " + maxAge);
     httpResponse.setDateHeader(ResourceRequestFilter.LAST_MODIFIED, System.currentTimeMillis());
     httpResponse.setDateHeader(ResourceRequestFilter.EXPIRES,
-                               System.currentTimeMillis() + ResourceRequestHandler.MAX_AGE * 1000);
+                               System.currentTimeMillis() + maxAge * 1000);
     PrintWriter writer = httpResponse.getWriter();
     IOUtils.write(bytes, writer, StandardCharsets.UTF_8);
     writer.close();
@@ -179,4 +206,25 @@ public class ResourceRequestFilter extends AbstractFilter {
     }
     return resourceBundleService;
   }
+
+  private static String getVersion() {
+    String version = PropertyManager.getProperty("gatein.assets.version");
+    if (StringUtils.isNotBlank(version)) {
+      if (StringUtils.contains(version, "SNAPSHOT") || PropertyManager.isDevelopping()) {
+        version += "-" + new Random().nextLong(); // NOSONAR
+      }
+      LOG.info("Use version \"{}\" for resource serving", version);
+    }
+    return version;
+  }
+
+  private static long getMaxAge() {
+    String maxAge = PropertyManager.getProperty("gatein.assets.script.max-age");
+    if (StringUtils.isBlank(maxAge)) {
+      maxAge = String.valueOf(DEFAULT_MAX_AGE);
+    }
+    LOG.info("Use maxAge \"{}\" seconds for resource serving", maxAge);
+    return Long.parseLong(maxAge);
+  }
+
 }

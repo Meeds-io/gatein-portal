@@ -76,6 +76,7 @@ import org.exoplatform.web.ControllerContext;
 
 import jakarta.servlet.ServletContext;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 
 @Managed
@@ -114,7 +115,7 @@ public class SkinService extends AbstractResourceService implements Startable {
 
   public static final String                                     CUSTOM_MODULE_ID        = "customModule";
 
-  private static final boolean                                   DEVELOPPING             = PropertyManager.isDevelopping();
+  public static final long                                       MAX_AGE;
 
   /** The deployer. */
   private final WebAppListener                                   deployer;
@@ -160,7 +161,8 @@ public class SkinService extends AbstractResourceService implements Startable {
   final String                                                   id                      =
                                                                     Long.toString(System.currentTimeMillis());
 
-  public static final long                                       MAX_AGE;
+  @Setter
+  private boolean                                                developing;
 
   static {
     long seconds = 31536000L;
@@ -229,12 +231,11 @@ public class SkinService extends AbstractResourceService implements Startable {
         defaultSkin = defaultSkinValueParam.getValue();
       }
     }
-
-    addResourceResolver(new CompositeResourceResolver(portalContainerName, skinConfigs));
   }
 
   @Override
   public void start() {
+    developing = PropertyManager.isDevelopping();
     ServletContainerFactory.getServletContainer().addWebAppListener(deployer);
   }
 
@@ -304,17 +305,6 @@ public class SkinService extends AbstractResourceService implements Startable {
     rtCache.remove(path);
   }
 
-  public void addSkinConfig(SkinConfigPlugin skinConfigPlugin) {
-    if (!skinConfigPlugin.getAvailableSkins().isEmpty()) {
-      for (String newSkin : skinConfigPlugin.getAvailableSkins()) {
-        availableSkins.add(newSkin);
-      }
-    }
-    if (StringUtils.isNotBlank(skinConfigPlugin.getDefaultSkin())) {
-      defaultSkin = skinConfigPlugin.getDefaultSkin();
-    }
-  }
-
   /**
    * @param fileWebAppPath File Path including webapp context name
    * @param fileContentHash File Content Hash
@@ -327,7 +317,7 @@ public class SkinService extends AbstractResourceService implements Startable {
                                      int fileContentHash,
                                      Orientation orientation,
                                      boolean compress) throws IOException {
-    if (DEVELOPPING) {
+    if (developing) {
       return getSkinModuleFileContent(fileWebAppPath, orientation, compress);
     } else {
       File cssFile = files.computeIfAbsent(Objects.hash(fileContentHash, orientation, compress),
@@ -544,20 +534,6 @@ public class SkinService extends AbstractResourceService implements Startable {
   }
 
   /**
-   * Merge several skins into one single skin.
-   *
-   * @param skins the skins to merge
-   * @return the merged skin
-   */
-  public Skin merge(Collection<SkinConfig> skins) {
-    return merge(skins, null);
-  }
-
-  public Skin merge(Collection<SkinConfig> skins, String id) {
-    return new CompositeSkin(this, skins, id);
-  }
-
-  /**
    * Registry theme category with its themes for portlet Theme
    *
    * @param categoryName category name that will be registried
@@ -742,7 +718,9 @@ public class SkinService extends AbstractResourceService implements Startable {
    * if cached css can not be found
    *
    * @param context
+   * @deprecated CSS Caching is using files mechanism instead of InMemory cache
    */
+  @Deprecated
   public long getLastModified(ControllerContext context) {
     String resource = "/" + context.getParameter(ResourceRequestHandler.RESOURCE_QN) + ".css";
 
@@ -753,23 +731,6 @@ public class SkinService extends AbstractResourceService implements Startable {
     } else {
       return cachedCSS.getLastModified();
     }
-  }
-
-  /**
-   * Remove a Skin from the service as well as its cache
-   *
-   * @param module
-   * @param skinName
-   */
-  public void removeSkin(String module, String skinName) {
-    SkinKey key;
-    if (skinName == null || skinName.length() == 0) {
-      key = new SkinKey(module, getDefaultSkin());
-    } else {
-      key = new SkinKey(module, skinName);
-    }
-
-    removeSkin(key);
   }
 
   /**
@@ -1039,7 +1000,7 @@ public class SkinService extends AbstractResourceService implements Startable {
     try {
       fullCSSPath = skin.createURL().toString();
       fullCSSPath = fullCSSPath.substring(0, fullCSSPath.indexOf("?"));
-      getSkinModuleContent(fullCSSPath, skin.getFileContentHash(), Orientation.LT, !DEVELOPPING);
+      getSkinModuleContent(fullCSSPath, skin.getFileContentHash(), Orientation.LT, !developing);
     } catch (Exception e) {
       LOG.warn("Error while initializing cache of CSS with path {}", fullCSSPath, e);
     } finally {
