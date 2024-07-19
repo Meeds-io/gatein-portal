@@ -58,6 +58,7 @@
         <value>bundles.portal.test</value>
         <value>bundles.portal.base</value>
         <value>bundles.portal.no-base</value>
+        <value>bundles.portal.shared</value>
       </values-param>
 
       <values-param>
@@ -68,6 +69,7 @@
         <value>bundles.portal.test</value>
         <value>bundles.portal.base</value>
         <value>bundles.portal.no-base</value>
+        <value>bundles.portal.shared</value>
       </values-param>
     </init-params>
   </component>
