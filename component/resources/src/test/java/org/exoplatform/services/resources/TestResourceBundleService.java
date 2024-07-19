@@ -76,6 +76,18 @@ public class TestResourceBundleService extends AbstractKernelTest {
         assertEquals("base_vi.xml", res.getString("base_vi"));
     }
     
+    public void testGetSharedString() {
+      assertEquals("Test EN 1", service_.getSharedString("test1", Locale.ENGLISH));
+      assertEquals("Test FR 1", service_.getSharedString("test1", Locale.FRENCH));
+      assertEquals("Test EN 2", service_.getSharedString("test2", Locale.ENGLISH));
+      assertEquals("Test EN 2", service_.getSharedString("test2", Locale.FRENCH));
+    }
+
+    public void testGetResourceBundleContent() {
+      assertEquals("{\"test2\":\"Test EN 2\",\"test1\":\"Test EN 1\"}", service_.getResourceBundleContent("bundles.portal.shared", Locale.ENGLISH));
+      assertEquals("{\"test2\":\"Test EN 2\",\"test1\":\"Test FR 1\"}", service_.getResourceBundleContent("bundles.portal.shared", Locale.FRENCH));
+    }
+
     public void testCachingPortletBundle() {
         String oldValue = PropertyManager.getProperty(PropertyManager.DEVELOPING);
         try {

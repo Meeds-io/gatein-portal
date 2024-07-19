@@ -30,8 +30,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import jakarta.servlet.ServletContext;
+import org.picocontainer.Startable;
+
 import org.exoplatform.commons.cache.future.FutureCache;
 import org.exoplatform.commons.cache.future.FutureExoCache;
 import org.exoplatform.commons.cache.future.Loader;
@@ -53,7 +57,8 @@ import org.exoplatform.services.resources.PropertiesClassLoader;
 import org.exoplatform.services.resources.Query;
 import org.exoplatform.services.resources.ResourceBundleData;
 import org.exoplatform.services.resources.ResourceBundleService;
-import org.picocontainer.Startable;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * Created by The eXo Platform SAS Mar 9, 2007
@@ -62,14 +67,6 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
 
   protected static final Log                                                  LOG         =
                                                                                   ExoLogger.getLogger("org.exoplatform.services.resources");
-
-  /**
-   * Default Crowdin language different from default platform language
-   */
-  protected static final Locale                                               DEFAULT_CROWDIN_LOCALE = Locale.ENGLISH;
-
-  protected static final String                                               DEFAULT_CROWDIN_LANGUAGE =
-                                                                                                       DEFAULT_CROWDIN_LOCALE.toLanguageTag();
 
   protected ClassLoader                                                       cl;
 
@@ -196,12 +193,6 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
     });
   }
 
-  /**
-   * @see org.picocontainer.Startable#stop()
-   */
-  public void stop() {
-  }
-
   public ResourceBundle getResourceBundle(String[] name, Locale locale) {
     ClassLoader cl = Thread.currentThread().getContextClassLoader();
     return getResourceBundle(name, locale, cl);
@@ -214,6 +205,27 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
 
   public String[] getSharedResourceBundleNames() {
     return portalResourceBundleNames_;
+  }
+
+  @Override
+  public String getSharedString(String key, Locale locale) {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(portalContainer_.getPortalClassLoader());
+    try {
+      String[] sharedResourceBundleNames = getSharedResourceBundleNames();
+      ResourceBundle resourceBundle = getResourceBundle(sharedResourceBundleNames, locale);
+      if (resourceBundle.containsKey(key)) {
+        return resourceBundle.getString(key);
+      } else if (!DEFAULT_CROWDIN_LOCALE.equals(locale)) {
+        resourceBundle = getResourceBundle(sharedResourceBundleNames, DEFAULT_CROWDIN_LOCALE);
+        if (resourceBundle.containsKey(key)) {
+          return resourceBundle.getString(key);
+        }
+      }
+      return null;
+    } finally {
+      Thread.currentThread().setContextClassLoader(contextClassLoader);
+    }
   }
 
   public ResourceBundleData createResourceBundleDataInstance() {
@@ -438,16 +450,13 @@ public abstract class BaseResourceBundleService implements ResourceBundleService
     }
   }
 
-  public ResourceBundle getResourceBundle(String[] name, Locale locale, ClassLoader cl) {
+  public ResourceBundle getResourceBundle(String[] names, Locale locale, ClassLoader cl) {
     if (IdentityResourceBundle.MAGIC_LANGUAGE.equals(locale.getLanguage())) {
       return IdentityResourceBundle.getInstance();
     }
-    StringBuilder idBuf = new StringBuilder("merge:");
-    for (String n : name)
-      idBuf.append(n).append("_");
-    idBuf.append(locale);
-    String id = idBuf.toString();
-    return getFutureCache().get(new GetResourceBundleContext(name, locale, cl), id);
+    List<String> bundleNames = Stream.of(names).distinct().toList();
+    String id = "merge:" + bundleNames.hashCode() + locale.toLanguageTag().hashCode() + cl.hashCode();
+    return getFutureCache().get(new GetResourceBundleContext(bundleNames.toArray(String[]::new), locale, cl), id);
   }
 
   protected FutureCache<String, ResourceBundle, ResourceBundleContext> getFutureCache() {
