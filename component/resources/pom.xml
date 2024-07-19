@@ -29,8 +29,7 @@
   <name>Meeds Portal Component Resources</name>
   <description>Internationalization and localization resources</description>
   <properties>
-<!--   TODO  <exo.test.coverage.ratio>0.64</exo.test.coverage.ratio> -->
-    <exo.test.coverage.ratio>0.60</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.70</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
