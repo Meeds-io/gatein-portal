@@ -140,7 +140,12 @@
     <key>org.exoplatform.services.organization.search.UserSearchService</key>
     <type>org.exoplatform.services.organization.search.UserSearchServiceImpl</type>
   </component>
-  
+
+  <component>
+    <key>io.meeds.portal.permlink.service.PermanentLinkService</key>
+    <type>io.meeds.portal.permlink.service.PermanentLinkServiceImpl</type>
+  </component>
+
   <component>
     <key>org.exoplatform.web.login.recovery.PasswordRecoveryService</key>
     <type>org.exoplatform.mock.MockPasswordRecoveryService</type>
