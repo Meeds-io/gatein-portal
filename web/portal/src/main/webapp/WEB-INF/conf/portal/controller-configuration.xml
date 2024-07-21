@@ -26,6 +26,11 @@
     xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
+    <key>io.meeds.portal.permlink.service.PermanentLinkService</key>
+    <type>io.meeds.portal.permlink.service.PermanentLinkServiceImpl</type>
+  </component>
+
+  <component>
     <type>org.exoplatform.web.WebAppController</type>
     <init-params>
       <value-param>
@@ -170,6 +175,11 @@
       <name>StaticResourceRequestHandler</name>
       <set-method>register</set-method>
       <type>org.exoplatform.portal.application.StaticResourceRequestHandler</type>
+    </component-plugin>
+    <component-plugin>
+      <name>PermanentLinkRequestHandler</name>
+      <set-method>register</set-method>
+      <type>io.meeds.portal.permlink.web.PermanentLinkRequestHandler</type>
     </component-plugin>
   </external-component-plugins>
 
