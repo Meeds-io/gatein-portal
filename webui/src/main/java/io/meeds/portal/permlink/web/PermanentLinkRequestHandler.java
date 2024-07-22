@@ -65,8 +65,10 @@ public class PermanentLinkRequestHandler extends WebRequestHandler {
     try {
       String directAccessUrl = getPermanentLinkService().getDirectAccessUrl(requestPath, currentIdentity);
       HttpServletResponse res = context.getResponse();
-      res.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-      res.setHeader("Location", directAccessUrl);
+      // Use HTTP 302 response instead of 301 to not
+      // allow to cache the redirect directive in routers
+      // and user browsers to secure effective URL
+      res.sendRedirect(directAccessUrl);
     } catch (IllegalAccessException e) {
       if (currentIdentity == null || StringUtils.equals(IdentityConstants.ANONIM, currentIdentity.getUserId())) {
         String loginPath = getAuthenticationUrl(context.getRequest().getRequestURI());
