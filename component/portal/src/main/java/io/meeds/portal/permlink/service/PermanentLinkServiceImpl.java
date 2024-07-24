@@ -42,6 +42,8 @@ import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer.PortalContainerPostCreateTask;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.Identity;
 
 import io.meeds.portal.permlink.model.PermanentLinkObject;
@@ -52,6 +54,9 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 
 public class PermanentLinkServiceImpl implements PermanentLinkService, Startable {
+
+  private static final Log                 LOG                      =
+                                               ExoLogger.getLogger(PermanentLinkServiceImpl.class);
 
   public static final Context              PERMANEN_LINK_CONTEXT    = Context.GLOBAL.id("PermanentLink");
 
@@ -207,10 +212,21 @@ public class PermanentLinkServiceImpl implements PermanentLinkService, Startable
 
   private String getAndSetId(String permanentLink) {
     String permanentLinkId = generateHash(permanentLink);
-    settingService.set(PERMANEN_LINK_CONTEXT,
-                       PERMANENT_LINK_IDS_SCOPE,
-                       permanentLinkId,
-                       SettingValue.create(permanentLink));
+    try {
+      settingService.set(PERMANEN_LINK_CONTEXT,
+                         PERMANENT_LINK_IDS_SCOPE,
+                         permanentLinkId,
+                         SettingValue.create(permanentLink));
+    } catch (RuntimeException e) {
+      if (settingService.get(PERMANEN_LINK_CONTEXT,
+                             PERMANENT_LINK_IDS_SCOPE,
+                             permanentLinkId)
+          == null) {
+        throw e;
+      } else {
+        LOG.debug("Duplicated Permanent Link Id {} set. This may be due to parallel saving", permanentLinkId);
+      }
+    }
     return permanentLinkId;
   }
 
