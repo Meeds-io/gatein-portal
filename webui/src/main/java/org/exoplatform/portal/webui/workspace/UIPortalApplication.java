@@ -1204,7 +1204,7 @@ public class UIPortalApplication extends UIApplication {
       // Determine portlets visible on the page
       uiPortlets = new ArrayList<>();
       UISharedLayout sharedLayout = uiWorkingWorkspace.findFirstComponentOfType(UISharedLayout.class);
-      if (sharedLayout.isShowSharedLayout(requestContext)) {
+      if (sharedLayout == null || sharedLayout.isShowSharedLayout(requestContext)) {
         uiWorkingWorkspace.findComponentOfType(uiPortlets, UIPortlet.class);
       } else {
         UIPage currentPage = getCurrentPage();
