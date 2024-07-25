@@ -91,8 +91,8 @@ public class CookieTokenService extends AbstractTokenService<GateInToken, String
 
         String cookieTokenString = null;
         while (cookieTokenString == null) {
-            String selector = nextTokenId(); //9 bytes selector
-            String validator = nextRandom(); //9 bytes validator
+            String selector = nextTokenId();
+            String validator = nextRandom();
 
             String hashedRandomString = hashToken(validator+SEPARATOR_CHAR+type);
             long expirationTimeMillis = System.currentTimeMillis() + validityMillis;
