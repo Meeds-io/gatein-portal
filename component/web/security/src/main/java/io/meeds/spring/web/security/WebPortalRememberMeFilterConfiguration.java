@@ -13,21 +13,21 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.spring.web.transaction;
+package io.meeds.spring.web.security;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration("webTransactionFilterConfiguration")
-public class WebTransactionFilterConfiguration {
+@Configuration("webPortalRememberMeFilterConfiguration")
+public class WebPortalRememberMeFilterConfiguration {
 
   @Bean
-  public FilterRegistrationBean<PortalTransactionFilter> transactionFilter() {
-    FilterRegistrationBean<PortalTransactionFilter> registrationBean = new FilterRegistrationBean<>();
-    registrationBean.setFilter(new PortalTransactionFilter());
+  public FilterRegistrationBean<PortalRememberMeFilter> rememberMeFilter() {
+    FilterRegistrationBean<PortalRememberMeFilter> registrationBean = new FilterRegistrationBean<>();
+    registrationBean.setFilter(new PortalRememberMeFilter());
     registrationBean.addUrlPatterns("/rest/*");
-    registrationBean.setOrder(2);
+    registrationBean.setOrder(3);
     return registrationBean;
   }
 

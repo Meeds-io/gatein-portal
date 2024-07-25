@@ -48,9 +48,6 @@ import org.picocontainer.Startable;
 /**
  * Created by The eXo Platform SAS Author : liem.nguyen ncliam@gmail.com Jun 5, 2009
  *
- * todo julien : - make delay configuration from init param and @Managed setter - start/stop expiration daemon - manually invoke
- * the daemon via @Managed
- *
  * @param <T> the token type
  * @param <K> the token key type
  */
@@ -66,10 +63,12 @@ public abstract class AbstractTokenService<T extends Token, K> implements Starta
     protected static final String CLEANUP_PERIOD_TIME = "cleanup.period.time";
 
     /**
-     * See {@link #tokenByteLength}. 8 bytes (64 bits) would be enough, but we want to get padding-less Byte64 representation,
-     * so we take the next greater number divisible by 3 which is 9. 9 bytes is equal to 72 bits.
+     * See {@link #tokenByteLength}. 16 bytes (128 bits) would be enough
+     * (Validator + Selector = 256bits), but we want to get padding-less Byte64
+     * representation, so we take a greater number divisible by 3.<br>
+     * (24 bytes is equal to 192 bits.)
      */
-    public static final int DEFAULT_TOKEN_BYTE_LENGTH = 9;
+    public static final int DEFAULT_TOKEN_BYTE_LENGTH = 24;
 
     /**
      * The number of random bits generared by {@link #nextRandom()}. Use values divisible by 3 to produce random strings
@@ -233,7 +232,7 @@ public abstract class AbstractTokenService<T extends Token, K> implements Starta
     protected String nextRandom() {
         byte[] randomBytes = new byte[tokenByteLength];
         PortalContainer container = PortalContainer.getInstance();
-        SecureRandom random = ((SecureRandomService) container.getComponentInstanceOfType(SecureRandomService.class)).getSecureRandom();
+        SecureRandom random = container.getComponentInstanceOfType(SecureRandomService.class).getSecureRandom();
         random.nextBytes(randomBytes);
         return Base64.encodeBytes(randomBytes, EncodingOption.USEURLSAFEENCODING);
     }
