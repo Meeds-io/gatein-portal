@@ -1,7 +1,7 @@
 /**
  * This file is part of the Meeds project (https://meeds.io/).
  *
- * Copyright (C) 2020 - 2023 Meeds Association contact@meeds.io
+ * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,15 +16,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
+package io.meeds.spring.web.localization;
 
-package io.meeds.spring.web.security;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import org.exoplatform.services.security.web.SetCurrentIdentityFilter;
+@Configuration("httpRequestLocaleFilterConfiguration")
+public class HttpRequestLocaleFilterConfiguration {
 
-/**
- * A Web filter to retrieve currently authenticated user Identity to current Web
- * context session
- */
-public class PortalIdentityFilter extends SetCurrentIdentityFilter {
+  @Bean
+  public FilterRegistrationBean<HttpRequestLocaleFilter> httpRequestLocaleFilter() {
+    FilterRegistrationBean<HttpRequestLocaleFilter> registrationBean = new FilterRegistrationBean<>();
+    registrationBean.setFilter(new HttpRequestLocaleFilter());
+    registrationBean.addUrlPatterns("/rest/*");
+    registrationBean.setOrder(4);
+    return registrationBean;
+  }
 
 }
