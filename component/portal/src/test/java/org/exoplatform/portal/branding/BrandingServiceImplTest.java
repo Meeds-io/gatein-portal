@@ -37,6 +37,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,6 +62,7 @@ import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.services.FileService;
+import org.exoplatform.commons.file.services.FileStorageException;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
@@ -314,7 +316,7 @@ public class BrandingServiceImplTest {
   }
 
   @Test
-  public void shouldGetBrandingInformationWithoutBinaries() {
+  public void shouldGetBrandingInformationWithoutBinaries() throws FileStorageException, IOException {
 
     // Given
     SettingService settingService = mock(SettingService.class);
@@ -365,6 +367,7 @@ public class BrandingServiceImplTest {
         1, 2, 3
     }));
 
+    when(fileService.writeFile(any())).thenAnswer(invocation -> invocation.getArgument(0));
     assertNotNull(brandingService.getLoginBackgroundPath());
     assertNotNull(brandingService.getLogoPath());
     assertNotNull(brandingService.getLoginBackgroundPath());
@@ -683,6 +686,7 @@ public class BrandingServiceImplTest {
     when(context.getResourceAsStream(imagePath)).thenReturn(new ByteArrayInputStream(new byte[] {
         1, 2, 3
     }));
+    when(fileService.writeFile(any())).thenAnswer(invocation -> invocation.getArgument(0));
     Background loginBackground = brandingService.getLoginBackground();
     assertNotNull(loginBackground);
     assertEquals(3, loginBackground.getSize());
@@ -730,6 +734,7 @@ public class BrandingServiceImplTest {
     when(context.getResourceAsStream(imagePath)).thenReturn(new ByteArrayInputStream(new byte[] {
         1, 2, 3
     }));
+    when(fileService.writeFile(any())).thenAnswer(invocation -> invocation.getArgument(0));
     Favicon favicon = brandingService.getFavicon();
     assertNotNull(favicon);
     assertEquals(3, favicon.getSize());
@@ -777,6 +782,7 @@ public class BrandingServiceImplTest {
     when(context.getResourceAsStream(imagePath)).thenReturn(new ByteArrayInputStream(new byte[] {
         1, 2, 3
     }));
+    when(fileService.writeFile(any())).thenAnswer(invocation -> invocation.getArgument(0));
     Logo logo = brandingService.getLogo();
     assertNotNull(logo);
     assertEquals(3, logo.getSize());
