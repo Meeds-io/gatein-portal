@@ -16,6 +16,7 @@
  */
 package org.exoplatform.portal.branding;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -68,6 +69,8 @@ import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
+
+import lombok.SneakyThrows;
 
 @SuppressWarnings("unchecked")
 public class BrandingServiceImpl implements BrandingService, Startable {
@@ -461,7 +464,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
         if (imageId != null && imageId > 0) {
           this.logo = retrieveStoredBrandingFile(imageId, new Logo());
         } else {
-          this.logo = retrieveDefaultBrandingFile(defaultConfiguredLogoPath, new Logo());
+          this.logo = retrieveDefaultBrandingFile(defaultConfiguredLogoPath, new Logo(), LOGO_NAME, BRANDING_LOGO_ID_SETTING_KEY);
         }
       } catch (Exception e) {
         LOG.warn("Error retrieving logo", e);
@@ -478,7 +481,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
         if (imageId != null) {
           this.favicon = retrieveStoredBrandingFile(imageId, new Favicon());
         } else {
-          this.favicon = retrieveDefaultBrandingFile(defaultConfiguredFaviconPath, new Favicon());
+          this.favicon = retrieveDefaultBrandingFile(defaultConfiguredFaviconPath, new Favicon(), FAVICON_NAME, BRANDING_FAVICON_ID_SETTING_KEY);
         }
       } catch (Exception e) {
         LOG.warn("Error retrieving favicon", e);
@@ -495,7 +498,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
         if (imageId != null) {
           this.loginBackground = retrieveStoredBrandingFile(imageId, new Background());
         } else if (StringUtils.isNotBlank(defaultConfiguredLoginBgPath)) {
-          this.loginBackground = retrieveDefaultBrandingFile(defaultConfiguredLoginBgPath, new Background());
+          this.loginBackground = retrieveDefaultBrandingFile(defaultConfiguredLoginBgPath, new Background(), LOGIN_BACKGROUND_NAME, BRANDING_LOGIN_BG_ID_SETTING_KEY);
         } else {
           this.loginBackground = new Background();
         }
@@ -919,14 +922,20 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     }
   }
 
+  @SneakyThrows
   private void updateBrandingFileByUploadId(String uploadId,
                                             String fileName,
-                                            String settingKey) throws Exception {
+                                            String settingKey) {
     InputStream inputStream = getUploadDataAsStream(uploadId);
     if (inputStream == null) {
       throw new IllegalArgumentException("Cannot update " + fileName +
           ", the object must contain the image data or an upload id");
     }
+    updateBrandingFileByInputStream(inputStream, fileName, settingKey);
+  }
+
+  @SneakyThrows
+  private FileItem updateBrandingFileByInputStream(InputStream inputStream, String fileName, String settingKey)  {
     int size = inputStream.available();
     FileItem fileItem = new FileItem(0l,
                                      fileName,
@@ -942,6 +951,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
                        Scope.GLOBAL,
                        settingKey,
                        SettingValue.create(String.valueOf(fileItem.getFileInfo().getId())));
+    return fileItem;
   }
 
   private String computeThemeCSS() {// NOSONAR
@@ -1029,21 +1039,27 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     return brandingFile;
   }
 
-  private <T extends BrandingFile> T retrieveDefaultBrandingFile(String imagePath, T brandingFile) throws IOException {
+  private <T extends BrandingFile> T retrieveDefaultBrandingFile(String imagePath, T brandingFile, String fileName, String settingKey) throws IOException {
     if (StringUtils.isNotBlank(imagePath)) {
+      byte[] bytes = null;
+      long lastModified = DEFAULT_LAST_MODIFED;
       File file = new File(imagePath);
       if (file.exists()) {
-        brandingFile.setData(Files.readAllBytes(file.toPath()));
-        brandingFile.setSize(file.length());
-        brandingFile.setUpdatedDate(file.lastModified());
+        bytes = Files.readAllBytes(file.toPath());
+        lastModified = file.lastModified();
       } else {
-        InputStream is = container.getPortalContext().getResourceAsStream(imagePath);
-        if (is != null) {
-          byte[] streamContentAsBytes = IOUtil.getStreamContentAsBytes(is);
-          brandingFile.setData(streamContentAsBytes);
-          brandingFile.setSize(streamContentAsBytes.length);
-          brandingFile.setUpdatedDate(DEFAULT_LAST_MODIFED);
+        try (InputStream is = container.getPortalContext().getResourceAsStream(imagePath)) {
+          if (is != null) {
+            bytes = IOUtil.getStreamContentAsBytes(is);
+          }
         }
+      }
+      if (bytes != null) {
+        FileItem fileItem = updateBrandingFileByInputStream(new ByteArrayInputStream(bytes), fileName, settingKey);
+        brandingFile.setFileId(fileItem.getFileInfo().getId());
+        brandingFile.setData(bytes);
+        brandingFile.setSize(bytes.length);
+        brandingFile.setUpdatedDate(lastModified);
       }
     }
     return brandingFile;
