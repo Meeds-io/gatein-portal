@@ -25,6 +25,12 @@
   import java.util.ResourceBundle;
   import org.exoplatform.services.resources.LocaleConfigService;
   import org.exoplatform.portal.mop.user.UserNode;
+  import java.util.Optional;
+  import java.util.Set;
+  import java.util.Arrays;
+  import org.exoplatform.portal.localization.LocaleContextInfoUtils;
+  import org.json.simple.JSONArray;
+  import org.json.simple.JSONObject;
 
   def rcontext = _ctx.getRequestContext() ;
   def session = rcontext.getRequest().getSession();
@@ -116,6 +122,19 @@
   LocaleConfigService localeConfigService = uicomponent.getApplicationComponent(LocaleConfigService.class);
   def defaultLocaleTag = localeConfigService.getDefaultLocaleConfig().getLocale().toLanguageTag();
 
+  Set<Locale> locales = LocaleContextInfoUtils.getSupportedLocales();
+  List<Locale> localesList = new ArrayList<>(locales);
+
+  JSONArray localesJSON = new JSONArray();
+  Locale currentLocal = Locale.ENGLISH;
+  for (Locale locale : localesList) {
+    JSONObject object = new JSONObject();
+    if (locale != null && !locale.toString().equals("ma")) {
+       object.put("value", locale.toString());
+       object.put("text", locale.getDisplayName(currentLocal));
+       localesJSON.add(object);
+    }
+  }
 %>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="$language" lang="$language" dir="$dir">
   <head id="head">
@@ -178,6 +197,7 @@
      eXo.env.portal.userName='<%= userName == null ? "" : userName %>';
      eXo.env.portal.language='<%= language %>';
      eXo.env.portal.defaultLanguage='<%= defaultLocaleTag %>';
+     eXo.env.portal.availableLanguages='<%= localesJSON.toString() %>';
      eXo.env.portal.orientation='<%= orientation == Orientation.RT ? "rtl" : "ltr" %>';
      eXo.env.portal.selectedNodeId = '<%= selectedNodeId %>';
      eXo.env.portal.selectedNodeUri = '<%= selectedNodeUri %>';
