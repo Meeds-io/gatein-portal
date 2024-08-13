@@ -105,6 +105,20 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest { // NO
 
       URL url = mockServletContext.getResource("/gatein-resources.xml");
       SkinConfigParser.processConfigResource(DocumentSource.create(url), skinService, mockServletContext);
+
+      URL baseTest = AbstractSkinServiceTest.class.getClassLoader().getResource("mockwebapp-test");
+      File fTest = new File(baseTest.toURI());
+      assertTrue(fTest.exists());
+      assertTrue(fTest.isDirectory());
+      ServletContext mockServletContextTest = new ServletContextImpl(fTest, "/mockwebapp-test", "mockwebapp-test");
+      skinService.registerContext(new WebAppImpl(mockServletContextTest, Thread.currentThread().getContextClassLoader()));
+
+      MockResourceResolver resResolverTest = new MockResourceResolver();
+      skinService.addResourceResolver(resResolverTest);
+
+      URL urlTest = mockServletContextTest.getResource("/gatein-resources.xml");
+      SkinConfigParser.processConfigResource(DocumentSource.create(urlTest), skinService, mockServletContextTest);
+
       //
       touchSetUp();
     }
@@ -122,7 +136,7 @@ public abstract class AbstractSkinServiceTest extends AbstractKernelTest { // NO
   }
 
   public void testInitializing() throws Exception {
-    assertEquals(2, skinService.getAvailableSkinNames().size());
+    assertEquals(3, skinService.getAvailableSkinNames().size());
     assertTrue(skinService.getAvailableSkinNames().contains(TEST_SKIN));
     assertTrue(skinService.mainResolver.resolvers.contains(resResolver));
   }

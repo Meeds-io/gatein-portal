@@ -116,7 +116,7 @@ public class TestSkinService extends AbstractSkinServiceTest {
   public void testGetSkinList() {
     String[] skinList = skinService.getSkinList();
     assertNotNull(skinList);
-    assertEquals(2, skinList.length);
+    assertEquals(3, skinList.length);
   }
 
   public void testRenderURL() {
@@ -128,6 +128,9 @@ public class TestSkinService extends AbstractSkinServiceTest {
 
   public void testGetSkinModuleFileContent() throws IOException {
     assertEquals(".FirstPortlet {foo1 : bar1}", skinService.getSkinModuleFileContent("/mockwebapp/skin/FirstPortlet.css"));
+    assertEquals(".ThirdPortlet {foo1 : bar1}\n", skinService.getSkinModuleFileContent("/mockwebapp-test/skin/ThirdPortlet.css"));
+
+
   }
 
   public void testGetSkinModuleContent() throws IOException {
