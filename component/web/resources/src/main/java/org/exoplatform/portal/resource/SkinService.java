@@ -348,7 +348,7 @@ public class SkinService extends AbstractResourceService implements Startable {
   public String getSkinModuleFileContent(String fileWebAppPath) throws IOException {
     ServletContext servletContext = Collections.unmodifiableCollection(contexts.values())
                                                .stream()
-                                               .filter(c -> fileWebAppPath.startsWith(c.getContextPath()))
+                                               .filter(c -> fileWebAppPath.startsWith(c.getContextPath()+"/"))
                                                .map(WebApp::getServletContext)
                                                .findFirst()
                                                .orElse(null);
