@@ -230,7 +230,7 @@ public class Application<S> extends ModelObject implements Cloneable {
         return cssStyle.getCssClass();
       } else {
         StringBuilder cssClasses = new StringBuilder();
-        cssClasses.append(cssStyle.getCssClass());
+        cssClasses.append(cssStyle.getCssClass(cssClass));
         cssClasses.append(" ");
         cssClasses.append(cssClass);
         return cssClasses.toString();

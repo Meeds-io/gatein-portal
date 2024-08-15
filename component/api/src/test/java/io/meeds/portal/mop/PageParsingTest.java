@@ -73,7 +73,7 @@ public class PageParsingTest extends TestCase {
 
       Application<Portlet> columnApplication = (Application<Portlet>) column.getChildren().get(0);
       assertNotNull(columnApplication.getCssClass());
-      assertTrue("'mt-n1' not found in: " + columnApplication.getCssClass(), columnApplication.getCssClass().contains("mt-n1"));
+      assertTrue("'mt-0' not found in: " + columnApplication.getCssClass(), columnApplication.getCssClass().contains("mt-0"));
       assertTrue("'mb-n3' not found in: " + columnApplication.getCssClass(), columnApplication.getCssClass().contains("mb-n3"));
       assertTrue("'me-n4' not found", columnApplication.getCssClass().contains("me-n4"));
       assertTrue("'ms-n5' not found", columnApplication.getCssClass().contains("ms-n5"));
