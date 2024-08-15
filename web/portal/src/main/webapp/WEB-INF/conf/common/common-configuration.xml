@@ -193,9 +193,7 @@
         <name>init.resources</name>
         <description>Initiate the following resources during the first launch</description>
         <value>locale.portal.expression</value>
-        <value>locale.portal.services</value>
         <value>locale.portal.webui</value>
-        <value>locale.portal.custom</value>
         <value>locale.portal.login</value>
         <value>locale.navigation.portal.global</value>
       </values-param>
@@ -209,9 +207,7 @@
           into one ResoruceBundle properties
         </description>
         <value>locale.portal.expression</value>
-        <value>locale.portal.services</value>
         <value>locale.portal.webui</value>
-        <value>locale.portal.custom</value>
         <value>locale.portal.login</value>
       </values-param>
       <values-param>
