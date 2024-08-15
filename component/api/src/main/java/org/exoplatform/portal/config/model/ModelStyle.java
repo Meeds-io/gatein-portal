@@ -20,6 +20,8 @@ package org.exoplatform.portal.config.model;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -98,40 +100,56 @@ public class ModelStyle implements Serializable {
   private String            textSubtitleFontStyle;
 
   public String getCssClass() { // NOSONAR
+    return getCssClass(null);
+  }
+
+  public String getCssClass(String existingCssClass) { // NOSONAR
     StringBuilder cssClass = new StringBuilder();
-    if (marginTop != null && marginTop >= 0) {
-      cssClass.append(" mt-n");
+    if (marginTop != null && marginTop >= 0 && !StringUtils.contains(existingCssClass, "mt-")) {
+      cssClass.append(" mt-");
+      if (marginTop < 20) {
+        cssClass.append("n");
+      }
       cssClass.append(Math.abs((marginTop - 20) / 4));
     }
-    if (marginBottom != null && marginBottom >= 0) {
-      cssClass.append(" mb-n");
+    if (marginBottom != null && marginBottom >= 0 && !StringUtils.contains(existingCssClass, "mb-")) {
+      cssClass.append(" mb-");
+      if (marginBottom < 20) {
+        cssClass.append("n");
+      }
       cssClass.append(Math.abs((marginBottom - 20) / 4));
     }
-    if (marginRight != null && marginRight >= 0) {
-      cssClass.append(" me-n");
+    if (marginRight != null && marginRight >= 0 && !StringUtils.contains(existingCssClass, "me-")) {
+      cssClass.append(" me-");
+      if (marginRight < 20) {
+        cssClass.append("n");
+      }
       cssClass.append(Math.abs((marginRight - 20) / 4));
     }
-    if (marginLeft != null && marginLeft >= 0) {
-      cssClass.append(" ms-n");
+    if (marginLeft != null && marginLeft >= 0 && !StringUtils.contains(existingCssClass, "ms-")) {
+      cssClass.append(" ms-");
+      if (marginLeft < 20) {
+        cssClass.append("n");
+      }
       cssClass.append(Math.abs((marginLeft - 20) / 4));
     }
-    if (radiusTopRight != null) {
+    if (radiusTopRight != null && !StringUtils.contains(existingCssClass, "brtr-")) {
       cssClass.append(" brtr-");
       cssClass.append(radiusTopRight / 4);
     }
-    if (radiusTopLeft != null) {
+    if (radiusTopLeft != null && !StringUtils.contains(existingCssClass, "brtl-")) {
       cssClass.append(" brtl-");
       cssClass.append(radiusTopLeft / 4);
     }
-    if (radiusBottomRight != null) {
+    if (radiusBottomRight != null && !StringUtils.contains(existingCssClass, "brbr-")) {
       cssClass.append(" brbr-");
       cssClass.append(radiusBottomRight / 4);
     }
-    if (radiusBottomLeft != null) {
+    if (radiusBottomLeft != null && !StringUtils.contains(existingCssClass, "brbl-")) {
       cssClass.append(" brbl-");
       cssClass.append(radiusBottomLeft / 4);
     }
-    if (mobileHidden != null && mobileHidden.booleanValue()) {
+    if (mobileHidden != null && mobileHidden.booleanValue() && !StringUtils.contains(existingCssClass, "hidden-sm-and-down")) {
       cssClass.append(" hidden-sm-and-down");
     }
     return cssClass.toString();
