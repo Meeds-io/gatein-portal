@@ -45,7 +45,7 @@
             <portlet-ref>TestPortlet</portlet-ref>
           </portlet>
           <css-style>
-            <margin-top>16</margin-top>
+            <margin-top>20</margin-top>
             <margin-bottom>8</margin-bottom>
             <margin-right>4</margin-right>
             <margin-left>0</margin-left>
