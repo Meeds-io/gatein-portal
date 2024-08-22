@@ -27,6 +27,8 @@ import org.exoplatform.portal.branding.model.Logo;
 
 public interface BrandingService {
 
+  static final String BRANDING_UPDATED_EVENT = "branding.updated";
+
   Branding getBrandingInformation();
 
   Branding getBrandingInformation(boolean retrieveBinaries);
@@ -50,8 +52,6 @@ public interface BrandingService {
   void updateCompanyLink(String companyLink);
 
   void updateSiteName(String siteName);
-
-  String getTopBarTheme();
 
   Long getLogoId();
 
@@ -142,8 +142,6 @@ public interface BrandingService {
    * @return Page custom additional css
    */
   String getCustomCss();
-
-  void updateTopBarTheme(String style);
 
   /**
    * Update branding logo. If the logo object contains the image data, they are

@@ -22,51 +22,37 @@ package org.gatein.portal.controller.resource;
 import java.io.Serializable;
 import java.util.Locale;
 
-import org.exoplatform.commons.utils.Safe;
+import lombok.Data;
+import lombok.EqualsAndHashCode.Exclude;
+import lombok.Getter;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  */
-class ScriptKey implements Serializable {
+@Data
+public class ScriptKey implements Serializable {
 
-    /** . */
-    final ResourceId id;
+  private static final long  serialVersionUID   = 8421109092217952533L;
 
-    /** . */
-    final boolean minified;
+  public static final String SCOPE_QUERY_PARAM  = "scope";
 
-    /** . */
-    final Locale locale;
+  public static final String MINIFY_QUERY_PARAM = "minify";
 
-    /** . */
-    final int hashCode;
+  public static final String HASH_QUERY_PARAM   = "hash";
 
-    ScriptKey(ResourceId id, boolean minified, Locale locale) {
-        this.id = id;
-        this.minified = minified;
-        this.locale = locale;
-        this.hashCode = id.hashCode() ^ (locale != null ? locale.hashCode() : 0) ^ (minified ? ~1 : 0);
-    }
+  @Getter
+  final ResourceId           id;
 
-    @Override
-    public int hashCode() {
-        return hashCode;
-    }
+  @Getter
+  final boolean              minified;
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj instanceof ScriptKey) {
-            ScriptKey that = (ScriptKey) obj;
-            return id.equals(that.id) && (minified == that.minified) && Safe.equals(locale, that.locale);
-        }
-        return false;
-    }
+  @Exclude
+  final Locale               locale;
 
-    @Override
-    public String toString() {
-        return "ScriptKey[id=" + id + ",minified=" + minified + ",locale=" + locale + "]";
-    }
+  public ScriptKey(ResourceId id, boolean minified, Locale locale) {
+    this.id = id;
+    this.minified = minified;
+    this.locale = locale;
+  }
+
 }

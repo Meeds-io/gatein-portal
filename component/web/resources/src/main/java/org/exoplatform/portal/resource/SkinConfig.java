@@ -22,54 +22,67 @@ package org.exoplatform.portal.resource;
 import java.util.List;
 
 /**
- * Extends a skin with additional information.
- *
- * Created by The eXo Platform SAS Jan 19, 2007
+ * Extends a skin with additional information. Created by The eXo Platform SAS
+ * Jan 19, 2007
  */
 public interface SkinConfig extends Skin {
 
-    /**
-     * Returns the skin name
-     *
-     * @return the skin name
-     */
-    String getName();
+  /**
+   * Returns the skin name
+   *
+   * @return the skin name
+   */
+  String getName();
 
-    /**
-     * Returns the skin module.
-     *
-     * @return the module
-     */
-    String getModule();
+  /**
+   * Returns the skin module.
+   *
+   * @return the module
+   */
+  String getModule();
 
-    /**
-     * Returns the css path.
-     *
-     * @return the css path
-     */
-    String getCSSPath();
+  /**
+   * Returns the css path.
+   *
+   * @return the css path
+   */
+  String getCSSPath();
 
-    /**
-     * @return the dependent PortalSkins to load with the current Skin
-     */
-    default List<String> getAdditionalModules() {
-      return null; // NOSONAR
-    }
+  /**
+   * @return the dependent PortalSkins to load with the current Skin
+   */
+  default List<String> getAdditionalModules() {
+    return null; // NOSONAR
+  }
 
-    /**
-     * @return true is the current PortalSkin is filtered
-     */
-    default boolean isFiltered() {
-      return false;
-    }
+  /**
+   * @return true is the current PortalSkin is filtered
+   */
+  default boolean isFiltered() {
+    return false;
+  }
 
-    /**
-     * Sets Skin type
-     * 
-     * @param type
-     */
-    default void setType(String type) {
-      // Nothing to do
-    }
+  /**
+   * Sets Skin type
+   * 
+   * @param type
+   */
+  default void setType(String type) {
+    // Nothing to do
+  }
+
+  /**
+   * @param cssPath
+   */
+  default void setCSSPath(String cssPath) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * @param priority
+   */
+  default void setPriority(int priority) {
+    throw new UnsupportedOperationException();
+  }
 
 }

@@ -60,7 +60,7 @@ public class TestResourceBundleService extends AbstractKernelTest {
 
         // Portal resource bundle
         ResourceBundle res = service_.getResourceBundle(test_res, Locale.GERMAN);
-        assertEquals("French", res.getString("language"));
+        assertEquals("English", res.getString("language"));
 
         res = service_.getResourceBundle(test_res, new Locale("vi"));
         assertEquals("TiengViet", res.getString("language"));
@@ -68,7 +68,7 @@ public class TestResourceBundleService extends AbstractKernelTest {
 
         // Portlet resource bundle
         res = service_.getResourceBundle("bundles.portlet.test", Locale.GERMAN);
-        assertEquals("French", res.getString("language"));
+        assertEquals("English", res.getString("language"));
     }
 
     public void testXMLResourceBunble() {
@@ -76,6 +76,18 @@ public class TestResourceBundleService extends AbstractKernelTest {
         assertEquals("base_vi.xml", res.getString("base_vi"));
     }
     
+    public void testGetSharedString() {
+      assertEquals("Test EN 1", service_.getSharedString("test1", Locale.ENGLISH));
+      assertEquals("Test FR 1", service_.getSharedString("test1", Locale.FRENCH));
+      assertEquals("Test EN 2", service_.getSharedString("test2", Locale.ENGLISH));
+      assertEquals("Test EN 2", service_.getSharedString("test2", Locale.FRENCH));
+    }
+
+    public void testGetResourceBundleContent() {
+      assertEquals("{\"test2\":\"Test EN 2\",\"test1\":\"Test EN 1\"}", service_.getResourceBundleContent("bundles.portal.shared", Locale.ENGLISH));
+      assertEquals("{\"test2\":\"Test EN 2\",\"test1\":\"Test FR 1\"}", service_.getResourceBundleContent("bundles.portal.shared", Locale.FRENCH));
+    }
+
     public void testCachingPortletBundle() {
         String oldValue = PropertyManager.getProperty(PropertyManager.DEVELOPING);
         try {
@@ -109,10 +121,10 @@ public class TestResourceBundleService extends AbstractKernelTest {
         assertEquals("English", res.getString("language"));
 
         res = service_.getResourceBundle(baseName, Locale.FRENCH);
-        assertEquals("Default", res.getString("language"));
+        assertEquals("English", res.getString("language"));
 
         res = service_.getResourceBundle(baseName, Locale.GERMAN);
-        assertEquals("Default", res.getString("language"));
+        assertEquals("English", res.getString("language"));
 
         // Test locale with no base file
         baseName = "bundles." + app + ".no-base";
@@ -148,7 +160,7 @@ public class TestResourceBundleService extends AbstractKernelTest {
 
         ResourceBundle res = service_.getResourceBundle(bundle, Locale.ENGLISH);
         assertEquals("en", res.getString("language"));
-        assertEquals("property", res.getString("property"));
+        assertFalse(res.containsKey("property"));
 
         res = service_.getResourceBundle(bundle, Locale.FRENCH);
         assertEquals("fr", res.getString("language"));

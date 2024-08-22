@@ -19,9 +19,10 @@
 
 package org.exoplatform.portal.resource;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.ServletContext;
 
@@ -38,14 +39,14 @@ public class MainResourceResolver implements ResourceResolver {
     final Map<String, SimpleResourceContext> contexts;
 
     /** . */
-    final CopyOnWriteArrayList<ResourceResolver> resolvers;
+    final List<ResourceResolver> resolvers;
 
     /** . */
     private final Log                          log = ExoLogger.getLogger(MainResourceResolver.class);
 
     public MainResourceResolver() {
-        this.contexts = new HashMap<String, SimpleResourceContext>();
-        this.resolvers = new CopyOnWriteArrayList<ResourceResolver>();
+        this.contexts = new ConcurrentHashMap<>();
+        this.resolvers = new Vector<>();
     }
 
     /**
@@ -72,14 +73,13 @@ public class MainResourceResolver implements ResourceResolver {
      * @param servletContext
      */
     public void removeServletContext(ServletContext servletContext) {
-        String key = "/" + servletContext.getServletContextName();
-        SimpleResourceContext ctx = contexts.get(key);
-        if (ctx != null) {
-            contexts.remove(ctx.getContextPath());
-        } else {
-            log.warn("Cannot find servlet context module");
-            return;
-        }
+      String key = "/" + servletContext.getServletContextName();
+      SimpleResourceContext ctx = contexts.get(key);
+      if (ctx != null) {
+        contexts.remove(ctx.getContextPath());
+      } else {
+        log.warn("Cannot find servlet context module");
+      }
     }
 
     public Resource resolve(String path) {

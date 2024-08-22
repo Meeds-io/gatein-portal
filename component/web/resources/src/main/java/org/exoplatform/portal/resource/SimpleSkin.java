@@ -19,170 +19,154 @@
 
 package org.exoplatform.portal.resource;
 
-import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.exoplatform.commons.utils.PropertyManager;
-import org.exoplatform.services.resources.Orientation;
-import org.exoplatform.web.ControllerContext;
-import org.exoplatform.web.WebAppController;
-import org.exoplatform.web.controller.QualifiedName;
-import org.exoplatform.web.controller.router.URIWriter;
-import org.exoplatform.web.url.MimeType;
-
-import org.exoplatform.services.log.ExoLogger;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gatein.portal.controller.resource.ResourceRequestHandler;
+
+import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.resources.Orientation;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode.Exclude;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * An implementation of the skin config. Created by The eXo Platform SAS Jan 19,
  * 2007
  */
-class SimpleSkin implements SkinConfig {
+@Data
+public class SimpleSkin implements SkinConfig {
 
-  private final String       module;
+  public static final String   ORIENTATION_QUERY_PARAM = "orientation";
 
-  private final String       name;
+  public static final String   MINIFY_QUERY_PARAM      = "minify";
 
-  private final String       cssPath;
+  public static final String   HASH_QUERY_PARAM        = "hash";
 
-  private final String       id;
+  private static final Log     LOG                     = ExoLogger.getLogger(SimpleSkin.class);
 
-  private final int          priority;
+  @Setter
+  private static boolean       developing              = PropertyManager.isDevelopping();
 
-  private final boolean      filtered;
+  private String               module;
 
-  private final List<String> additionalModules;
+  private String               name;
 
-  private String             type;
+  private String               cssPath;
 
-  public SimpleSkin(SkinService service, String module, String name, String cssPath) {
-    this(service, module, name, cssPath, Integer.MAX_VALUE);
+  private String               id;
+
+  private int                  priority;
+
+  private boolean              filtered;
+
+  private List<String>         additionalModules;
+
+  private String               type;
+
+  @Exclude
+  private int                  fileContentHash;
+
+  @Getter
+  private Map<Integer, String> urls                    = new ConcurrentHashMap<>();
+
+  public SimpleSkin(String module, String name, String cssPath) {
+    this(module, name, cssPath, Integer.MAX_VALUE, false, null);
   }
 
-  public SimpleSkin(SkinService service, String module, String name, String cssPath, int cssPriority) {
-    this.module = module;
-    this.name = name;
-    this.cssPath = cssPath;
-    this.id = module.replace('/', '_');
-    priority = cssPriority;
-    additionalModules = null;
-    filtered = false;
+  public SimpleSkin(String module, String name, String cssPath, int cssPriority) {
+    this(module, name, cssPath, cssPriority, false, null);
   }
 
   public SimpleSkin(String module, String name, String cssPath, int cssPriority, List<String> additionalModules) {
-    this.module = module;
-    this.name = name;
-    this.cssPath = cssPath;
-    this.id = module.replace('/', '_');
-    this.priority = cssPriority;
-    this.additionalModules = additionalModules;
-    this.filtered = false;
+    this(module, name, cssPath, cssPriority, false, additionalModules);
   }
 
   public SimpleSkin(String module, String name, String cssPath, int cssPriority, boolean filtered) {
+    this(module, name, cssPath, cssPriority, filtered, null);
+  }
+
+  public SimpleSkin(String module,
+                    String name,
+                    String cssPath,
+                    int cssPriority,
+                    boolean filtered,
+                    List<String> additionalModules) {
     this.module = module;
     this.name = name;
     this.cssPath = cssPath;
     this.id = module.replace('/', '_');
     this.priority = cssPriority;
-    this.additionalModules = null;
+    this.additionalModules = additionalModules == null ? new ArrayList<>() : additionalModules;
     this.filtered = filtered;
   }
 
   @Override
-  public int getCSSPriority() {
-    return priority;
-  }
-
-  @Override
-  public String getId() {
-    return this.id;
-  }
-
-  @Override
-  public String getModule() {
-    return this.module;
-  }
-
-  @Override
   public String getCSSPath() {
-    return this.cssPath;
+    return cssPath;
   }
 
   @Override
-  public String getName() {
-    return this.name;
+  public void setCSSPath(String cssPath) {
+    this.cssPath = cssPath;
   }
 
   @Override
-  public boolean isFiltered() {
-    return filtered;
+  public int getCSSPriority() {
+    return getPriority();
   }
 
   @Override
-  public List<String> getAdditionalModules() {
-    return additionalModules;
-  }
-
-  @Override
-  public String getType() {
-    return type;
-  }
-
-  @Override
-  public void setType(String type) {
-    this.type = type;
-  }
-
-  public String toString() {
-    return "SimpleSkin[id=" + this.id + ",module=" + this.module + ",name=" + this.name + ",cssPath=" + this.cssPath +
-        ", priority=" + priority +
-        "]";
-  }
-
-  public SkinURL createURL(final ControllerContext context) {
-    if (context == null) {
-      throw new NullPointerException("No controller context provided");
+  public int getFileContentHash() {
+    if (developing) {
+      return 0;
+    } else if (fileContentHash == 0) {
+      String absolutePath = ("/" + cssPath).replace("//", "/"); // NOSONAR
+      SkinService skinService = ExoContainerContext.getService(SkinService.class);
+      try {
+        String fileContent = skinService.getSkinModuleFileContent(absolutePath);
+        fileContentHash = fileContent.hashCode();
+      } catch (Exception e) {
+        LOG.error("Error while processing CSS file {}", absolutePath, e);
+      }
     }
+    return fileContentHash;
+  }
+
+  @Override
+  public SkinURL createURL() {
     if (StringUtils.isBlank(this.cssPath)) {
       return null;
-    }
-    return new SkinURL() {
+    } else {
+      return new SkinURL() {
 
-      Orientation orientation = null;
+        @Setter
+        private Orientation orientation;
 
-      boolean     compress    = !PropertyManager.isDevelopping();
-
-      public void setOrientation(Orientation orientation) {
-        this.orientation = orientation;
-      }
-
-      @Override
-      public String toString() {
-        try {
-          String resource = cssPath.substring(1, cssPath.length() - ".css".length());
-
-          //
-          Map<QualifiedName, String> params = new HashMap<QualifiedName, String>();
-          params.put(ResourceRequestHandler.VERSION_QN, ResourceRequestHandler.VERSION);
-          params.put(ResourceRequestHandler.ORIENTATION_QN, orientation == Orientation.RT ? "rt" : "lt");
-          params.put(ResourceRequestHandler.COMPRESS_QN, compress ? "min" : "");
-          params.put(WebAppController.HANDLER_PARAM, "skin");
-          params.put(ResourceRequestHandler.RESOURCE_QN, resource);
-          StringBuilder url = new StringBuilder();
-          context.renderURL(params, new URIWriter(url, MimeType.PLAIN));
-
-          //
-          return url.toString();
-        } catch (IOException e) {
-          ExoLogger.getLogger(this.getClass()).error(e.getMessage(), e);
-          return null;
+        @Override
+        public String toString() {
+          return toString(orientation);
         }
-      }
-    };
+
+        @Override
+        public String toString(Orientation orientation) {
+          Orientation cssOrientation = orientation == null ? Orientation.LT : orientation;
+          return urls.computeIfAbsent(Objects.hash(cssOrientation), k -> {
+            String absolutePath = ("/" + cssPath).replace("//", "/"); // NOSONAR
+            return absolutePath + "?" + ORIENTATION_QUERY_PARAM + "=" + cssOrientation.name() + "&" +
+                MINIFY_QUERY_PARAM + "=" + !developing + "&" + HASH_QUERY_PARAM + "=" + getFileContentHash();
+          });
+        }
+      };
+    }
   }
+
 }

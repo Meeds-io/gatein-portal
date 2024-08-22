@@ -9,13 +9,21 @@ import java.util.Date;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.exoplatform.commons.utils.BinaryOutput;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.portal.application.ResourceRequestFilter;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.WebRequestHandler;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.log.ExoLogger;
 import org.gatein.portal.controller.resource.ResourceRequestHandler;
 
-/** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
+/**
+ * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @deprecated Replaced by {@link ResourceRequestFilter} which will handle files
+ *             using webapp context based URL instead of a centralized endpoint
+ *             for all skins to define inside the monolith
+ */
+@Deprecated
 public class SkinResourceRequestHandler extends WebRequestHandler {
 
     /** . */
@@ -122,7 +130,7 @@ public class SkinResourceRequestHandler extends WebRequestHandler {
         return false;
     }
 
-    public class SkinResourceRenderer implements ResourceRenderer {
+    public static class SkinResourceRenderer implements ResourceRenderer {
 
       private final BinaryOutput      output;
 
@@ -144,12 +152,12 @@ public class SkinResourceRequestHandler extends WebRequestHandler {
         if (seconds > 0) {
           response.setHeader("Cache-Control", "public, " + seconds);
           response.setDateHeader(EXPIRES, (System.currentTimeMillis() + seconds * 1000L));
-          response.setHeader("Etag", ResourceRequestHandler.VERSION_E_TAG);
+          response.setHeader("Etag", "W/\"" + ResourceRequestHandler.VERSION.hashCode() + "\"");
         } else {
           response.setHeader("Cache-Control", "no-cache");
         }
 
-        long lastModified = skinService.getLastModified(context);
+        long lastModified = ExoContainerContext.getService(SkinService.class).getLastModified(context);
         response.setDateHeader(LAST_MODIFIED, lastModified);
       }
     }

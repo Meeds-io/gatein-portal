@@ -55,7 +55,7 @@
     def url = !jsConfig.has("paths") ? null :
               (!jsConfig.get("paths").has(module) ? null :
                 jsConfig.get("paths").get(module));
-    headerScripts.add(url != null ? url + ".js" : module);
+    headerScripts.add(url != null ? url : module);
     if (scriptsURLs.get(module)) {
       remoteScripts.put(module);
     }
@@ -123,7 +123,6 @@
     <%/* Metadatas */%>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="theme-color" content="#476A9C"/>
     <% if (portal.viewport != null) {
     %><meta name="viewport" content = "${portal.viewport}"/>
     <% }

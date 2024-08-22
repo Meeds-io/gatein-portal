@@ -18,9 +18,12 @@
  */
 package org.exoplatform.portal.resource.config.tasks;
 
-import org.exoplatform.portal.resource.config.xml.SkinConfigParser;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import org.exoplatform.portal.resource.config.xml.SkinConfigParser;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * @author <a href="trong.tran@exoplatform.com">Trong Tran</a>
@@ -29,61 +32,67 @@ import org.w3c.dom.NodeList;
 
 public abstract class AbstractSkinModule {
 
-    protected String skinName;
-    protected String cssPath;
-    protected boolean overwrite;
-    protected String cssPriority;
+  protected static final Log   LOG         = ExoLogger.getLogger(AbstractSkinModule.class);
 
-    public AbstractSkinModule(String name) {
-        skinName = name;
-    }
+  protected String             skinName;
 
-    protected void bindingSkinName(Element element) {
-        NodeList nodes = element.getElementsByTagName(SkinConfigParser.SKIN_NAME_TAG);
-        if (nodes == null || nodes.getLength() < 1) {
-            return;
-        }
-        this.skinName = nodes.item(0).getFirstChild().getNodeValue();
-    }
+  protected String             cssPath;
 
-    protected void bindingCSSPath(Element element) {
-        NodeList nodes = element.getElementsByTagName(SkinConfigParser.CSS_PATH_TAG);
-        if (nodes == null || nodes.getLength() < 1) {
-            return;
-        }
-        this.cssPath = nodes.item(0).getFirstChild().getNodeValue();
-    }
+  protected boolean            overwrite;
 
-    protected void bindingOverwrite(Element element) {
-        NodeList nodes = element.getElementsByTagName(SkinConfigParser.OVERWRITE);
-        if (nodes == null || nodes.getLength() < 1) {
-            return;
-        }
-        String overwrite = nodes.item(0).getFirstChild().getNodeValue();
-        setOverwrite("true".equals(overwrite));
-    }
+  protected String             cssPriority;
 
-    protected void bindingCSSPriority(Element element) {
-        NodeList nodes = element.getElementsByTagName(SkinConfigParser.CSS_PRIORITY_TAG);
-        if (nodes == null || nodes.getLength() < 1) {
-            return;
-        }
-        this.cssPriority = nodes.item(0).getFirstChild().getNodeValue();
-    }
+  AbstractSkinModule(String name) {
+    skinName = name;
+  }
 
-    public void setSkinName(String name) {
-        this.skinName = name;
+  protected void bindingSkinName(Element element) {
+    NodeList nodes = element.getElementsByTagName(SkinConfigParser.SKIN_NAME_TAG);
+    if (nodes == null || nodes.getLength() < 1) {
+      return;
     }
+    this.skinName = nodes.item(0).getFirstChild().getNodeValue();
+  }
 
-    public void setCSSPath(String _cssPath) {
-        this.cssPath = _cssPath;
+  protected void bindingCSSPath(Element element) {
+    NodeList nodes = element.getElementsByTagName(SkinConfigParser.CSS_PATH_TAG);
+    if (nodes == null || nodes.getLength() < 1) {
+      return;
     }
+    this.cssPath = nodes.item(0).getFirstChild().getNodeValue();
+  }
 
-    public void setOverwrite(boolean _overwrite) {
-        this.overwrite = _overwrite;
+  protected void bindingOverwrite(Element element) {
+    NodeList nodes = element.getElementsByTagName(SkinConfigParser.OVERWRITE);
+    if (nodes == null || nodes.getLength() < 1) {
+      setOverwrite(false);
+    } else {
+      setOverwrite("true".equals(nodes.item(0).getFirstChild().getNodeValue()));
     }
+  }
 
-    public void setCSSPriority(String _cssPriority) {
-        this.cssPriority = _cssPriority;
+  protected void bindingCSSPriority(Element element) {
+    NodeList nodes = element.getElementsByTagName(SkinConfigParser.CSS_PRIORITY_TAG);
+    if (nodes == null || nodes.getLength() < 1) {
+      return;
     }
+    this.cssPriority = nodes.item(0).getFirstChild().getNodeValue();
+  }
+
+  public void setSkinName(String name) {
+    this.skinName = name;
+  }
+
+  public void setCSSPath(String cssPath) {
+    this.cssPath = cssPath;
+  }
+
+  public void setOverwrite(boolean overwrite) {
+    this.overwrite = overwrite;
+  }
+
+  public void setCSSPriority(String cssPriority) {
+    this.cssPriority = cssPriority;
+  }
+
 }

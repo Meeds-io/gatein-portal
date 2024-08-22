@@ -33,85 +33,83 @@ import org.exoplatform.services.log.ExoLogger;
 import org.gatein.wci.WebApp;
 
 /**
- *
- * Created by eXoPlatform SAS
- *
- * Author: Minh Hoang TO - hoang281283@gmail.com
- *
- * Sep 16, 2009
+ * Created by eXoPlatform SAS Author: Minh Hoang TO - hoang281283@gmail.com Sep
+ * 16, 2009
  */
 public class GateInSkinConfigDeployer extends AbstractResourceDeployer {
 
-    /** . */
-    private static final Log log = ExoLogger.getLogger(GateInSkinConfigDeployer.class);
+  /** . */
+  private static final Log  log = ExoLogger.getLogger(GateInSkinConfigDeployer.class);
 
-    /** . */
-    private final SkinService skinService;
+  /** . */
+  private final SkinService skinService;
 
-    /**
-     * The name of the portal container
-     */
-    private final String portalContainerName;
+  /**
+   * The name of the portal container
+   */
+  private final String      portalContainerName;
 
-    public GateInSkinConfigDeployer(String portalContainerName, SkinService _skinService) {
-        this.skinService = _skinService;
-        this.portalContainerName = portalContainerName;
-    }
+  public GateInSkinConfigDeployer(String portalContainerName, SkinService skinService) {
+    this.skinService = skinService;
+    this.portalContainerName = portalContainerName;
+  }
 
-    /**
-     * @see org.exoplatform.portal.resource.AbstractResourceDeployer#add(WebApp, URL)
-     */
-    @Override
-    protected void add(final WebApp webApp, final URL url) {
-        ServletContext scontext = null;
-        try {
-            scontext = webApp.getServletContext();
-            final PortalContainerPostInitTask task = new PortalContainerPostInitTask() {
-                public void execute(ServletContext scontext, PortalContainer portalContainer) {
-                    try {
-                        SkinConfigParser.processConfigResource(DocumentSource.create(url), skinService, scontext);
-                    } catch (Exception ex) {
-                        log.error("An error occurs while registering '" + GATEIN_CONFIG_RESOURCE + "' from the context '"
-                                + (scontext == null ? "unknown" : scontext.getServletContextName()) + "'", ex);
-                    }
-                    skinService.registerContext(webApp);
-                }
-            };
-            PortalContainer.addInitTask(scontext, task, portalContainerName);
-        } catch (Exception ex) {
-            log.error("An error occurs while registering '" + GATEIN_CONFIG_RESOURCE + "' from the context '"
-                    + (scontext == null ? "unknown" : scontext.getServletContextName()) + "'", ex);
+  /**
+   * @see org.exoplatform.portal.resource.AbstractResourceDeployer#add(WebApp,
+   *      URL)
+   */
+  @Override
+  protected void add(final WebApp webApp, final URL url) {
+    ServletContext scontext = null;
+    try {
+      scontext = webApp.getServletContext();
+      final PortalContainerPostInitTask task = new PortalContainerPostInitTask() {
+        public void execute(ServletContext scontext, PortalContainer portalContainer) {
+          skinService.registerContext(webApp);
+          try {
+            SkinConfigParser.processConfigResource(DocumentSource.create(url), skinService, scontext);
+          } catch (Exception ex) {
+            log.error("An error occurs while registering '" + GATEIN_CONFIG_RESOURCE + "' from the context '" +
+                (scontext == null ? "unknown" : scontext.getServletContextName()) + "'", ex);
+          }
         }
+      };
+      PortalContainer.addInitTask(scontext, task, portalContainerName);
+    } catch (Exception ex) {
+      log.error("An error occurs while registering '" + GATEIN_CONFIG_RESOURCE + "' from the context '" +
+          (scontext == null ? "unknown" : scontext.getServletContextName()) + "'", ex);
     }
+  }
 
-    /**
-     * @see org.exoplatform.portal.resource.AbstractResourceDeployer#remove(org.gatein.wci.WebApp)
-     */
-    @Override
-    protected void remove(WebApp webApp) {
-        String contextPath = webApp.getServletContext().getContextPath();
-        try {
-            skinService.removeSkins(SkinDependentManager.getPortalSkins(contextPath));
-            skinService.removeSkins(SkinDependentManager.getPortletSkins(contextPath));
+  /**
+   * @see org.exoplatform.portal.resource.AbstractResourceDeployer#remove(org.gatein.wci.WebApp)
+   */
+  @Override
+  protected void remove(WebApp webApp) {
+    String contextPath = webApp.getServletContext().getContextPath();
+    try {
+      skinService.removeSkins(SkinDependentManager.getPortalSkins(contextPath));
+      skinService.removeSkins(SkinDependentManager.getPortletSkins(contextPath));
 
-            /*
-             * Remove skinName defined by the webApp, if no other webApps supports the skinName
-             */
-            Set<String> supportedSkins = SkinDependentManager.getSkinNames(contextPath);
-            if (supportedSkins != null) {
-                for (String skin : supportedSkins) {
-                    if (SkinDependentManager.skinNameIsRemovable(skin, contextPath)) {
-                        skinService.removeSupportedSkin(skin);
-                    }
-                }
-            }
-
-            // Update the 'skinDependentManager'
-            SkinDependentManager.clearAssociatedSkins(contextPath);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+      /*
+       * Remove skinName defined by the webApp, if no other webApps supports the
+       * skinName
+       */
+      Set<String> supportedSkins = SkinDependentManager.getSkinNames(contextPath);
+      if (supportedSkins != null) {
+        for (String skin : supportedSkins) {
+          if (SkinDependentManager.skinNameIsRemovable(skin, contextPath)) {
+            skinService.removeSupportedSkin(skin);
+          }
         }
-        skinService.unregisterServletContext(webApp);
+      }
+
+      // Update the 'skinDependentManager'
+      SkinDependentManager.clearAssociatedSkins(contextPath);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
     }
+    skinService.unregisterServletContext(webApp);
+  }
 
 }

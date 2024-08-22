@@ -20,7 +20,6 @@ import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_SITE_
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_SUBTITLE_SETTING_KEY;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_THEME_VARIABLES;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_TITLE_SETTING_KEY;
-import static org.exoplatform.portal.branding.BrandingServiceImpl.BRANDING_TOPBAR_THEME_SETTING_KEY;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.FILE_API_NAME_SPACE;
 import static org.exoplatform.portal.branding.BrandingServiceImpl.LOGIN_BACKGROUND_NAME;
 import static org.junit.Assert.assertEquals;
@@ -38,6 +37,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,6 +62,7 @@ import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.services.FileService;
+import org.exoplatform.commons.file.services.FileStorageException;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
@@ -315,7 +316,7 @@ public class BrandingServiceImplTest {
   }
 
   @Test
-  public void shouldGetBrandingInformationWithoutBinaries() {
+  public void shouldGetBrandingInformationWithoutBinaries() throws FileStorageException, IOException {
 
     // Given
     SettingService settingService = mock(SettingService.class);
@@ -366,6 +367,7 @@ public class BrandingServiceImplTest {
         1, 2, 3
     }));
 
+    when(fileService.writeFile(any())).thenAnswer(invocation -> invocation.getArgument(0));
     assertNotNull(brandingService.getLoginBackgroundPath());
     assertNotNull(brandingService.getLogoPath());
     assertNotNull(brandingService.getLoginBackgroundPath());
@@ -438,8 +440,7 @@ public class BrandingServiceImplTest {
 
     Branding newBranding = new Branding();
     newBranding.setCompanyName("New Company Name");
-    newBranding.setTopBarTheme("Pink");
-    newBranding.setThemeStyle(new HashMap<String, String>());
+    newBranding.setThemeStyle(new HashMap<>());
     newBranding.getThemeStyle().put("primaryColor", primaryColorNewValue);
     newBranding.getThemeStyle().put("primaryBackground", primaryBackgroundNewValue);
     newBranding.getThemeStyle().put("secondaryColor", secondaryColorNewValue);
@@ -455,7 +456,7 @@ public class BrandingServiceImplTest {
     brandingService.updateBrandingInformation(newBranding);
 
     // Then
-    verify(settingService, times(5)).set(settingContext.capture(),
+    verify(settingService, times(4)).set(settingContext.capture(),
                                          settingScope.capture(),
                                          settingKey.capture(),
                                          settingValue.capture());
@@ -479,21 +480,16 @@ public class BrandingServiceImplTest {
     assertEquals(BRANDING_COMPANY_NAME_SETTING_KEY, keys.get(0));
     assertEquals("New Company Name", values.get(0).getValue());
 
-    assertEquals(Context.GLOBAL, contexts.get(1));
-    assertEquals(Scope.GLOBAL, scopes.get(1));
-    assertEquals(BRANDING_TOPBAR_THEME_SETTING_KEY, keys.get(1));
-    assertEquals("Pink", values.get(1).getValue());
-
+    assertEquals(BRANDING_CONTEXT, contexts.get(1));
+    assertEquals(BRANDING_SCOPE, scopes.get(1));
     assertEquals(BRANDING_CONTEXT, contexts.get(2));
     assertEquals(BRANDING_SCOPE, scopes.get(2));
-    assertEquals(BRANDING_CONTEXT, contexts.get(3));
-    assertEquals(BRANDING_SCOPE, scopes.get(3));
 
-    String firstThemeColorParam = keys.get(2);
-    String firstThemeColorValue = values.get(2).getValue().toString();
+    String firstThemeColorParam = keys.get(1);
+    String firstThemeColorValue = values.get(1).getValue().toString();
 
-    String secondThemeColorParam = keys.get(3);
-    String secondThemeColorValue = values.get(3).getValue().toString();
+    String secondThemeColorParam = keys.get(2);
+    String secondThemeColorValue = values.get(2).getValue().toString();
 
     assertEquals("primaryColor", secondThemeColorParam);
     assertEquals("primaryBackground", firstThemeColorParam);
@@ -690,6 +686,7 @@ public class BrandingServiceImplTest {
     when(context.getResourceAsStream(imagePath)).thenReturn(new ByteArrayInputStream(new byte[] {
         1, 2, 3
     }));
+    when(fileService.writeFile(any())).thenAnswer(invocation -> invocation.getArgument(0));
     Background loginBackground = brandingService.getLoginBackground();
     assertNotNull(loginBackground);
     assertEquals(3, loginBackground.getSize());
@@ -737,6 +734,7 @@ public class BrandingServiceImplTest {
     when(context.getResourceAsStream(imagePath)).thenReturn(new ByteArrayInputStream(new byte[] {
         1, 2, 3
     }));
+    when(fileService.writeFile(any())).thenAnswer(invocation -> invocation.getArgument(0));
     Favicon favicon = brandingService.getFavicon();
     assertNotNull(favicon);
     assertEquals(3, favicon.getSize());
@@ -784,6 +782,7 @@ public class BrandingServiceImplTest {
     when(context.getResourceAsStream(imagePath)).thenReturn(new ByteArrayInputStream(new byte[] {
         1, 2, 3
     }));
+    when(fileService.writeFile(any())).thenAnswer(invocation -> invocation.getArgument(0));
     Logo logo = brandingService.getLogo();
     assertNotNull(logo);
     assertEquals(3, logo.getSize());

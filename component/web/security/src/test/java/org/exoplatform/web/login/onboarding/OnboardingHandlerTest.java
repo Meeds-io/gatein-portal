@@ -179,7 +179,7 @@ public class OnboardingHandlerTest {
     when(resourceBundleService.getResourceBundle(any(String[].class), eq(REQUEST_LOCALE))).thenReturn(resourceBundle);
     when(resourceBundle.getString(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
 
-    when(javascriptConfigService.getJSConfig(any(), eq(REQUEST_LOCALE))).thenReturn(new JSONObject());
+    when(javascriptConfigService.getJSConfig()).thenReturn(new JSONObject());
 
     when(servletContext.getRequestDispatcher(any())).thenReturn(requestDispatcher);
 

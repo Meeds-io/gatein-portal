@@ -22,10 +22,15 @@ package org.gatein.portal.controller.resource.script;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.controller.QualifiedName;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import org.gatein.portal.controller.resource.Resource;
 import org.gatein.portal.controller.resource.ResourceId;
 import org.gatein.portal.controller.resource.ResourceRequestHandler;
@@ -50,11 +55,16 @@ public class BaseScriptResource<R extends Resource<R>> extends Resource<R> {
     /** . */
     private final Map<Locale, Map<QualifiedName, String>> minParametersMap;
 
+    /** . */
+    @Getter
+    @Setter
+    protected String contextPath;
+
     BaseScriptResource(ScriptGraph graph, ResourceId id) {
         super(id);
 
         //
-        Map<QualifiedName, String> parameters = new HashMap<QualifiedName, String>();
+        Map<QualifiedName, String> parameters = new HashMap<>();
         parameters.put(WebAppController.HANDLER_PARAM, "script");
         parameters.put(ResourceRequestHandler.RESOURCE_QN, id.getName());
         parameters.put(ResourceRequestHandler.SCOPE_QN, id.getScope().name());
@@ -63,15 +73,15 @@ public class BaseScriptResource<R extends Resource<R>> extends Resource<R> {
         parameters.put(ResourceRequestHandler.LANG_QN, "");
 
         //
-        Map<QualifiedName, String> minifiedParameters = new HashMap<QualifiedName, String>(parameters);
+        Map<QualifiedName, String> minifiedParameters = new HashMap<>(parameters);
         minifiedParameters.put(ResourceRequestHandler.COMPRESS_QN, "min");
 
         //
         this.parameters = parameters;
         this.minParameters = minifiedParameters;
         this.graph = graph;
-        this.parametersMap = new HashMap<Locale, Map<QualifiedName, String>>();
-        this.minParametersMap = new HashMap<Locale, Map<QualifiedName, String>>();
+        this.parametersMap = new ConcurrentHashMap<>();
+        this.minParametersMap = new ConcurrentHashMap<>();
     }
 
     public Map<QualifiedName, String> getParameters(boolean minified, Locale locale) {

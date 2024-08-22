@@ -29,13 +29,12 @@ import org.gatein.portal.controller.resource.ResourceId;
  */
 public class ScriptGroup extends BaseScriptResource<ScriptGroup> {
     final Set<ResourceId> scripts;
-    final String contextPath;
 
     ScriptGroup(ScriptGraph graph, ResourceId id, String contextPath) {
         super(graph, id);
 
         //
-        this.scripts = new HashSet<ResourceId>();
+        this.scripts = new HashSet<>();
         this.contextPath = contextPath;
     }
 

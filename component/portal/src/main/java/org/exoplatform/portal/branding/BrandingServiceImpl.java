@@ -16,6 +16,7 @@
  */
 package org.exoplatform.portal.branding;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -69,6 +70,8 @@ import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
 
+import lombok.SneakyThrows;
+
 @SuppressWarnings("unchecked")
 public class BrandingServiceImpl implements BrandingService, Startable {
 
@@ -117,8 +120,6 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   public static final String   BRANDING_THEME_LESS_PATH          = "exo.branding.theme.path";
 
   public static final String   BRANDING_THEME_VARIABLES          = "exo.branding.theme.variables";
-
-  public static final String   BRANDING_TOPBAR_THEME_SETTING_KEY = "bar_navigation_style";
 
   public static final String   BRANDING_LOGO_ID_SETTING_KEY      = "exo.branding.company.id";
 
@@ -186,8 +187,6 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   private String               defaultCompanyLink                = "";
 
-  private String               defaultTopbarTheme                = "Dark";
-
   private String               defaultConfiguredLogoPath         = null;
 
   private String               defaultConfiguredFaviconPath      = null;
@@ -247,7 +246,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     computeThemeCSS();
     listenerService.addListener(ExoFeatureService.FEATURE_STATUS_CHANGED_EVENT, e -> {
       if (StringUtils.equals(BRANDING_CUSTOM_STYLE_FEATURE, (String) e.getSource())) {
-        this.updateLastUpdatedTime();
+        this.triggerBrandingUpdated(true, true);
       }
     });
   }
@@ -279,11 +278,11 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   public Branding getBrandingInformation(boolean retrieveBinaries) {
     Branding branding = new Branding();
     branding.setDefaultLanguage(getDefaultLanguage());
+    branding.setDirection(getDefaultLocaleDirection());
     branding.setSupportedLanguages(loadLanguages());
     branding.setCompanyName(getCompanyName());
     branding.setCompanyLink(getCompanyLink());
     branding.setSiteName(getSiteName());
-    branding.setTopBarTheme(getTopBarTheme());
     branding.setLogo(getLogo());
     branding.setFavicon(getFavicon());
     branding.setLoginBackground(getLoginBackground());
@@ -326,11 +325,12 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   @Override
   public long getLastUpdatedTime() {
-    SettingValue<?> lastUpdatedTime = settingService.get(Context.GLOBAL, Scope.GLOBAL, BRANDING_LAST_UPDATED_TIME_KEY);
-    if (lastUpdatedTime == null || lastUpdatedTime.getValue() == null) {
+    String lastUpdatedTime = getPropertyValue(BRANDING_LAST_UPDATED_TIME_KEY);
+    if (lastUpdatedTime == null) {
       return DEFAULT_LAST_MODIFED;
+    } else {
+      return Long.parseLong(lastUpdatedTime);
     }
-    return Long.parseLong(lastUpdatedTime.getValue().toString());
   }
 
   @Override
@@ -340,7 +340,6 @@ public class BrandingServiceImpl implements BrandingService, Startable {
       updateCompanyName(branding.getCompanyName(), false);
       updateSiteName(branding.getSiteName(), false);
       updateCompanyLink(branding.getCompanyLink(), false);
-      updateTopBarTheme(branding.getTopBarTheme(), false);
       updateLogo(branding.getLogo(), false);
       updateFavicon(branding.getFavicon(), false);
       updateLoginBackground(branding.getLoginBackground(), false);
@@ -356,7 +355,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
       updateLoginTitle(branding.getLoginTitle());
       updateLoginSubtitle(branding.getLoginSubtitle());
     } finally {
-      updateLastUpdatedTime();
+      triggerBrandingUpdated(true, true);
     }
   }
 
@@ -374,110 +373,47 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   @Override
   public String getCompanyLink() {
-    SettingValue<String> brandingCompanyLink = (SettingValue<String>) settingService.get(Context.GLOBAL,
-                                                                                         Scope.GLOBAL,
-                                                                                         BRANDING_COMPANY_LINK_SETTING_KEY);
-    if (brandingCompanyLink != null && StringUtils.isNotBlank(brandingCompanyLink.getValue())) {
-      return brandingCompanyLink.getValue();
-    } else {
-      return defaultCompanyLink;
-    }
+    return getPropertyValue(BRANDING_COMPANY_LINK_SETTING_KEY, defaultCompanyLink);
   }
 
   @Override
   public String getSiteName() {
-    SettingValue<String> brandingSiteName = (SettingValue<String>) settingService.get(Context.GLOBAL,
-                                                                                      Scope.GLOBAL,
-                                                                                      BRANDING_SITE_NAME_SETTING_KEY);
-    if (brandingSiteName != null && StringUtils.isNotBlank(brandingSiteName.getValue())) {
-      return brandingSiteName.getValue();
-    } else {
-      return defaultSiteName;
-    }
+    return getPropertyValue(BRANDING_SITE_NAME_SETTING_KEY, defaultSiteName);
   }
 
   @Override
   public String getPageBackgroundColor() {
-    SettingValue<String> color = (SettingValue<String>) settingService.get(Context.GLOBAL,
-                                                                           Scope.GLOBAL,
-                                                                           BRANDING_PAGE_BG_COLOR_KEY);
-    if (color != null && StringUtils.isNotBlank(color.getValue())) {
-      return color.getValue();
-    } else {
-      return null;
-    }
+    return getPropertyValue(BRANDING_PAGE_BG_COLOR_KEY);
   }
 
   @Override
   public String getPageBackgroundRepeat() {
-    SettingValue<String> value = (SettingValue<String>) settingService.get(Context.GLOBAL,
-                                                                           Scope.GLOBAL,
-                                                                           BRANDING_PAGE_BG_REPEAT_KEY);
-    if (value != null && StringUtils.isNotBlank(value.getValue())) {
-      return value.getValue();
-    } else {
-      return null;
-    }
+    return getPropertyValue(BRANDING_PAGE_BG_REPEAT_KEY);
   }
 
   @Override
   public String getPageWidth() {
-    SettingValue<String> value = (SettingValue<String>) settingService.get(Context.GLOBAL,
-                                                                           Scope.GLOBAL,
-                                                                           BRANDING_PAGE_WIDTH_KEY);
-    if (value != null && StringUtils.isNotBlank(value.getValue())) {
-      return value.getValue();
-    } else {
-      return null;
-    }
+    return getPropertyValue(BRANDING_PAGE_WIDTH_KEY);
   }
 
   @Override
   public String getCustomCss() {
-    SettingValue<String> value = (SettingValue<String>) settingService.get(Context.GLOBAL,
-                                                                           Scope.GLOBAL,
-                                                                           BRANDING_CUSTOM_CSS);
-    if (value != null && StringUtils.isNotBlank(value.getValue())) {
-      return value.getValue();
-    } else {
-      return null;
-    }
+    return getPropertyValue(BRANDING_CUSTOM_CSS);
   }
 
   @Override
   public String getPageBackgroundPosition() {
-    SettingValue<String> value = (SettingValue<String>) settingService.get(Context.GLOBAL,
-                                                                           Scope.GLOBAL,
-                                                                           BRANDING_PAGE_BG_POSITION_KEY);
-    if (value != null && StringUtils.isNotBlank(value.getValue())) {
-      return value.getValue();
-    } else {
-      return null;
-    }
+    return getPropertyValue(BRANDING_PAGE_BG_POSITION_KEY);
   }
 
   @Override
   public String getPageBackgroundSize() {
-    SettingValue<String> value = (SettingValue<String>) settingService.get(Context.GLOBAL,
-                                                                           Scope.GLOBAL,
-                                                                           BRANDING_PAGE_BG_SIZE_KEY);
-    if (value != null && StringUtils.isNotBlank(value.getValue())) {
-      return value.getValue();
-    } else {
-      return null;
-    }
+    return getPropertyValue(BRANDING_PAGE_BG_SIZE_KEY);
   }
 
   @Override
   public String getLoginBackgroundTextColor() {
-    SettingValue<String> color = (SettingValue<String>) settingService.get(Context.GLOBAL,
-                                                                           Scope.GLOBAL,
-                                                                           BRANDING_LOGIN_TEXT_COLOR_KEY);
-    if (color != null && StringUtils.isNotBlank(color.getValue())) {
-      return color.getValue();
-    } else {
-      return null;
-    }
+    return getPropertyValue(BRANDING_LOGIN_TEXT_COLOR_KEY);
   }
 
   @Override
@@ -501,63 +437,23 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   }
 
   @Override
-  public String getTopBarTheme() {
-    SettingValue<String> topBarTheme = (SettingValue<String>) settingService.get(Context.GLOBAL,
-                                                                                 Scope.GLOBAL,
-                                                                                 BRANDING_TOPBAR_THEME_SETTING_KEY);
-    if (topBarTheme != null && StringUtils.isNotBlank(topBarTheme.getValue())) {
-      return topBarTheme.getValue();
-    } else {
-      return defaultTopbarTheme;
-    }
-  }
-
-  @Override
   public Long getLogoId() {
-    SettingValue<String> logoId = (SettingValue<String>) settingService.get(Context.GLOBAL,
-                                                                            Scope.GLOBAL,
-                                                                            BRANDING_LOGO_ID_SETTING_KEY);
-    if (logoId != null && logoId.getValue() != null) {
-      return Long.parseLong(logoId.getValue());
-    } else {
-      return null;
-    }
+    return getPropertyValueLong(BRANDING_LOGO_ID_SETTING_KEY);
   }
 
   @Override
   public Long getFaviconId() {
-    SettingValue<String> faviconId = (SettingValue<String>) settingService.get(Context.GLOBAL,
-                                                                               Scope.GLOBAL,
-                                                                               BRANDING_FAVICON_ID_SETTING_KEY);
-    if (faviconId != null && faviconId.getValue() != null) {
-      return Long.parseLong(faviconId.getValue());
-    } else {
-      return null;
-    }
+    return getPropertyValueLong(BRANDING_FAVICON_ID_SETTING_KEY);
   }
 
   @Override
   public Long getLoginBackgroundId() {
-    SettingValue<String> loginBackgroundId = (SettingValue<String>) settingService.get(Context.GLOBAL,
-                                                                                       Scope.GLOBAL,
-                                                                                       BRANDING_LOGIN_BG_ID_SETTING_KEY);
-    if (loginBackgroundId != null && loginBackgroundId.getValue() != null) {
-      return Long.parseLong(loginBackgroundId.getValue());
-    } else {
-      return null;
-    }
+    return getPropertyValueLong(BRANDING_LOGIN_BG_ID_SETTING_KEY);
   }
 
   @Override
   public Long getPageBackgroundId() {
-    SettingValue<String> backgroundId = (SettingValue<String>) settingService.get(Context.GLOBAL,
-                                                                                  Scope.GLOBAL,
-                                                                                  BRANDING_PAGE_BG_ID_SETTING_KEY);
-    if (backgroundId != null && backgroundId.getValue() != null) {
-      return Long.parseLong(backgroundId.getValue());
-    } else {
-      return null;
-    }
+    return getPropertyValueLong(BRANDING_PAGE_BG_ID_SETTING_KEY);
   }
 
   @Override
@@ -568,7 +464,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
         if (imageId != null && imageId > 0) {
           this.logo = retrieveStoredBrandingFile(imageId, new Logo());
         } else {
-          this.logo = retrieveDefaultBrandingFile(defaultConfiguredLogoPath, new Logo());
+          this.logo = retrieveDefaultBrandingFile(defaultConfiguredLogoPath, new Logo(), LOGO_NAME, BRANDING_LOGO_ID_SETTING_KEY);
         }
       } catch (Exception e) {
         LOG.warn("Error retrieving logo", e);
@@ -585,7 +481,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
         if (imageId != null) {
           this.favicon = retrieveStoredBrandingFile(imageId, new Favicon());
         } else {
-          this.favicon = retrieveDefaultBrandingFile(defaultConfiguredFaviconPath, new Favicon());
+          this.favicon = retrieveDefaultBrandingFile(defaultConfiguredFaviconPath, new Favicon(), FAVICON_NAME, BRANDING_FAVICON_ID_SETTING_KEY);
         }
       } catch (Exception e) {
         LOG.warn("Error retrieving favicon", e);
@@ -602,7 +498,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
         if (imageId != null) {
           this.loginBackground = retrieveStoredBrandingFile(imageId, new Background());
         } else if (StringUtils.isNotBlank(defaultConfiguredLoginBgPath)) {
-          this.loginBackground = retrieveDefaultBrandingFile(defaultConfiguredLoginBgPath, new Background());
+          this.loginBackground = retrieveDefaultBrandingFile(defaultConfiguredLoginBgPath, new Background(), LOGIN_BACKGROUND_NAME, BRANDING_LOGIN_BG_ID_SETTING_KEY);
         } else {
           this.loginBackground = new Background();
         }
@@ -657,11 +553,6 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     Background background = getPageBackground();
     return background == null
            || background.getData() == null ? null : BRANDING_PAGE_BG_BASE_PATH + Objects.hash(background.getUpdatedDate());
-  }
-
-  @Override
-  public void updateTopBarTheme(String topBarTheme) {
-    updateTopBarTheme(topBarTheme, true);
   }
 
   @Override
@@ -867,53 +758,57 @@ public class BrandingServiceImpl implements BrandingService, Startable {
                                                                                    .getLocale();
   }
 
+  private String getDefaultLocaleDirection() {
+    LocaleConfig defaultLocaleConfig = localeConfigService.getDefaultLocaleConfig();
+    return defaultLocaleConfig == null
+           || defaultLocaleConfig.getOrientation() == null
+           || !defaultLocaleConfig.getOrientation()
+                                  .isRT() ? "ltr" : "rtl";
+  }
+
   private String getLocaleDisplayName(Locale defaultLocale, Locale locale) {
     return defaultLocale.equals(locale) ? defaultLocale.getDisplayName(defaultLocale) :
                                         locale.getDisplayName(defaultLocale) + " / " + locale.getDisplayName(locale);
   }
 
-  private void updateTopBarTheme(String topBarTheme, boolean updateLastUpdatedTime) {
-    updatePropertyValue(topBarTheme, updateLastUpdatedTime, BRANDING_TOPBAR_THEME_SETTING_KEY);
-  }
-
   private void updateCompanyLink(String companyLink, boolean updateLastUpdatedTime) {
-    updatePropertyValue(companyLink, updateLastUpdatedTime, BRANDING_COMPANY_LINK_SETTING_KEY);
+    updatePropertyValue(BRANDING_COMPANY_LINK_SETTING_KEY, companyLink, updateLastUpdatedTime);
   }
 
   private void updateSiteName(String siteName, boolean updateLastUpdatedTime) {
-    updatePropertyValue(siteName, updateLastUpdatedTime, BRANDING_SITE_NAME_SETTING_KEY);
+    updatePropertyValue(BRANDING_SITE_NAME_SETTING_KEY, siteName, updateLastUpdatedTime);
   }
 
   private void updateLoginBackgroundTextColor(String textColor, boolean updateLastUpdatedTime) {
-    updatePropertyValue(textColor, updateLastUpdatedTime, BRANDING_LOGIN_TEXT_COLOR_KEY);
+    updatePropertyValue(BRANDING_LOGIN_TEXT_COLOR_KEY, textColor, updateLastUpdatedTime);
   }
 
   private void updatePageBackgroundColor(String color, boolean updateLastUpdatedTime) {
-    updatePropertyValue(color, updateLastUpdatedTime, BRANDING_PAGE_BG_COLOR_KEY);
+    updatePropertyValue(BRANDING_PAGE_BG_COLOR_KEY, color, updateLastUpdatedTime);
   }
 
   private void updatePageBackgroundSize(String value, boolean updateLastUpdatedTime) {
-    updatePropertyValue(value, updateLastUpdatedTime, BRANDING_PAGE_BG_SIZE_KEY);
+    updatePropertyValue(BRANDING_PAGE_BG_SIZE_KEY, value, updateLastUpdatedTime);
   }
 
   private void updatePageBackgroundPosition(String value, boolean updateLastUpdatedTime) {
-    updatePropertyValue(value, updateLastUpdatedTime, BRANDING_PAGE_BG_POSITION_KEY);
+    updatePropertyValue(BRANDING_PAGE_BG_POSITION_KEY, value, updateLastUpdatedTime);
   }
 
   private void updatePageBackgroundRepeat(String value, boolean updateLastUpdatedTime) {
-    updatePropertyValue(value, updateLastUpdatedTime, BRANDING_PAGE_BG_REPEAT_KEY);
+    updatePropertyValue(BRANDING_PAGE_BG_REPEAT_KEY, value, updateLastUpdatedTime);
   }
 
   private void updatePageWidth(String value, boolean updateLastUpdatedTime) {
-    updatePropertyValue(value, updateLastUpdatedTime, BRANDING_PAGE_WIDTH_KEY);
+    updatePropertyValue(BRANDING_PAGE_WIDTH_KEY, value, updateLastUpdatedTime);
   }
 
   private void updateCustomCss(String value, boolean updateLastUpdatedTime) {
-    updatePropertyValue(value, updateLastUpdatedTime, BRANDING_CUSTOM_CSS);
+    updatePropertyValue(BRANDING_CUSTOM_CSS, value, updateLastUpdatedTime);
   }
 
   private void updateCompanyName(String companyName, boolean updateLastUpdatedTime) {
-    updatePropertyValue(companyName, updateLastUpdatedTime, BRANDING_COMPANY_NAME_SETTING_KEY);
+    updatePropertyValue(BRANDING_COMPANY_NAME_SETTING_KEY, companyName, updateLastUpdatedTime);
   }
 
   private void updateThemeStyle(Map<String, String> themeStyles, boolean updateLastUpdatedTime) {
@@ -932,9 +827,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     }
 
     // Refresh Theme
-    if (updateLastUpdatedTime) {
-      updateLastUpdatedTime();
-    }
+    triggerBrandingUpdated(updateLastUpdatedTime, updateLastUpdatedTime);
   }
 
   private void updateLoginTitle(Map<String, String> titles) {
@@ -974,52 +867,54 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   private void updateLogo(Logo logo, boolean updateLastUpdatedTime) { // NOSONAR
     updateBrandingFile(logo, LOGO_NAME, this.getLogoId(), BRANDING_LOGO_ID_SETTING_KEY);
     this.logo = null;
-    if (updateLastUpdatedTime) {
-      updateLastUpdatedTime();
-    }
+    triggerBrandingUpdated(updateLastUpdatedTime, updateLastUpdatedTime);
   }
 
   private void updateFavicon(Favicon favicon, boolean updateLastUpdatedTime) {
     updateBrandingFile(favicon, FAVICON_NAME, this.getFaviconId(), BRANDING_FAVICON_ID_SETTING_KEY);
     this.favicon = null;
-    if (updateLastUpdatedTime) {
-      updateLastUpdatedTime();
-    }
+    triggerBrandingUpdated(updateLastUpdatedTime, updateLastUpdatedTime);
   }
 
   private void updateLoginBackground(Background loginBackground, boolean updateLastUpdatedTime) {
     updateBrandingFile(loginBackground, LOGIN_BACKGROUND_NAME, this.getLoginBackgroundId(), BRANDING_LOGIN_BG_ID_SETTING_KEY);
     this.loginBackground = null;
-    if (updateLastUpdatedTime) {
-      updateLastUpdatedTime();
-    }
+    triggerBrandingUpdated(updateLastUpdatedTime, updateLastUpdatedTime);
   }
 
   private void updatePageBackground(Background background, boolean updateLastUpdatedTime) {
     updateBrandingFile(background, PAGE_BACKGROUND_NAME, this.getPageBackgroundId(), BRANDING_PAGE_BG_ID_SETTING_KEY);
     this.pageBackground = null;
-    if (updateLastUpdatedTime) {
-      updateLastUpdatedTime();
-    }
+    triggerBrandingUpdated(updateLastUpdatedTime, updateLastUpdatedTime);
   }
 
   private void updateBrandingFile(BrandingFile brandingFile, String fileName, Long fileId, String settingKey) {
     String uploadId = brandingFile == null ? null : brandingFile.getUploadId();
-    if (StringUtils.isNotBlank(uploadId)) {
-      try {
-        if (StringUtils.equals(BRANDING_RESET_ATTACHMENT_ID, uploadId)) {
-          removeBrandingFile(fileId, settingKey);
-        } else {
-          updateBrandingFileByUploadId(uploadId, fileName, fileId, settingKey);
-        }
-      } catch (Exception e) {
-        throw new IllegalStateException("Error while updating login background", e);
+    updateBrandingFile(uploadId,
+                       fileName,
+                       fileId,
+                       settingKey);
+    if (fileId != null
+        && !StringUtils.equals(BRANDING_RESET_ATTACHMENT_ID, uploadId)) {
+      // Cleanup old fileId
+      fileService.deleteFile(fileId);
+    }
+  }
+
+  private void updateBrandingFile(String uploadId, String fileName, Long fileId, String settingKey) {
+    try {
+      if (StringUtils.equals(BRANDING_RESET_ATTACHMENT_ID, uploadId)) {
+        removeBrandingFile(fileId, settingKey);
+      } else if (StringUtils.isNotBlank(uploadId)) {
+        updateBrandingFileByUploadId(uploadId, fileName, settingKey);
       }
+    } catch (Exception e) {
+      throw new IllegalStateException("Error while updating login background", e);
     }
   }
 
   private void removeBrandingFile(Long fileId, String settingKey) {
-    if (fileId != null) {
+    if (fileId != null && fileId > 0) {
       fileService.deleteFile(fileId);
       settingService.remove(Context.GLOBAL,
                             Scope.GLOBAL,
@@ -1027,17 +922,22 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     }
   }
 
+  @SneakyThrows
   private void updateBrandingFileByUploadId(String uploadId,
                                             String fileName,
-                                            Long fileId,
-                                            String settingKey) throws Exception {
+                                            String settingKey) {
     InputStream inputStream = getUploadDataAsStream(uploadId);
     if (inputStream == null) {
       throw new IllegalArgumentException("Cannot update " + fileName +
           ", the object must contain the image data or an upload id");
     }
+    updateBrandingFileByInputStream(inputStream, fileName, settingKey);
+  }
+
+  @SneakyThrows
+  private FileItem updateBrandingFileByInputStream(InputStream inputStream, String fileName, String settingKey)  {
     int size = inputStream.available();
-    FileItem fileItem = new FileItem(fileId,
+    FileItem fileItem = new FileItem(0l,
                                      fileName,
                                      "image/png",
                                      FILE_API_NAME_SPACE,
@@ -1046,15 +946,12 @@ public class BrandingServiceImpl implements BrandingService, Startable {
                                      getCurrentUserId(),
                                      false,
                                      inputStream);
-    if (fileId == null) {
-      fileItem = fileService.writeFile(fileItem);
-      settingService.set(Context.GLOBAL,
-                         Scope.GLOBAL,
-                         settingKey,
-                         SettingValue.create(String.valueOf(fileItem.getFileInfo().getId())));
-    } else {
-      fileService.updateFile(fileItem);
-    }
+    fileItem = fileService.writeFile(fileItem);
+    settingService.set(Context.GLOBAL,
+                       Scope.GLOBAL,
+                       settingKey,
+                       SettingValue.create(String.valueOf(fileItem.getFileInfo().getId())));
+    return fileItem;
   }
 
   private String computeThemeCSS() {// NOSONAR
@@ -1142,35 +1039,61 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     return brandingFile;
   }
 
-  private <T extends BrandingFile> T retrieveDefaultBrandingFile(String imagePath, T brandingFile) throws IOException {
+  private <T extends BrandingFile> T retrieveDefaultBrandingFile(String imagePath, T brandingFile, String fileName, String settingKey) throws IOException {
     if (StringUtils.isNotBlank(imagePath)) {
+      byte[] bytes = null;
+      long lastModified = DEFAULT_LAST_MODIFED;
       File file = new File(imagePath);
       if (file.exists()) {
-        brandingFile.setData(Files.readAllBytes(file.toPath()));
-        brandingFile.setSize(file.length());
-        brandingFile.setUpdatedDate(file.lastModified());
+        bytes = Files.readAllBytes(file.toPath());
+        lastModified = file.lastModified();
       } else {
-        InputStream is = container.getPortalContext().getResourceAsStream(imagePath);
-        if (is != null) {
-          byte[] streamContentAsBytes = IOUtil.getStreamContentAsBytes(is);
-          brandingFile.setData(streamContentAsBytes);
-          brandingFile.setSize(streamContentAsBytes.length);
-          brandingFile.setUpdatedDate(DEFAULT_LAST_MODIFED);
+        try (InputStream is = container.getPortalContext().getResourceAsStream(imagePath)) {
+          if (is != null) {
+            bytes = IOUtil.getStreamContentAsBytes(is);
+          }
         }
+      }
+      if (bytes != null) {
+        FileItem fileItem = updateBrandingFileByInputStream(new ByteArrayInputStream(bytes), fileName, settingKey);
+        brandingFile.setFileId(fileItem.getFileInfo().getId());
+        brandingFile.setData(bytes);
+        brandingFile.setSize(bytes.length);
+        brandingFile.setUpdatedDate(lastModified);
       }
     }
     return brandingFile;
   }
 
-  private void updatePropertyValue(String value, boolean updateLastUpdatedTime, String key) {
+  private String getPropertyValue(String key) {
+    return getPropertyValue(key, null);
+  }
+
+  private Long getPropertyValueLong(String key) {
+    String value = getPropertyValue(key, null);
+    return StringUtils.isBlank(value) ? null : Long.parseLong(value);
+  }
+
+  private String getPropertyValue(String key, String defaultValue) {
+    SettingValue<?> value = settingService.get(Context.GLOBAL,
+                                               Scope.GLOBAL,
+                                               key);
+    if (value != null
+        && value.getValue() != null
+        && StringUtils.isNotBlank(value.getValue().toString())) {
+      return value.getValue().toString();
+    } else {
+      return defaultValue;
+    }
+  }
+
+  private void updatePropertyValue(String key, String value, boolean updateLastUpdatedTime) {
     if (StringUtils.isBlank(value)) {
       settingService.remove(Context.GLOBAL, Scope.GLOBAL, key);
     } else {
       settingService.set(Context.GLOBAL, Scope.GLOBAL, key, SettingValue.create(value));
     }
-    if (updateLastUpdatedTime) {
-      updateLastUpdatedTime();
-    }
+    triggerBrandingUpdated(updateLastUpdatedTime, updateLastUpdatedTime);
   }
 
   private void validateCSSInputs(Branding branding) { // NOSONAR
@@ -1197,8 +1120,13 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     }
   }
 
-  private void updateLastUpdatedTime() {
-    updateLastUpdatedTime(System.currentTimeMillis());
+  private void triggerBrandingUpdated(boolean updateLastUpdatedTime, boolean triggerEvent) {
+    if (updateLastUpdatedTime) {
+      updateLastUpdatedTime(System.currentTimeMillis());
+    }
+    if (triggerEvent) {
+      listenerService.broadcast(BRANDING_UPDATED_EVENT, null, getBrandingInformation(false));
+    }
   }
 
   private ExoFeatureService getFeatureService() {

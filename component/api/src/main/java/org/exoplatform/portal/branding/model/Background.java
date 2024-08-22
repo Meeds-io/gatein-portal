@@ -33,4 +33,9 @@ public class Background extends BrandingFile implements Cloneable {
     return new Background(getUploadId(), getSize(), getData(), getUpdatedDate(), getFileId());
   }
 
+  @Override
+  @SuppressWarnings("unchecked")
+  public Background cloneFile() {
+    return this.clone();
+  }
 }

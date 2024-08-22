@@ -20,10 +20,17 @@ package org.exoplatform.portal.resource;
 
 import static org.exoplatform.web.controller.metadata.DescriptorBuilder.*;
 
-import java.net.MalformedURLException;
-import java.util.Arrays;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
+import org.exoplatform.commons.utils.BinaryOutput;
+import org.exoplatform.portal.resource.SkinResourceRequestHandler.SkinResourceRenderer;
 import org.exoplatform.services.resources.Orientation;
+import org.exoplatform.test.mocks.servlet.MockHttpServletResponse;
+import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.controller.router.Router;
 import org.exoplatform.web.controller.router.RouterConfigException;
 
@@ -32,142 +39,103 @@ import org.exoplatform.web.controller.router.RouterConfigException;
  * @version $Revision$
  */
 public class TestSkinService extends AbstractSkinServiceTest {
-    private static boolean isFirstStartup = true;
+  private static boolean isFirstStartup = true;
 
-    boolean isDevelopingMode() {
-        return false;
+  boolean isDevelopingMode() {
+    return false;
+  }
+
+  @Override
+  boolean setUpTestEnvironment() {
+    return isFirstStartup;
+  }
+
+  Router getRouter() {
+    Router router;
+    try {
+      router = router().add(
+                            route("/skins/{gtn:version}/{gtn:resource}{gtn:compress}{gtn:orientation}.css")
+                                                                                                           .with(routeParam("gtn:handler").withValue("skin"))
+                                                                                                           .with(pathParam("gtn:version").matchedBy("[^/]*")
+                                                                                                                                         .preservePath())
+                                                                                                           .with(pathParam("gtn:orientation").matchedBy("-(lt)|-(rt)|")
+                                                                                                                                             .captureGroup(true))
+                                                                                                           .with(pathParam("gtn:compress").matchedBy("-(min)|")
+                                                                                                                                          .captureGroup(true))
+                                                                                                           .with(pathParam("gtn:resource").matchedBy(".+?")
+                                                                                                                                          .preservePath()))
+                       .build();
+      return router;
+    } catch (RouterConfigException e) {
+      return null;
     }
+  }
 
-    @Override
-    boolean setUpTestEnvironment() {
-        return isFirstStartup;
-    }
+  @Override
+  void touchSetUp() {
+    isFirstStartup = false;
+  }
 
-    Router getRouter() {
-        Router router;
-        try {
-            router = router().add(
-                    route("/skins/{gtn:version}/{gtn:resource}{gtn:compress}{gtn:orientation}.css")
-                            .with(routeParam("gtn:handler").withValue("skin"))
-                            .with(pathParam("gtn:version").matchedBy("[^/]*").preservePath())
-                            .with(pathParam("gtn:orientation").matchedBy("-(lt)|-(rt)|").captureGroup(true))
-                            .with(pathParam("gtn:compress").matchedBy("-(min)|").captureGroup(true))
-                            .with(pathParam("gtn:resource").matchedBy(".+?").preservePath())).build();
-            return router;
-        } catch (RouterConfigException e) {
-            return null;
-        }
-    }
+  @SuppressWarnings({ "deprecation", "removal" })
+  public void testRenderCss() throws IOException {
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    final BinaryOutput output = new BinaryOutput() {
+      public Charset getCharset() {
+        return StandardCharsets.UTF_8;
+      }
 
-    @Override
-    void touchSetUp() {
-        isFirstStartup = false;
-    }
+      public void write(byte b) throws IOException {
+        outputStream.write(b);
+      }
 
-    public void testRenderURL() {
-        SkinURL skinURL = skinService.getSkin("mockwebapp/FirstPortlet", "TestSkin").createURL(controllerCtx);
-        assertEquals("/portal/skins/" + ASSETS_VERSION + "/mockwebapp/skin/FirstPortlet-min-lt.css", skinURL.toString());
-        skinURL.setOrientation(Orientation.RT);
-        assertEquals("/portal/skins/" + ASSETS_VERSION + "/mockwebapp/skin/FirstPortlet-min-rt.css", skinURL.toString());
-    }
+      public void write(byte[] bytes) throws IOException {
+        outputStream.write(bytes);
+      }
 
-    public void testCompositeSkin() throws NullPointerException, MalformedURLException {
-        SkinConfig fSkin = skinService.getSkin("mockwebapp/FirstPortlet", "TestSkin");
-        SkinConfig sSkin = skinService.getSkin("mockwebapp/SecondPortlet", "TestSkin");
-        assertNotNull(fSkin);
-        assertNotNull(sSkin);
+      public void write(byte[] bytes, int off, int len) throws IOException {
+        outputStream.write(bytes, off, len);
+      }
+    };
+    ControllerContext controllerContext = newControllerContext(getRouter(), "/skins/7.0/mockwebapp/skin/FirstPortlet-min-lt.css");
+    ResourceRenderer renderer = new SkinResourceRenderer(new MockHttpServletResponse(), controllerContext, output);
+    assertTrue(skinService.renderCSS(controllerContext, renderer, true));
+    String result = outputStream.toString();
+    assertEquals(".FirstPortlet {foo1 : bar1}", result);
+  }
 
-        Skin merged = skinService.merge(Arrays.asList(fSkin, sSkin));
-        SkinURL url = merged.createURL(controllerCtx);
+  public void testGetCustomPortalSkins() {
+    Collection<SkinConfig> customSkins = skinService.getCustomPortalSkins("TestSkin");
+    assertNotNull(customSkins);
+    assertEquals(0, customSkins.size());
 
-        url.setOrientation(Orientation.LT);
-        assertEquals(".FirstPortlet {foo1 : bar1}\n.SecondPortlet {foo2 : bar2}",
-                skinService.getCSS(newControllerContext(getRouter(), url.toString()), true));
+    customSkins = skinService.getCustomPortalSkins("OtherSkin");
+    assertNotNull(customSkins);
+    assertEquals(1, customSkins.size());
+  }
 
-        url.setOrientation(Orientation.RT);
-        assertEquals(".FirstPortlet {foo1 : bar1}\n.SecondPortlet {foo2 : bar2}",
-                skinService.getCSS(newControllerContext(getRouter(), url.toString()), true));
-    }
+  public void testGetSkinList() {
+    String[] skinList = skinService.getSkinList();
+    assertNotNull(skinList);
+    assertEquals(3, skinList.length);
+  }
 
-    public void testCache() throws Exception {
-        String resource = "/path/to/test/cache.css";
-        String url = newSimpleSkin(resource).createURL(controllerCtx).toString();
+  public void testRenderURL() {
+    SkinURL skinURL = skinService.getSkin("mockwebapp/FirstPortlet", "TestSkin").createURL();
+    assertEquals("/mockwebapp/skin/FirstPortlet.css?orientation=LT&minify=true&hash=1107379639", skinURL.toString());
+    skinURL.setOrientation(Orientation.RT);
+    assertEquals("/mockwebapp/skin/FirstPortlet.css?orientation=RT&minify=true&hash=1107379639", skinURL.toString());
+  }
 
-        resResolver.addResource(resource, "foo");
-        assertEquals("foo", skinService.getCSS(newControllerContext(getRouter(), url), true));
+  public void testGetSkinModuleFileContent() throws IOException {
+    assertEquals(".FirstPortlet {foo1 : bar1}", skinService.getSkinModuleFileContent("/mockwebapp/skin/FirstPortlet.css"));
+    assertEquals(".ThirdPortlet {foo1 : bar1}\n", skinService.getSkinModuleFileContent("/mockwebapp-test/skin/ThirdPortlet.css"));
 
-        resResolver.addResource(resource, "bar");
-        assertEquals("foo", skinService.getCSS(newControllerContext(getRouter(), url), true));
-    }
 
-    public void testInvalidateCache() throws Exception {
-        String resource = "/path/to/test/invalidate/cache.css";
-        String url = newSimpleSkin(resource).createURL(controllerCtx).toString();
+  }
 
-        resResolver.addResource(resource, "foo");
-        assertEquals("foo", skinService.getCSS(newControllerContext(getRouter(), url), true));
+  public void testGetSkinModuleContent() throws IOException {
+    assertEquals(".FirstPortlet {foo1 : bar1}",
+                 skinService.getSkinModuleContent("/mockwebapp/skin/FirstPortlet.css", 0, Orientation.LT, true));
+  }
 
-        resResolver.addResource(resource, "bar");
-        skinService.invalidateCachedSkin(resource);
-        assertEquals("bar", skinService.getCSS(newControllerContext(getRouter(), url), true));
-    }
-
-    public void testProcessImportCSS() throws Exception {
-        String resource = "/process/import/css.css";
-        String url = newSimpleSkin(resource).createURL(controllerCtx).toString();
-
-        resResolver.addResource(resource, "@import url(Portlet/Stylesheet.css); aaa;");
-        assertEquals(" aaa;", skinService.getCSS(newControllerContext(getRouter(), url), true));
-        skinService.invalidateCachedSkin(resource);
-
-        resResolver.addResource(resource, "@import url('/Portlet/Stylesheet.css'); aaa;");
-        assertEquals(" aaa;", skinService.getCSS(newControllerContext(getRouter(), url), true));
-        skinService.invalidateCachedSkin(resource);
-
-        // parent file import child css file
-        resResolver.addResource(resource, "@import url(childCSS/child.css);  background:url(images/foo.gif);");
-        String childResource = "/process/import/childCSS/child.css";
-        resResolver.addResource(childResource, "background:url(bar.gif);");
-
-        /*
-         * Now test merge and process recursively (run in non-dev mode) We have folder /path/to/parent.css /images/foo.gif
-         * /childCSS/child.css /bar.gif
-         */
-        assertEquals("background:url(/process/import/childCSS/bar.gif);  background:url(/process/import/images/foo.gif);",
-                skinService.getCSS(newControllerContext(getRouter(), url), true));
-
-        url = newSimpleSkin(childResource).createURL(controllerCtx).toString();
-        assertEquals("background:url(/process/import/childCSS/bar.gif);",
-                skinService.getCSS(newControllerContext(getRouter(), url), true));
-    }
-
-    public void testProcessImportWithUnicodeCssChar() throws Exception {
-        String childResource = "/process/import/childCSS/child.css";
-        resResolver.addResource(childResource, "#test:after {content: \"\\00a0 \\003e \\00a0\";}");
-
-        String resource = "/process/import/css.css";
-        String url = newSimpleSkin(resource).createURL(controllerCtx).toString();
-
-        resResolver.addResource(resource, "@import url(childCSS/child.css); aaa;");
-        String css = skinService.getCSS(newControllerContext(getRouter(), url), true);
-        assertEquals("#test:after {content: \"\\00a0 \\003e \\00a0\";} aaa;", css);
-
-        skinService.invalidateCachedSkin(resource);
-    }
-
-    public void testLastModifiedSince() throws Exception {
-        String resource = "/last/modify/since.css";
-        SkinURL skinURL = newSimpleSkin(resource).createURL(controllerCtx);
-
-        resResolver.addResource(resource, "foo");
-
-        assertTrue(skinService.getCSS(newControllerContext(getRouter(), skinURL.toString()), true).length() > 0);
-        long lastModified = skinService.getLastModified(newControllerContext(getRouter(), skinURL.toString()));
-        Thread.sleep(1000);
-        assertEquals(lastModified, skinService.getLastModified(newControllerContext(getRouter(), skinURL.toString())));
-
-        skinURL.setOrientation(Orientation.RT);
-        Thread.sleep(1000);
-        assertTrue(lastModified < skinService.getLastModified(newControllerContext(getRouter(), skinURL.toString())));
-    }
 }
