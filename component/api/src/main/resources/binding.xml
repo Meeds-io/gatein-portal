@@ -51,6 +51,31 @@
     <value name="radius-bottom-left" field="radiusBottomLeft" usage="optional" />
     <value name="mobile-hidden" field="mobileHidden" usage="optional" />
     <value name="border-color" field="borderColor" usage="optional" />
+    <value name="border-size" field="borderSize" usage="optional" />
+    <value name="box-shadow" field="boxShadow" usage="optional" />
+    <value name="background-color" field="backgroundColor" usage="optional" />
+    <value name="background-image" field="backgroundImage" usage="optional" />
+    <value name="background-effect" field="backgroundEffect" usage="optional" />
+    <value name="background-position" field="backgroundPosition" usage="optional" />
+    <value name="background-size" field="backgroundSize" usage="optional" />
+    <value name="background-repeat" field="backgroundRepeat" usage="optional" />
+    <value name="text-title-color" field="textTitleColor" usage="optional" />
+    <value name="text-title-color" field="textTitleColor" usage="optional" />
+    <value name="text-title-font-size" field="textTitleFontSize" usage="optional" />
+    <value name="text-title-font-weight" field="textTitleFontWeight" usage="optional" />
+    <value name="text-title-font-style" field="textTitleFontStyle" usage="optional" />
+    <value name="text-header-color" field="textHeaderColor" usage="optional" />
+    <value name="text-header-font-size" field="textHeaderFontSize" usage="optional" />
+    <value name="text-header-font-weight" field="textHeaderFontWeight" usage="optional" />
+    <value name="text-header-font-style" field="textHeaderFontStyle" usage="optional" />
+    <value name="text-color" field="textColor" usage="optional" />
+    <value name="text-font-size" field="textFontSize" usage="optional" />
+    <value name="text-font-weight" field="textFontWeight" usage="optional" />
+    <value name="text-font-style" field="textFontStyle" usage="optional" />
+    <value name="text-subtitle-color" field="textSubtitleColor" usage="optional" />
+    <value name="text-subtitle-font-size" field="textSubtitleFontSize" usage="optional" />
+    <value name="text-subtitle-font-weight" field="textSubtitleFontWeight" usage="optional" />
+    <value name="text-subtitle-font-style" field="textSubtitleFontStyle" usage="optional" />
   </mapping>
 
   <mapping class="org.exoplatform.portal.application.Preference" name="preference" label="preference">
@@ -176,6 +201,10 @@
       default="Everyone"
       serializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.serializePermissions"
       deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions"/>
+    <structure
+      field="cssStyle"
+      map-as="org.exoplatform.portal.config.model.ModelStyle"
+      usage="optional" />
     <collection field="children" ordered="false">
       <structure map-as="org.exoplatform.portal.config.serialize.model.GridSection" usage="optional"/>
       <structure map-as="org.exoplatform.portal.config.serialize.model.FlexSection" usage="optional"/>
@@ -203,6 +232,10 @@
           deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions"/>
     <value name="move-containers-permissions" field="moveContainersPermissions" usage="optional" default="Everyone" serializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.serializePermissions"
           deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions"/>
+    <structure
+      field="cssStyle"
+      map-as="org.exoplatform.portal.config.model.ModelStyle"
+      usage="optional" />
     <collection field="children" ordered="false">
       <structure map-as="org.exoplatform.portal.config.model.Container" usage="optional"/>
       <structure map-as="org.exoplatform.portal.config.model.PageBody" usage="optional"/>
