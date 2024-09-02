@@ -18,27 +18,69 @@
  */
 package org.exoplatform.portal.mop.service;
 
+import org.apache.commons.collections.MapUtils;
+import org.exoplatform.commons.utils.ExpressionUtil;
+import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.State;
+import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.portal.mop.storage.DescriptionStorage;
+import org.exoplatform.services.resources.LocaleConfigService;
+import org.exoplatform.services.resources.ResourceBundleManager;
 
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class DescriptionServiceImpl implements DescriptionService {
 
   private DescriptionStorage descriptionStorage;
 
-  public DescriptionServiceImpl(DescriptionStorage descriptionStorage) {
+  private NavigationService navigationService;
+
+  private LocaleConfigService localeConfigService;
+
+  private ResourceBundleManager resourceBundleManager;
+
+
+  public DescriptionServiceImpl(DescriptionStorage descriptionStorage, NavigationService navigationService,
+                                LocaleConfigService localeConfigService, ResourceBundleManager resourceBundleManager) {
     this.descriptionStorage = descriptionStorage;
+    this.navigationService = navigationService;
+    this.localeConfigService = localeConfigService;
+    this.resourceBundleManager = resourceBundleManager;
   }
 
   @Override
-  public Map<Locale, State> getDescriptions(String id) {
-    return descriptionStorage.getDescriptions(id);
+  public Map<Locale, State> getDescriptions(String nodeId) {
+    Map<Locale, State> nodeLabels = descriptionStorage.getDescriptions(nodeId);
+    NodeData nodeData = navigationService.getNodeById(Long.valueOf(nodeId));
+    if (MapUtils.isEmpty(nodeLabels)) {
+      Map<Locale, State> nodeLocalizedLabels = new HashMap<>();
+      localeConfigService.getLocalConfigs().forEach(localeConfig -> {
+        Locale locale = localeConfig.getLocale();
+        String label = nodeData.getState().getLabel();
+        if (ExpressionUtil.isResourceBindingExpression(label)) {
+          SiteKey siteKey = nodeData.getSiteKey();
+          ResourceBundle nodeLabelResourceBundle = resourceBundleManager.getNavigationResourceBundle(getLocaleName(locale),
+                  siteKey.getTypeName(),
+                  siteKey.getName());
+          if (nodeLabelResourceBundle != null) {
+            label = ExpressionUtil.getExpressionValue(nodeLabelResourceBundle, label);
+          }
+        }
+        nodeLocalizedLabels.put(locale, new State(label, null));
+      });
+      return nodeLocalizedLabels;
+    } else {
+      return nodeLabels;
+    }
   }
 
   @Override
   public void setDescriptions(String id, Map<Locale, State> descriptions) {
     descriptionStorage.setDescriptions(id, descriptions);
+  }
+
+  private String getLocaleName(Locale locale) {
+    return locale.toLanguageTag().replace("-", "_"); // Use same name as
+    // localeConfigService
   }
 }
