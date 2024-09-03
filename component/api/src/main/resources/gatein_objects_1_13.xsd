@@ -218,6 +218,7 @@
         <xs:element name="portlet-ref" type="xs:string" minOccurs="1" maxOccurs="1"/>
         <xs:element name="preferences" type="portletPreferencesType" minOccurs="0" maxOccurs="1"/>
       </xs:sequence>
+      <xs:attribute name="profiles" type="xs:string"/>
     </xs:complexType>
 
     <xs:complexType name="sectionGridType">
