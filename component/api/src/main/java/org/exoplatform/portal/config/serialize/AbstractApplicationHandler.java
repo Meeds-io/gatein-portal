@@ -24,6 +24,7 @@ import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.config.model.Properties;
 import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.pom.data.MappedAttributes;
 import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
 
 import java.util.Collections;
@@ -87,6 +88,7 @@ public class AbstractApplicationHandler implements IMarshaller, IUnmarshaller, I
 
         // Id
         String id = optionalAttribute(ctx, "id");
+        String profiles = optionalAttribute(ctx, "profiles");
 
         //
         ctx.parsePastStartTag(m_uri, m_name);
@@ -143,6 +145,14 @@ public class AbstractApplicationHandler implements IMarshaller, IUnmarshaller, I
         Properties properties = null;
         if (ctx.isAt(m_uri, "properties")) {
             properties = (Properties) ctx.unmarshalElement();
+        }
+        if (StringUtils.isNotBlank(profiles)) {
+          if (properties == null) {
+            properties = new Properties();
+          } else {
+            properties = new Properties(properties);
+          }
+          properties.put(MappedAttributes.PROFILES.getName(), profiles);
         }
 
         //
