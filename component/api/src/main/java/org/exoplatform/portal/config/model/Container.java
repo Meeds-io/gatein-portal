@@ -289,6 +289,16 @@ public class Container extends ModelObject implements Cloneable {
               continue;
             }
           }
+        } else if (node instanceof Application application) { // NOSONAR
+          String nodeProfiles = application.getProfiles();
+          if (StringUtils.isNotBlank(nodeProfiles)) {
+            Set<String> activeProfiles = Tools.parseCommaList(nodeProfiles);
+            if (ExoContainer.getProfiles()
+                            .stream()
+                            .noneMatch(activeProfiles::contains)) {
+              continue;
+            }
+          }
         }
         ModelData data = node.build();
         ComponentData componentData = (ComponentData) data;
