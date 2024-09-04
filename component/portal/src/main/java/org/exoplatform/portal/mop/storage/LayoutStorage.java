@@ -629,7 +629,11 @@ public class LayoutStorage {
         TYPE type = TYPE.valueOf(jsonComponent.get(TYPE_PROP).toString());
 
         if (type == TYPE.WINDOW) {
-          results.add(buildWindow(windows.get(id)));
+          WindowEntity windowEntity = windows.get(id);
+          if (windowEntity == null) {
+            continue;
+          }
+          results.add(buildWindow(windowEntity));
         } else if (type == TYPE.CONTAINER) {
           ContainerEntity srcContainer = containerDAO.find(id);
           if (srcContainer == null) {
