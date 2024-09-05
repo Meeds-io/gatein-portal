@@ -24,6 +24,7 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.ApplicationData;
+import org.exoplatform.portal.pom.data.MappedAttributes;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
 /**
@@ -116,6 +117,13 @@ public class Application<S> extends ModelObject implements Cloneable {
 
     public String getHeight() {
         return height;
+    }
+
+    public String getProfiles() {
+      if (properties != null && properties.containsKey(MappedAttributes.PROFILES.getName())) {
+        return (String) properties.get(MappedAttributes.PROFILES.getName());
+      }
+      return null;
     }
 
     public void setHeight(String s) {
