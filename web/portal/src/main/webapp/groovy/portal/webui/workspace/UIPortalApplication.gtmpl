@@ -25,6 +25,7 @@
   import java.util.ResourceBundle;
   import org.exoplatform.services.resources.LocaleConfigService;
   import org.exoplatform.portal.mop.user.UserNode;
+  import org.exoplatform.portal.mop.SiteKey;
 
   def rcontext = _ctx.getRequestContext() ;
   def session = rcontext.getRequest().getSession();
@@ -63,12 +64,15 @@
   def title = rcontext.getTitle();
 
   BrandingService brandingService = uicomponent.getApplicationComponent(BrandingService.class);
-  if (portal.getSiteKey().getType() == org.exoplatform.portal.mop.SiteType.PORTAL) {
+  SiteKey siteKey = portal.getSiteKey();
+  String siteName = siteKey.getName();
+  String siteType = siteKey.getTypeName();
+  if (siteKey.getType() == org.exoplatform.portal.mop.SiteType.PORTAL) {
     ResourceBundleService resourceBundleService = uicomponent.getApplicationComponent(ResourceBundleService.class);
     ResourceBundle bundle = resourceBundleService.getResourceBundle("locale.portlet.Portlets", rcontext.getLocale());
-    if (portal.getSiteKey().getName().equals("public")) {
+    if ("public".equals(siteName)) {
       title = brandingService.getCompanyName() + " - " + bundle.getString("publicSite.title.suffix");
-    } else if (portal.getSiteKey().getName().equals("administration")) {
+    } else if ("administration".equals(siteName)) {
       title = title + " - " + brandingService.getCompanyName();
     }
   }
@@ -180,7 +184,9 @@
      eXo.env.portal.orientation='<%= orientation == Orientation.RT ? "rtl" : "ltr" %>';
      eXo.env.portal.selectedNodeId = '<%= selectedNodeId %>';
      eXo.env.portal.selectedNodeUri = '<%= selectedNodeUri %>';
-     eXo.env.portal.previousURI = '<%= previousURI %>';
+     eXo.env.portal.siteKeyName = '<%=siteName%>';
+     eXo.env.portal.siteKeyType = '<%=siteType%>';
+     eXo.env.portal.previousURI = '<%= previousURI == null ? "" : previousURI %>';
      eXo.env.portal.rest = '<%= PortalContainer.getCurrentRestContextName() %>';
      eXo.env.portal.csrfToken = "<%=CSRFTokenUtil.getToken(rcontext.getRequest())%>";
      eXo.env.portal.productName = "<%=productName%>";
