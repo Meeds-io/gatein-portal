@@ -28,7 +28,9 @@ import java.util.ResourceBundle;
  *
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
+ * @deprecated Not needed anymore in Meeds context, should be removed after
  */
+@Deprecated(forRemoval = true, since = "7.0")
 public interface UserPortalContext {
 
     /**

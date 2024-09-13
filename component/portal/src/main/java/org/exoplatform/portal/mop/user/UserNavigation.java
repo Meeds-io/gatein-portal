@@ -56,7 +56,7 @@ public class UserNavigation {
     }
 
     public ResourceBundle getBundle() {
-        ResourceBundle bundle = portal.context.getBundle(this);
+        ResourceBundle bundle = portal.getBundle(this);
         if (bundle == null) {
             bundle = EmptyResourceBundle.INSTANCE;
         }
@@ -80,4 +80,5 @@ public class UserNavigation {
     public String toString() {
         return "UserNavigation[key=" + navigation.getKey() + "]";
     }
+    
 }

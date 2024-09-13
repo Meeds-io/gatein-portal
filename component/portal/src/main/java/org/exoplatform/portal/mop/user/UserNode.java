@@ -179,7 +179,7 @@ public class UserNode {
     String id = context.getId();
 
     //
-    Locale userLocale = owner.navigation.portal.context.getUserLocale();
+    Locale userLocale = owner.navigation.portal.getUserLocale();
     if (context.getState().getLabel() != null
         && ExpressionUtil.isResourceBindingExpression(context.getState().getLabel())) {
       ResourceBundle bundle = owner.navigation.getBundle();
