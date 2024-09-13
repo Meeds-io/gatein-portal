@@ -289,7 +289,6 @@ public class UserPortalConfigService implements Startable {
      * @param portalName the portal name
      * @param username the user name
      * @return the config
-     * @throws Exception any exception
      */
     public UserPortalConfig getUserPortalConfig(String portalName, String username) {
         return getUserPortalConfig(portalName, username, LocaleContextInfoUtils.getUserLocale(username));
@@ -308,7 +307,6 @@ public class UserPortalConfigService implements Startable {
      * @param accessUser the user name
      * @param userPortalContext
      * @return the config
-     * @throws Exception
      * @deprecated the method
      *             {@link #getUserPortalConfig(String, String, java.util.Locale)}
      *             or {@link #getUserPortalConfig(String, String)} should be
