@@ -29,11 +29,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserNode;
 import org.exoplatform.portal.mop.user.UserNodeFilterConfig;
 import org.exoplatform.portal.mop.user.UserPortal;
-import org.exoplatform.portal.mop.user.UserPortalContext;
 import org.exoplatform.portal.url.PortalURLContext;
 import org.exoplatform.web.ControllerContext;
 import org.exoplatform.web.WebRequestHandler;
@@ -54,17 +52,6 @@ public class LegacyRequestHandler extends WebRequestHandler {
 
     /** . */
     private final UserPortalConfigService userPortalService;
-
-    /** . */
-    private final UserPortalContext userPortalContext = new UserPortalContext() {
-        public ResourceBundle getBundle(UserNavigation navigation) {
-            return null;
-        }
-
-        public Locale getUserLocale() {
-            return Locale.ENGLISH;
-        }
-    };
 
     public LegacyRequestHandler(URLFactoryService urlFactory, UserPortalConfigService userPortalService) {
         this.urlFactory = urlFactory;
@@ -96,8 +83,7 @@ public class LegacyRequestHandler extends WebRequestHandler {
 
         // Resolve the user node if node path is indicated
         if (!requestPath.equals("")) {
-            UserPortalConfig cfg = userPortalService.getUserPortalConfig(requestSiteName, request.getRemoteUser(),
-                    userPortalContext);
+            UserPortalConfig cfg = userPortalService.getUserPortalConfig(requestSiteName, request.getRemoteUser());
             if (cfg != null) {
                 UserPortal userPortal = cfg.getUserPortal();
                 UserNodeFilterConfig.Builder builder = UserNodeFilterConfig.builder().withAuthMode(

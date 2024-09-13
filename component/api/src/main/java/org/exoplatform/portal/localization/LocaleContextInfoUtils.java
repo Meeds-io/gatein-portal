@@ -53,14 +53,18 @@ public class LocaleContextInfoUtils {
       supported = supportedLocales.contains(locale);
     }
     if (!supported) {
-      LocaleConfigService localeConfigService = ExoContainerContext.getService(LocaleConfigService.class);
-      Locale defaultLocale = localeConfigService.getDefaultLocaleConfig().getLocale();
+      Locale defaultLocale = getDefaultLocale();
       LOG.warn("Unsupported locale returned by LocalePolicy: {}. Falling back to default configured local '{}'.",
                locale,
                defaultLocale);
       locale = defaultLocale;
     }
     return locale;
+  }
+
+  public static Locale getDefaultLocale() {
+    LocaleConfigService localeConfigService = ExoContainerContext.getService(LocaleConfigService.class);
+    return localeConfigService.getDefaultLocaleConfig().getLocale();
   }
 
   /**
@@ -161,6 +165,40 @@ public class LocaleContextInfoUtils {
   }
 
   /**
+   * Helper method to retrieve user locale from UserProfile
+   * 
+   * @param username
+   * @return user locale
+   */
+  public static Locale getUserLocale(String username) {
+    String lang = "";
+    UserProfile profile = null;
+    //
+    if (username != null) {
+      OrganizationService organizationService = ExoContainerContext.getCurrentContainer()
+                                                                   .getComponentInstanceOfType(OrganizationService.class);
+      // get user profile
+      beginContext(organizationService);
+      try {
+        profile = organizationService.getUserProfileHandler().findUserProfileByName(username);
+      } catch (Exception e) {
+        LOG.debug(username + " profile not found ", e);
+      } finally {
+        endContext(organizationService);
+      }
+      // fetch profile lang
+      if (profile != null) {
+        lang = profile.getAttribute(Constants.USER_LANGUAGE);
+      }
+    }
+    if (lang != null && lang.trim().length() > 0) {
+      return LocaleUtils.toLocale(lang);
+    } else {
+      return getDefaultLocale();
+    }
+  }
+
+  /**
    * Get session locale
    * 
    * @param request
@@ -173,39 +211,6 @@ public class LocaleContextInfoUtils {
     if (session != null)
       lang = (String) session.getAttribute(attrName);
     return (lang != null) ? LocaleContextInfo.getLocale(lang) : null;
-  }
-
-  /**
-   * Helper method to retrieve user locale from UserProfile
-   * 
-   * @param userId
-   * @return user locale
-   */
-  private static Locale getUserLocale(String userId) {
-    String lang = "";
-    UserProfile profile = null;
-    //
-    if (userId != null) {
-      OrganizationService organizationService = ExoContainerContext.getCurrentContainer()
-                                                                   .getComponentInstanceOfType(OrganizationService.class);
-      // get user profile
-      beginContext(organizationService);
-      try {
-        profile = organizationService.getUserProfileHandler().findUserProfileByName(userId);
-      } catch (Exception e) {
-        LOG.debug(userId + " profile not found ", e);
-      } finally {
-        endContext(organizationService);
-      }
-      // fetch profile lang
-      if (profile != null) {
-        lang = profile.getAttribute(Constants.USER_LANGUAGE);
-      }
-      if (lang != null && lang.trim().length() > 0) {
-        return LocaleUtils.toLocale(lang);
-      }
-    }
-    return null;
   }
 
   /**
