@@ -16,7 +16,6 @@
 package org.exoplatform.services.organization.mock;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +89,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
   public List<Membership> removeMembershipByUser(String userName, boolean broadcast) {
     List<Membership> memberships = userMemberships.compute(userName,
                                                            (key,
-                                                            existingMemberships) -> existingMemberships == null ? Collections.emptyList()
+                                                            existingMemberships) -> existingMemberships == null ? new ArrayList<>()
                                                                                                                 : new ArrayList<>(existingMemberships));
     removeMemberships(memberships, broadcast);
     return memberships;
@@ -99,7 +98,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
   public List<Membership> removeMembershipByGroup(String groupId, boolean broadcast) {
     List<Membership> memberships = groupMemberships.compute(groupId,
                                                             (key,
-                                                             existingMemberships) -> existingMemberships == null ? Collections.emptyList()
+                                                             existingMemberships) -> existingMemberships == null ? new ArrayList<>()
                                                                                                                  : new ArrayList<>(existingMemberships));
     removeMemberships(memberships, broadcast);
     return memberships;
@@ -108,7 +107,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
   public List<Membership> removeMembershipByMembershipType(String membershipType, boolean broadcast) {
     List<Membership> memberships = membershipTypeMemberships.compute(membershipType,
                                                                      (key,
-                                                                      existingMemberships) -> existingMemberships == null ? Collections.emptyList()
+                                                                      existingMemberships) -> existingMemberships == null ? new ArrayList<>()
                                                                                                                           : new ArrayList<>(existingMemberships));
     removeMemberships(memberships, broadcast);
     return memberships;
@@ -142,7 +141,7 @@ public class InMemoryMembershipHandler implements MembershipHandler {
 
   @Override
   public List<Membership> findMembershipsByUser(String userName) {
-    return userMemberships.computeIfAbsent(userName, key -> Collections.emptyList());
+    return userMemberships.computeIfAbsent(userName, key -> new ArrayList<>());
   }
 
   @Override
@@ -152,11 +151,11 @@ public class InMemoryMembershipHandler implements MembershipHandler {
 
   @Override
   public List<Membership> findMembershipsByGroup(Group group) {
-    return groupMemberships.computeIfAbsent(group.getId(), key -> Collections.emptyList());
+    return groupMemberships.computeIfAbsent(group.getId(), key -> new ArrayList<>());
   }
 
   public List<Membership> findMembershipsByGroupId(String groupId) {
-    return groupMemberships.computeIfAbsent(groupId, key -> Collections.emptyList());
+    return groupMemberships.computeIfAbsent(groupId, key -> new ArrayList<>());
   }
 
   @Override
