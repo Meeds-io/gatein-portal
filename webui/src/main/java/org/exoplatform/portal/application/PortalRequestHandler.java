@@ -76,6 +76,8 @@ public class PortalRequestHandler extends WebRequestHandler {
                                                                                  .findFirst()
                                                                                  .orElse(null);
 
+  private static final String                   PORTAL_PUBLIC_PAGE_NOT_FOUND = "/portal/public/page-not-found";
+
   public String getHandlerName() {
     return "portal";
   }
@@ -153,7 +155,23 @@ public class PortalRequestHandler extends WebRequestHandler {
         } else if (req.getRemoteUser() == null) {
           context.requestAuthenticationLogin();
         } else {
-          context.sendRedirect("/portal/" + portalConfigService.getMetaPortal() + "/page-not-found");
+          String metaPageNotFound = "/portal/" + portalConfigService.getMetaPortal() + "/page-not-found";
+          if (!StringUtils.equals(req.getRequestURI(), metaPageNotFound)) {
+            if (StringUtils.equals(req.getRequestURI(), PORTAL_PUBLIC_PAGE_NOT_FOUND)) {
+              // In case page-not-found can't be displayed in 'public' or 'meta' sites
+              // If logged in => redirect to /
+              // If Anonymous => redirect to Login page
+              if (StringUtils.isNotBlank(req.getRemoteUser())) {
+                context.sendRedirect("/");
+              } else {
+                context.requestAuthenticationLogin();
+              }
+            } else {
+              context.sendRedirect(metaPageNotFound);
+            }
+          } else {
+            context.sendRedirect(PORTAL_PUBLIC_PAGE_NOT_FOUND);
+          }
         }
       } else if (persistentPortalConfig != null
                  && StringUtils.equals(persistentPortalConfig.getName(), portalConfigService.getGlobalPortal())) {
