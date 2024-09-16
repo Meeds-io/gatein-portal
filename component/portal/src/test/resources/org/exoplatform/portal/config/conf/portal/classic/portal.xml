@@ -23,8 +23,8 @@
     xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_objects_1_10 http://www.gatein.org/xml/ns/gatein_objects_1_10"
     xmlns="http://www.gatein.org/xml/ns/gatein_objects_1_10">
   <portal-name>classic</portal-name>
-  <label>Classic</label>
-  <description>This is classic portal for testing</description>
+  <label>#{portal.classic.label}</label>
+  <description>#{portal.classic.description}</description>
   <display-order>1</display-order>
   <locale>en</locale>
   <access-permissions>Everyone</access-permissions>

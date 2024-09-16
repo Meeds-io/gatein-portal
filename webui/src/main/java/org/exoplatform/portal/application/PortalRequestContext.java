@@ -61,7 +61,6 @@ import org.exoplatform.portal.mop.user.UserNodeFilterConfig;
 import org.exoplatform.portal.mop.user.UserNodeFilterConfig.Builder;
 import org.exoplatform.portal.resource.SkinService;
 import org.exoplatform.portal.mop.user.UserPortal;
-import org.exoplatform.portal.mop.user.UserPortalContext;
 import org.exoplatform.portal.url.PortalURLContext;
 import org.exoplatform.portal.webui.application.UIPortlet;
 import org.exoplatform.portal.webui.page.UIPage;
@@ -411,8 +410,7 @@ public class PortalRequestContext extends WebuiRequestContext {
       String portalName = getCurrentPortalSite();
       try {
         userPortalConfig = portalConfigService.getUserPortalConfig(portalName,
-                                                                   remoteUser,
-                                                                   PortalRequestContext.USER_PORTAL_CONTEXT);
+                                                                   remoteUser);
       } catch (Exception e) {
         return null;
       }
@@ -553,15 +551,13 @@ public class PortalRequestContext extends WebuiRequestContext {
       UserNode node = uiportal.getSelectedUserNode();
       if (node != null) {
         ExoContainer container = getApplication().getApplicationServiceContainer();
-        container.getComponentInstanceOfType(UserPortalConfigService.class);
-        UserPortalConfigService configService = (UserPortalConfigService) container
-                                                                                   .getComponentInstanceOfType(UserPortalConfigService.class);
+        UserPortalConfigService configService = container.getComponentInstanceOfType(UserPortalConfigService.class);
         PageKey pageRef = node.getPageRef();
-        PageContext page = configService.getPage(pageRef);
+        PageContext pageContext = configService.getPage(pageRef);
 
         //
-        if (page != null) {
-          title = page.getState().getDisplayName();
+        if (pageContext != null) {
+          title = pageContext.getState().getDisplayName();
           // testing to ensure first that the title is a I18N expression
           if (ExpressionUtil.isResourceBindingExpression(title)) {
             String resolvedTitle = ExpressionUtil.getExpressionValue(this.getApplicationResourceBundle(), title);
@@ -833,28 +829,10 @@ public class PortalRequestContext extends WebuiRequestContext {
   public void addExtraMarkupHeader(Element element, String portletWindowId) {
     element.setAttribute("class", "ExHead-" + portletWindowId);
     if (this.extraMarkupHeaders == null) {
-      this.extraMarkupHeaders = new ArrayList<Element>();
+      this.extraMarkupHeaders = new ArrayList<>();
     }
     this.extraMarkupHeaders.add(element);
   }
-
-  public static final UserPortalContext USER_PORTAL_CONTEXT = new UserPortalContext() {
-    public ResourceBundle getBundle(UserNavigation navigation) {
-      ExoContainer container = ExoContainerContext.getCurrentContainer();
-      ResourceBundleManager rbMgr = (ResourceBundleManager) container
-                                                                     .getComponentInstanceOfType(ResourceBundleManager.class);
-      Locale locale = Util.getPortalRequestContext().getLocale();
-      return rbMgr.getNavigationResourceBundle(LocaleContextInfo.getLocaleAsString(locale),
-                                               navigation.getKey().getTypeName(),
-                                               navigation
-                                                         .getKey()
-                                                         .getName());
-    }
-
-    public Locale getUserLocale() {
-      return Util.getPortalRequestContext().getLocale();
-    }
-  };
 
   public RequestNavigationData getNavigationData() {
     return new RequestNavigationData(controllerContext.getParameter(RequestNavigationData.REQUEST_SITE_TYPE),

@@ -131,7 +131,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     startUserSession(username);
     when(portalConfigService.getMetaPortal()).thenReturn(metaPortalName);
     when(portalConfigService.getGlobalPortal()).thenReturn(globalPortalName);
-    when(portalConfigService.getUserPortalConfig(eq(metaPortalName), eq(username), any())).thenReturn(userPortalConfig);
+    when(portalConfigService.getUserPortalConfig(eq(metaPortalName), eq(username))).thenReturn(userPortalConfig);
     when(userPortalConfig.getUserPortal()).thenReturn(userPortal);
     when(userPortal.getNavigations()).thenReturn(userNavigations);
 
@@ -177,7 +177,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     when(nodePage.getType()).thenReturn("LINK");
     when(nodePage.getLink()).thenReturn("www.test.com");
     when(userNode.getPageRef()).thenReturn(pageKey);
-    when(portalConfigService.getUserPortalConfig(anyString(), anyString(), any())).thenReturn(userPortalConfig);
+    when(portalConfigService.getUserPortalConfig(anyString(), anyString())).thenReturn(userPortalConfig);
     when(userPortalConfig.getUserPortal()).thenReturn(userPortal);
     when(userPortal.getNodes(any(SiteType.class) , any(Scope.class), any(UserNodeFilterConfig.class),anyBoolean())).thenReturn(nodes);
     when(userACL.hasEditPermission(any(Page.class))).thenReturn(true);
@@ -246,7 +246,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     when(userNode.getParent()).thenReturn(parentNode);
     when(parentNode.getName()).thenReturn("default");
     when(parentNode.getChildren()).thenReturn(nodes);
-    when(portalConfigService.getUserPortalConfig(anyString(), anyString(), any())).thenReturn(userPortalConfig);
+    when(portalConfigService.getUserPortalConfig(anyString(), anyString())).thenReturn(userPortalConfig);
     when(userPortalConfig.getUserPortal()).thenReturn(userPortal);
     when(userPortal.getNodes(any(SiteType.class),
                              any(Scope.class),

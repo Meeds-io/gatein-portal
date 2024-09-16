@@ -19,65 +19,59 @@
 
 package org.exoplatform.portal.config;
 
-import java.io.Serializable;
+import java.util.Locale;
 
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.user.UserPortal;
-import org.exoplatform.portal.mop.user.UserPortalContext;
 import org.exoplatform.portal.mop.user.UserPortalImpl;
 
-public class UserPortalConfig implements Serializable {
+public class UserPortalConfig {
 
-    PortalConfig portal;
+  private PortalConfig            portal;
 
-    final UserPortalConfigService service;
+  private UserPortalConfigService service;
 
-    final String portalName;
+  private String                  portalName;
 
-    final String accessUser;
+  private String                  accessUser;
 
-    /** . */
-    private UserPortalContext userPortalContext;
+  private UserPortal              userPortal;
 
-    private UserPortal userPortal;
+  private Locale                  locale;
 
-    public UserPortalConfig() {
-        this.portal = null;
-        this.service = null;
-        this.portalName = null;
-        this.accessUser = null;
-        this.userPortalContext = null;
+  public UserPortalConfig(PortalConfig portal,
+                          UserPortalConfigService service,
+                          String portalName,
+                          String accessUser,
+                          Locale locale) {
+    this.portal = portal;
+    this.service = service;
+    this.portalName = portalName;
+    this.accessUser = accessUser;
+    this.locale = locale;
+  }
+
+  public UserPortal getUserPortal() {
+    return getUserPortal(false);
+  }
+
+  public UserPortal getUserPortal(boolean isNewlyCreated) {
+    if (isNewlyCreated || userPortal == null) {
+      userPortal = new UserPortalImpl(service, portalName, portal, accessUser, locale);
     }
+    return userPortal;
+  }
 
-    public UserPortalConfig(PortalConfig portal, UserPortalConfigService service, String portalName, String accessUser,
-            UserPortalContext userPortalContext) {
-        this.portal = portal;
-        this.service = service;
-        this.portalName = portalName;
-        this.accessUser = accessUser;
-        this.userPortalContext = userPortalContext;
-    }
+  public PortalConfig getPortalConfig() {
+    return portal;
+  }
 
-    public UserPortal getUserPortal() {
-        return getUserPortal(false);
-    }
+  public void setPortalConfig(PortalConfig portal) {
+    this.portal = portal;
+  }
 
-    public UserPortal getUserPortal(boolean isNewlyCreated) {
-        if (isNewlyCreated || userPortal == null) {
-            userPortal = new UserPortalImpl(service, portalName, portal, accessUser, userPortalContext);
-        }
-        return userPortal;
-    }
+  public String getPortalName() {
+    return portalName;
+  }
 
-    public PortalConfig getPortalConfig() {
-        return portal;
-    }
-
-    public void setPortalConfig(PortalConfig portal) {
-        this.portal = portal;
-    }
-
-    public String getPortalName() {
-        return portalName;
-    }
 }
