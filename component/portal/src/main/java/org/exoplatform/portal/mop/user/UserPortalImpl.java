@@ -193,6 +193,9 @@ public class UserPortalImpl implements UserPortal {
                           NodeChangeListener<UserNode> listener) throws NullPointerException,
                                                                  UserPortalException,
                                                                  NavigationServiceException {
+    if (userNavigation == null || userNavigation.navigation == null) {
+      return null;
+    }
     UserNodeContext userNodeContext = new UserNodeContext(userNavigation, filterConfig);
     NodeContext<UserNode> nodeContext = service.getNavigationService()
                                                .loadNode(userNodeContext,
