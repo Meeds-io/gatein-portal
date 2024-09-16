@@ -643,6 +643,9 @@ public class UserPortalConfigService implements Startable {
       }
       UserPortal userPortal = userPortalConfig.getUserPortal();
       UserNavigation navigation = userPortal.getNavigation(new SiteKey(SiteType.valueOf(siteType.toUpperCase()), siteName));
+      if (navigation == null) {
+        return null;
+      }
       UserNodeFilterConfig builder = UserNodeFilterConfig.builder()
                                                          .withReadWriteCheck()
                                                          .withVisibility(Visibility.DISPLAYED, Visibility.TEMPORAL)
