@@ -25,11 +25,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import org.exoplatform.commons.utils.ExpressionUtil;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
@@ -43,11 +48,17 @@ import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.navigation.VisitMode;
 import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.resources.LocaleContextInfo;
+import org.exoplatform.services.resources.ResourceBundleManager;
+import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.IdentityConstants;
 
+import lombok.Getter;
+import lombok.SneakyThrows;
+
 /**
- * @author  <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
+ * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
  * @version $Revision$
  */
 public class UserPortalImpl implements UserPortal {
@@ -59,14 +70,13 @@ public class UserPortalImpl implements UserPortal {
   /** . */
   final UserPortalConfigService          service;
 
+  private ResourceBundleManager          resourceBundleManager;
+
   /** . */
   private final PortalConfig             portalConfig;
 
   /** . */
-  final UserPortalContext                context;
-
-  /** . */
-  final String                           userName;
+  private final String                   userName;
 
   /** . */
   private List<UserNavigation>           navigations;
@@ -77,34 +87,26 @@ public class UserPortalImpl implements UserPortal {
   private final String                   portalName;
 
   /** . */
-  private final Locale                   portalLocale;
+  @Getter
+  private final Locale                   userLocale;
 
   public UserPortalImpl(UserPortalConfigService service,
                         String portalName,
                         PortalConfig portal,
                         String userName,
-                        UserPortalContext context) {
-    if (context == null) {
-      throw new IllegalArgumentException("No null context argument allowed");
-    }
-
-    //
-    String locale = portal.getLocale();
-
-    //
-    this.portalLocale = locale != null ? new Locale(locale) : null;
+                        Locale locale) {
     this.service = service;
     this.portalName = portalName;
     this.portalConfig = portal;
     this.userName = userName;
-    this.context = context;
     this.navigations = null;
     this.userNavigationComparator.setGlobalPortal(service.getGlobalPortal());
+    this.userLocale = locale;
   }
 
   @Override
   public Locale getLocale() {
-    return portalLocale;
+    return userLocale;
   }
 
   /**
@@ -143,7 +145,7 @@ public class UserPortalImpl implements UserPortal {
   public Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig filterConfig) {
     return getNodes(siteType, scope, filterConfig, true);
   }
-  
+
   @Override
   public Collection<UserNode> getNodes(SiteType siteType, Scope scope, UserNodeFilterConfig filterConfig, boolean includeGlobal) {
 
@@ -205,7 +207,8 @@ public class UserPortalImpl implements UserPortal {
   }
 
   @Override
-  public UserNode getNodeById(String userNodeId, SiteKey siteKey,
+  public UserNode getNodeById(String userNodeId,
+                              SiteKey siteKey,
                               Scope scope,
                               UserNodeFilterConfig filterConfig,
                               NodeChangeListener<UserNode> listener) {
@@ -404,16 +407,83 @@ public class UserPortalImpl implements UserPortal {
     return getGlobalUserNode(filterConfig, navigation.getKey(), segments);
   }
 
+  @Override
+  @SneakyThrows
+  public String getPortalLabel(SiteKey siteKey) {
+    return getPortalLabel(siteKey, userLocale);
+  }
+
+  @Override
+  @SneakyThrows
+  public String getPortalLabel(SiteKey siteKey, Locale locale) {
+    PortalConfig site = service.getDataStorage().getPortalConfig(siteKey);
+    String label = site == null ?
+                                siteKey.getName() :
+                                StringUtils.firstNonBlank(site.getLabel(),
+                                                          site.getName(),
+                                                          siteKey.getName());
+    if (siteKey.getType() == SiteType.PORTAL) {
+      return StringUtils.firstNonBlank(getLabel(siteKey, label, locale),
+                                       siteKey.getName());
+    } else if (siteKey.getType() == SiteType.GROUP) {
+      Group siteGroup = service.getOrganizationService()
+                               .getGroupHandler()
+                               .findGroupById(siteKey.getName());
+      if (siteGroup != null) {
+        return siteGroup.getLabel();
+      }
+    }
+    return label;
+  }
+
+  @Override
+  @SneakyThrows
+  public String getPortalDescription(SiteKey siteKey) {
+    return getPortalDescription(siteKey, userLocale);
+  }
+
+  @Override
+  @SneakyThrows
+  public String getPortalDescription(SiteKey siteKey, Locale locale) {
+    PortalConfig site = service.getDataStorage().getPortalConfig(siteKey);
+    String description = site == null ? null : site.getDescription();
+    if (siteKey.getType() == SiteType.PORTAL && description != null) {
+      return getLabel(siteKey, description, locale);
+    } else if (siteKey.getType() == SiteType.GROUP) {
+      Group siteGroup = service.getOrganizationService()
+                               .getGroupHandler()
+                               .findGroupById(siteKey.getName());
+      if (siteGroup != null) {
+        return siteGroup.getLabel();
+      }
+    }
+    return description;
+  }
+
   public PortalConfig getPortalConfig() {
     return portalConfig;
   }
 
+  protected String getLabel(SiteKey siteKey, String label, Locale locale) {
+    if (ExpressionUtil.isResourceBindingExpression(label)) {
+      return Stream.of(locale, ResourceBundleService.DEFAULT_CROWDIN_LOCALE)
+                   .map(l -> getBundle(siteKey.getTypeName(), siteKey.getName(), locale))
+                   .filter(Objects::nonNull)
+                   .map(b -> ExpressionUtil.getExpressionValue(b, label))
+                   .filter(StringUtils::isNotBlank)
+                   .findFirst()
+                   .orElse(null);
+    } else {
+      return label;
+    }
+  }
+
   protected UserNavigation filterUserNavigation(SiteKey key) {
-    UserNavigation userNavigation = this.navigations == null ? null
-                                                             : this.navigations.stream()
-                                                                               .filter(nav -> nav.getKey().equals(key))
-                                                                               .findFirst()
-                                                                               .orElse(null);
+    UserNavigation userNavigation = this.navigations == null ? null :
+                                                             this.navigations.stream()
+                                                                             .filter(nav -> nav.getKey().equals(key))
+                                                                             .findFirst()
+                                                                             .orElse(null);
     if (userNavigation == null) {
       this.refreshList = true;
       return loadUserNavigation(key);
@@ -503,6 +573,11 @@ public class UserPortalImpl implements UserPortal {
     return null;
   }
 
+  protected ResourceBundle getNavigationBundle(SiteKey siteKey) {
+    UserNavigation navigation = getNavigation(siteKey);
+    return navigation == null ? null : navigation.getBundle();
+  }
+
   /**
    * Note : the scope implementation is not stateless but we don't care in this
    * case.
@@ -572,6 +647,33 @@ public class UserPortalImpl implements UserPortal {
         userNode = nodeContext.getNode().filter().find(id);
       }
     }
+  }
+
+  public ResourceBundle getBundle(UserNavigation navigation) {
+    return getBundle(getSiteType(navigation), getSiteName(navigation), userLocale);
+  }
+
+  private ResourceBundle getBundle(String siteType, String siteName, Locale locale) {
+    return getResourceBundleManager().getNavigationResourceBundle(LocaleContextInfo.getLocaleAsString(locale),
+                                                                  siteType,
+                                                                  siteName);
+  }
+
+  private String getSiteName(UserNavigation navigation) {
+    return navigation.getKey()
+                     .getName();
+  }
+
+  private String getSiteType(UserNavigation navigation) {
+    return navigation.getKey()
+                     .getTypeName();
+  }
+
+  private ResourceBundleManager getResourceBundleManager() {
+    if (resourceBundleManager == null) {
+      resourceBundleManager = ExoContainerContext.getService(ResourceBundleManager.class);
+    }
+    return resourceBundleManager;
   }
 
 }

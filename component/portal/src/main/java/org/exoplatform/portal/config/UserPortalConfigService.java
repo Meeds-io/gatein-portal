@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -52,6 +51,7 @@ import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.localization.LocaleContextInfoUtils;
 import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.portal.mop.SiteFilter;
 import org.exoplatform.portal.mop.SiteKey;
@@ -66,7 +66,6 @@ import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.service.NavigationService;
 import org.exoplatform.portal.mop.storage.DescriptionStorage;
 import org.exoplatform.portal.mop.storage.PageStorage;
-import org.exoplatform.portal.mop.user.HttpUserPortalContext;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserNode;
 import org.exoplatform.portal.mop.user.UserNodeFilterConfig;
@@ -265,17 +264,6 @@ public class UserPortalConfigService implements Startable {
         return orgService_;
     }
 
-    /** Temporary until the {@link #getUserPortalConfig(String, String)} is removed. */
-    private static final UserPortalContext NULL_CONTEXT = new UserPortalContext() {
-        public ResourceBundle getBundle(UserNavigation navigation) {
-            return null;
-        }
-
-        public Locale getUserLocale() {
-            return Locale.ENGLISH;
-        }
-    };
-
     /**
      * <p>
      * Build and returns an instance of <code>UserPortalConfig</code>.
@@ -299,25 +287,36 @@ public class UserPortalConfigService implements Startable {
      * All the navigations are sorted using the value returned by {@link org.exoplatform.portal.config.model.PageNavigation#getPriority()}.
      *
      * @param portalName the portal name
-     * @param accessUser the user name
+     * @param username the user name
      * @return the config
-     * @throws Exception any exception
-     * @deprecated the method {@link #getUserPortalConfig(String, String, org.exoplatform.portal.mop.user.UserPortalContext)}
-     *             should be used instead
      */
-    @Deprecated
-    public UserPortalConfig getUserPortalConfig(String portalName, String accessUser) throws Exception {
-        return getUserPortalConfig(portalName, accessUser, NULL_CONTEXT);
+    public UserPortalConfig getUserPortalConfig(String portalName, String username) {
+        return getUserPortalConfig(portalName, username, LocaleContextInfoUtils.getUserLocale(username));
     }
 
-    public UserPortalConfig getUserPortalConfig(String portalName, String accessUser, UserPortalContext userPortalContext)
-            throws Exception {
+    public UserPortalConfig getUserPortalConfig(String portalName, String accessUser, Locale locale) {
         PortalConfig portal = layoutService.getPortalConfig(portalName);
         if (portal == null || !userACL_.hasPermission(portal)) {
             return null;
         }
+        return new UserPortalConfig(portal, this, portalName, accessUser, locale);
+    }
 
-        return new UserPortalConfig(portal, this, portalName, accessUser, userPortalContext);
+    /**
+     * @param portalName the portal name
+     * @param accessUser the user name
+     * @param userPortalContext
+     * @return the config
+     * @deprecated the method
+     *             {@link #getUserPortalConfig(String, String, java.util.Locale)}
+     *             or {@link #getUserPortalConfig(String, String)} should be
+     *             used instead
+     */
+    @Deprecated(forRemoval = true, since = "7.0")
+    public UserPortalConfig getUserPortalConfig(String portalName, String accessUser, UserPortalContext userPortalContext) {
+      boolean noSpecificLocale = userPortalContext == null || userPortalContext.getUserLocale() == null;
+      return noSpecificLocale ? getUserPortalConfig(portalName, accessUser) :
+                              getUserPortalConfig(portalName, accessUser, userPortalContext.getUserLocale());
     }
 
     /**
@@ -610,8 +609,7 @@ public class UserPortalConfigService implements Startable {
     }
 
     public Collection<UserNode> getPortalSiteNavigations(String siteName, String portalType, HttpServletRequest context) throws Exception {
-      HttpUserPortalContext userPortalContext = new HttpUserPortalContext(context);
-      UserPortalConfig userPortalConfig = getUserPortalConfig(siteName, context.getRemoteUser(), userPortalContext);
+      UserPortalConfig userPortalConfig = getUserPortalConfig(siteName, context.getRemoteUser());
       if (userPortalConfig == null) {
         return Collections.emptyList();
       }
@@ -630,15 +628,14 @@ public class UserPortalConfigService implements Startable {
     }
 
     public UserNode getPortalSiteRootNode(String siteName,String siteType, HttpServletRequest context) throws Exception {
-      HttpUserPortalContext userPortalContext = new HttpUserPortalContext(context);
       UserPortalConfig userPortalConfig = null;
       String username = context.getRemoteUser();
       if (StringUtils.equalsIgnoreCase(siteType, PortalConfig.PORTAL_TYPE)) {
-        userPortalConfig = getUserPortalConfig(siteName, username, userPortalContext);
+        userPortalConfig = getUserPortalConfig(siteName, username);
       } else {
         PortalConfig defaultPortalConfig = getUserPortalSites().stream().findFirst().orElse(null);
         if (defaultPortalConfig != null) {
-          userPortalConfig = getUserPortalConfig(defaultPortalConfig.getName(), username, userPortalContext);
+          userPortalConfig = getUserPortalConfig(defaultPortalConfig.getName(), username);
         }
       }
       if (userPortalConfig == null) {

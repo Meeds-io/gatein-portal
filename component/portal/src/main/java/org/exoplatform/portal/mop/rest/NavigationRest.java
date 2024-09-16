@@ -26,7 +26,6 @@ import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.exoplatform.portal.mop.service.LayoutService;
-import org.exoplatform.portal.mop.user.HttpUserPortalContext;
 import org.exoplatform.portal.mop.user.UserNavigation;
 import org.exoplatform.portal.mop.user.UserNode;
 import org.exoplatform.portal.mop.user.UserNodeFilterConfig;
@@ -93,7 +92,6 @@ public class NavigationRest implements ResourceContainer {
                                     @Schema(defaultValue = "20")
                                     @QueryParam("limit")
                                     int limit) {
-    HttpUserPortalContext userPortalContext = new HttpUserPortalContext(request);
     String portalName = portalConfigService.getMetaPortal();
 
     ConversationState state = ConversationState.getCurrent();
@@ -104,7 +102,7 @@ public class NavigationRest implements ResourceContainer {
     }
 
     try {
-      UserPortalConfig userPortalConfig = portalConfigService.getUserPortalConfig(portalName, username, userPortalContext);
+      UserPortalConfig userPortalConfig = portalConfigService.getUserPortalConfig(portalName, username);
       List<ResultUserNavigation> allNavs = userPortalConfig.getUserPortal()
                                                            .getNavigations()
                                                            .stream()
@@ -228,8 +226,7 @@ public class NavigationRest implements ResourceContainer {
     }
 
     try {
-      HttpUserPortalContext userPortalContext = new HttpUserPortalContext(request);
-      UserPortalConfig userPortalConfig = portalConfigService.getUserPortalConfig(portalName, username, userPortalContext);
+      UserPortalConfig userPortalConfig = portalConfigService.getUserPortalConfig(portalName, username);
       if (userPortalConfig == null) {
         return Response.status(404).build();
       }

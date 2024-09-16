@@ -21,6 +21,7 @@ package org.exoplatform.portal.mop.user;
 
 import java.util.*;
 
+import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.navigation.NavigationServiceException;
@@ -237,4 +238,37 @@ public interface UserPortal {
     UserNode resolvePath(UserNavigation navigation, UserNodeFilterConfig filterConfig, String path)
             throws NullPointerException, UserPortalException, NavigationServiceException;
 
+    /**
+     * @param siteKey Site Key
+     * @return the {@link PortalConfig} label
+     */
+    default String getPortalLabel(SiteKey siteKey) {
+      return null;
+    }
+
+    /**
+     * @param siteKey Site Key
+     * @param locale {@link Locale}
+     * @return the {@link PortalConfig} label
+     */
+    default String getPortalLabel(SiteKey siteKey, Locale locale) {
+      return null;
+    }
+
+    /**
+     * @param siteKey Site Key
+     * @return the {@link PortalConfig} description
+     */
+    default String getPortalDescription(SiteKey siteKey) {
+      return null;
+    }
+
+    /**
+     * @param siteKey Site Key
+     * @param locale {@link Locale}
+     * @return the {@link PortalConfig} description
+     */
+    default String getPortalDescription(SiteKey siteKey, Locale locale) {
+      return null;
+    }
 }

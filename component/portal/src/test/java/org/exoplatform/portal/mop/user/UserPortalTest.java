@@ -20,6 +20,7 @@ package org.exoplatform.portal.mop.user;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.exoplatform.portal.config.AbstractConfigTest;
 import org.exoplatform.portal.config.UserPortalConfig;
@@ -140,6 +141,13 @@ public class UserPortalTest extends AbstractConfigTest {
 
     navs = userPortal.getNavigations();
     assertEquals(initialSize, navs.size());
+  }
+
+  public void testGetSiteLabels() {
+    assertEquals("Classic", userPortal.getPortalLabel(SiteKey.portal("classic")));
+    assertEquals("Site classique", userPortal.getPortalLabel(SiteKey.portal("classic"), Locale.FRENCH));
+    assertEquals("This is classic portal for testing", userPortal.getPortalDescription(SiteKey.portal("classic")));
+    assertEquals("Un site pour test seulement", userPortal.getPortalDescription(SiteKey.portal("classic"), Locale.FRENCH));
   }
 
   private void createTestedNavigation() throws Exception {
