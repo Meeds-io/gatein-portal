@@ -39,4 +39,20 @@
       <artifactId>portal.component.web.controller</artifactId>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>aspectj-maven-plugin</artifactId>
+        <configuration>
+          <aspectLibraries>
+            <aspectLibrary>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>portal.component.common</artifactId>
+            </aspectLibrary>
+          </aspectLibraries>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

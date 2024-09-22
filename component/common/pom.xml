@@ -28,6 +28,7 @@
   <name>Meeds Portal Component Common</name>
 
   <properties>
+    <org.lombok.version>1.18.34</org.lombok.version>
     <exo.test.coverage.ratio>0.42</exo.test.coverage.ratio>
   </properties>
 
@@ -46,6 +47,11 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-fileupload2-jakarta</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -68,10 +74,6 @@
       </resource>
     </resources>
     <plugins>
-      <plugin>
-        <groupId>com.jcabi</groupId>
-        <artifactId>jcabi-maven-plugin</artifactId>
-      </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <executions>
