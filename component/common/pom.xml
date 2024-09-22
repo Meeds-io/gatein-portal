@@ -47,6 +47,11 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-fileupload2-jakarta</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>io.meeds.kernel</groupId>
@@ -68,10 +73,6 @@
       </resource>
     </resources>
     <plugins>
-      <plugin>
-        <groupId>com.jcabi</groupId>
-        <artifactId>jcabi-maven-plugin</artifactId>
-      </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <executions>
