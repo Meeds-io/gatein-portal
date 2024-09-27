@@ -59,13 +59,21 @@
       <artifactId>sso-agent</artifactId>
     </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
-        <groupId>com.jcabi</groupId>
-        <artifactId>jcabi-maven-plugin</artifactId>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>aspectj-maven-plugin</artifactId>
+        <configuration>
+          <aspectLibraries>
+            <aspectLibrary>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>portal.component.common</artifactId>
+            </aspectLibrary>
+          </aspectLibraries>
+        </configuration>
       </plugin>
     </plugins>
   </build>
+
 </project>
