@@ -20,18 +20,29 @@
 package org.exoplatform.web.application;
 
 /**
- * Created by The eXo Platform SARL Author : Tuan Nguyen tuan08@users.sourceforge.net May 9, 2006
+ * Created by The eXo Platform SARL Author : Tuan Nguyen
+ * tuan08@users.sourceforge.net May 9, 2006
  */
 public interface ApplicationLifecycle<E extends RequestContext> {
 
-    void onInit(Application app) throws Exception;
+  default void onInit(Application app) throws Exception {
 
-    void onStartRequest(Application app, E context) throws Exception;
+  }
 
-    void onFailRequest(Application app, E context, RequestFailure failureType);
+  default void onStartRequest(Application app, E context) throws Exception {
 
-    void onEndRequest(Application app, E context) throws Exception;
+  }
 
-    void onDestroy(Application app) throws Exception;
+  default void onFailRequest(Application app, E context, RequestFailure failureType) {
+
+  }
+
+  default void onEndRequest(Application app, E context) throws Exception {
+
+  }
+
+  default void onDestroy(Application app) throws Exception {
+
+  }
 
 }
