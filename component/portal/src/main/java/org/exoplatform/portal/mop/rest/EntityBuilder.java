@@ -42,6 +42,7 @@ import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.security.ConversationState;
 
 public class EntityBuilder {
   private static final Log   LOG             = ExoLogger.getLogger(EntityBuilder.class);
@@ -75,7 +76,7 @@ public class EntityBuilder {
           resultNode.setPageLink(userNodePage.getLink());
         }
         if (!StringUtils.isBlank(userNodePage.getEditPermission())) {
-          resultNode.setCanEditPage(userACL.hasEditPermission(userNodePage));
+          resultNode.setCanEditPage(userACL.hasEditPermission(userNodePage, ConversationState.getCurrent().getIdentity()));
           Map<String, Object> editPermission = new HashMap<>();
           try {
             String[] editPermissionExpression = userNodePage.getEditPermission().split(":");

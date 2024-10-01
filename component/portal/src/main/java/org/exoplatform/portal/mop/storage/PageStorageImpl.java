@@ -125,9 +125,7 @@ public class PageStorageImpl extends AbstractPageStorage {
       savePagePermissions(PageEntity.class.getName(),
                           entity.getId(),
                           state.getAccessPermissions(),
-                          Arrays.asList(state.getEditPermission()),
-                          state.getMoveAppsPermissions(),
-                          state.getMoveContainersPermissions());
+                          Arrays.asList(state.getEditPermission()));
     }
 
     if (created) {
@@ -285,9 +283,7 @@ public class PageStorageImpl extends AbstractPageStorage {
   private void savePagePermissions(String objectType,
                                    long objectId,
                                    List<String> accessPermissions,
-                                   List<String> editPermissions,
-                                   List<String> moveAppsPermissions,
-                                   List<String> moveContainersPermissions) {
+                                   List<String> editPermissions) {
     layoutStorage.savePermissions(objectType,
                                   objectId,
                                   PermissionEntity.TYPE.ACCESS,
@@ -296,14 +292,6 @@ public class PageStorageImpl extends AbstractPageStorage {
                                   objectId,
                                   PermissionEntity.TYPE.EDIT,
                                   editPermissions);
-    layoutStorage.savePermissions(objectType,
-                                  objectId,
-                                  PermissionEntity.TYPE.MOVE_APP,
-                                  moveAppsPermissions);
-    layoutStorage.savePermissions(objectType,
-                                  objectId,
-                                  PermissionEntity.TYPE.MOVE_CONTAINER,
-                                  moveContainersPermissions);
   }
 
 }

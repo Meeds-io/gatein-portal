@@ -1,584 +1,498 @@
 /**
- * Copyright (C) 2009 eXo Platform SAS.
+ * This file is part of the Meeds project (https://meeds.io/).
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
+ * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-
 package org.exoplatform.portal.config;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.container.xml.ValuesParam;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageContext;
-import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityConstants;
+import org.exoplatform.services.security.IdentityRegistry;
 import org.exoplatform.services.security.MembershipEntry;
 
-/** Jun 27, 2006 */
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.SneakyThrows;
+
 public class UserACL {
-    public static final String EVERYONE = "Everyone";
 
-    /**
-     * {@code "Nobody"} is equivalent to empty list of permissions.
-     */
-    public static final String NOBODY = "Nobody";
+  public static final String                       EVERYONE               = "Everyone";
 
-    protected static Log log = ExoLogger.getLogger("organization:UserACL");
+  private static final Collection<MembershipEntry> NO_MEMBERSHIP          = Collections.emptyList();
 
-    private static final Collection<MembershipEntry> NO_MEMBERSHIP = Collections.emptyList();
+  private static final Collection<String>          NO_ROLES               = Collections.emptyList();
 
-    private static final Collection<String> NO_ROLES = Collections.emptyList();
+  private static final Identity                    guest                  = new Identity(null, NO_MEMBERSHIP, NO_ROLES);
 
-    private static final Identity guest = new Identity(null, NO_MEMBERSHIP, NO_ROLES);
+  @Getter
+  private String                                   superUser;
 
-    private String superUser_;
+  @Getter
+  private String                                   guestsGroup;
 
-    private String guestGroup_;
+  @Getter
+  private List<String>                             portalCreatorGroups;
 
-    private List<String> portalCreatorGroups_;
+  @Getter
+  private String                                   makableMT;
 
-    private String navigationCreatorMembershipType_;
+  @Getter
+  private List<String>                             mandatoryGroups;
 
-    private List<String> mandatoryGroups_;
+  @Getter
+  private List<String>                             mandatoryMSTypes;
 
-    private List<String> mandatoryMSTypes_;
+  @Getter
+  @Setter
+  private String                                   adminGroups;
 
-    private PortalACLPlugin portalACLPlugin;
+  @Getter
+  @Setter
+  private String                                   adminMSType;
 
-    private String adminGroups;
-    
-    private String adminMSType;
+  private Map<String, GroupVisibilityPlugin>       groupVisibilityPlugins = new HashMap<>();
 
-    private Map<String, GroupVisibilityPlugin> groupVisibilityPlugins = new HashMap<>();
+  private Authenticator                            authenticator;
 
-    public UserACL(InitParams params) {
-        UserACLMetaData md = new UserACLMetaData(params);
+  private IdentityRegistry                         identityRegistry;
 
-        ValuesParam mandatoryGroupsParam = params.getValuesParam("mandatory.groups");
-        if (mandatoryGroupsParam != null) {
-            mandatoryGroups_ = mandatoryGroupsParam.getValues();
-        } else {
-            mandatoryGroups_ = new ArrayList<String>();
-        }
-
-        ValuesParam mandatoryMSTypesParam = params.getValuesParam("mandatory.mstypes");
-        if (mandatoryMSTypesParam != null)
-            mandatoryMSTypes_ = mandatoryMSTypesParam.getValues();
-        else
-            mandatoryMSTypes_ = new ArrayList<String>();
-
-        // tam.nguyen get admin group value
-        ValueParam adminGroupsParam = params.getValueParam("portal.administrator.groups");
-        if (adminGroupsParam != null) {
-            setAdminGroups(adminGroupsParam.getValue());
-        }
-        
-        // tam.nguyen get administrator member type
-        ValueParam adminMSTypeParam = params.getValueParam("portal.administrator.mstype");
-        if (adminMSTypeParam != null) {
-            setAdminMSType(adminMSTypeParam.getValue());
-        }
-
-        init(md);
+  public UserACL(InitParams params) {
+    ValuesParam mandatoryGroupsParam = params.getValuesParam("mandatory.groups");
+    if (mandatoryGroupsParam != null) {
+      mandatoryGroups = mandatoryGroupsParam.getValues();
+    } else {
+      mandatoryGroups = new ArrayList<>();
     }
 
-    public UserACL(UserACLMetaData md) {
-        if (md == null) {
-            throw new NullPointerException("No meta data provided");
-        }
-        init(md);
+    ValuesParam mandatoryMSTypesParam = params.getValuesParam("mandatory.mstypes");
+    if (mandatoryMSTypesParam != null)
+      mandatoryMSTypes = mandatoryMSTypesParam.getValues();
+    else
+      mandatoryMSTypes = new ArrayList<>();
+
+    // tam.nguyen get admin group value
+    ValueParam adminGroupsParam = params.getValueParam("portal.administrator.groups");
+    if (adminGroupsParam != null) {
+      setAdminGroups(adminGroupsParam.getValue());
     }
 
-    private void init(UserACLMetaData md) {
-        if (md.getSuperUser() != null) {
-            superUser_ = md.getSuperUser();
-        }
-        if (superUser_ == null || superUser_.trim().length() == 0) {
-            superUser_ = "root";
-        }
-
-        if (md.getGuestsGroups() != null) {
-            guestGroup_ = md.getGuestsGroups();
-        }
-        if (guestGroup_ == null || guestGroup_.trim().length() < 1) {
-            guestGroup_ = "/platform/guests";
-        }
-
-        if (md.getNavigationCreatorMembershipType() != null) {
-            navigationCreatorMembershipType_ = md.getNavigationCreatorMembershipType();
-        }
-        if (navigationCreatorMembershipType_ == null || navigationCreatorMembershipType_.trim().length() == 0) {
-            navigationCreatorMembershipType_ = "owner";
-        }
-
-        String allGroups = "";
-        if (md.getPortalCreateGroups() != null) {
-            allGroups = md.getPortalCreateGroups();
-        }
-        portalCreatorGroups_ = defragmentPermission(allGroups);
+    // tam.nguyen get administrator member type
+    ValueParam adminMSTypeParam = params.getValueParam("portal.administrator.mstype");
+    if (adminMSTypeParam != null) {
+      setAdminMSType(adminMSTypeParam.getValue());
     }
 
-    // TODO: unnecessary to keep potalACLPlugin
-    public void addPortalACLPlugin(PortalACLPlugin plugin) {
-        this.portalACLPlugin = plugin;
-        String superUser = portalACLPlugin.getSuperUser();
-        if (superUser != null) {
-            log.info("Overidden SuperUser by PortalACLPlugin");
-            superUser_ = superUser;
-        }
-        List<String> portalCreationRoles = portalACLPlugin.getPortalCreationRoles();
-        if (portalCreationRoles != null) {
-            log.info("Overidden PortalCreatorGroup by PortalACLPlugin");
-            portalCreatorGroups_ = portalCreationRoles;
-        }
+    UserACLMetaData md = new UserACLMetaData(params);
+    if (md.getSuperUser() != null) {
+      superUser = md.getSuperUser();
+    }
+    if (superUser == null || superUser.trim().length() == 0) {
+      superUser = "root";
     }
 
-    public void addGroupVisibilityPlugin(GroupVisibilityPlugin plugin) {
-        this.groupVisibilityPlugins.put(plugin.getName(), plugin);
+    if (md.getGuestsGroups() != null) {
+      guestsGroup = md.getGuestsGroups();
+    }
+    if (guestsGroup == null || guestsGroup.trim().length() < 1) {
+      guestsGroup = "/platform/guests";
     }
 
-    public String getMakableMT() {
-        return navigationCreatorMembershipType_;
+    if (md.getNavigationCreatorMembershipType() != null) {
+      makableMT = md.getNavigationCreatorMembershipType();
+    }
+    if (makableMT == null || makableMT.trim().length() == 0) {
+      makableMT = "owner";
     }
 
-    public List<String> getPortalCreatorGroups() {
-        return portalCreatorGroups_;
+    String allGroups = "";
+    if (md.getPortalCreateGroups() != null) {
+      allGroups = md.getPortalCreateGroups();
+    }
+    portalCreatorGroups = defragmentPermission(allGroups);
+  }
+
+  public void addGroupVisibilityPlugin(GroupVisibilityPlugin plugin) {
+    this.groupVisibilityPlugins.put(plugin.getName(), plugin);
+  }
+
+  public boolean hasPermission(Identity identity, Group group, String pluginId) {
+    GroupVisibilityPlugin plugin = groupVisibilityPlugins.get(pluginId);
+    return plugin == null || plugin.hasPermission(identity, group);
+  }
+
+  /**
+   * Retrieves the User ACL {@link Identity} from Registry, else build it from
+   * {@link OrganizationService} using
+   * {@link Authenticator#createIdentity(String)}
+   * 
+   * @param username
+   * @return
+   */
+  @SneakyThrows
+  public Identity getUserIdentity(String username) {
+    if (StringUtils.isBlank(username) || IdentityConstants.ANONIM.equals(username)) {
+      return null;
+    }
+    Identity identity = getIdentityRegistry().getIdentity(username);
+    if (identity == null) {
+      identity = getAuthenticator().createIdentity(username);
+      identityRegistry.register(identity);
+    }
+    return identity;
+  }
+
+  /**
+   * Checks whether a designated {@link Identity} is the super user of platform
+   * or not
+   * 
+   * @return true if super user, else false
+   */
+  public boolean isSuperUser(Identity identity) {
+    return isSameUser(identity, getSuperUser());
+  }
+
+  /**
+   * Checks whether a designated {@link Identity} is a super administrator or a
+   * member of <strong>manager:/platform/administrators</strong>
+   * 
+   * @param identity {@link Identity} to check
+   * @return true if is an administrator, else false
+   */
+  public boolean isAdministrator(Identity identity) {
+    return isSuperUser(identity) || isMemberOf(identity, getAdminMSType(), getAdminGroups());
+  }
+
+  /**
+   * Check whether the designated {@link Identity} has permissions to create a
+   * new Site of type PORTAL
+   * 
+   * @param identity {@link Identity}
+   * @return true if has site creation permission else false
+   */
+  public boolean hasCreatePortalPermission(Identity identity) {
+    if (isAdministrator(identity)) {
+      return true;
+    }
+    return CollectionUtils.isNotEmpty(getPortalCreatorGroups())
+           && getPortalCreatorGroups().stream().anyMatch(expression -> isMemberOf(identity, expression));
+  }
+
+  /**
+   * Checks whether a designated {@link Identity} has edit permission on
+   * designated {@link PortalConfig} or not
+   * 
+   * @param portalConfig
+   * @param identity
+   * @return true if have edit permission else false
+   */
+  public boolean hasEditPermission(PortalConfig portalConfig, Identity identity) {
+    return hasEditPermission(identity,
+                             portalConfig.getType(),
+                             portalConfig.getName(),
+                             portalConfig.getEditPermission());
+  }
+
+  /**
+   * Checks whether a designated {@link Identity} has edit permission on
+   * designated {@link Page} or not
+   * 
+   * @param page
+   * @param identity
+   * @return true if have edit permission else false
+   */
+  public boolean hasEditPermission(Page page, Identity identity) {
+    return hasEditPermission(identity,
+                             page.getOwnerType(),
+                             page.getOwnerId(),
+                             page.getEditPermission());
+  }
+
+  /**
+   * Checks whether a designated {@link Identity} has edit permission on
+   * designated {@link PageContext} or not
+   * 
+   * @param pageContext
+   * @param identity
+   * @return true if have edit permission else false
+   */
+  public boolean hasEditPermission(PageContext pageContext, Identity identity) {
+    return hasEditPermission(identity,
+                             pageContext.getKey().getSite().getTypeName(),
+                             pageContext.getKey().getSite().getName(),
+                             pageContext.getState().getEditPermission());
+  }
+
+  /**
+   * Checks whether a designated {@link Identity} has access permission on
+   * designated Site or not
+   * 
+   * @param portalConfig
+   * @param identity
+   * @return true if have access permission else false
+   */
+  public boolean hasAccessPermission(PortalConfig portalConfig, Identity identity) {
+    return hasAccessPermission(identity,
+                               portalConfig.getType(),
+                               portalConfig.getName(),
+                               portalConfig.getAccessPermissions())
+           || hasEditPermission(portalConfig, identity);
+  }
+
+  /**
+   * Checks whether a designated {@link Identity} has access permission on
+   * designated Page or not
+   * 
+   * @param page
+   * @param identity
+   * @return true if have access permission else false
+   */
+  public boolean hasAccessPermission(Page page, Identity identity) {
+    return hasAccessPermission(identity,
+                               page.getOwnerType(),
+                               page.getOwnerId(),
+                               page.getAccessPermissions())
+           || hasEditPermission(page, identity);
+  }
+
+  /**
+   * Checks whether a designated {@link Identity} has access permission on
+   * designated Page or not
+   * 
+   * @param pageContext
+   * @param identity
+   * @return true if have access permission else false
+   */
+  public boolean hasAccessPermission(PageContext pageContext, Identity identity) {
+    return hasAccessPermission(identity,
+                               pageContext.getKey().getSite().getTypeName(),
+                               pageContext.getKey().getSite().getName(),
+                               pageContext.getState().getAccessPermissions())
+           || hasEditPermission(pageContext, identity);
+  }
+
+  /**
+   * Checks whether the designated {@link Identity} belongs to a designated
+   * group or not
+   * 
+   * @param identity {@link Identity}
+   * @param group groupId
+   * @return true if has an associated memberdshipType with this group else
+   *         false
+   */
+  public boolean isUserInGroup(Identity identity, String group) {
+    if (identity == null
+        || group == null
+        || CollectionUtils.isEmpty(identity.getGroups())) {
+      return false;
+    } else {
+      return identity.getGroups().stream().anyMatch(g -> g.equals(group));
+    }
+  }
+
+  public Identity getIdentity() {
+    ConversationState conv = ConversationState.getCurrent();
+    if (conv == null) {
+      return guest;
     }
 
-    public String getSuperUser() {
-        return superUser_;
+    Identity id = conv.getIdentity();
+    if (id == null) {
+      return guest;
     }
 
-    public String getGuestsGroup() {
-        return guestGroup_;
+    return id;
+  }
+
+  public boolean hasPermission(Identity identity, String[] expressions) {
+    return isAdministrator(identity) || Arrays.stream(expressions).anyMatch(expression -> isMemberOf(identity, expression));
+  }
+
+  public boolean hasPermission(Identity identity, String expression) {
+    return isAdministrator(identity) || isMemberOf(identity, expression);
+  }
+
+  public boolean hasPermission(Identity identity, String membershipType, String groupId) {
+    return isAdministrator(identity) || isMemberOf(identity, membershipType, groupId);
+  }
+
+  /**
+   * Checks whether user is member of a groupId or membershipType:groupId
+   * 
+   * @param identity {@link Identity} to check
+   * @param expression permission expression of type groupId or
+   *          membershipType:groupId
+   * @return true if is member, else false
+   */
+  public boolean isMemberOf(Identity identity, String expression) {
+    if (expression == null) {
+      return false;
+    }
+    String[] temp = expression.split(":");
+    String membershipType = temp.length == 2 ? temp[0].trim() : "*";
+    String groupId = temp.length == 2 ? temp[1].trim() : expression;
+    return isMemberOf(identity, membershipType, groupId);
+  }
+
+  public boolean isMemberOf(Identity identity, String membershipType, String groupId) {
+    return EVERYONE.equals(groupId)
+           || (isGuestsGroup(groupId) && isAnonymousUser(identity))
+           || (identity != null && identity.isMemberOf(groupId, membershipType));
+  }
+
+  public boolean hasEditPermission(Identity identity, String ownerType, String ownerId, String expression) {
+    if (isAdministrator(identity)) {
+      return true;
+    } else if (PortalConfig.USER_TYPE.equals(ownerType)) {
+      return isSameUser(identity, ownerId);
+    }
+    return isMemberOf(identity, expression);
+  }
+
+  public boolean hasAccessPermission(Identity identity,
+                                     String ownerType,
+                                     String ownerId,
+                                     String[] expressions) {
+    return hasAccessPermission(identity,
+                               ownerType,
+                               ownerId,
+                               expressions == null ? Stream.empty() : Arrays.stream(expressions));
+  }
+
+  public boolean hasAccessPermission(Identity identity,
+                                     String ownerType,
+                                     String ownerId,
+                                     List<String> expressions) {
+    return hasAccessPermission(identity,
+                               ownerType,
+                               ownerId,
+                               expressions == null ? Stream.empty() : expressions.stream());
+  }
+
+  public boolean hasAccessPermission(Identity identity, String ownerType, String ownerId, Stream<String> expressionsStream) {
+    if (isAdministrator(identity)) {
+      return true;
+    } else if (PortalConfig.USER_TYPE.equals(ownerType)) {
+      return isSameUser(identity, ownerId);
+    }
+    return expressionsStream.anyMatch(expression -> isMemberOf(identity, expression));
+  }
+
+  public boolean isGuestsGroup(String groupId) {
+    return getGuestsGroup().equals(groupId);
+  }
+
+  public boolean isAnonymousUser(Identity identity) {
+    return identity == null || isAnonymousUser(identity.getUserId());
+  }
+
+  public boolean isAnonymousUser(String username) {
+    return username == null || IdentityConstants.ANONIM.equals(username);
+  }
+
+  public Authenticator getAuthenticator() {
+    if (authenticator == null) {
+      authenticator = ExoContainerContext.getService(Authenticator.class);
+    }
+    return authenticator;
+  }
+
+  public IdentityRegistry getIdentityRegistry() {
+    if (identityRegistry == null) {
+      identityRegistry = ExoContainerContext.getService(IdentityRegistry.class);
+    }
+    return identityRegistry;
+  }
+
+  private List<String> defragmentPermission(String permission) {
+    List<String> result = new ArrayList<>();
+    if (permission != null) {
+      if (permission.contains(",")) {
+        String[] groups = permission.split(",");
+        for (String group : groups) {
+          result.add(group.trim());
+        }
+      } else {
+        result.add(permission);
+      }
+    }
+    return result;
+  }
+
+  private boolean isSameUser(Identity identity, String ownerId) {
+    return identity != null && identity.getUserId().equals(ownerId);
+  }
+
+  @Data
+  public static class Permission implements Serializable {
+
+    private static final long serialVersionUID = -2642107810551203332L;
+
+    private String            name;
+
+    private String            groupId          = "";
+
+    private String            membership       = "";
+
+    private String            expression;
+
+    private boolean           selected         = false;
+
+    public void setPermissionExpression(String exp) {
+      if (exp == null || exp.length() == 0) {
+        return;
+      }
+      String[] temp = exp.split(":");
+      if (temp.length < 2) {
+        return;
+      }
+      expression = exp;
+      membership = temp[0].trim();
+      groupId = temp[1].trim();
     }
 
-    public List<String> getMandatoryGroups() {
-        return mandatoryGroups_;
+    public String getValue() {
+      if (membership.length() == 0 || groupId.length() == 0) {
+        return null;
+      }
+      return membership + ":" + groupId;
     }
-
-    public List<String> getMandatoryMSTypes() {
-        return mandatoryMSTypes_;
-    }
-
-    public void setAdminGroups(String adminGroups) {
-        this.adminGroups = adminGroups;
-    }
-    
-    public String getAdminGroups() {
-        return adminGroups;
-    }
-    
-    public void setAdminMSType(String adminMSType) {
-        this.adminMSType = adminMSType;
-    }
-
-    public String getAdminMSType() {
-        return adminMSType;
-    }
-
-    public boolean hasPermission(PortalConfig pconfig) {
-        Identity identity = getIdentity();
-        if (hasPermission(identity, pconfig.getEditPermission())) {
-            pconfig.setModifiable(true);
-            return true;
-        }
-        pconfig.setModifiable(false);
-        String[] accessPerms = (pconfig.getAccessPermissions());
-        for (String per : accessPerms) {
-            if (hasPermission(identity, per)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean hasEditPermission(PortalConfig pconfig) {
-        return hasPermission(getIdentity(), pconfig.getEditPermission());
-    }
-    
-    public boolean hasAccessPermission(PortalConfig portalConfig) {
-      return hasPermission(portalConfig.getAccessPermissions());
-    }
-
-    /**
-     * This method is equivalent to <code>hasEditPermission(PortalConfig)</code>. That allows us to check edit permission on a
-     * UIPortal, without converting UIPortal into PortalConfig via PortalDataMapper.
-     *
-     * @param ownerType the owner type
-     * @param ownerId the owner id
-     * @param editPermExpression the permission expression
-     * @return true or false
-     */
-    public boolean hasEditPermissionOnPortal(String ownerType, String ownerId, String editPermExpression) {
-        Identity identity = this.getIdentity();
-        if (superUser_.equals(identity.getUserId())) {
-            return true;
-        }
-
-        if (PortalConfig.USER_TYPE.equals(ownerType)) {
-            return identity.getUserId().equals(ownerId);
-        }
-
-        return hasPermission(identity, editPermExpression);
-    }
-
-    public boolean hasCreatePortalPermission() {
-        Identity identity = getIdentity();
-        if (superUser_.equals(identity.getUserId())) {
-            return true;
-        }
-        if (portalCreatorGroups_ == null || portalCreatorGroups_.size() < 1) {
-            return false;
-        }
-        for (String ele : portalCreatorGroups_) {
-            if (hasPermission(identity, ele)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // copied from @link{#hasEditPermission}
-    public boolean hasEditPermissionOnNavigation(SiteKey siteKey) {
-        Identity identity = getIdentity();
-        if (superUser_.equals(identity.getUserId())) {
-            return true;
-        }
-
-        //
-        switch (siteKey.getType()) {
-            case PORTAL:
-                // TODO: We should also take care of Portal's navigation
-                return false;
-            case GROUP:
-                String temp = siteKey.getName().trim();
-                String expAdminGroup = getAdminGroups();
-                String expPerm = null;
-
-                // Check to see whether current user is member of admin group or not,
-                // if so grant
-                // edit permission for group navigation for that user.
-                if (expAdminGroup != null) {
-                    expAdminGroup = expAdminGroup.startsWith("/") ? expAdminGroup : "/" + expAdminGroup;
-                    expPerm = temp.startsWith("/") ? temp : "/" + temp;
-                    if (isUserInGroup(expPerm) && isUserInGroup(expAdminGroup)) {
-                        return true;
-                    }
-                }
-
-                expPerm = navigationCreatorMembershipType_ + (temp.startsWith("/") ? ":" + temp : ":/" + temp);
-                return hasPermission(identity, expPerm);
-            case USER:
-                return siteKey.getName().equals(identity.getUserId());
-            default:
-                return false;
-        }
-    }
-
-    public boolean hasPermission(Page page) {
-        Identity identity = getIdentity();
-        if (PortalConfig.USER_TYPE.equals(page.getOwnerType())) {
-            if (page.getOwnerId().equals(identity.getUserId())) {
-                page.setModifiable(true);
-                return true;
-            }
-        }
-        if (superUser_.equals(identity.getUserId())) {
-            page.setModifiable(true);
-            return true;
-        }
-        if (hasEditPermission(page)) {
-            page.setModifiable(true);
-            return true;
-        }
-        page.setModifiable(false);
-        String[] accessPerms = page.getAccessPermissions();
-        if (accessPerms != null) {
-            for (String per : accessPerms) {
-                if (hasPermission(identity, per)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean hasPermission(PageContext page) {
-        PageKey key = page.getKey();
-        Identity identity = getIdentity();
-        if (SiteType.USER == key.getSite().getType()) {
-            if (key.getSite().getName().equals(identity.getUserId())) {
-                return true;
-            }
-        }
-        if (superUser_.equals(identity.getUserId())) {
-            return true;
-        }
-        if (hasEditPermission(page)) {
-            return true;
-        }
-        List<String> accessPerms = page.getState().getAccessPermissions();
-        if (accessPerms != null) {
-            for (String per : accessPerms) {
-                if (hasPermission(identity, per)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean hasEditPermission(Page page) {
-        Identity identity = getIdentity();
-        if (PortalConfig.USER_TYPE.equals(page.getOwnerType())) {
-            if (page.getOwnerId().equals(identity.getUserId())) {
-                page.setModifiable(true);
-                return true;
-            }
-            return false;
-        }
-        if (hasPermission(identity, page.getEditPermission())) {
-            page.setModifiable(true);
-            return true;
-        }
-        page.setModifiable(false);
-        return false;
-    }
-
-    public boolean hasEditPermission(PageContext page) {
-        PageKey key = page.getKey();
-        Identity identity = getIdentity();
-        if (SiteType.USER == key.getSite().getType()) {
-            return key.getSite().getName().equals(identity.getUserId());
-        } else {
-            return hasPermission(identity, page.getState().getEditPermission());
-        }
-    }
-
-    /**
-     *
-     * Minh Hoang TO - This method is equivalent to <code>hasEditPermission(Page)</code>. It allows us to check edit permission
-     * with a UIPage, without converting UIPage into Page via PortalDataMapper
-     *
-     */
-    public boolean hasEditPermissionOnPage(String ownerType, String ownerId, String editPermExpression) {
-        Identity identity = this.getIdentity();
-
-        if (PortalConfig.USER_TYPE.equals(ownerType)) {
-            if (ownerId.equals(identity.getUserId())) {
-                return true;
-            }
-            return false;
-        }
-
-        return hasPermission(identity, editPermExpression);
-    }
-
-    public boolean hasPermission(String expPerm) {
-        return hasPermission(getIdentity(), expPerm);
-    }
-
-    public boolean hasPermission(String[] permissions) {
-        Identity identity = this.getIdentity();
-        String currentUser = identity.getUserId();
-        if (superUser_.equals(currentUser)) {
-            return true;
-        } else if (permissions == null || permissions.length == 0) {
-            return false;
-        } else {
-            for (String per : permissions) {
-                if (hasPermission(identity, per)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    /**
-     * @param group
-     * @return
-     */
-    public boolean isUserInGroup(String group) {
-        ConversationState conv = ConversationState.getCurrent();
-        Identity id = null;
-        if (conv != null) {
-            id = conv.getIdentity();
-        }
-
-        if (id == null) {
-            return false;
-        }
-
-        Iterator<String> iter = id.getGroups().iterator();
-
-        while (iter.hasNext()) {
-            if (iter.next().equals(group)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public boolean isSuperUser() {
-        Identity identity = getIdentity();
-        return superUser_.equals(identity.getUserId());
-    }
-
-    private Identity getIdentity() {
-        ConversationState conv = ConversationState.getCurrent();
-        if (conv == null) {
-            return guest;
-        }
-
-        Identity id = conv.getIdentity();
-        if (id == null) {
-            return guest;
-        }
-
-        return id;
-    }
-
-    public boolean hasPermission(Identity identity, String expPerm) {
-        String currentUser = identity.getUserId();
-        if (superUser_.equals(currentUser)) {
-            return true;
-        }
-        if (expPerm == null) {
-            return false;
-        }
-        if (EVERYONE.equals(expPerm)) {
-            return true;
-        }
-        Permission permission = new Permission();
-        permission.setPermissionExpression(expPerm);
-        String groupId = permission.getGroupId();
-        if ((currentUser == null || currentUser.equals(IdentityConstants.ANONIM)) && groupId.equals(guestGroup_)) {
-            return true;
-        }
-        String membership = permission.getMembership();
-        return identity.isMemberOf(groupId, membership);
-    }
-
-    public boolean hasPermission(Identity identity, Group group, String pluginId) {
-        GroupVisibilityPlugin plugin = groupVisibilityPlugins.get(pluginId);
-        return plugin == null ? true : plugin.hasPermission(identity, group);
-    }
-
-    private List<String> defragmentPermission(String permission) {
-        List<String> result = new ArrayList<String>();
-        if (permission != null) {
-            if (permission.contains(",")) {
-                String[] groups = permission.split(",");
-                for (String group : groups) {
-                    result.add(group.trim());
-                }
-            } else {
-                result.add(permission);
-            }
-        }
-        return result;
-    }
-
-    public static class Permission implements Serializable {
-
-        private static final long serialVersionUID = -2642107810551203332L;
-
-        private String name_;
-
-        private String groupId_ = "";
-
-        private String membership_ = "";
-
-        private String expression;
-
-        private boolean selected_ = false;
-
-        public void setPermissionExpression(String exp) {
-            if (exp == null || exp.length() == 0) {
-                return;
-            }
-            String[] temp = exp.split(":");
-            if (temp.length < 2) {
-                return;
-            }
-            expression = exp;
-            membership_ = temp[0].trim();
-            groupId_ = temp[1].trim();
-        }
-
-        public String getGroupId() {
-            return groupId_;
-        }
-
-        public void setGroupId(String groupId) {
-            groupId_ = groupId;
-        }
-
-        public String getName() {
-            return name_;
-        }
-
-        public void setName(String name) {
-            name_ = name;
-        }
-
-        public String getValue() {
-            if (membership_.length() == 0 || groupId_.length() == 0) {
-                return null;
-            }
-            return membership_ + ":" + groupId_;
-        }
-
-        public String getMembership() {
-            return membership_;
-        }
-
-        public void setMembership(String membership) {
-            membership_ = membership;
-        }
-
-        public boolean isSelected() {
-            return selected_;
-        }
-
-        public void setSelected(boolean selected) {
-            selected_ = selected;
-        }
-
-        public String getExpression() {
-            return expression;
-        }
-
-        public void setExpression(String expression) {
-            this.expression = expression;
-        }
-    }
+  }
 }
