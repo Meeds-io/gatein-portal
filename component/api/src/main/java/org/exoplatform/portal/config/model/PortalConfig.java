@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.pom.data.PortalData;
 
@@ -309,4 +311,21 @@ public class PortalConfig extends ModelObject implements Cloneable {
     this.setPortalLayout(initDefaultLayout());
     this.setDefaultLayout(true);
   }
+
+  /**
+   * @return true if the site should be used as default site to redirected to
+   *         when no other site is available, else false
+   */
+  public boolean isDefaultSite() {
+    return !StringUtils.equals(getProperty("NO_DEFAULT_PATH"), "true");
+  }
+
+  /**
+   * @param defaultSite true the site should be used as default site to
+   *          redirected to when no other site is available, else false
+   */
+  public void setDefaultSite(boolean defaultSite) {
+    setProperty("NO_DEFAULT_PATH", String.valueOf(!defaultSite));
+  }
+
 }

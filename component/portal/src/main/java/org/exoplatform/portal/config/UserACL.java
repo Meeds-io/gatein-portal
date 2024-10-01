@@ -424,7 +424,7 @@ public class UserACL {
   }
 
   public boolean isAnonymousUser(String username) {
-    return username == null || IdentityConstants.ANONIM.equals(username);
+    return StringUtils.isBlank(username) || IdentityConstants.ANONIM.equals(username);
   }
 
   public Authenticator getAuthenticator() {
