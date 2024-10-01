@@ -20,11 +20,10 @@
 package org.exoplatform.portal.config.model;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.pom.config.Utils;
 import org.exoplatform.portal.pom.data.PortalData;
 
 /**
@@ -35,355 +34,279 @@ import org.exoplatform.portal.pom.data.PortalData;
  **/
 public class PortalConfig extends ModelObject implements Cloneable {
 
-  public static final String        USER_TYPE      = SiteType.USER.getName();
+  public static final String    USER_TYPE      = SiteType.USER.getName();
 
-  public static final String        GROUP_TYPE     = SiteType.GROUP.getName();
+  public static final String    GROUP_TYPE     = SiteType.GROUP.getName();
 
-  public static final String        PORTAL_TYPE    = SiteType.PORTAL.getName();
+  public static final String    PORTAL_TYPE    = SiteType.PORTAL.getName();
 
-  public static final String        SPACE_TYPE     = SiteType.SPACE.getName();
+  public static final String    SPACE_TYPE     = SiteType.SPACE.getName();
 
-  public static final Container     DEFAULT_LAYOUT = initDefaultLayout();
+  public static final Container DEFAULT_LAYOUT = initDefaultLayout();
 
-  private String                    name;
+  private String                name;
 
   /** Added for new POM . */
-  private String                    type;
+  private String                type;
 
-  private String                    locale;
+  private String                locale;
 
-  private String                    label;
+  private String                label;
 
-  private String                    description;
+  private String                description;
 
-  private String[]                  accessPermissions;
+  private String[]              accessPermissions;
 
-  private String                    editPermission;
+  private String                editPermission;
 
-  private Properties                properties;
+  private Properties            properties;
 
-  private String                    skin;
+  private String                skin;
 
-  private Container                 portalLayout;
+  private Container             portalLayout;
 
-  private boolean                   defaultLayout;
+  private boolean               defaultLayout;
 
-  private transient boolean         modifiable;
+  private boolean               displayed      = true;
 
-  private boolean                   displayed      = true;
+  private int                   displayOrder;
 
-  private int                       displayOrder;
+  private String                bannerUploadId;
 
-  private String                    bannerUploadId;
+  private long                  bannerFileId;
 
-  private long                      bannerFileId;
+  public PortalConfig() {
+    this(PORTAL_TYPE);
+  }
 
-    public PortalConfig() {
-        this(PORTAL_TYPE);
-    }
+  public PortalConfig(String type) {
+    this(type, null);
+  }
 
-    public PortalConfig(String type) {
-        this(type, null);
-    }
+  public PortalConfig(String type, String ownerId) {
+    this(type, ownerId, null);
+  }
 
-    public PortalConfig(String type, String ownerId) {
-        this(type, ownerId, null);
-    }
+  public PortalConfig(String type, String ownerId, String storageId) {
+    super(storageId);
 
-    public PortalConfig(String type, String ownerId, String storageId) {
-        super(storageId);
+    //
+    this.type = type;
+    this.name = ownerId;
+    this.portalLayout = new Container();
+  }
 
-        //
-        this.type = type;
-        this.name = ownerId;
-        this.portalLayout = new Container();
-    }
+  public PortalConfig(PortalData data) {
+    super(data.getStorageId());
 
-    public PortalConfig(PortalData data) {
-        super(data.getStorageId());
+    //
+    this.name = data.getName();
+    this.type = data.getType();
+    this.locale = data.getLocale();
+    this.label = data.getLabel();
+    this.description = data.getDescription();
+    this.accessPermissions = data.getAccessPermissions().toArray(new String[data.getAccessPermissions().size()]);
+    this.editPermission = data.getEditPermission();
+    this.properties = data.getProperties() == null ? new Properties() : new Properties(data.getProperties());
+    this.skin = data.getSkin();
+    this.portalLayout = new Container(data.getPortalLayout());
+    this.defaultLayout = data.isDefaultLayout();
+    this.displayed = data.isDisplayed();
+    this.displayOrder = data.getDisplayOrder();
+    this.bannerFileId = data.getBannerFileId();
+  }
 
-        //
-        this.name = data.getName();
-        this.type = data.getType();
-        this.locale = data.getLocale();
-        this.label = data.getLabel();
-        this.description = data.getDescription();
-        this.accessPermissions = data.getAccessPermissions().toArray(new String[data.getAccessPermissions().size()]);
-        this.editPermission = data.getEditPermission();
-        this.properties = data.getProperties() == null ? new Properties() : new Properties(data.getProperties());
-        this.skin = data.getSkin();
-        this.portalLayout = new Container(data.getPortalLayout());
-        this.defaultLayout = data.isDefaultLayout();
-        this.displayed = data.isDisplayed();
-        this.displayOrder = data.getDisplayOrder();
-        this.bannerFileId = data.getBannerFileId();
-    }
+  public String getType() {
+    return type;
+  }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String s) {
-        name = s;
-    }
-
-    public String getLocale() {
-        return locale;
-    }
-
-    public void setLocale(String s) {
-        locale = s;
-    }
-
-    public String[] getAccessPermissions() {
-        return accessPermissions;
-    }
-
-    public void setAccessPermissions(String[] s) {
-        accessPermissions = s;
-    }
-
-    public String getEditPermission() {
-        return editPermission;
-    }
-
-    public void setEditPermission(String editPermission) {
-        this.editPermission = editPermission;
-    }
-
-    public String getSkin() {
-        return skin;
-    }
-
-    public void setSkin(String s) {
-        skin = s;
-    }
-
-    public Container getPortalLayout() {
-        return portalLayout;
-    }
-
-    public void setPortalLayout(Container container) {
-        portalLayout = container;
-    }
-
-    public boolean isModifiable() {
-        return modifiable;
-    }
-
-    public void setModifiable(boolean b) {
-        modifiable = b;
-    }
-
-    public boolean isDefaultLayout() {
-      return defaultLayout;
-    }
-
-    public void setDefaultLayout(boolean defaultLayout) {
-      this.defaultLayout = defaultLayout;
-    }
-
-    public Properties getProperties() {
-        return properties;
-    }
-
-    public void setProperties(Properties props) {
-        properties = props;
-    }
-
-    public String getProperty(String name) {
-        if (name == null)
-            throw new NullPointerException();
-        if (properties == null || !properties.containsKey(name))
-            return null;
-        return properties.get(name);
-    }
-
-    public String getProperty(String name, String defaultValue) {
-      //We disable cache-control, viewport, and shared-layout control feature for PLF 4.3.x
-      //We may enable it later after make it work properly on PLF
-      if (PortalProperties.CACHE_CONTROL.equals(name)) {
-        return "no-cache";
-      } else if (PortalProperties.SHARED_LAYOUT.equals(name)) {
-        return PortalProperties.SHARED_LAYOUT_ALL;
-      } else if (PortalProperties.VIEWPORT.equals(name)) {
-        return null;
-      }
-        String value = getProperty(name);
-        if (value != null)
-            return value;
-        return defaultValue;
-    }
-
-    public void setProperty(String name, String value) {
-        if (name == null || properties == null)
-            throw new NullPointerException();
-        properties.setProperty(name, value);
-    }
-
-    public void removeProperty(String name) {
-        if (name == null || properties == null)
-            throw new NullPointerException();
-        properties.remove(name);
-    }
-
-    public String getSessionAlive() {
-        return getProperty(PortalProperties.SESSION_ALIVE, PortalProperties.SESSION_ON_DEMAND);
-    }
-
-    public void setSessionAlive(String type) {
-        setProperty(PortalProperties.SESSION_ALIVE, type);
-    }
-
-    public Boolean isShowInfobar() {
-        String value = getProperty(PortalProperties.SHOW_PORTLET_INFO, "1");
-        if (Integer.parseInt(value) == 1) {
-            return true;
-        }
-        return false;
-    }
-
-    public void setShowInfobar(Boolean value) {
-        if (value) {
-            setProperty(PortalProperties.SHOW_PORTLET_INFO, "1");
-        } else {
-            setProperty(PortalProperties.SHOW_PORTLET_INFO, "0");
-        }
-    }
-
-    public String getViewport() {
-        return getProperty(PortalProperties.VIEWPORT);
-    }
-
-    public void setViewport(String viewport) {
-        setProperty(PortalProperties.VIEWPORT, viewport);
-    }
-
-    public String getSharedLayout() {
-        return getProperty(PortalProperties.SHARED_LAYOUT, PortalProperties.SHARED_LAYOUT_ALL);
-    }
-
-    public void setSharedLayout(String type) {
-        if (type.equals(PortalProperties.SHARED_LAYOUT_ADMINS)) {
-            setProperty(PortalProperties.SHARED_LAYOUT, PortalProperties.SHARED_LAYOUT_ADMINS);
-        } else {
-            setProperty(PortalProperties.SHARED_LAYOUT, PortalProperties.SHARED_LAYOUT_ALL);
-        }
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public boolean isDisplayed() {
-        return displayed;
-    }
-
-    public void setDisplayed(boolean displayed) {
-        this.displayed = displayed;
-    }
-
-    public int getDisplayOrder() {
-        return displayOrder;
-    }
-
-    public void setDisplayOrder(int displayOrder) {
-        this.displayOrder = displayOrder;
-    }
-
-    public String getBannerUploadId() {
-      return bannerUploadId;
-    }
-
-    public void setBannerUploadId(String bannerUploadId) {
-      this.bannerUploadId = bannerUploadId;
-    }
-
-    public long getBannerFileId() {
-      return bannerFileId;
-    }
-
-    public void setBannerFileId(long bannerFileId) {
-      this.bannerFileId = bannerFileId;
-    }
-
-    public static class PortalConfigSet {
-        private ArrayList<PortalConfig> portalConfigs;
-
-        public ArrayList<PortalConfig> getPortalConfigs() {
-            return portalConfigs;
-        }
-
-        public void setPortalConfigs(ArrayList<PortalConfig> list) {
-            portalConfigs = list;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "PortalConfig[name=" + name + ",type=" + type + "]";
-    }
-
-    @Override
-    public PortalConfig clone() {
-      try {
-        return (PortalConfig) super.clone();
-      } catch (CloneNotSupportedException e) {
-        return new PortalConfig(build());
-      }
-    }
-
-    /**
-     * Retuns Container that contains only PageBody
-     * to be able to display, at least, the page content
-     *
-     * @return
-     */
-    private static Container initDefaultLayout() {
-        Container container = new Container();
-        ArrayList<ModelObject> children = new ArrayList<ModelObject>();
-        children.add(new PageBody());
-        container.setChildren(children);
-        return container;
-    }
-
-    public PortalData build() {
-        List<String> accessPermissions = Utils.safeImmutableList(this.accessPermissions);
-        Map<String, String> properties = Utils.safeImmutableMap(this.properties);
-        return new PortalData(storageId, name, type, locale, label, description, accessPermissions, editPermission, properties,
-                skin, portalLayout.build(), defaultLayout, displayed, displayOrder, bannerFileId);
-    }
-
-    public void useMetaPortalLayout() {
-      this.setPortalLayout(initDefaultLayout());
-      this.setDefaultLayout(true);
-    }
-
-    /**
-     * @deprecated the 'default' portal notion doesn't exist anymore
-     */
-    @Deprecated(forRemoval = true, since = "1.5.0")
-    public void useDefaultPortalLayout() {
-      this.useMetaPortalLayout();
-    }
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String s) {
+    name = s;
+  }
+
+  public String getLocale() {
+    return locale;
+  }
+
+  public void setLocale(String s) {
+    locale = s;
+  }
+
+  public String[] getAccessPermissions() {
+    return accessPermissions;
+  }
+
+  public void setAccessPermissions(String[] s) {
+    accessPermissions = s;
+  }
+
+  public String getEditPermission() {
+    return editPermission;
+  }
+
+  public void setEditPermission(String editPermission) {
+    this.editPermission = editPermission;
+  }
+
+  public String getSkin() {
+    return skin;
+  }
+
+  public void setSkin(String s) {
+    skin = s;
+  }
+
+  public Container getPortalLayout() {
+    return portalLayout;
+  }
+
+  public void setPortalLayout(Container container) {
+    portalLayout = container;
+  }
+
+  public boolean isDefaultLayout() {
+    return defaultLayout;
+  }
+
+  public void setDefaultLayout(boolean defaultLayout) {
+    this.defaultLayout = defaultLayout;
+  }
+
+  public Properties getProperties() {
+    return properties;
+  }
+
+  public void setProperties(Properties props) {
+    properties = props;
+  }
+
+  public String getProperty(String name) {
+    if (name == null)
+      throw new NullPointerException();
+    if (properties == null || !properties.containsKey(name))
+      return null;
+    return properties.get(name);
+  }
+
+  public String getProperty(String name, String defaultValue) {
+    String value = getProperty(name);
+    if (value != null)
+      return value;
+    return defaultValue;
+  }
+
+  public void setProperty(String name, String value) {
+    if (name == null || properties == null)
+      throw new NullPointerException();
+    properties.setProperty(name, value);
+  }
+
+  public void removeProperty(String name) {
+    if (name == null || properties == null)
+      throw new NullPointerException();
+    properties.remove(name);
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  public String getLabel() {
+    return label;
+  }
+
+  public boolean isDisplayed() {
+    return displayed;
+  }
+
+  public void setDisplayed(boolean displayed) {
+    this.displayed = displayed;
+  }
+
+  public int getDisplayOrder() {
+    return displayOrder;
+  }
+
+  public void setDisplayOrder(int displayOrder) {
+    this.displayOrder = displayOrder;
+  }
+
+  public String getBannerUploadId() {
+    return bannerUploadId;
+  }
+
+  public void setBannerUploadId(String bannerUploadId) {
+    this.bannerUploadId = bannerUploadId;
+  }
+
+  public long getBannerFileId() {
+    return bannerFileId;
+  }
+
+  public void setBannerFileId(long bannerFileId) {
+    this.bannerFileId = bannerFileId;
+  }
+
+  @Override
+  public String toString() {
+    return "PortalConfig[name=" + name + ",type=" + type + "]";
+  }
+
+  @Override
+  public PortalConfig clone() { // NOSONAR
+    return new PortalConfig(build());
+  }
+
+  /**
+   * Retuns Container that contains only PageBody to be able to display, at
+   * least, the page content
+   *
+   * @return
+   */
+  private static Container initDefaultLayout() {
+    Container container = new Container();
+    ArrayList<ModelObject> children = new ArrayList<>();
+    children.add(new PageBody());
+    container.setChildren(children);
+    return container;
+  }
+
+  public PortalData build() {
+    return new PortalData(storageId,
+                          name,
+                          type,
+                          locale,
+                          label,
+                          description,
+                          accessPermissions == null ? Collections.emptyList() : Arrays.asList(accessPermissions),
+                          editPermission,
+                          properties == null ? Collections.emptyMap() : new Properties(properties),
+                          skin,
+                          portalLayout.build(),
+                          defaultLayout,
+                          displayed,
+                          displayOrder,
+                          bannerFileId);
+  }
+
+  public void useMetaPortalLayout() {
+    this.setPortalLayout(initDefaultLayout());
+    this.setDefaultLayout(true);
+  }
 }

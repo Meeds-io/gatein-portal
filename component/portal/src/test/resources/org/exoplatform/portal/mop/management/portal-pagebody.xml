@@ -80,8 +80,6 @@
     <container id="913506166" template="system:/groovy/portal/webui/container/UITableColumnContainer.gtmpl">
       <access-permissions>Everyone</access-permissions>
       <factory-id>TableColumnContainer</factory-id>
-      <move-apps-permissions>*:/platform/app-movers</move-apps-permissions>
-      <move-containers-permissions>*:/platform/container-movers</move-containers-permissions>
       <container id="937539559" template="system:/groovy/portal/webui/container/UIColumnContainer.gtmpl">
         <access-permissions>Everyone</access-permissions>
         <factory-id>ColumnContainer</factory-id>

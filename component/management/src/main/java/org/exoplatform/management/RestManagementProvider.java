@@ -38,6 +38,7 @@ import org.exoplatform.management.spi.ManagedResource;
 import org.exoplatform.management.spi.ManagementProvider;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.rest.resource.ResourceContainer;
+import org.exoplatform.services.security.ConversationState;
 
 /**
  * @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a>
@@ -64,7 +65,7 @@ public class RestManagementProvider implements ResourceContainer, ManagementProv
     @Produces(MediaType.APPLICATION_JSON)
     public Object list() {
         // Apply security here
-        if (!acl.hasPermission("*:/platform/administrators")) {
+        if (!acl.hasPermission(ConversationState.getCurrent().getIdentity(), "*:/platform/administrators")) {
             return Response.status(Response.Status.FORBIDDEN);
         }
 
@@ -79,7 +80,7 @@ public class RestManagementProvider implements ResourceContainer, ManagementProv
     @Path("{resource}")
     public Object dispatch(@PathParam("resource") String resourceName) {
         // Apply security here
-        if (!acl.hasPermission("*:/platform/administrators")) {
+        if (!acl.hasPermission(ConversationState.getCurrent().getIdentity(), "*:/platform/administrators")) {
             return Response.status(Response.Status.FORBIDDEN);
         }
 

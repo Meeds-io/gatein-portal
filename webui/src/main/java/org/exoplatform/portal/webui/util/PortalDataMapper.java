@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.exoplatform.portal.mop.service.LayoutService;
-
 import org.gatein.common.net.media.MediaType;
 import org.gatein.pc.api.Portlet;
 import org.gatein.pc.api.info.ModeInfo;
@@ -33,7 +31,6 @@ import org.gatein.pc.portlet.impl.info.ContainerPortletInfo;
 
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Application;
-import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
@@ -54,334 +51,165 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.core.UIComponent;
 
-/**
- * Created by The eXo Platform SAS May 4, 2007 TODO: Rename this to PortalDataModelMapper
- */
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class PortalDataMapper {
 
-    protected static final Log log = ExoLogger.getLogger("portal:PortalDataMapper");
+  protected static final Log log = ExoLogger.getLogger("portal:PortalDataMapper");
 
-    @SuppressWarnings("unchecked")
-    public static ModelObject buildModelObject(UIComponent uiComponent) {
-        ModelObject model = null;
-        try {
-            model = uiComponent.buildModelObject();
-        } catch (UnsupportedOperationException ex) {
-            if (uiComponent instanceof UIPortal) {
-                model = toPortal((UIPortal) uiComponent);
-            } else if (uiComponent instanceof UIPageBody) {
-                model = new PageBody(((UIPageBody) uiComponent).getStorageId());
-            } else if (uiComponent instanceof UIPage) {
-                model = toPageModel((UIPage) uiComponent);
-            } else if (uiComponent instanceof UIPortlet) {
-                model = toPortletModel((UIPortlet<Object, ?>) uiComponent);
-            } else if (uiComponent instanceof UIContainer) {
-                model = toContainer((UIContainer) uiComponent);
-            }
-        }
-        return model;
+  private static <S> void toUIPortlet(UIPortlet<S, ?> uiPortlet, Application<S> model) {
+    PortletState<S> portletState = new PortletState<>(model.getState(), model.getType());
+    uiPortlet.setWidth(model.getWidth());
+    uiPortlet.setHeight(model.getHeight());
+    uiPortlet.setState(portletState);
+    uiPortlet.setTitle(model.getTitle());
+    uiPortlet.setIcon(model.getIcon());
+    uiPortlet.setDescription(model.getDescription());
+    uiPortlet.setShowInfoBar(model.getShowInfoBar());
+    uiPortlet.setShowWindowState(model.getShowApplicationState());
+    uiPortlet.setShowPortletMode(model.getShowApplicationMode());
+    uiPortlet.setProperties(model.getProperties());
+    uiPortlet.setTheme(model.getTheme());
+    uiPortlet.setId(model.getId());
+    if (model.getAccessPermissions() != null) {
+      uiPortlet.setAccessPermissions(model.getAccessPermissions());
     }
 
-    public static void toContainer(Container model, UIContainer uiContainer) {
-        model.setId(uiContainer.getId());
-        model.setName(uiContainer.getName());
-        model.setTitle(uiContainer.getTitle());
-        model.setIcon(uiContainer.getIcon());
-        model.setDescription(uiContainer.getDescription());
-        model.setHeight(uiContainer.getHeight());
-        model.setWidth(uiContainer.getWidth());
-        model.setCssClass(uiContainer.getCssClass());
-        model.setProfiles(uiContainer.getProfiles());
-        model.setTemplate(uiContainer.getTemplate());
-        model.setFactoryId(uiContainer.getFactoryId());
-        model.setAccessPermissions(uiContainer.getAccessPermissions());
-        model.setMoveAppsPermissions(uiContainer.getMoveAppsPermissions());
-        model.setMoveContainersPermissions(uiContainer.getMoveContainersPermissions());
+    Portlet portlet = uiPortlet.getProducedOfferedPortlet();
+    if (portlet == null || portlet.getInfo() == null)
+      return;
 
-        List<UIComponent> uiChildren = uiContainer.getChildren();
-        if (uiChildren == null)
-            return;
-        ArrayList<ModelObject> children = new ArrayList<ModelObject>();
-        for (UIComponent child : uiChildren) {
-            ModelObject component = buildModelObject(child);
-            if (component != null)
-                children.add(component);
-        }
-        model.setChildren(children);
-    }
+    PortletInfo portletInfo = portlet.getInfo();
 
-    private static <S> Application<S> toPortletModel(UIPortlet<S, ?> uiPortlet) {
-        Application<S> model;
-        PortletState<S> state = uiPortlet.getState();
-        ApplicationType<S> type = state.getApplicationType();
-        if (type == ApplicationType.PORTLET) {
-            model = (Application<S>) Application.createPortletApplication(uiPortlet.getStorageId());
-        } else {
-            throw new AssertionError();
-        }
-
-        //
-        model.setStorageName(uiPortlet.getStorageName());
-        model.setState(state.getApplicationState());
-        model.setTitle(uiPortlet.getTitle());
-        model.setWidth(uiPortlet.getWidth());
-        model.setHeight(uiPortlet.getHeight());
-        model.setDescription(uiPortlet.getDescription());
-        model.setShowInfoBar(uiPortlet.getShowInfoBar());
-        model.setShowApplicationState(uiPortlet.getShowWindowState());
-        model.setShowApplicationMode(uiPortlet.getShowPortletMode());
-        model.setDescription(uiPortlet.getDescription());
-        model.setIcon(uiPortlet.getIcon());
-        model.setProperties(uiPortlet.getProperties());
-        model.setTheme(uiPortlet.getTheme());
-        model.setAccessPermissions(uiPortlet.getAccessPermissions());
-        model.setModifiable(uiPortlet.isModifiable());
-        return model;
-    }
-
-    private static Container toContainer(UIContainer uiContainer) {
-        Container model = new Container(uiContainer.getStorageId());
-        toContainer(model, uiContainer);
-        return model;
-    }
-
-    public static Page toPageModel(UIPage uiPage) {
-        Page model = new Page(uiPage.getStorageId());
-        toContainer(model, uiPage);
-        model.setOwnerId(uiPage.getSiteKey().getName());
-        model.setOwnerType(uiPage.getSiteKey().getTypeName());
-        model.setIcon(uiPage.getIcon());
-        model.setPageId(uiPage.getPageId());
-        model.setTitle(uiPage.getTitle());
-        model.setAccessPermissions(uiPage.getAccessPermissions());
-        model.setEditPermission(uiPage.getEditPermission());
-        model.setFactoryId(uiPage.getFactoryId());
-        model.setShowMaxWindow(uiPage.isShowMaxWindow());
-        model.setHideSharedLayout(uiPage.isHideSharedLayout());
-        model.setModifiable(uiPage.isModifiable());
-        return model;
-    }
-
-    private static PortalConfig toPortal(UIPortal uiPortal) {
-        PortalConfig model = new PortalConfig(uiPortal.getSiteType().getName(), uiPortal.getName(), uiPortal.getStorageId());
-        model.setAccessPermissions(uiPortal.getAccessPermissions());
-        model.setEditPermission(uiPortal.getEditPermission());
-        model.setLabel(uiPortal.getLabel());
-        model.setDescription(uiPortal.getDescription());
-        model.setLocale(uiPortal.getLocale());
-        model.setSkin(uiPortal.getSkin());
-        model.setModifiable(uiPortal.isModifiable());
-        model.setProperties(uiPortal.getProperties());
-        model.setDefaultLayout(uiPortal.isUseDynamicLayout());
-
-        model.setPortalLayout(new Container());
-        LayoutService layoutService = uiPortal.getApplicationComponent(LayoutService.class);
-        PortalConfig portalConfig = layoutService.getPortalConfig(uiPortal.getSiteKey());
-        model.setDisplayed(portalConfig.isDisplayed());
-        model.setDisplayOrder(portalConfig.getDisplayOrder());
-        model.setBannerFileId(portalConfig.getBannerFileId());
-        List<UIComponent> children = uiPortal.getChildren();
-        if (children == null || children.isEmpty()) {
-          // Use default portal layout when the UI doesn't define one
-          // The default portal layout will add just the PageBody component
-          // which is mandatory to display page content inside PortalLayout
-          model.useMetaPortalLayout();
-          return model;
-        }
-        ArrayList<ModelObject> newChildren = new ArrayList<>();
-        for (UIComponent child : children) {
-            ModelObject component = buildModelObject(child);
-            if (component != null)
-                newChildren.add(component);
-        }
-        model.getPortalLayout().setChildren(newChildren);
-        model.getPortalLayout().setMoveAppsPermissions(uiPortal.getMoveAppsPermissions());
-        model.getPortalLayout().setMoveContainersPermissions(uiPortal.getMoveContainersPermissions());
-        return model;
-    }
-
-    /**
-     * Fill the UI component with both information from the persistent model and some coming from the portlet.xml defined by the
-     * JSR 286 specification
+    /*
+     * Define which portlet modes the portlet supports and hence should be shown
+     * in the portlet info bar
      */
-    private static <S> void toUIPortlet(UIPortlet<S, ?> uiPortlet, Application<S> model) {
+    Set<ModeInfo> modes = portletInfo.getCapabilities().getModes(MediaType.create("text/html"));
+    List<String> supportModes = modes.stream()
+                                     .map(modeInfo -> modeInfo.getModeName().toLowerCase())
+                                     .toList();
+    if (supportModes.size() > 1) {
+      supportModes.remove("view");
+    }
+    uiPortlet.setSupportModes(supportModes);
+    if (portletInfo instanceof ContainerPortletInfo containerPortletInfo) {
+      uiPortlet.setCssClass(containerPortletInfo.getInitParameter("layout-css-class"));
+    }
+  }
 
-        //
-        PortletState<S> portletState = new PortletState<S>(model.getState(), model.getType());
+  public static void toUIContainer(UIContainer uiContainer, Container model) throws Exception {
+    uiContainer.setStorageId(model.getStorageId());
+    uiContainer.setId(model.getId());
+    uiContainer.setWidth(model.getWidth());
+    uiContainer.setHeight(model.getHeight());
+    uiContainer.setProfiles(model.getProfiles());
+    uiContainer.setCssClass(model.getCssClass());
+    uiContainer.setTitle(model.getTitle());
+    uiContainer.setIcon(model.getIcon());
+    uiContainer.setDescription(model.getDescription());
+    uiContainer.setFactoryId(model.getFactoryId());
+    uiContainer.setName(model.getName());
+    uiContainer.setTemplate(model.getTemplate());
+    if (model.getAccessPermissions() != null) {
+      uiContainer.setAccessPermissions(model.getAccessPermissions());
+    }
+    List<ModelObject> children = model.getChildren();
+    if (children == null)
+      return;
+    for (Object child : children) {
+      buildUIContainer(uiContainer, child);
+    }
+  }
 
-        /*
-         * Fill UI component object with info from the XML file that persist portlet information
-         */
-        uiPortlet.setWidth(model.getWidth());
-        uiPortlet.setHeight(model.getHeight());
-        uiPortlet.setState(portletState);
-        uiPortlet.setTitle(model.getTitle());
-        uiPortlet.setIcon(model.getIcon());
-        uiPortlet.setDescription(model.getDescription());
-        uiPortlet.setShowInfoBar(model.getShowInfoBar());
-        uiPortlet.setShowWindowState(model.getShowApplicationState());
-        uiPortlet.setShowPortletMode(model.getShowApplicationMode());
-        uiPortlet.setProperties(model.getProperties());
-        uiPortlet.setTheme(model.getTheme());
-        uiPortlet.setId(model.getId());
-        if (model.getAccessPermissions() != null)
-            uiPortlet.setAccessPermissions(model.getAccessPermissions());
-        uiPortlet.setModifiable(model.isModifiable());
+  public static void toUIPage(UIPage uiPage, Page model) throws Exception {
+    toUIContainer(uiPage, model);
+    uiPage.setSiteKey(new SiteKey(model.getOwnerType(), model.getOwnerId()));
+    uiPage.setIcon(model.getIcon());
+    uiPage.setAccessPermissions(model.getAccessPermissions());
+    uiPage.setEditPermission(model.getEditPermission());
+    uiPage.setFactoryId(model.getFactoryId());
+    uiPage.setPageId(model.getPageId());
+    uiPage.setTitle(model.getTitle());
+    uiPage.setProfiles(model.getProfiles());
+    uiPage.setShowMaxWindow(model.isShowMaxWindow());
+    uiPage.setHideSharedLayout(model.isHideSharedLayout());
 
-        Portlet portlet = uiPortlet.getProducedOfferedPortlet();
-        if (portlet == null || portlet.getInfo() == null)
-            return;
+    List<UIPortlet> portlets = new ArrayList<>();
+    uiPage.findComponentOfType(portlets, UIPortlet.class);
+    for (UIPortlet portlet : portlets) {
+      portlet.setPortletInPortal(false);
+    }
+  }
 
-        PortletInfo portletInfo = portlet.getInfo();
+  public static void toUIPortal(UIPortal uiPortal, PortalConfig model) throws Exception {
+    buildUIPortal(uiPortal, model, false);
+  }
 
-        /*
-         * Define which portlet modes the portlet supports and hence should be shown in the portlet info bar
-         */
-        Set<ModeInfo> modes = portletInfo.getCapabilities().getModes(MediaType.create("text/html"));
-        List<String> supportModes = new ArrayList<String>();
-        for (ModeInfo modeInfo : modes) {
-            String modeName = modeInfo.getModeName().toLowerCase();
-            if ("config".equals(modeInfo.getModeName())) {
-                supportModes.add(modeName);
-            } else {
-                supportModes.add(modeName);
-            }
-        }
+  public static void toUIPortalWithMetaLayout(UIPortal uiPortal, PortalConfig model) throws Exception {
+    buildUIPortal(uiPortal, model, true);
+  }
 
-        if (supportModes.size() > 1)
-            supportModes.remove("view");
-        uiPortlet.setSupportModes(supportModes);
-        if (portletInfo instanceof ContainerPortletInfo containerPortletInfo) {
-          uiPortlet.setCssClass(containerPortletInfo.getInitParameter("layout-css-class"));
-        }
+  private static void buildUIPortal(UIPortal uiPortal, PortalConfig model, boolean metaLayout) throws Exception {
+    uiPortal.setSiteKey(new SiteKey(model.getType(), model.getName()));
+    uiPortal.setStorageId(model.getStorageId());
+    uiPortal.setName(model.getName());
+    uiPortal.setId("UIPortal");
+
+    uiPortal.setLabel(model.getLabel());
+    uiPortal.setDescription(model.getDescription());
+    uiPortal.setLocale(model.getLocale());
+    uiPortal.setSkin(model.getSkin());
+    uiPortal.setAccessPermissions(model.getAccessPermissions());
+    uiPortal.setEditPermission(model.getEditPermission());
+    uiPortal.setProperties(model.getProperties());
+    uiPortal.setUseDynamicLayout(model.isDefaultLayout());
+    UserPortalConfigService userPortalConfigService = uiPortal.getApplicationComponent(UserPortalConfigService.class);
+    PortalConfig metaSite = userPortalConfigService.getMetaPortalConfig();
+
+    Container layout = metaLayout && model.isDisplayed() ? metaSite.getPortalLayout() : model.getPortalLayout();
+    List<ModelObject> children = layout.getChildren();
+    if (children != null) {
+      for (Object child : children) {
+        buildUIContainer(uiPortal, child);
+      }
+    }
+  }
+
+  private static void buildUIContainer(UIContainer uiContainer, Object model) throws Exception {
+    UIComponent uiComponent = null;
+    WebuiRequestContext context = Util.getPortalRequestContext();
+
+    if (model instanceof SiteBody siteBody) {
+      UISiteBody uiSiteBody = uiContainer.createUIComponent(context, UISiteBody.class, null, null);
+      uiSiteBody.setStorageId(siteBody.getStorageId());
+      uiComponent = uiSiteBody;
+    } else if (model instanceof PageBody pageBody) {
+      UIPageBody uiPageBody = uiContainer.createUIComponent(context, UIPageBody.class, null, null);
+      uiPageBody.setStorageId(pageBody.getStorageId());
+      uiComponent = uiPageBody;
+    } else if (model instanceof Application application) {
+      UIPortlet uiPortlet = uiContainer.createUIComponent(context, UIPortlet.class, null, null);
+      uiPortlet.setStorageId(application.getStorageId());
+      if (application.getStorageName() != null) {
+        uiPortlet.setStorageName(application.getStorageName());
+      } else {
+        uiPortlet.setStorageName(application.getStorageId());
+      }
+      toUIPortlet(uiPortlet, application);
+      uiComponent = uiPortlet;
+    } else if (model instanceof Container container) {
+      UIComponentFactory<? extends UIContainer> factory = UIComponentFactory.getInstance(UIContainer.class);
+      UIContainer uiTempContainer = factory.createUIComponent(container.getFactoryId(), context);
+
+      if (uiTempContainer == null) {
+        log.warn("Can't find container factory for: {}. Default container is used", container.getFactoryId());
+        uiTempContainer = uiContainer.createUIComponent(context, UIContainer.class, null, null);
       }
 
-    public static void toUIContainer(UIContainer uiContainer, Container model) throws Exception {
-        uiContainer.setStorageId(model.getStorageId());
-        uiContainer.setId(model.getId());
-        uiContainer.setWidth(model.getWidth());
-        uiContainer.setHeight(model.getHeight());
-        uiContainer.setProfiles(model.getProfiles());
-        uiContainer.setCssClass(model.getCssClass());
-        uiContainer.setTitle(model.getTitle());
-        uiContainer.setIcon(model.getIcon());
-        uiContainer.setDescription(model.getDescription());
-        uiContainer.setFactoryId(model.getFactoryId());
-        uiContainer.setName(model.getName());
-        uiContainer.setTemplate(model.getTemplate());
-        if (model.getAccessPermissions() != null) {
-            uiContainer.setAccessPermissions(model.getAccessPermissions());
-        }
-        uiContainer.setMoveAppsPermissions(model.getMoveAppsPermissions());
-        uiContainer.setMoveContainersPermissions(model.getMoveContainersPermissions());
-
-        List<ModelObject> children = model.getChildren();
-        if (children == null)
-            return;
-        for (Object child : children) {
-            buildUIContainer(uiContainer, child);
-        }
+      toUIContainer(uiTempContainer, (Container) model);
+      uiComponent = uiTempContainer;
     }
-
-    public static void toUIPage(UIPage uiPage, Page model) throws Exception {
-        toUIContainer(uiPage, model);
-        uiPage.setSiteKey(new SiteKey(model.getOwnerType(), model.getOwnerId()));
-        uiPage.setIcon(model.getIcon());
-        uiPage.setAccessPermissions(model.getAccessPermissions());
-        uiPage.setEditPermission(model.getEditPermission());
-        uiPage.setFactoryId(model.getFactoryId());
-        uiPage.setPageId(model.getPageId());
-        uiPage.setTitle(model.getTitle());
-        uiPage.setProfiles(model.getProfiles());
-        uiPage.setShowMaxWindow(model.isShowMaxWindow());
-        uiPage.setHideSharedLayout(model.isHideSharedLayout());
-        uiPage.setModifiable(model.isModifiable());
-
-        List<UIPortlet> portlets = new ArrayList<UIPortlet>();
-        uiPage.findComponentOfType(portlets, UIPortlet.class);
-        for (UIPortlet portlet : portlets) {
-            portlet.setPortletInPortal(false);
-        }
-    }
-    
-    public static void toUIPortal(UIPortal uiPortal, PortalConfig model) throws Exception {
-        buildUIPortal(uiPortal, model, false);
-    }
-    
-    public static void toUIPortalWithMetaLayout(UIPortal uiPortal, PortalConfig model) throws Exception {
-        buildUIPortal(uiPortal, model, true);
-    }
-
-    private static void buildUIPortal(UIPortal uiPortal, PortalConfig model, boolean metaLayout) throws Exception {
-        uiPortal.setSiteKey(new SiteKey(model.getType(), model.getName()));
-        uiPortal.setStorageId(model.getStorageId());
-        uiPortal.setName(model.getName());
-        uiPortal.setId("UIPortal");
-        // uiPortal.setFactoryId(model.getFactoryId());
-        uiPortal.setModifiable(model.isModifiable());
-
-        uiPortal.setLabel(model.getLabel());
-        uiPortal.setDescription(model.getDescription());
-        uiPortal.setLocale(model.getLocale());
-        uiPortal.setSkin(model.getSkin());
-        uiPortal.setAccessPermissions(model.getAccessPermissions());
-        uiPortal.setEditPermission(model.getEditPermission());
-        uiPortal.setProperties(model.getProperties());
-        uiPortal.setUseDynamicLayout(model.isDefaultLayout());
-        UserPortalConfigService userPortalConfigService = uiPortal.getApplicationComponent(UserPortalConfigService.class);
-        PortalConfig metaSite = userPortalConfigService.getMetaPortalConfig();
-
-        Container layout = metaLayout && model.isDisplayed() ? metaSite.getPortalLayout() : model.getPortalLayout();
-        
-        uiPortal.setMoveAppsPermissions(layout.getMoveAppsPermissions());
-        uiPortal.setMoveContainersPermissions(layout.getMoveContainersPermissions());
-        List<ModelObject> children = layout .getChildren();
-        if (children != null) {
-            for (Object child : children) {
-                buildUIContainer(uiPortal, child);
-            }
-        }
-    }
-
-    private static void buildUIContainer(UIContainer uiContainer, Object model) throws Exception {
-        UIComponent uiComponent = null;
-        WebuiRequestContext context = Util.getPortalRequestContext();
-
-        if (model instanceof SiteBody) {
-            UISiteBody uiSiteBody = uiContainer.createUIComponent(context, UISiteBody.class, null, null);
-            uiSiteBody.setStorageId(((SiteBody) model).getStorageId());
-            uiComponent = uiSiteBody;
-        } else if (model instanceof PageBody) {
-            UIPageBody uiPageBody = uiContainer.createUIComponent(context, UIPageBody.class, null, null);
-            uiPageBody.setStorageId(((PageBody) model).getStorageId());
-            uiComponent = uiPageBody;
-        } else if (model instanceof Application) {
-            Application application = (Application) model;
-
-            UIPortlet uiPortlet = uiContainer.createUIComponent(context, UIPortlet.class, null, null);
-            uiPortlet.setStorageId(application.getStorageId());
-            if (application.getStorageName() != null) {
-              uiPortlet.setStorageName(application.getStorageName());
-            } else {
-              uiPortlet.setStorageName(application.getStorageId());
-            }
-            toUIPortlet(uiPortlet, application);
-            uiComponent = uiPortlet;
-        } else if (model instanceof Container) {
-            Container container = (Container) model;
-
-            UIComponentFactory<? extends UIContainer> factory = UIComponentFactory.getInstance(UIContainer.class);
-            UIContainer uiTempContainer = factory.createUIComponent(container.getFactoryId(), context);
-
-            if (uiTempContainer == null) {
-                log.warn("Can't find container factory for: {}. Default container is used", container.getFactoryId());
-                uiTempContainer = uiContainer.createUIComponent(context, UIContainer.class, null, null);
-            }
-
-            toUIContainer(uiTempContainer, (Container) model);
-            uiComponent = uiTempContainer;
-        }
-        uiContainer.addChild(uiComponent);
-    }
+    uiContainer.addChild(uiComponent);
+  }
 
 }

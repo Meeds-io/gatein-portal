@@ -32,119 +32,104 @@ import org.exoplatform.portal.mop.page.PageKey;
  */
 class UserNodeFilter implements NodeFilter {
 
-    /** . */
-    private final UserPortalImpl userPortal;
+  /** . */
+  private final UserPortalImpl       userPortal;
 
-    /** . */
-    private final UserNodeFilterConfig config;
+  /** . */
+  private final UserNodeFilterConfig config;
 
-    public UserNodeFilter(UserPortalImpl userPortal, UserNodeFilterConfig config) {
-        if (userPortal == null) {
-            throw new NullPointerException();
-        }
-        if (config == null) {
-            throw new NullPointerException();
-        }
-
-        //
-        this.userPortal = userPortal;
-        this.config = config;
+  public UserNodeFilter(UserPortalImpl userPortal, UserNodeFilterConfig config) {
+    if (userPortal == null) {
+      throw new NullPointerException();
+    }
+    if (config == null) {
+      throw new NullPointerException();
     }
 
-    private boolean canRead(NodeState state) {
-        PageKey pageRef = state.getPageRef();
-        if (pageRef != null) {
-            try {
-                PageContext page = userPortal.service.getPageService().loadPage(pageRef);
-                if (page != null) {
-                    return userPortal.service.getUserACL().hasPermission(page);
-                }
-            } catch (Exception ignore) {
-            }
-        }
-        return true;
+    //
+    this.userPortal = userPortal;
+    this.config = config;
+  }
+
+  private boolean canRead(NodeState state) {
+    PageKey pageRef = state.getPageRef();
+    if (pageRef != null) {
+      PageContext page = userPortal.service.getPageService().loadPage(pageRef);
+      if (page != null) {
+        UserACL userACL = userPortal.service.getUserACL();
+        return userACL.hasAccessPermission(page, userACL.getUserIdentity(userPortal.getUserName()));
+      }
+    }
+    return true;
+  }
+
+  private boolean canWrite(NodeState state) {
+    PageKey pageRef = state.getPageRef();
+    if (pageRef != null) {
+      PageContext page = userPortal.service.getPageService().loadPage(pageRef);
+      if (page != null) {
+        UserACL userACL = userPortal.service.getUserACL();
+        return userACL.hasEditPermission(page, userACL.getUserIdentity(userPortal.getUserName()));
+      }
+    }
+    return false;
+  }
+
+  public boolean accept(int depth, String id, String name, NodeState state) {
+    Visibility visibility = state.getVisibility();
+
+    // Correct null -> displayed
+    if (visibility == null) {
+      visibility = Visibility.DISPLAYED;
     }
 
-    private boolean canWrite(NodeState state) {
-        PageKey pageRef = state.getPageRef();
-        if (pageRef != null) {
-            try {
-                PageContext page = userPortal.service.getPageService().loadPage(pageRef);
-                if (page != null) {
-                    return userPortal.service.getUserACL().hasEditPermission(page);
-                }
-            } catch (Exception ignore) {
-            }
-        }
-        return false;
+    // If a visibility is specified then we use it
+    if (config.visibility != null && !config.visibility.contains(visibility)) {
+      return false;
     }
 
-    public boolean accept(int depth, String id, String name, NodeState state) {
-        Visibility visibility = state.getVisibility();
+    // Filter by path
+    if (depth > 0 && config.path != null && (depth - 1 >= config.path.length || !config.path[depth - 1].equals(name))) {
+      return false;
+    }
 
-        // Correct null -> displayed
-        if (visibility == null) {
-            visibility = Visibility.DISPLAYED;
-        }
-
-        // If a visibility is specified then we use it
-        if (config.visibility != null && !config.visibility.contains(visibility)) {
+    // Perform authorization check
+    if (config.authorizationMode == UserNodeFilterConfig.AUTH_NO_CHECK) {
+      // Do nothing here
+    } else {
+      if (visibility == Visibility.SYSTEM) {
+        if (config.authorizationMode == UserNodeFilterConfig.AUTH_READ_WRITE) {
+          if (!canWrite(state)) {
             return false;
-        }
-
-        // Filter by path
-        if (depth > 0 && config.path != null && (depth - 1 >= config.path.length || !config.path[depth - 1].equals(name))) {
-            return false;
-        }
-
-        //
-        UserACL acl = userPortal.service.getUserACL();
-
-        // Perform authorization check
-        if (config.authorizationMode == UserNodeFilterConfig.AUTH_NO_CHECK) {
-            // Do nothing here
+          }
         } else {
-            if (visibility == Visibility.SYSTEM) {
-                if (config.authorizationMode == UserNodeFilterConfig.AUTH_READ_WRITE) {
-                    if (!canWrite(state)) {
-                        return false;
-                    }
-                } else {
-                    if (!canRead(state)) {
-                        return false;
-                    }
-                }
-            } else {
-                if (config.authorizationMode == UserNodeFilterConfig.AUTH_READ_WRITE) {
-                    if (!canRead(state)) {
-                        return false;
-                    }
-                } else {
-                    if (!canRead(state)) {
-                        return false;
-                    }
-                }
-            }
+          if (!canRead(state)) {
+            return false;
+          }
         }
-
-        // Now make the custom checks
-        switch (visibility) {
-            case SYSTEM:
-                break;
-            case TEMPORAL:
-                if (config.temporalCheck) {
-                    long now = System.currentTimeMillis();
-                    if (state.getStartPublicationTime() != -1 && now < state.getStartPublicationTime()) {
-                        return false;
-                    }
-                    if (state.getEndPublicationTime() != -1 && now > state.getEndPublicationTime()) {
-                        return false;
-                    }
-                }
-                break;
+      } else if (config.authorizationMode == UserNodeFilterConfig.AUTH_READ_WRITE) {
+        if (!canRead(state)) {
+          return false;
         }
-
-        //
-        return true;
+      } else {
+        if (!canRead(state)) {
+          return false;
+        }
+      }
     }
+
+    // Now make the custom checks
+    if (visibility == Visibility.TEMPORAL && config.temporalCheck) {
+      long now = System.currentTimeMillis();
+      if (state.getStartPublicationTime() != -1 && now < state.getStartPublicationTime()) {
+        return false;
+      }
+      if (state.getEndPublicationTime() != -1 && now > state.getEndPublicationTime()) {
+        return false;
+      }
+    }
+
+    //
+    return true;
+  }
 }

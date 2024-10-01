@@ -294,8 +294,6 @@ public class LayoutStorage {
   public void clonePermissions(String objectType, long dstId, long srcId) {
     clonePermissions(objectType, dstId, srcId, PermissionEntity.TYPE.ACCESS);
     clonePermissions(objectType, dstId, srcId, PermissionEntity.TYPE.EDIT);
-    clonePermissions(objectType, dstId, srcId, PermissionEntity.TYPE.MOVE_APP);
-    clonePermissions(objectType, dstId, srcId, PermissionEntity.TYPE.MOVE_CONTAINER);
   }
 
   public void clonePermissions(String objectType, long dstId, long srcId, PermissionEntity.TYPE type) {
@@ -573,14 +571,6 @@ public class LayoutStorage {
     List<PermissionEntity> access = permissionDAO.getPermissions(ContainerEntity.class.getName(),
                                                                  entity.getId(),
                                                                  PermissionEntity.TYPE.ACCESS);
-    List<PermissionEntity> moveApps =
-                                    permissionDAO.getPermissions(ContainerEntity.class.getName(),
-                                                                 entity.getId(),
-                                                                 PermissionEntity.TYPE.MOVE_APP);
-    List<PermissionEntity> moveConts =
-                                     permissionDAO.getPermissions(ContainerEntity.class.getName(),
-                                                                  entity.getId(),
-                                                                  PermissionEntity.TYPE.MOVE_CONTAINER);
 
     String cssClass = null;
     String profiles = null;
@@ -612,8 +602,6 @@ public class LayoutStorage {
                              cssStyle,
                              appBackgroundStyle,
                              buildPermission(access),
-                             buildPermission(moveApps),
-                             buildPermission(moveConts),
                              children);
   }
 
@@ -797,14 +785,6 @@ public class LayoutStorage {
     if (srcChild instanceof ContainerData srcChildContainer) {
       typeName = ContainerEntity.class.getName();
       access = srcChildContainer.getAccessPermissions();
-      savePermissions(typeName,
-                      id,
-                      PermissionEntity.TYPE.MOVE_APP,
-                      srcChildContainer.getMoveAppsPermissions());
-      savePermissions(typeName,
-                      id,
-                      PermissionEntity.TYPE.MOVE_CONTAINER,
-                      srcChildContainer.getMoveContainersPermissions());
     } else if (srcChild instanceof ApplicationData srcChildApplication) { // NOSONAR
       typeName = WindowEntity.class.getName();
       access = srcChildApplication.getAccessPermissions();

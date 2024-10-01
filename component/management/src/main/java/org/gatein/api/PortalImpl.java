@@ -271,8 +271,6 @@ public class PortalImpl implements Portal {
     }
 
     Permission edit = Permission.any("platform", "administrators");
-    List<String> moveAppsPermissions = Container.DEFAULT_MOVE_APPLICATIONS_PERMISSIONS;
-    List<String> moveContainersPermissions = Container.DEFAULT_MOVE_CONTAINERS_PERMISSIONS;
 
     PageState pageState = new PageState(pageId.getPageName(),
                                         null,
@@ -283,8 +281,6 @@ public class PortalImpl implements Portal {
                                         Arrays.asList(Util.from(Permission
                                                                           .everyone())),
                                         Util.from(edit)[0],
-                                        moveAppsPermissions,
-                                        moveContainersPermissions,
                                         PageType.PAGE.name(),
                                         null);
 

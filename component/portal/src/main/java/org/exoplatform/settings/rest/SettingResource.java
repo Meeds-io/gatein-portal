@@ -13,6 +13,7 @@ import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
@@ -116,11 +117,12 @@ public class SettingResource implements ResourceContainer {
    * @return true if the operation is authorized for the current user
    */
   private boolean hasPermissions(Context context) {
-    String currentUser = ConversationState.getCurrent().getIdentity().getUserId();
+    Identity identity = ConversationState.getCurrent().getIdentity();
+    String currentUser = identity.getUserId();
     if(currentUser != null) {
       return (context.getName().toUpperCase().equals(Context.USER.getName())
               && (context.getId() == null || currentUser.equals(context.getId())))
-                || (userACL.isSuperUser() || userACL.isUserInGroup(userACL.getAdminGroups()));
+             || userACL.isAdministrator(identity);
     }
     return false;
   }
