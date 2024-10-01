@@ -74,8 +74,6 @@ public class PageData extends ContainerData {
                     String editPermission,
                     boolean showMaxWindow,
                     boolean hideSharedLayout,
-                    List<String> moveAppsPermissions,
-                    List<String> moveContainersPermissions,
                     String type,
                     String link) {
       super(storageId,
@@ -93,8 +91,6 @@ public class PageData extends ContainerData {
             null,
             null,
             accessPermissions,
-            moveAppsPermissions,
-            moveContainersPermissions,
             children);
 
         //

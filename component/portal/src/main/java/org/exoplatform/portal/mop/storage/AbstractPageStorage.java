@@ -93,12 +93,6 @@ public abstract class AbstractPageStorage implements PageStorage {
       return null;
     }
 
-    List<String> moveAppsPermissions = layoutStorage.getPermissions(PageEntity.class.getName(),
-                                                                    entity.getId(),
-                                                                    PermissionEntity.TYPE.MOVE_APP);
-    List<String> moveContainersPermissions = layoutStorage.getPermissions(PageEntity.class.getName(),
-                                                                          entity.getId(),
-                                                                          PermissionEntity.TYPE.MOVE_CONTAINER);
     List<String> accessPermissions = layoutStorage.getPermissions(PageEntity.class.getName(),
                                                                   entity.getId(),
                                                                   PermissionEntity.TYPE.ACCESS);
@@ -128,8 +122,6 @@ public abstract class AbstractPageStorage implements PageStorage {
                         editPermission, // editPermission
                         entity.isShowMaxWindow(), // showMaxWindow
                         entity.isHideSharedLayout(),
-                        moveAppsPermissions,
-                        moveContainersPermissions,
                         entity.getPageType() != null ? entity.getPageType().name() : null,
                         entity.getLink());
   }

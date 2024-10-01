@@ -638,7 +638,7 @@ public class GroupRestResourcesV1 implements ResourceContainer {
     } catch (Exception e) {
       return Response.status(Response.Status.UNAUTHORIZED).build();
     }
-    if (!userACL.isSuperUser() && !userACL.isUserInGroup(userACL.getAdminGroups()) && !identity.isMemberOf(groupMember)) {
+    if (!userACL.isAdministrator(identity) && !identity.isMemberOf(groupMember)) {
       return Response.status(Response.Status.UNAUTHORIZED).build();
     }
     if (StringUtils.isNotBlank(q)) {
@@ -650,7 +650,7 @@ public class GroupRestResourcesV1 implements ResourceContainer {
     Group[] groups = null;
     int totalSize = 0;
     Collection<Group> userGroupsList = null;
-    if (allGroupsForAdmin && (userACL.isSuperUser() || userACL.isUserInGroup(userACL.getAdminGroups()))) {
+    if (allGroupsForAdmin && userACL.isAdministrator(identity)) {
       userGroupsList  = organizationService.getGroupHandler().findAllGroupsByKeyword(q, excludeParentGroup);
     } else {
       userGroupsList = organizationService.getGroupHandler()

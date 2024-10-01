@@ -23,6 +23,7 @@ import java.util.Map;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.webui.ext.filter.UIExtensionFilter;
 import org.exoplatform.webui.ext.filter.UIExtensionFilterType;
 
@@ -52,7 +53,7 @@ public class UserACLFilter implements UIExtensionFilter {
     UserACL userACL = (UserACL) container.getComponentInstance(UserACL.class);
     for (int i = 0, length = permissions.size(); i < length; i++) {
       String permission = permissions.get(i);
-      if (userACL.hasPermission(permission)) {
+      if (userACL.hasPermission(ConversationState.getCurrent().getIdentity(), permission)) {
         return true;
       }
     }

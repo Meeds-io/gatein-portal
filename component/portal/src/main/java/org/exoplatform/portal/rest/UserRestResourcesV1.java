@@ -26,6 +26,7 @@ import org.exoplatform.services.organization.search.UserSearchService;
 import org.exoplatform.services.rest.http.PATCH;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.rest.http.PATCH;
 import org.exoplatform.web.login.recovery.ChangePasswordConnector;
 import org.exoplatform.web.login.recovery.PasswordRecoveryService;
@@ -254,8 +255,9 @@ public class UserRestResourcesV1 implements ResourceContainer {
   )
   public Response updateUser(@Context HttpServletRequest request,
                              @RequestBody(description = "User Object") UserRestEntity userEntity) throws Exception {
-
-    if (!userACL.isUserInGroup(DELEGATED_GROUP) && !userACL.isUserInGroup(ADMINISTRATOR_GROUP)) {
+    Identity identity = ConversationState.getCurrent().getIdentity();
+    if (!userACL.isUserInGroup(identity, DELEGATED_GROUP)
+        && !userACL.isAdministrator(ConversationState.getCurrent().getIdentity())) {
       throw new WebApplicationException(Response.Status.FORBIDDEN);
     }
     if (userEntity == null) {
@@ -392,9 +394,8 @@ public class UserRestResourcesV1 implements ResourceContainer {
                           @Parameter(description = "User name identifier", required = true) @PathParam(
                             "id"
                           ) String id) throws Exception {
-
-    if (!userACL.isSuperUser() && !userACL.isUserInGroup(userACL.getAdminGroups())
-        && !ConversationState.getCurrent().getIdentity().getUserId().equals(id)) {
+    Identity identity = ConversationState.getCurrent().getIdentity();
+    if (!userACL.isAdministrator(identity) && !identity.getUserId().equals(id)) {
       return Response.status(Response.Status.UNAUTHORIZED).build();
     }
 
@@ -442,8 +443,9 @@ public class UserRestResourcesV1 implements ResourceContainer {
                                  @Parameter(description = "New user password", required = true) @FormParam(
                                    "newPassword"
                                  ) String newPassword) {
-    boolean isAdmin = userACL.isSuperUser() || userACL.isUserInGroup(userACL.getAdminGroups());
-    boolean isSameUser = ConversationState.getCurrent().getIdentity().getUserId().equals(username);
+    Identity identity = ConversationState.getCurrent().getIdentity();
+    boolean isAdmin = userACL.isAdministrator(identity);
+    boolean isSameUser = identity.getUserId().equals(username);
     if (!isAdmin && !isSameUser) {
       return Response.status(Response.Status.UNAUTHORIZED).build();
     }
@@ -551,7 +553,7 @@ public class UserRestResourcesV1 implements ResourceContainer {
       }
   )
   public Response isSuperUser() {
-    return Response.ok().entity("{\"isSuperUser\":\"" + userACL.isSuperUser() + "\"}").build();
+    return Response.ok().entity("{\"isSuperUser\":\"" + userACL.isSuperUser(ConversationState.getCurrent().getIdentity()) + "\"}").build();
   }
 
   @GET
@@ -569,7 +571,8 @@ public class UserRestResourcesV1 implements ResourceContainer {
           }
   )
   public Response isDelegatedAdministrator() {
-    boolean isDelegatedAdministrator = userACL.isUserInGroup(DELEGATED_GROUP) && !userACL.isUserInGroup(ADMINISTRATOR_GROUP);
+    boolean isDelegatedAdministrator = userACL.isUserInGroup(ConversationState.getCurrent().getIdentity(), DELEGATED_GROUP)
+                                       && !userACL.isAdministrator(ConversationState.getCurrent().getIdentity());
     return Response.ok().entity("{\"result\":\"" + isDelegatedAdministrator + "\"}").build();
   }
 
