@@ -22,6 +22,7 @@ package org.exoplatform.portal.webui.portal;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.webui.core.UIContainer;
 
 /**
@@ -41,8 +42,6 @@ public class UIPortalComponent extends UIContainer {
     protected String height_;
 
     private String title_;
-
-    private transient boolean modifiable_;
 
     private String[] accessPermissions = { UserACL.EVERYONE };
 
@@ -84,9 +83,8 @@ public class UIPortalComponent extends UIContainer {
     }
 
     public boolean hasAccessPermission() {
-        ExoContainer exoContainer = ExoContainerContext.getCurrentContainer();
-        UserACL acl = (UserACL) exoContainer.getComponentInstanceOfType(UserACL.class);
-        return acl.hasPermission(accessPermissions);
+      return ExoContainerContext.getService(UserACL.class)
+                                .hasPermission(ConversationState.getCurrent().getIdentity(), accessPermissions);
     }
 
     public String getWidth() {
@@ -103,14 +101,6 @@ public class UIPortalComponent extends UIContainer {
 
     public void setHeight(String s) {
         height_ = s;
-    }
-
-    public boolean isModifiable() {
-        return modifiable_;
-    }
-
-    public void setModifiable(boolean b) {
-        modifiable_ = b;
     }
 
     public String getTitle() {

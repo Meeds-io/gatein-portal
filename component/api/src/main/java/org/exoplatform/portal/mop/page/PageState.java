@@ -55,35 +55,33 @@ public class PageState implements Serializable {
   /** . */
   final List<String>        accessPermissions;
 
-  final List<String>        moveAppsPermissions;
-
-  final List<String>        moveContainersPermissions;
-
   public PageState(String displayName, // NOSONAR
                    String description,
                    boolean showMaxWindow,
                    String factoryId,
                    List<String> accessPermissions,
                    String editPermission,
-                   List<String> moveAppsPermissions,
-                   List<String> moveContainersPermissions,
                    String type,
                    String link) {
-    this(displayName, description, showMaxWindow, false, factoryId, null, accessPermissions, editPermission, moveAppsPermissions, moveContainersPermissions, type, link);
+    this(displayName,
+         description,
+         showMaxWindow,
+         false,
+         factoryId,
+         null,
+         accessPermissions,
+         editPermission,
+         type,
+         link);
   }
 
   public PageState(String displayName, // NOSONAR
                    String description,
                    boolean showMaxWindow,
-                   boolean hideSharedLayout,
                    String factoryId,
                    List<String> accessPermissions,
-                   String editPermission,
-                   List<String> moveAppsPermissions,
-                   List<String> moveContainersPermissions,
-                   String type,
-                   String link) {
-    this(displayName, description, showMaxWindow, hideSharedLayout, factoryId, null, accessPermissions, editPermission, moveAppsPermissions, moveContainersPermissions, type, link);
+                   String editPermission) {
+    this(displayName, description, showMaxWindow, false, factoryId, accessPermissions, editPermission);
   }
 
   public PageState(String displayName, // NOSONAR
@@ -94,8 +92,6 @@ public class PageState implements Serializable {
                    String profiles,
                    List<String> accessPermissions,
                    String editPermission,
-                   List<String> moveAppsPermissions,
-                   List<String> moveContainersPermissions,
                    String type,
                    String link) {
     this.editPermission = editPermission;
@@ -106,21 +102,8 @@ public class PageState implements Serializable {
     this.displayName = displayName;
     this.description = description;
     this.accessPermissions = accessPermissions;
-    this.moveAppsPermissions = moveAppsPermissions;
-    this.moveContainersPermissions = moveContainersPermissions;
     this.type = type;
     this.link = link;
-  }
-
-  public PageState(String displayName, // NOSONAR
-                   String description,
-                   boolean showMaxWindow,
-                   String factoryId,
-                   List<String> accessPermissions,
-                   String editPermission,
-                   List<String> moveAppsPermissions,
-                   List<String> moveContainersPermissions) {
-    this(displayName, description, showMaxWindow, false, factoryId, accessPermissions, editPermission, moveAppsPermissions, moveContainersPermissions);
   }
 
   public PageState(String displayName, // NOSONAR
@@ -129,9 +112,7 @@ public class PageState implements Serializable {
                    boolean hideSharedLayout,
                    String factoryId,
                    List<String> accessPermissions,
-                   String editPermission,
-                   List<String> moveAppsPermissions,
-                   List<String> moveContainersPermissions) {
+                   String editPermission) {
     this.editPermission = editPermission;
     this.showMaxWindow = showMaxWindow;
     this.hideSharedLayout = hideSharedLayout;
@@ -140,8 +121,6 @@ public class PageState implements Serializable {
     this.displayName = displayName;
     this.description = description;
     this.accessPermissions = accessPermissions;
-    this.moveAppsPermissions = moveAppsPermissions;
-    this.moveContainersPermissions = moveContainersPermissions;
     this.type = PageType.PAGE.name();
     this.link = null;
   }
@@ -174,20 +153,6 @@ public class PageState implements Serializable {
     return accessPermissions;
   }
 
-  /**
-   * @return the moveAppsPermissions
-   */
-  public List<String> getMoveAppsPermissions() {
-    return moveAppsPermissions;
-  }
-
-  /**
-   * @return the moveContainersPermissions
-   */
-  public List<String> getMoveContainersPermissions() {
-    return moveContainersPermissions;
-  }
-
   public String getType() {
     return type;
   }
@@ -206,8 +171,10 @@ public class PageState implements Serializable {
     }
     PageState that = (PageState) o;
     return Safe.equals(editPermission, that.editPermission) && showMaxWindow == that.showMaxWindow
-        && Safe.equals(factoryId, that.factoryId) && Safe.equals(displayName, that.displayName)
-        && Safe.equals(description, that.description) && Safe.equals(accessPermissions, that.accessPermissions);
+           && Safe.equals(factoryId, that.factoryId)
+           && Safe.equals(displayName, that.displayName)
+           && Safe.equals(description, that.description)
+           && Safe.equals(accessPermissions, that.accessPermissions);
   }
 
   @Override
@@ -230,8 +197,6 @@ public class PageState implements Serializable {
                        displayName,
                        description,
                        accessPermissions,
-                       moveAppsPermissions,
-                       moveContainersPermissions,
                        type,
                        link);
   }
@@ -267,11 +232,7 @@ public class PageState implements Serializable {
     /** . */
     private List<String> accessPermissions;
 
-    private List<String> moveAppsPermissions;
-
-    private List<String> moveContainersPermissions;
-
-    private Builder(String editPermission,
+    private Builder(String editPermission, // NOSONAR
                     boolean showMaxWindow,
                     boolean hideSharedLayout,
                     String factoryId,
@@ -279,8 +240,6 @@ public class PageState implements Serializable {
                     String displayName,
                     String description,
                     List<String> accessPermissions,
-                    List<String> moveAppsPermissions,
-                    List<String> moveContainersPermissions,
                     String type,
                     String link) {
       this.editPermission = editPermission;
@@ -291,8 +250,6 @@ public class PageState implements Serializable {
       this.displayName = displayName;
       this.description = description;
       this.accessPermissions = accessPermissions;
-      this.moveAppsPermissions = moveAppsPermissions;
-      this.moveContainersPermissions = moveContainersPermissions;
       this.type = type;
       this.link = link;
     }
@@ -308,7 +265,7 @@ public class PageState implements Serializable {
     }
 
     public Builder accessPermissions(String... accessPermissions) {
-      this.accessPermissions = new ArrayList<String>(Arrays.asList(accessPermissions));
+      this.accessPermissions = new ArrayList<>(Arrays.asList(accessPermissions));
       return this;
     }
 
@@ -341,10 +298,12 @@ public class PageState implements Serializable {
       this.factoryId = factoryId;
       return this;
     }
+
     public Builder type(String type) {
       this.type = type;
       return this;
     }
+
     public Builder link(String link) {
       this.link = link;
       return this;
@@ -359,8 +318,6 @@ public class PageState implements Serializable {
                            profiles,
                            accessPermissions,
                            editPermission,
-                           moveAppsPermissions,
-                           moveContainersPermissions,
                            type,
                            link);
     }

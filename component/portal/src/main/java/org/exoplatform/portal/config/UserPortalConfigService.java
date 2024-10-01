@@ -75,6 +75,8 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 
 import io.meeds.common.ContainerTransactional;
 
@@ -271,7 +273,7 @@ public class UserPortalConfigService implements Startable {
      * <br>
      * <p>
      * To return a valid config, the current thread must be associated with an identity that will grant him access to the portal
-     * as returned by the {@link UserACL#hasPermission(org.exoplatform.portal.config.model.PortalConfig)} method.
+     * as returned by the {@link UserACL#hasAccessPermission(org.exoplatform.portal.config.model.PortalConfig, Identity)} method.
      * </p>
      * <br>
      * The navigation loaded on the <code>UserPortalConfig</code> object are obtained according to the specified user
@@ -296,7 +298,7 @@ public class UserPortalConfigService implements Startable {
 
     public UserPortalConfig getUserPortalConfig(String portalName, String accessUser, Locale locale) {
         PortalConfig portal = layoutService.getPortalConfig(portalName);
-        if (portal == null || !userACL_.hasPermission(portal)) {
+        if (portal == null || !userACL_.hasAccessPermission(portal, userACL_.getUserIdentity(accessUser))) {
             return null;
         }
         return new UserPortalConfig(portal, this, portalName, accessUser, locale);
@@ -515,7 +517,7 @@ public class UserPortalConfigService implements Startable {
         }
 
         PageContext page = layoutService.getPageContext(pageRef);
-        if (page == null || !userACL_.hasPermission(page)) {
+        if (page == null || !userACL_.hasAccessPermission(page, getCurrentIdentity())) {
             return null;
         }
         return page;
@@ -549,7 +551,7 @@ public class UserPortalConfigService implements Startable {
           continue;
         }
         PortalConfig config = layoutService.getPortalConfig(siteType.getName(), name);
-        if (config == null || !userACL_.hasPermission(config)) {
+        if (config == null || !userACL_.hasAccessPermission(config, getCurrentIdentity())) {
           i.remove();
         }
       }
@@ -560,7 +562,7 @@ public class UserPortalConfigService implements Startable {
       List<PortalConfig> list = layoutService.getSites(siteFilter);
       return list.stream()
                  .filter(Objects::nonNull)
-                 .filter(userACL_::hasPermission)
+                 .filter(portalConfig -> userACL_.hasAccessPermission(portalConfig, getCurrentIdentity()))
                  .sorted((s1, s2) -> {
                    if (!s2.isDisplayed() && !s1.isDisplayed()) {
                      if (StringUtils.equals(s1.getName(), PUBLIC_SITE_NAME)) {
@@ -920,6 +922,11 @@ public class UserPortalConfigService implements Startable {
         uri = uri + node.getURI();
       }
       return uri;
+    }
+
+    private Identity getCurrentIdentity() {
+      ConversationState conversationState = ConversationState.getCurrent();
+      return conversationState == null ? null : conversationState.getIdentity();
     }
 
 }

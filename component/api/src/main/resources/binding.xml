@@ -187,20 +187,6 @@
     <value name="height" usage="optional" field="height" style="attribute"/>
     <value name="cssClass" field="cssClass" usage="optional" style="attribute"/>
     <value name="profiles" field="profiles" usage="optional" style="attribute"/>
-    <value
-      name="move-apps-permissions"
-      field="moveAppsPermissions"
-      usage="optional"
-      default="Everyone"
-      serializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.serializePermissions"
-      deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions"/>
-    <value
-      name="move-containers-permissions"
-      field="moveContainersPermissions"
-      usage="optional"
-      default="Everyone"
-      serializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.serializePermissions"
-      deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions"/>
     <structure
       field="cssStyle"
       map-as="org.exoplatform.portal.config.model.ModelStyle"
@@ -228,10 +214,6 @@
     <value name="edit-permission" field="editPermission" usage="optional"/>
     <value name="show-max-window" field="showMaxWindow" usage="optional"/>
     <value name="hide-shared-layout" field="hideSharedLayout" usage="optional"/>
-    <value name="move-apps-permissions" field="moveAppsPermissions" usage="optional" default="Everyone" serializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.serializePermissions"
-          deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions"/>
-    <value name="move-containers-permissions" field="moveContainersPermissions" usage="optional" default="Everyone" serializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.serializePermissions"
-          deserializer="org.exoplatform.portal.config.serialize.JibxArraySerialize.deserializePermissions"/>
     <structure
       field="cssStyle"
       map-as="org.exoplatform.portal.config.model.ModelStyle"

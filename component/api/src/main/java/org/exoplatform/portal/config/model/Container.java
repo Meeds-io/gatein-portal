@@ -63,10 +63,6 @@ public class Container extends ModelObject implements Cloneable {
 
   protected String[]                   accessPermissions;
 
-  protected String[]                   moveAppsPermissions;
-
-  protected String[]                   moveContainersPermissions;
-
   protected ArrayList<ModelObject>     children;
 
   @Getter
@@ -74,13 +70,11 @@ public class Container extends ModelObject implements Cloneable {
   protected ApplicationBackgroundStyle appBackgroundStyle;
 
   public Container() {
-    setDefaultPermissions();
     children = new ArrayList<>();
   }
 
   public Container(String storageId) {
     super(storageId);
-    setDefaultPermissions();
     //
     this.children = new ArrayList<>();
   }
@@ -103,10 +97,6 @@ public class Container extends ModelObject implements Cloneable {
     this.appBackgroundStyle = data.getAppBackgroundStyle();
     this.profiles = data.getProfiles();
     this.accessPermissions = data.getAccessPermissions().toArray(new String[data.getAccessPermissions().size()]);
-    List<String> permisssions = data.getMoveAppsPermissions();
-    this.moveAppsPermissions = permisssions != null ? permisssions.toArray(new String[permisssions.size()]) : null;
-    permisssions = data.getMoveContainersPermissions();
-    this.moveContainersPermissions = permisssions != null ? permisssions.toArray(new String[permisssions.size()]) : null;
     this.children = new ArrayList<>();
     for (ComponentData child : data.getChildren()) {
       ModelObject m = ModelObject.build(child);
@@ -114,13 +104,6 @@ public class Container extends ModelObject implements Cloneable {
         children.add(ModelObject.build(child));
       }
     }
-  }
-
-  private void setDefaultPermissions() {
-    List<String> permissions = DEFAULT_MOVE_APPLICATIONS_PERMISSIONS;
-    this.moveAppsPermissions = permissions.toArray(new String[permissions.size()]);
-    permissions = DEFAULT_MOVE_CONTAINERS_PERMISSIONS;
-    this.moveContainersPermissions = permissions.toArray(new String[permissions.size()]);
   }
 
   public String getId() {
@@ -195,22 +178,6 @@ public class Container extends ModelObject implements Cloneable {
     this.accessPermissions = accessPermissions;
   }
 
-  public String[] getMoveAppsPermissions() {
-    return moveAppsPermissions;
-  }
-
-  public void setMoveAppsPermissions(String[] moveAppsPermissions) {
-    this.moveAppsPermissions = moveAppsPermissions;
-  }
-
-  public String[] getMoveContainersPermissions() {
-    return moveContainersPermissions;
-  }
-
-  public void setMoveContainersPermissions(String[] moveContainersPermissions) {
-    this.moveContainersPermissions = moveContainersPermissions;
-  }
-
   public String getProfiles() {
     return profiles;
   }
@@ -236,8 +203,6 @@ public class Container extends ModelObject implements Cloneable {
                              getCssStyle(),
                              getAppBackgroundStyle(),
                              Utils.safeImmutableList(accessPermissions),
-                             Utils.safeImmutableList(moveAppsPermissions),
-                             Utils.safeImmutableList(moveContainersPermissions),
                              buildChildren());
   }
 

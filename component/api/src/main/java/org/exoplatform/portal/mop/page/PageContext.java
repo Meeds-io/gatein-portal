@@ -88,11 +88,5 @@ public class PageContext {
         List<String> permisssions = s.accessPermissions;
         page.setAccessPermissions(permisssions != null ? permisssions.toArray(new String[permisssions.size()]) : null);
         page.setEditPermission(getState().editPermission);
-
-        permisssions = s.moveAppsPermissions;
-        page.setMoveAppsPermissions(permisssions != null ? permisssions.toArray(new String[permisssions.size()]) : null);
-
-        permisssions = s.moveContainersPermissions;
-        page.setMoveContainersPermissions(permisssions != null ? permisssions.toArray(new String[permisssions.size()]) : null);
     }
 }

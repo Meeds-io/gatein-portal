@@ -188,9 +188,7 @@ public class NavigationRest implements ResourceContainer {
                                   boolean expand,
                                   boolean temporalCheck,
                                   boolean expandBreadcrumb) {
-    ConversationState state = ConversationState.getCurrent();
-    Identity userIdentity = state == null ? null : state.getIdentity();
-    String username = userIdentity == null ? null : userIdentity.getUserId();
+    String username = request.getRemoteUser();
     if (StringUtils.equals(username, IdentityConstants.ANONIM)) {
       username = null;
     }

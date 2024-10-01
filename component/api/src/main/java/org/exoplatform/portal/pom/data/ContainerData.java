@@ -75,10 +75,6 @@ public class ContainerData extends ComponentData {
   /** . */
   private final List<String>                 accessPermissions;
 
-  private final List<String>                 moveAppsPermissions;
-
-  private final List<String>                 moveContainersPermissions;
-
   /** . */
   private final List<ComponentData>          children;
 
@@ -100,8 +96,6 @@ public class ContainerData extends ComponentData {
                        ModelStyle cssStyle,
                        ApplicationBackgroundStyle appBackgroundStyle,
                        List<String> accessPermissions,
-                       List<String> moveAppsPermissions,
-                       List<String> moveContainersPermissions,
                        List<ComponentData> children) {
     super(storageId, null, cssStyle);
 
@@ -119,8 +113,6 @@ public class ContainerData extends ComponentData {
     this.appBackgroundStyle = appBackgroundStyle;
     this.profiles = profiles;
     this.accessPermissions = accessPermissions;
-    this.moveAppsPermissions = moveAppsPermissions;
-    this.moveContainersPermissions = moveContainersPermissions;
     this.children = children;
   }
 
