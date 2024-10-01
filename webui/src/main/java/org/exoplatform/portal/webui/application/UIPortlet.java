@@ -649,7 +649,7 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
         UIPortal uiPortal = Util.getUIPortal();
         Map<String, String[]> publicParams = uiPortal.getPublicParameters();
 
-        List<String> publicParamsSupportedByPortlet = new ArrayList<String>();
+        List<String> publicParamsSupportedByPortlet = new ArrayList<>();
         if (publicParams != null) {
             Set<String> keys = publicParams.keySet();
             for (String key : keys) {
@@ -659,14 +659,14 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
             }
             return publicParamsSupportedByPortlet;
         }
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     /*
      * Adding Map<String, String[]> parameter to support propagation of publicParameters from URL
      */
     public Map<String, String[]> getPublicParameters(Map<String, String[]> portletParameters) {
-        Map<String, String[]> publicParamsMap = new HashMap<String, String[]>();
+        Map<String, String[]> publicParamsMap = new HashMap<>();
         UIPortal uiPortal = Util.getUIPortal();
         Map<String, String[]> publicParams = uiPortal.getPublicParameters();
         Set<String> allPublicParamsNames = publicParams.keySet();

@@ -19,122 +19,65 @@
 
 package org.exoplatform.portal.webui.portal;
 
-import org.exoplatform.container.ExoContainer;
+import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.webui.core.UIContainer;
 
-/**
- * May 19, 2006
- */
+import lombok.Getter;
+import lombok.Setter;
+
 public class UIPortalComponent extends UIContainer {
 
-    protected String template_;
+  @Setter
+  protected String template;
 
-    protected String name_;
+  @Getter
+  @Setter
+  protected String name;
 
-    protected String factoryId;
+  @Getter
+  @Setter
+  protected String factoryId;
 
-    // protected String decorator_ ;
-    protected String width_;
+  @Getter
+  @Setter
+  protected String width;
 
-    protected String height_;
+  @Getter
+  @Setter
+  protected String height;
 
-    private String title_;
+  @Getter
+  @Setter
+  private String   title;
 
-    private transient boolean modifiable_;
+  @Getter
+  @Setter
+  private String[] accessPermissions = { UserACL.EVERYONE };
 
-    private String[] accessPermissions = { UserACL.EVERYONE };
-
-    protected int mode_ = COMPONENT_VIEW_MODE;
-
-    public static final int COMPONENT_VIEW_MODE = 1;
-
-    public static final int COMPONENT_EDIT_MODE = 2;
-
-    // public String getDecorator() { return decorator_; }
-    // public void setDecorator(String decorator) { decorator_ = decorator ; }
-
-    public String getTemplate() {
-        if (template_ == null || template_.length() == 0)
-            return getComponentConfig().getTemplate();
-        return template_;
+  @Override
+  public String getTemplate() {
+    if (StringUtils.isBlank(template)) {
+      return getComponentConfig().getTemplate();
     }
+    return template;
+  }
 
-    public void setTemplate(String s) {
-        template_ = s;
-    }
+  /**
+   * @return
+   * @deprecated Use {@link #hasAccessPermission()}
+   */
+  @Deprecated
+  public boolean hasPermission() {
+    return hasAccessPermission();
+  }
 
-    public String[] getAccessPermissions() {
-        return accessPermissions;
-    }
-
-    public void setAccessPermissions(String[] accessPermissions) {
-        this.accessPermissions = accessPermissions;
-    }
-
-    /**
-     *
-     * @return
-     * @deprecated Use {@link #hasAccessPermission()}
-     */
-    @Deprecated
-    public boolean hasPermission() {
-        return hasAccessPermission();
-    }
-
-    public boolean hasAccessPermission() {
-        ExoContainer exoContainer = ExoContainerContext.getCurrentContainer();
-        UserACL acl = (UserACL) exoContainer.getComponentInstanceOfType(UserACL.class);
-        return acl.hasPermission(accessPermissions);
-    }
-
-    public String getWidth() {
-        return width_;
-    }
-
-    public void setWidth(String s) {
-        width_ = s;
-    }
-
-    public String getHeight() {
-        return height_;
-    }
-
-    public void setHeight(String s) {
-        height_ = s;
-    }
-
-    public boolean isModifiable() {
-        return modifiable_;
-    }
-
-    public void setModifiable(boolean b) {
-        modifiable_ = b;
-    }
-
-    public String getTitle() {
-        return title_;
-    }
-
-    public void setTitle(String s) {
-        title_ = s;
-    }
-
-    public String getName() {
-        return name_;
-    }
-
-    public void setName(String name) {
-        this.name_ = name;
-    }
-
-    public String getFactoryId() {
-        return factoryId;
-    }
-
-    public void setFactoryId(String factoryId) {
-        this.factoryId = factoryId;
-    }
+  public boolean hasAccessPermission() {
+    return ExoContainerContext.getService(UserACL.class)
+                              .hasPermission(ConversationState.getCurrent().getIdentity(), accessPermissions);
+  }
 
 }

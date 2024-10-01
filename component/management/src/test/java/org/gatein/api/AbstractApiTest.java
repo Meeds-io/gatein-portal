@@ -169,8 +169,6 @@ public abstract class AbstractApiTest {
                                                              null,
                                                              Arrays.asList("Everyone"),
                                                              "Everyone",
-                                                             Arrays.asList("Everyone"),
-                                                             Arrays.asList("Everyone"),
                                                              PageType.PAGE.name(),
                                                              null)));
         }

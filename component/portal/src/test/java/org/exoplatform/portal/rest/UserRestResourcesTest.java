@@ -21,6 +21,8 @@ import org.exoplatform.services.organization.*;
 import org.exoplatform.services.organization.idm.UserImpl;
 import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.services.rest.impl.*;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.test.mock.MockHttpServletRequest;
 
 public class UserRestResourcesTest extends BaseRestServicesTestCase {
@@ -60,10 +62,6 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
 
     UserImpl user = new UserImpl(USER_1);
     when(userHandler.findUserByName(eq(USER_1), any(UserStatus.class))).thenReturn(user);
-
-    when(userACL.isSuperUser()).thenReturn(false);
-    when(userACL.getAdminGroups()).thenReturn("admins");
-    when(userACL.isUserInGroup("/platform/administrators")).thenReturn(true);
 
     getContainer().unregisterComponent(OrganizationService.class);
     getContainer().unregisterComponent(UserACL.class);
@@ -120,7 +118,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     envctx.put(HttpServletRequest.class, httpRequest);
 
     startUserSession(USER_2);
-    when(userACL.isUserInGroup(eq("admins"))).thenReturn(true);
+    when(userACL.isAdministrator(ConversationState.getCurrent().getIdentity())).thenReturn(true);
 
     // When
     ContainerResponse resp = launcher.service("PATCH",
@@ -146,7 +144,7 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     envctx.put(HttpServletRequest.class, httpRequest);
 
     startUserSession(USER_2);
-    when(userACL.isUserInGroup(eq("admins"))).thenReturn(true);
+    when(userACL.isAdministrator(ConversationState.getCurrent().getIdentity())).thenReturn(true);
 
     // When
     ContainerResponse resp = launcher.service("PATCH",
@@ -370,7 +368,8 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     user1.setEnabled(true);
 
     startUserSession(USER_1);
-    
+    when(userACL.isAdministrator(ConversationState.getCurrent().getIdentity())).thenReturn(true);
+
     JSONObject data = new JSONObject();
 
     ContainerResponse response = getResponse("PUT", "/v1/users", data.toString());

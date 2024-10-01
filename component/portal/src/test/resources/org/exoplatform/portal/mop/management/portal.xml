@@ -35,8 +35,6 @@
     <entry key="sessionAlive">onDemand</entry>
   </properties>
   <portal-layout>
-    <move-apps-permissions>*:/platform/app-movers</move-apps-permissions>
-    <move-containers-permissions>*:/platform/container-movers</move-containers-permissions>
     <portlet-application>
       <portlet>
         <application-ref>web</application-ref>

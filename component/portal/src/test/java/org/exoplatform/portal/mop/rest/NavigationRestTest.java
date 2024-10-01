@@ -61,6 +61,7 @@ import org.exoplatform.services.organization.GroupHandler;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.rest.impl.ContainerResponse;
 import org.exoplatform.services.rest.impl.EnvironmentContext;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.test.mock.MockHttpServletRequest;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -180,7 +181,7 @@ public class NavigationRestTest extends BaseRestServicesTestCase {
     when(portalConfigService.getUserPortalConfig(anyString(), anyString())).thenReturn(userPortalConfig);
     when(userPortalConfig.getUserPortal()).thenReturn(userPortal);
     when(userPortal.getNodes(any(SiteType.class) , any(Scope.class), any(UserNodeFilterConfig.class),anyBoolean())).thenReturn(nodes);
-    when(userACL.hasEditPermission(any(Page.class))).thenReturn(true);
+    when(userACL.hasEditPermission(any(Page.class), any(Identity.class))).thenReturn(true);
     ContainerResponse resp = launcher.service("GET", path, "", null, null, envctx);
     Object entity = resp.getEntity();
 

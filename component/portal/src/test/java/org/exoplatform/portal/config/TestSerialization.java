@@ -53,8 +53,6 @@ public class TestSerialization extends AbstractGateInTest {
                                                             new ModelStyle(),
                                                             new ApplicationBackgroundStyle(),
                                                             Collections.singletonList("foo11"),
-                                                            Collections.singletonList("foo11"),
-                                                            Collections.singletonList("foo11"),
                                                             Collections.<ComponentData> singletonList(body));
 
     public void testNavigationKey() throws Exception {
@@ -122,8 +120,6 @@ public class TestSerialization extends AbstractGateInTest {
                                 "foo16",
                                 true,
                                 true,
-                                Collections.singletonList("foo13"),
-                                Collections.singletonList("foo13"),
                                 PageType.LINK.name(),
                                 "wwww.exo.com");
         PageData clone = IOTools.clone(obj);
@@ -147,7 +143,6 @@ public class TestSerialization extends AbstractGateInTest {
         assertEquals(obj.getOwnerId(), clone.getOwnerId());
         assertEquals(obj.getEditPermission(), clone.getEditPermission());
         assertEquals(obj.isShowMaxWindow(), clone.isShowMaxWindow());
-        assertEquals(obj.isHideSharedLayout(), clone.isHideSharedLayout());
         assertEquals(obj.isHideSharedLayout(), clone.isHideSharedLayout());
         assertEquals(obj.getType(), clone.getType());
         assertEquals(obj.getLink(), clone.getLink());
