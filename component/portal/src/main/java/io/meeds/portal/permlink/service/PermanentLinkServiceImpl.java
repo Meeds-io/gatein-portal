@@ -125,7 +125,7 @@ public class PermanentLinkServiceImpl implements PermanentLinkService, Startable
 
   @Override
   public String getLink(PermanentLinkObject object) throws ObjectNotFoundException {
-    PermanentLinkPlugin plugin = plugins.get(object.getObjectType());
+    PermanentLinkPlugin plugin = getPlugin(object.getObjectType());
     if (plugin == null) {
       throw new ObjectNotFoundException("Plugin not found with object of type : " + object.getObjectType());
     }
@@ -140,7 +140,7 @@ public class PermanentLinkServiceImpl implements PermanentLinkService, Startable
     if (object == null) {
       throw new ObjectNotFoundException(String.format("Url '%s' can't be parsed", permanentLink));
     } else {
-      PermanentLinkPlugin plugin = plugins.get(object.getObjectType());
+      PermanentLinkPlugin plugin = getPlugin(object.getObjectType());
       if (plugin == null) {
         throw new ObjectNotFoundException("Plugin not found with object of type : " + object.getObjectType());
       } else {
@@ -170,6 +170,13 @@ public class PermanentLinkServiceImpl implements PermanentLinkService, Startable
     } else {
       salt = saltSettingValue.getValue().toString();
     }
+  }
+
+  private PermanentLinkPlugin getPlugin(String objectType) {
+    if (plugins == null) {
+      initPlugins();
+    }
+    return plugins.get(objectType);
   }
 
   private PermanentLinkObject parseObject(String permanentLink) {

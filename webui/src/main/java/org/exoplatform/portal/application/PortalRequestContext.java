@@ -638,10 +638,12 @@ public class PortalRequestContext extends WebuiRequestContext {
     return getRequestContextPath();
   }
 
+  @Override
   public String getActionParameterName() {
     return PortalRequestContext.UI_COMPONENT_ACTION;
   }
 
+  @Override
   public String getUIComponentIdParameterName() {
     return ComponentURL.PORTAL_COMPONENT_ID;
   }
