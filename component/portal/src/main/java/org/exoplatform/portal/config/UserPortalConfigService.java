@@ -584,7 +584,7 @@ public class UserPortalConfigService implements Startable {
                  .toList();
     }
 
-    public String computePortalSitePath(String portalName, HttpServletRequest context) throws Exception {
+    public String computePortalSitePath(String portalName, HttpServletRequest context) {
       PortalConfig portalConfig = layoutService.getPortalConfig(portalName);
       if (portalConfig == null) {
         return null;
@@ -596,21 +596,21 @@ public class UserPortalConfigService implements Startable {
       }
       return getDefaultUri(userNode, portalName);
     }
-    
-    public String computePortalPath(HttpServletRequest context) throws Exception {
+
+    public String computePortalPath(HttpServletRequest context) {
       List<PortalConfig> portalConfigList = getUserPortalSites();
       if (CollectionUtils.isEmpty(portalConfigList)) {
         return null;
       }
-      String portalPath = null;
-      Iterator<PortalConfig> iterator = portalConfigList.stream().iterator();
-      while (portalPath == null && iterator.hasNext()) {
-        portalPath = computePortalSitePath(iterator.next().getName(), context);
-      }
-      return portalPath;
+      return portalConfigList.stream()
+                             .filter(PortalConfig::isDefaultSite)
+                             .map(portalConfig -> computePortalSitePath(portalConfig.getName(), context))
+                             .filter(Objects::nonNull)
+                             .findFirst()
+                             .orElse(null);
     }
 
-    public Collection<UserNode> getPortalSiteNavigations(String siteName, String portalType, HttpServletRequest context) throws Exception {
+    public Collection<UserNode> getPortalSiteNavigations(String siteName, String portalType, HttpServletRequest context) {
       UserPortalConfig userPortalConfig = getUserPortalConfig(siteName, context.getRemoteUser());
       if (userPortalConfig == null) {
         return Collections.emptyList();
