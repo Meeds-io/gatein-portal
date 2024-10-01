@@ -68,12 +68,8 @@
 
   <page>
     <name>add-component-test-page</name>
-    <move-apps-permissions>*:/platform/page-move-apps-permissions-1;*:/platform/page-move-apps-permissions-2</move-apps-permissions>
-    <move-containers-permissions>*:/platform/page-move-containers-permissions-1;*:/platform/page-move-containers-permissions-2</move-containers-permissions>
     <container>
       <name>add-component-test-container</name>
-      <move-apps-permissions>*:/platform/container-move-apps-permissions-1;*:/platform/container-move-apps-permissions-2</move-apps-permissions>
-      <move-containers-permissions>*:/platform/container-move-containers-permissions-1;*:/platform/container-move-containers-permissions-2</move-containers-permissions>
       <portlet-application>
         <portlet>
           <application-ref>web</application-ref>

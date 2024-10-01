@@ -44,6 +44,11 @@ public interface UserPortal {
     Locale getLocale();
 
     /**
+     * @return username
+     */
+    String getUserName();
+
+    /**
      * Returns the sorted list of current user navigations.
      *
      * @return the current user navigations
