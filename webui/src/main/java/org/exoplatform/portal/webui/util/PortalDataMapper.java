@@ -85,13 +85,10 @@ public class PortalDataMapper {
      * in the portlet info bar
      */
     Set<ModeInfo> modes = portletInfo.getCapabilities().getModes(MediaType.create("text/html"));
-    List<String> supportModes = modes.stream()
-                                     .map(modeInfo -> modeInfo.getModeName().toLowerCase())
-                                     .toList();
-    if (supportModes.size() > 1) {
-      supportModes.remove("view");
-    }
-    uiPortlet.setSupportModes(supportModes);
+    uiPortlet.setSupportModes(modes.stream()
+                                   .map(modeInfo -> modeInfo.getModeName().toLowerCase())
+                                   .filter(mode -> modes.size() == 1 || !"view".equals(mode))
+                                   .toList());
     if (portletInfo instanceof ContainerPortletInfo containerPortletInfo) {
       uiPortlet.setCssClass(containerPortletInfo.getInitParameter("layout-css-class"));
     }
