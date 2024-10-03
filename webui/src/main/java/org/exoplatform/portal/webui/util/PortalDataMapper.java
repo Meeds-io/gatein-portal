@@ -133,9 +133,6 @@ public class PortalDataMapper {
 
     List<UIPortlet> portlets = new ArrayList<>();
     uiPage.findComponentOfType(portlets, UIPortlet.class);
-    for (UIPortlet portlet : portlets) {
-      portlet.setPortletInPortal(false);
-    }
   }
 
   public static void toUIPortal(UIPortal uiPortal, PortalConfig model) throws Exception {
