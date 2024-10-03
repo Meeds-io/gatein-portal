@@ -276,22 +276,6 @@ public class UIPortlet<S, C extends Serializable> extends UIApplication {
     }
 
     /**
-     *  Used internally by portal to change current state
-     *  if portlet is in portal or in page
-     */
-    public void setPortletInPortal(boolean b) {
-        portletInPortal_ = b;
-    }
-
-    /**
-     * Check if portlet is in portal
-     * @return true if portlet is in portal
-     */
-    public boolean isPortletInPortal() {
-        return portletInPortal_;
-    }
-
-    /**
      * Theme is composed of map between theme name and skin name.
      * Theme format: {skinName}:{themeName}::{anotherSkin}:{anotherTheme}.
      * For example: the default them is 'Default:DefaultTheme::Vista:VistaTheme::Mac:MacTheme'.

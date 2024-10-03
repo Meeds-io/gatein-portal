@@ -1186,11 +1186,11 @@ public class UIPortalApplication extends UIApplication {
   }
 
   private boolean isDraftPage() {
-    return ((PortalRequestContext) RequestContext.getCurrentInstance()).isDraftPage();
+    return PortalRequestContext.getCurrentInstance().isDraftPage();
   }
 
   public boolean isMaximizePortlet() {
-    return StringUtils.isNotBlank(PortalRequestContext.getCurrentInstance().getMaximizedPortletId());
+    return PortalRequestContext.getCurrentInstance().isMaximizePortlet();
   }
 
   public String getMaximizedPortletId() {
