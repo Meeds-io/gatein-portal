@@ -26,18 +26,21 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityConstants;
 import org.exoplatform.web.ControllerContext;
+import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.WebRequestHandler;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.security.sso.SSOHelper;
 
 import io.meeds.portal.permlink.service.PermanentLinkService;
 
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class PermanentLinkRequestHandler extends WebRequestHandler {
@@ -47,6 +50,8 @@ public class PermanentLinkRequestHandler extends WebRequestHandler {
   public static final QualifiedName REQUEST_PATH = QualifiedName.create("path");
 
   private PermanentLinkService      permanentLinkService;
+
+  private UserPortalConfigService   userPortalConfigService;
 
   @Override
   public String getHandlerName() {
@@ -59,11 +64,17 @@ public class PermanentLinkRequestHandler extends WebRequestHandler {
   }
 
   @Override
+  public void onInit(WebAppController controller, ServletConfig sConfig) throws Exception {
+    permanentLinkService = ExoContainerContext.getService(PermanentLinkService.class);
+    userPortalConfigService = ExoContainerContext.getService(UserPortalConfigService.class);
+  }
+
+  @Override
   public boolean execute(ControllerContext context) throws Exception {
     String requestPath = context.getParameter(REQUEST_PATH);
     Identity currentIdentity = getCurrentIdentity();
     try {
-      String directAccessUrl = getPermanentLinkService().getDirectAccessUrl(requestPath, currentIdentity);
+      String directAccessUrl = permanentLinkService.getDirectAccessUrl(requestPath, currentIdentity);
       HttpServletResponse res = context.getResponse();
       // Use HTTP 302 response instead of 301 to not
       // allow to cache the redirect directive in routers
@@ -74,12 +85,16 @@ public class PermanentLinkRequestHandler extends WebRequestHandler {
         String loginPath = getAuthenticationUrl(context.getRequest().getRequestURI());
         context.getResponse().sendRedirect(loginPath);
       } else {
-        LOG.error("Error while handling permanent link '{}' redirecting to not found page", requestPath, e);
-        context.getResponse().sendRedirect("/portal/public/page-not-found");
+        LOG.warn("Error while handling permanent link '{}' redirecting to not found page", requestPath, e);
+        context.getResponse()
+               .sendRedirect(String.format("/portal/%s/page-not-found",
+                                           userPortalConfigService.getMetaPortal()));
       }
     } catch (ObjectNotFoundException e) {
-      LOG.error("Error while handling permanent link '{}'", requestPath, e);
-      context.getResponse().sendRedirect("/portal/public/page-not-found");
+      LOG.warn("Error while handling permanent link '{}'", requestPath, e);
+      context.getResponse()
+             .sendRedirect(String.format("/portal/%s/page-not-found",
+                                         userPortalConfigService.getMetaPortal()));
     }
     return true;
   }
@@ -101,13 +116,6 @@ public class PermanentLinkRequestHandler extends WebRequestHandler {
   private Identity getCurrentIdentity() {
     ConversationState conversationState = ConversationState.getCurrent();
     return conversationState == null ? null : conversationState.getIdentity();
-  }
-
-  private PermanentLinkService getPermanentLinkService() {
-    if (permanentLinkService == null) {
-      permanentLinkService = ExoContainerContext.getService(PermanentLinkService.class);
-    }
-    return permanentLinkService;
   }
 
 }
