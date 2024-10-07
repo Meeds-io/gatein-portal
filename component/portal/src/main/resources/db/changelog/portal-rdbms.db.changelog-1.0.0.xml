@@ -411,4 +411,58 @@
     <modifyDataType tableName="PORTAL_CONTAINERS" columnName="WIDTH" newDataType="NVARCHAR(200)" />
   </changeSet>
 
+  <changeSet author="portal" id="1.0.0-44" dbms="mysql">
+    <sql>
+      ALTER TABLE PORTAL_SITES MODIFY COLUMN LABEL varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
+  <changeSet author="portal" id="1.0.0-45" dbms="mysql">
+    <sql>
+      ALTER TABLE PORTAL_SITES MODIFY COLUMN SITE_BODY longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
+  <changeSet author="portal" id="1.0.0-46" dbms="mysql">
+    <sql>
+      ALTER TABLE PORTAL_SITES MODIFY COLUMN PROPERTIES longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
+  <changeSet author="portal" id="1.0.0-47" dbms="mysql">
+    <sql>
+      ALTER TABLE PORTAL_PAGES MODIFY COLUMN DESCRIPTION longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
+  <changeSet author="portal" id="1.0.0-48" dbms="mysql">
+    <sql>
+      ALTER TABLE PORTAL_PAGES MODIFY COLUMN PAGE_BODY longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
+  <changeSet author="portal" id="1.0.0-49" dbms="mysql">
+    <sql>
+      ALTER TABLE PORTAL_NAVIGATION_NODES MODIFY COLUMN LABEL varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
+  <changeSet author="portal" id="1.0.0-50" dbms="mysql">
+    <sql>
+      ALTER TABLE PORTAL_CONTAINERS MODIFY COLUMN PROPERTIES longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
+  <changeSet author="portal" id="1.0.0-51" dbms="mysql">
+    <sql>
+      ALTER TABLE PORTAL_CONTAINERS MODIFY COLUMN CONTAINER_BODY longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
+  <changeSet author="portal" id="1.0.0-52" dbms="mysql">
+    <sql>
+      ALTER TABLE PORTAL_WINDOWS MODIFY COLUMN PROPERTIES longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
 </databaseChangeLog>

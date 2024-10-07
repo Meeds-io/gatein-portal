@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.ExpressionUtil;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
@@ -52,6 +53,7 @@ import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.ResourceBundleManager;
 import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityConstants;
 
 import lombok.Getter;
@@ -76,6 +78,7 @@ public class UserPortalImpl implements UserPortal {
   private final PortalConfig             portalConfig;
 
   /** . */
+  @Getter
   private final String                   userName;
 
   /** . */
@@ -512,11 +515,11 @@ public class UserPortalImpl implements UserPortal {
     PortalConfig sitePortalConfig = service.getDataStorage().getPortalConfig(siteKey);
     if (navigationContext != null
         && navigationContext.getState() != null
-        && service.getUserACL().hasPermission(sitePortalConfig)) {
+        && service.getUserACL().hasAccessPermission(sitePortalConfig, getCurrentIdentity())) {
+      UserACL userACL = service.getUserACL();
       UserNavigation userNavigation = new UserNavigation(this,
                                                          navigationContext,
-                                                         service.getUserACL()
-                                                                .hasEditPermissionOnNavigation(navigationContext.getKey()));
+                                                         userACL.hasEditPermission(sitePortalConfig, userACL.getUserIdentity(userName)));
       this.navigations.add(userNavigation);
       Collections.sort(this.navigations, userNavigationComparator);
       return userNavigation;
@@ -677,6 +680,11 @@ public class UserPortalImpl implements UserPortal {
       resourceBundleManager = ExoContainerContext.getService(ResourceBundleManager.class);
     }
     return resourceBundleManager;
+  }
+
+  private Identity getCurrentIdentity() {
+    ConversationState conversationState = ConversationState.getCurrent();
+    return conversationState == null ? null : conversationState.getIdentity();
   }
 
 }

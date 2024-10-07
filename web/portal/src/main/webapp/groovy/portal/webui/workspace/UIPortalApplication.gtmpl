@@ -9,13 +9,9 @@
   import org.json.JSONArray;
   import org.apache.commons.lang3.StringUtils;
   import org.exoplatform.container.PortalContainer;
-  import org.exoplatform.webui.core.UIComponent;
-  import org.exoplatform.portal.application.PortalRequestContext ;
-  import org.exoplatform.portal.config.model.PortalProperties ;
-  import org.exoplatform.portal.config.model.PortalConfig ;
+  import org.exoplatform.portal.config.model.PortalConfig;
   import org.exoplatform.commons.info.ProductInformations;
   import org.exoplatform.portal.webui.workspace.UIPortalApplication;
-  import org.exoplatform.portal.webui.workspace.UIWorkingWorkspace;
   import org.exoplatform.web.security.csrf.CSRFTokenUtil;
   import org.exoplatform.commons.utils.HTMLEntityEncoder;
   import org.exoplatform.portal.webui.util.Util;
@@ -127,9 +123,7 @@
     <%/* Metadatas */%>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <% if (portal.viewport != null) {
-    %><meta name="viewport" content = "${portal.viewport}"/>
-    <% }
+    <%
       if (metaInformation!= null) {
          Iterator<String> keys = metaInformation.keySet().iterator();
          while (keys.hasNext()) {

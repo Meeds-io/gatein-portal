@@ -19,9 +19,6 @@
 
 package org.exoplatform.portal.webui.container;
 
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.webui.portal.UIPortalComponent;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 
@@ -30,22 +27,19 @@ import org.exoplatform.webui.config.annotation.ComponentConfig;
  */
 @ComponentConfig
 public class UIContainer extends UIPortalComponent {
-  public static final String TABLE_COLUMN_CONTAINER = "TableColumnContainer";
+
+  public static final String    TABLE_COLUMN_CONTAINER = "TableColumnContainer";
 
   /** Storage id. */
-  private String             storageId;
+  private String                storageId;
 
-  protected String           icon;
+  protected String              icon;
 
-  protected String           description;
+  protected String              description;
 
-  protected String           cssClass;
+  protected String              cssClass;
 
-  protected String           profiles;
-
-  protected String[]         moveContainersPermissions;
-
-  protected String[]         moveAppsPermissions;
+  protected String              profiles;
 
   public String getStorageId() {
     return storageId;
@@ -85,28 +79,6 @@ public class UIContainer extends UIPortalComponent {
 
   public void setProfiles(String profiles) {
     this.profiles = profiles;
-  }
-
-  public String[] getMoveContainersPermissions() {
-    return moveContainersPermissions;
-  }
-
-  public void setMoveContainersPermissions(String[] moveContainersPermissions) {
-    this.moveContainersPermissions = moveContainersPermissions;
-  }
-
-  public boolean hasMoveContainersPermission() {
-    ExoContainer exoContainer = ExoContainerContext.getCurrentContainer();
-    UserACL acl = exoContainer.getComponentInstanceOfType(UserACL.class);
-    return acl.hasPermission(moveContainersPermissions);
-  }
-
-  public String[] getMoveAppsPermissions() {
-    return moveAppsPermissions;
-  }
-
-  public void setMoveAppsPermissions(String[] moveAppsPermissions) {
-    this.moveAppsPermissions = moveAppsPermissions;
   }
 
   public String getPermissionClasses() {

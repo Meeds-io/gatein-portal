@@ -115,8 +115,10 @@ public class DefaultUserMembershipListener extends Listener<ConversationRegistry
           identityRegistry.unregister(username);
           conversationRegistry.unregisterByUserId(username);
           Identity identity = authenticator.createIdentity(username);
-          state.getIdentity().setMemberships(identity.getMemberships());
-          state.getIdentity().setRoles(identity.getRoles());
+          if (identity != null) {
+            state.getIdentity().setMemberships(identity.getMemberships());
+            state.getIdentity().setRoles(identity.getRoles());
+          }
         }
       } catch (Exception e) {
         LOG.warn("Error while updating default groups of user {}",
@@ -131,6 +133,7 @@ public class DefaultUserMembershipListener extends Listener<ConversationRegistry
 
   private boolean isFirstTimeLogin(User user) {
     return user.getLastLoginTime() == null
+           || user.getCreatedDate() == null
            || Math.abs(user.getLastLoginTime().getTime() - user.getCreatedDate().getTime()) < 1000;
   }
 

@@ -950,8 +950,6 @@ public class TestDataStorage extends AbstractKernelTest {
                                                 null,
                                                 null,
                                                 Collections.emptyList(),
-                                                Collections.emptyList(),
-                                                Collections.emptyList(),
                                                 Collections.emptyList());
       PortalData portal = new PortalData(null,
                                          siteName,

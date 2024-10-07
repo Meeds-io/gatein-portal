@@ -30,7 +30,7 @@
 		String windowHeight = uicomponent.getHeight();
 
 		String cssStyle = "";
-		if (windowHeight != null || windowWidth != null) {
+		if ((windowHeight != null || windowWidth != null) && !rcontext.isMaximizePortlet()) {
   		if (windowWidth != null) {
   			cssStyle += "width: "+ windowWidth +";";
   		}

@@ -30,8 +30,6 @@
   <access-permissions>Everyone</access-permissions>
   <edit-permission>*:/platform/administrators</edit-permission>
   <portal-layout>
-    <move-apps-permissions>classic-portal-move-apps-permissions</move-apps-permissions>
-    <move-containers-permissions>classic-portal-move-containers-permissions</move-containers-permissions>
     <portlet-application>
       <portlet>
         <application-ref>web</application-ref>
