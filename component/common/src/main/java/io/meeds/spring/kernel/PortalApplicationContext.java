@@ -17,6 +17,9 @@
  */
 package io.meeds.spring.kernel;
 
+import static io.meeds.spring.kernel.KernelContainerLifecyclePlugin.addSpringContext;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -25,7 +28,6 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.RootContainer.PortalContainerPostInitTask;
 
 import jakarta.servlet.ServletContext;
 
@@ -48,20 +50,13 @@ public class PortalApplicationContext extends AnnotationConfigServletWebServerAp
 
   @Override
   protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
-    BeanDefinitionRegistry beanRegistry = (BeanDefinitionRegistry) beanFactory;
     // Declare spring Context for integration on Kernel when it will start
     // ( Kernel container is always started after all Spring contexts are
     // started, see "PortalContainersCreator" in Meeds-io/meeds project )
-    KernelContainerLifecyclePlugin.addSpringContext(servletContext.getServletContextName(), this, beanRegistry);
-
-    // Delay Spring context finishing startup until the Kernel container is
-    // fully started
-    PortalContainer.addInitTask(servletContext, new PortalContainerPostInitTask() {
-      @Override
-      public void execute(ServletContext context, PortalContainer portalContainer) {
-        finishSpringContextStartup(beanFactory);
-      }
-    }, "portal");
+    addSpringContext(servletContext.getServletContextName(),
+                     this,
+                     (BeanDefinitionRegistry) beanFactory,
+                     () -> finishSpringContextStartup(beanFactory));
   }
 
   @Override
@@ -72,11 +67,18 @@ public class PortalApplicationContext extends AnnotationConfigServletWebServerAp
   private void finishSpringContextStartup(ConfigurableListableBeanFactory beanFactory) {
     long start = System.currentTimeMillis();
     LOG.info("Continue Spring context '{}' initialization", servletContext.getServletContextName());
-    PortalApplicationContext.super.finishBeanFactoryInitialization(beanFactory);
-    PortalApplicationContext.super.finishRefresh();
-    LOG.info("Spring context '{}' initialized in {}ms",
-             servletContext.getServletContextName(),
-             System.currentTimeMillis() - start);
+    try {
+      PortalApplicationContext.super.finishBeanFactoryInitialization(beanFactory);
+      PortalApplicationContext.super.finishRefresh();
+      LOG.info("Spring context '{}' initialized in {}ms",
+               servletContext.getServletContextName(),
+               System.currentTimeMillis() - start);
+    } catch (Exception e) {
+      throw new IllegalStateException(String.format("Error While finishing Beans Initialization in context '%s' with Bean names [%s] (May be related to issue Meeds-io/meeds#2469)",
+                                                    servletContext.getServletContextName(),
+                                                    StringUtils.join(beanFactory.getBeanDefinitionNames(), " , ")),
+                                      e);
+    }
   }
 
 }

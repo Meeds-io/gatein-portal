@@ -26,6 +26,10 @@ import org.exoplatform.container.ExoContainer;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 
+/**
+ * A super class used to define {@link PortalApplicationContext} as the Spring
+ * Application Builder to use
+ */
 public abstract class PortalApplicationContextInitializer extends SpringBootServletInitializer {
 
   private DefaultListableBeanFactory beanFactory;

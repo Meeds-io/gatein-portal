@@ -37,7 +37,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.picocontainer.Startable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -46,10 +48,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
+import org.exoplatform.commons.api.persistence.GenericDAO;
 import org.exoplatform.container.BaseContainerLifecyclePlugin;
 import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.PropertyConfigurator;
+import org.exoplatform.container.RootContainer.PortalContainerPostInitTask;
+import org.exoplatform.container.definition.PortalContainerConfig;
 import org.exoplatform.container.spi.ComponentAdapter;
 import org.exoplatform.services.rest.impl.StartableApplication;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -57,20 +63,25 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 import io.meeds.spring.kernel.annotation.Exclude;
 import io.meeds.spring.kernel.model.SpringBeanComponentAdapter;
 
+import jakarta.servlet.ServletContext;
+
 public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin {
 
-  private static final Logger                        LOG                  =
+  private static final Logger                        LOG                     =
                                                          LoggerFactory.getLogger(KernelContainerLifecyclePlugin.class);
 
-  private static Map<String, BeanDefinitionRegistry> springBeanRegistries = new ConcurrentHashMap<>();
+  private static Map<String, BeanDefinitionRegistry> springBeanRegistries    = new ConcurrentHashMap<>();
 
-  private static Map<String, ApplicationContext>     springContexts       = new ConcurrentHashMap<>();
+  private static Map<String, ApplicationContext>     springContexts          = new ConcurrentHashMap<>();
 
-  private static boolean                             kernelAlreadyBooted  = false;
+  private static Map<String, Runnable>               springContextsInitTasks = new ConcurrentHashMap<>();
+
+  private static boolean                             kernelAlreadyBooted     = false;
 
   public static void addSpringContext(String servletContextName,
                                       ApplicationContext applicationContext,
-                                      BeanDefinitionRegistry beanDefinitionRegistry) {
+                                      BeanDefinitionRegistry beanDefinitionRegistry,
+                                      Runnable springContextInitTask) {
     if (kernelAlreadyBooted) {
       LOG.warn("Adding Spring context '{}' happened too late in Server startup, spring beans will not be injected for this context",
                servletContextName);
@@ -79,6 +90,9 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
     LOG.info("Add Spring context '{}' to inject its Beans in Kernel as available components", servletContextName);
     springContexts.put(servletContextName, applicationContext);
     springBeanRegistries.put(servletContextName, beanDefinitionRegistry);
+    if (springContextInitTask != null) {
+      springContextsInitTasks.put(servletContextName, springContextInitTask);
+    }
   }
 
   @Override
@@ -92,6 +106,16 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
                StringUtils.join(springContexts.keySet(), ","));
     }
     long start = System.currentTimeMillis();
+
+    // Delay Spring context finishing startup until the Kernel container is
+    // fully started
+    PortalContainer.addInitTask(portalContainer.getPortalContext(), new PortalContainerPostInitTask() {
+      @Override
+      public void execute(ServletContext context, PortalContainer portalContainer) {
+        finishSpringContextStartup(portalContainer);
+      }
+    }, "portal");
+
     Collection<ComponentAdapter<?>> containerComponentAdapters = portalContainer.getComponentAdapters();
     Collection<ComponentAdapter<?>> parentComponentAdapters = portalContainer.getParent()
         != null ? portalContainer.getParent().getComponentAdapters() : Collections.emptyList();
@@ -110,35 +134,45 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
   public static void addKernelToSpring(PortalContainer portalContainer, Collection<ComponentAdapter<?>> kernelComponentAdapters) {
     kernelComponentAdapters.forEach(adapter -> {
       Class<?> componentKey = componentToBeanName(adapter);
-      if (!componentKey.isInterface() && isComponentDuplicated(portalContainer, componentKey)) {
+      if (isIgnoreKernelComponent(portalContainer,
+                                  componentKey,
+                                  adapter.getComponentImplementation())) {
         return;
+      }
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Add Kernel Component '{}' in Spring contexts [{}]",
+                  componentKey.getName(),
+                  StringUtils.join(springContexts.keySet(), ", "));
       }
       springContexts.forEach((servletContextName, applicationContext) -> {
         BeanDefinitionRegistry beanRegistry = springBeanRegistries.get(servletContextName);
         String componentKeyName = componentKey.getName();
-        if (beanRegistry.containsBeanDefinition(componentKeyName)) {
-          LOG.debug("Ignore Kernel Component '{}' as it's already injected in Spring context '{}'",
-                    componentKeyName,
-                    servletContextName);
-        } else {
+        if (!beanRegistry.containsBeanDefinition(componentKeyName)) {
           RootBeanDefinition beanDefinition = createBeanDefinition(componentKey, portalContainer);
-          LOG.debug("Add Kernel Component '{}' in Spring context '{}'", componentKeyName, servletContextName);
           beanRegistry.registerBeanDefinition(componentKeyName, beanDefinition);
+        } else if (LOG.isDebugEnabled()) {
+          LOG.debug("-- Ignore Adding duplicated Kernel Component '{}' in Spring contexts {}",
+                    componentKey.getName(),
+                    servletContextName);
         }
       });
     });
   }
 
-  public static void addSpringToKernel(PortalContainer portalContainer, Map<String, Map<String, BeanDefinition>> springBeansByContext) {
+  @SuppressWarnings("rawtypes")
+  public static void addSpringToKernel(PortalContainer portalContainer,
+                                       Map<String, Map<String, BeanDefinition>> springBeansByContext) {
     springContexts.forEach((servletContextName, applicationContext) -> {
       Map<String, BeanDefinition> beansMap = springBeansByContext.get(servletContextName);
       beansMap.forEach((beanName, beanDefinition) -> {
+        Class componentKey = beanNameToComponentKey(beanDefinition.getBeanClassName(), beanName);
         ComponentAdapter<?> componentAdapter = createComponentAdapter(servletContextName,
                                                                       portalContainer,
-                                                                      beanName,
+                                                                      componentKey.getName(),
                                                                       beanDefinition.getBeanClassName(),
                                                                       () -> getBeanInstance(applicationContext,
-                                                                                            beanName));
+                                                                                            beanName,
+                                                                                            portalContainer.getName()));
         if (componentAdapter != null) {
           LOG.debug("Add Spring Bean '{}' from context '{}' as Kernel component '{}'",
                     beanName,
@@ -160,25 +194,13 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
       springBeanRegistries.entrySet()
                           .stream()
                           .filter(e -> !StringUtils.equals(senderServletContextName, e.getKey()))
-                          .forEach(entry -> {
-                            String receiverServletContextName = entry.getKey();
-                            BeanDefinitionRegistry receiverBeanRegistry = entry.getValue();
-                            beansMap.forEach((beanName, senderBeanDefinition) -> {
-                              Class<Object> beanClassName = getClass(senderBeanDefinition.getBeanClassName());
-                              if (beanClassName != null
-                                  && !receiverBeanRegistry.containsBeanDefinition(beanName)
-                                  && !receiverBeanRegistry.containsBeanDefinition(senderBeanDefinition.getBeanClassName())) {
-                                RootBeanDefinition receiverBeanDefinition = createBeanDefinition(beanName,
-                                                                                                 beanClassName,
-                                                                                                 senderApplicationContext);
-                                receiverBeanRegistry.registerBeanDefinition(beanName, receiverBeanDefinition);
-                                LOG.debug("Add Spring Bean '{}' from Spring Context '{}' to Spring context '{}'",
-                                          beanName,
-                                          senderServletContextName,
-                                          receiverServletContextName);
-                              }
-                            });
-                          });
+                          .collect(Collectors.toMap(Entry::getKey, Entry::getValue))
+                          .forEach((receiverServletContextName,
+                                    receiverBeanRegistry) -> addSpringBeansToEachOtherContexts(senderServletContextName,
+                                                                                               receiverServletContextName,
+                                                                                               senderApplicationContext,
+                                                                                               receiverBeanRegistry,
+                                                                                               beansMap));
     });
   }
 
@@ -189,12 +211,34 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
                                                          e -> getEligibleBeans(e.getValue())));
   }
 
+  /**
+   * Finish booting Spring contexts switch the order or priority added in Kernel
+   * addons definition
+   *
+   * @param portalContainer
+   */
+  public static void finishSpringContextStartup(PortalContainer portalContainer) {
+    PortalContainerConfig portalContainerConfig = portalContainer.getComponentInstanceOfType(PortalContainerConfig.class);
+    List<String> springDependencies = portalContainerConfig.getDependencies(portalContainer.getName())
+                                                           .stream()
+                                                           .filter(springContextsInitTasks::containsKey)
+                                                           .filter(Objects::nonNull)
+                                                           .toList();
+    if (LOG.isInfoEnabled()) {
+      LOG.info("4. Finish booting spring based contexts switch Addons Priority: [{}]",
+               StringUtils.join(springDependencies, ", "));
+    }
+    springDependencies.stream()
+                      .map(springContextsInitTasks::get)
+                      .forEach(Runnable::run);
+  }
+
   @SuppressWarnings({ "rawtypes", "unchecked" })
   private static ComponentAdapter<Object> createComponentAdapter(String servletContextName,
-                                                          PortalContainer portalContainer,
-                                                          String beanName,
-                                                          String beanClassName,
-                                                          Supplier<Object> getBeanFunction) {
+                                                                 PortalContainer portalContainer,
+                                                                 String beanName,
+                                                                 String beanClassName,
+                                                                 Supplier<Object> getBeanFunction) {
     Class componentKey = beanNameToComponentKey(beanClassName, beanName);
     if (componentKey != null && portalContainer.getComponentAdapter(componentKey) == null) {
       return new SpringBeanComponentAdapter(servletContextName,
@@ -206,6 +250,47 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
     }
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private static void addSpringBeansToEachOtherContexts(String senderServletContextName,
+                                                        String receiverServletContextName,
+                                                        ApplicationContext senderApplicationContext,
+                                                        BeanDefinitionRegistry receiverBeanRegistry,
+                                                        Map<String, BeanDefinition> beansMap) {
+    beansMap.forEach((beanName, senderBeanDefinition) -> {
+      Class<Object> beanClassName = getClass(senderBeanDefinition.getBeanClassName());
+      Class beanClassNameInterface = beanNameToComponentKey(senderBeanDefinition.getBeanClassName());
+      if (beanClassName != null
+          && !receiverBeanRegistry.containsBeanDefinition(beanName)
+          && !receiverBeanRegistry.containsBeanDefinition(senderBeanDefinition.getBeanClassName())
+          && !receiverBeanRegistry.containsBeanDefinition(beanClassNameInterface.getTypeName())) {
+        LOG.debug("Add Spring Bean '{}' with Class '{}' Interface '{}' from Spring Context '{}' to Spring context '{}'",
+                  beanName,
+                  beanClassName,
+                  beanClassNameInterface,
+                  senderServletContextName,
+                  receiverServletContextName);
+        RootBeanDefinition receiverBeanDefinition = createBeanDefinition(beanName,
+                                                                         beanClassNameInterface,
+                                                                         senderApplicationContext,
+                                                                         receiverServletContextName);
+        receiverBeanRegistry.registerBeanDefinition(beanClassNameInterface.getName(), receiverBeanDefinition);
+      }
+    });
+  }
+
+  private static boolean isIgnoreKernelComponent(PortalContainer portalContainer,
+                                                 Class<?> componentKey,
+                                                 Class<?> componentImplementation) {
+    return (!componentKey.isInterface() && isComponentDuplicated(portalContainer, componentKey))
+           || componentImplementation.getPackageName().startsWith("java")
+           || componentImplementation.getPackageName().startsWith("jakarta")
+           || componentImplementation.getPackageName().startsWith("sun.")
+           || ResourceContainer.class.isAssignableFrom(componentImplementation)
+           || PropertyConfigurator.class.isAssignableFrom(componentImplementation)
+           || ExoContainerContext.class.isAssignableFrom(componentImplementation)
+           || GenericDAO.class.isAssignableFrom(componentImplementation);
+  }
+
   private static <T> RootBeanDefinition createBeanDefinition(Class<T> keyClass, PortalContainer portalContainer) {
     RootBeanDefinition beanDefinition = new RootBeanDefinition(keyClass,
                                                                () -> getComponentInstance(portalContainer, keyClass));
@@ -215,13 +300,19 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
   }
 
   private static RootBeanDefinition createBeanDefinition(String beanName,
-                                                  Class<Object> beanClassName,
-                                                  ApplicationContext senderApplicationContext) {
+                                                         Class<Object> beanClassName,
+                                                         ApplicationContext senderApplicationContext,
+                                                         String receiverServletContextName) {
     RootBeanDefinition receiverBeanDefinition = new RootBeanDefinition(beanClassName,
                                                                        () -> getBeanInstance(senderApplicationContext,
-                                                                                             beanName));
+                                                                                             beanName,
+                                                                                             receiverServletContextName));
     receiverBeanDefinition.setLazyInit(true);
+    receiverBeanDefinition.setAutowireCandidate(true);
+    receiverBeanDefinition.setAutowireMode(AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE);
+    receiverBeanDefinition.setScope(ConfigurableBeanFactory.SCOPE_SINGLETON);
     receiverBeanDefinition.setDependencyCheck(AbstractBeanDefinition.DEPENDENCY_CHECK_NONE);
+    receiverBeanDefinition.setBeanClass(beanClassName);
     return receiverBeanDefinition;
   }
 
@@ -229,8 +320,7 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
     String[] beanNames = beanRegistry.getBeanDefinitionNames();
     return Stream.of(beanNames)
                  .map(beanName -> {
-                   BeanDefinition beanDefinition =
-                                                 beanRegistry.getBeanDefinition(beanName);
+                   BeanDefinition beanDefinition = beanRegistry.getBeanDefinition(beanName);
                    if (isBeanEligible(beanName, beanDefinition.getBeanClassName())) {
                      return new SimpleEntry<>(beanName, beanDefinition);
                    }
@@ -319,9 +409,11 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
            && !StringUtils.equals(componentClass.getName(), "org.exoplatform.commons.cluster.StartableClusterAware");
   }
 
-  private static Object getBeanInstance(ApplicationContext applicationContext, String beanName) {
-    LOG.trace("Retrieve Bean with name '{}' from Spring to Kernel using Application context",
-              beanName);
+  private static Object getBeanInstance(ApplicationContext applicationContext, String beanName, String contextName) {
+    LOG.trace("Retrieve Bean with name '{}' from Spring to Kernel using Application context '{}' in detstination to '{}'",
+              beanName,
+              applicationContext.getApplicationName(),
+              contextName);
     return applicationContext.getBean(beanName);
   }
 
@@ -345,7 +437,7 @@ public class KernelContainerLifecyclePlugin extends BaseContainerLifecyclePlugin
   }
 
   private static Class<?> getComponentKeyClass(Object key) {
-    if (key instanceof Class<?> keyClass) {
+    if (key instanceof Class<?> keyClass) { // NOSONAR
       return keyClass;
     } else if (key instanceof String keyString) {
       return getClass(keyString);

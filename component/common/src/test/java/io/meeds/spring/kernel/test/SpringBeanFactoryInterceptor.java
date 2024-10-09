@@ -49,7 +49,7 @@ public class SpringBeanFactoryInterceptor implements BeanFactoryPostProcessor, A
     LOG.info("Integrating Spring Context with Container. Application name = '{}' using Kernel configuration class '{}'",
              applicationContext.getApplicationName(),
              getTestClass());
-    addSpringContext("test", applicationContext, (BeanDefinitionRegistry) beanFactory);
+    addSpringContext("test", applicationContext, (BeanDefinitionRegistry) beanFactory, null);
     bootContainer(getTestClass());
   }
 
