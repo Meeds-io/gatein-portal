@@ -18,10 +18,34 @@
  */
 package io.meeds.spring.module.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import org.exoplatform.commons.api.settings.SettingService;
+
 import io.meeds.spring.module.model.TestModel;
+import io.meeds.spring.module.storage.TestStorage;
 
-public interface TestService {
+@Service
+public class TestServiceImpl implements TestService {
 
-  TestModel save(TestModel testModel);
+  // Fake injection from Kernel for Testing Purpose
+  @Autowired
+  private SettingService settingService;
+
+  @Autowired
+  private TestStorage    storage;
+
+  @Override
+  public TestModel save(TestModel model) {
+    if (model == null) {
+      throw new IllegalArgumentException("TestModel is mandatory");
+    }
+    if (settingService == null) {
+      // Fake exception
+      throw new IllegalStateException("SettingService is null");
+    }
+    return storage.save(model);
+  }
 
 }
