@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.services.resources.ResourceBundleService;
@@ -137,14 +138,17 @@ public class LocaleConfigImpl implements LocaleConfig {
     }
 
     public ResourceBundle getMergeResourceBundle(String[] names) {
-        ResourceBundleService service = (ResourceBundleService) ExoContainerContext.getCurrentContainer()
+        ResourceBundleService service = ExoContainerContext.getCurrentContainer()
                 .getComponentInstanceOfType(ResourceBundleService.class);
-        ResourceBundle res = service.getResourceBundle(names, locale_);
-        return res;
+        return service.getResourceBundle(names, locale_);
     }
 
     public ResourceBundle getNavigationResourceBundle(String ownerType, String ownerId) {
-        return getResourceBundle("locale.navigation." + ownerType + "." + ownerId.replaceAll("/", "."));
+        ResourceBundle resourceBundle = getResourceBundle("locale.navigation." + ownerType + "." + ownerId.replaceAll("/", "."));
+        if (resourceBundle == null) {
+          return getResourceBundle("locale.navigation.portal.global");
+        }
+        return resourceBundle;
     }
 
     public void setInput(HttpServletRequest req) throws java.io.UnsupportedEncodingException {
