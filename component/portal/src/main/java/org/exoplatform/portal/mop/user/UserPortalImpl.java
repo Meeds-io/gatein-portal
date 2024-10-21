@@ -559,9 +559,6 @@ public class UserPortalImpl implements UserPortal {
   }
 
   protected UserNode getGlobalUserNode(UserNodeFilterConfig filterConfig, SiteKey siteKey, String[] segments) {
-    if (siteKey.getType() != SiteType.PORTAL) {
-      return null;
-    }
     UserNavigation globalNavigation = getNavigation(SiteKey.portal(this.service.getGlobalPortal()));
     if (globalNavigation != null) {
       MatchingScope globalScope = new MatchingScope(globalNavigation, filterConfig, segments);
