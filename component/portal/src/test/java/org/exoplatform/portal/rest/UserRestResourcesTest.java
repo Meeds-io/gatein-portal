@@ -32,6 +32,7 @@ import org.json.JSONObject;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.rest.services.BaseRestServicesTestCase;
@@ -362,6 +363,37 @@ public class UserRestResourcesTest extends BaseRestServicesTestCase {
     assertEquals(204, response.getStatus());
 
     verify(userHandler, atLeast(1)).createUser(eq(user), eq(true));
+  }
+
+  public void testCreateUserWithUsernameOfDeletedAccount() throws Exception {
+    when(userHandler.findUserByName(eq(USER_2), any())).thenReturn(null);
+    @SuppressWarnings("unchecked")
+    ListAccess<User> listAccess = mock(ListAccess.class);
+    when(userHandler.findUsersByQuery(any(), any())).thenReturn(listAccess);
+    when(listAccess.getSize()).thenReturn(0);
+    UserImpl user = new UserImpl(USER_2);
+    when(userHandler.createUserInstance(eq(USER_2))).thenReturn(user);
+    // the IDM wraps the veto raised by a listener for a previously deleted
+    // account into an IllegalStateException
+    doThrow(new IllegalStateException("Error executing preSave on listener",
+                                      new ObjectAlreadyExistsException(user,
+                                                                       "Unable to create a previously deleted user : "
+                                                                           + USER_2)))
+                                                                                     .when(userHandler)
+                                                                                     .createUser(eq(user), eq(true));
+
+    startUserSession(USER_1);
+
+    JSONObject data = new JSONObject();
+    data.put("userName", USER_2);
+    data.put("lastName", USER_2);
+    data.put("firstName", USER_2);
+    data.put("password", "newPassword1");
+    data.put("email", USER_2 + "@example.com");
+    ContainerResponse response = getResponse("POST", "/v1/users", data.toString());
+    assertNotNull(response);
+    assertEquals(400, response.getStatus());
+    assertEquals("USERNAME:ALREADY_EXISTS_AS_DELETED", response.getEntity());
   }
 
   public void testUpdateUser() throws Exception {
