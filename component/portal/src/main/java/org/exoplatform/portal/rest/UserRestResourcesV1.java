@@ -44,6 +44,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.utils.ListAccess;
@@ -280,9 +281,15 @@ public class UserRestResourcesV1 implements ResourceContainer {
     user.setPassword(password);
     user.setCreationSource(CREATION_SOURCE_UI);
     try {
-       organizationService.getUserHandler().createUser(user, true);
-    } catch (ObjectAlreadyExistsException objectAlreadyExistsException) {
-       return Response.status(Response.Status.BAD_REQUEST).entity("USERNAME:ALREADY_EXISTS_AS_DELETED").build();
+      organizationService.getUserHandler().createUser(user, true);
+    } catch (Exception exception) {
+      // the creation is vetoed (ObjectAlreadyExistsException) when the username
+      // belonged to a deleted account, but the IDM wraps the exceptions of its
+      // listeners: the veto has to be looked up in the cause chain
+      if (ExceptionUtils.indexOfType(exception, ObjectAlreadyExistsException.class) >= 0) {
+        return Response.status(Response.Status.BAD_REQUEST).entity("USERNAME:ALREADY_EXISTS_AS_DELETED").build();
+      }
+      throw exception;
     }
 
     if (!isEnabled) {
