@@ -167,4 +167,53 @@ public class LayoutStorageTest extends AbstractDAOTest {
     assertEquals("1px 1px 1px 1px", loadedStyle.getTextSubtitleBackgroundRadius());
   }
 
+  public void testImageBackgroundStylePersistedAndReloaded() {
+    ModelStyle style = new ModelStyle();
+    style.setBackgroundColor("#FFFFFF00");
+    style.setBackgroundImage("/portal/rest/v1/social/attachments/containerBackground/1/2");
+    style.setBackgroundSize("cover");
+    style.setBackgroundPosition("center");
+    style.setBackgroundRepeat("no-repeat");
+    style.setBackgroundAttachment("fixed");
+
+    ContainerData containerData = new ContainerData(null,
+                                                    "testImageBackground",
+                                                    "testImageBackground",
+                                                    null,
+                                                    "system:/groovy/portal/webui/container/UIContainer.gtmpl",
+                                                    null,
+                                                    null,
+                                                    null,
+                                                    null,
+                                                    null,
+                                                    null,
+                                                    null,
+                                                    style,
+                                                    null,
+                                                    Collections.emptyList(),
+                                                    Collections.emptyList());
+
+    List<ComponentEntity> saved = layoutStorage.saveChildren(new JSONArray(),
+                                                             Collections.<ComponentData> singletonList(containerData));
+    assertEquals(1, saved.size());
+    restartTransaction();
+
+    ContainerEntity savedEntity = (ContainerEntity) saved.get(0);
+    JSONArray body = new JSONArray();
+    body.add(savedEntity.toJSON());
+
+    List<ComponentData> loaded = layoutStorage.buildChildren(body);
+    assertEquals(1, loaded.size());
+    ContainerData loadedContainer = (ContainerData) loaded.get(0);
+    ModelStyle loadedStyle = loadedContainer.getCssStyle();
+    assertNotNull(loadedStyle);
+
+    assertEquals("#FFFFFF00", loadedStyle.getBackgroundColor());
+    assertEquals("/portal/rest/v1/social/attachments/containerBackground/1/2", loadedStyle.getBackgroundImage());
+    assertEquals("cover", loadedStyle.getBackgroundSize());
+    assertEquals("center", loadedStyle.getBackgroundPosition());
+    assertEquals("no-repeat", loadedStyle.getBackgroundRepeat());
+    assertEquals("fixed", loadedStyle.getBackgroundAttachment());
+  }
+
 }
