@@ -48,7 +48,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockHttpSession;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
@@ -161,6 +165,31 @@ class PortalRememberMeFilterTest {
     verify(request, never()).login(any(), any());
     verify(response, never()).addCookie(any());
     verify(chain).doFilter(request, response);
+  }
+
+  @Test
+  void savedContextIsReadBackFromHttpSessionOnNextRequest() throws Exception {
+    // Public constructor: the real session-backed repository, executed
+    Authentication authenticated = authenticatedUser();
+    when(authenticationProvider.authenticate(any())).thenReturn(authenticated);
+    PortalRememberMeFilter realRepositoryFilter = new PortalRememberMeFilter(authenticationProvider);
+    MockHttpSession httpSession = new MockHttpSession();
+    MockHttpServletRequest firstRequest = new MockHttpServletRequest();
+    firstRequest.setSession(httpSession);
+    firstRequest.setCookies(new Cookie(LoginUtils.COOKIE_NAME, TOKEN));
+
+    realRepositoryFilter.doFilter(firstRequest, new MockHttpServletResponse(), chain);
+
+    Object attribute = httpSession.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
+    assertNotNull(attribute);
+    assertSame(authenticated, ((SecurityContext) attribute).getAuthentication());
+
+    MockHttpServletRequest secondRequest = new MockHttpServletRequest();
+    secondRequest.setSession(httpSession);
+    Authentication readBack = new HttpSessionSecurityContextRepository().loadDeferredContext(secondRequest)
+                                                                        .get()
+                                                                        .getAuthentication();
+    assertSame(authenticated, readBack);
   }
 
   @Test

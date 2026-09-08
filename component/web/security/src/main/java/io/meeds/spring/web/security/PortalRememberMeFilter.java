@@ -72,20 +72,22 @@ public class PortalRememberMeFilter extends AbstractFilter {
 
   private static final Log                LOG = ExoLogger.getLogger(PortalRememberMeFilter.class);
 
-  private static ConversationRegistry     conversationRegistry;
+  private ConversationRegistry            conversationRegistry;
 
-  private static IdentityRegistry         identityRegistry;
+  private IdentityRegistry                identityRegistry;
 
-  private static Authenticator            authenticator;
+  private Authenticator                   authenticator;
 
   private final AuthenticationProvider    authenticationProvider;
 
   private final SecurityContextRepository securityContextRepository;
 
   public PortalRememberMeFilter(AuthenticationProvider authenticationProvider) {
-    // Same repository shape as the default Spring Security chain
-    // (SecurityContextConfigurer), so that the saved context is read back
-    // by the chain on the next requests of the session
+    // Writes the default HttpSessionSecurityContextRepository
+    // SPRING_SECURITY_CONTEXT_KEY session attribute, which the chain's
+    // SecurityContextHolderFilter reads on the next requests of the session
+    // (the chain's own repository is the delegating one built by
+    // SessionManagementConfigurer.init, same key)
     this(authenticationProvider,
          new DelegatingSecurityContextRepository(new RequestAttributeSecurityContextRepository(),
                                                  new HttpSessionSecurityContextRepository()));
@@ -195,21 +197,21 @@ public class PortalRememberMeFilter extends AbstractFilter {
     return identity;
   }
 
-  private static IdentityRegistry getIdentityRegistry(ExoContainer container) {
+  private IdentityRegistry getIdentityRegistry(ExoContainer container) {
     if (identityRegistry == null) {
       identityRegistry = container.getComponentInstanceOfType(IdentityRegistry.class);
     }
     return identityRegistry;
   }
 
-  private static ConversationRegistry getConversationRegistry(ExoContainer container) {
+  private ConversationRegistry getConversationRegistry(ExoContainer container) {
     if (conversationRegistry == null) {
       conversationRegistry = container.getComponentInstanceOfType(ConversationRegistry.class);
     }
     return conversationRegistry;
   }
 
-  private static Authenticator getAuthenticator(ExoContainer container) {
+  private Authenticator getAuthenticator(ExoContainer container) {
     if (authenticator == null) {
       authenticator = container.getComponentInstanceOfType(Authenticator.class);
     }
