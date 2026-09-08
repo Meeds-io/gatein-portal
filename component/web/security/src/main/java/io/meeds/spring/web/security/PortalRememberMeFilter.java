@@ -20,8 +20,16 @@ package io.meeds.spring.web.security;
 
 import java.io.IOException;
 
-import org.gatein.wci.ServletContainerFactory;
-import org.gatein.wci.security.Credentials;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
@@ -43,24 +51,51 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpServletResponseWrapper;
 
 /**
  * A Web filter to authenticate user Identity using 'rememberme' cookie if
  * present.<br>
+ * The cookie token is validated by {@link CookieTokenService}; a valid token is
+ * a <b>pre-authentication</b>: the user is authenticated on the Spring Security
+ * side with a {@link PreAuthenticatedAuthenticationToken} and the resulting
+ * {@link SecurityContext} is saved in the HTTP session, so that the following
+ * requests of the same session are authenticated without re-reading the
+ * cookie. No password login is attempted through the Servlet API: on a Spring
+ * WAR, {@link HttpServletRequest#login(String, String)} is intercepted by
+ * Spring Security and routed to the {@code AuthenticationManager} as a
+ * {@code UsernamePasswordAuthenticationToken}, which
+ * {@link PortalAuthenticationManager} deliberately does not support.<br>
  * Note: added to be included in class packages scan for Spring
  */
 public class PortalRememberMeFilter extends AbstractFilter {
 
-  private static final Log            LOG = ExoLogger.getLogger(PortalRememberMeFilter.class);
+  private static final Log                LOG = ExoLogger.getLogger(PortalRememberMeFilter.class);
 
-  private static ConversationRegistry conversationRegistry;
+  private static ConversationRegistry     conversationRegistry;
 
-  private static IdentityRegistry     identityRegistry;
+  private static IdentityRegistry         identityRegistry;
 
-  private static Authenticator        authenticator;
+  private static Authenticator            authenticator;
+
+  private final AuthenticationProvider    authenticationProvider;
+
+  private final SecurityContextRepository securityContextRepository;
+
+  public PortalRememberMeFilter(AuthenticationProvider authenticationProvider) {
+    // Same repository shape as the default Spring Security chain
+    // (SecurityContextConfigurer), so that the saved context is read back
+    // by the chain on the next requests of the session
+    this(authenticationProvider,
+         new DelegatingSecurityContextRepository(new RequestAttributeSecurityContextRepository(),
+                                                 new HttpSessionSecurityContextRepository()));
+  }
+
+  PortalRememberMeFilter(AuthenticationProvider authenticationProvider,
+                         SecurityContextRepository securityContextRepository) {
+    this.authenticationProvider = authenticationProvider;
+    this.securityContextRepository = securityContextRepository;
+  }
 
   public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
     HttpServletRequest request = (HttpServletRequest) req;
@@ -79,8 +114,8 @@ public class PortalRememberMeFilter extends AbstractFilter {
       String username = getRememberMeTokenUser(request);
       if (username != null) {
         try {
-          login(request, response, new Credentials(username, ""));
-          if (request.getRemoteUser() != null) {
+          Authentication authentication = authenticate(request, response, username);
+          if (authentication != null) {
             Identity identity = getIdentity(container, username);
             if (identity != null) {
               ConversationState state = new ConversationState(identity);
@@ -99,32 +134,31 @@ public class PortalRememberMeFilter extends AbstractFilter {
     }
   }
 
-  private void login(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws ServletException,
-                                                                                                        IOException {
-    HttpServletRequest wrappedRequest = new HttpServletRequestWrapper(request) {
-      @Override
-      public String getContextPath() {
-        return "/portal";
-      }
-
-      @Override
-      public String getRequestURI() {
-        return "/portal/login";
-      }
-    };
-    HttpServletResponse wrappedResponse = new HttpServletResponseWrapper(response) {
-      @Override
-      public void sendRedirect(String location) throws IOException {
-        // Nothing
-      }
-
-      @Override
-      public void setStatus(int sc) {
-        // Nothing
-      }
-    };
-    ServletContainerFactory.getServletContainer()
-                           .login(wrappedRequest, wrappedResponse, credentials);
+  /**
+   * Authenticates the user whose rememberme token was already validated, as a
+   * pre-authenticated principal, and saves the resulting
+   * {@link SecurityContext} in the current thread and in the HTTP session.
+   * 
+   * @param request {@link HttpServletRequest}
+   * @param response {@link HttpServletResponse}
+   * @param username validated token owner
+   * @return the fully authenticated {@link Authentication}, or null when the
+   *         provider did not authenticate the user (disabled user, user not
+   *         member of a platform group...)
+   */
+  private Authentication authenticate(HttpServletRequest request, HttpServletResponse response, String username) {
+    Authentication authentication = authenticationProvider.authenticate(new PreAuthenticatedAuthenticationToken(username,
+                                                                                                                ""));
+    if (authentication == null
+        || !authentication.isAuthenticated()
+        || authentication instanceof AnonymousAuthenticationToken) {
+      return null;
+    }
+    SecurityContext context = SecurityContextHolder.createEmptyContext();
+    context.setAuthentication(authentication);
+    SecurityContextHolder.setContext(context);
+    securityContextRepository.saveContext(context, request, response);
+    return authentication;
   }
 
   private String getRememberMeTokenUser(HttpServletRequest request) {
