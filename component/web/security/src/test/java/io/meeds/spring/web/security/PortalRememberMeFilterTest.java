@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -207,16 +206,20 @@ class PortalRememberMeFilterTest {
   }
 
   @Test
-  void providerFailureClearsTokenCookieAndContinuesChain() throws Exception {
+  void providerFailureKeepsTokenCookieAndContinuesChain() throws Exception {
+    // A failure here is always internal: PortalAuthenticationManager wraps any
+    // IDM or database error into an AuthenticationServiceException (pinned by
+    // PortalAuthenticationManagerTest), while an unusable token yields no
+    // username at all and a user who must not be authenticated comes back
+    // anonymous. So a transient failure must leave the cookie alone — deleting
+    // it used to log the user out of "remember me" for good.
     when(authenticationProvider.authenticate(any())).thenThrow(new AuthenticationServiceException("failure"));
 
     filter.doFilter(request, response, chain);
 
     assertNull(SecurityContextHolder.getContext().getAuthentication());
     verify(securityContextRepository, never()).saveContext(any(), any(), any());
-    verify(response).addCookie(argThat(cookie -> LoginUtils.COOKIE_NAME.equals(cookie.getName())
-                                                 && cookie.getMaxAge() == 0
-                                                 && "".equals(cookie.getValue())));
+    verify(response, never()).addCookie(any());
     verify(chain).doFilter(request, response);
   }
 

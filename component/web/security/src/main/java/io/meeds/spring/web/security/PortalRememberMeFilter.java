@@ -49,7 +49,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -66,6 +65,9 @@ import jakarta.servlet.http.HttpServletResponse;
  * Spring Security and routed to the {@code AuthenticationManager} as a
  * {@code UsernamePasswordAuthenticationToken}, which
  * {@link PortalAuthenticationManager} deliberately does not support.<br>
+ * Nothing here ever deletes the remember-me cookie: the token store is the
+ * source of truth for a token's validity, and every failure reaching this
+ * filter is an internal one.<br>
  * Note: added to be included in class packages scan for Spring
  */
 public class PortalRememberMeFilter extends AbstractFilter {
@@ -127,8 +129,14 @@ public class PortalRememberMeFilter extends AbstractFilter {
             }
           }
         } catch (Exception e) {
-          clearInvalidToken(request, response);
-          LOG.warn("Error while logging in user {} using rememberme token, invalidate token", username, e);
+          // Keep the cookie and the stored token. Every failure that reaches
+          // this point is internal: an unusable token yields no username at all
+          // (AbstractTokenService.validateToken logs and returns null on any
+          // store failure) and a user who must not be authenticated comes back
+          // as an anonymous authentication, not as an exception. So a transient
+          // IDM or database failure must not cost the user their remember-me
+          // token, which deleting the cookie here used to do.
+          LOG.warn("Error while authenticating user {} with its rememberme token, the token is kept", username, e);
         }
       }
     } finally {
@@ -171,17 +179,6 @@ public class PortalRememberMeFilter extends AbstractFilter {
       return tokenservice.validateToken(token, false);
     }
     return null;
-  }
-
-  private void clearInvalidToken(HttpServletRequest request, HttpServletResponse response) {
-    if (request.getRemoteUser() == null) {
-      Cookie cookie = new Cookie(LoginUtils.COOKIE_NAME, "");
-      cookie.setPath("/");
-      cookie.setMaxAge(0);
-      cookie.setHttpOnly(true);
-      cookie.setSecure(request.isSecure());
-      response.addCookie(cookie);
-    }
   }
 
   private Identity getIdentity(ExoContainer container, String userId) {

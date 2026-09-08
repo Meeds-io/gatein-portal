@@ -42,6 +42,8 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.web.AbstractFilter;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.web.security.security.CookieTokenService;
 
@@ -52,6 +54,8 @@ import org.exoplatform.web.security.security.CookieTokenService;
  *
  */
 public class RememberMeFilter extends AbstractFilter {
+
+  private static final Log LOG = ExoLogger.getLogger(RememberMeFilter.class);
 
   private List<String> ignoredPaths = null;
 
@@ -87,6 +91,7 @@ public class RememberMeFilter extends AbstractFilter {
           try {
             servletContainer.login(request, response, credentials);
           } catch (Exception e) {
+            LOG.warn("Error while logging in user {} with its rememberme token on the portal container", username, e);
             // Clear token cookie if we did not authenticate
             if (request.getRemoteUser() == null) {
               Cookie cookie = new Cookie(LoginUtils.COOKIE_NAME, "");
