@@ -158,6 +158,8 @@ public class MappedAttributes {
 
   public static final Key<String>  BACKGROUND_SIZE            = Key.create("background-size", ValueType.STRING);
 
+  public static final Key<String>  BACKGROUND_ATTACHMENT      = Key.create("background-attachment", ValueType.STRING);
+
   public static final Key<String>  APP_BACKGROUND_COLOR       = Key.create("app-background-color", ValueType.STRING);
 
   public static final Key<String>  APP_BACKGROUND_IMAGE       = Key.create("app-background-image", ValueType.STRING);
@@ -169,6 +171,8 @@ public class MappedAttributes {
   public static final Key<String>  APP_BACKGROUND_REPEAT      = Key.create("app-background-repeat", ValueType.STRING);
 
   public static final Key<String>  APP_BACKGROUND_SIZE        = Key.create("app-background-size", ValueType.STRING);
+
+  public static final Key<String>  APP_BACKGROUND_ATTACHMENT  = Key.create("app-background-attachment", ValueType.STRING);
 
   public static final Key<String>  BORDER_SIZE                = Key.create("border-size", ValueType.STRING);
 

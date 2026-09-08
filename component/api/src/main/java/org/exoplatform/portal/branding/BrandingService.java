@@ -96,6 +96,11 @@ public interface BrandingService {
    */
   String getPageBackgroundRepeat();
 
+  /**
+   * @return Page Background attachment directive (fixed or scroll)
+   */
+  String getPageBackgroundAttachment();
+
   Logo getLogo();
 
   /**
