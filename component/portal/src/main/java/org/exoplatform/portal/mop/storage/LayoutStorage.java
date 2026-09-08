@@ -815,6 +815,9 @@ public class LayoutStorage {
     if (attrs.containsKey(MappedAttributes.BACKGROUND_REPEAT.getName())) {
       cssStyle.setBackgroundRepeat((String) attrs.get(MappedAttributes.BACKGROUND_REPEAT.getName()));
     }
+    if (attrs.containsKey(MappedAttributes.BACKGROUND_ATTACHMENT.getName())) {
+      cssStyle.setBackgroundAttachment((String) attrs.get(MappedAttributes.BACKGROUND_ATTACHMENT.getName()));
+    }
     if (attrs.containsKey(MappedAttributes.BORDER_SIZE.getName())) {
       cssStyle.setBorderSize((String) attrs.get(MappedAttributes.BORDER_SIZE.getName()));
     }
@@ -1012,6 +1015,9 @@ public class LayoutStorage {
     if (attrs.containsKey(MappedAttributes.APP_BACKGROUND_REPEAT.getName())) {
       cssStyle.setBackgroundRepeat((String) attrs.get(MappedAttributes.APP_BACKGROUND_REPEAT.getName()));
     }
+    if (attrs.containsKey(MappedAttributes.APP_BACKGROUND_ATTACHMENT.getName())) {
+      cssStyle.setBackgroundAttachment((String) attrs.get(MappedAttributes.APP_BACKGROUND_ATTACHMENT.getName()));
+    }
     return cssStyle;
   }
 
@@ -1037,6 +1043,9 @@ public class LayoutStorage {
     }
     if (StringUtils.isNotBlank(cssStyle.getBackgroundRepeat())) {
       properties.put(MappedAttributes.BACKGROUND_REPEAT.getName(), cssStyle.getBackgroundRepeat());
+    }
+    if (StringUtils.isNotBlank(cssStyle.getBackgroundAttachment())) {
+      properties.put(MappedAttributes.BACKGROUND_ATTACHMENT.getName(), cssStyle.getBackgroundAttachment());
     }
     if (StringUtils.isNotBlank(cssStyle.getBorderSize())) {
       properties.put(MappedAttributes.BORDER_SIZE.getName(), cssStyle.getBorderSize());
@@ -1233,6 +1242,9 @@ public class LayoutStorage {
     }
     if (StringUtils.isNotBlank(cssStyle.getBackgroundRepeat())) {
       properties.put(MappedAttributes.APP_BACKGROUND_REPEAT.getName(), cssStyle.getBackgroundRepeat());
+    }
+    if (StringUtils.isNotBlank(cssStyle.getBackgroundAttachment())) {
+      properties.put(MappedAttributes.APP_BACKGROUND_ATTACHMENT.getName(), cssStyle.getBackgroundAttachment());
     }
   }
 

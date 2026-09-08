@@ -94,6 +94,9 @@
   if (brandingService.getPageBackgroundPosition() != null) {
     bodyStyle += "--allPagesBackgroundPosition: " + brandingService.getPageBackgroundPosition() + ";";
   }
+  if (brandingService.getPageBackgroundAttachment() != null) {
+    bodyStyle += "--allPagesBackgroundAttachment: " + brandingService.getPageBackgroundAttachment() + ";";
+  }
   if (brandingService.getPageWidth() != null) {
     bodyStyle += "--allPagesWidth: " + brandingService.getPageWidth() + ";";
   }

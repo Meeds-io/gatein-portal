@@ -41,4 +41,6 @@ public class ApplicationBackgroundStyle implements Serializable {
 
   private String            backgroundRepeat;
 
+  private String            backgroundAttachment;
+
 }

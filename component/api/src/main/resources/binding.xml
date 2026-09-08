@@ -59,6 +59,7 @@
     <value name="background-position" field="backgroundPosition" usage="optional" />
     <value name="background-size" field="backgroundSize" usage="optional" />
     <value name="background-repeat" field="backgroundRepeat" usage="optional" />
+    <value name="background-attachment" field="backgroundAttachment" usage="optional" />
     <value name="text-title-color" field="textTitleColor" usage="optional" />
     <value name="text-title-font-size" field="textTitleFontSize" usage="optional" />
     <value name="text-title-font-weight" field="textTitleFontWeight" usage="optional" />

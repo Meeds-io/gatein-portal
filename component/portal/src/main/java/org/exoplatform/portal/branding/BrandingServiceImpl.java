@@ -165,6 +165,8 @@ public class BrandingServiceImpl implements BrandingService, Startable {
 
   public static final String   BRANDING_PAGE_BG_SIZE_KEY          = "page.backgroundSize";
 
+  public static final String   BRANDING_PAGE_BG_ATTACHMENT_KEY    = "page.backgroundAttachment";
+
   public static final String   BRANDING_CUSTOM_STYLE_FEATURE      = "customStylesheet";
 
   public static final String   BRANDING_LAST_UPDATED_TIME_KEY     = "branding.lastUpdatedTime";
@@ -336,6 +338,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     branding.setPageBackgroundPosition(getPageBackgroundPosition());
     branding.setPageBackgroundSize(getPageBackgroundSize());
     branding.setPageBackgroundRepeat(getPageBackgroundRepeat());
+    branding.setPageBackgroundAttachment(getPageBackgroundAttachment());
     branding.setPageBackgroundEffect(getPageBackgroundEffect());
     branding.setPageWidth(getPageWidth());
     branding.setCustomCss(getCustomCss());
@@ -414,6 +417,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
       updatePageBackgroundPosition(branding.getPageBackgroundPosition(), false);
       updatePageBackgroundEffect(branding.getPageBackgroundEffect(), false);
       updatePageBackgroundRepeat(branding.getPageBackgroundRepeat(), false);
+      updatePageBackgroundAttachment(branding.getPageBackgroundAttachment(), false);
       updatePageWidth(branding.getPageWidth(), false);
       updateCustomCss(branding.getCustomCss(), false);
       Map<String, String> themeStyles = branding.getThemeStyle();
@@ -503,6 +507,11 @@ public class BrandingServiceImpl implements BrandingService, Startable {
   @Override
   public String getPageBackgroundSize() {
     return getPropertyValue(BRANDING_PAGE_BG_SIZE_KEY);
+  }
+
+  @Override
+  public String getPageBackgroundAttachment() {
+    return getPropertyValue(BRANDING_PAGE_BG_ATTACHMENT_KEY);
   }
 
   @Override
@@ -1008,6 +1017,10 @@ public class BrandingServiceImpl implements BrandingService, Startable {
     updatePropertyValue(BRANDING_PAGE_BG_REPEAT_KEY, value, updateLastUpdatedTime);
   }
 
+  private void updatePageBackgroundAttachment(String value, boolean updateLastUpdatedTime) {
+    updatePropertyValue(BRANDING_PAGE_BG_ATTACHMENT_KEY, value, updateLastUpdatedTime);
+  }
+
   private void updatePageBackgroundEffect(String effect, boolean updateLastUpdatedTime) {
     updatePropertyValue(BRANDING_PAGE_BG_EFFECT_KEY, effect, updateLastUpdatedTime);
   }
@@ -1335,6 +1348,7 @@ public class BrandingServiceImpl implements BrandingService, Startable {
                   branding.getPageBackgroundPosition(),
                   branding.getPageBackgroundRepeat(),
                   branding.getPageBackgroundSize(),
+                  branding.getPageBackgroundAttachment(),
                   branding.getLoginBackgroundTextColor(),
                   branding.getPageBackgroundColor(),
                   branding.getPageBackgroundColor(),
