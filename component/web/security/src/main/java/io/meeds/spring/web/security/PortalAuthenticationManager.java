@@ -55,13 +55,13 @@ import lombok.SneakyThrows;
 @Component
 public class PortalAuthenticationManager implements AuthenticationProvider {
 
-  private static OrganizationService  organizationService;
+  private OrganizationService         organizationService;
 
-  private static ConversationRegistry conversationRegistry;
+  private ConversationRegistry        conversationRegistry;
 
-  private static IdentityRegistry     identityRegistry;
+  private IdentityRegistry            identityRegistry;
 
-  private static Authenticator        authenticator;
+  private Authenticator               authenticator;
 
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -189,28 +189,28 @@ public class PortalAuthenticationManager implements AuthenticationProvider {
            || isDisabledUser(identity.getUserId());
   }
 
-  private static Authenticator getAuthenticator() {
+  private Authenticator getAuthenticator() {
     if (authenticator == null) {
       authenticator = ExoContainerContext.getService(Authenticator.class);
     }
     return authenticator;
   }
 
-  private static IdentityRegistry getIdentityRegistry() {
+  private IdentityRegistry getIdentityRegistry() {
     if (identityRegistry == null) {
       identityRegistry = ExoContainerContext.getService(IdentityRegistry.class);
     }
     return identityRegistry;
   }
 
-  private static OrganizationService getOrganizationService() {
+  private OrganizationService getOrganizationService() {
     if (organizationService == null) {
       organizationService = ExoContainerContext.getService(OrganizationService.class);
     }
     return organizationService;
   }
 
-  private static ConversationRegistry getConversationRegistry() {
+  private ConversationRegistry getConversationRegistry() {
     if (conversationRegistry == null) {
       conversationRegistry = ExoContainerContext.getService(ConversationRegistry.class);
     }

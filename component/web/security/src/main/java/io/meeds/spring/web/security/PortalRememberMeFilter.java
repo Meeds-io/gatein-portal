@@ -20,8 +20,16 @@ package io.meeds.spring.web.security;
 
 import java.io.IOException;
 
-import org.gatein.wci.ServletContainerFactory;
-import org.gatein.wci.security.Credentials;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
@@ -41,26 +49,58 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpServletResponseWrapper;
 
 /**
  * A Web filter to authenticate user Identity using 'rememberme' cookie if
  * present.<br>
+ * The cookie token is validated by {@link CookieTokenService}; a valid token is
+ * a <b>pre-authentication</b>: the user is authenticated on the Spring Security
+ * side with a {@link PreAuthenticatedAuthenticationToken} and the resulting
+ * {@link SecurityContext} is saved in the HTTP session, so that the following
+ * requests of the same session are authenticated without re-reading the
+ * cookie. No password login is attempted through the Servlet API: on a Spring
+ * WAR, {@link HttpServletRequest#login(String, String)} is intercepted by
+ * Spring Security and routed to the {@code AuthenticationManager} as a
+ * {@code UsernamePasswordAuthenticationToken}, which
+ * {@link PortalAuthenticationManager} deliberately does not support.<br>
+ * Nothing here ever deletes the remember-me cookie: the token store is the
+ * source of truth for a token's validity, and a failure reaching this filter
+ * says nothing about the token — it is internal, or the user was removed since
+ * the token was issued.<br>
  * Note: added to be included in class packages scan for Spring
  */
 public class PortalRememberMeFilter extends AbstractFilter {
 
-  private static final Log            LOG = ExoLogger.getLogger(PortalRememberMeFilter.class);
+  private static final Log                LOG = ExoLogger.getLogger(PortalRememberMeFilter.class);
 
-  private static ConversationRegistry conversationRegistry;
+  private ConversationRegistry            conversationRegistry;
 
-  private static IdentityRegistry     identityRegistry;
+  private IdentityRegistry                identityRegistry;
 
-  private static Authenticator        authenticator;
+  private Authenticator                   authenticator;
+
+  private final AuthenticationProvider    authenticationProvider;
+
+  private final SecurityContextRepository securityContextRepository;
+
+  public PortalRememberMeFilter(AuthenticationProvider authenticationProvider) {
+    // Writes the default HttpSessionSecurityContextRepository
+    // SPRING_SECURITY_CONTEXT_KEY session attribute, which the chain's
+    // SecurityContextHolderFilter reads on the next requests of the session
+    // (the chain's own repository is the delegating one built by
+    // SessionManagementConfigurer.init, same key)
+    this(authenticationProvider,
+         new DelegatingSecurityContextRepository(new RequestAttributeSecurityContextRepository(),
+                                                 new HttpSessionSecurityContextRepository()));
+  }
+
+  PortalRememberMeFilter(AuthenticationProvider authenticationProvider,
+                         SecurityContextRepository securityContextRepository) {
+    this.authenticationProvider = authenticationProvider;
+    this.securityContextRepository = securityContextRepository;
+  }
 
   public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
     HttpServletRequest request = (HttpServletRequest) req;
@@ -79,8 +119,8 @@ public class PortalRememberMeFilter extends AbstractFilter {
       String username = getRememberMeTokenUser(request);
       if (username != null) {
         try {
-          login(request, response, new Credentials(username, ""));
-          if (request.getRemoteUser() != null) {
+          Authentication authentication = authenticate(request, response, username);
+          if (authentication != null) {
             Identity identity = getIdentity(container, username);
             if (identity != null) {
               ConversationState state = new ConversationState(identity);
@@ -90,8 +130,15 @@ public class PortalRememberMeFilter extends AbstractFilter {
             }
           }
         } catch (Exception e) {
-          clearInvalidToken(request, response);
-          LOG.warn("Error while logging in user {} using rememberme token, invalidate token", username, e);
+          // Keep the cookie and the stored token. A failure here is never a
+          // statement about the token: an unusable one yields no username at
+          // all (AbstractTokenService.validateToken logs and returns null on
+          // any store failure), and what does reach this catch is an internal
+          // failure or a user removed since the token was issued — a disabled
+          // or non-member user comes back as an anonymous authentication
+          // instead. So a transient IDM or database failure must not cost the
+          // user their remember-me token, which deleting the cookie here did.
+          LOG.warn("Error while authenticating user {} with its rememberme token, the token is kept", username, e);
         }
       }
     } finally {
@@ -99,32 +146,31 @@ public class PortalRememberMeFilter extends AbstractFilter {
     }
   }
 
-  private void login(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws ServletException,
-                                                                                                        IOException {
-    HttpServletRequest wrappedRequest = new HttpServletRequestWrapper(request) {
-      @Override
-      public String getContextPath() {
-        return "/portal";
-      }
-
-      @Override
-      public String getRequestURI() {
-        return "/portal/login";
-      }
-    };
-    HttpServletResponse wrappedResponse = new HttpServletResponseWrapper(response) {
-      @Override
-      public void sendRedirect(String location) throws IOException {
-        // Nothing
-      }
-
-      @Override
-      public void setStatus(int sc) {
-        // Nothing
-      }
-    };
-    ServletContainerFactory.getServletContainer()
-                           .login(wrappedRequest, wrappedResponse, credentials);
+  /**
+   * Authenticates the user whose rememberme token was already validated, as a
+   * pre-authenticated principal, and saves the resulting
+   * {@link SecurityContext} in the current thread and in the HTTP session.
+   * 
+   * @param request {@link HttpServletRequest}
+   * @param response {@link HttpServletResponse}
+   * @param username validated token owner
+   * @return the fully authenticated {@link Authentication}, or null when the
+   *         provider did not authenticate the user (disabled user, user not
+   *         member of a platform group...)
+   */
+  private Authentication authenticate(HttpServletRequest request, HttpServletResponse response, String username) {
+    Authentication authentication = authenticationProvider.authenticate(new PreAuthenticatedAuthenticationToken(username,
+                                                                                                                ""));
+    if (authentication == null
+        || !authentication.isAuthenticated()
+        || authentication instanceof AnonymousAuthenticationToken) {
+      return null;
+    }
+    SecurityContext context = SecurityContextHolder.createEmptyContext();
+    context.setAuthentication(authentication);
+    SecurityContextHolder.setContext(context);
+    securityContextRepository.saveContext(context, request, response);
+    return authentication;
   }
 
   private String getRememberMeTokenUser(HttpServletRequest request) {
@@ -135,17 +181,6 @@ public class PortalRememberMeFilter extends AbstractFilter {
       return tokenservice.validateToken(token, false);
     }
     return null;
-  }
-
-  private void clearInvalidToken(HttpServletRequest request, HttpServletResponse response) {
-    if (request.getRemoteUser() == null) {
-      Cookie cookie = new Cookie(LoginUtils.COOKIE_NAME, "");
-      cookie.setPath("/");
-      cookie.setMaxAge(0);
-      cookie.setHttpOnly(true);
-      cookie.setSecure(request.isSecure());
-      response.addCookie(cookie);
-    }
   }
 
   private Identity getIdentity(ExoContainer container, String userId) {
@@ -161,21 +196,21 @@ public class PortalRememberMeFilter extends AbstractFilter {
     return identity;
   }
 
-  private static IdentityRegistry getIdentityRegistry(ExoContainer container) {
+  private IdentityRegistry getIdentityRegistry(ExoContainer container) {
     if (identityRegistry == null) {
       identityRegistry = container.getComponentInstanceOfType(IdentityRegistry.class);
     }
     return identityRegistry;
   }
 
-  private static ConversationRegistry getConversationRegistry(ExoContainer container) {
+  private ConversationRegistry getConversationRegistry(ExoContainer container) {
     if (conversationRegistry == null) {
       conversationRegistry = container.getComponentInstanceOfType(ConversationRegistry.class);
     }
     return conversationRegistry;
   }
 
-  private static Authenticator getAuthenticator(ExoContainer container) {
+  private Authenticator getAuthenticator(ExoContainer container) {
     if (authenticator == null) {
       authenticator = container.getComponentInstanceOfType(Authenticator.class);
     }
