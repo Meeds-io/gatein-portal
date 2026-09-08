@@ -31,9 +31,9 @@ import jakarta.servlet.DispatcherType;
 public class WebPortalRememberMeFilterConfiguration {
 
   @Bean
-  public FilterRegistrationBean<PortalRememberMeFilter> rememberMeFilter() {
+  public FilterRegistrationBean<PortalRememberMeFilter> rememberMeFilter(PortalAuthenticationManager authenticationProvider) {
     FilterRegistrationBean<PortalRememberMeFilter> registrationBean = new FilterRegistrationBean<>();
-    registrationBean.setFilter(new PortalRememberMeFilter());
+    registrationBean.setFilter(new PortalRememberMeFilter(authenticationProvider));
     registrationBean.setUrlPatterns(List.of("/rest/*"));
     registrationBean.setDispatcherTypes(EnumSet.allOf(DispatcherType.class));
     registrationBean.setOrder(3);
