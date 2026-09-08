@@ -91,16 +91,30 @@ public class RememberMeFilter extends AbstractFilter {
           try {
             servletContainer.login(request, response, credentials);
           } catch (Exception e) {
-            LOG.warn("Error while logging in user {} with its rememberme token on the portal container", username, e);
-            // Clear token cookie if we did not authenticate
-            if (request.getRemoteUser() == null) {
-              Cookie cookie = new Cookie(LoginUtils.COOKIE_NAME, "");
-              cookie.setPath("/");
-              cookie.setMaxAge(0);
-              cookie.setHttpOnly(true);
-              cookie.setSecure(request.isSecure());
-              response.addCookie(cookie);
+            // The token was validated just above, so a failure here is not a
+            // statement about it: a rejected JAAS login arrives as a WCI
+            // AuthenticationException (a RuntimeException wrapping the bare
+            // ServletException Tomcat throws once JAASRealm has swallowed the
+            // LoginException) and is indistinguishable from an outage — except
+            // for the one permanent, expected rejection the shipped
+            // gatein-domain chain marks on the request: a disabled user
+            // (FilterDisabledLoginModule sets DISABLED_USER_NAME before
+            // throwing, as LoginHandler already relies on). Clear the cookie
+            // for that case only, so the browser stops re-running the chain on
+            // every request for the cookie's whole lifetime, and keep it
+            // otherwise: this cookie is written at path "/" and shared with
+            // every Spring WAR, so deleting it on a transient IDM or database
+            // failure cost users their remember-me everywhere at once.
+            if (request.getAttribute(FilterDisabledLoginModule.DISABLED_USER_NAME) != null) {
+              clearTokenCookie(request, response);
             }
+            // Debug, not warn: Tomcat's JAASRealm has already logged the
+            // underlying LoginException with its stack at warn
+            // (tomcat-catalina 11.0.24 JAASRealm:441-442 — no module of this
+            // chain throws a FailedLoginException, so nothing lands in its
+            // debug branch), and this filter is mapped on every portal
+            // request, so a second warn here would only duplicate it.
+            LOG.debug("Cannot log user {} in with its rememberme token", username, e);
           }
         }
       }
@@ -108,6 +122,15 @@ public class RememberMeFilter extends AbstractFilter {
 
     // Continue
     chain.doFilter(request, response);
+  }
+
+  private void clearTokenCookie(HttpServletRequest request, HttpServletResponse response) {
+    Cookie cookie = new Cookie(LoginUtils.COOKIE_NAME, "");
+    cookie.setPath("/");
+    cookie.setMaxAge(0);
+    cookie.setHttpOnly(true);
+    cookie.setSecure(request.isSecure());
+    response.addCookie(cookie);
   }
 
   public void begin(OrganizationService orgService) {

@@ -66,8 +66,9 @@ import jakarta.servlet.http.HttpServletResponse;
  * {@code UsernamePasswordAuthenticationToken}, which
  * {@link PortalAuthenticationManager} deliberately does not support.<br>
  * Nothing here ever deletes the remember-me cookie: the token store is the
- * source of truth for a token's validity, and every failure reaching this
- * filter is an internal one.<br>
+ * source of truth for a token's validity, and a failure reaching this filter
+ * says nothing about the token — it is internal, or the user was removed since
+ * the token was issued.<br>
  * Note: added to be included in class packages scan for Spring
  */
 public class PortalRememberMeFilter extends AbstractFilter {
@@ -129,13 +130,14 @@ public class PortalRememberMeFilter extends AbstractFilter {
             }
           }
         } catch (Exception e) {
-          // Keep the cookie and the stored token. Every failure that reaches
-          // this point is internal: an unusable token yields no username at all
-          // (AbstractTokenService.validateToken logs and returns null on any
-          // store failure) and a user who must not be authenticated comes back
-          // as an anonymous authentication, not as an exception. So a transient
-          // IDM or database failure must not cost the user their remember-me
-          // token, which deleting the cookie here used to do.
+          // Keep the cookie and the stored token. A failure here is never a
+          // statement about the token: an unusable one yields no username at
+          // all (AbstractTokenService.validateToken logs and returns null on
+          // any store failure), and what does reach this catch is an internal
+          // failure or a user removed since the token was issued — a disabled
+          // or non-member user comes back as an anonymous authentication
+          // instead. So a transient IDM or database failure must not cost the
+          // user their remember-me token, which deleting the cookie here did.
           LOG.warn("Error while authenticating user {} with its rememberme token, the token is kept", username, e);
         }
       }

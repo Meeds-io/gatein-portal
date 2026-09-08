@@ -24,11 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
@@ -100,7 +100,6 @@ class PortalAuthenticationManagerTest {
 
   @BeforeEach
   void setUp() {
-    resetStaticServiceCaches();
     authenticationManager = new PortalAuthenticationManager();
     RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
   }
@@ -113,7 +112,6 @@ class PortalAuthenticationManagerTest {
     }
     RequestContextHolder.resetRequestAttributes();
     ConversationState.setCurrent(null);
-    resetStaticServiceCaches();
   }
 
   @Test
@@ -178,6 +176,22 @@ class PortalAuthenticationManagerTest {
   }
 
   @Test
+  void discardsASessionStateBelongingToAnotherUser() throws Exception {
+    // The one branch of this class with an ACL flavour: a session whose
+    // ConversationState belongs to someone else is unregistered, never reused.
+    givenServices();
+    when(conversationRegistry.getState(any())).thenReturn(new ConversationState(new Identity("someone-else")));
+    when(identityRegistry.getIdentity(USERNAME)).thenReturn(platformUserIdentity());
+    when(organizationService.getUserHandler()).thenReturn(userHandler);
+    when(userHandler.findUserByName(USERNAME, UserStatus.ENABLED)).thenReturn(user);
+
+    Authentication authentication = authenticate();
+
+    verify(conversationRegistry).unregister(any(StateKey.class), eq(false));
+    assertEquals(USERNAME, ((UserPrincipal) authentication.getPrincipal()).getName());
+  }
+
+  @Test
   void wrapsAnInternalFailureIntoAnAuthenticationServiceException() throws Exception {
     // Why PortalRememberMeFilter must not delete the remember-me cookie when
     // authentication throws: a transient IDM or database failure arrives here,
@@ -209,23 +223,6 @@ class PortalAuthenticationManagerTest {
 
   private Identity platformUserIdentity() {
     return new Identity(USERNAME, List.of(new MembershipEntry("/platform/users")), List.of("users"));
-  }
-
-  /**
-   * {@link PortalAuthenticationManager} caches its Kernel services in static
-   * fields, so one test's mocks would otherwise be reused by the next one after
-   * the static mock is closed.
-   */
-  private void resetStaticServiceCaches() {
-    for (String name : List.of("organizationService", "conversationRegistry", "identityRegistry", "authenticator")) {
-      try {
-        Field field = PortalAuthenticationManager.class.getDeclaredField(name);
-        field.setAccessible(true); // NOSONAR test-only reset of a static cache
-        field.set(null, null);
-      } catch (ReflectiveOperationException e) {
-        throw new IllegalStateException("Cannot reset the static service cache " + name, e);
-      }
-    }
   }
 
 }
