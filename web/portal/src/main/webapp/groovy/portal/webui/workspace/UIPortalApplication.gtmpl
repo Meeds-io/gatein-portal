@@ -94,6 +94,12 @@
   if (brandingService.getPageBackgroundPosition() != null) {
     bodyStyle += "--allPagesBackgroundPosition: " + brandingService.getPageBackgroundPosition() + ";";
   }
+  if (brandingService.getPageBackgroundAttachment() != null) {
+    /* The site background paints on the scroll container, where "scroll" would mean
+       fixed with regard to that box; "local" is what makes it follow the content. */
+    def pageBackgroundAttachment = brandingService.getPageBackgroundAttachment();
+    bodyStyle += "--allPagesBackgroundAttachment: " + (pageBackgroundAttachment == "scroll" ? "local" : pageBackgroundAttachment) + ";";
+  }
   if (brandingService.getPageWidth() != null) {
     bodyStyle += "--allPagesWidth: " + brandingService.getPageWidth() + ";";
   }

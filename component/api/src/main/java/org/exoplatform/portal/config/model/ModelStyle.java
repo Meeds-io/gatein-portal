@@ -67,6 +67,8 @@ public class ModelStyle implements Serializable {
 
   private String            backgroundRepeat;
 
+  private String            backgroundAttachment;
+
   private String            textTitleColor;
 
   private String            textTitleFontSize;
